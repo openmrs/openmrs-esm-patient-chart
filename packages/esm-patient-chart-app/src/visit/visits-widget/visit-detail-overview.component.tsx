@@ -1,37 +1,34 @@
 import React from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, OpenmrsResource, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { Observation, useVisits } from './visit.resource';
-import { EncountersTableLifecycle } from './encounters-table/encounters-table.component';
+import { mapEncounters, useVisits } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
+import { ChartConfig } from '../../config-schema';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
 }
 
-export interface FormattedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  form: OpenmrsResource;
-  obs: Array<Observation>;
-  provider: string;
-  visitType: string;
-  visitUuid: string;
-}
-
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
   const { visits, isError, isLoading } = useVisits(patientUuid);
-  const { showAllEncountersTab } = useConfig();
+  const { showAllEncountersTab } = useConfig<ChartConfig>();
 
   const visitsWithEncounters = visits
     ?.filter((visit) => visit.encounters.length)
-    ?.flatMap((visitWithEncounters) => mapEncounters(visitWithEncounters));
+    ?.flatMap((visitWithEncounters) => {
+      return mapEncounters(
+        visitWithEncounters,
+        visitWithEncounters.uuid,
+        visitWithEncounters.visitType.uuid,
+        visitWithEncounters.startDatetime,
+        visitWithEncounters.stopDatetime,
+      );
+    });
 
   return (
     <div className={styles.tabs}>
@@ -39,9 +36,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         <TabList aria-label="Visit detail tabs" contained>
           <Tab className={styles.tab} id="visit-summaries-tab">
             {t('visitSummaries', 'Visit summaries')}
-          </Tab>
-          <Tab className={styles.tab} id="all-encounters-tab">
-            {t('allEncounters', 'All encounters')}
           </Tab>
           {showAllEncountersTab ? (
             <Tab className={styles.tab} id="all-encounters-tab">
@@ -74,37 +68,25 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                       ) : null}
                     </div>
                   </div>
-                  <VisitSummary
-                    encounters={visit.encounters}
-                    patientUuid={patientUuid}
-                    visitUuid={visit.uuid}
-                    visitTypeUuid={visit.visitType.uuid}
-                    visitStartDatetime={visit.startDatetime}
-                    visitStopDatetime={visit.stopDatetime}
-                  />
+                  <VisitSummary visit={visit} patientUuid={patientUuid} />
                 </div>
               ))
             ) : (
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
             )}
           </TabPanel>
-          <TabPanel>
-            {isLoading ? (
-              <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-            ) : isError ? (
-              <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
-            ) : visits?.length ? (
-              <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
-            ) : (
-              <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
-            )}
-          </TabPanel>
-          {showAllEncountersTab ? (
+          {showAllEncountersTab && (
             <TabPanel>
-              <EncountersTableLifecycle patientUuid={patientUuid} />
+              {isLoading ? (
+                <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+              ) : isError ? (
+                <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
+              ) : visits?.length ? (
+                <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
+              ) : (
+                <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
+              )}
             </TabPanel>
-          ) : (
-            <></>
           )}
         </TabPanels>
       </Tabs>
@@ -113,18 +95,3 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
 }
 
 export default VisitDetailOverviewComponent;
-
-export function mapEncounters(visit) {
-  return visit?.encounters?.map((encounter) => ({
-    id: encounter?.uuid,
-    datetime: encounter?.encounterDatetime,
-    encounterType: encounter?.encounterType?.display,
-    form: encounter?.form,
-    obs: encounter?.obs,
-    provider:
-      encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
-    visitUuid: visit?.uuid,
-    visitType: visit?.visitType?.name,
-    visitTypeUuid: visit?.visitType.uuid,
-  }));
-}

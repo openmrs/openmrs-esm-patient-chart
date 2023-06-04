@@ -23,8 +23,9 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit, TrashCan } from '@carbon/react/icons';
+import { Edit, TrashCan, Document } from '@carbon/react/icons';
 import {
+  Visit,
   formatDatetime,
   getConfig,
   isDesktop,
@@ -34,14 +35,17 @@ import {
   showToast,
   useLayoutType,
   usePagination,
+  useSession,
+  userHasAccess,
 } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import isEmpty from 'lodash-es/isEmpty';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
-import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import { deleteEncounter } from './visits-table.resource';
 import styles from './visits-table.scss';
+import { MappedEncounter } from '../../visit.resource';
+import { KeyedMutator } from 'swr';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -61,6 +65,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const visitCount = 20;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
+  const session = useSession();
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
   useEffect(() => {
@@ -260,40 +265,42 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                               flipped
                             >
                               <OverflowMenuItem
-                                className={styles.menuItem}
-                                itemText={t('editThisEncounter', 'Edit this encounter')}
-                                size={desktopLayout ? 'sm' : 'lg'}
-                                onClick={() => {
-                                  launchWorkspace(
-                                    visits[index]?.form?.uuid,
-                                    visits[index]?.visitUuid,
-                                    visits[index]?.id,
-                                    visits[index]?.form?.display,
-                                    visits[index]?.visitTypeUuid,
-                                    visits[index]?.visitStartDatetime,
-                                    visits[index]?.visitStopDatetime,
-                                  );
-                                }}
-                              >
-                                {t('editThisEncounter', 'Edit this encounter')}
-                              </OverflowMenuItem>
-                              <OverflowMenuItem
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
                                 itemText={t('goToThisEncounter', 'Go to this encounter')}
-                              >
-                                {t('goToThisEncounter', 'Go to this encounter')}
-                              </OverflowMenuItem>
-                              <OverflowMenuItem
-                                size={desktopLayout ? 'sm' : 'lg'}
-                                className={styles.menuItem}
-                                itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
-                                hasDivider
-                                isDelete
-                              >
-                                itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                              </OverflowMenuItem>
+                              />
+                              {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
+                                <>
+                                  {visits[index]?.form?.uuid && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      itemText={t('editThisEncounter', 'Edit this encounter')}
+                                      size={desktopLayout ? 'sm' : 'lg'}
+                                      onClick={() => {
+                                        launchWorkspace(
+                                          visits[index]?.form?.uuid,
+                                          visits[index]?.visitUuid,
+                                          visits[index]?.id,
+                                          visits[index]?.form?.display,
+                                          visits[index]?.visitTypeUuid,
+                                          visits[index]?.visitStartDatetime,
+                                          visits[index]?.visitStopDatetime,
+                                        );
+                                      }}
+                                    />
+                                  )}
+                                  <OverflowMenuItem
+                                    size={desktopLayout ? 'sm' : 'lg'}
+                                    className={styles.menuItem}
+                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                    onClick={() => {
+                                      handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display);
+                                    }}
+                                    hasDivider
+                                    isDelete
+                                  />
+                                </>
+                              )}
                             </OverflowMenu>
                           </Layer>
                         </TableCell>
@@ -303,33 +310,38 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
-                          {visits[index]?.form?.uuid && (
-                            <Button
-                              kind="ghost"
-                              onClick={() => {
-                                launchWorkspace(
-                                  visits[index].form.uuid,
-                                  visits[index].visitUuid,
-                                  visits[index].id,
-                                  visits[index].form.display,
-                                  visits[index].visitTypeUuid,
-                                  visits[index]?.visitStartDatetime,
-                                  visits[index]?.visitStopDatetime,
-                                );
-                              }}
-                              renderIcon={(props) => <Edit size={16} {...props} />}
-                            >
-                              {t('editThisEncounter', 'Edit this encounter')}
-                            </Button>
-                          )}
-                          {visits[index]?.form?.display && (
-                            <Button
-                              kind="danger--ghost"
-                              onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
-                              renderIcon={(props) => <TrashCan size={16} {...props} />}
-                            >
-                              {t('deleteThisEncounter', 'Delete this encounter')}
-                            </Button>
+                          <Button kind="ghost" renderIcon={(props) => <Document size={16} {...props} />}>
+                            {t('goToThisEncounter', 'Go to this encounter')}
+                          </Button>
+                          {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
+                            <>
+                              {visits[index]?.form?.uuid && (
+                                <Button
+                                  kind="ghost"
+                                  onClick={() => {
+                                    launchWorkspace(
+                                      visits[index].form.uuid,
+                                      visits[index].visitUuid,
+                                      visits[index].id,
+                                      visits[index].form.display,
+                                      visits[index].visitTypeUuid,
+                                      visits[index]?.visitStartDatetime,
+                                      visits[index]?.visitStopDatetime,
+                                    );
+                                  }}
+                                  renderIcon={(props) => <Edit size={16} {...props} />}
+                                >
+                                  {t('editThisEncounter', 'Edit this encounter')}
+                                </Button>
+                              )}
+                              <Button
+                                kind="danger--ghost"
+                                onClick={() => handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display)}
+                                renderIcon={(props) => <TrashCan size={16} {...props} />}
+                              >
+                                {t('deleteThisEncounter', 'Delete this encounter')}
+                              </Button>
+                            </>
                           )}
                         </>
                       </TableExpandedRow>

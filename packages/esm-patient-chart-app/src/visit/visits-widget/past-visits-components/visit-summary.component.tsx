@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { Order, Encounter, Note, Observation, OrderItem, Diagnosis } from '../visit.resource';
+import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType, Visit } from '@openmrs/esm-framework';
+import { Order, Encounter, Note, Observation, OrderItem, Diagnosis, mapEncounters } from '../visit.resource';
 import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -16,35 +16,11 @@ interface DiagnosisItem {
 }
 
 interface VisitSummaryProps {
-  encounters: Array<Encounter | OpenmrsResource>;
+  visit: Visit;
   patientUuid: string;
-  visitUuid: string;
-  visitTypeUuid: string;
-  visitStartDatetime?: string;
-  visitStopDatetime?: string;
 }
 
-export interface MappedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  form: OpenmrsResource;
-  obs: Array<Observation>;
-  provider: string;
-  visitUuid: string;
-  visitTypeUuid: string;
-  visitStartDatetime?: string;
-  visitStopDatetime?: string;
-}
-
-const VisitSummary: React.FC<VisitSummaryProps> = ({
-  encounters,
-  patientUuid,
-  visitUuid,
-  visitTypeUuid,
-  visitStartDatetime,
-  visitStopDatetime,
-}) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -58,7 +34,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
     const notes: Array<Note> = [];
 
     // Iterating through every Encounter
-    encounters.forEach((enc: Encounter) => {
+    visit?.encounters.forEach((enc: Encounter) => {
       // Orders of every encounter put in a single array.
       medications.push(
         ...enc.orders.map((order: Order) => ({
@@ -101,14 +77,14 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
     });
 
     return [diagnoses, notes, medications];
-  }, [config.notesConceptUuids, encounters]);
+  }, [config.notesConceptUuids, visit?.encounters]);
 
   const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
-    const encounterIds = encounters.map((e) => `Encounter/${e.uuid}`);
+    const encounterIds = visit?.encounters.map((e) => `Encounter/${e.uuid}`);
     return ([entry]) => {
       return encounterIds.includes(entry.encounter?.reference);
     };
-  }, [encounters]);
+  }, [visit?.encounters]);
 
   return (
     <div className={styles.summaryContainer}>
@@ -145,7 +121,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
           >
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="encounters-tab" disabled={encounters.length <= 0 && config.disableEmptyTabs}>
+          <Tab
+            className={styles.tab}
+            id="encounters-tab"
+            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+          >
             {t('encounters_title', 'Encounters')}
           </Tab>
         </TabList>
@@ -154,14 +134,20 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
             <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters as Array<Encounter>} />
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
             <VisitsTable
-              visits={mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime)}
+              visits={mapEncounters(
+                visit,
+                visit?.uuid,
+                visit?.visitType?.uuid,
+                visit?.startDatetime,
+                visit?.stopDatetime,
+              )}
               showAllEncounters={false}
               patientUuid={patientUuid}
             />
@@ -173,19 +159,3 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
 };
 
 export default VisitSummary;
-
-export function mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime) {
-  return encounters?.map((encounter) => ({
-    id: encounter?.uuid,
-    datetime: encounter?.encounterDatetime,
-    encounterType: encounter?.encounterType?.display,
-    form: encounter?.form,
-    obs: encounter?.obs,
-    visitUuid: visitUuid,
-    visitTypeUuid: visitTypeUuid,
-    visitStartDatetime: visitStartDatetime,
-    visitStopDatetime: visitStopDatetime,
-    provider:
-      encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
-  }));
-}

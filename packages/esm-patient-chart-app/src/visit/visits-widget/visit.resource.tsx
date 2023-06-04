@@ -1,11 +1,11 @@
 import useSWR from 'swr';
-import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, OpenmrsResource, Privilege, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -14,9 +14,9 @@ export function useVisits(patientUuid: string) {
     isError: error,
     isLoading,
     isValidating,
+    mutateVisit: mutate,
   };
 }
-
 export function useEncounters(patientUuid: string) {
   const endpointUrl = '/ws/rest/v1/encounter';
   // setting this up to make it more generic and usable later
@@ -69,28 +69,54 @@ export function usePastVisits(patientUuid: string) {
   };
 }
 
+export function mapEncounters(
+  visit: Visit,
+  visitUuid: string,
+  visitTypeUuid: string,
+  visitStartDatetime: string,
+  visitStopDatetime: string,
+): MappedEncounter[] {
+  return visit?.encounters?.map((encounter) => ({
+    id: encounter?.uuid,
+    datetime: encounter?.encounterDatetime,
+    encounterType: encounter?.encounterType?.display,
+    editPrivilege: encounter?.encounterType?.editPrivilege?.display,
+    form: encounter?.form,
+    obs: encounter?.obs,
+    visitUuid: visitUuid,
+    visitType: visit?.visitType?.name,
+    visitTypeUuid: visitTypeUuid,
+    visitStartDatetime: visitStartDatetime,
+    visitStopDatetime: visitStopDatetime,
+    provider:
+      encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
+  }));
+}
+
+export interface MappedEncounter {
+  id: string;
+  datetime: string;
+  encounterType: string;
+  editPrivilege: string;
+  form: OpenmrsResource;
+  obs: Array<Observation>;
+  provider: string;
+  visitUuid: string;
+  visitType: string;
+  visitTypeUuid: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
+}
 export interface Encounter {
   uuid: string;
   diagnoses: Array<Diagnosis>;
   encounterDatetime: string;
-  encounterProviders: Array<{
-    uuid: string;
-    display: string;
-    encounterRole: {
-      uuid: string;
-      display: string;
-    };
-    provider: {
-      uuid: string;
-      person: {
-        uuid: string;
-        display: string;
-      };
-    };
-  }>;
+  encounterProviders: Array<EncounterProvider>;
   encounterType: {
     uuid: string;
     display: string;
+    viewPrivilege: Privilege;
+    editPrivilege: Privilege;
   };
   obs: Array<Observation>;
   orders: Array<Order>;

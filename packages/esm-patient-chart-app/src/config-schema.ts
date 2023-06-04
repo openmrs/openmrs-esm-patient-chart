@@ -32,7 +32,7 @@ export const esmPatientChartSchema = {
   showAllEncountersTab: {
     _type: Type.Boolean,
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
-    _default: false,
+    _default: true,
   },
   startVisitLabel: {
     _type: Type.String,
@@ -126,6 +126,7 @@ export interface ChartConfig {
   }>;
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
+  showAllEncountersTab: boolean;
   defaultFacilityUrl: string;
   showUpcomingAppointments: boolean;
   logo: {
