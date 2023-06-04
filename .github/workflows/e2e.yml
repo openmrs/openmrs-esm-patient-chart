@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  testOnPR:
+  test-on-pr:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
