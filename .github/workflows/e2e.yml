@@ -98,7 +98,7 @@ jobs:
         run: yarn start --sources 'packages/esm-*-app/' --backend "http://localhost:9000" --port 8180 & # Refer to O3-1994
 
       - name: Run E2E tests
-        run: yarn playwright test
+        run: yarn test-e2e
 
       - name: Upload report
         uses: actions/upload-artifact@v3
