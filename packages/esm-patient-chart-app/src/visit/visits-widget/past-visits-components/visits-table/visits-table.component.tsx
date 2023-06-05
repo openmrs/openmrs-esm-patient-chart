@@ -23,7 +23,7 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit, TrashCan, Document } from '@carbon/react/icons';
+import { Edit, TrashCan } from '@carbon/react/icons';
 import {
   Visit,
   formatDatetime,
@@ -310,9 +310,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
-                          <Button kind="ghost" renderIcon={(props) => <Document size={16} {...props} />}>
-                            {t('goToThisEncounter', 'Go to this encounter')}
-                          </Button>
                           {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
                             <>
                               {visits[index]?.form?.uuid && (

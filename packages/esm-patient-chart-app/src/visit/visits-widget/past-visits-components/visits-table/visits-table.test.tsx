@@ -1,14 +1,16 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, within } from '@testing-library/react';
-import { getConfig, useConfig, usePagination, showModal } from '@openmrs/esm-framework';
+import { getConfig, useConfig, usePagination, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { renderWithSwr } from '../../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../../../../__mocks__/visits.mock';
 import VisitsTable from './visits-table.component';
+import { mockPatient } from '../../../../../../../__mocks__/patient.mock';
 
 jest.setTimeout(10000);
 
 const testProps = {
+  patientUuid: mockPatient.id,
   showAllEncounters: true,
   visits: mockEncounters,
 };
@@ -23,6 +25,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
+    userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
       goTo: () => {},

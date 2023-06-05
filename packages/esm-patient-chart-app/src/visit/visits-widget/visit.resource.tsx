@@ -69,13 +69,7 @@ export function usePastVisits(patientUuid: string) {
   };
 }
 
-export function mapEncounters(
-  visit: Visit,
-  visitUuid: string,
-  visitTypeUuid: string,
-  visitStartDatetime: string,
-  visitStopDatetime: string,
-): MappedEncounter[] {
+export function mapEncounters(visit: Visit): MappedEncounter[] {
   return visit?.encounters?.map((encounter) => ({
     id: encounter?.uuid,
     datetime: encounter?.encounterDatetime,
@@ -83,11 +77,11 @@ export function mapEncounters(
     editPrivilege: encounter?.encounterType?.editPrivilege?.display,
     form: encounter?.form,
     obs: encounter?.obs,
-    visitUuid: visitUuid,
+    visitUuid: visit?.uuid,
     visitType: visit?.visitType?.name,
-    visitTypeUuid: visitTypeUuid,
-    visitStartDatetime: visitStartDatetime,
-    visitStopDatetime: visitStopDatetime,
+    visitTypeUuid: visit?.visitType?.uuid,
+    visitStartDatetime: visit?.startDatetime,
+    visitStopDatetime: visit?.stopDatetime,
     provider:
       encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
   }));

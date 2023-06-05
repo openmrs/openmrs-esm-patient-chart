@@ -21,13 +21,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const visitsWithEncounters = visits
     ?.filter((visit) => visit.encounters.length)
     ?.flatMap((visitWithEncounters) => {
-      return mapEncounters(
-        visitWithEncounters,
-        visitWithEncounters.uuid,
-        visitWithEncounters.visitType.uuid,
-        visitWithEncounters.startDatetime,
-        visitWithEncounters.stopDatetime,
-      );
+      return mapEncounters(visitWithEncounters);
     });
 
   return (
