@@ -10,7 +10,7 @@
 
   a {
     @include type.type-style('heading-compact-02');
-    
+
 
     &:hover {
       color: inherit;
@@ -122,8 +122,5 @@
   .dynamicWidth {
     width: 100%;
   }
-
-  :global(.cds--header){
-    z-index: 5;
-  }
 }
+
