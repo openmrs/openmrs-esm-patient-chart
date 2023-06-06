@@ -41,7 +41,7 @@ $actionPanelOffset: 3rem;
         &:hover {
           background-color: $color-gray-30;
         }
-  
+
         &:focus {
           border-color: $interactive-01;
         }
@@ -58,12 +58,12 @@ $actionPanelOffset: 3rem;
     background: #ededed;
     left: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 8000;
     width: 100%;
     display: flex;
     justify-content: stretch;
   }
-  
+
   .chartExtensions {
     background-color: $ui-02;
     flex-basis: 0.75%;
