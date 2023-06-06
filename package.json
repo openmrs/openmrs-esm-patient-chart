@@ -10,15 +10,17 @@
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
     "verify": "turbo run lint && turbo run typescript && yarn run test",
-    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
+    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "postinstall": "husky install",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
     "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
     "coverage": "yarn test --coverage",
-    "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next"
+    "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",
+    "test-e2e": "playwright test"
   },
   "devDependencies": {
     "@openmrs/esm-framework": "next",
+    "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.21",
@@ -40,6 +42,7 @@
     "css-loader": "^6.6.0",
     "d3-selection": "^3.0.0",
     "dayjs": "^1.8.36",
+    "dotenv": "^16.0.3",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
