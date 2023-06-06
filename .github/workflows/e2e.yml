@@ -27,7 +27,6 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Install Playwright Browsers
@@ -66,7 +65,6 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Install Playwright Browsers
