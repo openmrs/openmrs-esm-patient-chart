@@ -12,8 +12,8 @@ export interface Patient {
     birthdate: string;
     birthdateEstimated: boolean;
     dead: boolean;
-    deathDate?: any;
-    causeOfDeath?: any;
+    deathDate?: string;
+    causeOfDeath?: string;
     preferredAddress: {
       address1: string;
       cityVillage: string;
@@ -22,9 +22,9 @@ export interface Patient {
       stateProvince: string;
       countyDistrict: string;
     };
-    attributes: any[];
+    attributes: Array<Record<string, unknown>>;
     voided: boolean;
-    birthtime?: any;
+    birthtime?: string;
     deathdateEstimated: boolean;
     resourceVersion: string;
   };
