@@ -110,7 +110,11 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
                   <li key={r.uuid} className={styles.relationship}>
                     <div>{r.display}</div>
                     <div>{r.relationshipType}</div>
-                    <div>{`${r.relativeAge} ${r.relativeAge === 1 ? 'yr' : 'yrs'}`}</div>
+                    <div>
+                      {`${r.relativeAge ? r.relativeAge : '--'} ${
+                        r.relativeAge ? (r.relativeAge === 1 ? 'yr' : 'yrs') : ''
+                      }`}
+                    </div>
                   </li>
                 ))}
               </ul>
