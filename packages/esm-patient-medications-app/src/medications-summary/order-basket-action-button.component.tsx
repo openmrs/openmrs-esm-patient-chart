@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
@@ -17,7 +17,7 @@ const OrderBasketActionButton: React.FC = () => {
 
   const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
 
-  const patientOrderItems = getOrderItems(items, patientUuid);
+  const patientOrderItems = useMemo(() => getOrderItems(items, patientUuid), [items, patientUuid]);
 
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
