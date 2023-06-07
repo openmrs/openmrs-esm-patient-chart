@@ -82,10 +82,21 @@ function setupOpenMRS() {
         name: 'charts-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 0,
-        load: getSyncLifecycle(createDashboardLink(summaryDashboardMeta), {
-          featureName: 'summary-dashboard',
-          moduleName,
-        }),
+        // t('Summary_link', 'Patient Summary')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...summaryDashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Summary_link', { defaultValue: 'Patient Summary', ns: moduleName }) ??
+                  'Patient Summary',
+              ),
+          }),
+          {
+            featureName: 'summary-dashboard',
+            moduleName,
+          },
+        ),
         meta: summaryDashboardMeta,
         online: true,
         offline: true,
@@ -166,7 +177,17 @@ function setupOpenMRS() {
         name: 'encounters-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 5,
-        load: getSyncLifecycle(createDashboardLink(encountersDashboardMeta), { featureName: 'encounter', moduleName }),
+        // t('Encounters_link', 'Visits')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...encountersDashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Encounters_link', { defaultValue: 'Visits', ns: moduleName }) ?? 'Visits',
+              ),
+          }),
+          { featureName: 'encounter', moduleName },
+        ),
         meta: encountersDashboardMeta,
         online: true,
         offline: true,

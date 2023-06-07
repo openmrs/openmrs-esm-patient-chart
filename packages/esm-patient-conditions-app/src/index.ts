@@ -52,7 +52,17 @@ function setupOpenMRS() {
         name: 'conditions-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 7,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('Conditions_link', 'Conditions')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Conditions_link', { defaultValue: 'Conditions', ns: moduleName }) ?? 'Conditions',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
       },
       {

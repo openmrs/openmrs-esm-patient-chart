@@ -40,6 +40,7 @@ function setupOpenMRS() {
         name: 'attachments-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 9,
+        // t('Attachments_link', 'Attachments')
         load: getSyncLifecycle(
           createDashboardLink({
             ...dashboardMeta,

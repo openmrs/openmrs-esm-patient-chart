@@ -45,7 +45,17 @@ function setupOpenMRS() {
         name: 'programs-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 10,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('Programs_link', 'Programs')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Programs_link', { defaultValue: 'Programs', ns: moduleName }) ?? 'Programs',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
       },
       {

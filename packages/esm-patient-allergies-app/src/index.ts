@@ -62,10 +62,14 @@ function setupOpenMRS() {
         name: 'allergies-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 6,
+        // t('Allergies_link', 'Allergies')
         load: getSyncLifecycle(
           createDashboardLink({
             ...dashboardMeta,
-            title: window.i18next.t('Allergies_dashboard', { defaultValue: 'Allergies', ns: moduleName }),
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Allergies_link', { defaultValue: 'Allergies', ns: moduleName }) ?? 'Allergies',
+              ),
           }),
           options,
         ),
