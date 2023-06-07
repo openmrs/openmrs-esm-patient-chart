@@ -5,11 +5,15 @@ import { DashboardExtension } from '@openmrs/esm-patient-common-lib';
 
 export const genericDashboardConfigSchema = {
   title: {
-    _default: 'New Dashboard',
+    _description: 'The display string for this dashboard',
+    _type: Type.String,
+  },
+  path: {
+    _description: 'The URL fragment this link points to',
     _type: Type.String,
   },
   slot: {
-    _default: 'new-dashboard-slot',
+    _description: 'The slot that this dashbaord config renders',
     _type: Type.String,
   },
   columns: {
@@ -24,6 +28,7 @@ export const genericDashboardConfigSchema = {
 };
 
 export interface GenericDashboardConfig {
+  path: string;
   title: string;
   /** This gets used by the patient chart when it renders the dashboard itself. */
   slot: string;
@@ -34,10 +39,10 @@ interface GenericDashboardProps {
 }
 
 export default function GenericDashboard({ basePath }: GenericDashboardProps) {
-  const config = useConfig() as GenericDashboardConfig;
+  const config = useConfig<GenericDashboardConfig>();
   return (
     <BrowserRouter>
-      <DashboardExtension title={config.title} basePath={basePath} />
+      <DashboardExtension path={config.path} title={config.title} basePath={basePath} />
     </BrowserRouter>
   );
 }

@@ -40,10 +40,19 @@ function setupOpenMRS() {
         name: 'attachments-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 9,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), {
-          featureName: 'attachments-dashboard-link',
-          moduleName,
-        }),
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('Attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
+              ),
+          }),
+          {
+            featureName: 'attachments-dashboard-link',
+            moduleName,
+          },
+        ),
         meta: dashboardMeta,
       },
       {

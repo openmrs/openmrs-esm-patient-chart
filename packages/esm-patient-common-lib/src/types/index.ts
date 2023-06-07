@@ -8,7 +8,8 @@ export interface DashbardConfig {
 }
 
 export interface DashboardLinkConfig {
-  title: string | (() => string) | (() => Promise<string>);
+  path: string;
+  title: string | (() => string | Promise<string>);
 }
 
 export interface DashboardConfig extends DashboardLinkConfig {
