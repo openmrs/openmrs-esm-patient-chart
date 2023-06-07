@@ -42,3 +42,19 @@ export interface Attribute {
 export interface PersonFetchResponse {
   person: { uuid: string; dead: boolean; deathDate: Date; type: string };
 }
+
+export interface CohortResponse {
+  results: Array<CohortMember>;
+}
+interface CohortMember {
+  uuid: string;
+  patient: OpenmrsResource;
+  cohort: Cohort;
+}
+
+interface Cohort {
+  uuid: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}

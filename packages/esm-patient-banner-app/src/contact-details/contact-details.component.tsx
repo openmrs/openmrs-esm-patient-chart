@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, navigate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
-import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { usePatientContactAttributes, usePatientListsForPatient } from '../hooks/usePatientAttributes';
 import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
@@ -13,6 +13,48 @@ interface ContactDetailsProps {
   patientId: string;
   deceased: boolean | string;
 }
+
+const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+  const { data: cohorts, isLoading, mutateLists } = usePatientListsForPatient(patientUuid);
+  const { t } = useTranslation();
+
+  if (isLoading) {
+    return <InlineLoading />;
+  }
+
+  if (cohorts.length > 0) {
+    const sorted = cohorts.sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime());
+
+    const slicedLists = sorted.slice(0, 3);
+    return (
+      <>
+        <p className={styles.heading}>
+          {t('patientLists', 'Patient Lists ({totalLists})', {
+            totalLists: cohorts.length,
+          })}
+        </p>
+        {slicedLists.map((cohort) => (
+          <p>
+            <ConfigurableLink
+              to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`}
+              className={styles.pLink}
+              key={cohort.uuid}
+            >
+              {cohort.name}
+            </ConfigurableLink>
+          </p>
+        ))}
+        <p>
+          {cohorts.length > 3
+            ? t('seeMore', 'see all {moreLists} lists', {
+                moreLists: cohorts.length - 3,
+              })
+            : ''}
+        </p>
+      </>
+    );
+  }
+};
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
@@ -144,7 +186,9 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patie
         <div className={styles.col}>
           <Relationships patientId={patientId} />
         </div>
-        <div className={styles.col}>{/* Patient lists go here */}</div>
+        <div className={styles.col}>
+          <PatientList patientUuid={patientId} />
+        </div>
       </div>
     </div>
   );
