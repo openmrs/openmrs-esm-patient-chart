@@ -84,3 +84,6 @@ dist
 !.yarn/sdks
 !.yarn/versions
 ~
+
+# i18next using moduleName as a namespace
+moduleName/

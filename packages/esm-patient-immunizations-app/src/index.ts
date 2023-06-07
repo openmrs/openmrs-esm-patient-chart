@@ -46,13 +46,13 @@ function setupOpenMRS() {
         name: 'immunization-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 8,
-        // t('Immunizations_link', 'Immunizations')
+        // t('immunizations_link', 'Immunizations')
         load: getSyncLifecycle(
           createDashboardLink({
             ...dashboardMeta,
             title: () =>
               Promise.resolve(
-                window.i18next?.t('Immunizations_link', { defaultValue: 'Immunizations', ns: moduleName }) ??
+                window.i18next?.t('immunizations_link', { defaultValue: 'Immunizations', ns: moduleName }) ??
                   'Immunizations',
               ),
           }),

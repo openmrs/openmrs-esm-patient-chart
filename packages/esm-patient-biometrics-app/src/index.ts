@@ -57,13 +57,13 @@ function setupOpenMRS() {
         name: 'results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 2,
-        // t('Biometrics_link', 'Vitals & Biometrics')
+        // t('biometrics_link', 'Vitals & Biometrics')
         load: getSyncLifecycle(
           createDashboardLink({
             ...dashboardMeta,
             title: () =>
               Promise.resolve(
-                window.i18next?.t('Biometrics_link', { defaultValue: 'Vitals & Biometrics', ns: moduleName }) ??
+                window.i18next?.t('biometrics_link', { defaultValue: 'Vitals & Biometrics', ns: moduleName }) ??
                   'Vitals & Biometrics',
               ),
           }),

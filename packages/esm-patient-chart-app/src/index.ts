@@ -32,19 +32,19 @@ function setupOpenMRS() {
   /**
    * This comment tells i18n to still keep the following translation keys (DO NOT DELETE THESE):
    *
-   * t('patientBreadcrumb')
-   * t("Patient Summary dashboard")
-   * t("Allergies dashboard")
-   * t("Appointments dashboard")
-   * t("Vitals & Biometrics dashboard")
-   * t("Medications dashboard")
-   * t("Visits dashboard")
-   * t("Conditions dashboard")
-   * t("Attachments dashboard")
-   * t("Programs dashboard")
-   * t("Offline Actions dashboard")
-   * t("Forms & Notes dashboard")
-   * t("Test Results dashboard")
+   * t('patientBreadcrumb', 'Patient')
+   * t('Patient Summary dashboard', 'Patient Summary dashboard')
+   * t('Allergies dashboard', 'Allergies dashboard')
+   * t('Appointments dashboard', 'Appointments dashboard')
+   * t('Vitals & Biometrics dashboard', 'Vitals & Biometrics dashboard')
+   * t('Medications dashboard', 'Medications dashboard')
+   * t('Visits dashboard', 'Visits dashboard')
+   * t('Conditions dashboard', 'Conditions dashboard')
+   * t('Attachments dashboard', 'Attachments dashboard')
+   * t('Programs dashboard', 'Programs dashboard')
+   * t('Offline Actions dashboard', 'Offline Actions dashboard')
+   * t('Forms & Notes dashboard', 'Forms & Notes dashboard')
+   * t('Test Results dashboard', 'Test Results dashboard')
    */
   registerBreadcrumbs([
     {
@@ -82,13 +82,13 @@ function setupOpenMRS() {
         name: 'charts-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 0,
-        // t('Summary_link', 'Patient Summary')
+        // t('summary_link', 'Patient Summary')
         load: getSyncLifecycle(
           createDashboardLink({
             ...summaryDashboardMeta,
             title: () =>
               Promise.resolve(
-                window.i18next?.t('Summary_link', { defaultValue: 'Patient Summary', ns: moduleName }) ??
+                window.i18next?.t('summary_link', { defaultValue: 'Patient Summary', ns: moduleName }) ??
                   'Patient Summary',
               ),
           }),
@@ -177,13 +177,13 @@ function setupOpenMRS() {
         name: 'encounters-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 5,
-        // t('Encounters_link', 'Visits')
+        // t('encounters_link', 'Visits')
         load: getSyncLifecycle(
           createDashboardLink({
             ...encountersDashboardMeta,
             title: () =>
               Promise.resolve(
-                window.i18next?.t('Encounters_link', { defaultValue: 'Visits', ns: moduleName }) ?? 'Visits',
+                window.i18next?.t('encounters_link', { defaultValue: 'Visits', ns: moduleName }) ?? 'Visits',
               ),
           }),
           { featureName: 'encounter', moduleName },
