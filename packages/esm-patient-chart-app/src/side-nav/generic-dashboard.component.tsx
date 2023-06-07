@@ -13,7 +13,7 @@ export const genericDashboardConfigSchema = {
     _type: Type.String,
   },
   slot: {
-    _description: 'The slot that this dashbaord config renders',
+    _description: 'The slot that this dashboard config renders',
     _type: Type.String,
   },
   columns: {
