@@ -87,3 +87,9 @@ dist
 
 # i18next using moduleName as a namespace
 moduleName/
+
+# Playwright and e2e tests
+/test-results/
+/playwright-report/
+/playwright/.cache/
+e2e/storageState.json
