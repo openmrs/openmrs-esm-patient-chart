@@ -11,7 +11,8 @@ interface ContactDetailsProps {
   address: Array<fhir.Address>;
   telecom: Array<fhir.ContactPoint>;
   patientId: string;
-  deceased: boolean | string;
+  deceased: boolean;
+  isPatientBannerSmallSize: boolean;
 }
 
 const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
@@ -24,7 +25,6 @@ const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
 
   if (cohorts.length > 0) {
     const sorted = cohorts.sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime());
-
     const slicedLists = sorted.slice(0, 3);
     return (
       <>
@@ -169,11 +169,21 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId, deceased }) => {
+const ContactDetails: React.FC<ContactDetailsProps> = ({
+  address,
+  telecom,
+  patientId,
+  deceased,
+  isPatientBannerSmallSize,
+}) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
   return (
-    <div className={`${styles.contactDetails} ${deceased ? styles.deceased : ''}`}>
+    <div
+      className={`${styles.contactDetails} ${deceased && styles.deceased} ${
+        isPatientBannerSmallSize && styles.smallBannerSize
+      }`}
+    >
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />

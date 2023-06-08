@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -25,6 +25,23 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { t } = useTranslation();
   const overflowMenuRef = React.useRef(null);
+  const patientBannerRef = React.useRef(null);
+  const [isPatientBannerSmallSize, setIsPatientBannerSmallSize] = useState(false);
+
+  // eslint-disable-next-line no-console
+  console.log(isPatientBannerSmallSize, 'is it small?');
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // eslint-disable-next-line no-console
+        console.log('changed');
+        setIsPatientBannerSmallSize(entry.contentRect.width < 600);
+      }
+    });
+    resizeObserver.observe(patientBannerRef.current);
+    return () => resizeObserver.unobserve(patientBannerRef.current);
+  }, [patientBannerRef, setIsPatientBannerSmallSize]);
 
   // Ensure we have emptyStateText and record translation keys
   // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
@@ -88,6 +105,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     <div
       className={`${styles.container} ${isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer}`}
       role="banner"
+      ref={patientBannerRef}
     >
       <div
         onClick={handleNavigateToPatientChart}
@@ -163,6 +181,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       </div>
       {showContactDetails && (
         <ContactDetails
+          isPatientBannerSmallSize={isPatientBannerSmallSize}
           address={patient?.address ?? []}
           telecom={patient?.telecom ?? []}
           patientId={patient?.id}
