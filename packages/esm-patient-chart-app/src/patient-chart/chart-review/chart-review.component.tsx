@@ -48,7 +48,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.title === view);
+  const dashboard = dashboards.find((dashboard) => dashboard.path === view);
 
   if (!defaultDashboard) {
     return null;
