@@ -2,10 +2,22 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+// .contactDetailsContainer {
+//   color: $text-02;
+//   width: 100%;
+//   border-top: 1px solid $ui-03;
+
+// }
+
 .contactDetails {
-  color: $text-02;
-  width: 100%;
-  border-top: 1px solid $ui-03;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+
+.smallBannerSize {
+  grid-template-columns: auto;
 }
 
 .heading {
