@@ -6,17 +6,14 @@ import { DashboardExtension } from '@openmrs/esm-patient-common-lib';
 export const genericDashboardConfigSchema = {
   title: {
     _description: 'The display string for this dashboard',
-    _default: '',
     _type: Type.String,
   },
   path: {
     _description: 'The URL fragment this link points to',
-    _default: '',
     _type: Type.String,
   },
   slot: {
     _description: 'The slot that this dashboard config renders',
-    _default: '',
     _type: Type.String,
   },
   columns: {
