@@ -126,19 +126,10 @@
 
 // Overriding styles for RTL support
 html[dir='rtl'] {
-  .headerGlobalBar {
-    & > span:last-child {
-      svg {
-        rotate: 180deg;
-      }
-    }
-  }
-  :global(.omrs-breakpoint-lt-desktop) {
-    .container {}
-  }
   :global(.omrs-breakpoint-gt-tablet) {
     .container {
       margin-left: 2.825rem;
       margin-right: unset;
-    }}
+    }
+  }
 }
