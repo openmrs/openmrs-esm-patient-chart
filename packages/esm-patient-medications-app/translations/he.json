@@ -41,6 +41,7 @@
   "medicationDurationAndUnit": "למשך {duration} {durationUnit}",
   "medicationIndefiniteDuration": "לאורך זמן בלתי מוגבל",
   "medications": "תרופות",
+  "medications_link": "תרופות",
   "modify": "שנה",
   "none": "אין",
   "noResultsForDrugSearch": "אין תוצאות להצגה עבור \"{searchTerm}\"",
