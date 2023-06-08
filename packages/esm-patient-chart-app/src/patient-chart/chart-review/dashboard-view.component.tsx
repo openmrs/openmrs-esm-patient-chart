@@ -18,6 +18,7 @@ function getColumnsLayoutStyle(dashboard: DashboardConfig) {
 export interface DashboardConfig {
   slot: string;
   title: string;
+  path: string;
   columns: number;
   hideDashboardTitle?: boolean;
 }
