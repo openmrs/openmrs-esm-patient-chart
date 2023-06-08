@@ -59,7 +59,17 @@ function setupOpenMRS() {
         name: 'medications-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 3,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('medications_link', 'Medications')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('medications_link', { defaultValue: 'Medications', ns: moduleName }) ?? 'Medications',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
       },
       {

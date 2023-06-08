@@ -7,7 +7,7 @@ export const createDashboardLink = (db: DashboardLinkConfig) => {
   return ({ basePath }: { basePath: string }) => {
     return (
       <BrowserRouter>
-        <DashboardExtension title={db.title} basePath={basePath} />
+        <DashboardExtension basePath={basePath} title={db.title} path={db.path} />
       </BrowserRouter>
     );
   };

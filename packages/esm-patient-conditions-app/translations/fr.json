@@ -7,6 +7,7 @@
   "condition": "Condition",
   "conditionNowVisible": "C'est maintenant visible sur la page des conditions",
   "conditions": "Conditions",
+  "conditions_link": "Conditions",
   "conditionSaved": "Condition enregistrée avec succès",
   "conditionSaveError": "Erreur en enregistrant la condition",
   "currentStatus": "Statut actuel",

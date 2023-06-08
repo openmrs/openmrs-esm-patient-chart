@@ -176,7 +176,7 @@ const EncountersTableLifecycle = ({ patientUuid }) => {
   }
 
   if (!encounters?.length) {
-    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('Encounters', 'Encounters')} />;
+    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('encounters', 'Encounters')} />;
   }
 
   return <EncountersTable encounters={encounters} showAllEncounters />;
