@@ -100,3 +100,14 @@ $actionPanelOffset: 3rem;
   height: 1px;
   width: 2.5rem;
 }
+
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  :global(.omrs-breakpoint-gt-tablet) {
+    .sideRail {
+      right: unset;
+      left: 0;
+    }
+  }
+}
