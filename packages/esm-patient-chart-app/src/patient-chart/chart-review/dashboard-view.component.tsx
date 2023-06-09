@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMatch } from 'react-router-dom';
 import {
   Extension,
@@ -7,7 +7,7 @@ import {
   getExtensionNameFromId,
   useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
-import { basePath, dashboardPath } from '../../constants';
+import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 
 function getColumnsLayoutStyle(dashboard: DashboardConfig) {
@@ -17,7 +17,7 @@ function getColumnsLayoutStyle(dashboard: DashboardConfig) {
 
 export interface DashboardConfig {
   slot: string;
-  title: string;
+  title: string | (() => string | Promise<string>);
   path: string;
   columns: number;
   hideDashboardTitle?: boolean;
@@ -36,7 +36,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   } = useMatch(dashboardPath);
   const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
-  const state = React.useMemo(
+  const state = useMemo(
     () => ({
       basePath: view,
       patient,
@@ -45,18 +45,28 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
     [patient, patientUuid, view],
   );
 
-  const wrapItem = React.useCallback(
-    (slot: React.ReactNode, extension: ExtensionData) => {
+  const wrapItem = useCallback(
+    (slot: ReactNode, extension: ExtensionData) => {
       const { columnSpan = 1 } = widgetMetas[getExtensionNameFromId(extension.extensionId)];
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
     [widgetMetas],
   );
 
+  const [resolvedTitle, setResolvedTitle] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (typeof dashboard?.title === 'function') {
+      Promise.resolve(dashboard.title()).then(setResolvedTitle);
+    } else if (typeof dashboard?.title === 'string') {
+      setResolvedTitle(dashboard.title);
+    }
+  }, [dashboard]);
+
   return (
     <>
       <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
-      {!dashboard.hideDashboardTitle && dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
+      {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
       <ExtensionSlot
         key={dashboard.slot}
         extensionSlotName={dashboard.slot}
