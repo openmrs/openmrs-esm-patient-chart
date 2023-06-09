@@ -11,6 +11,7 @@
   "countyDistrict": "District",
   "deceased": "Deceased",
   "district": "District",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "female": "Female",
   "hideDetails": "Hide details",
   "loading": "Loading...",

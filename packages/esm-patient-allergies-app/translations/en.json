@@ -11,6 +11,7 @@
   "dateOfOnsetAndComments": "Date of onset and comments",
   "discard": "Discard",
   "drug": "Drug",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "environmental": "Environmental",
   "errorFetchingData": "Error fetching allergens and reactions",
   "food": "Food",

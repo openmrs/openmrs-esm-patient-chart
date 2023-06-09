@@ -140,6 +140,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
             </div>
           );
         }
+        // Ensure we have the emptyStateText translation key
+        // t('emptyStateText', 'There are no {displayText} to display for this patient')
         return (
           <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
         );

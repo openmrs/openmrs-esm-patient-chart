@@ -218,6 +218,8 @@ const Trendline: React.FC<TrendlineProps> = ({
   }
 
   if (obs.length === 0) {
+    // Ensure we have the emptyStateText translation key
+    // t('emptyStateText', 'There are no {displayText} to display for this patient')
     return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
   }
 

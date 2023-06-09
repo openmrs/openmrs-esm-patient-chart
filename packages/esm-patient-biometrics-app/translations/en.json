@@ -3,6 +3,7 @@
   "biometricDisplayed": "Biometric displayed",
   "biometrics": "Biometrics",
   "biometrics_lower": "biometrics",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "goToSummary": "Go to Summary",
   "loading": "Loading",
   "seeAll": "See all",

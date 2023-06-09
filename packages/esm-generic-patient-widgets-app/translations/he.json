@@ -1,5 +1,6 @@
 {
   "chartView": "תצוגת תרשים",
   "displaying": "מציג",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "tableView": "תצוגת טבלה"
 }

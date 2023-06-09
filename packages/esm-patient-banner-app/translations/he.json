@@ -4,6 +4,7 @@
   "address": "כתובת",
   "contactDetails": "פרטי יצירת קשר",
   "deceased": "נפטר",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "loading": "טוען...",
   "relationships": "יחסים",
   "showAllDetails": "הצג את כל הפרטים",

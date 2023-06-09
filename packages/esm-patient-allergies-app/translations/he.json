@@ -13,6 +13,7 @@
   "dateOfFirstOnset": "תאריך תחילת ההתפתחות",
   "discard": "בטל",
   "drug": "תרופה",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "environmental": "סביבתי",
   "errorFetchingData": "שגיאה בקבלת נתוני החומרים האלרגניים והתגובות",
   "food": "מזון",

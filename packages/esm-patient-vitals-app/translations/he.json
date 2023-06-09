@@ -9,6 +9,7 @@
   "checkForValidity": "חלק מהערכים שהוזנו אינם תקפים",
   "diastolic": "דיאסטולי",
   "discard": "בטל",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "goToSummary": "עבור לסיכום",
   "heartRate": "קצב לב",
   "height": "גובה",

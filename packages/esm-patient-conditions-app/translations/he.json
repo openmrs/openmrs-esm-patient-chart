@@ -12,6 +12,7 @@
   "conditionSaveError": "שגיאה בשמירת המצב",
   "currentStatus": "מצב נוכחי",
   "dateOfOnset": "תאריך התחלה",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "endDate": "תאריך סיום",
   "enterCondition": "הזן מצב",
   "inactive": "לא פעיל",

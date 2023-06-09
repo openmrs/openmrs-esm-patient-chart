@@ -26,6 +26,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { t } = useTranslation();
   const overflowMenuRef = React.useRef(null);
 
+  // Ensure we have the emptyStateText translation key
+  // t('emptyStateText', 'There are no {displayText} to display for this patient')
+
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],

@@ -10,6 +10,7 @@
   "diagnosis": "אבחנה",
   "discard": "בטל",
   "emptyDiagnosisText": "לא נבחרה אבחנה - הכנס אבחנה למטה",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "enterPrimaryDiagnoses": "הזן אבחנות ראשיות",
   "enterSecondaryDiagnoses": "הזן אבחנות משניות",
   "goToSummary": "עבור לסיכום",

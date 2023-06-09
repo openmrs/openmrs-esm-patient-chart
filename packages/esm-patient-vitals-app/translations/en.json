@@ -8,6 +8,7 @@
   "checkForValidity": "Some of the values entered are invalid",
   "diastolic": "diastolic",
   "discard": "Discard",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "goToSummary": "Go to Summary",
   "heartRate": "Heart rate",
   "height": "Height",

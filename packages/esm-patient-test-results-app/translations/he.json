@@ -2,6 +2,7 @@
   "backToTimeline": "חזור לציר הזמן",
   "date": "תאריך",
   "dateCollected": "מציג תאריך איסוף",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "moreResultsAvailable": "קיימים עוד תוצאות זמינות",
   "observationsDisplayText": "תצוגת מדדים",
   "ordered": "הוזמן",

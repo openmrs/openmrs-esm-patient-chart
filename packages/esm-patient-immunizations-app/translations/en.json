@@ -1,6 +1,7 @@
 {
   "add": "Add",
   "cancel": "Cancel",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
   "goToSummary": "Go to Summary",
