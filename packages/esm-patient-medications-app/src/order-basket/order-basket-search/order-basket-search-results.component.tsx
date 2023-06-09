@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useRef, useMemo, useEffect, useState, RefObject } from 'react';
 import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,11 @@ export interface OrderBasketSearchResultsProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  searchInputRef: RefObject<HTMLInputElement>;
 }
 
 export default function OrderBasketSearchResults({
+  searchInputRef,
   searchTerm,
   setSearchTerm,
   onSearchResultClicked,
@@ -23,6 +25,17 @@ export default function OrderBasketSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
+  const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
+  function handleClick() {
+    setIsSearchInputCleared(true);
+    setSearchTerm('');
+  }
+  useEffect(() => {
+    if (isSearchIputCleared && searchInputRef.current) {
+      searchInputRef.current.focus();
+      setIsSearchInputCleared(false);
+    }
+  }, [isSearchIputCleared, searchInputRef]);
 
   if (!searchTerm) {
     return null;
@@ -81,7 +94,7 @@ export default function OrderBasketSearchResults({
             </h4>
             <p className={styles.bodyShort01}>
               <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={() => setSearchTerm('')}>
+              <span className={styles.link} role="link" tabIndex={0} onClick={handleClick}>
                 {t('searchAgain', 'search again')}
               </span>{' '}
               <span>{t('usingADifferentTerm', 'using a different term')}</span>
@@ -199,3 +212,11 @@ const DrugSearchSkeleton = () => {
     </div>
   );
 };
+function setIsSearchInputCleared(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
+function useEffect(arg0: () => void, arg1: any[]) {
+  throw new Error('Function not implemented.');
+}
+
