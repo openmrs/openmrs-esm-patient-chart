@@ -1,5 +1,6 @@
 {
   "chartView": "Chart View",
   "displaying": "Displaying",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "tableView": "Table View"
 }

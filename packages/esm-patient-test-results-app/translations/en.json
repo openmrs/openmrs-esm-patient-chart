@@ -2,6 +2,7 @@
   "backToTimeline": "Back to timeline",
   "date": "Date",
   "dateCollected": "Displaying date collected",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "moreResultsAvailable": "More results available",
   "observationsDisplayText": "observations",
   "ordered": "Ordered",

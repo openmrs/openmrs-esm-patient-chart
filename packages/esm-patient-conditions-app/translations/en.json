@@ -18,6 +18,7 @@
   "deleting": "Deleting",
   "edit": "Edit",
   "editCondition": "Edit a Condition",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "endDate": "End date",
   "enterCondition": "Enter condition",
   "errorCreatingCondition": "Error creating condition",

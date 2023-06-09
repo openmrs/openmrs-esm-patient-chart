@@ -33,6 +33,8 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
 
   const { results, currentPage, goTo } = usePagination<ConceptAnswer>(searchResults, 10);
 
+  // Ensure we have the emptyStateText translation key
+  // t('emptyStateText', 'There are no {{displayText}} to display for this patient')
   return (
     <div
       className={`${styles.conceptAnswerOverviewWrapper} ${
