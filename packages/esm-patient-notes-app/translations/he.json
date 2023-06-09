@@ -11,6 +11,7 @@
   "discard": "בטל",
   "emptyDiagnosisText": "לא נבחרה אבחנה - הכנס אבחנה למטה",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
   "enterPrimaryDiagnoses": "הזן אבחנות ראשיות",
   "enterSecondaryDiagnoses": "הזן אבחנות משניות",
   "goToSummary": "עבור לסיכום",

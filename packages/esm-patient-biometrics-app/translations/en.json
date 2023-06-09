@@ -6,6 +6,7 @@
   "emptyStateText": "There are no {{displayText}} to display for this patient",
   "goToSummary": "Go to Summary",
   "loading": "Loading",
+  "record": "Record",
   "seeAll": "See all",
   "weight": "Weight"
 }

@@ -13,6 +13,7 @@
   "currentStatus": "מצב נוכחי",
   "dateOfOnset": "תאריך התחלה",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
   "endDate": "תאריך סיום",
   "enterCondition": "הזן מצב",
   "inactive": "לא פעיל",
