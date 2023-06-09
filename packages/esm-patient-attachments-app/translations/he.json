@@ -15,7 +15,7 @@
   "delete": "מחק",
   "deleteAttachmentConfirmationText": "",
   "deleteImage": "מחק תמונה",
-  "emptyStateText": "אין {displayText} להצגה עבור מטופל זה",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "error": "שגיאה",
   "errorUploading": "שגיאה בהעלאת קובץ",
   "failed": "נכשל",
