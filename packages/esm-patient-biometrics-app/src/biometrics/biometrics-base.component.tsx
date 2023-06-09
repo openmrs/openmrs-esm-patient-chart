@@ -122,7 +122,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
     );
   }
   // Ensure we have the emptyStateText translation key
-  // t('emptyStateText', 'There are no {displayText} to display for this patient')
+  // t('emptyStateText', 'There are no {{displayText}} to display for this patient')
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchBiometricsForm} />;
 };
 

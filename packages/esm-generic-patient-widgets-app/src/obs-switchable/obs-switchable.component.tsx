@@ -69,7 +69,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
           );
         }
         // Ensure we have the emptyStateText translation key
-        // t('emptyStateText', 'There are no {displayText} to display for this patient')
+        // t('emptyStateText', 'There are no {{displayText}} to display for this patient')
         return <EmptyState displayText={config.resultsName} headerTitle={config.title} />;
       })()}
     </>
