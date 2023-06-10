@@ -33,3 +33,11 @@
     color: $text-02;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .desktopHeader, .tabletHeader {
+    text-align: right;
+    padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
+  }
+}

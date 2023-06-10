@@ -19,6 +19,7 @@ module.exports = {
     '!**/vendor/**',
     '!**/src/**/*.test.*',
     '!**/src/declarations.d.tsx',
+    '!**/e2e/**',
   ],
   coverageThreshold: {
     global: {
@@ -29,7 +30,7 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: ['<rootDir>/tools/setupTests.ts'],
-  testPathIgnorePatterns: ['<rootDir>/packages/esm-form-entry-app'],
+  testPathIgnorePatterns: ['<rootDir>/packages/esm-form-entry-app', '<rootDir>/e2e'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost/',

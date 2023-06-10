@@ -100,6 +100,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   );
 
   if (!attachments.length) {
+    // Ensure we have emptyStateText and record translation keys
+    // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
   }
 

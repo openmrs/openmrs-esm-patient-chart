@@ -1,0 +1,23 @@
+
+{
+  "add": "הוסף",
+  "cancel": "ביטול",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
+  "errorSaving": "שגיאה בשמירת החיסון",
+  "expirationDate": "תאריך תפוגה",
+  "goToSummary": "עבור לסיכום",
+  "immunizations": "חיסונים",
+  "immunizations_link": "חיסונים",
+  "lotNumber": "מספר לוט",
+  "manufacturer": "יצרן",
+  "pleaseSelect": "בחר בבקשה",
+  "recentVaccination": "חיסון אחרון",
+  "save": "שמור",
+  "seeAll": "ראה הכל",
+  "sequence": "סדר",
+  "singleDoseOn": "מנת יחידה בתאריך",
+  "vaccinationDate": "תאריך החיסון",
+  "vaccinationSaved": "החיסון נשמר בהצלחה",
+  "vaccine": "חיסון"
+}

@@ -25,6 +25,6 @@ interface GenericNavGroupProps {
 }
 
 export default function GenericNavGroup({ basePath }: GenericNavGroupProps) {
-  const config = useConfig() as GenericNavGroupConfig;
+  const config = useConfig<GenericNavGroupConfig>();
   return <DashboardGroupExtension title={config.title} slotName={config.slotName} basePath={basePath} />;
 }

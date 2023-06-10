@@ -67,7 +67,17 @@ function setupOpenMRS() {
         name: 'forms-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 12,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('forms_link', 'Forms & Notes')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('forms_link', { defaultValue: 'Forms & Notes', ns: moduleName }) ?? 'Forms & Notes',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
         online: true,
         offline: true,
