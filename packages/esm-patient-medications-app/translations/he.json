@@ -28,6 +28,8 @@
   "editFrequencyComboBoxTitle": "תדירות",
   "editRouteComboBoxTitle": "דרך",
   "emptyOrderBasket": "הסל שלך ריק",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
   "endDate": "תאריך סיום",
   "error": "שגיאה",
   "errorCreatingAnEncounter": "שגיאה ביצירת פגישה",

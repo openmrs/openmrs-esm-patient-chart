@@ -126,5 +126,7 @@ export function mapEncounters(visit) {
     visitUuid: visit?.uuid,
     visitType: visit?.visitType?.name,
     visitTypeUuid: visit?.visitType.uuid,
+    visitStartDatetime: visit?.startDatetime,
+    visitStopDatetime: visit?.stopDatetime,
   }));
 }

@@ -4,6 +4,7 @@
   "clinicalForm": "Clinical form",
   "completed": "Completed",
   "editForm": "Edit form",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "form": "Form",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
@@ -27,6 +28,7 @@
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
   "recommended": "Recommended",
+  "record": "Record",
   "searchForAForm": "Search for a form",
   "searchThisList": "Search this list",
   "seeAll": "See all"

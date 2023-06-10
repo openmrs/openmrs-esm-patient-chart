@@ -2,6 +2,8 @@
   "all": "הכל",
   "clinicalForm": "טופס קליני",
   "completed": "הושלם",
+  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
   "form": "טופס",
   "forms_link": "טפסים והערות",
   "formName": "שם הטופס (א-ת)",
