@@ -19,6 +19,7 @@
   "numericInputError": "Must be a number within acceptable ranges",
   "oxygenSaturation": "Oxygen Saturation",
   "pulse": "Pulse",
+  "record": "Record",
   "recordBiometrics": "Record biometrics",
   "recordVitals": "Record vitals",
   "respirationRate": "Respiration Rate",

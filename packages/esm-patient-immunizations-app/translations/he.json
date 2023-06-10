@@ -3,6 +3,7 @@
   "add": "הוסף",
   "cancel": "ביטול",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "record": "רשומה",
   "errorSaving": "שגיאה בשמירת החיסון",
   "expirationDate": "תאריך תפוגה",
   "goToSummary": "עבור לסיכום",

@@ -105,6 +105,7 @@
   "queueAddedSuccessfully": "Patient has been added to the queue successfully.",
   "queueEntryError": "Error adding patient to the queue",
   "recommended": "Recommended",
+  "record": "Record",
   "refills": "Refills",
   "refreshToTryAgain": "Please refresh to try again",
   "searchForAVisitType": "Search for a visit type",

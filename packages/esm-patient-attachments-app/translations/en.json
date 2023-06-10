@@ -33,6 +33,7 @@
   "image": "Image",
   "imageDescription": "Image description",
   "name": "name",
+  "record": "Record",
   "successfullyDeleted": "successfully deleted",
   "type": "Type",
   "uploadComplete": "Upload complete",

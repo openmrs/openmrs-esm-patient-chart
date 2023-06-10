@@ -71,6 +71,7 @@
   "prnReasonPlaceholder": "Reason to take medicine",
   "quantity": "Quantity",
   "quantityToDispense": "Quantity to dispense",
+  "record": "Record",
   "refills": "Refills",
   "removeFromBasket": "Remove from basket",
   "renewedOrdersfalseone": "{count} order(s) being renewed (continued)",
