@@ -14,17 +14,61 @@ test('Add drug allergy to patient', async ({ page, api }) => {
 
   await test.step('When I visit the patient allergies page', async () => {
     await allergiesPage.goto(patient.uuid);
-  });
-  await test.step('And I add a drug allergy', async () => {
     await expect(allergiesPage.page).toHaveURL(
       `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Allergies`,
     );
-    await allergiesPage.addAllergy();
+  });
+  await test.step('And I add a drug allergy', async () => {
+    await allergiesPage.addDrugAllergy();
+    await expect(allergiesPage.savedMessage()).toBeVisible();
   });
   await test.step('Then I should see the allergy in the list', async () => {
     await expect(allergiesPage.drugAllergenOption()).toBeVisible();
     await expect(allergiesPage.reactionOption()).toBeVisible();
-    await expect(allergiesPage.page.getByText('HIGH')).toBeVisible();
+    await expect(allergiesPage.severityOption()).toBeVisible();
+    await expect(allergiesPage.commentMessage()).toBeVisible();
+  });
+});
+
+test('Add food allergy to patient', async ({ page, api }) => {
+  const allergiesPage = new PatientAllergiesPage(page);
+
+  await test.step('When I visit the patient allergies page', async () => {
+    await allergiesPage.goto(patient.uuid);
+    await expect(allergiesPage.page).toHaveURL(
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Allergies`,
+    );
+  });
+  await test.step('And I add a food allergy', async () => {
+    await allergiesPage.addFoodAllergy();
+  });
+  await test.step('Then I should see the allergy in the list', async () => {
+    await expect(allergiesPage.savedMessage()).toBeVisible();
+    await expect(allergiesPage.foodAllergenOption()).toBeVisible();
+    await expect(allergiesPage.reactionOption()).toBeVisible();
+    await expect(allergiesPage.severityOption()).toBeVisible();
+    await expect(allergiesPage.commentMessage()).toBeVisible();
+  });
+});
+
+test('Add environmental allergy to patient', async ({ page, api }) => {
+  const allergiesPage = new PatientAllergiesPage(page);
+
+  await test.step('When I visit the patient allergies page', async () => {
+    await allergiesPage.goto(patient.uuid);
+    await expect(allergiesPage.page).toHaveURL(
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Allergies`,
+    );
+  });
+  await test.step('And I add an environmental allergy', async () => {
+    await allergiesPage.addEnvironmentalAllergy();
+  });
+  await test.step('Then I should see the allergy in the list', async () => {
+    await expect(allergiesPage.savedMessage()).toBeVisible();
+    await expect(allergiesPage.environmentalAllergenOption()).toBeVisible();
+    await expect(allergiesPage.reactionOption()).toBeVisible();
+    await expect(allergiesPage.severityOption()).toBeVisible();
+    await expect(allergiesPage.commentMessage()).toBeVisible();
   });
 });
 
