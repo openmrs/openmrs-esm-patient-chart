@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock',300) }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock',300) }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
