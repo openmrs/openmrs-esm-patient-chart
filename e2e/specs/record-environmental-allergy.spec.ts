@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Add drug allergy to patient', async ({ page, api }) => {
+test('Add environmental allergy to patient', async ({ page, api }) => {
   const allergiesPage = new PatientAllergiesPage(page);
 
   await test.step('When I visit the patient allergies page', async () => {
@@ -18,12 +18,12 @@ test('Add drug allergy to patient', async ({ page, api }) => {
       `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Allergies`,
     );
   });
-  await test.step('And I add a drug allergy', async () => {
-    await allergiesPage.addDrugAllergy();
-    await expect(allergiesPage.savedMessage()).toBeVisible();
+  await test.step('And I add an environmental allergy', async () => {
+    await allergiesPage.addEnvironmentalAllergy();
   });
   await test.step('Then I should see the allergy in the list', async () => {
-    await expect(allergiesPage.drugAllergenOption()).toBeVisible();
+    await expect(allergiesPage.savedMessage()).toBeVisible();
+    await expect(allergiesPage.environmentalAllergenOption()).toBeVisible();
     await expect(allergiesPage.reactionOption()).toBeVisible();
     await expect(allergiesPage.severityOption()).toBeVisible();
     await expect(allergiesPage.commentMessage()).toBeVisible();
