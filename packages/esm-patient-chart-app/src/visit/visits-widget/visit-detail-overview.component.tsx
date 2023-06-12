@@ -15,7 +15,7 @@ interface VisitOverviewComponentProps {
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
-  const { visits, isError, isLoading } = useVisits(patientUuid);
+  const { visits, isError, isLoading, mutateVisits } = useVisits(patientUuid);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
 
   const visitsWithEncounters = visits
@@ -76,7 +76,12 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ) : isError ? (
                 <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
               ) : visits?.length ? (
-                <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
+                <VisitsTable
+                  mutateVisits={mutateVisits}
+                  visits={visitsWithEncounters}
+                  showAllEncounters
+                  patientUuid={patientUuid}
+                />
               ) : (
                 <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
               )}

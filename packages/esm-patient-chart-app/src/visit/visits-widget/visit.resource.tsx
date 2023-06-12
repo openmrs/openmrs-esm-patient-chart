@@ -14,7 +14,7 @@ export function useVisits(patientUuid: string) {
     isError: error,
     isLoading,
     isValidating,
-    mutateVisit: mutate,
+    mutateVisits: mutate,
   };
 }
 export function useEncounters(patientUuid: string) {
