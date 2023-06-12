@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { Add, User } from '@carbon/react/icons';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
@@ -257,6 +257,7 @@ function OrderBasketItemActions({
   openOrderBasket: () => void;
 }) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
   const handleDiscontinueClick = useCallback(() => {
     setItems([
@@ -406,7 +407,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
+    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet && 'lg'}>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

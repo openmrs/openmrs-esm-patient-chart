@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './overflow-menu.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
@@ -15,6 +16,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   deceased,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const isTablet = useLayoutType() === 'tablet';
   const wrapperRef = useRef(null);
 
   useEffect(() => {
@@ -66,7 +68,9 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         aria-labelledby="custom-actions-overflow-menu-trigger"
         id="custom-actions-overflow-menu"
       >
-        <ul className="cds--overflow-menu-options__content">{children}</ul>
+        <ul className={`cds--overflow-menu-options__content ${isTablet && 'cds--overflow-menu-options--lg'}`}>
+          {children}
+        </ul>
         <span />
       </div>
     </div>
