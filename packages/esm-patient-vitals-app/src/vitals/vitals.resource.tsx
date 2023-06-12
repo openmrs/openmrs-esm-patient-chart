@@ -179,7 +179,7 @@ export function savePatientVitals(
 
 function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObject['concepts']): Array<ObsRecord> {
   return Object.entries(vitals)
-    .filter(([_, result]) => result != null)
+    .filter(([_, result]) => Boolean(result))
     .map(([name, result]) => {
       return {
         concept: concepts[name + 'Uuid'],

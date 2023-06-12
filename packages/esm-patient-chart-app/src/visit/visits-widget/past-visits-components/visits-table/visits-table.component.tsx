@@ -47,6 +47,7 @@ interface VisitTableProps {
   visits: Array<MappedEncounter>;
   showAllEncounters?: boolean;
   patientUuid: string;
+  mutateVisits: () => void;
 }
 
 type FilterProps = {
@@ -57,7 +58,7 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
+const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid, mutateVisits }) => {
   const visitCount = 20;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
@@ -153,6 +154,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                 description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
+              mutateVisits?.();
             })
             .catch((error) => {
               showToast({
@@ -165,7 +167,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         },
       });
     },
-    [t],
+    [t, mutateVisits],
   );
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {

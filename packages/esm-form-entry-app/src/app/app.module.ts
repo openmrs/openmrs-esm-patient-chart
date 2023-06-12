@@ -1,11 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
-
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
 import { FormEntryModule } from '@openmrs/ngx-formentry';
+
 import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { FormSchemaService } from './form-schema/form-schema.service';
@@ -42,6 +42,10 @@ import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translat
     SingleSpaPropsService,
     TranslateService,
     TranslateStore,
+    {
+      provide: LOCALE_ID,
+      useValue: (window as any).i18next.language.toLowerCase() ? (window as any).i18next.language.toLowerCase() : 'en',
+    },
   ],
   bootstrap: [AppComponent],
 })
