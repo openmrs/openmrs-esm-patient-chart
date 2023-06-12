@@ -51,7 +51,7 @@ interface VisitTableProps {
   visits: Array<MappedEncounter>;
   showAllEncounters?: boolean;
   patientUuid: string;
-  mutateVisits: () => void;
+  mutateVisits?: () => void;
 }
 
 type FilterProps = {
