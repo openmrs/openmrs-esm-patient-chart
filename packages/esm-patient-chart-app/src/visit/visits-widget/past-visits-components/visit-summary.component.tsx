@@ -22,6 +22,7 @@ interface VisitSummaryProps {
   visitTypeUuid: string;
   visitStartDatetime?: string;
   visitStopDatetime?: string;
+  mutateEncounters: () => void;
 }
 
 export interface MappedEncounter {
@@ -44,6 +45,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
   visitTypeUuid,
   visitStartDatetime,
   visitStopDatetime,
+  mutateEncounters,
 }) => {
   const config = useConfig();
   const { t } = useTranslation();
@@ -164,6 +166,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
               visits={mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime)}
               showAllEncounters={false}
               patientUuid={patientUuid}
+              mutateVisits={mutateEncounters}
             />
           </TabPanel>
         </TabPanels>
