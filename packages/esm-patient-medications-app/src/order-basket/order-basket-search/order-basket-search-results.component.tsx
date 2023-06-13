@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect, useState, RefObject } from 'react';
+import React, {useMemo,useState, RefObject } from 'react';
 import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -26,16 +26,19 @@ export default function OrderBasketSearchResults({
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
   const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
+  function focusOnSearchInput() {
+    searchInputRef.current.focus();
+  }
   function handleClick() {
     setIsSearchInputCleared(true);
     setSearchTerm('');
+    focusOnSearchInput();
+    handleClearSearchInput();
   }
-  useEffect(() => {
-    if (isSearchIputCleared && searchInputRef.current) {
-      searchInputRef.current.focus();
-      setIsSearchInputCleared(false);
-    }
-  }, [isSearchIputCleared, searchInputRef]);
+  function handleClearSearchInput() {
+    setSearchTerm('');
+    searchInputRef.current.focus();
+  }
 
   if (!searchTerm) {
     return null;
@@ -212,11 +215,5 @@ const DrugSearchSkeleton = () => {
     </div>
   );
 };
-function setIsSearchInputCleared(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
 
-function useEffect(arg0: () => void, arg1: any[]) {
-  throw new Error('Function not implemented.');
-}
 
