@@ -12,15 +12,6 @@ export function useRelationships(patientUuid: string) {
     openmrsFetch,
   );
 
-  // eslint-disable-next-line no-console
-  console.log(data);
-
-  // eslint-disable-next-line no-console
-  console.log(
-    data?.data?.results?.map((r) => r.personA.person?.display),
-    'data Data',
-  );
-
   const formattedRelationships = useMemo(() => {
     return data?.data?.results?.length ? extractRelationshipData(patientUuid, data.data.results) : null;
   }, [data?.data?.results, patientUuid]);
