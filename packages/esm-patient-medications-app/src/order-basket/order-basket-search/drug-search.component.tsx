@@ -22,8 +22,7 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
         value={searchTerm}
         placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
         labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-        onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
-        ref={searchInputRef}
+        onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')
       />
       <OrderBasketSearchResults
         searchInputRef={searchInputRef}
