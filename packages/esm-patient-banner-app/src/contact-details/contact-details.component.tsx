@@ -15,7 +15,7 @@ interface ContactDetailsProps {
   isPatientBannerSmallSize: boolean;
 }
 
-const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { data: cohorts, isLoading, mutateLists } = usePatientListsForPatient(patientUuid);
   const { t } = useTranslation();
 
@@ -23,7 +23,7 @@ const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
     return <InlineLoading />;
   }
 
-  if (cohorts.length > 0) {
+  if (cohorts?.length > 0) {
     const sorted = cohorts.sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime());
     const slicedLists = sorted.slice(0, 3);
     return (
@@ -35,21 +35,19 @@ const PatientList: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
         </p>
         {slicedLists.map((cohort) => (
           <p>
-            <ConfigurableLink
-              to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`}
-              className={styles.pLink}
-              key={cohort.uuid}
-            >
+            <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
               {cohort.name}
             </ConfigurableLink>
           </p>
         ))}
         <p>
-          {cohorts.length > 3
-            ? t('seeMore', 'see all {moreLists} lists', {
-                moreLists: cohorts.length - 3,
-              })
-            : ''}
+          <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
+            {cohorts.length > 3
+              ? t('seeMore', 'see all {moreLists} lists', {
+                  moreLists: cohorts.length - 3,
+                })
+              : ''}
+          </ConfigurableLink>
         </p>
       </>
     );
@@ -177,13 +175,11 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({
   isPatientBannerSmallSize,
 }) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
-
+  const currentClass = `${styles[deceased && 'deceased']} ${
+    styles[isPatientBannerSmallSize ? 'smallBannerSize' : 'contactDetailsContainer']
+  }`;
   return (
-    <div
-      className={`${styles.contactDetails} ${deceased && styles.deceased} ${
-        isPatientBannerSmallSize && styles.smallBannerSize
-      }`}
-    >
+    <div className={currentClass}>
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />
@@ -197,7 +193,7 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({
           <Relationships patientId={patientId} />
         </div>
         <div className={styles.col}>
-          <PatientList patientUuid={patientId} />
+          <PatientLists patientUuid={patientId} />
         </div>
       </div>
     </div>

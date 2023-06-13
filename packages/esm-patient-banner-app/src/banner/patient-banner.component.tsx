@@ -28,15 +28,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const patientBannerRef = React.useRef(null);
   const [isPatientBannerSmallSize, setIsPatientBannerSmallSize] = useState(false);
 
-  // eslint-disable-next-line no-console
-  console.log(isPatientBannerSmallSize, 'is it small?');
-
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        // eslint-disable-next-line no-console
-        console.log('changed');
-        setIsPatientBannerSmallSize(entry.contentRect.width < 600);
+        setIsPatientBannerSmallSize(entry.contentRect.width < 1023);
       }
     });
     resizeObserver.observe(patientBannerRef.current);
