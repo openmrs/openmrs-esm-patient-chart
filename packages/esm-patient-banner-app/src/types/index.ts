@@ -43,7 +43,7 @@ export interface PersonFetchResponse {
   person: { uuid: string; dead: boolean; deathDate: Date; type: string };
 }
 
-export interface CohortResponse {
+export interface CohortMemberResponse {
   results: Array<CohortMember>;
 }
 interface CohortMember {
