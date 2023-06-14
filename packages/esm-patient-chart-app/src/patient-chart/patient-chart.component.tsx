@@ -45,14 +45,14 @@ const PatientChart: React.FC = () => {
             windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
           }`}
         >
-          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+          <ExtensionSlot name="breadcrumbs-slot" />
           {isLoadingPatient ? (
             <Loader />
           ) : (
             <>
               <aside>
-                <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
-                <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
+                <ExtensionSlot name="patient-header-slot" state={state} />
+                <ExtensionSlot name="patient-info-slot" state={state} />
               </aside>
               <div className={styles.grid}>
                 <div className={styles.chartReview}>

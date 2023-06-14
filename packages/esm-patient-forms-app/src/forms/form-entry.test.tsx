@@ -19,7 +19,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 
 jest.mock('@openmrs/esm-framework', () => ({
-  ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
+  ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
   usePatient: jest.fn(),
 }));
 

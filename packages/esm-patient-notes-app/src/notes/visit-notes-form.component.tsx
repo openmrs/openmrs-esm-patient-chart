@@ -249,7 +249,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     <Form className={styles.form}>
       {isTablet && (
         <Row className={styles.headerGridRow}>
-          <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+          <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
         </Row>
       )}
       <Stack className={styles.formContainer} gap={2}>

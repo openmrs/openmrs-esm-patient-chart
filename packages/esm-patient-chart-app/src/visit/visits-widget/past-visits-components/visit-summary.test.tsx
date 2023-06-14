@@ -17,7 +17,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
+    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
     useConfig: jest.fn(() => {
       return {
         notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
