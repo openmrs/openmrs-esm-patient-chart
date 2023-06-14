@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { ConfigurableLink, navigate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, navigate, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
+import { useAllPatientLists, usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
@@ -17,7 +17,8 @@ interface ContactDetailsProps {
 }
 
 const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
-  const { data: cohorts, isLoading, mutateLists } = usePatientListsForPatient(patientUuid);
+  const { data: cohorts, isLoading } = usePatientListsForPatient(patientUuid);
+  const { allLists } = useAllPatientLists();
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -44,8 +45,8 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
         <p>
           <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
             {cohorts.length > 3
-              ? t('seeMore', 'see all {moreLists} lists', {
-                  moreLists: cohorts.length - 3,
+              ? t('seeMore', 'see {moreLists} more', {
+                  moreLists: allLists?.length,
                 })
               : ''}
           </ConfigurableLink>
