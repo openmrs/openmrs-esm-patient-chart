@@ -54,6 +54,17 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
       </>
     );
   }
+
+  return (
+    <>
+      <p className={styles.heading}>
+        {t('patientLists', 'Patient Lists ({totalLists})', {
+          totalLists: cohorts.length,
+        })}
+      </p>
+      <p>--</p>
+    </>
+  );
 };
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
