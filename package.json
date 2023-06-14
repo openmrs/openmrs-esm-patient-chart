@@ -75,5 +75,8 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.0",
+  "dependencies": {
+    "react-to-print": "^2.14.13"
+  }
 }

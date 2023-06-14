@@ -1,0 +1,32 @@
+@use "@carbon/styles/scss/spacing";
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+@media screen {
+    .printpage {
+        display: none;
+    }
+}
+.img{
+    filter: brightness(10);
+    margin-right: spacing.$spacing-06;
+    margin-left: spacing.$spacing-04;
+}
+
+.patientDetails{
+    margin-top: 3.5rem;
+    text-align: center;
+    column-count: 2;
+    font-weight: bolder;
+}
+
+.subheader{
+    text-align: center;
+    font-weight: bolder;
+}
+.footer{
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 400;
+}
