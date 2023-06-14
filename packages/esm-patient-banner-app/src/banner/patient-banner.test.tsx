@@ -4,6 +4,20 @@ import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import PatientBanner from './patient-banner.component';
 
+class ResizeObserverMock {
+  callback: any;
+  contentRect: { width: number };
+  constructor(callback) {
+    this.callback = callback;
+    this.contentRect = { width: 1000 };
+  }
+  observe(target) {
+    this.callback([{ target, contentRect: this.contentRect }]);
+  }
+  unobserve() {}
+  disconnect() {}
+}
+
 const testProps = {
   patient: mockPatient,
   patientUuid: mockPatient.id,
@@ -19,6 +33,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 describe('PatientBanner: ', () => {
   it('renders information about a patient in a banner above the patient chart', () => {
+    window.ResizeObserver = ResizeObserverMock;
     renderPatientBanner();
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
@@ -36,6 +51,7 @@ describe('PatientBanner: ', () => {
   it("can toggle between showing or hiding the patient's contact details", async () => {
     const user = userEvent.setup();
 
+    window.ResizeObserver = ResizeObserverMock;
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole('button', {
@@ -60,6 +76,7 @@ describe('PatientBanner: ', () => {
     const user = userEvent.setup();
 
     const patientBannerSeachPageProps = { ...testProps, onClick: mockNavigateTo };
+    window.ResizeObserver = ResizeObserverMock;
     render(<PatientBanner {...patientBannerSeachPageProps} />);
 
     const imgAvatar = screen.getByRole('img');

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, navigate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
-import { usePatientContactAttributes, usePatientListsForPatient } from '../hooks/usePatientAttributes';
+import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
