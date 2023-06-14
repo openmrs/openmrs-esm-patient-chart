@@ -30,16 +30,10 @@ export default function OrderBasketSearchResults({
     searchInputRef.current.focus();
   }
   function handleClick() {
-    setIsSearchInputCleared(true);
     setSearchTerm('');
     focusOnSearchInput();
-    handleClearSearchInput();
   }
-  function handleClearSearchInput() {
-    setSearchTerm('');
-    searchInputRef.current.focus();
-  }
-
+  
   if (!searchTerm) {
     return null;
   }
