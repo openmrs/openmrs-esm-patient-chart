@@ -153,6 +153,15 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
   const { data: relationships, isLoading } = useRelationships(patientId);
 
+  const extractName = (display: string) => {
+    const pattern = /-\s*(.*)$/;
+    const match = display.match(pattern);
+    if (match && match.length > 1) {
+      return match[1].trim();
+    }
+    return display.trim();
+  };
+
   return (
     <>
       <p className={styles.heading}>{t('relationships', 'Relationships')}</p>
@@ -164,7 +173,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
               <ul>
                 {relationships.map((r) => (
                   <li key={r.uuid} className={styles.relationship}>
-                    <div>{r.display}</div>
+                    <div>{extractName(r.display)}</div>
                     <div>{r.relationshipType}</div>
                     <div>
                       {`${r.relativeAge ? r.relativeAge : '--'} ${
