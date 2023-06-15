@@ -6,6 +6,7 @@ import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/e
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { Breakpoint } from '@openmrs/esm-framework/src/internal';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -32,12 +33,14 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     const currentRef = patientBannerRef.current;
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setIsPatientBannerSmallSize(entry.contentRect.width < 1023);
+        setIsPatientBannerSmallSize(entry.contentRect.width < Breakpoint.TABLET_MAX);
       }
     });
     resizeObserver.observe(patientBannerRef.current);
     return () => {
-      if (currentRef) resizeObserver.unobserve(currentRef);
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
+      }
     };
   }, [patientBannerRef, setIsPatientBannerSmallSize]);
 

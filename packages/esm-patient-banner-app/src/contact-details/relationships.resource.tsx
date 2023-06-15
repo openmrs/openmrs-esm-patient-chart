@@ -66,8 +66,8 @@ interface ExtractedRelationship {
 export interface Relationship {
   display: string;
   uuid: string;
-  personA: PersonX;
-  personB: PersonX;
+  personA: Person;
+  personB: Person;
   relationshipType: {
     uuid: string;
     display: string;
@@ -76,7 +76,7 @@ export interface Relationship {
   };
 }
 
-interface PersonX {
+interface Person {
   uuid: string;
   age: number;
   display: string;

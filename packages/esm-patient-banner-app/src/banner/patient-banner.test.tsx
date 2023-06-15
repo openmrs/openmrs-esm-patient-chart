@@ -29,6 +29,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
   useVisit: jest.fn(),
   age: jest.fn(),
+  Breakpoint: { TABLET_MAX: 1023 },
 }));
 
 describe('PatientBanner: ', () => {
