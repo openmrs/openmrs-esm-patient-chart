@@ -28,6 +28,10 @@
   .contactDetails, .heading, .row, .row > .col {
     color: $ui-02;
   }
+
+  a {
+    color: $inverse-link
+  }
 }
 
 .row {
