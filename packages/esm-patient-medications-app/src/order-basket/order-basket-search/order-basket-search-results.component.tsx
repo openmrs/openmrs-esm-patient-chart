@@ -25,13 +25,12 @@ export default function OrderBasketSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
-  const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
   function focusOnSearchInput() {
-    searchInputRef.current.focus();
+  searchInputRef.current.focus();
   }
   function handleClick() {
-    setSearchTerm('');
-    focusOnSearchInput();
+  setSearchTerm('');
+  focusOnSearchInput();
   }
   
   if (!searchTerm) {
