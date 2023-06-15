@@ -4,7 +4,7 @@ import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, navigate, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import { useAllPatientLists, usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
+import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
@@ -18,7 +18,6 @@ interface ContactDetailsProps {
 
 const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { data: cohorts, isLoading } = usePatientListsForPatient(patientUuid);
-  const { allLists } = useAllPatientLists();
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -45,8 +44,8 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
         <p>
           <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
             {cohorts.length > 3
-              ? t('seeMore', 'see {moreLists} more', {
-                  moreLists: allLists?.length,
+              ? t('seeMore', 'See {moreLists} more', {
+                  moreLists: cohorts?.length - 3,
                 })
               : ''}
           </ConfigurableLink>
@@ -187,6 +186,8 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({
   deceased,
   isPatientBannerSmallSize,
 }) => {
+  // eslint-disable-next-line no-console
+  console.log(address, 'address');
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
   const currentClass = `${styles[deceased && 'deceased']} ${
     styles[isPatientBannerSmallSize ? 'smallBannerSize' : 'contactDetailsContainer']

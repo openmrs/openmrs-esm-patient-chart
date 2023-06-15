@@ -21,7 +21,7 @@
   "postalCode": "Postal code",
   "record": "Record",
   "relationships": "Relationships",
-  "seeMore": "see all {moreLists} lists",
+  "seeMore": "See {moreLists} more",
   "showDetails": "Show details",
   "started": "Started",
   "state": "State",
