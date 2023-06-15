@@ -9,6 +9,7 @@
   display: flex;
 
   a {
+    @include type.type-style("body-compact-01");
     text-decoration: none;
   }
 
