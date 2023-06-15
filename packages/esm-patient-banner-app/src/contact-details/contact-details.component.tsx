@@ -17,7 +17,7 @@ interface ContactDetailsProps {
 }
 
 const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
-  const { data: cohorts, isLoading } = usePatientListsForPatient(patientUuid);
+  const { cohorts, isLoading } = usePatientListsForPatient(patientUuid);
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -68,7 +68,9 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
-  const { customAddressLabel } = useConfig() as ConfigObject;
+  const { useCustomAddressLabel } = useConfig<ConfigObject>();
+  const useCustomAddressLabelEnabled = useCustomAddressLabel?.enabled;
+  const customAddressLabel = useCustomAddressLabel?.customAddressLabel;
 
   const getAddressKey = (url) => url.split('#')[1];
   /*
@@ -99,13 +101,15 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
                 key === 'extension' ? (
                   address?.extension[0]?.extension.map((add, i) => (
                     <li key={`address-${key}-${i}`}>
-                      {customAddressLabel ? t(customAddressLabel[getAddressKey(add.url)]) : t(getAddressKey(add.url))}:{' '}
-                      {add.valueString}
+                      {useCustomAddressLabelEnabled
+                        ? t(customAddressLabel[getAddressKey(add.url)])
+                        : t(getAddressKey(add.url))}
+                      : {add.valueString}
                     </li>
                   ))
                 ) : (
                   <li>
-                    {customAddressLabel ? t(customAddressLabel[key]) : t(key)}: {value}
+                    {useCustomAddressLabelEnabled ? t(customAddressLabel[key]) : t(key)}: {value}
                   </li>
                 ),
               )}
