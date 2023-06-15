@@ -30,18 +30,12 @@ const mockRelationships = [
     personA: {
       uuid: '07006bcb-91d4-4c57-a5f7-49751899d9b5',
       display: '100ADT - Amanda Robinson',
-      person: {
-        age: 24,
-        display: 'Amanda Robinson',
-      },
+      age: 24,
     },
     personB: {
       uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
       display: '100GEJ - John Wilson',
-      person: {
-        age: 49,
-        display: 'John Wilson',
-      },
+      age: 49,
     },
     relationshipType: {
       uuid: '8d91a01c-c2cc-11de-8d13-0010c6dffd0f',
