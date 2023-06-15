@@ -303,6 +303,7 @@ export const mockEncounters = [
     id: '979d38e3-fb68-47cf-843f-2b0263690f49',
     datetime: '2022-01-18T16:25:27.000+0000',
     encounterType: 'Admission',
+    editPrivilege: null,
     form: {
       uuid: '17e3bc1a-d319-408f-8b57-73e367f7fa80',
       display: 'POC Consent Form',
@@ -316,6 +317,7 @@ export const mockEncounters = [
     id: '09eadbdd-6924-4126-8a3b-c92aac04b8e7',
     datetime: '2021-08-03T00:47:48.000+0000',
     encounterType: 'Visit Note',
+    editPrivilege: null,
     form: null,
     obs: [
       {
@@ -356,6 +358,7 @@ export const mockEncounters = [
     id: 'ff9a0035-8698-47dc-b608-bd6ec2646e5c',
     datetime: '2021-07-05T10:07:18.000+0000',
     encounterType: 'Consultation',
+    editPrivilege: 'edit',
     form: {
       uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
       display: 'Covid 19',

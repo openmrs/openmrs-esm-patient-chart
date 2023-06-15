@@ -9,7 +9,7 @@ import { mockPatient } from '../../../../../../__mocks__/patient.mock';
 import VisitSummary from './visit-summary.component';
 import { getConfig } from '@openmrs/esm-framework';
 
-const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
+const mockVisit = visitOverviewDetailMockData.data.results[0];
 const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -65,9 +65,9 @@ describe('VisitSummary', () => {
   it('should display notes, tests and medication summary', async () => {
     const user = userEvent.setup();
 
-    const mockEncounter = visitOverviewDetailMockDataNotEmpty.data.results[0].encounters.map((encounter) => encounter);
+    const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
-    render(<VisitSummary patientUuid={mockPatient.id} encounters={mockEncounter} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
@@ -97,5 +97,5 @@ describe('VisitSummary', () => {
 });
 
 function renderVisitSummary() {
-  render(<VisitSummary patientUuid={mockPatient.id} encounters={mockEncounter} />);
+  render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 }
