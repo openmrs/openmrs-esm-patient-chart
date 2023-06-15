@@ -1,0 +1,114 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.productiveHeading02 {
+  color: $color-gray-70;
+  @include type.type-style("heading-compact-02");
+}
+
+$openmrs-background-grey: #ededed;
+
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formWrapper {
+  background-color: $openmrs-background-grey;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formWrapper {
+  background-color: $ui-02;
+}
+
+.formGroup {
+  display: flex;
+  margin-bottom: spacing.$spacing-02;
+  padding: spacing.$spacing-05;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup > span {
+  flex: 1;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup > div {
+  flex: 3;
+}
+
+.formGroup span {
+  @extend .productiveHeading02;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.formGroup checkbox {
+  @extend .productiveHeading02;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.toggleLabel span {
+  margin-bottom: 0;
+}
+
+.toggleLabel {
+  margin-bottom: 1rem;
+}
+
+.inLine {
+  display: flex;
+}
+
+.rangeDatePickerControl {
+}
+
+.repeatEvery {
+}
+
+.recurringPatternType {
+  margin-top: 2rem;
+  margin-left: 0.5rem;
+}
+
+.timeDuration {
+  display: flex;
+}
+
+.duration {
+  margin-left: 0.2rem;
+}
+
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup {
+  flex-direction: row;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formGroup {
+  flex-direction: column;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.loader {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: spacing.$spacing-09;
+  height: 100vh;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}

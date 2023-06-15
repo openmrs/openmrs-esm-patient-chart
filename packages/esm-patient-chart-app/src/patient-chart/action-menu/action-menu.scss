@@ -41,7 +41,7 @@ $actionPanelOffset: 3rem;
         &:hover {
           background-color: $color-gray-30;
         }
-  
+
         &:focus {
           border-color: $interactive-01;
         }
@@ -58,12 +58,12 @@ $actionPanelOffset: 3rem;
     background: #ededed;
     left: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 8000;
     width: 100%;
     display: flex;
     justify-content: stretch;
   }
-  
+
   .chartExtensions {
     background-color: $ui-02;
     flex-basis: 0.75%;
@@ -99,4 +99,15 @@ $actionPanelOffset: 3rem;
   margin: 0.75rem 0;
   height: 1px;
   width: 2.5rem;
+}
+
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  :global(.omrs-breakpoint-gt-tablet) {
+    .sideRail {
+      right: unset;
+      left: 0;
+    }
+  }
 }

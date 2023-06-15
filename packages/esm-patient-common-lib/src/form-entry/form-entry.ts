@@ -6,6 +6,8 @@ export interface FormEntryProps {
   visitUuid?: string;
   formUuid: string;
   visitTypeUuid?: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
 }
 
 export const formEntrySub = new BehaviorSubject<FormEntryProps | null>(null);

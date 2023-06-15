@@ -26,7 +26,7 @@ export interface FormattedEncounter {
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
-  const { visits, isError, isLoading } = useVisits(patientUuid);
+  const { visits, isError, isLoading, mutateVisits } = useVisits(patientUuid);
   const { showAllEncountersTab } = useConfig();
 
   const visitsWithEncounters = visits
@@ -79,6 +79,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                     patientUuid={patientUuid}
                     visitUuid={visit.uuid}
                     visitTypeUuid={visit.visitType.uuid}
+                    visitStartDatetime={visit.startDatetime}
+                    visitStopDatetime={visit.stopDatetime}
+                    mutateEncounters={mutateVisits}
                   />
                 </div>
               ))
@@ -92,7 +95,12 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             ) : isError ? (
               <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
             ) : visits?.length ? (
-              <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
+              <VisitsTable
+                visits={visitsWithEncounters}
+                showAllEncounters
+                patientUuid={patientUuid}
+                mutateVisits={mutateVisits}
+              />
             ) : (
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
             )}
@@ -124,5 +132,7 @@ export function mapEncounters(visit) {
     visitUuid: visit?.uuid,
     visitType: visit?.visitType?.name,
     visitTypeUuid: visit?.visitType.uuid,
+    visitStartDatetime: visit?.startDatetime,
+    visitStopDatetime: visit?.stopDatetime,
   }));
 }

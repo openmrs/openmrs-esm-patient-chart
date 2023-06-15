@@ -10,10 +10,11 @@ import {
   ExtensionSlot,
   usePatient,
   useVisit,
+  age,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
-import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
+import { calculateBMI, isInNormalRange, extractNumbers, getColorCode } from './vitals-biometrics-form.utils';
 import { savePatientVitals, useVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
@@ -46,11 +47,21 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
+  const useMuacColorStatus = config.vitals.useMuacColors;
+  const [colorCode, setColorCode] = useState('');
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
     return value >= 18.5 && value <= 24.9;
   };
+
+  useEffect(() => {
+    getColorCode(
+      extractNumbers(age(patient.patient?.birthDate)),
+      parseInt(patientVitalAndBiometrics?.midUpperArmCircumference),
+      setColorCode,
+    );
+  }, [patient.patient?.birthDate, patientVitalAndBiometrics?.midUpperArmCircumference]);
 
   const concepts = {
     midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
@@ -389,7 +400,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
-                inputIsNormal={true}
+                inputIsNormal={isInNormalRange(
+                  conceptMetadata,
+                  config.concepts['heightUuid'],
+                  patientVitalAndBiometrics?.height,
+                )}
               />
             </Column>
             <Column className={styles.column}>
@@ -411,6 +426,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             <Column className={styles.column}>
               <VitalsBiometricInput
                 title={t('muac', 'MUAC')}
+                useMuacColors={useMuacColorStatus}
+                colorCode={colorCode}
                 onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setPatientVitalAndBiometrics({
                     ...patientVitalAndBiometrics,

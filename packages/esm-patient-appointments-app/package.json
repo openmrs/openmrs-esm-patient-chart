@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-appointments-app",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "license": "MPL-2.0",
   "description": "Patient appointments microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-appointments-app.js",
@@ -14,7 +14,7 @@
     "analyze": "webpack --mode=production --env analyze=true",
     "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

@@ -58,3 +58,25 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
 .activeWorkspace {
   padding-right: $actionNavOffset;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .chartContainer {
+    padding-right: unset;
+    padding-left: spacing.$spacing-01;
+    .activeWorkspace {
+      padding-right: unset;
+      padding-left: $actionNavOffset;
+    }
+  }
+
+  :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
+    margin-right: var(--omrs-sidenav-width);
+    margin-left: unset;
+  }
+
+  :global(.omrs-breakpoint-lt-desktop) .innerChartContainer {
+    padding-left: 0;
+    margin-right: unset;
+  }
+}

@@ -3,9 +3,11 @@
   "clinicalForm": "Clinical form",
   "completed": "Completed",
   "editForm": "Edit form",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "form": "Form",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
+  "forms_link": "Forms & Notes",
   "formSearchHint": "Try searching for the form using an alternative name or keyword",
   "goToSummary": "Go to Summary",
   "homeOverviewCardView": "View",
@@ -24,6 +26,7 @@
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
   "recommended": "Recommended",
+  "record": "Record",
   "searchForAForm": "Search for a form",
   "seeAll": "See all"
 }

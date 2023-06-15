@@ -41,7 +41,18 @@ function setupOpenMRS() {
         name: 'test-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 4,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('testResults_link', 'Test Results')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('testResults_link', { defaultValue: 'Test Results', ns: moduleName }) ??
+                  'Test Results',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
         online: true,
         offline: true,

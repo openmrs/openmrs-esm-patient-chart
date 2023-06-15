@@ -1,12 +1,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useExtensionStore } from '@openmrs/esm-framework';
+import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
-  const parts = `${basePath}/${encodeURIComponent(target.title)}`.split('/');
+  const parts = `${basePath}/${encodeURIComponent(target.path)}`.split('/');
 
   Object.keys(params).forEach((key) => {
     for (let i = 0; i < parts.length; i++) {
@@ -19,7 +19,7 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   return parts.join('/');
 }
 
-function getDashboardDefinition(meta, config) {
+function getDashboardDefinition(meta: object, config: ConfigObject) {
   return { ...meta, ...config };
 }
 
@@ -48,7 +48,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.title === view);
+  const dashboard = dashboards.find((dashboard) => dashboard.path === view);
 
   if (!defaultDashboard) {
     return null;

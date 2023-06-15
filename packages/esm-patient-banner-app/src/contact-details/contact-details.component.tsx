@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
@@ -14,6 +16,7 @@ interface ContactDetailsProps {
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
+  const { customAddressLabel } = useConfig() as ConfigObject;
 
   const getAddressKey = (url) => url.split('#')[1];
   /*
@@ -44,12 +47,13 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
                 key === 'extension' ? (
                   address?.extension[0]?.extension.map((add, i) => (
                     <li>
-                      {t(getAddressKey(add.url))}: {add.valueString}
+                      {customAddressLabel ? t(customAddressLabel[getAddressKey(add.url)]) : t(getAddressKey(add.url))}:{' '}
+                      {add.valueString}
                     </li>
                   ))
                 ) : (
                   <li>
-                    {t(key)}: {value}
+                    {customAddressLabel ? t(customAddressLabel[key]) : t(key)}: {value}
                   </li>
                 ),
               )}

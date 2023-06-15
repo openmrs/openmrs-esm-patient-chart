@@ -1,7 +1,12 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } from '../types';
+import {
+  AppointmentPayload,
+  AppointmentService,
+  AppointmentsFetchResponse,
+  RecurringAppointmentsPayload,
+} from '../types';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 
@@ -79,6 +84,20 @@ export function saveAppointment(appointment: AppointmentPayload, abortController
       'Content-Type': 'application/json',
     },
     body: appointment,
+  });
+}
+
+export function saveRecurringAppointments(
+  recurringAppointments: RecurringAppointmentsPayload,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/recurring-appointments`, {
+    method: 'POST',
+    signal: abortController.signal,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: recurringAppointments,
   });
 }
 

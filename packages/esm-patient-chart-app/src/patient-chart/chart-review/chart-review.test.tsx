@@ -66,6 +66,7 @@ describe('ChartReview: ', () => {
                 config: {
                   columns: 4,
                 },
+                path: 'Patient Summary',
                 title: 'Patient Summary',
               },
             },
@@ -76,6 +77,7 @@ describe('ChartReview: ', () => {
                 config: {
                   columns: 1,
                 },
+                path: 'Test Results',
                 title: 'Test Results',
               },
             },

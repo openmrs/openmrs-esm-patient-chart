@@ -5,7 +5,7 @@ export function useVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -14,6 +14,7 @@ export function useVisits(patientUuid: string) {
     isError: error,
     isLoading,
     isValidating,
+    mutateVisits: mutate,
   };
 }
 

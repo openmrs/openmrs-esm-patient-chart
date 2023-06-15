@@ -260,6 +260,12 @@ export interface Concept {
   display: string;
 }
 
+export interface Visit {
+  uuid: string;
+  startDatetime: string;
+  stopDatetime?: string;
+}
+
 export interface Encounter {
   uuid: string;
   encounterDatetime: string;
@@ -282,6 +288,7 @@ export interface Encounter {
     uuid: string;
     display: string;
   };
+  visit?: Visit;
   obs: Array<Observation>;
   orders: Array<Order>;
   diagnoses: Array<Diagnosis>;

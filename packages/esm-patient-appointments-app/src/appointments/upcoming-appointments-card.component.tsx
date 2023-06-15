@@ -1,5 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
+
 import {
   Checkbox,
   InlineLoading,
@@ -9,7 +11,6 @@ import {
   StructuredListRow,
   StructuredListBody,
   StructuredListWrapper,
-  TextInput,
 } from '@carbon/react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { useAppointments } from './appointments.resource';
@@ -26,14 +27,19 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
   const { t } = useTranslation();
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
-  const {
-    data: appointmentsData,
-    isError,
-    isLoading,
-    isValidating,
-  } = useAppointments(patientUuid, startDate, new AbortController());
-  const appointments = appointmentsData?.todaysAppointments.concat(appointmentsData?.upcomingAppointments);
-  const upcomingAppointment = appointments?.filter(({ dateHonored }) => dateHonored === null);
+
+  const ac = useMemo<AbortController>(() => new AbortController(), []);
+  useEffect(() => () => ac.abort(), [ac]);
+  const { data: appointmentsData, isError, isLoading } = useAppointments(patientUuid, startDate, ac);
+
+  const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
+  const futureAppointments = appointmentsData?.upcomingAppointments?.length
+    ? appointmentsData?.upcomingAppointments
+    : [];
+  const appointments = todaysAppointments.concat(futureAppointments);
+  const upcomingAppointment = !isEmpty(appointments)
+    ? appointments?.filter(({ dateHonored }) => dateHonored === null)
+    : [];
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }

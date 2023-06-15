@@ -1,4 +1,4 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
@@ -55,4 +55,16 @@ export interface AppointmentPayload {
   locationUuid: string;
   comments: string;
   uuid?: string;
+}
+
+export interface RecurringPattern {
+  type: 'DAY' | 'WEEK';
+  period: number;
+  endDate: string;
+  daysOfWeek?: Array<string>; //'MONDAY' | 'TUESDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'>;
+}
+
+export interface RecurringAppointmentsPayload {
+  appointmentRequest: AppointmentPayload;
+  recurringPattern: RecurringPattern;
 }

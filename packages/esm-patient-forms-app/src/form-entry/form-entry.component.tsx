@@ -23,6 +23,8 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       formUuid: selectedForm?.formUuid ?? null,
       visitUuid: selectedForm?.visitUuid ?? currentVisit?.uuid ?? null,
       visitTypeUuid: selectedForm?.visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
+      visitStartDatetime: selectedForm?.visitStartDatetime ?? currentVisit?.startDatetime ?? null,
+      visitStopDatetime: selectedForm?.visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: selectedForm?.encounterUuid ?? null,
@@ -36,8 +38,12 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       selectedForm?.visitUuid,
       selectedForm?.visitTypeUuid,
       selectedForm?.encounterUuid,
+      selectedForm?.visitStartDatetime,
+      selectedForm?.visitStopDatetime,
       currentVisit?.uuid,
       currentVisit?.visitType?.uuid,
+      currentVisit?.startDatetime,
+      currentVisit?.stopDatetime,
       patientUuid,
       patient,
       mutateForm,
@@ -58,7 +64,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
         setShowForm(true);
       });
     }
-  }, [state.formUuid]);
+  }, [state]);
 
   return (
     <div>
