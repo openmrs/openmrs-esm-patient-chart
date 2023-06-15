@@ -22,7 +22,7 @@ export function usePatientListsForPatient(patientUuid: string) {
   );
 
   return {
-    data: cohorts,
+    cohorts,
     isLoading,
   };
 }
