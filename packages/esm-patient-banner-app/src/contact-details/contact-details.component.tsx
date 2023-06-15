@@ -199,7 +199,7 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({
   deceased,
   isPatientBannerSmallSize,
 }) => {
-  const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
+  const currentAddress = address?.find((a) => a.use === 'home');
   const currentClass = `${styles[deceased && 'deceased']} ${
     styles[isPatientBannerSmallSize ? 'smallBannerSize' : 'contactDetailsContainer']
   }`;

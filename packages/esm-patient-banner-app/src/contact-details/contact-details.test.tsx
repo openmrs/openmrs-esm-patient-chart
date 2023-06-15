@@ -4,9 +4,11 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
 import { usePatientAttributes, usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 
 const mockedUsePatientAttributes = usePatientAttributes as jest.Mock;
 const mockedUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;
+const mockUsePatientListsForPatient = usePatientListsForPatient as jest.Mock;
 
 const testProps = {
   address: [
@@ -21,6 +23,7 @@ const testProps = {
   ],
   telecom: [{ value: '+0123456789' }],
   patientId: '1111',
+  deceased: false,
 };
 
 const mockRelationships = [
@@ -59,6 +62,32 @@ const mockPersonAttributes = [
   },
 ];
 
+const mockCohorts = [
+  {
+    uuid: 'fdc95682-e206-421b-9534-e2a4010cc05d',
+    name: 'List three',
+    startDate: '2023-04-19T23:26:27.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '1d48bec7-6aab-464c-ac16-687ba46e7812',
+    name: ' Test patient List-47',
+    startDate: '2023-04-24T23:28:49.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '6ce81b61-387d-43ab-86fb-606fa16d39dd',
+    name: ' Test patient List-41',
+    startDate: '2023-04-24T23:28:49.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '1361caf0-b3c3-4937-88e3-40074f7f3320',
+    name: 'Potential Patients',
+    startDate: '2023-06-07T15:40:00.000+0000',
+    endDate: null,
+  },
+];
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('../hooks/usePatientAttributes.tsx', () => ({
@@ -66,8 +95,12 @@ jest.mock('../hooks/usePatientAttributes.tsx', () => ({
   usePatientContactAttributes: jest.fn(),
 }));
 
+jest.mock('../hooks/usePatientListsForPatient.tsx', () => ({
+  usePatientListsForPatient: jest.fn(),
+}));
+
 describe('ContactDetails', () => {
-  it('renders an empty state view when relationships data is not available', async () => {
+  it("renders the patient's address, contact details, patient lists, and relationships when available", async () => {
     mockedUsePatientAttributes.mockReturnValue({
       isLoading: false,
       attributes: [],
@@ -79,27 +112,9 @@ describe('ContactDetails', () => {
       contactAttributes: mockPersonAttributes,
     });
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
-
-    renderContactDetails();
-
-    await waitForLoadingToFinish();
-
-    screen.findByText('Relationships');
-    expect(screen.getByText('Relationships')).toBeInTheDocument();
-    expect(screen.getByText('--')).toBeInTheDocument();
-  });
-
-  it("renders the patient's address, contact details and relationships when available", async () => {
-    mockedUsePatientAttributes.mockReturnValue({
+    mockUsePatientListsForPatient.mockReturnValueOnce({
       isLoading: false,
-      attributes: [],
-      error: null,
-    });
-
-    mockedUsePatientContactAttributes.mockReturnValueOnce({
-      isLoading: false,
-      contactAttributes: mockPersonAttributes,
+      cohorts: mockCohorts,
     });
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
@@ -116,9 +131,83 @@ describe('ContactDetails', () => {
     expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
     expect(screen.getByText(/Next of Kin Contact Phone Number/i)).toBeInTheDocument();
     expect(screen.getByText(/0700-000-000/)).toBeInTheDocument();
+    expect(screen.getByText(/Patient Lists/)).toBeInTheDocument();
+    expect(screen.getByText(/Test patient List-47/)).toBeInTheDocument();
+    expect(screen.getByText(/List three/)).toBeInTheDocument();
   });
 
-  it('renders an empty state view when address and contact details are not available', async () => {
+  it('renders the contact details with 2 columns if banner width is small', async () => {
+    mockedUsePatientAttributes.mockReturnValue({
+      isLoading: false,
+      attributes: [],
+      error: null,
+    });
+
+    mockedUsePatientContactAttributes.mockReturnValueOnce({
+      isLoading: false,
+      contactAttributes: mockPersonAttributes,
+    });
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
+
+    mockUsePatientListsForPatient.mockReturnValueOnce({
+      isLoading: false,
+      cohorts: mockCohorts,
+    });
+    const props = { ...testProps, isPatientBannerSmallSize: true };
+
+    const { container } = renderWithSwr(<ContactDetails {...props} />);
+
+    await waitForLoadingToFinish();
+
+    expect(container.firstChild).toHaveClass('smallBannerSize');
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText('Relationships')).toBeInTheDocument();
+    expect(screen.getByText(/Amanda Robinson/)).toBeInTheDocument();
+    expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
+    expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Next of Kin Contact Phone Number/i)).toBeInTheDocument();
+    expect(screen.getByText(/0700-000-000/)).toBeInTheDocument();
+    expect(screen.getByText(/Patient Lists/)).toBeInTheDocument();
+  });
+
+  it('renders the contact details with 4 colummns if banner width is large', async () => {
+    mockedUsePatientAttributes.mockReturnValue({
+      isLoading: false,
+      attributes: [],
+      error: null,
+    });
+
+    mockedUsePatientContactAttributes.mockReturnValueOnce({
+      isLoading: false,
+      contactAttributes: mockPersonAttributes,
+    });
+
+    mockUsePatientListsForPatient.mockReturnValueOnce({
+      isLoading: false,
+      cohorts: mockCohorts,
+    });
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
+    const props = { ...testProps, isPatientBannerSmallSize: false };
+
+    const { container } = renderWithSwr(<ContactDetails {...props} />);
+
+    await waitForLoadingToFinish();
+
+    expect(container.firstChild).not.toHaveClass('smallBannerSize');
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText('Relationships')).toBeInTheDocument();
+    expect(screen.getByText(/Amanda Robinson/)).toBeInTheDocument();
+    expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
+    expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Next of Kin Contact Phone Number/i)).toBeInTheDocument();
+    expect(screen.getByText(/0700-000-000/)).toBeInTheDocument();
+  });
+
+  it('renders an empty state view when contact details, relations, patient lists and addresses are not available', async () => {
     mockedUsePatientAttributes.mockReturnValue({
       isLoading: false,
       attributes: [],
@@ -130,6 +219,11 @@ describe('ContactDetails', () => {
       contactAttributes: [],
     });
 
+    mockUsePatientListsForPatient.mockReturnValueOnce({
+      isLoading: false,
+      cohorts: [],
+    });
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     renderWithSwr(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
@@ -137,8 +231,10 @@ describe('ContactDetails', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Relationships')).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
-    expect(screen.getAllByText('--').length).toBe(3);
+    expect(screen.getByText(/Patient Lists/)).toBeInTheDocument();
+    expect(screen.getAllByText('--').length).toBe(4);
   });
 });
 
