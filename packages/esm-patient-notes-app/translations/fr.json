@@ -10,6 +10,7 @@
   "diagnosis": "Diagnostic",
   "discard": "Abandonner",
   "emptyDiagnosisText": "Aucun diagnostic sélectionné - Entrez un diagnostic ci-dessous",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "enterPrimaryDiagnoses": "Mettre les diagnostics principaux",
   "enterSecondaryDiagnoses": "Mettre les diagnostics secondaires",
   "goToSummary": "Allerr à la vue d'ensemble",

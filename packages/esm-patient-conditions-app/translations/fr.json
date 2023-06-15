@@ -12,6 +12,7 @@
   "conditionSaveError": "Erreur en enregistrant la condition",
   "currentStatus": "Statut actuel",
   "dateOfOnset": "Date de début",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "endDate": "Date de fin",
   "enterCondition": "Entrer une condition",
   "inactive": "Inactif",

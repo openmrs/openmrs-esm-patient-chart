@@ -4,6 +4,7 @@
   "address": "Adresse",
   "contactDetails": "Coordonnées",
   "deceased": "Décédé",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "loading": "En cours de chargement",
   "relationships": "Relations",
   "showDetails": "Afficher les détails",

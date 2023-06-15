@@ -42,6 +42,7 @@
   "editPastVisit": "Editer une visite passée",
   "editQueueEntryStatusTooltip": "Editer",
   "editThisEncounter": "Editer cette rencontre",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "encounters": "Rencontres",
   "encounterType": "Type de rencontre",
   "end": "Fin",

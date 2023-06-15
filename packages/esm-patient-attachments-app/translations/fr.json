@@ -15,6 +15,7 @@
   "delete": "Effacer",
   "deleteAttachmentConfirmationText": "",
   "deleteImage": "Effacer l'image",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "error": "Erreur",
   "errorUploading": "Erreur en téléchargeant l'image",
   "failed": "échec",

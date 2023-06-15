@@ -12,6 +12,7 @@
   "dateCompleted": "Date de fin",
   "dateEnrolled": "Date d'enregistrement",
   "discontinue": "Cesser",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "enroll": "Enregistrer",
   "enrollment": "Enregistrement",
   "enrollmentLocation": "Lieu d'enregistrement",

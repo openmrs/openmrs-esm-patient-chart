@@ -2,6 +2,7 @@
   "all": "Tout",
   "clinicalForm": "Formulaire clinique",
   "completed": "Complété",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "form": "Formulaire",
   "forms_link": "Formulaires et notes",
   "formName": "Nom du formulaire (A-Z)",
