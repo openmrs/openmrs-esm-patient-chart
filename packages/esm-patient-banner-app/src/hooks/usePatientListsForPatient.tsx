@@ -26,15 +26,3 @@ export function usePatientListsForPatient(patientUuid: string) {
     isLoading,
   };
 }
-
-export function useAllPatientLists() {
-  const { data } = useSWR<FetchResponse<CohortResponse>>('ws/rest/v1/cohortm/cohort', openmrsFetch);
-  return { allLists: data?.data?.results };
-}
-
-interface CohortResponse {
-  results: Array<{
-    uuid: string;
-    display: string;
-  }>;
-}

@@ -29,13 +29,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const [isPatientBannerSmallSize, setIsPatientBannerSmallSize] = useState(false);
 
   useEffect(() => {
+    const currentRef = patientBannerRef.current;
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setIsPatientBannerSmallSize(entry.contentRect.width < 1023);
       }
     });
     resizeObserver.observe(patientBannerRef.current);
-    return () => resizeObserver.unobserve(patientBannerRef.current);
+    return () => {
+      if (currentRef) resizeObserver.unobserve(currentRef);
+    };
   }, [patientBannerRef, setIsPatientBannerSmallSize]);
 
   // Ensure we have emptyStateText and record translation keys
