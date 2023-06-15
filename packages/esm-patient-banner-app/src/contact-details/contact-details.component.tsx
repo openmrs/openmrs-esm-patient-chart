@@ -34,22 +34,24 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
             totalLists: cohorts.length,
           })}
         </p>
-        {slicedLists.map((cohort) => (
-          <p>
-            <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
-              {cohort.name}
+        <ul>
+          {slicedLists.map((cohort) => (
+            <li>
+              <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
+                {cohort.name}
+              </ConfigurableLink>
+            </li>
+          ))}
+          <li>
+            <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
+              {cohorts.length > 3
+                ? t('seeMore', 'See {moreLists} more', {
+                    moreLists: cohorts?.length - 3,
+                  })
+                : ''}
             </ConfigurableLink>
-          </p>
-        ))}
-        <p>
-          <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
-            {cohorts.length > 3
-              ? t('seeMore', 'See {moreLists} more', {
-                  moreLists: cohorts?.length - 3,
-                })
-              : ''}
-          </ConfigurableLink>
-        </p>
+          </li>
+        </ul>
       </>
     );
   }
