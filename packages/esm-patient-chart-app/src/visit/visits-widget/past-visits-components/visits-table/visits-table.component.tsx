@@ -25,6 +25,7 @@ import {
 } from '@carbon/react';
 import { Edit, TrashCan } from '@carbon/react/icons';
 import {
+  UserHasAccess,
   formatDatetime,
   getConfig,
   isDesktop,
@@ -305,34 +306,36 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
-                          {visits[index]?.form?.uuid && (
-                            <Button
-                              kind="ghost"
-                              onClick={() => {
-                                launchWorkspace(
-                                  visits[index].form.uuid,
-                                  visits[index].visitUuid,
-                                  visits[index].id,
-                                  visits[index].form.display,
-                                  visits[index].visitTypeUuid,
-                                  visits[index]?.visitStartDatetime,
-                                  visits[index]?.visitStopDatetime,
-                                );
-                              }}
-                              renderIcon={(props) => <Edit size={16} {...props} />}
-                            >
-                              {t('editThisEncounter', 'Edit this encounter')}
-                            </Button>
-                          )}
-                          {visits[index]?.form?.display && (
-                            <Button
-                              kind="danger--ghost"
-                              onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
-                              renderIcon={(props) => <TrashCan size={16} {...props} />}
-                            >
-                              {t('deleteThisEncounter', 'Delete this encounter')}
-                            </Button>
-                          )}
+                          <UserHasAccess privilege={visits[index]?.editPrivilege?.display}>
+                            {visits[index]?.form?.uuid && (
+                              <Button
+                                kind="ghost"
+                                onClick={() => {
+                                  launchWorkspace(
+                                    visits[index].form.uuid,
+                                    visits[index].visitUuid,
+                                    visits[index].id,
+                                    visits[index].form.display,
+                                    visits[index].visitTypeUuid,
+                                    visits[index]?.visitStartDatetime,
+                                    visits[index]?.visitStopDatetime,
+                                  );
+                                }}
+                                renderIcon={(props) => <Edit size={16} {...props} />}
+                              >
+                                {t('editThisEncounter', 'Edit this encounter')}
+                              </Button>
+                            )}
+                            {visits[index]?.form?.display && (
+                              <Button
+                                kind="danger--ghost"
+                                onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
+                                renderIcon={(props) => <TrashCan size={16} {...props} />}
+                              >
+                                {t('deleteThisEncounter', 'Delete this encounter')}
+                              </Button>
+                            )}
+                          </UserHasAccess>
                         </>
                       </TableExpandedRow>
                     ) : (

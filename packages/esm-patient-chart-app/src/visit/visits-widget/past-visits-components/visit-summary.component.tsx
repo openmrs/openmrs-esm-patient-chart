@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { formatTime, OpenmrsResource, parseDate, Privilege, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem, Diagnosis } from '../visit.resource';
 import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
@@ -36,6 +36,8 @@ export interface MappedEncounter {
   visitTypeUuid: string;
   visitStartDatetime?: string;
   visitStopDatetime?: string;
+  viewPrivilege?: Privilege;
+  editPrivilege?: Privilege;
 }
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({
@@ -190,5 +192,7 @@ export function mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDa
     visitStopDatetime: visitStopDatetime,
     provider:
       encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
+    viewPrivilege: encounter?.encounterType?.viewPrivilege,
+    editPrivilege: encounter?.encounterType?.editPrivilege,
   }));
 }
