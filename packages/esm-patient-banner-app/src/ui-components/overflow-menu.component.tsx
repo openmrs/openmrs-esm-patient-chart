@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import styles from './overflow-menu.scss';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;

@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+import { useStore } from 'zustand';
 import { Add, User } from '@carbon/react/icons';
 import { formatDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
@@ -24,9 +25,8 @@ import { compare } from '../utils/compare';
 import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
-import styles from './medications-details-table.scss';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
-import { useStore } from 'zustand';
+import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -407,7 +407,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet && 'lg'}>
+    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}
