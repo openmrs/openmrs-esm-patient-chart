@@ -269,7 +269,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
         <Stack gap={1} className={styles.container}>
@@ -319,7 +319,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
           {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
           {config.showUpcomingAppointments && (
-            <ExtensionSlot state={upcomingAppointmentState} extensionSlotName="upcoming-appointment-slot" />
+            <ExtensionSlot state={upcomingAppointmentState} name="upcoming-appointment-slot" />
           )}
 
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
@@ -425,7 +425,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           </section>
 
           {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
-          {config.showServiceQueueFields && <ExtensionSlot extensionSlotName="add-queue-entry-slot" />}
+          {config.showServiceQueueFields && <ExtensionSlot name="add-queue-entry-slot" />}
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

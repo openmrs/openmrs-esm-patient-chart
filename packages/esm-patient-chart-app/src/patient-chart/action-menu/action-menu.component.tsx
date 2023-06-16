@@ -12,9 +12,9 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   return (
     <aside className={styles.sideRail}>
       <div className={styles.container}>
-        <ExtensionSlot className={styles.chartExtensions} extensionSlotName={'action-menu-chart-items-slot'} />
+        <ExtensionSlot className={styles.chartExtensions} name={'action-menu-chart-items-slot'} />
         {layout === 'small-desktop' || layout === 'large-desktop' ? <div className={styles.divider}></div> : null}
-        <ExtensionSlot className={styles.nonChartExtensions} extensionSlotName={'action-menu-non-chart-items-slot'} />
+        <ExtensionSlot className={styles.nonChartExtensions} name={'action-menu-non-chart-items-slot'} />
       </div>
     </aside>
   );

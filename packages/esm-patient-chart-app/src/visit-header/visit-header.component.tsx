@@ -210,7 +210,7 @@ const VisitHeader: React.FC = () => {
           <HeaderGlobalBar>
             {systemVisitEnabled && (
               <>
-                <ExtensionSlot extensionSlotName="visit-header-right-slot" />
+                <ExtensionSlot name="visit-header-right-slot" />
                 {!hasActiveVisit && !isDeceased && (
                   <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                     {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}

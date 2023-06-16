@@ -172,11 +172,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
     <Form>
       {isTablet ? (
         <Row className={styles.header}>
-          <ExtensionSlot
-            className={styles.content}
-            extensionSlotName="patient-details-header-slot"
-            state={patientState}
-          />
+          <ExtensionSlot className={styles.content} name="patient-details-header-slot" state={patientState} />
         </Row>
       ) : null}
       <div className={`${styles.form} ${isTablet ? styles.tablet : styles.desktop}`}>

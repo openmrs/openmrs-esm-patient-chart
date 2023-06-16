@@ -18,7 +18,7 @@ export const DashboardGroupExtension = ({ title, slotName, basePath, isExpanded 
   return (
     <Accordion>
       <AccordionItem open={isExpanded ?? true} title={title} style={{ border: 'none' }}>
-        <ExtensionSlot extensionSlotName={slotName ?? title} state={{ basePath }} />
+        <ExtensionSlot name={slotName ?? title} state={{ basePath }} />
       </AccordionItem>
     </Accordion>
   );

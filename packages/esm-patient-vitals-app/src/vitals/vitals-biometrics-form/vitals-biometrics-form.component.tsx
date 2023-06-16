@@ -148,7 +148,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   if (config.vitals.useFormEngine) {
     return (
       <ExtensionSlot
-        extensionSlotName="form-widget-slot"
+        name="form-widget-slot"
         state={{
           view: 'form',
           formUuid: config.vitals.formUuid,

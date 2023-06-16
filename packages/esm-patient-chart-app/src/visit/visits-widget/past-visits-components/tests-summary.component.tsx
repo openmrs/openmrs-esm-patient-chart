@@ -13,7 +13,7 @@ const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encoun
 
   return (
     <ExtensionSlot
-      extensionSlotName="test-results-filtered-overview-slot"
+      name="test-results-filtered-overview-slot"
       state={{ filter, patientUuid } as ExternalOverviewProps}
     />
   );

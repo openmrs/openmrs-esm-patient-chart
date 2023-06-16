@@ -65,11 +65,11 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
 
   return (
     <>
-      <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
+      <ExtensionSlot state={state} name="top-of-all-patient-dashboards-slot" />
       {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
       <ExtensionSlot
         key={dashboard.slot}
-        extensionSlotName={dashboard.slot}
+        name={dashboard.slot}
         className={styles.dashboard}
         style={{ gridTemplateColumns }}
       >

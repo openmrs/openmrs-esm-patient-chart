@@ -46,7 +46,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+      <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
     </div>
   );
 
@@ -101,7 +101,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
-                extensionSlotName="patient-banner-tags-slot"
+                name="patient-banner-tags-slot"
                 state={{ patientUuid, patient }}
                 className={styles.flexRow}
               />
@@ -120,7 +120,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 >
                   <ExtensionSlot
                     onClick={closeDropdownMenu}
-                    extensionSlotName="patient-actions-slot"
+                    name="patient-actions-slot"
                     key="patient-actions-slot"
                     className={styles.overflowMenuItemList}
                     state={patientActionsSlotState}
