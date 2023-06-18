@@ -128,7 +128,12 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
       formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime });
-      launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
+      launchPatientWorkspace('patient-form-entry-workspace', {
+        workspaceTitle: formName,
+        formUuid,
+        encounterUuid,
+        mutateVisits,
+      });
     } else {
       navigate({
         to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,

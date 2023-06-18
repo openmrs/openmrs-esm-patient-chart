@@ -12,11 +12,19 @@ interface FormRendererProps {
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
+  mutateVisits?: () => void;
   closeWorkspace: () => void;
   encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({
+  formUuid,
+  patientUuid,
+  visit,
+  closeWorkspace,
+  encounterUuid,
+  mutateVisits,
+}) => {
   const { t } = useTranslation();
   const { form, formLoadError } = useForm(formUuid);
 
@@ -48,7 +56,10 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visi
           visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
-          onSubmit={() => closeWorkspace()}
+          onSubmit={() => {
+            mutateVisits?.();
+            closeWorkspace();
+          }}
         />
       )}
     </>
