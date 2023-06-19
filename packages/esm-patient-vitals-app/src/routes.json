@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0",
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "vitals-overview-widget",
+      "component": "vitalsSummary",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 1
+    },
+    {
+      "name": "vitals-details-widget",
+      "component": "vitalsMain",
+      "slot": "patient-chart-vitals-biometrics-dashboard-slot",
+      "meta": {
+        "title": "Vitals",
+        "view": "vitals"
+      },
+      "order": 1
+    },
+    {
+      "name": "patient-vitals-info",
+      "component": "vitalsHeader",
+      "slot": "patient-info-slot"
+    },
+    {
+      "name": "patient-vitals-biometrics-form-workspace",
+      "component": "vitalsAndBiometricsForm",
+      "meta": {
+        "title": {
+          "key": "recordVitalsAndBiometrics",
+          "default": "Record Vitals and Biometrics"
+        }
+      }
+    }
+  ],
+  "pages": []
+}
