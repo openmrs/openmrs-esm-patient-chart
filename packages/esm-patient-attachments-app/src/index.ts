@@ -7,6 +7,10 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 const moduleName = '@openmrs/esm-patient-attachments-app';
 
+export function startupApp() {
+  defineConfigSchema(moduleName, attachmentsConfigSchema);
+}
+
 export const attachmentsOverview = () =>
   getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
     featureName: 'patient-attachments',
@@ -46,7 +50,3 @@ export const deleteAttachmentModal = () =>
     featureName: 'delete-attachment-modal',
     moduleName,
   });
-
-export function startupApp() {
-  defineConfigSchema(moduleName, attachmentsConfigSchema);
-}

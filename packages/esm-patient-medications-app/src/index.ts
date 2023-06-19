@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -11,6 +11,10 @@ const options = {
   featureName: 'patient-medications',
   moduleName,
 };
+
+export function startupApp() {
+  defineConfigSchema(moduleName, configSchema);
+}
 
 export const medicationsSummary = () =>
   getAsyncLifecycle(() => import('./medications/root-medication-summary'), options);
@@ -35,7 +39,3 @@ export const medicationsDashboardLink = () =>
 
 export const orderBasketActionMenu = () =>
   getAsyncLifecycle(() => import('./medications-summary/order-basket-action-button.component'), options);
-
-export function startupApp() {
-  defineConfigSchema(moduleName, configSchema);
-}

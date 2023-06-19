@@ -12,6 +12,10 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
+export function startupApp() {
+  defineConfigSchema(moduleName, configSchema);
+}
+
 export const programsOverview = () =>
   getAsyncLifecycle(() => import('./programs/programs-overview.component'), options);
 
@@ -30,7 +34,3 @@ export const programsDashboardLink = () =>
   );
 
 export const programsForm = () => getAsyncLifecycle(() => import('./programs/programs-form.component'), options);
-
-export function startupApp() {
-  defineConfigSchema(moduleName, configSchema);
-}

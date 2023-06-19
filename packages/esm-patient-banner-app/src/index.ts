@@ -10,15 +10,6 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export const activeVisitTag = getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options);
-
-export const deceasedPatientTag = getAsyncLifecycle(
-  () => import('./banner-tags/deceased-patient-tag.component'),
-  options,
-);
-
-export const patientBanner = getAsyncLifecycle(() => import('./banner/patient-banner.component'), options);
-
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
@@ -27,3 +18,12 @@ export function startupApp() {
 
   defineConfigSchema(moduleName, configSchema);
 }
+
+export const activeVisitTag = getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options);
+
+export const deceasedPatientTag = getAsyncLifecycle(
+  () => import('./banner-tags/deceased-patient-tag.component'),
+  options,
+);
+
+export const patientBanner = getAsyncLifecycle(() => import('./banner/patient-banner.component'), options);
