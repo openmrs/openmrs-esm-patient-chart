@@ -5,9 +5,9 @@ import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-frame
 import { configSchema } from './config-schema';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 
-export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
 const moduleName = '@openmrs/esm-form-entry-app';
+
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
   setupStaticDataOfflinePrecaching();
