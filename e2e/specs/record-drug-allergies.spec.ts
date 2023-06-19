@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Add environmental allergy to patient', async ({ page, api }) => {
+test('Add drug allergy to patient', async ({ page, api }) => {
   const allergiesPage = new PatientAllergiesPage(page);
 
   await test.step('When I visit the patient allergies page', async () => {
@@ -20,19 +20,15 @@ test('Add environmental allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('And I click the Environmental allergen tab', async () => {
-    await allergiesPage.page.getByText('Environmental').click();
+  await test.step('Then I clicked a drug allergen option', async () => {
+    await allergiesPage.page.getByText('ACE inhibitors').click();
   });
 
-  await test.step('Then I click the Environmental allergen option', async () => {
-    await allergiesPage.page.getByText('Dust').click();
-  });
-
-  await test.step('Then I click the reaction option', async () => {
+  await test.step('Then I clicked a reaction option', async () => {
     await allergiesPage.page.getByText('Mental status change').click();
   });
 
-  await test.step('Then I click the severity option', async () => {
+  await test.step('Then I clicked a severity option', async () => {
     await allergiesPage.page.getByText('Mild').click();
   });
 
@@ -40,16 +36,16 @@ test('Add environmental allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
-  await test.step('Then I click the save button', async () => {
+  await test.step('Then I submit the form', async () => {
     await allergiesPage.page.getByText('Save').click();
   });
 
-  await test.step('And I see the Allergy saved message', async () => {
+  await test.step('And I see the Allergy Saved message', async () => {
     await expect(allergiesPage.page.getByText('saved')).toBeVisible();
   });
 
   await test.step('And I see the data of the allergy that I saved', async () => {
-    await expect(allergiesPage.page.getByText('Dust')).toBeVisible();
+    await expect(allergiesPage.page.getByText('ACE inhibitors')).toBeVisible();
     await expect(allergiesPage.page.getByText('Mental status change')).toBeVisible();
     await expect(allergiesPage.page.getByText('LOW')).toBeVisible();
     await expect(allergiesPage.page.getByText('Test comment')).toBeVisible();
