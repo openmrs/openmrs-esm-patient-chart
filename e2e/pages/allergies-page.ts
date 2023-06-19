@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-export class PatientAllergiesPage {
+export class AllergiesPage {
   constructor(readonly page: Page) {}
 
   async goto(uuid: string) {
