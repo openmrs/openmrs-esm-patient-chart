@@ -44,7 +44,18 @@ function setupOpenMRS() {
         name: 'appointments-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 11,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        // t('appointments_link', 'Appointments')
+        load: getSyncLifecycle(
+          createDashboardLink({
+            ...dashboardMeta,
+            title: () =>
+              Promise.resolve(
+                window.i18next?.t('appointments_link', { defaultValue: 'Appointments', ns: moduleName }) ??
+                  'Appointments',
+              ),
+          }),
+          options,
+        ),
         meta: dashboardMeta,
       },
       {
