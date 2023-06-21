@@ -322,6 +322,30 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        name: 'patient-flags-tag',
+        slot: 'patient-highlights-bar-slot',
+        order: 0,
+        load: getAsyncLifecycle(() => import('./patient-flags/patient-flags-tag.component'), {
+          featureName: 'patient flag tag',
+          moduleName,
+        }),
+        online: true,
+        offline: false,
+      },
+      {
+        name: 'patient-flags-overview',
+        slot: 'patient-chart-summary-dashboard-slot',
+        order: -1,
+        load: getAsyncLifecycle(() => import('./patient-flags/patient-flags.component'), {
+          featureName: 'patient flags',
+          moduleName,
+        }),
+        meta: {
+          columnSpan: 4,
+        },
+        online: { showAddAllergyButton: true },
+      },
     ],
   };
 }
