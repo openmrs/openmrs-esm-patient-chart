@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -6,7 +6,6 @@ import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/e
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { Breakpoint } from '@openmrs/esm-framework/src/internal';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -23,17 +22,17 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   onTransition,
   hideActionsOverflow,
 }) => {
-  const { excludePatientIdentifierCodeTypes } = useConfig();
   const { t } = useTranslation();
-  const overflowMenuRef = React.useRef(null);
-  const patientBannerRef = React.useRef(null);
-  const [isPatientBannerSmallSize, setIsPatientBannerSmallSize] = useState(false);
+  const overflowMenuRef = useRef(null);
+  const patientBannerRef = useRef(null);
+  const [isTabletViewport, setIsTabletViewport] = useState(false);
+  const { excludePatientIdentifierCodeTypes } = useConfig();
 
   useEffect(() => {
     const currentRef = patientBannerRef.current;
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setIsPatientBannerSmallSize(entry.contentRect.width < Breakpoint.TABLET_MAX);
+        setIsTabletViewport(entry.contentRect.width < 1023);
       }
     });
     resizeObserver.observe(patientBannerRef.current);
@@ -42,20 +41,20 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
         resizeObserver.unobserve(currentRef);
       }
     };
-  }, [patientBannerRef, setIsPatientBannerSmallSize]);
+  }, [patientBannerRef, setIsTabletViewport]);
 
   // Ensure we have emptyStateText and record translation keys
   // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
 
-  const patientActionsSlotState = React.useMemo(
+  const patientActionsSlotState = useMemo(
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],
   );
 
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
+  const patientPhotoSlotState = useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
-  const [showContactDetails, setShowContactDetails] = React.useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
@@ -182,7 +181,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       </div>
       {showContactDetails && (
         <ContactDetails
-          isPatientBannerSmallSize={isPatientBannerSmallSize}
+          isTabletViewport={isTabletViewport}
           address={patient?.address ?? []}
           telecom={patient?.telecom ?? []}
           patientId={patient?.id}
