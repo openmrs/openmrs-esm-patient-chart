@@ -1,3 +1,12 @@
 {
-    "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient."
+  "add": "Add",
+  "biometricDisplayed": "Biometric displayed",
+  "biometrics": "Biometrics",
+  "biometrics_lower": "biometrics",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
+  "goToSummary": "Go to Summary",
+  "loading": "Loading",
+  "record": "Record",
+  "seeAll": "See all",
+  "weight": "Weight"
 }

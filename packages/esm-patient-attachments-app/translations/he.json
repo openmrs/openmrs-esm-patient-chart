@@ -1,6 +1,7 @@
 {
   "add": "הוסף",
   "addAttachment": "הוסף קובץ מצורף",
+  "addAttachment_title": "Add Attachment",
   "addImage": "הוסף תמונה +",
   "addMoreAttachments": "הוסף קבצים מצורפים נוספים",
   "attachmentCaptionInstruction": "הכנס תיאור לתמונה",
@@ -16,7 +17,6 @@
   "deleteAttachmentConfirmationText": "",
   "deleteImage": "מחק תמונה",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
-  "record": "רשומה",
   "error": "שגיאה",
   "errorUploading": "שגיאה בהעלאת קובץ",
   "failed": "נכשל",
@@ -33,6 +33,7 @@
   "image": "תמונה",
   "imageDescription": "תיאור התמונה",
   "name": "שם",
+  "record": "רשומה",
   "successfullyDeleted": "נמחק בהצלחה",
   "type": "סוג",
   "uploadComplete": "ההעלאה הושלמה",
