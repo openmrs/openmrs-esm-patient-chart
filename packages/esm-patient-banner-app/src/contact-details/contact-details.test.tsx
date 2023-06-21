@@ -154,13 +154,13 @@ describe('ContactDetails', () => {
       isLoading: false,
       cohorts: mockCohorts,
     });
-    const props = { ...testProps, isPatientBannerSmallSize: true };
+    const props = { ...testProps, isTabletViewport: true };
 
     const { container } = renderWithSwr(<ContactDetails {...props} />);
 
     await waitForLoadingToFinish();
 
-    expect(container.firstChild).toHaveClass('smallBannerSize');
+    expect(container.firstChild).toHaveClass('tabletSizeBanner');
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
     expect(screen.getByText('Relationships')).toBeInTheDocument();
@@ -190,13 +190,13 @@ describe('ContactDetails', () => {
     });
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
-    const props = { ...testProps, isPatientBannerSmallSize: false };
+    const props = { ...testProps, isTabletViewport: false };
 
     const { container } = renderWithSwr(<ContactDetails {...props} />);
 
     await waitForLoadingToFinish();
 
-    expect(container.firstChild).not.toHaveClass('smallBannerSize');
+    expect(container.firstChild).not.toHaveClass('tabletSizeBanner');
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
     expect(screen.getByText('Relationships')).toBeInTheDocument();

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { ConfigurableLink, navigate, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
-import { ConfigObject } from '../config-schema';
 import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
@@ -13,57 +13,49 @@ interface ContactDetailsProps {
   telecom: Array<fhir.ContactPoint>;
   patientId: string;
   deceased: boolean;
-  isPatientBannerSmallSize: boolean;
+  isTabletViewport: boolean;
 }
 
 const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
-  const { cohorts, isLoading } = usePatientListsForPatient(patientUuid);
   const { t } = useTranslation();
+  const { cohorts, isLoading } = usePatientListsForPatient(patientUuid);
 
-  if (isLoading) {
-    return <InlineLoading />;
-  }
-
-  if (cohorts?.length > 0) {
-    const sorted = cohorts.sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime());
-    const slicedLists = sorted.slice(0, 3);
-    return (
-      <>
-        <p className={styles.heading}>
-          {t('patientLists', 'Patient Lists ({totalLists})', {
-            totalLists: cohorts.length,
-          })}
-        </p>
+  return (
+    <>
+      <p className={styles.heading}>
+        {t('patientLists', 'Patient Lists')} ({cohorts?.length ?? 0})
+      </p>
+      {isLoading ? (
+        <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
         <ul>
-          {slicedLists.map((cohort) => (
-            <li>
-              <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
-                {cohort.name}
-              </ConfigurableLink>
-            </li>
-          ))}
-          <li>
+          {(() => {
+            if (cohorts?.length > 0) {
+              const sortedLists = cohorts.sort(
+                (a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime(),
+              );
+              const slicedLists = sortedLists.slice(0, 3);
+              return slicedLists?.map((cohort) => (
+                <li key={cohort.uuid}>
+                  <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
+                    {cohort.name}
+                  </ConfigurableLink>
+                </li>
+              ));
+            }
+            return <li>--</li>;
+          })()}
+          <li style={{ marginTop: '1rem' }}>
             <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
               {cohorts.length > 3
-                ? t('seeMore', 'See {moreLists} more', {
-                    moreLists: cohorts?.length - 3,
+                ? t('seeMoreLists', 'See {listCount} more lists', {
+                    listCount: cohorts?.length - 3,
                   })
                 : ''}
             </ConfigurableLink>
           </li>
         </ul>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <p className={styles.heading}>
-        {t('patientLists', 'Patient Lists ({totalLists})', {
-          totalLists: cohorts.length,
-        })}
-      </p>
-      <p>--</p>
+      )}
     </>
   );
 };
@@ -135,18 +127,21 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      <ul>
-        <li>{value}</li>
-        {isLoading ? (
-          <InlineLoading description={`${t('loading', 'Loading')} ...`} />
-        ) : (
-          contactAttributes?.map(({ attributeType, value, uuid }) => (
-            <li key={uuid}>
-              {attributeType.display} : {value}
-            </li>
-          ))
-        )}
-      </ul>
+      {isLoading ? (
+        <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {contactAttributes?.length > 0 ? (
+            contactAttributes.map(({ attributeType, value, uuid }) => (
+              <li key={uuid}>
+                {attributeType.display} : {value}
+              </li>
+            ))
+          ) : (
+            <li>--</li>
+          )}
+        </ul>
+      )}
     </>
   );
 };
@@ -167,44 +162,39 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   return (
     <>
       <p className={styles.heading}>{t('relationships', 'Relationships')}</p>
-      <>
-        {(() => {
-          if (isLoading) return <InlineLoading description="Loading..." role="progressbar" />;
-          if (relationships?.length) {
-            return (
-              <ul>
-                {relationships.map((r) => (
-                  <li key={r.uuid} className={styles.relationship}>
-                    <div>{extractName(r.display)}</div>
-                    <div>{r.relationshipType}</div>
-                    <div>
-                      {`${r.relativeAge ? r.relativeAge : '--'} ${
-                        r.relativeAge ? (r.relativeAge === 1 ? 'yr' : 'yrs') : ''
-                      }`}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            );
-          }
-          return <p>--</p>;
-        })()}
-      </>
+      {isLoading ? (
+        <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {relationships?.length > 0 ? (
+            <>
+              {relationships.map((r) => (
+                <li key={r.uuid} className={styles.relationship}>
+                  <div>{extractName(r.display)}</div>
+                  <div>{r.relationshipType}</div>
+                  <div>
+                    {`${r.relativeAge ? r.relativeAge : '--'} ${
+                      r.relativeAge ? (r.relativeAge === 1 ? 'yr' : 'yrs') : ''
+                    }`}
+                  </div>
+                </li>
+              ))}
+            </>
+          ) : (
+            <li>--</li>
+          )}
+        </ul>
+      )}
     </>
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({
-  address,
-  telecom,
-  patientId,
-  deceased,
-  isPatientBannerSmallSize,
-}) => {
+const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId, deceased, isTabletViewport }) => {
   const currentAddress = address?.find((a) => a.use === 'home');
   const currentClass = `${styles[deceased && 'deceased']} ${
-    styles[isPatientBannerSmallSize ? 'smallBannerSize' : 'contactDetailsContainer']
+    styles[isTabletViewport ? 'tabletSizeBanner' : 'contactDetailsContainer']
   }`;
+
   return (
     <div className={currentClass}>
       <div className={styles.row}>

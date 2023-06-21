@@ -12,7 +12,6 @@
     @include type.type-style("body-compact-01");
     text-decoration: none;
   }
-
 }
 
 .contactDetailsContainer {
@@ -52,21 +51,21 @@
 .relationship {
   display: flex;
   flex-flow: row nowrap;
+
+  div {
+    flex: 1 1;
+  }
 }
 
-.relationship div {
-  flex: 1 1;
-}
-
-.smallBannerSize {
+.tabletSizeBanner {
   @include container;
   display: block;
 
   .row {
     &:first-child {
     border-bottom: 1px solid $ui-03;
+    }
   }
-}
 
   .row > .col {
     &:nth-of-type(2n + 1) {
