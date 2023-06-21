@@ -92,7 +92,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 8000;
   }
 
   .header {
@@ -115,7 +115,7 @@
 
   .fixed {
     top: 3rem;
-    bottom: spacing.$spacing-10;
+    bottom: 3.96rem;
     background-color: $ui-01;
   }
 
