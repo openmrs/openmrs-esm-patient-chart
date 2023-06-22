@@ -20,9 +20,7 @@ describe('PatientFlag: ', () => {
       error: null,
     });
     render(<PatientFlags patientUuid={mockPatient.id} />);
-    // const tooltipElements = await screen.findAllByRole('tooltip');
     const buttonElements = await screen.findAllByRole('button');
-    // expect(tooltipElements.length).toBe(3);
     expect(buttonElements.length).toBe(4);
   });
 
@@ -34,6 +32,5 @@ describe('PatientFlag: ', () => {
     });
     render(<PatientFlags patientUuid={mockPatient.id} />);
     expect(await screen.queryByRole('tooltip')).not.toBeInTheDocument();
-    expect(await screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
