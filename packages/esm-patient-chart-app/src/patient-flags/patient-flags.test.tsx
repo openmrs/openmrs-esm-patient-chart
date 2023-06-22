@@ -23,7 +23,7 @@ describe('PatientFlag: ', () => {
     // const tooltipElements = await screen.findAllByRole('tooltip');
     const buttonElements = await screen.findAllByRole('button');
     // expect(tooltipElements.length).toBe(3);
-    expect(buttonElements.length).toBe(3);
+    expect(buttonElements.length).toBe(4);
   });
 
   it('should not render if patient flag are abscent', async () => {
