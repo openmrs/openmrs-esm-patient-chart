@@ -9,7 +9,6 @@
 
 .patientChartWrapper {
   &>nav {
-    overflow-y: scroll;
     padding-bottom: 3rem;
     scrollbar-width: none;
   }
@@ -18,9 +17,23 @@
     width: 0px;
     background-color: transparent
   }
+
   :global(.cds--side-nav__overlay-active) {
     background-color: transparent;
   }
+
+  :global(.cds--side-nav) {
+    overflow: auto;
+  }
+}
+
+// Tablet side nav scrolling
+:global(.omrs-breakpoint-lt-desktop) {
+  .patientChartWrapper {
+    :global(.cds--side-nav) {
+      height: calc(100vh - 3rem - 3.96rem);
+  }
+ }
 }
 
 .caption01 {
