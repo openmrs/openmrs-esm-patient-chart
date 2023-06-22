@@ -1,0 +1,39 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.flagSummary {
+    padding: spacing.$spacing-03;
+    border-bottom: 0.063rem solid $ui-03;
+}
+
+.flagIcon{
+    font-size: medium;
+}
+
+.flagsHighlightTag {
+  padding: 0 0.5rem;
+  border: none;
+  span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .flagText {
+    margin-right: 0.5rem;
+  }
+}
+
+.highlightBarContainer {
+  display: flex;
+  align-items: center;
+  position: 'relative';
+  padding: 0.5rem;
+  border-bottom: 0.065rem solid $ui-03;
+}
+
+.flagSkeleton{
+    height: 3rem;
+    width: 9rem;
+}
+

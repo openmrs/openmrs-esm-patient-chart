@@ -237,6 +237,16 @@ function setupOpenMRS() {
         },
       },
       {
+        name: 'edit-flags-side-panel',
+        load: getAsyncLifecycle(() => import('./patient-flags/patient-flags-list.component'), {
+          featureName: 'edit-flags-side-panel',
+          moduleName,
+        }),
+        meta: {
+          title: 'Edit Flags',
+        },
+      },
+      {
         name: 'patient-details-tile',
         slot: 'visit-form-header-slot',
         order: 1,
@@ -326,7 +336,7 @@ function setupOpenMRS() {
         name: 'patient-flags-tag',
         slot: 'patient-highlights-bar-slot',
         order: 0,
-        load: getAsyncLifecycle(() => import('./patient-flags/patient-flags-tag.component'), {
+        load: getAsyncLifecycle(() => import('./patient-flags/patient-flags-highlight-bar.component'), {
           featureName: 'patient flag tag',
           moduleName,
         }),
