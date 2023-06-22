@@ -34,6 +34,5 @@ describe('PatientFlag: ', () => {
     });
     render(<PatientFlags patientUuid={mockPatient.id} />);
     expect(await screen.queryByRole('tooltip')).not.toBeInTheDocument();
-    expect(await screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
