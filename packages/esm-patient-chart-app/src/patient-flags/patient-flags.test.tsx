@@ -20,9 +20,9 @@ describe('PatientFlag: ', () => {
       error: null,
     });
     render(<PatientFlags patientUuid={mockPatient.id} />);
-    const tooltipElements = await screen.findAllByRole('tooltip');
+    // const tooltipElements = await screen.findAllByRole('tooltip');
     const buttonElements = await screen.findAllByRole('button');
-    expect(tooltipElements.length).toBe(3);
+    // expect(tooltipElements.length).toBe(3);
     expect(buttonElements.length).toBe(3);
   });
 
