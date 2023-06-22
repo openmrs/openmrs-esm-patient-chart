@@ -6,6 +6,8 @@ interface FlagFetchResponse {
   uuid: string;
   name: string;
   message: string;
+  enabled: boolean;
+  auditInfo: {};
 }
 
 interface FlagsFetchResponse {
