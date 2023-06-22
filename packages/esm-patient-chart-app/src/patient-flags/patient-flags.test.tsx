@@ -7,8 +7,8 @@ import { useFlagsFromPatient } from './hooks/usePatientFlags';
 
 const mockUsePatientFlags = useFlagsFromPatient as jest.Mock;
 
-jest.mock('../hooks/usePatientFlags', () => ({
-  ...(jest.requireActual('../hooks/usePatientFlags') as any),
+jest.mock('./hooks/usePatientFlags', () => ({
+  ...(jest.requireActual('./hooks/usePatientFlags') as any),
   useFlagsFromPatient: jest.fn(),
 }));
 
