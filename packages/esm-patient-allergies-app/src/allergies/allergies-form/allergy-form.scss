@@ -12,7 +12,6 @@
   display: grid;
   grid-template-columns: 50% 10% 1fr;
   margin: 0.5rem 1rem;
-  width: 100%;
 }
 
 .container {
@@ -61,12 +60,12 @@
 }
 
 .sectionHeading {
-  @include type.type-style('heading-compact-02');  
+  @include type.type-style('heading-compact-02');
   margin: 1rem 1rem 0.5rem;
 }
 
 .midSectionHeading {
-  @include type.type-style('heading-compact-02');  
+  @include type.type-style('heading-compact-02');
   margin: 0rem 1rem 0.5rem;
 }
 
@@ -93,7 +92,7 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.wrapper { 
+.wrapper {
   margin: 1rem;
 
   &:last-of-type {

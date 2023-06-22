@@ -15,6 +15,7 @@ import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.serv
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
 import { ConceptService } from '../services/concept.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ProgramResourceService } from '../openmrs-api/program-resource.service';
 
 type FormState =
   | 'initial'
@@ -56,6 +57,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly conceptService: ConceptService,
     private readonly translateService: TranslateService,
     private readonly ngZone: NgZone,
+    private readonly programService: ProgramResourceService,
   ) {}
 
   public ngOnInit() {
@@ -182,6 +184,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     }
 
     this.changeState('submitting');
+    const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
     this.formSubmissionService.submitPayload(this.form).subscribe(
       ({ encounter }) => {
         this.onPostResponse(encounter);
@@ -200,6 +203,11 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             });
         }
 
+        this.programService.handleProgramEnrollmentAndDiscontinuation(
+          this.form,
+          this.singleSpaPropsService.getProp('patientUuid'),
+          encounterToSubmit,
+        );
         showToast({
           critical: true,
           kind: 'success',

@@ -271,37 +271,35 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 className={styles.menuItem}
                                 itemText={t('goToThisEncounter', 'Go to this encounter')}
                               />
+                              {userHasAccess(visits[index]?.editPrivilege, session?.user) && visits[index]?.form?.uuid && (
+                                <OverflowMenuItem
+                                  className={styles.menuItem}
+                                  itemText={t('editThisEncounter', 'Edit this encounter')}
+                                  size={desktopLayout ? 'sm' : 'lg'}
+                                  onClick={() => {
+                                    launchWorkspace(
+                                      visits[index]?.form?.uuid,
+                                      visits[index]?.visitUuid,
+                                      visits[index]?.id,
+                                      visits[index]?.form?.display,
+                                      visits[index]?.visitTypeUuid,
+                                      visits[index]?.visitStartDatetime,
+                                      visits[index]?.visitStopDatetime,
+                                    );
+                                  }}
+                                />
+                              )}
                               {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
-                                <>
-                                  {visits[index]?.form?.uuid && (
-                                    <OverflowMenuItem
-                                      className={styles.menuItem}
-                                      itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      size={desktopLayout ? 'sm' : 'lg'}
-                                      onClick={() => {
-                                        launchWorkspace(
-                                          visits[index]?.form?.uuid,
-                                          visits[index]?.visitUuid,
-                                          visits[index]?.id,
-                                          visits[index]?.form?.display,
-                                          visits[index]?.visitTypeUuid,
-                                          visits[index]?.visitStartDatetime,
-                                          visits[index]?.visitStopDatetime,
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                  <OverflowMenuItem
-                                    size={desktopLayout ? 'sm' : 'lg'}
-                                    className={styles.menuItem}
-                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                    onClick={() => {
-                                      handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display);
-                                    }}
-                                    hasDivider
-                                    isDelete
-                                  />
-                                </>
+                                <OverflowMenuItem
+                                  size={desktopLayout ? 'sm' : 'lg'}
+                                  className={styles.menuItem}
+                                  itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                  onClick={() => {
+                                    handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display);
+                                  }}
+                                  hasDivider
+                                  isDelete
+                                />
                               )}
                             </OverflowMenu>
                           </Layer>
