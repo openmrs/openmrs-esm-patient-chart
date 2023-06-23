@@ -45,10 +45,10 @@ test('Add drug allergy to patient', async ({ page, api }) => {
   });
 
   await test.step('And I see the data of the allergy that I saved', async () => {
-    await expect(allergiesPage.page.getByText('ACE inhibitors')).toBeVisible();
-    await expect(allergiesPage.page.getByText('Mental status change')).toBeVisible();
-    await expect(allergiesPage.page.getByText('LOW')).toBeVisible();
-    await expect(allergiesPage.page.getByText('Test comment')).toBeVisible();
+    await expect(allergiesPage.tableRow().getByText('ACE inhibitors')).toBeVisible();
+    await expect(allergiesPage.tableRow().getByText('Mental status change')).toBeVisible();
+    await expect(allergiesPage.tableRow().getByText('LOW')).toBeVisible();
+    await expect(allergiesPage.tableRow().getByText('Test comment')).toBeVisible();
   });
 });
 
