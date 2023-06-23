@@ -60,10 +60,9 @@ export function startupApp() {
   ]);
 }
 
-export const root = () =>
-  getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
+export const root = getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
 
-export const patientSummaryDashboardLink = () =>
+export const patientSummaryDashboardLink =
   // t('summary_link', 'Patient Summary')
   getSyncLifecycle(
     createDashboardLink({
