@@ -5,12 +5,12 @@
       "name": "charts-summary-dashboard",
       "component": "patientSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
+      "order": 0,
       "meta": {
         "slot": "patient-chart-summary-dashboard-slot",
         "columns": 4,
         "path": "Patient Summary"
-      },
-      "order": 0
+      }
     },
     {
       "name": "start-visit-button",
@@ -58,6 +58,11 @@
       "component": "addPastVisitPatientSearchActionButton"
     },
     {
+      "name": "add-past-visit-button",
+      "slot": "patient-search-actions-slot",
+      "component": "addPastVisitPatientSearchActionButton"
+    },
+    {
       "name": "encounters-summary-dashboard",
       "slot": "patient-chart-dashboard-slot",
       "component": "encountersSummaryDashboardLink",
@@ -80,9 +85,7 @@
     },
     {
       "name": "past-visits-overview",
-      "slot": "patient-chart-encounters-dashboard-slot",
       "component": "pastVisitsOverview",
-      "order": 1,
       "meta": {
         "title": "Edit or load a past visit",
         "view": "visits"
@@ -90,9 +93,7 @@
     },
     {
       "name": "start-visit-workspace-form",
-      "slot": "patient-chart-encounters-dashboard-slot",
-      "component": "pastVisitsOverview",
-      "order": 1,
+      "component": "startVisitForm",
       "meta": {
         "title": "Start a visit"      
       }
@@ -108,17 +109,11 @@
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
-      "meta": {
-        "title": "Mark Deceased"
-      },
       "order": 1
     },
     {
       "name": "nav-group",
-      "component": "genericNavGroup",
-      "meta": {
-        "title": "Nav group"
-      }
+      "component": "genericNavGroup"
     },
     {
       "name": "dashboard",
@@ -142,7 +137,7 @@
     },
     {
       "name": "confirm-alive-modal",
-      "component": "confirmDeceasedDialog"
+      "component": "confirmAliveDialog"
     },
     {
       "name": "start-visit-button-patient-search",

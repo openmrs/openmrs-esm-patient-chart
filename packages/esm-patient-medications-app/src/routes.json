@@ -24,7 +24,6 @@
     {
       "name": "order-basket-workspace",
       "component": "orderBasketWorkspace",
-      "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
         "title": {
           "key": "orderBasket",
