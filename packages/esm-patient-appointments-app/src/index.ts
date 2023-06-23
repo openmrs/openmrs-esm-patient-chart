@@ -2,79 +2,32 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const moduleName = '@openmrs/esm-patient-appointments-app';
 
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
+const options = {
+  featureName: 'patient-appointments',
+  moduleName,
 };
 
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-appointments-app';
-
-  const options = {
-    featureName: 'patient-appointments',
-    moduleName,
-  };
-
+export function startupApp() {
   defineConfigSchema(moduleName, {});
-
-  return {
-    extensions: [
-      {
-        name: 'appointments-overview-widget',
-        order: getPatientSummaryOrder('Appointments'),
-        load: getAsyncLifecycle(() => import('./appointments/appointments-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-      },
-      {
-        name: 'appointments-details-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options),
-        meta: {
-          columnSpan: 1,
-        },
-      },
-      {
-        name: 'appointments-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 11,
-        // t('appointments_link', 'Appointments')
-        load: getSyncLifecycle(
-          createDashboardLink({
-            ...dashboardMeta,
-            title: () =>
-              Promise.resolve(
-                window.i18next?.t('appointments_link', { defaultValue: 'Appointments', ns: moduleName }) ??
-                  'Appointments',
-              ),
-          }),
-          options,
-        ),
-        meta: dashboardMeta,
-      },
-      {
-        name: 'appointments-form-workspace',
-        load: getAsyncLifecycle(() => import('./appointments/appointments-form/appointments-form.component'), options),
-      },
-      {
-        name: 'appointment-cancel-confirmation-dialog',
-        load: getAsyncLifecycle(() => import('./appointments/appointments-cancel-modal.component'), options),
-        online: true,
-        offline: false,
-      },
-      {
-        id: 'upcoming-appointment-widget',
-        slot: 'upcoming-appointment-slot',
-        load: getAsyncLifecycle(() => import('./appointments/upcoming-appointments-card.component'), options),
-      },
-    ],
-  };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS, version };
+export const appointmentsOverview = () =>
+  getAsyncLifecycle(() => import('./appointments/appointments-overview.component'), options);
+
+export const appointmentsDetailedSummary = () =>
+  getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options);
+
+export const appointmentsSummaryDashboardLink = () => getSyncLifecycle(createDashboardLink(dashboardMeta), options);
+
+export const appointmentsFormWorkspace = () =>
+  getAsyncLifecycle(() => import('./appointments/appointments-form/appointments-form.component'), options);
+
+export const appointmentsCancelConfirmationDialog = () =>
+  getAsyncLifecycle(() => import('./appointments/appointments-cancel-modal.component'), options);
+
+export const upcomingAppointmentsWidget = () =>
+  getAsyncLifecycle(() => import('./appointments/upcoming-appointments-card.component'), options);

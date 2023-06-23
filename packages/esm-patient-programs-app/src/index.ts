@@ -3,70 +3,34 @@ import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patien
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+const moduleName = '@openmrs/esm-patient-programs-app';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
+const options = {
+  featureName: 'patient-programs',
+  moduleName,
 };
 
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-programs-app';
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-  const options = {
-    featureName: 'patient-programs',
-    moduleName,
-  };
-
+export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-
-  return {
-    extensions: [
-      {
-        name: 'programs-overview-widget',
-        order: getPatientSummaryOrder('Programs'),
-        load: getAsyncLifecycle(() => import('./programs/programs-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-      },
-      {
-        name: 'programs-details-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options),
-        meta: {
-          columnSpan: 1,
-        },
-      },
-      {
-        name: 'programs-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 10,
-        // t('programs_link', 'Programs')
-        load: getSyncLifecycle(
-          createDashboardLink({
-            ...dashboardMeta,
-            title: () =>
-              Promise.resolve(
-                window.i18next?.t('programs_link', { defaultValue: 'Programs', ns: moduleName }) ?? 'Programs',
-              ),
-          }),
-          options,
-        ),
-        meta: dashboardMeta,
-      },
-      {
-        name: 'programs-form-workspace',
-        load: getAsyncLifecycle(() => import('./programs/programs-form.component'), options),
-        meta: {
-          title: 'Record program enrollment',
-        },
-      },
-    ],
-  };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS, version };
+export const programsOverview = () =>
+  getAsyncLifecycle(() => import('./programs/programs-overview.component'), options);
+
+export const programsDetailedSummary = () =>
+  getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options);
+
+export const programsDashboardLink = () =>
+  // t('programs_link', 'Programs')
+  getSyncLifecycle(
+    createDashboardLink({
+      ...dashboardMeta,
+      title: () =>
+        Promise.resolve(window.i18next?.t('programs_link', { defaultValue: 'Programs', ns: moduleName }) ?? 'Programs'),
+    }),
+    options,
+  );
+
+export const programsForm = () => getAsyncLifecycle(() => import('./programs/programs-form.component'), options);

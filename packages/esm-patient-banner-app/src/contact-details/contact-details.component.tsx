@@ -46,7 +46,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
               .map(([key, value]) =>
                 key === 'extension' ? (
                   address?.extension[0]?.extension.map((add, i) => (
-                    <li>
+                    <li key={`address-${key}-${i}`}>
                       {customAddressLabel ? t(customAddressLabel[getAddressKey(add.url)]) : t(getAddressKey(add.url))}:{' '}
                       {add.valueString}
                     </li>
