@@ -27,12 +27,11 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const externalOverview = () =>
-  getAsyncLifecycle(() => import('./overview/external-overview.component'), options);
+export const externalOverview = getAsyncLifecycle(() => import('./overview/external-overview.component'), options);
 
-export const resultsViewer = () => getAsyncLifecycle(() => import('./results-viewer'), options);
+export const resultsViewer = getAsyncLifecycle(() => import('./results-viewer'), options);
 
-export const testResultsDashboardLink = () =>
+export const testResultsDashboardLink =
   // t('testResults_link', 'Test Results')
   getSyncLifecycle(
     createDashboardLink({

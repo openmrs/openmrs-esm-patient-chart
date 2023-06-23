@@ -59,16 +59,21 @@ export const formsAndNotesDashboardLink = () =>
     options,
   );
 
-export const offlineFormOverviewCard = () =>
-  getAsyncLifecycle(() => import('./offline-forms/offline-forms-overview-card.component'), options);
+export const offlineFormOverviewCard = getAsyncLifecycle(
+  () => import('./offline-forms/offline-forms-overview-card.component'),
+  options,
+);
 
-export const offlineFormsNavLink = () =>
-  getSyncLifecycle(() => OfflineToolsNavLink({ page: 'forms', title: 'Offline forms' }), options);
+export const offlineFormsNavLink = getSyncLifecycle(
+  () => OfflineToolsNavLink({ page: 'forms', title: 'Offline forms' }),
+  options,
+);
 
-export const offlineForms = () => getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options);
+export const offlineForms = getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options);
 
-export const clinicalFormActionMenu = () =>
-  getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options);
+export const clinicalFormActionMenu = getAsyncLifecycle(
+  () => import('./clinical-form-action-button.component'),
+  options,
+);
 
-export const clinicalFormsWorkspace = () =>
-  getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options);
+export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options);

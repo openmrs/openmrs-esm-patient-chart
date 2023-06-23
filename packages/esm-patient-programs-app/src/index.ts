@@ -16,13 +16,14 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const programsOverview = () =>
-  getAsyncLifecycle(() => import('./programs/programs-overview.component'), options);
+export const programsOverview = getAsyncLifecycle(() => import('./programs/programs-overview.component'), options);
 
-export const programsDetailedSummary = () =>
-  getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options);
+export const programsDetailedSummary = getAsyncLifecycle(
+  () => import('./programs/programs-detailed-summary.component'),
+  options,
+);
 
-export const programsDashboardLink = () =>
+export const programsDashboardLink =
   // t('programs_link', 'Programs')
   getSyncLifecycle(
     createDashboardLink({
@@ -33,4 +34,4 @@ export const programsDashboardLink = () =>
     options,
   );
 
-export const programsForm = () => getAsyncLifecycle(() => import('./programs/programs-form.component'), options);
+export const programsForm = getAsyncLifecycle(() => import('./programs/programs-form.component'), options);

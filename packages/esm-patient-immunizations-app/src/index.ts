@@ -16,13 +16,17 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const immunizationsOverview = () =>
-  getAsyncLifecycle(() => import('./immunizations/immunizations-overview.component'), options);
+export const immunizationsOverview = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-overview.component'),
+  options,
+);
 
-export const immunizationsDetailedSummary = () =>
-  getAsyncLifecycle(() => import('./immunizations/immunizations-detailed-summary.component'), options);
+export const immunizationsDetailedSummary = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-detailed-summary.component'),
+  options,
+);
 
-export const immunizationsDashboardLink = () =>
+export const immunizationsDashboardLink =
   // t('immunizations_link', 'Immunizations')
   getSyncLifecycle(
     createDashboardLink({
@@ -35,5 +39,7 @@ export const immunizationsDashboardLink = () =>
     options,
   );
 
-export const immunizationsForm = () =>
-  getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options);
+export const immunizationsForm = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-form.component'),
+  options,
+);

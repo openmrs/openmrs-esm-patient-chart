@@ -11,42 +11,43 @@ export function startupApp() {
   defineConfigSchema(moduleName, attachmentsConfigSchema);
 }
 
-export const attachmentsOverview = () =>
-  getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
-    featureName: 'patient-attachments',
-    moduleName,
-  });
+export const attachmentsOverview = getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
+  featureName: 'patient-attachments',
+  moduleName,
+});
 
 // t('attachments_link', 'Attachments')
-export const attachmentsSummaryResultsDashboard = () =>
-  getSyncLifecycle(
-    createDashboardLink({
-      ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
-        ),
-    }),
-    {
-      featureName: 'attachments-dashboard-link',
-      moduleName,
-    },
-  );
+export const attachmentsSummaryResultsDashboard = getSyncLifecycle(
+  createDashboardLink({
+    ...dashboardMeta,
+    title: () =>
+      Promise.resolve(
+        window.i18next?.t('attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
+      ),
+  }),
+  {
+    featureName: 'attachments-dashboard-link',
+    moduleName,
+  },
+);
 
-export const capturePhotoModal = () =>
-  getAsyncLifecycle(() => import('./camera-media-uploader/camera-media-uploader.component'), {
+export const capturePhotoModal = getAsyncLifecycle(
+  () => import('./camera-media-uploader/camera-media-uploader.component'),
+  {
     featureName: 'capture-photo-modal',
     moduleName,
-  });
+  },
+);
 
-export const capturePhotoWidget = () =>
-  getAsyncLifecycle(() => import('./camera-media-uploader/capture-photo.component'), {
-    featureName: 'capture-photo-widget',
-    moduleName,
-  });
+export const capturePhotoWidget = getAsyncLifecycle(() => import('./camera-media-uploader/capture-photo.component'), {
+  featureName: 'capture-photo-widget',
+  moduleName,
+});
 
-export const deleteAttachmentModal = () =>
-  getAsyncLifecycle(() => import('./attachments/delete-attachment-confirmation-modal.component'), {
+export const deleteAttachmentModal = getAsyncLifecycle(
+  () => import('./attachments/delete-attachment-confirmation-modal.component'),
+  {
     featureName: 'delete-attachment-modal',
     moduleName,
-  });
+  },
+);

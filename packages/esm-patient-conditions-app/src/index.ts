@@ -16,16 +16,19 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const conditionsOverview = () =>
-  getAsyncLifecycle(() => import('./conditions/conditions-overview.component'), options);
+export const conditionsOverview = getAsyncLifecycle(
+  () => import('./conditions/conditions-overview.component'),
+  options,
+);
 
-export const conditionsDetailedSummary = () =>
-  getAsyncLifecycle(() => import('./conditions/conditions-detailed-summary.component'), options);
+export const conditionsDetailedSummary = getAsyncLifecycle(
+  () => import('./conditions/conditions-detailed-summary.component'),
+  options,
+);
 
-export const conditionsWidget = () =>
-  getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options);
+export const conditionsWidget = getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options);
 
-export const conditionsDashboardLink = () =>
+export const conditionsDashboardLink =
   // t('conditions_link', 'Conditions')
   getSyncLifecycle(
     createDashboardLink({
@@ -37,8 +40,12 @@ export const conditionsDashboardLink = () =>
     }),
     options,
   );
-export const conditionsFormWorkspace = () =>
-  getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options);
+export const conditionsFormWorkspace = getAsyncLifecycle(
+  () => import('./conditions/conditions-form.component'),
+  options,
+);
 
-export const conditionsDeleteConfirmationDialog = () =>
-  getAsyncLifecycle(() => import('./conditions/delete-condition-modal.component'), options);
+export const conditionsDeleteConfirmationDialog = getAsyncLifecycle(
+  () => import('./conditions/delete-condition-modal.component'),
+  options,
+);
