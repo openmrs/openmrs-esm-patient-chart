@@ -31,7 +31,7 @@
     },
     {
       "name": "allergies-details-widget",
-      "component": "patientDetailsTile",
+      "component": "allergiesDetailedSummary",
       "slot": "patient-chart-allergies-dashboard-slot",
       "online": true,
       "offline": true,

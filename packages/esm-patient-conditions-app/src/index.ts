@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -40,6 +40,7 @@ export const conditionsDashboardLink =
     }),
     options,
   );
+
 export const conditionsFormWorkspace = getAsyncLifecycle(
   () => import('./conditions/conditions-form.component'),
   options,
