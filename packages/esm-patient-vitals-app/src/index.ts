@@ -19,12 +19,13 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const vitalsSummary = () => getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options);
+export const vitalsSummary = getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options);
 
-export const vitalsMain = () => getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options);
+export const vitalsMain = getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options);
 
-export const vitalsHeader = () =>
-  getAsyncLifecycle(() => import('./vitals/vitals-header/vitals-header.component'), options);
+export const vitalsHeader = getAsyncLifecycle(() => import('./vitals/vitals-header/vitals-header.component'), options);
 
-export const vitalsAndBiometricsForm = () =>
-  getAsyncLifecycle(() => import('./vitals/vitals-biometrics-form/vitals-biometrics-form.component'), options);
+export const vitalsAndBiometricsForm = getAsyncLifecycle(
+  () => import('./vitals/vitals-biometrics-form/vitals-biometrics-form.component'),
+  options,
+);

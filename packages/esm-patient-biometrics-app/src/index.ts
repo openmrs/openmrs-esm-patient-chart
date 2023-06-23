@@ -32,13 +32,17 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const biometricsOverview = () =>
-  getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options);
+export const biometricsOverview = getAsyncLifecycle(
+  () => import('./biometrics/biometrics-overview.component'),
+  options,
+);
 
-export const biometricsDetailedSummary = () =>
-  getAsyncLifecycle(() => import('./biometrics/biometrics-main.component'), options);
+export const biometricsDetailedSummary = getAsyncLifecycle(
+  () => import('./biometrics/biometrics-main.component'),
+  options,
+);
 
-export const vitalsAndBiometricsDashboardLink = () =>
+export const vitalsAndBiometricsDashboardLink =
   // t('biometrics_link', 'Vitals & Biometrics')
   getSyncLifecycle(
     createDashboardLink({
@@ -52,4 +56,4 @@ export const vitalsAndBiometricsDashboardLink = () =>
     options,
   );
 
-export const weightTile = () => getAsyncLifecycle(() => import('./biometrics/weight-tile.component'), options);
+export const weightTile = getAsyncLifecycle(() => import('./biometrics/weight-tile.component'), options);

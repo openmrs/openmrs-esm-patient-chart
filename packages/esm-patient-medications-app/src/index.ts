@@ -16,15 +16,13 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const medicationsSummary = () =>
-  getAsyncLifecycle(() => import('./medications/root-medication-summary'), options);
+export const medicationsSummary = getAsyncLifecycle(() => import('./medications/root-medication-summary'), options);
 
-export const activeMedications = () =>
-  getAsyncLifecycle(() => import('./medications/active-medications.component'), options);
+export const activeMedications = getAsyncLifecycle(() => import('./medications/active-medications.component'), options);
 
-export const orderBasketWorkspace = () => getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
+export const orderBasketWorkspace = getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
 
-export const medicationsDashboardLink = () =>
+export const medicationsDashboardLink =
   // t('medications_link', 'Medications')
   getSyncLifecycle(
     createDashboardLink({
@@ -37,5 +35,7 @@ export const medicationsDashboardLink = () =>
     options,
   );
 
-export const orderBasketActionMenu = () =>
-  getAsyncLifecycle(() => import('./medications-summary/order-basket-action-button.component'), options);
+export const orderBasketActionMenu = getAsyncLifecycle(
+  () => import('./medications-summary/order-basket-action-button.component'),
+  options,
+);
