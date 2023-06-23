@@ -10,10 +10,9 @@ import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 interface ActiveMedicationsProps {
   patientUuid: string;
-  showAddMedications: boolean;
 }
 
-const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, showAddMedications }) => {
+const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
@@ -36,7 +35,6 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
-        showAddNewButton={showAddMedications}
         patientUuid={patientUuid}
       />
     );

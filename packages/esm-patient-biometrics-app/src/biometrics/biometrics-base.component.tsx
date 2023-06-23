@@ -20,19 +20,12 @@ import { launchVitalsAndBiometricsForm } from '../biometrics-utils';
 
 interface BiometricsBaseProps {
   patientUuid: string;
-  showAddBiometrics: boolean;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
 }
 
-const BiometricsBase: React.FC<BiometricsBaseProps> = ({
-  patientUuid,
-  showAddBiometrics,
-  pageSize,
-  urlLabel,
-  pageUrl,
-}) => {
+const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
@@ -92,19 +85,17 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
                 <ChartLineSmooth size={16} />
               </Switch>
             </ContentSwitcher>
-            {showAddBiometrics && (
-              <>
-                <span className={styles.divider}>|</span>
-                <Button
-                  kind="ghost"
-                  renderIcon={(props) => <Add size={16} {...props} />}
-                  iconDescription="Add biometrics"
-                  onClick={launchBiometricsForm}
-                >
-                  {t('add', 'Add')}
-                </Button>
-              </>
-            )}
+            <>
+              <span className={styles.divider}>|</span>
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <Add size={16} {...props} />}
+                iconDescription="Add biometrics"
+                onClick={launchBiometricsForm}
+              >
+                {t('add', 'Add')}
+              </Button>
+            </>
           </div>
         </CardHeader>
         {chartView ? (

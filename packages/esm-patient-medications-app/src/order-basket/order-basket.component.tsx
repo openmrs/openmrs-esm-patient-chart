@@ -196,7 +196,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
                   showDiscontinueButton={true}
                   showModifyButton={true}
                   showReorderButton={false}
-                  showAddNewButton={false}
                   patientUuid={patientUuid}
                 />
               );

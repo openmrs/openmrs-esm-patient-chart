@@ -15,7 +15,6 @@ const testProps = {
   basePath: patientChartBasePath,
   patient: mockPatient,
   patientUuid: mockPatient.id,
-  showAddNote: false,
 };
 
 const mockUseVisitNotes = useVisitNotes as jest.Mock;
