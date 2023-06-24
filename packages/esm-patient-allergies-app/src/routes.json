@@ -53,7 +53,7 @@
     },
     {
       "name": "allergies-summary-dashboard",
-      "component": "patientDetailsTile",
+      "component": "allergiesDashboardLink",
       "slot": "patient-chart-dashboard-slot",
       "online": true,
       "offline": true,
