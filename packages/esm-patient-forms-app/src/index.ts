@@ -39,12 +39,12 @@ export function startupApp() {
   registerWorkspace({
     name: 'patient-form-entry-workspace',
     title: 'Clinical Form',
-    load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+    load: getAsyncLifecycle(() => import('./form-entry/form-entry.component'), options),
   });
 }
 
 export const formsDetailedOverview = getAsyncLifecycle(
-  () => import('./forms/forms-detailed-overview.component'),
+  () => import('./forms-detailed-overview/forms-detailed-overview.component'),
   options,
 );
 
@@ -74,8 +74,11 @@ export const offlineFormsNavLink = getSyncLifecycle(
 export const offlineForms = getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options);
 
 export const clinicalFormActionMenu = getAsyncLifecycle(
-  () => import('./clinical-form-action-button.component'),
+  () => import('./clinical-form-action-button/clinical-form-action-button.component'),
   options,
 );
 
-export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options);
+export const clinicalFormsWorkspace = getAsyncLifecycle(
+  () => import('./forms-workspace/forms-workspace.component'),
+  options,
+);
