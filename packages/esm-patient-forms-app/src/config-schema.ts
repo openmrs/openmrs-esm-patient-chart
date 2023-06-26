@@ -108,7 +108,7 @@ export const configSchema = {
   },
   useCurrentVisitDates: {
     _type: Type.Boolean,
-    _description: 'Only load encounters inside of the current visits dated.',
+    _description: 'Only load encounters inside of the current visit.',
     _default: false,
   },
   orderBy: {
