@@ -6,7 +6,7 @@ import { EncounterWithFormRef, Form, ListResponse } from '../types';
 import dayjs from 'dayjs';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
-  const { customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
+  const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
   const url = customFormsUrl
     ? customFormsUrl.concat(`?patientUuid=${patientUuid}`)
     : showHtmlFormEntryForms
