@@ -28,7 +28,7 @@ export const configSchema = {
         },
       },
     },
-    _default:[],
+    _default: [],
   },
   htmlFormEntryForms: {
     _type: Type.Array,
@@ -116,6 +116,9 @@ export const configSchema = {
     _description:
       'Accept the values `name` that will order the forms alphabetically and `most-recent` that will order by the most recent created forms.',
     _default: 'most-recent',
+    _validators: [
+      validator((s) => s === 'name' || s === 'most-recent', "orderBy must be either 'name' or 'most-recent'"),
+    ],
   },
 };
 
