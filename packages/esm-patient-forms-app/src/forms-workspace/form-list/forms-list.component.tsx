@@ -52,7 +52,7 @@ const FormsList: React.FC<FormsListProps> = ({
   const orderForms = (orderBy: string, forms: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
     switch (orderBy) {
       case OrderBy.Name:
-        return forms.sort((a, b) => (a.form.display < b.form.display ? -1 : 1));
+        return forms.sort((a, b) => (a.form.display.toLowerCase() < b.form.display.toLowerCase() ? -1 : 1));
       case OrderBy.MostRecent:
         return forms.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0));
       default:
