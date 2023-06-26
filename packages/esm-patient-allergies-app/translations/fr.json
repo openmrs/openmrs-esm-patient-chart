@@ -13,6 +13,7 @@
   "dateOfFirstOnset": "Date du premier début",
   "discard": "Abandonner",
   "drug": "Drogue",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "environmental": "Environnemental",
   "errorFetchingData": "Erreur en récupérant les allergènes et les réactions",
   "food": "Nourriture",

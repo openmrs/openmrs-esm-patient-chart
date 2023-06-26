@@ -66,7 +66,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
         <div className={styles.container}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, getConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
 import { visitOverviewDetailMockData } from '../../../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
@@ -12,6 +12,7 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseConfig = useConfig as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -22,7 +23,9 @@ jest.mock('@openmrs/esm-framework', () => {
     getVisitsForPatient: jest.fn(),
     createErrorHandler: jest.fn(),
     useLayoutType: jest.fn(),
-    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
+    // useConfig: jest.fn().mockImplementation(() => ({ showAllEncountersTab: true })),
+    userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
+    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
   };
 });
 
@@ -61,17 +64,18 @@ describe('VisitDetailOverview', () => {
     expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
   });
 
-  it(`renders a summary of the patient's visits and encounters when data is available`, async () => {
+  it(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
+    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: true }));
 
     renderVisitDetailOverview();
 
     await waitForLoadingToFinish();
 
-    const allVisitsTab = screen.getByRole('tab', { name: /all encounters/i });
+    const allVisitsTab = screen.getByRole('tab', { name: /All encounters/i });
     const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
 
     expect(visitSummariesTab).toBeInTheDocument();
@@ -93,6 +97,32 @@ describe('VisitDetailOverview', () => {
 
     expect(allVisitsTab).toHaveAttribute('aria-selected', 'true');
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
+    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false }));
+
+    renderVisitDetailOverview();
+
+    await waitForLoadingToFinish();
+
+    const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
+
+    expect(visitSummariesTab).toBeInTheDocument();
+    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByText('/All encounters/i')).toBeNull();
+    expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
+
+    expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
+    expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
+    expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
+    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
+    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
   });
 });
 

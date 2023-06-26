@@ -129,4 +129,18 @@ html[dir='rtl'] {
       }
     }
   }
+
+  .demographics {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .tag {
+    margin: 0.25rem 0rem 0.25rem 0.25rem;
+  }
+
+  .patientName {
+    margin-right: unset;
+    margin-left: 0.25rem;
+  }
 }

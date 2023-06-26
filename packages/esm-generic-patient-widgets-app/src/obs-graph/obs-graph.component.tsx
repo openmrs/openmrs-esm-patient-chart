@@ -109,7 +109,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       </div>
       {config.interpretationSlot ? (
         <div>
-          <ExtensionSlot extensionSlotName={config.interpretationSlot} style={{ gridTemplateColumns: '1fr' }} />
+          <ExtensionSlot name={config.interpretationSlot} style={{ gridTemplateColumns: '1fr' }} />
         </div>
       ) : null}
     </>

@@ -47,6 +47,7 @@ export class FormSchemaService {
           referencedForms: formSchema.referencedForms || [],
           processor: formSchema.processor,
           translations: {},
+          meta: formSchema?.meta,
         };
 
         if (combinedFormMetadata.referencedForms.length > 0) {

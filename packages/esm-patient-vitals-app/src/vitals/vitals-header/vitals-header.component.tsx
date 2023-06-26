@@ -76,7 +76,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                 <Tag type="red">
                   <span className={styles.overdueIndicator}>
                     <Time />
-                    Overdue
+                    {t('overdue', 'Overdue')}
                   </span>
                 </Tag>
               </div>

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0",
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "patient-details-tile",
+      "component": "patientDetailsTile",
+      "slot": "patient-details-header-slot",
+      "online": true,
+      "offline": true,
+      "order": 1
+    },
+    {
+      "name": "weight-tile",
+      "component": "weightTile",
+      "slot": "patient-details-header-slot",
+      "online": true,
+      "offline": true,
+      "order": 2
+    },
+    {
+      "name": "allergy-tile",
+      "component": "allergyTile",
+      "slot": "patient-details-header-slot",
+      "online": true,
+      "offline": true,
+      "order": 3
+    },
+    {
+      "name": "allergies-details-widget",
+      "component": "allergiesDetailedSummary",
+      "slot": "patient-chart-allergies-dashboard-slot",
+      "online": true,
+      "offline": true,
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "patient-allergy-form-workspace",
+      "component": "allergiesForm",
+      "online": true,
+      "offline": true,
+      "meta": {
+        "title": {
+          "key": "recordNewAllergy",
+          "default": "Record a new allergy"
+        }
+      }
+    },
+    {
+      "name": "allergies-summary-dashboard",
+      "component": "allergiesDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "online": true,
+      "offline": true,
+      "order": 6,
+      "meta": {
+        "columns": 1,
+        "slot": "patient-chart-allergies-dashboard-slot",
+        "path": "Allergies"
+      }
+    }
+  ]
+}

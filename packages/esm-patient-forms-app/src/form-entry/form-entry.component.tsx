@@ -68,9 +68,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
 
   return (
     <div>
-      {showForm && selectedForm && patientUuid && patient && (
-        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
-      )}
+      {showForm && selectedForm && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
     </div>
   );
 };

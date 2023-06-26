@@ -1,5 +1,6 @@
 {
   "chartView": "Vue graphique",
   "displaying": "En cours d'affichage",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "tableView": "Vue tabulaire"
 }

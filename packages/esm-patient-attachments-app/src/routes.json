@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "attachments-overview-widget",
+      "component": "attachmentsOverview",
+      "slot": "patient-chart-attachments-dashboard-slot"
+    },
+    {
+      "name": "attachments-results-summary-dashboard",
+      "component": "attachmentsSummaryResultsDashboard",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "slot": "patient-chart-attachments-dashboard-slot",
+        "path": "Attachments",
+        "columns": 1
+      },
+      "order": 9
+    },
+    {
+      "name": "capture-photo-widget",
+      "component": "capturePhotoWidget",
+      "slot": "capture-patient-photo-slot"
+    },
+    {
+      "name": "capture-photo-modal",
+      "component": "capturePhotoModal"
+    },
+    {
+      "name": "delete-attachment-modal",
+      "component": "deleteAttachmentModal"
+    }
+  ],
+  "pages": []
+}

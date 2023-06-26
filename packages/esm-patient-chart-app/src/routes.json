@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "extensions": [
+    {
+      "name": "charts-summary-dashboard",
+      "component": "patientSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 0,
+      "meta": {
+        "slot": "patient-chart-summary-dashboard-slot",
+        "columns": 4,
+        "path": "Patient Summary"
+      }
+    },
+    {
+      "name": "start-visit-button",
+      "component": "startVisitActionButton",
+      "slot": "patient-actions-slot"
+    },
+    {
+      "name": "stop-visit-button",
+      "component": "stopVisitActionButton",
+      "slot": "patient-actions-slot"
+    },
+    {
+      "name": "mark-alive-button",
+      "component": "markPatientAliveActionButton",
+      "slot": "patient-actions-slot"
+    },
+    {
+      "name": "stop-visit-button-patient-search",
+      "slot": "patient-search-actions-slot",
+      "component": "stopVisitPatientSearchActionButton"
+    },
+    {
+      "name": "cancel-visit-button",
+      "slot": "patient-actions-slot",
+      "component": "cancelVisitActionButton"
+    },
+    {
+      "name": "cancel-visit-button",
+      "slot": "patient-search-actions-slot",
+      "component": "cancelVisitPatientSearchActionButton"
+    },
+    {
+      "name": "mark-patient-deceased-button",
+      "slot": "patient-actions-slot",
+      "component": "markPatientDeceasedActionButton"
+    },
+    {
+      "name": "add-past-visit-button",
+      "slot": "patient-actions-slot",
+      "component": "addPastVisitActionButton"
+    },
+    {
+      "name": "add-past-visit-button",
+      "slot": "patient-search-actions-slot",
+      "component": "addPastVisitPatientSearchActionButton"
+    },
+    {
+      "name": "add-past-visit-button",
+      "slot": "patient-search-actions-slot",
+      "component": "addPastVisitPatientSearchActionButton"
+    },
+    {
+      "name": "encounters-summary-dashboard",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "encountersSummaryDashboardLink",
+      "meta": {
+        "slot": "patient-chart-encounters-dashboard-slot",
+        "columns": 1,
+        "path": "Visits"
+      },
+      "order": 5
+    },
+    {
+      "name": "past-visits-detail-overview",
+      "slot": "patient-chart-encounters-dashboard-slot",
+      "component": "pastVisitsDetailOverview",
+      "order": 1,
+      "meta": {
+        "title": "Visits",
+        "view": "visits"
+      }
+    },
+    {
+      "name": "past-visits-overview",
+      "component": "pastVisitsOverview",
+      "meta": {
+        "title": "Edit or load a past visit",
+        "view": "visits"
+      }
+    },
+    {
+      "name": "start-visit-workspace-form",
+      "component": "startVisitForm",
+      "meta": {
+        "title": "Start a visit"      
+      }
+    },
+    {
+      "name": "mark-patient-deceased-workspace-form",
+      "component": "markPatientDeceasedForm",
+      "meta": {
+        "title": "Mark Deceased"
+      }
+    },
+    {
+      "name": "patient-details-tile",
+      "slot": "visit-form-header-slot",
+      "component": "patientDetailsTile",
+      "order": 1
+    },
+    {
+      "name": "nav-group",
+      "component": "genericNavGroup"
+    },
+    {
+      "name": "dashboard",
+      "component": "genericDashboard"
+    },
+    {
+      "name": "cancel-visit-dialog",
+      "component": "cancelVisitDialog"
+    },
+    {
+      "name": "start-visit-dialog",
+      "component": "startVisitDialog"
+    },
+    {
+      "name": "end-visit-dialog",
+      "component": "endVisitDialog"
+    },
+    {
+      "name": "confirm-deceased-dialog",
+      "component": "confirmDeceasedDialog"
+    },
+    {
+      "name": "confirm-alive-modal",
+      "component": "confirmAliveDialog"
+    },
+    {
+      "name": "start-visit-button-patient-search",
+      "slot": "start-visit-button-slot",
+      "component": "startVisitButtonPatientSearch"
+    },
+    {
+      "name": "visit-attribute-tags",
+      "slot": "patient-banner-tags-slot",
+      "component": "visitAttributeTags"
+    },
+    {
+      "name": "delete-encounter-modal",
+      "component": "deleteEncounterModal"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "routeRegex": "^patient\/.+\/chart"
+    }
+  ]
+}

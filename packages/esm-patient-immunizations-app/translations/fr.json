@@ -1,3 +1,4 @@
 {
+    "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
     "immunizations_link": "Immunizations"
 }

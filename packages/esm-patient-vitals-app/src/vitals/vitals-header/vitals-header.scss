@@ -57,7 +57,7 @@
 }
 
 .tag {
-  margin: 0 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .overdueIndicator {
@@ -106,4 +106,13 @@
   @extend .body-text;
   text-decoration-line: none;
   color: $interactive-01;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .container {
+    & > span:nth-child(2) {
+      margin-right: spacing.$spacing-03;
+    }
+  }
 }

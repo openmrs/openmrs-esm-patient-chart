@@ -71,7 +71,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
       >
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar className={styles.headerGlobalBar}>
-          <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
+          <ExtensionSlot name={patientChartWorkspaceHeaderSlot} />
           {isDesktop(layout) && (
             <>
               <Button

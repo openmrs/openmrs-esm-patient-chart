@@ -178,7 +178,7 @@ export class FormSubmissionService {
       .pipe(catchError((res) => this.throwUserFriendlyError(res)));
   }
 
-  private buildEncounterPayload(form: Form): EncounterCreate | undefined {
+  public buildEncounterPayload(form: Form): EncounterCreate | undefined {
     const providers = this.formDataSourceService.getCachedProviderSearchResults();
 
     if (providers?.length && !form.valueProcessingInfo.providerUuid) {

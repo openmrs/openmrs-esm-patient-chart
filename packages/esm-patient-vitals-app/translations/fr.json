@@ -9,6 +9,7 @@
   "checkForValidity": "Certaines des valeurs saisies ne sont pas valides.",
   "diastolic": "diastolique",
   "discard": "Abandonner",
+  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "goToSummary": "Aller à la vue d'ensemble",
   "heartRate": "Rythme cardiaque",
   "height": "Hauteur",

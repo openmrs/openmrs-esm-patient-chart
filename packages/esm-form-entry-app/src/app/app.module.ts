@@ -18,6 +18,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
 import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
+import { ProgramResourceService } from './openmrs-api/program-resource.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -46,6 +47,7 @@ import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translat
       provide: LOCALE_ID,
       useValue: (window as any).i18next.language.toLowerCase() ? (window as any).i18next.language.toLowerCase() : 'en',
     },
+    ProgramResourceService,
   ],
   bootstrap: [AppComponent],
 })
