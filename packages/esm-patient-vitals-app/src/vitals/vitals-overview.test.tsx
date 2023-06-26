@@ -15,7 +15,6 @@ import VitalsOverview from './vitals-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showAddVitals: false,
   pageSize: 5,
   pageUrl: '',
   urlLabel: '',
