@@ -46,7 +46,7 @@ export function startupApp() {
 export const formsDetailedOverview = () =>
   getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options);
 
-export const formsAndNotesDashboardLink = () =>
+export const formsAndNotesDashboardLink =
   // t('forms_link', 'Forms & Notes')
   getSyncLifecycle(
     createDashboardLink({
