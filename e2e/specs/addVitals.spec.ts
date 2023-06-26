@@ -54,11 +54,6 @@ test('Record Vitals of the patient', async ({ page, api }) => {
     await vitalsPage.page.getByText('Save').click();
   });
 
-  await test.step('Then I end Visit', async () => {
-    await vitalsPage.page.getByText('Actions').click();
-    await vitalsPage.page.getByText('End visit').click();
-  });
-
   await test.step('Then I should see the vitals record', async () => {
     await expect(vitalsPage.tableRow().getByText('37')).toBeVisible();
     await expect(vitalsPage.tableRow().getByRole('cell', { name: '120 / 80' })).toBeVisible();
