@@ -28,7 +28,7 @@ export const configSchema = {
         },
       },
     },
-    _default: undefined,
+    _default:[],
   },
   htmlFormEntryForms: {
     _type: Type.Array,
