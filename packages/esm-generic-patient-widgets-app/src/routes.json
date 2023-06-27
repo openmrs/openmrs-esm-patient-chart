@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0"
+  },
+  "extensions": [
+    {
+      "name": "obs-by-encounter-widget",
+      "component": "switchableObs",
+      "online": true,
+      "offline": true,
+      "meta": {
+        "columnSpan": 4
+      }
+    }
+  ]
+}

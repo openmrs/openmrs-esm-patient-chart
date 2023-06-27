@@ -1,81 +1,53 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import { dashboardMeta } from './dashboard.meta';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { attachmentsConfigSchema } from './attachments-config-schema';
+import { dashboardMeta } from './dashboard.meta';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const moduleName = '@openmrs/esm-patient-attachments-app';
 
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
-};
-
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-attachments-app';
-
+export function startupApp() {
   defineConfigSchema(moduleName, attachmentsConfigSchema);
-
-  return {
-    extensions: [
-      {
-        name: 'attachments-overview-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
-          featureName: 'patient-attachments',
-          moduleName,
-        }),
-      },
-      {
-        name: 'capture-photo-widget',
-        slot: 'capture-patient-photo-slot',
-        load: getAsyncLifecycle(() => import('./camera-media-uploader/capture-photo.component'), {
-          featureName: 'capture-photo-widget',
-          moduleName,
-        }),
-      },
-      {
-        name: 'attachments-results-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 9,
-        // t('attachments_link', 'Attachments')
-        load: getSyncLifecycle(
-          createDashboardLink({
-            ...dashboardMeta,
-            title: () =>
-              Promise.resolve(
-                window.i18next?.t('attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
-              ),
-          }),
-          {
-            featureName: 'attachments-dashboard-link',
-            moduleName,
-          },
-        ),
-        meta: dashboardMeta,
-      },
-      {
-        name: 'capture-photo-modal',
-        load: getAsyncLifecycle(() => import('./camera-media-uploader/camera-media-uploader.component'), {
-          featureName: 'capture-photo-modal',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
-        name: 'delete-attachment-modal',
-        load: getAsyncLifecycle(() => import('./attachments/delete-attachment-confirmation-modal.component'), {
-          featureName: 'delete-attachment-modal',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-    ],
-  };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS, version };
+export const attachmentsOverview = getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
+  featureName: 'patient-attachments',
+  moduleName,
+});
+
+// t('attachments_link', 'Attachments')
+export const attachmentsSummaryResultsDashboard = getSyncLifecycle(
+  createDashboardLink({
+    ...dashboardMeta,
+    title: () =>
+      Promise.resolve(
+        window.i18next?.t('attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
+      ),
+  }),
+  {
+    featureName: 'attachments-dashboard-link',
+    moduleName,
+  },
+);
+
+export const capturePhotoModal = getAsyncLifecycle(
+  () => import('./camera-media-uploader/camera-media-uploader.component'),
+  {
+    featureName: 'capture-photo-modal',
+    moduleName,
+  },
+);
+
+export const capturePhotoWidget = getAsyncLifecycle(() => import('./camera-media-uploader/capture-photo.component'), {
+  featureName: 'capture-photo-widget',
+  moduleName,
+});
+
+export const deleteAttachmentModal = getAsyncLifecycle(
+  () => import('./attachments/delete-attachment-confirmation-modal.component'),
+  {
+    featureName: 'delete-attachment-modal',
+    moduleName,
+  },
+);

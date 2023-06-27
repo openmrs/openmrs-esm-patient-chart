@@ -22,7 +22,6 @@ import { launchVitalsForm } from './vitals-utils';
 
 interface VitalsOverviewProps {
   patientUuid: string;
-  showAddVitals: boolean;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
@@ -33,7 +32,7 @@ export function launchFormEntry(formUuid: string, encounterUuid?: string, formNa
   launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
 }
 
-const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const displayText = t('vitalSigns', 'Vital signs');
@@ -111,19 +110,17 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                       <ChartLineSmooth size={16} />
                     </Switch>
                   </ContentSwitcher>
-                  {showAddVitals && (
-                    <>
-                      <span className={styles.divider}>|</span>
-                      <Button
-                        kind="ghost"
-                        renderIcon={Add}
-                        iconDescription="Add vitals"
-                        onClick={launchVitalsBiometricsForm}
-                      >
-                        {t('add', 'Add')}
-                      </Button>
-                    </>
-                  )}
+                  <>
+                    <span className={styles.divider}>|</span>
+                    <Button
+                      kind="ghost"
+                      renderIcon={Add}
+                      iconDescription="Add vitals"
+                      onClick={launchVitalsBiometricsForm}
+                    >
+                      {t('add', 'Add')}
+                    </Button>
+                  </>
                 </div>
               </CardHeader>
               {chartView ? (

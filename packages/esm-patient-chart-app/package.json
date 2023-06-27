@@ -39,7 +39,7 @@
   },
   "peerDependencies": {
     "@carbon/react": "1.x",
-    "@openmrs/esm-framework": "4.x",
+    "@openmrs/esm-framework": "5.x",
     "@openmrs/esm-patient-common-lib": "*",
     "dayjs": "1.x",
     "lodash-es": "4.x",

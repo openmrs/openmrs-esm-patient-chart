@@ -9,7 +9,6 @@ import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showAddMedications: true,
 };
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
