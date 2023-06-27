@@ -27,7 +27,7 @@
     },
     {
       "name": "results-viewer",
-      "slot": "patient-chart-results-viewer-slot",
+      "slots": ["patient-chart-results-viewer-slot", "patient-chart-test-results-dashboard-slot"],
       "component": "resultsViewer",
       "meta": {
         "columnSpan": 4
