@@ -274,9 +274,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         )}
         <Stack gap={1} className={styles.container}>
           {/* Date and time of visit. Defaults to the current date and time. */}
-          <section className={styles.section}>
+          <section>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
-            <div className={styles.dateTimeSection}>
+            <div className={`${styles.dateTimeSection} ${styles['sectionField']}`}>
               <DatePicker
                 dateFormat="d/m/Y"
                 datePickerType="single"
@@ -319,7 +319,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
           {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
           {config.showUpcomingAppointments && (
-            <ExtensionSlot state={upcomingAppointmentState} name="upcoming-appointment-slot" />
+            <section>
+              <div className={styles.sectionTitle}></div>
+              <div className={styles['sectionField']}>
+                <ExtensionSlot state={upcomingAppointmentState} name="upcoming-appointment-slot" />
+              </div>
+            </section>
           )}
 
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
@@ -330,7 +335,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showRecommendedVisitTypeTab && (
             <section>
               <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
-              <FormGroup legendText={t('selectProgramType', 'Select program type')}>
+              <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles['sectionField']}>
                 <RadioButtonGroup
                   defaultSelected={enrollment?.program?.uuid ?? ''}
                   orientation="vertical"
@@ -356,76 +361,90 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
           <section>
             <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
-
-            {config.showRecommendedVisitTypeTab ? (
-              <>
-                <ContentSwitcher
-                  selectedIndex={contentSwitcherIndex}
-                  onChange={({ index }) => setContentSwitcherIndex(index)}
-                >
-                  <Switch name="recommended" text={t('recommended', 'Recommended')} />
-                  <Switch name="all" text={t('all', 'All')} />
-                </ContentSwitcher>
-                {contentSwitcherIndex === 0 && !isLoading && (
-                  <MemoizedRecommendedVisitType
-                    onChange={(visitType) => {
-                      setVisitType(visitType);
-                      setIsMissingVisitType(false);
-                    }}
-                    patientUuid={patientUuid}
-                    patientProgramEnrollment={enrollment}
-                    locationUuid={selectedLocation}
-                  />
-                )}
-                {contentSwitcherIndex === 1 && (
-                  <BaseVisitType
-                    onChange={(visitType) => {
-                      setVisitType(visitType);
-                      setIsMissingVisitType(false);
-                    }}
-                    visitTypes={allVisitTypes}
-                    patientUuid={patientUuid}
-                  />
-                )}
-              </>
-            ) : (
-              // Defaults to showing all possible visit types if recommended visits are not enabled
-              <BaseVisitType
-                onChange={(visitType) => {
-                  setVisitType(visitType);
-                  setIsMissingVisitType(false);
-                }}
-                visitTypes={allVisitTypes}
-                patientUuid={patientUuid}
-              />
-            )}
+            <div className={styles['sectionField']}>
+              {config.showRecommendedVisitTypeTab ? (
+                <>
+                  <ContentSwitcher
+                    selectedIndex={contentSwitcherIndex}
+                    onChange={({ index }) => setContentSwitcherIndex(index)}
+                  >
+                    <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                    <Switch name="all" text={t('all', 'All')} />
+                  </ContentSwitcher>
+                  {contentSwitcherIndex === 0 && !isLoading && (
+                    <MemoizedRecommendedVisitType
+                      onChange={(visitType) => {
+                        setVisitType(visitType);
+                        setIsMissingVisitType(false);
+                      }}
+                      patientUuid={patientUuid}
+                      patientProgramEnrollment={enrollment}
+                      locationUuid={selectedLocation}
+                    />
+                  )}
+                  {contentSwitcherIndex === 1 && (
+                    <BaseVisitType
+                      onChange={(visitType) => {
+                        setVisitType(visitType);
+                        setIsMissingVisitType(false);
+                      }}
+                      visitTypes={allVisitTypes}
+                      patientUuid={patientUuid}
+                    />
+                  )}
+                </>
+              ) : (
+                // Defaults to showing all possible visit types if recommended visits are not enabled
+                <BaseVisitType
+                  onChange={(visitType) => {
+                    setVisitType(visitType);
+                    setIsMissingVisitType(false);
+                  }}
+                  visitTypes={allVisitTypes}
+                  patientUuid={patientUuid}
+                />
+              )}
+            </div>
           </section>
 
           {isMissingVisitType && (
             <section>
-              <InlineNotification
-                role="alert"
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingVisitType', 'Missing visit type')}
-                subtitle={t('selectVisitType', 'Please select a Visit Type')}
-              />
+              <div className={styles.sectionTitle}></div>
+              <div className={styles['sectionField']}>
+                <InlineNotification
+                  role="alert"
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingVisitType', 'Missing visit type')}
+                  subtitle={t('selectVisitType', 'Please select a Visit Type')}
+                />
+              </div>
             </section>
           )}
 
           {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
           <section>
-            <VisitAttributeTypeFields
-              setVisitAttributes={setVisitAttributes}
-              isMissingRequiredAttributes={isMissingRequiredAttributes}
-              visitAttributes={visitAttributes}
-              setErrorFetchingResources={setErrorFetchingResources}
-            />
+            <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit Attributes')}</div>
+            <div className={styles['sectionField']}>
+              <VisitAttributeTypeFields
+                setVisitAttributes={setVisitAttributes}
+                isMissingRequiredAttributes={isMissingRequiredAttributes}
+                visitAttributes={visitAttributes}
+                setErrorFetchingResources={setErrorFetchingResources}
+              />
+            </div>
           </section>
 
           {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
-          {config.showServiceQueueFields && <ExtensionSlot name="add-queue-entry-slot" />}
+          {config.showServiceQueueFields && (
+            <section>
+              <div className={styles.sectionTitle}></div>
+              <div className={styles['sectionField']}>
+                <ExtensionSlot name="add-queue-entry-slot" />
+              </div>
+            </section>
+          )}
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
