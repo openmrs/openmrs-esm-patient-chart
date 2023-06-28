@@ -2,11 +2,12 @@
   "add": "הוסף",
   "biometricDisplayed": "תצוגת מדדים ביומטריים",
   "biometrics": "מדדים ביומטריים",
+  "biometrics_link": "מדדים וביומטריה",
   "biometrics_lower": "מדדים ביומטריים",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
-  "record": "רשומה",
   "goToSummary": "עבור לסיכום",
   "loading": "טוען",
+  "record": "רשומה",
   "seeAll": "ראה הכל",
   "weight": "משקל"
 }

@@ -292,6 +292,8 @@ export interface Encounter {
   obs: Array<Observation>;
   orders: Array<Order>;
   diagnoses: Array<Diagnosis>;
+  patient: OpenmrsResource;
+  location: OpenmrsResource;
 }
 
 /** https://rest.openmrs.org/?shell#create-an-encounter */
@@ -392,4 +394,45 @@ export interface PersonAttribute {
 export interface PersonUpdate {
   uuid?: string;
   attributes: Array<PersonAttribute>;
+}
+
+export interface PatientProgram {
+  uuid: string;
+  patient?: OpenmrsResource;
+  program: {
+    uuid: string;
+    name: string;
+    allWorkflows: Array<{
+      uuid: string;
+      concept: OpenmrsResource;
+      retired: boolean;
+      states: Array<{}>;
+      links?: OpenmrsResource;
+    }>;
+    concept: {
+      display: string;
+      uuid: string;
+    };
+    links: OpenmrsResource;
+  };
+  display: string;
+  dateEnrolled: string;
+  dateCompleted: string | null;
+  location?: {
+    uuid: string;
+    display: string;
+    links: OpenmrsResource;
+  };
+  voided?: boolean;
+  outcome?: null;
+  states?: [];
+  links: OpenmrsResource;
+  resourceVersion?: string;
+}
+
+export interface MetaData {
+  isEnrollment: boolean;
+  uuid: string;
+  discontinuationDateQuestionId: string;
+  enrollmentDateQuestionId: string;
 }

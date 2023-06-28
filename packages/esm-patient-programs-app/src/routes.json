@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "programs-overview-widget",
+      "component": "programsOverview",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 6
+    },
+    {
+      "name": "programs-details-widget",
+      "slot": "patient-chart-programs-dashboard-slot",
+      "component": "programsDetailedSummary",
+      "meta": {
+        "columnSpan": 1
+      },
+      "order": 6
+    },
+    {
+      "name": "programs-summary-dashboard",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "programsDashboardLink",
+      "meta": {
+        "slot": "patient-chart-programs-dashboard-slot",
+        "columns": 1,
+        "path": "Programs"  
+      },
+      "order": 10
+    },
+    {
+      "name": "programs-form-workspace",
+      "component": "programsForm",
+      "meta": {
+        "title": "Record program enrollment"
+      }
+    }
+  ],
+  "pages": []
+}

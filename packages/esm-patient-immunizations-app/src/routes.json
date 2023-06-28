@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "immunization-overview-widget",
+      "component": "immunizationsOverview",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 8
+    },
+    {
+      "name": "immunization-details-widget",
+      "component": "immunizationsDetailedSummary",
+      "slot": "patient-chart-immunizations-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "immunization-summary-dashboard",
+      "component": "immunizationsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "slot": "patient-chart-immunizations-dashboard-slot",
+        "columns": 1,
+        "path": "Immunizations"
+      },
+      "order": 8
+    },
+    {
+      "name": "immunization-form-workspace",
+      "component": "immunizationsForm",
+      "meta": {
+        "title": "Immunization Form"
+      }
+    }
+  ],
+  "pages": []
+}

@@ -9,7 +9,6 @@ import AllergiesOverview from './allergies-overview.component';
 const testProps = {
   patient: mockPatient,
   basePath: patientChartBasePath,
-  showAddAllergyButton: false,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

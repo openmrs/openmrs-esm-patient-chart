@@ -5,25 +5,16 @@ import NotesMain from './notes-main.component';
 interface NotesOverviewProps {
   patientUuid: string;
   patient: fhir.Patient;
-  showAddNote: boolean;
   basePath: string;
 }
 
-const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, showAddNote, basePath }) => {
+const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Forms & Notes`;
   const urlLabel = t('seeAll', 'See all');
 
-  return (
-    <NotesMain
-      patientUuid={patientUuid}
-      showAddNote={showAddNote}
-      pageSize={pageSize}
-      urlLabel={urlLabel}
-      pageUrl={pageUrl}
-    />
-  );
+  return <NotesMain patientUuid={patientUuid} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />;
 };
 
 export default NotesOverview;

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0",
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "notes-overview-widget",
+      "component": "notesOverview",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 5
+    },
+    {
+      "name": "notes-details-widget",
+      "component": "notesDetailedSummary",
+      "slot": "patient-chart-form-dashboard-slot"
+    },
+    {
+      "name": "visit-note-nav-button",
+      "component": "visitNotesActionButton",
+      "slot": "action-menu-chart-items-slot",
+      "order": 1
+    },
+    {
+      "name": "visit-notes-form-workspace",
+      "component": "visitNotesForm",
+      "meta": {
+        "title": {
+          "key": "visitNote",
+          "default": "Visit Note"
+        },
+        "type": "visit-note"
+      }
+    }
+  ]
+}

@@ -1,1 +1,1 @@
-export * from './PatientAllergiesPage';
+export * from './allergies-page';

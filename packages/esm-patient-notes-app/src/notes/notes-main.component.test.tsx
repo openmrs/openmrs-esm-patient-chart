@@ -9,7 +9,6 @@ import { useVisitNotes } from './visit-notes.resource';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showAddNote: false,
   pageSize: 10,
   urlLabel: window.spaBase + patientChartBasePath + '/summary',
   pageUrl: 'Go to Summary',

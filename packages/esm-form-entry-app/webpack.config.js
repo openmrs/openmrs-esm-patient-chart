@@ -1,6 +1,25 @@
 const { DefinePlugin, container } = require('webpack');
 const { ModuleFederationPlugin } = container;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
+const { existsSync, statSync } = require('fs');
+
+function getFrameworkVersion() {
+  try {
+    const { version } = require('@openmrs/esm-framework/package.json');
+    return `^${version}`;
+  } catch {
+    return '5.x';
+  }
+}
+
+/**
+ * @param {string} name the name of the file
+ * @returns true if file exists and is a file
+ */
+function fileExistsSync(name) {
+  return existsSync(name) && statSync(name).isFile();
+}
 
 const path = require('path');
 const { basename, dirname, resolve } = path;
@@ -11,17 +30,18 @@ const outDir = dirname(browser || main);
 const srcFile = resolve(root, browser ? main : types);
 const production = 'production';
 const mode = process.env.NODE_ENV || production;
-
-function getFrameworkVersion() {
-  try {
-    const { version } = require('@openmrs/esm-framework/package.json');
-    return `^${version}`;
-  } catch {
-    return '4.x';
-  }
-}
-
 const frameworkVersion = getFrameworkVersion();
+const routes = resolve(root, 'src', 'routes.json');
+const hasRoutesDefined = fileExistsSync(routes);
+
+if (!hasRoutesDefined) {
+  console.error(
+    'This app does not define a routes.json. This file is required for this app to be used by the OpenMRS 3 App Shell.',
+  );
+  // key-smash error code
+  // so this (hopefully) doesn't interfere with Webpack-specific exit codes
+  process.exit(9819023573289);
+}
 
 module.exports = {
   entry: resolve(__dirname, 'src/index.ts'),
@@ -70,6 +90,23 @@ module.exports = {
         chunks: true,
       },
     }),
+    hasRoutesDefined
+      ? new CopyWebpackPlugin({
+          patterns: [
+            {
+              from: routes,
+              transform: {
+                transformer: (content) =>
+                  JSON.stringify(
+                    Object.assign({}, JSON.parse(content.toString()), {
+                      version: mode === production ? version : inc(version, 'prerelease', 'local'),
+                    }),
+                  ),
+              },
+            },
+          ],
+        })
+      : {},
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '.scss'],

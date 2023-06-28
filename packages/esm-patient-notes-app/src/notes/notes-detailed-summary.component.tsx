@@ -4,25 +4,16 @@ import NotesMain from './notes-main.component';
 
 interface NotesDetailedSummaryProps {
   patientUuid: string;
-  showAddNote: boolean;
   basePath: string;
 }
 
-const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ patientUuid, showAddNote, basePath }) => {
+const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ patientUuid, basePath }) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart`;
   const urlLabel = t('goToSummary', 'Go to Summary');
 
-  return (
-    <NotesMain
-      patientUuid={patientUuid}
-      pageSize={pageSize}
-      pageUrl={pageUrl}
-      showAddNote={showAddNote}
-      urlLabel={urlLabel}
-    />
-  );
+  return <NotesMain patientUuid={patientUuid} pageSize={pageSize} pageUrl={pageUrl} urlLabel={urlLabel} />;
 };
 
 export default NotesDetailedSummary;
