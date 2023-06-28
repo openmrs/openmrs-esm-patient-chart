@@ -191,7 +191,7 @@ export const genericDashboard = getAsyncLifecycle(() => import('./side-nav/gener
 });
 
 export const cancelVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
-  featureName: 'start visit',
+  featureName: 'cancel visit',
   moduleName,
 });
 
