@@ -143,6 +143,5 @@ describe('Delete Encounter', () => {
 });
 
 function renderVisitsTable() {
-  // FIXME: fix types
   renderWithSwr(<VisitsTable {...testProps} />);
 }

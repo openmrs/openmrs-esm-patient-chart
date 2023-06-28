@@ -144,11 +144,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
-      datetime: formatDatetime(parseDate(encounter?.datetime)),
-    }));
+      datetime: formatDatetime(parseDate(encounter.datetime)),
+    }));    
   }, [paginatedVisits]);
 
-  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
+  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem.value);
 
   const handleDeleteEncounter = React.useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
@@ -300,7 +300,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   className={styles.menuItem}
                                   itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                   onClick={() => {
-                                    handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display);
+                                    handleDeleteEncounter(paginatedVisits[index]?.id, paginatedVisits[index]?.form?.display);
                                   }}
                                   hasDivider
                                   isDelete
