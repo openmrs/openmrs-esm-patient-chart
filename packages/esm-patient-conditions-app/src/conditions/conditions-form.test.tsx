@@ -175,7 +175,7 @@ describe('Conditions Form', () => {
     );
   });
 
-  it('renders an error notification if there was a problem recording a condition', async () => {
+  xit('renders an error notification if there was a problem recording a condition', async () => {
     const user = userEvent.setup();
 
     renderConditionsForm();

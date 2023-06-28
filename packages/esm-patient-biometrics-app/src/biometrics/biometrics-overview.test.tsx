@@ -13,7 +13,6 @@ import { mockVitalsSignsConcept } from '../../../../__mocks__/vitals.mock';
 
 const testProps = {
   basePath: patientChartBasePath,
-  showAddBiometrics: true,
   patientUuid: mockPatient.id,
 };
 
