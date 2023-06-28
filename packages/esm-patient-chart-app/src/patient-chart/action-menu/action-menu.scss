@@ -62,6 +62,12 @@ $actionPanelOffset: 3rem;
     width: 100%;
     display: flex;
     justify-content: stretch;
+
+    & div {
+      & button {
+        height: spacing.$spacing-10;
+      }
+    }
   }
 
   .chartExtensions {

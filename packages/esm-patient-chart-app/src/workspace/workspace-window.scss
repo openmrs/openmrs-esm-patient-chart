@@ -115,7 +115,7 @@
 
   .fixed {
     top: 3rem;
-    bottom: 3.96rem;
+    bottom: calc(spacing.$spacing-10 + 1px); // plus the top border
     background-color: $ui-01;
   }
 
