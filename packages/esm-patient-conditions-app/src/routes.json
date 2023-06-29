@@ -42,8 +42,8 @@
       "component": "conditionsFormWorkspace"
     },
     {
-      "name": "conditions-delete-confirmation-dialog",
-      "component": "conditionsDeleteConfirmationDialog"
+      "name": "condition-delete-confirmation-dialog",
+      "component": "conditionDeleteConfirmationDialog"
     }
   ]
 }
