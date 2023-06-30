@@ -161,7 +161,7 @@ function ConditionsDetailedSummary({ patient }) {
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu condition={row} />
+                          <ConditionsActionMenu patientUuid={patient.id} condition={row} />
                         </TableCell>
                       </TableRow>
                     ))}
