@@ -276,7 +276,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {/* Date and time of visit. Defaults to the current date and time. */}
           <section>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
-            <div className={`${styles.dateTimeSection} ${styles['sectionField']}`}>
+            <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
               <DatePicker
                 dateFormat="d/m/Y"
                 datePickerType="single"
@@ -321,7 +321,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showUpcomingAppointments && (
             <section>
               <div className={styles.sectionTitle}></div>
-              <div className={styles['sectionField']}>
+              <div className={styles.sectionField}>
                 <ExtensionSlot state={upcomingAppointmentState} name="upcoming-appointment-slot" />
               </div>
             </section>
@@ -335,7 +335,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showRecommendedVisitTypeTab && (
             <section>
               <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
-              <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles['sectionField']}>
+              <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles.sectionField}>
                 <RadioButtonGroup
                   defaultSelected={enrollment?.program?.uuid ?? ''}
                   orientation="vertical"
@@ -361,7 +361,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
           <section>
             <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
-            <div className={styles['sectionField']}>
+            <div className={styles.sectionField}>
               {config.showRecommendedVisitTypeTab ? (
                 <>
                   <ContentSwitcher
@@ -410,7 +410,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {isMissingVisitType && (
             <section>
               <div className={styles.sectionTitle}></div>
-              <div className={styles['sectionField']}>
+              <div className={styles.sectionField}>
                 <InlineNotification
                   role="alert"
                   style={{ margin: '0', minWidth: '100%' }}
@@ -425,8 +425,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
           {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
           <section>
-            <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit Attributes')}</div>
-            <div className={styles['sectionField']}>
+            <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
+            <div className={styles.sectionField}>
               <VisitAttributeTypeFields
                 setVisitAttributes={setVisitAttributes}
                 isMissingRequiredAttributes={isMissingRequiredAttributes}
@@ -440,7 +440,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showServiceQueueFields && (
             <section>
               <div className={styles.sectionTitle}></div>
-              <div className={styles['sectionField']}>
+              <div className={styles.sectionField}>
                 <ExtensionSlot name="add-queue-entry-slot" />
               </div>
             </section>

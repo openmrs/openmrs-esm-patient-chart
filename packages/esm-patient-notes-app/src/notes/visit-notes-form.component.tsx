@@ -277,7 +277,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         </Row>
         <Row className={styles.row}>
           <Column sm={1}>
-            <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary Diagnosis')}</span>
+            <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
           </Column>
           <Column sm={3}>
             <div className={styles.diagnosesText} style={{ marginBottom: '1.188rem' }}>
@@ -386,7 +386,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         </Row>
         <Row className={styles.row}>
           <Column sm={1}>
-            <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary Diagnosis')}</span>
+            <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
           </Column>
           <Column sm={3}>
             <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
