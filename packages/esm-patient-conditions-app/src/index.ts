@@ -46,7 +46,7 @@ export const conditionsFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const conditionsDeleteConfirmationDialog = getAsyncLifecycle(
+export const conditionDeleteConfirmationDialog = getAsyncLifecycle(
   () => import('./conditions/delete-condition-modal.component'),
   options,
 );

@@ -8,9 +8,10 @@ import styles from './conditions-action-menu.scss';
 
 interface conditionsActionMenuProps {
   condition: Condition;
+  patientUuid?: string;
 }
 
-export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) => {
+export const ConditionsActionMenu = ({ condition, patientUuid }: conditionsActionMenuProps) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -28,6 +29,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
     const dispose = showModal('condition-delete-confirmation-dialog', {
       closeDeleteModal: () => dispose(),
       conditionId,
+      patientUuid,
     });
   };
 

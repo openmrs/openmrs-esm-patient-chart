@@ -7,7 +7,7 @@ import { deleteCondition, useConditions } from './conditions.resource';
 interface DeleteConditionModalProps {
   closeDeleteModal: () => void;
   conditionId: string;
-  patientUuid: string;
+  patientUuid?: string;
 }
 
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
