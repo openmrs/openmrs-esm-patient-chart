@@ -35,7 +35,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ selectedLocation, s
   return (
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-      <div className={`${styles.selectContainer} ${styles['sectionField']}`}>
+      <div className={`${styles.selectContainer} ${styles.sectionField}`}>
         <ComboBox
           titleText={t('selectLocation', 'Select a location')}
           aria-label={t('selectLocation', 'Select a location')}
