@@ -394,7 +394,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                 size="lg"
                 id="diagnosisSecondarySearch"
                 labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
-                placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnose')}
+                placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
                 onChange={handleSecondarySearchChange}
                 value={(() => {
                   if (secondarySearchTerm) {
