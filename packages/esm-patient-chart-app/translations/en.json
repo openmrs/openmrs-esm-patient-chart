@@ -135,6 +135,7 @@
   "unknown": "Unknown",
   "updateError": "Error updating upcoming appointment",
   "visit": "Visit",
+  "visitAttributes": "Visit Attributes",
   "visitCanceled": "Canceled active visit successfully",
   "visitEnded": "Visit ended",
   "visitEndSuccessfully": "Ended current visit successfully",

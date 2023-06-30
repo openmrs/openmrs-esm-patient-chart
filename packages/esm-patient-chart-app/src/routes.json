@@ -58,11 +58,6 @@
       "component": "addPastVisitPatientSearchActionButton"
     },
     {
-      "name": "add-past-visit-button",
-      "slot": "patient-search-actions-slot",
-      "component": "addPastVisitPatientSearchActionButton"
-    },
-    {
       "name": "encounters-summary-dashboard",
       "slot": "patient-chart-dashboard-slot",
       "component": "encountersSummaryDashboardLink",

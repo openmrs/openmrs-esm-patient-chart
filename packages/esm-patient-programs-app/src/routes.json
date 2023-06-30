@@ -34,7 +34,7 @@
     },
     {
       "name": "programs-form-workspace",
-      "component": "programsFormWorkspace",
+      "component": "programsForm",
       "meta": {
         "title": "Record program enrollment"
       }
