@@ -5,7 +5,7 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import { ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ const conditionSchema = z.object({
   clinicalStatus: z.string(),
   endDate: z.date().optional(),
   onsetDateTime: z.date().nullable(),
-  search: z.string({ required_error: "A condition is required"}),
+  search: z.string({ required_error: 'A condition is required' }),
 });
 
 export type ConditionFormData = z.infer<typeof conditionSchema>;
@@ -34,7 +34,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
 
-  const { handleSubmit, control, formState, getValues, watch } = useForm<ConditionFormData>({
+  const methods = useForm<ConditionFormData>({
     mode: 'all',
     resolver: zodResolver(conditionSchema),
     defaultValues: {
@@ -59,60 +59,58 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
   };
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <ConditionsWidget
-        patientUuid={patientUuid}
-        closeWorkspace={closeWorkspace}
-        conditionToEdit={condition}
-        editing={formContext === 'editing' ? true : false}
-        setErrorCreating={setErrorCreating}
-        setErrorUpdating={setErrorUpdating}
-        isSubmittingForm={isSubmittingForm}
-        setIsSubmittingForm={setIsSubmittingForm}
-        formState={formState}
-        getValues={getValues}
-        control={control}
-        watch={watch}
-      />
-      <div>
-        {errorCreating ? (
-          <div className={styles.errorContainer}>
-            <InlineNotification
-              className={styles.error}
-              role="alert"
-              kind="error"
-              lowContrast
-              title={t('errorCreatingCondition', 'Error creating condition')}
-              subtitle={errorCreating?.message}
-            />
-          </div>
-        ) : null}
-        {errorUpdating ? (
-          <div className={styles.errorContainer}>
-            <InlineNotification
-              className={styles.error}
-              role="alert"
-              kind="error"
-              lowContrast
-              title={t('errorUpdatingCondition', 'Error updating condition')}
-              subtitle={errorUpdating?.message}
-            />
-          </div>
-        ) : null}
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
-            {isSubmittingForm ? (
-              <InlineLoading description={t('saving', 'Saving') + '...'} />
-            ) : (
-              <span>{t('saveAndClose', 'Save & close')}</span>
-            )}
-          </Button>
-        </ButtonSet>
-      </div>
-    </Form>
+    <FormProvider {...methods}>
+      <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
+        <ConditionsWidget
+          patientUuid={patientUuid}
+          closeWorkspace={closeWorkspace}
+          conditionToEdit={condition}
+          editing={formContext === 'editing' ? true : false}
+          setErrorCreating={setErrorCreating}
+          setErrorUpdating={setErrorUpdating}
+          isSubmittingForm={isSubmittingForm}
+          setIsSubmittingForm={setIsSubmittingForm}
+        />
+        <div>
+          {errorCreating ? (
+            <div className={styles.errorContainer}>
+              <InlineNotification
+                className={styles.error}
+                role="alert"
+                kind="error"
+                lowContrast
+                title={t('errorCreatingCondition', 'Error creating condition')}
+                subtitle={errorCreating?.message}
+              />
+            </div>
+          ) : null}
+          {errorUpdating ? (
+            <div className={styles.errorContainer}>
+              <InlineNotification
+                className={styles.error}
+                role="alert"
+                kind="error"
+                lowContrast
+                title={t('errorUpdatingCondition', 'Error updating condition')}
+                subtitle={errorUpdating?.message}
+              />
+            </div>
+          ) : null}
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
+              {isSubmittingForm ? (
+                <InlineLoading description={t('saving', 'Saving') + '...'} />
+              ) : (
+                <span>{t('saveAndClose', 'Save & close')}</span>
+              )}
+            </Button>
+          </ButtonSet>
+        </div>
+      </Form>
+    </FormProvider>
   );
 };
 

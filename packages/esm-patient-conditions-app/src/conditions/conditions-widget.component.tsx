@@ -26,9 +26,8 @@ import {
   useConditionsSearch,
 } from './conditions.resource';
 import styles from './conditions-form.scss';
-import { Control, Controller, FormState, UseFormGetValues, UseFormWatch } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import { ConditionFormData } from './conditions-form.component';
-
 interface ConditionsWidgetProps {
   closeWorkspace?: () => void;
   conditionToEdit?: ConditionDataTableRow;
@@ -37,10 +36,6 @@ interface ConditionsWidgetProps {
   setHasSubmissibleValue?: (value: boolean) => void;
   setErrorCreating?: (error: Error) => void;
   setErrorUpdating?: (error: Error) => void;
-  control?: Control<ConditionFormData>;
-  formState: FormState<ConditionFormData>;
-  getValues: UseFormGetValues<ConditionFormData>;
-  watch: UseFormWatch<ConditionFormData>;
   isSubmittingForm: boolean;
   setIsSubmittingForm: Dispatch<boolean>;
 }
@@ -54,18 +49,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   setIsSubmittingForm,
   setErrorCreating,
   setErrorUpdating,
-  formState,
-  control,
-  getValues,
-  watch,
 }) => {
   const { t } = useTranslation();
   const { conditions, mutate } = useConditions(patientUuid);
+  const { control, watch, getValues, formState } = useFormContext<ConditionFormData>();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const searchInputRef = useRef(null);
   const currentStatus = watch('clinicalStatus');
-
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
   const getFieldValue = (
@@ -314,7 +305,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 datePickerType="single"
                 dateFormat="d/m/Y"
                 light={isTablet}
-                minDate={new Date(getValues('onsetDateTime')).toISOString()}
+                minDate={new Date(watch('onsetDateTime')).toISOString()}
                 maxDate={dayjs().utc().format()}
                 placeholder="dd/mm/yyyy"
                 onChange={([date]) => onChange(date)}
