@@ -2,10 +2,20 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.contactDetails {
+@mixin container{
   color: $text-02;
   width: 100%;
   border-top: 1px solid $ui-03;
+  display: flex;
+
+  a {
+    @include type.type-style("body-compact-01");
+    text-decoration: none;
+  }
+}
+
+.contactDetailsContainer {
+  @include container;
 }
 
 .heading {
@@ -17,24 +27,21 @@
   .contactDetails, .heading, .row, .row > .col {
     color: $ui-02;
   }
+
+  a {
+    color: $inverse-link
+  }
 }
 
 .row {
   @include type.type-style("body-compact-01");
   display: flex;
-
-  &:first-child {
-    border-bottom: 1px solid $ui-03;
-  }
+  flex: 1;
 }
 
 .row > .col {
   flex: 1;
   padding: 1rem 1rem;
-
-  &:nth-of-type(2n + 1) {
-    border-right: 1px solid $ui-03;
-  }
 }
 
 .row li {
@@ -44,8 +51,25 @@
 .relationship {
   display: flex;
   flex-flow: row nowrap;
+
+  div {
+    flex: 1 1;
+  }
 }
 
-.relationship div {
-  flex: 1 1;
+.tabletSizeBanner {
+  @include container;
+  display: block;
+
+  .row {
+    &:first-child {
+    border-bottom: 1px solid $ui-03;
+    }
+  }
+
+  .row > .col {
+    &:nth-of-type(2n + 1) {
+      border-right: 1px solid $ui-03;
+    }
+  }
 }
