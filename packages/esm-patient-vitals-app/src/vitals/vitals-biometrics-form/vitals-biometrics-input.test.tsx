@@ -23,7 +23,7 @@ describe('VitalsBiometricsInput', () => {
 
     render(
       <VitalsBiometricsInput
-        inputIsNormal
+        isWithinNormalRange
         title={mockProps.title}
         onInputChange={mockOnChange}
         textFields={mockProps.textFields}
@@ -43,7 +43,7 @@ describe('VitalsBiometricsInput', () => {
   it('should display the correct text area with correct value', async () => {
     render(
       <VitalsBiometricsInput
-        inputIsNormal
+        isWithinNormalRange
         title="Notes"
         onInputChange={mockOnChange}
         textFields={[
@@ -64,7 +64,7 @@ describe('VitalsBiometricsInput', () => {
 
     render(
       <VitalsBiometricsInput
-        inputIsNormal
+        isWithinNormalRange
         title={mockProps.title}
         onInputChange={mockOnChange}
         textFields={mockProps.textFields}

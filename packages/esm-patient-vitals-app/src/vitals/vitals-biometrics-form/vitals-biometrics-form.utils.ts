@@ -1,7 +1,7 @@
 import isNumber from 'lodash/isNumber';
 import { ConceptMetadata } from '@openmrs/esm-patient-common-lib';
 
-export function calculateBMI(weight: number, height: number): number {
+export function calculateBodyMassIndex(weight: number, height: number): number {
   if (!weight || !height) return;
 
   if (weight > 0 && height > 0) {
@@ -9,7 +9,11 @@ export function calculateBMI(weight: number, height: number): number {
   }
 }
 
-export function isInNormalRange(conceptMetadata: Array<ConceptMetadata>, conceptUuid: string, value: string | number) {
+export function isValueWithinReferenceRange(
+  conceptMetadata: Array<ConceptMetadata>,
+  conceptUuid: string,
+  value: string | number,
+) {
   if (value === undefined || value === '') {
     return true;
   }
@@ -20,7 +24,7 @@ export function isInNormalRange(conceptMetadata: Array<ConceptMetadata>, concept
     : true;
 }
 
-//convert age into an integer (whole number)
+// Convert age into an integer (whole number)
 export function extractNumbers(str: string) {
   const regex = /\d+/g;
   const match = str.match(regex);
