@@ -15,18 +15,19 @@ interface PatientFlagsProps {
 const PatientFlags: React.FC<PatientFlagsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
+  const filteredFlags = flags.filter((f) => !f.voided);
 
-  const handleEditFlagsClick = useCallback(() => launchPatientWorkspace('edit-flags-side-panel'), []);
+  const handleEditFlagsClick = useCallback(() => launchPatientWorkspace('edit-flags-side-panel-form'), []);
 
   if (!isLoadingFlags && !flagLoadingError) {
     return (
       <div className={styles.flagsContainer}>
         <div>
-          {flags.map((patientFlag) => (
+          {filteredFlags.map((patientFlag) => (
             <Toggletip key={patientFlag.uuid} className={styles.toggleTip} align="bottom" direction="right">
               <ToggletipButton label="Additional information">
-                <Tag key={patientFlag.name} type="high-contrast" className={styles.flagTag}>
-                  <span className={styles.flagIcon}>&#128681;</span> {patientFlag.name}
+                <Tag key={patientFlag.uuid} type="high-contrast" className={styles.flagTag}>
+                  <span className={styles.flagIcon}>&#128681;</span> {patientFlag.flag.display}
                 </Tag>
               </ToggletipButton>
               <ToggletipContent className={styles.tooltipContent}>

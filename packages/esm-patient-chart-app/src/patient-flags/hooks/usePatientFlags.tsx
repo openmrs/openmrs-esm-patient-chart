@@ -4,10 +4,11 @@ import useSWR from 'swr';
 
 interface FlagFetchResponse {
   uuid: string;
-  name: string;
   message: string;
-  enabled: boolean;
-  auditInfo: {};
+  voided: boolean;
+  flag: { uuid: string; display: string };
+  patient: { uuid: string; display: string };
+  auditInfo: { dateCreated: string };
 }
 
 interface FlagsFetchResponse {
@@ -22,12 +23,12 @@ interface FlagsFetchResponse {
  */
 export function useFlagsFromPatient(patientUuid: string) {
   const { data, error, isValidating, mutate } = useSWR<{ data: FlagsFetchResponse }, Error>(
-    `/ws/rest/v1/patientflags/flag?patient=${patientUuid}&v=full`,
+    `/ws/rest/v1/patientflags/patientflag?patient=${patientUuid}&v=full`,
     openmrsFetch,
   );
   const result = useMemo(() => {
     return {
-      flags: data?.data?.results ?? null,
+      flags: data?.data?.results ?? [],
       flagLoadingError: error,
       isLoadingFlags: !data && !error,
       isValidatingFlags: isValidating,
@@ -58,4 +59,31 @@ export function useCurrentPath(): string {
   }, [listenToRoutingEvent]);
 
   return path;
+}
+
+export function enablePatientFlag(flagUuid: string) {
+  const controller = new AbortController();
+  const url = `/ws/rest/v1/patientflags/patientflag/${flagUuid}`;
+
+  return openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: { deleted: 'false' },
+    signal: controller.signal,
+  });
+}
+
+export function disablePatientFlag(flagUuid: string) {
+  const controller = new AbortController();
+  const url = `/ws/rest/v1/patientflags/patientflag/${flagUuid}`;
+
+  return openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'DELETE',
+    signal: controller.signal,
+  });
 }

@@ -16,6 +16,8 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
   const { t } = useTranslation();
   const path = useCurrentPath();
   const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
+  const filteredFlags = flags.filter((f) => !f.voided);
+
   const [showHighlightBar, setShowHighlightBar] = useState(false);
 
   const handleClick = () => {
@@ -39,18 +41,14 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
   return (
     <>
       <div className={styles.flagSummary}>
-        {flags.length && (
+        {filteredFlags.length && (
           <Tag type="high-contrast" onClick={handleClick} className={styles.flagsHighlightTag}>
             <span className={styles.flagIcon}>&#128681;</span>
             <span className={styles.flagText}>
-              {flags.length} {flags.length > 1 ? t('riskFlags', 'risk flags') : t('riskFlag', 'risk flag')}
+              {filteredFlags.length}{' '}
+              {filteredFlags.length > 1 ? t('riskFlags', 'risk flags') : t('riskFlag', 'risk flag')}
             </span>
             {!showHighlightBar && <ArrowRight size={16} />}
-          </Tag>
-        )}
-        {!flags && (
-          <Tag type="green">
-            <span className={styles.flagIcon}>&#9989;</span> {t('noRiskFlagToDisplay', 'No risk flag to display')}
           </Tag>
         )}
       </div>
