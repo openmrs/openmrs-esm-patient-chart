@@ -21,10 +21,10 @@
   "errorUploading": "កំហុសក្នុងការបង្ហោះឯកសារ",
   "failed": "បរាជ័យ",
   "failedDeleting": "មិនអាចលុបចោលបានទេ",
-  "fieldRequired": "ចន្លោះ\u200bនេះ\u200bត្រូវតែ\u200bបំពេញ",
+  "fieldRequired": "ចន្លោះនេះត្រូវតែបំពេញ",
   "file": "ឯកសារ",
   "fileDeleted": "បានលុបឯកសារចោល",
-  "fileName": "ឈ្មោះ\u200bឯកសារ",
+  "fileName": "ឈ្មោះឯកសារ",
   "fileSizeInstructions": "អូស និងទម្លាក់ឯកសារនៅទីនេះ ឬចុចដើម្បីផ្ទុកឡើង",
   "fileSizeLimitExceeded": "លើសពីទំហំឯកសារ",
   "fileSizeLimitExceededText": "លើសទំហំឯកសារកំណត់",
@@ -41,5 +41,5 @@
   "uploading": "កំពុងបង្ហោះ",
   "uploadMedia": "ផ្ទុកប្រព័ន្ធផ្សព្វផ្សាយ",
   "uploadWillContinueInTheBackground": "ឯកសារនឹងត្រូវបានផ្ទុកឡើងក្នុងផ្ទៃខាងក្រោយ។ អ្នកអាចបិទបង្អួចនេះ",
-  "webcam": "វេ\u200bប\u200bខេ\u200bម"
+  "webcam": "វេបខេម"
 }

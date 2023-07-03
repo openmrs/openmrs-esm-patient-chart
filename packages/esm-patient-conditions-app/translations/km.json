@@ -10,7 +10,7 @@
   "conditions_link": "លក្ខខណ្",
   "conditionSaved": "ស្ថានភាពត្រូវបានរក្សាទុកដោយជោគជ័យ",
   "conditionUpdated": "Condition updated",
-  "currentStatus": "ស្ថានភាព\u200bបច្ចុប្បន្ន",
+  "currentStatus": "ស្ថានភាពបច្ចុប្បន្ន",
   "dateOfOnset": "Date of onset",
   "delete": "Delete",
   "deleteCondition": "Delete condition",
@@ -32,7 +32,7 @@
   "saving": "Saving",
   "searchConditions": "លក្ខខណ្ឌស្វែងរក",
   "searching": "Searching",
-  "seeAll": "ឃើញ\u200bទាំងអស់",
+  "seeAll": "ឃើញbទាំងអស់",
   "show": "Show",
   "status": "ស្ថានភាព"
 }
