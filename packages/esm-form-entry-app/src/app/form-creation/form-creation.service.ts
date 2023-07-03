@@ -1,11 +1,11 @@
-import { DataSources, EncounterAdapter, Form, FormFactory } from '@openmrs/ngx-formentry';
+import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
-import { Encounter, FormSchema } from '../types';
+import { Encounter, FormSchema, Identifier } from '../types';
 import { Session } from '@openmrs/esm-framework';
 import { isFunction } from 'lodash-es';
 
@@ -31,6 +31,11 @@ export interface CreateFormParams {
    * A previous encounter for displaying previously entered data.
    */
   previousEncounter?: Encounter;
+
+  /**
+   * Patient identifiers
+   */
+  patientIdentifiers: Array<Identifier>;
 }
 
 const loadedCustomDataSources: Record<string, unknown> = {};
@@ -56,6 +61,7 @@ export class FormCreationService {
     private readonly encounterAdapter: EncounterAdapter,
     private readonly configResourceService: ConfigResourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
+    private readonly patientIdentifierAdapter: PatientIdentifierAdapter,
   ) {}
 
   /**
@@ -65,13 +71,16 @@ export class FormCreationService {
    * @returns The new {@link Form} instance.
    */
   public async initAndCreateForm(createFormParams: CreateFormParams) {
-    const { formSchema, encounter } = createFormParams;
+    const { formSchema, encounter, patientIdentifiers } = createFormParams;
 
     await this.wireDataSources(createFormParams, formSchema);
 
     const form = this.formFactory.createForm(formSchema, this.dataSources.dataSources);
     this.setUpWHOCascading(form);
 
+    if (patientIdentifiers) {
+      this.patientIdentifierAdapter.populateForm(form, patientIdentifiers);
+    }
     if (encounter) {
       const encounterUuid = encounter.uuid;
       this.populateEncounterForEditing(form, createFormParams);
