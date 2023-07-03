@@ -21,7 +21,6 @@ import styles from './vitals-header.scss';
 
 interface VitalsHeaderProps {
   patientUuid: string;
-  showRecordVitalsButton: boolean;
 }
 
 export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
@@ -29,7 +28,7 @@ export function launchFormEntry(formUuid: string, encounterUuid?: string, formNa
   launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
 }
 
-const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVitalsButton }) => {
+const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();

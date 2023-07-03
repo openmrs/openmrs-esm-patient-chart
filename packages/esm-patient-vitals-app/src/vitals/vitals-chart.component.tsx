@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';

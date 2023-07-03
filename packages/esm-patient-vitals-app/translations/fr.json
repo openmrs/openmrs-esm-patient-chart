@@ -3,7 +3,7 @@
   "additionalNoteText": "Tapez les notes supplémentaires ici",
   "bloodPressure": "Pression sanguine",
   "bmi": "IMC",
-  "bmiCalc": "IMC (calc.)",
+  "calculatedBmi": "IMC (calc.)",
   "bp": "Pression sanguine",
   "chartView": "Vue graphique",
   "checkForValidity": "Certaines des valeurs saisies ne sont pas valides.",
