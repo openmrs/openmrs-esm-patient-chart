@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { ConfigObject } from '../../config-schema';
 import styles from './order-basket-search-results.scss';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import { Drug } from '../../types/order';
+import debounce from 'lodash/debounce';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
@@ -22,9 +23,21 @@ export default function OrderBasketSearchResults({
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { drugs, isLoading, error } = useDrugSearch(searchTerm);
+  const [currentTerm, setCurrentTerm] = useState(searchTerm);
 
-  if (!searchTerm) {
+  useEffect(() => {
+    const debouncedSetCurrentTerm = debounce((term) => {
+      setCurrentTerm(term);
+    }, 300);
+
+    debouncedSetCurrentTerm(searchTerm);
+
+    return () => debouncedSetCurrentTerm.cancel();
+  }, [searchTerm]);
+
+  const { drugs, isLoading, error } = useDrugSearch(currentTerm);
+
+  if (!currentTerm) {
     return null;
   }
 
@@ -37,8 +50,8 @@ export default function OrderBasketSearchResults({
       <Tile className={styles.emptyState}>
         <div>
           <h4 className={styles.productiveHeading01}>
-            {t('errorFetchingDrugResults', 'Error fetching results for "{searchTerm}"', {
-              searchTerm,
+            {t('errorFetchingDrugResults', 'Error fetching results for "{currentTerm}"', {
+              currentTerm,
             })}
           </h4>
           <p className={styles.bodyShort01}>
@@ -55,9 +68,9 @@ export default function OrderBasketSearchResults({
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
+              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{currentTerm}"', {
                 count: drugs?.length,
-                searchTerm,
+                currentTerm,
                 plural: drugs?.length > 1 ? 's' : '',
               })}
             </span>
@@ -75,8 +88,8 @@ export default function OrderBasketSearchResults({
         <Tile className={styles.emptyState}>
           <div>
             <h4 className={styles.productiveHeading01}>
-              {t('noResultsForDrugSearch', 'No results to display for "{searchTerm}"', {
-                searchTerm,
+              {t('noResultsForDrugSearch', 'No results to display for "{currentTerm}"', {
+                currentTerm,
               })}
             </h4>
             <p className={styles.bodyShort01}>
