@@ -1,6 +1,7 @@
 {
   "add": "Ajouter",
   "addAttachment": "Ajouter une pièce jointe",
+  "addAttachment_title": "Add Attachment",
   "addImage": "Ajouter une image",
   "addMoreAttachments": "Ajouter plus de pièces jointes",
   "attachmentCaptionInstruction": "Ajouter une légende pour l'image",
@@ -32,6 +33,7 @@
   "image": "Image",
   "imageDescription": "Description de l'image",
   "name": "Nom",
+  "record": "Record",
   "successfullyDeleted": "Supprimé avec succès",
   "type": "Type",
   "uploadComplete": "Téléchargement terminé",
