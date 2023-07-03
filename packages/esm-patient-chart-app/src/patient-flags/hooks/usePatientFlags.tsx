@@ -8,6 +8,7 @@ interface FlagFetchResponse {
   voided: boolean;
   flag: { uuid: string; display: string };
   patient: { uuid: string; display: string };
+  tags: Array<{ uuid: string; display: string }>;
   auditInfo: { dateCreated: string };
 }
 

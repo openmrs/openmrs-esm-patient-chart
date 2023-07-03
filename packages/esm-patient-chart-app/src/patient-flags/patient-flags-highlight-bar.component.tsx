@@ -41,7 +41,7 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
   return (
     <>
       <div className={styles.flagSummary}>
-        {filteredFlags.length && (
+        {filteredFlags.length > 0 && (
           <Tag type="high-contrast" onClick={handleClick} className={styles.flagsHighlightTag}>
             <span className={styles.flagIcon}>&#128681;</span>
             <span className={styles.flagText}>
@@ -49,6 +49,12 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
               {filteredFlags.length > 1 ? t('riskFlags', 'risk flags') : t('riskFlag', 'risk flag')}
             </span>
             {!showHighlightBar && <ArrowRight size={16} />}
+          </Tag>
+        )}
+        {filteredFlags.length === 0 && (
+          <Tag type="green" onClick={handleClick} className={styles.flagsHighlightTag}>
+            <span className={styles.flagIcon}>&#9989;</span>{' '}
+            <span className={styles.flagText}>{t('noRiskFlagToDisplay', 'No risk flag to display')}</span>
           </Tag>
         )}
       </div>

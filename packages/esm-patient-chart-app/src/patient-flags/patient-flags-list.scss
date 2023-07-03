@@ -1,11 +1,8 @@
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.flagsList {
+.listWrapper {
   margin: 1rem;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 6rem);
 }
 
 .flagTile {
@@ -76,19 +73,28 @@
   min-width: 50%;
 }
 
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
 .tabletButtonSet {
   padding: 1.5rem 1rem;
   background-color: $ui-02;
-  bottom: 2.5rem;
-  position: absolute;
-  width: 100%;
 }
 
 .desktopButtonSet {
   padding: 0rem;
-  bottom: 2.5rem;
-  position: absolute;
-  width: 100%;
 }
 
 .emptyText {
