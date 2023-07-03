@@ -67,6 +67,12 @@
   :global(.cds--search-input):focus {
     outline: 2.5px solid $danger
   }
+
+  :global(.cds--search-magnifier) {
+    svg {
+      fill: $danger
+    }
+  }
 }
 
 .errorMessage {
@@ -74,3 +80,4 @@
   color: $danger;
   margin-top: 0.5rem;
 }
+

@@ -3243,15 +3243,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "@hookform/resolvers@npm:3.1.1"
-  peerDependencies:
-    react-hook-form: ^7.0.0
-  checksum: 41da04f0995438364f129484011a84c0d4333ce1b4cb7815593f58ece51bbd88c87db9ea6b1f5d0b7ae3e47bfcdf1a3f8e2328c46800e884074048473b56d5b5
-  languageName: node
-  linkType: hard
-
 "@humanwhocodes/config-array@npm:^0.5.0":
   version: 0.5.0
   resolution: "@humanwhocodes/config-array@npm:0.5.0"
@@ -5681,7 +5672,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
-    "@hookform/resolvers": ^3.1.1
     "@openmrs/esm-framework": next
     "@playwright/test": ^1.30.0
     "@swc/cli": ^0.1.57
@@ -5724,7 +5714,6 @@ __metadata:
     pretty-quick: ^2.0.2
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-hook-form: ^7.45.0
     react-i18next: ^11.18.6
     react-router-dom: ^6.3.0
     rxjs: ^6.6.3
@@ -5735,7 +5724,6 @@ __metadata:
     typescript: ^4.0.3
     webpack-cli: ^4.10.0
     webpack-dev-server: ^4.10.1
-    zod: ^3.21.4
   languageName: unknown
   linkType: soft
 
@@ -22407,15 +22395,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.45.0":
-  version: 7.45.0
-  resolution: "react-hook-form@npm:7.45.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17 || ^18
-  checksum: 3e35253f0efb0f77f5036c74f85cbdd425adb2fad20a14fc692d573fe552b3d9b7e7ac22193cd767f265fa292c33383d8721cfbdcc5ae41910a35a1ba3655f66
-  languageName: node
-  linkType: hard
-
 "react-html5-camera-photo@npm:^1.5.4":
   version: 1.5.9
   resolution: "react-html5-camera-photo@npm:1.5.9"
@@ -28201,13 +28180,6 @@ __metadata:
     synchronous-promise: ^2.0.13
     toposort: ^2.0.2
   checksum: ec7297457ed8a8ccbd7751c4f312a6e651fa5eeb62338d59c6c972f2e6f91d0ce9c7c4026c654afd7bf9fb5b3b651759d5ff5e6621562383390b366048edb5be
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.21.4":
-  version: 3.21.4
-  resolution: "zod@npm:3.21.4"
-  checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
   languageName: node
   linkType: hard
 

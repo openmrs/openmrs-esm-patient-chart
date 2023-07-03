@@ -1,7 +1,8 @@
-import React, { Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
+import { BehaviorSubject } from 'rxjs';
 import {
   DatePicker,
   DatePickerInput,
@@ -15,6 +16,7 @@ import {
   Stack,
   Tile,
 } from '@carbon/react';
+import {WarningFilled} from '@carbon/react/icons';
 import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   CodedCondition,
@@ -31,7 +33,7 @@ import { ConditionFormData } from './conditions-form.component';
 interface ConditionsWidgetProps {
   closeWorkspace?: () => void;
   conditionToEdit?: ConditionDataTableRow;
-  editing?: boolean;
+  formContext?: 'creating' | 'editing';
   patientUuid: string;
   setHasSubmissibleValue?: (value: boolean) => void;
   setErrorCreating?: (error: Error) => void;
@@ -43,7 +45,7 @@ interface ConditionsWidgetProps {
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspace,
   conditionToEdit,
-  editing,
+  formContext,
   patientUuid,
   isSubmittingForm,
   setIsSubmittingForm,
@@ -71,10 +73,36 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const displayName = getFieldValue(conditionToEdit?.cells, 'display');
   const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
+
+  const [clinicalStatus, setClinicalStatus] = useState(editing ? editableClinicalStatus?.toLowerCase() : 'active');
+  const [conditionToLookup, setConditionToLookup] = useState<string>(null);
+  const [endDate, setEndDate] = useState<string>(null);
+  const [onsetDate, setOnsetDate] = useState<Date>(
+    editing ? (matchingCondition?.onsetDateTime ? new Date(matchingCondition?.onsetDateTime) : null) : null,
+  );
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
-  const { searchResults, isSearching } = useConditionsSearch(watch('search'));
+  const { searchResults, isSearching } = useConditionsSearch(conditionToLookup);
+
+  const formTouched =
+    clinicalStatus !== editableClinicalStatus || onsetDate !== new Date(matchingCondition?.onsetDateTime);
+
+  useEffect(() => {
+    if (editing) {
+      if (formTouched) {
+        setHasSubmissibleValue(true);
+      } else {
+        setHasSubmissibleValue(false);
+      }
+    } else if (!editing) {
+      setHasSubmissibleValue(!!selectedCondition);
+    }
+  }, [formTouched, editing, selectedCondition, setHasSubmissibleValue]);
+
+  const handleSearchTermChange = (event) => setConditionToLookup(event.target.value);
+
   const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
+    setConditionToLookup('');
   }, []);
 
   const handleCreate = useCallback(async () => {
@@ -83,11 +111,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     }
 
     const payload: FormFields = {
-      clinicalStatus: getValues('clinicalStatus'),
+      clinicalStatus: clinicalStatus,
       conceptId: selectedCondition?.concept?.uuid,
       display: selectedCondition?.concept?.display,
-      endDate: getValues('endDate') ? dayjs(getValues('endDate')).format() : null,
-      onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
+      endDate: endDate ? dayjs(endDate).format() : null,
+      onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
       patientId: patientUuid,
       userId: session?.user?.uuid,
     };
@@ -108,28 +136,30 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         closeWorkspace?.();
       }
     } catch (error) {
-      setIsSubmittingForm(false);
       setErrorCreating(error);
     }
   }, [
+    clinicalStatus,
     closeWorkspace,
-    getValues,
+    endDate,
     mutate,
+    onsetDate,
     patientUuid,
     selectedCondition,
     session?.user?.uuid,
     setErrorCreating,
-    setIsSubmittingForm,
     t,
   ]);
 
   const handleUpdate = useCallback(async () => {
+    if (!formTouched) return;
+
     const payload: FormFields = {
-      clinicalStatus: editing ? getValues('clinicalStatus') : editableClinicalStatus,
+      clinicalStatus: formTouched ? clinicalStatus : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
-      endDate: getValues('endDate') ? dayjs(getValues('endDate')).format() : null,
-      onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
+      endDate: endDate ? dayjs(endDate).format() : null,
+      onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
       patientId: patientUuid,
       userId: session?.user?.uuid,
     };
@@ -150,42 +180,34 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         closeWorkspace();
       }
     } catch (error) {
-      setIsSubmittingForm(false);
       setErrorUpdating(error);
     }
   }, [
+    clinicalStatus,
     closeWorkspace,
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
-    editing,
-    getValues,
+    endDate,
+    formTouched,
     matchingCondition?.conceptId,
     mutate,
+    onsetDate,
     patientUuid,
     session?.user?.uuid,
     setErrorUpdating,
-    setIsSubmittingForm,
     t,
   ]);
 
-  const searchInputFocus = () => {
-    searchInputRef.current.focus();
-  };
-
   useEffect(() => {
-    if (formState?.errors?.search) {
-      searchInputFocus();
-    }
-    if (isSubmittingForm) {
-      if (Object.keys(formState.errors).length > 0) {
-        setIsSubmittingForm(false);
-        Object.entries(formState.errors).map((key, err) => console.error(`${key}: ${err} `));
-        return;
+    const subscription = submissionNotifier.subscribe(({ isSubmitting }) => {
+      if (isSubmitting) {
+        editing ? handleUpdate() : handleCreate();
       }
-      editing ? handleUpdate() : handleCreate();
-    }
-  }, [handleUpdate, editing, handleCreate, isSubmittingForm, formState.errors, setIsSubmittingForm]);
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [handleCreate, handleUpdate, editing, submissionNotifier]);
 
   return (
     <div className={styles.formContainer}>
@@ -208,6 +230,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     placeholder={t('searchConditions', 'Search conditions')}
                     className={formState?.errors?.search && styles.conditionsError}
                     onChange={onChange}
+                    renderIcon={formState?.errors?.search && <WarningFilled/>}
                     onBlur={onBlur}
                     onClear={() => setSelectedCondition(null)}
                     disabled={editing}
@@ -224,7 +247,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               />
               {formState?.errors?.search && <p className={styles.errorMessage}>{formState?.errors?.search?.message}</p>}
               {(() => {
-                if (!getValues('search') || selectedCondition) return null;
+                if (!conditionToLookup || selectedCondition) return null;
                 if (isSearching)
                   return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
                 if (searchResults && searchResults.length) {
@@ -247,7 +270,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   <Layer>
                     <Tile className={styles.emptyResults}>
                       <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{getValues('search')}"</strong>
+                        {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
                       </span>
                     </Tile>
                   </Layer>
@@ -257,43 +280,30 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           )}
         </FormGroup>
         <FormGroup legendText="">
-          <Controller
-            name="onsetDateTime"
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <DatePicker
-                id="onsetDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                light={isTablet}
-                maxDate={dayjs().utc().format()}
-                placeholder="dd/mm/yyyy"
-                onChange={([date]) => onChange(date)}
-                onBlur={onBlur}
-                value={value}
-              >
-                <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
-              </DatePicker>
-            )}
-          />
+          <DatePicker
+            id="onsetDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            light={isTablet}
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setOnsetDate(date)}
+            value={onsetDate}
+          >
+            <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
+          </DatePicker>
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
-          <Controller
+          <RadioButtonGroup
+            defaultSelected={clinicalStatus}
             name="clinicalStatus"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <RadioButtonGroup
-                valueSelected={value.toLowerCase()}
-                name="clinicalStatus"
-                orientation="vertical"
-                onChange={onChange}
-                onBlur={onBlur}
-              >
-                <RadioButton id="active" labelText="Active" value="active" />
-                <RadioButton id="inactive" labelText="Inactive" value="inactive" />
-              </RadioButtonGroup>
-            )}
-          />
+            valueSelected={clinicalStatus}
+            orientation="vertical"
+            onChange={(status) => setClinicalStatus(status.toString())}
+          >
+            <RadioButton id="active" labelText="Active" value="active" />
+            <RadioButton id="inactive" labelText="Inactive" value="inactive" />
+          </RadioButtonGroup>
         </FormGroup>
         {currentStatus === 'inactive' && (
           <Controller
