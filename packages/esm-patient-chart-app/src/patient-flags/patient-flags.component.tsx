@@ -17,8 +17,8 @@ const PatientFlags: React.FC<PatientFlagsProps> = ({ patientUuid }) => {
   const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
 
-  const hasRiskFlag = (tags) => tags.filter((t) => t.display.includes('risk')).length;
-  const hasInfoFlag = (tags) => tags.filter((t) => t.display.includes('info')).length;
+  const hasRiskFlag = (tags) => tags?.filter((t) => t.display.includes('risk')).length;
+  const hasInfoFlag = (tags) => tags?.filter((t) => t.display.includes('info')).length;
 
   const riskFlags = filteredFlags.filter((f) => hasRiskFlag(f.tags));
   const infoFlags = filteredFlags.filter((f) => hasInfoFlag(f.tags));
