@@ -95,7 +95,7 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         critical: true,
         kind: 'error',
         description: t('flagDisableError', 'Error disabling the flag'),
-        title: t('disableFlagError', 'Disabl flag error'),
+        title: t('disableFlagError', 'Disable flag error'),
       });
     }
   };
