@@ -54,7 +54,7 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
         {filteredFlags.length === 0 && (
           <Tag type="green" onClick={handleClick} className={styles.flagsHighlightTag}>
             <span className={styles.flagIcon}>&#9989;</span>{' '}
-            <span className={styles.flagText}>{t('noRiskFlagToDisplay', 'No risk flag to display')}</span>
+            <span className={styles.flagText}>{t('noRiskFlagsToDisplay', 'No risk flags to display')}</span>
           </Tag>
         )}
       </div>
