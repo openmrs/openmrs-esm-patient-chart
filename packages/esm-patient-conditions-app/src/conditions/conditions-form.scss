@@ -62,3 +62,22 @@
 .errorContainer {
   margin: 1rem;
 }
+
+.conditionsError {
+  :global(.cds--search-input):focus {
+    outline: 2.5px solid $danger
+  }
+
+  :global(.cds--search-magnifier) {
+    svg {
+      fill: $danger
+    }
+  }
+}
+
+.errorMessage {
+  @include type.type-style("label-02");
+  color: $danger;
+  margin-top: 0.5rem;
+}
+
