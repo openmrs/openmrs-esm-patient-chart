@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tag, Button, SkeletonPlaceholder } from '@carbon/react';
 import { ArrowRight, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -20,15 +20,15 @@ const PatientFlagsHighlightBar: React.FC<PatientFlagsHighlightBarProps> = ({ pat
 
   const [showHighlightBar, setShowHighlightBar] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     setShowHighlightBar(true);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setShowHighlightBar(false);
-  };
+  }, []);
 
-  if (path.includes('Summary')) {
+  if (decodeURI(path).includes('Patient Summary')) {
     return null;
   }
   if (isLoadingFlags) {

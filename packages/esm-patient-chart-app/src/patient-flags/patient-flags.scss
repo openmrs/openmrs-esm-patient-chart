@@ -6,7 +6,7 @@
 }
 
 .flagTag {
-  padding: 0 0.5rem;
+  padding: 0 spacing.$spacing-03;
   span {
     display: flex;
     align-items: center;
@@ -14,7 +14,7 @@
 }
 
 .infoFlagTag {
-  padding: 0 0.5rem;
+  padding: 0 spacing.$spacing-03;
   background-color: #ffd9be;
   color: #934412;
   font-weight: 500;
@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   position: 'relative';
-  padding: 0.5rem;
+  padding: spacing.$spacing-03;
   border-bottom: 0.063rem solid #e0e0e0;
 }
 
@@ -53,6 +53,6 @@
 
 
 .tooltipPadding {
-    padding: 0.25rem;
+    padding: spacing.$spacing-02;
 }
 

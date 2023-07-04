@@ -11,7 +11,7 @@
 }
 
 .flagsHighlightTag {
-  padding: 0 0.5rem;
+  padding: 0 spacing.$spacing-03;
   border: none;
   span {
     display: flex;
@@ -20,7 +20,7 @@
   }
 
   .flagText {
-    margin-left: 0.5rem;
+    margin-left: spacing.$spacing-03;
   }
 }
 
@@ -28,8 +28,8 @@
   display: flex;
   align-items: center;
   position: 'relative';
-  padding: 0.5rem;
-  border-bottom: 0.065rem solid $ui-03;
+  padding: spacing.$spacing-03;
+  border-bottom: 1px solid $ui-03;
 }
 
 .flagSkeleton{

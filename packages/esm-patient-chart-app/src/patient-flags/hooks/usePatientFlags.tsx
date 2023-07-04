@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,39 +23,35 @@ interface FlagsFetchResponse {
  * @returns An array of patient identifiers
  */
 export function useFlagsFromPatient(patientUuid: string) {
-  const { data, error, isValidating, mutate } = useSWR<{ data: FlagsFetchResponse }, Error>(
+  const { data, error, isValidating, mutate } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(
     `/ws/rest/v1/patientflags/patientflag?patient=${patientUuid}&v=full`,
     openmrsFetch,
   );
-  const result = useMemo(() => {
-    return {
-      flags: data?.data?.results ?? [],
-      flagLoadingError: error,
-      isLoadingFlags: !data && !error,
-      isValidatingFlags: isValidating,
-      mutate,
-    };
-  }, [data, error, isValidating, mutate]);
+  const result = {
+    flags: data?.data?.results ?? [],
+    flagLoadingError: error,
+    isLoadingFlags: !data && !error,
+    isValidatingFlags: isValidating,
+    mutate,
+  };
   return result;
 }
 
 export function useCurrentPath(): string {
   const [path, setPath] = useState(window.location.pathname);
 
-  const listenToRoutingEvent = useCallback(() => {
-    const winPath = window.location.pathname;
-    setPath(winPath);
-  }, []);
+  const listenToRoutingEvent = useCallback(
+    (e) => {
+      const winPath = e.detail.newUrl;
+      setPath(winPath);
+    },
+    [setPath],
+  );
 
   useEffect(() => {
-    const handleRoutingEvent = () => {
-      listenToRoutingEvent();
-    };
-
-    window.addEventListener('single-spa:routing-event', handleRoutingEvent);
-
+    window.addEventListener('single-spa:routing-event', listenToRoutingEvent);
     return () => {
-      window.removeEventListener('single-spa:routing-event', handleRoutingEvent);
+      window.removeEventListener('single-spa:routing-event', listenToRoutingEvent);
     };
   }, [listenToRoutingEvent]);
 

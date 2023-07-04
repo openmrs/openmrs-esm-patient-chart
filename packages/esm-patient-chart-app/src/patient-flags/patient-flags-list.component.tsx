@@ -61,8 +61,8 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       showToast({
         critical: true,
         kind: 'success',
-        description: t('flagEnabled', 'Patient flag successfully enabled'),
-        title: t('enablingFlag', 'Enabling flag'),
+        description: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
+        title: t('enabledFlag', 'Enabled flag'),
       });
 
       setEnabling(false);
@@ -70,8 +70,8 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       showNotification({
         critical: true,
         kind: 'error',
-        description: t('errorEnabling', 'There was a problem enabling the flag'),
-        title: t('enablingFlag', 'Enabling flag'),
+        description: t('flagEnableError', 'Error enabling flag'),
+        title: t('flagEnabled', 'flag enabled'),
       });
     }
   };
@@ -85,8 +85,8 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       showToast({
         critical: true,
         kind: 'success',
-        description: t('flagDisabled', 'Patient flag successfully disabled'),
-        title: t('disablingFlag', 'Disabling flag'),
+        description: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
+        title: t('flagDisabled', 'Flag disabled'),
       });
 
       setDisabling(false);
@@ -94,8 +94,8 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       showNotification({
         critical: true,
         kind: 'error',
-        description: t('errorDisabling', 'There was a problem disabling the flag'),
-        title: t('disablingFlag', 'Disabling flag'),
+        description: t('flagDisableError', 'Error disabling the flag'),
+        title: t('disableFlagError', 'Disabl flag error'),
       });
     }
   };
@@ -120,7 +120,7 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
           />
           <div className={styles.flagsHeaderInfo}>
             <div>
-              {searchResults.length} {searchResults.length > 1 ? 'flags' : 'flag'}
+              {searchResults.length} {searchResults.length > 1 ? t('flags', 'Flags') : t('flag', 'Flag')}
             </div>
             <div>
               <Dropdown
@@ -130,7 +130,11 @@ const PatientFlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                 label=""
                 titleText={t('sortBy', 'Sort by') + ':'}
                 type="inline"
-                items={['A - Z', t('activeFirst', 'Active first'), t('retiredFirst', 'Retired first')]}
+                items={[
+                  t('alphabetically', 'A - Z'),
+                  t('activeFirst', 'Active first'),
+                  t('retiredFirst', 'Retired first'),
+                ]}
                 onChange={handleSortByChange}
               />
             </div>
