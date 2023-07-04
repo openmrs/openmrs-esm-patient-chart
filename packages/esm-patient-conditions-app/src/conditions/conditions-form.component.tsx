@@ -1,10 +1,8 @@
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import 'dayjs/plugin/utc';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BehaviorSubject } from 'rxjs';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { ConditionDataTableRow } from './conditions.resource';
+import { ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -29,8 +27,9 @@ export type ConditionFormData = z.infer<typeof conditionSchema>;
 const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, condition, formContext, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const submissionNotifier = useMemo(() => new BehaviorSubject<{ isSubmitting: boolean }>({ isSubmitting: false }), []);
-  const [hasSubmissibleValue, setHasSubmissibleValue] = useState(false);
+  const { conditions } = useConditions(patientUuid);
+  const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
+
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
@@ -48,8 +47,16 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
       clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
       search: condition?.cells?.find((cell) => cell?.info?.header === 'display')?.value,
     },
-    [errorCreating, errorUpdating, submissionNotifier],
-  );
+  });
+
+  const onSubmit = (data) => {
+    setIsSubmittingForm(true);
+  };
+
+  const onError = (error) => {
+    setIsSubmittingForm(false);
+    console.error(error);
+  };
 
   return (
     <FormProvider {...methods}>
