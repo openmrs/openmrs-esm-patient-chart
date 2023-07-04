@@ -9,7 +9,16 @@ import { ProviderResourceService } from '../openmrs-api/provider-resource.servic
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import type { Concept, FormSchema, Location, Observation, Provider, Questions } from '../types';
+import type {
+  Concept,
+  FormSchema,
+  Identifier,
+  Location,
+  Observation,
+  PatientModel,
+  Provider,
+  Questions,
+} from '../types';
 
 @Injectable()
 export class FormDataSourceService {
@@ -331,20 +340,16 @@ export class FormDataSourceService {
         return 'U';
     }
   }
-  public getPatientObject(patient): object {
-    const model: object = {};
-    const gender = patient?.gender;
-    model['sex'] = this.getGender(gender);
-    model['birthdate'] = new Date(patient?.birthDate);
-    model['age'] = this.calculateAge(patient?.birthDate);
+  public getPatientObject(patient): PatientModel {
+    let model: PatientModel = {
+      sex: this.getGender(patient?.gender),
+      birthdate: new Date(patient?.birthDate),
+      age: this.calculateAge(patient?.birthDate),
+      identifiers: [],
+      gendercreatconstant: patient?.gender === 'female' ? 0.85 : patient?.gender === 'male' ? 1 : undefined,
+    };
 
-    // define gender based constant:
-    if (patient?.gender === 'female') {
-      model['gendercreatconstant'] = 0.85;
-    }
-    if (patient?.gender === 'male') {
-      model['gendercreatconstant'] = 1;
-    }
+    model.identifiers = this.mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient);
 
     return model;
   }
@@ -353,5 +358,30 @@ export class FormDataSourceService {
     const ageDifMs = Date.now() - new Date(birthday).getTime();
     const ageDate = new Date(ageDifMs);
     return Math.abs(ageDate.getUTCFullYear() - 1970);
+  }
+
+  private mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient): Array<Identifier> {
+    const identifiers = patient?.identifier ?? [];
+
+    return identifiers?.map((patientIdentifier) => ({
+      uuid: patientIdentifier?.id,
+      identifierType: {
+        uuid: patientIdentifier?.type?.coding?.[0]?.code,
+        display: patientIdentifier?.type?.text,
+      },
+      identifier: patientIdentifier?.value,
+      location: {
+        uuid: this.extractLocationUuid(patientIdentifier?.extension?.[0]?.valueReference?.reference),
+        display: patientIdentifier?.extension?.[0]?.valueReference?.display,
+      },
+    }));
+  }
+
+  private extractLocationUuid(locationReference: string): string | null {
+    const lastIndexOf = locationReference?.lastIndexOf('/');
+    if (lastIndexOf !== -1) {
+      return locationReference?.substring(lastIndexOf + 1);
+    }
+    return '';
   }
 }
