@@ -19,6 +19,7 @@
   "testName": "שם הבדיקה",
   "testResults": "תוצאות הבדיקה",
   "testResults_link": "תוצאות בדיקות",
+  "testResults_title": "Test Results",
   "timeline": "ציר זמן",
   "timeOfTest": "שעת הבדיקה",
   "tree": "עץ",

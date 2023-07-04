@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { ObsMetaInfo, ConceptMetadata, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
-import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
+import { calculateBodyMassIndex } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
 
 interface ObsRecord {
@@ -130,7 +130,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     return {
       ...vitalSigns,
       id: index.toString(),
-      bmi: calculateBMI(Number(vitalSigns.weight), Number(vitalSigns.height)),
+      bmi: calculateBodyMassIndex(Number(vitalSigns.weight), Number(vitalSigns.height)),
       date: date,
       bloodPressureInterpretation: interpretBloodPressure(
         vitalSigns.systolic,

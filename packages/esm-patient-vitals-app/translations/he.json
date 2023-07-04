@@ -3,7 +3,7 @@
   "additionalNoteText": "הקלד הערות נוספות כאן",
   "bloodPressure": "לחץ דם",
   "bmi": "BMI",
-  "bmiCalc": "BMI (חישוב)",
+  "calculatedBmi": "BMI (חישוב)",
   "bp": "ל.דם",
   "chartView": "תצוגת גרף",
   "checkForValidity": "חלק מהערכים שהוזנו אינם תקפים",

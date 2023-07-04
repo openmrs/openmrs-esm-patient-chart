@@ -6,7 +6,7 @@ import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { Encounter, FormSchema, Order } from '../types';
+import { Encounter, FormSchema, Identifier, Order } from '../types';
 import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
@@ -16,6 +16,7 @@ import { CreateFormParams, FormCreationService } from '../form-creation/form-cre
 import { ConceptService } from '../services/concept.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ProgramResourceService } from '../openmrs-api/program-resource.service';
+import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 
 type FormState =
   | 'initial'
@@ -58,6 +59,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly translateService: TranslateService,
     private readonly ngZone: NgZone,
     private readonly programService: ProgramResourceService,
+    private readonly formDataSourceService: FormDataSourceService,
   ) {}
 
   public ngOnInit() {
@@ -116,6 +118,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+    const patient = this.singleSpaPropsService.getPropOrThrow('patient');
+    const identifiers = this.formDataSourceService.getPatientObject(patient)?.identifiers ?? [];
     const language = window.i18next?.language?.substring(0, 2) ?? '';
     this.translateService.addLangs([language]);
     this.translateService.use(language);
@@ -126,6 +130,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       encounter: encounterOrSyncItemId
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
         : of<Encounter>(null),
+      patientIdentifiers: of<Array<Identifier>>(identifiers),
     }).pipe(
       mergeMap((result) =>
         this.loadPatientPreviousEncounters(result.formSchema).pipe(
