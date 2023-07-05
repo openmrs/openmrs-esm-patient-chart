@@ -4,8 +4,11 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 
 import { WindowRef } from '../window-ref';
-
-// TODO inject service
+import { Form, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
+import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
+import { FormDataSourceService } from '../form-data-source/form-data-source.service';
+import { OpenmrsResource } from '@openmrs/esm-framework';
+import { IdentifierPayload } from '../types';
 
 @Injectable()
 export class PatientResourceService {
@@ -19,7 +22,13 @@ export class PatientResourceService {
     'stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5' +
     ',address6,address7)))';
 
-  constructor(protected http: HttpClient, private windowRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    private windowRef: WindowRef,
+    private readonly patientIdentifierAdapter: PatientIdentifierAdapter,
+    private readonly singleSpaPropsService: SingleSpaPropsService,
+    private readonly formDataSourceService: FormDataSourceService,
+  ) {}
 
   public getUrl(): string {
     return this.windowRef.openmrsRestBase + 'patient';
@@ -52,16 +61,73 @@ export class PatientResourceService {
       params: params,
     });
   }
-  public saveUpdatePatientIdentifier(uuid, identifierUuid, payload): Observable<any> {
-    if (!payload || !uuid) {
+  public saveUpdatePatientIdentifier(patientUuid: string, identifierUuid: string, payload): Observable<any> {
+    if (!payload || !patientUuid) {
       return null;
     }
-    const url = this.getUrl() + '/' + uuid + '/' + 'identifier' + '/' + identifierUuid;
+
+    const url = this.getUrl() + '/' + patientUuid + '/' + 'identifier' + '/' + identifierUuid;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(url, JSON.stringify(payload), { headers }).pipe(
-      map((response: any) => {
-        return response.patient;
-      }),
+    return this.http.post(url, JSON.stringify(payload), { headers });
+  }
+
+  public createPatientIdentifier(patientUuid: string, payload): Observable<any> {
+    const url = `${this.getUrl()}/${patientUuid}/identifier`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(url, JSON.stringify(payload), { headers });
+  }
+
+  public buildIdentifiersToUpdatePayload(form: Form): Array<any> {
+    const location: OpenmrsResource = form.dataSourcesContainer.dataSources['userLocation'];
+    const patientIdentifiers = this.patientIdentifierAdapter.generateFormPayload(form, location?.uuid);
+
+    const currentIdentifiers = this.retrieveCurrentPatientIdentifiers();
+
+    const identifiersToUpdate = currentIdentifiers
+      .filter(({ identifierType }) =>
+        patientIdentifiers.find((pIdentifier) => pIdentifier.identifierType === identifierType.uuid),
+      )
+      .map((identifier) => {
+        const updatedIdentifier = patientIdentifiers.find(
+          (pIdentifier) => pIdentifier.identifierType === identifier.identifierType.uuid,
+        );
+        return {
+          ...identifier,
+          location: {
+            uuid: location.uuid,
+            display: location.display,
+          },
+          identifier: updatedIdentifier.identifier,
+        };
+      });
+
+    return identifiersToUpdate;
+  }
+
+  public retrieveCurrentPatientIdentifiers() {
+    const patient = this.singleSpaPropsService.getPropOrThrow('patient');
+    const patientObj = this.formDataSourceService.getPatientObject(patient);
+    return patientObj?.identifiers;
+  }
+
+  public buildIdentifiersToCreatePayload(form: Form) {
+    const location: OpenmrsResource = form.dataSourcesContainer.dataSources['userLocation'];
+    const currentIdentifiers = this.retrieveCurrentPatientIdentifiers();
+    const updatedIdentifiers = this.patientIdentifierAdapter.generateFormPayload(form, location.uuid);
+
+    const newIdentifiers = updatedIdentifiers.filter(
+      (updatedIdentifier) =>
+        !currentIdentifiers.some(
+          (exIdentifier) => exIdentifier.identifierType.uuid === updatedIdentifier.identifierType,
+        ),
     );
+
+    return newIdentifiers;
+  }
+
+  public buildIdentifierPayload(form): IdentifierPayload {
+    const currentIdentifiers = this.buildIdentifiersToUpdatePayload(form);
+    const newIdentifiers = this.buildIdentifiersToCreatePayload(form);
+    return { newIdentifiers, currentIdentifiers };
   }
 }

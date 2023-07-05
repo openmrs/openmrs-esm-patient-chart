@@ -15,7 +15,7 @@ import {
   Stack,
   Tile,
 } from '@carbon/react';
-import { WarningFilled } from '@carbon/react/icons' ;
+import { WarningFilled } from '@carbon/react/icons';
 import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   CodedCondition,
