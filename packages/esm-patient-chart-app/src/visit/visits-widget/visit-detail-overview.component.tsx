@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { mapEncounters, useVisits } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
@@ -49,17 +49,23 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               visits.map((visit, i) => (
                 <div className={styles.container} key={i}>
                   <div className={styles.header}>
-                    <h4 className={styles.visitType}>{visit?.visitType?.display}</h4>
-
-                    <div className={styles.displayFlex}>
-                      <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
-                      <span className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</span>
-                      {visit?.stopDatetime ? (
-                        <>
-                          <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
-                          <span className={styles.date}>{formatDatetime(parseDate(visit?.stopDatetime))}</span>
-                        </>
-                      ) : null}
+                    <div>
+                      <div>
+                        <h4 className={styles.visitType}>{visit?.visitType?.display}</h4>
+                        <div className={styles.displayFlex}>
+                          <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
+                          <span className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</span>
+                          {visit?.stopDatetime ? (
+                            <>
+                              <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
+                              <span className={styles.date}>{formatDatetime(parseDate(visit?.stopDatetime))}</span>
+                            </>
+                          ) : null}
+                        </div>
+                      </div>
+                      <div>
+                        <ExtensionSlot name="visit-detail-overview-actions" state={{ patientUuid, visit }} />
+                      </div>
                     </div>
                   </div>
                   <VisitSummary visit={visit} patientUuid={patientUuid} />

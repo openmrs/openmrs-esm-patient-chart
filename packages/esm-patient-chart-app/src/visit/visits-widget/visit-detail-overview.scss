@@ -47,6 +47,17 @@
   }
 }
 
+.header {
+  .visitInfo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .visitActions {
+      padding-left: spacing.$spacing-09;
+    }
+  }
+}
+
 .header::after {
   content: "";
   display: block;
@@ -171,4 +182,19 @@
 
 .notesContainer {
   margin-bottom: 2rem;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .header {
+    .visitInfo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .visitActions {
+        padding-left: unset;
+        padding-right: spacing.$spacing-09;
+      }
+    }
+  }
 }
