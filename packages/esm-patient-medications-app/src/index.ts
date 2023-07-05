@@ -23,14 +23,11 @@ export const activeMedications = getAsyncLifecycle(() => import('./medications/a
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
 
 export const medicationsDashboardLink =
-  // t('medications_link', 'Medications')
+  // t('Medications')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('medications_link', { defaultValue: 'Medications', ns: moduleName }) ?? 'Medications',
-        ),
+      moduleName,
     }),
     options,
   );

@@ -16,14 +16,11 @@ export const attachmentsOverview = getAsyncLifecycle(() => import('./attachments
   moduleName,
 });
 
-// t('attachments_link', 'Attachments')
+// t('Attachments')
 export const attachmentsSummaryResultsDashboard = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,
-    title: () =>
-      Promise.resolve(
-        window.i18next?.t('attachments_link', { defaultValue: 'Attachments', ns: moduleName }) ?? 'Attachments',
-      ),
+    moduleName,
   }),
   {
     featureName: 'attachments-dashboard-link',

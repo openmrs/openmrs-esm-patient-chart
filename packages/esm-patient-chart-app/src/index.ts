@@ -63,14 +63,11 @@ export function startupApp() {
 export const root = getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
 
 export const patientSummaryDashboardLink =
-  // t('summary_link', 'Patient Summary')
+  // t('Patient Summary')
   getSyncLifecycle(
     createDashboardLink({
       ...summaryDashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('summary_link', { defaultValue: 'Patient Summary', ns: moduleName }) ?? 'Patient Summary',
-        ),
+      moduleName,
     }),
     {
       featureName: 'summary-dashboard',
@@ -139,12 +136,11 @@ export const addPastVisitPatientSearchActionButton = getAsyncLifecycle(
 );
 
 export const encountersSummaryDashboardLink =
-  // t('encounters_link', 'Visits')
+  // t('Visits')
   getSyncLifecycle(
     createDashboardLink({
       ...encountersDashboardMeta,
-      title: () =>
-        Promise.resolve(window.i18next?.t('encounters_link', { defaultValue: 'Visits', ns: moduleName }) ?? 'Visits'),
+      moduleName,
     }),
     { featureName: 'encounter', moduleName },
   );
