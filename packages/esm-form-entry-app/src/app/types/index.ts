@@ -451,3 +451,8 @@ export interface PatientModel {
   gendercreatconstant?: number;
   identifiers: Array<Identifier>;
 }
+
+export interface IdentifierPayload {
+  newIdentifiers: Array<any>;
+  currentIdentifiers: Array<any>;
+}

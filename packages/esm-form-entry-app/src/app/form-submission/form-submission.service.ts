@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, flatMap, map, mapTo, mergeMap, switchMap, take } from 'rxjs/operators';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
 import { EncounterAdapter, PersonAttribuAdapter, Form } from '@openmrs/ngx-formentry';
 import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Person, PersonUpdate, EncounterCreate, Encounter } from '../types';
+import { Person, PersonUpdate, EncounterCreate, Encounter, IdentifierPayload, Identifier } from '../types';
 import {
   findQueuedPatientFormSyncItemByContentId,
   PatientFormSyncItemContent,
@@ -20,6 +20,8 @@ import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMuta
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { v4 } from 'uuid';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
+import { PatientResourceService } from '../openmrs-api/patient-resource.service';
+import { showToast } from '@openmrs/esm-framework';
 
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
@@ -38,7 +40,8 @@ export class FormSubmissionService {
     private readonly formDataSourceService: FormDataSourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private readonly visitResourceService: VisitResourceService,
-  ) {}
+    private readonly patientResourceService: PatientResourceService,
+  ) { }
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
     const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
@@ -55,10 +58,11 @@ export class FormSubmissionService {
 
         const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
         const personUpdate = this.buildPersonUpdatePayload(form);
+        const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
 
         return isOfflineSubmission
           ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
-          : this.submitPayloadOnline(encounterCreate, personUpdate);
+          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload);
       }),
     );
   }
@@ -110,7 +114,9 @@ export class FormSubmissionService {
   private submitPayloadOnline(
     encounterCreate: EncounterCreate,
     personUpdate: PersonUpdate,
+    identifierPayload: IdentifierPayload,
   ): Observable<FormSubmissionResult> {
+    this.submitPatientIdentifier(identifierPayload)
     return forkJoin({
       encounter: this.submitEncounter(encounterCreate),
       person: this.submitPersonUpdate(personUpdate),
@@ -215,6 +221,44 @@ export class FormSubmissionService {
     }
 
     return { uuid: form.valueProcessingInfo.personUuid, attributes: attributes };
+  }
+
+  private submitPatientIdentifier(identifierPayload) {
+    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+
+    const { newIdentifiers, currentIdentifiers } = identifierPayload;
+    if (newIdentifiers?.length > 0) {
+      const payload = { ...newIdentifiers.reduce((acc, cur) => Object.assign(cur, acc), {}) };
+      return this.patientResourceService.createPatientIdentifier(patientUuid, payload).pipe(
+        map((res) => {
+          showToast({
+            title: 'Identifier created',
+            description: `Patient's identifier has been successfully created.`,
+            kind: 'success',
+          });
+          return res;
+        }),
+        catchError((res) => this.throwUserFriendlyError(res)),
+      );
+    }
+    if (currentIdentifiers?.length > 0) {
+      return currentIdentifiers?.map((currentIdentifier) =>
+        this.patientResourceService
+          .saveUpdatePatientIdentifier(patientUuid, currentIdentifier.uuid, {
+            identifier: currentIdentifier.identifier,
+            location: currentIdentifier.location,
+          })
+          .subscribe(
+            (resp) =>
+              showToast({
+                title: 'Identifier Updated',
+                description: `Patient's identifier has been successfully updated.`,
+                kind: 'success',
+              }),
+            (error) => this.throwUserFriendlyError(error),
+          ),
+      );
+    }
   }
 
   // TODO: Should this function be extracted?
