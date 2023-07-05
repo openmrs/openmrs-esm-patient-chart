@@ -235,3 +235,21 @@ export const deleteEncounterModal = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const patientFlagTags = getAsyncLifecycle(
+  () => import('./patient-flags/patient-flags-highlight-bar.component'),
+  {
+    featureName: 'patient-flag-tags',
+    moduleName,
+  },
+);
+
+export const patientFlagsOverview = getAsyncLifecycle(() => import('./patient-flags/patient-flags.component'), {
+  featureName: 'patient-flags-overview',
+  moduleName,
+});
+
+export const editFlagsSidePanel = getAsyncLifecycle(() => import('./patient-flags/patient-flags-list.component'), {
+  featureName: 'edit-flags-side-panel-form',
+  moduleName,
+});
