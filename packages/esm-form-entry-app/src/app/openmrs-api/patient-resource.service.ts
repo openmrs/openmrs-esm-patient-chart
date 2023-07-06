@@ -1,6 +1,6 @@
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 
 import { WindowRef } from '../window-ref';
@@ -129,5 +129,21 @@ export class PatientResourceService {
     const currentIdentifiers = this.buildIdentifiersToUpdatePayload(form);
     const newIdentifiers = this.buildIdentifiersToCreatePayload(form);
     return { newIdentifiers, currentIdentifiers };
+  }
+
+  public validateIdentifiers(form: Form) {
+    const { newIdentifiers } = this.buildIdentifierPayload(form);
+    const patientIdentifierNodes = this.patientIdentifierAdapter.getPatientIdentifierNodes(form.rootNode);
+    const nodeValue = patientIdentifierNodes?.[0];
+
+    if (newIdentifiers.length > 0) {
+      return this.searchPatient(newIdentifiers[0].identifier);
+    }
+
+    if (nodeValue && nodeValue.control.value !== nodeValue.initialValue) {
+      return this.searchPatient(nodeValue.control.value);
+    }
+
+    return of([]);
   }
 }

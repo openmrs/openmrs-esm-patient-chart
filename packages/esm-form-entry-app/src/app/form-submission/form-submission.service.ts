@@ -21,13 +21,14 @@ import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.serv
 import { v4 } from 'uuid';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
-import { showToast } from '@openmrs/esm-framework';
 
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
  */
 interface FormSubmissionResult {
   encounter: Encounter;
+  identifiers?: Array<Identifier>;
+  person?: Person;
 }
 
 @Injectable()
@@ -116,10 +117,10 @@ export class FormSubmissionService {
     personUpdate: PersonUpdate,
     identifierPayload: IdentifierPayload,
   ): Observable<FormSubmissionResult> {
-    this.submitPatientIdentifier(identifierPayload);
     return forkJoin({
       encounter: this.submitEncounter(encounterCreate),
       person: this.submitPersonUpdate(personUpdate),
+      identifiers: this.submitPatientIdentifier(identifierPayload),
     });
   }
 
@@ -223,42 +224,22 @@ export class FormSubmissionService {
     return { uuid: form.valueProcessingInfo.personUuid, attributes: attributes };
   }
 
-  private submitPatientIdentifier(identifierPayload) {
+  private submitPatientIdentifier(identifierPayload): Observable<any> {
     const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
 
     const { newIdentifiers, currentIdentifiers } = identifierPayload;
     if (newIdentifiers?.length > 0) {
       const payload = { ...newIdentifiers.reduce((acc, cur) => Object.assign(cur, acc), {}) };
-      return this.patientResourceService.createPatientIdentifier(patientUuid, payload).pipe(
-        map((res) => {
-          showToast({
-            title: 'Identifier created',
-            description: `Patient's identifier has been successfully created.`,
-            kind: 'success',
-          });
-          return res;
-        }),
-        catchError((res) => this.throwUserFriendlyError(res)),
-      );
+      return this.patientResourceService.createPatientIdentifier(patientUuid, payload);
     }
     if (currentIdentifiers?.length > 0) {
-      return currentIdentifiers?.map((currentIdentifier) =>
-        this.patientResourceService
-          .saveUpdatePatientIdentifier(patientUuid, currentIdentifier.uuid, {
-            identifier: currentIdentifier.identifier,
-            location: currentIdentifier.location,
-          })
-          .subscribe(
-            (resp) =>
-              showToast({
-                title: 'Identifier Updated',
-                description: `Patient's identifier has been successfully updated.`,
-                kind: 'success',
-              }),
-            (error) => this.throwUserFriendlyError(error),
-          ),
-      );
+      const { uuid, identifier, location } = currentIdentifiers[0] ?? {};
+      return this.patientResourceService.saveUpdatePatientIdentifier(patientUuid, uuid, {
+        identifier: identifier,
+        location: location,
+      });
     }
+    return of(undefined);
   }
 
   // TODO: Should this function be extracted?
