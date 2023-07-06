@@ -41,7 +41,7 @@ export class FormSubmissionService {
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private readonly visitResourceService: VisitResourceService,
     private readonly patientResourceService: PatientResourceService,
-  ) { }
+  ) {}
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
     const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
@@ -116,7 +116,7 @@ export class FormSubmissionService {
     personUpdate: PersonUpdate,
     identifierPayload: IdentifierPayload,
   ): Observable<FormSubmissionResult> {
-    this.submitPatientIdentifier(identifierPayload)
+    this.submitPatientIdentifier(identifierPayload);
     return forkJoin({
       encounter: this.submitEncounter(encounterCreate),
       person: this.submitPersonUpdate(personUpdate),
