@@ -18,7 +18,7 @@ interface ContactDetailsProps {
 
 const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { cohorts, isLoading } = usePatientListsForPatient(patientUuid);
+  const { cohorts = [], isLoading } = usePatientListsForPatient(patientUuid);
 
   return (
     <>
