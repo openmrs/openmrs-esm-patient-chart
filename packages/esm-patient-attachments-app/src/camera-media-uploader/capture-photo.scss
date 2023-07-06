@@ -1,0 +1,30 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.container {
+  width: 7.5rem
+}
+
+.imageContainer {
+  border: solid 1px #343a3f;
+  width: 100%;
+  height: 7.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 100%;
+  }
+
+  p {
+    width: 3.5rem;
+    @include type.type-style('label-01');
+  }
+}
+
+.button {
+  width: 100%;
+  display: flex;
+}

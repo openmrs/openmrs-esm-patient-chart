@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
+import { Edit } from '@carbon/react/icons';
+import { showModal, toOmrsIsoString, useLayoutType } from '@openmrs/esm-framework';
+import styles from './capture-photo.scss';
 import placeholder from '../assets/placeholder.svg';
 
 export interface CapturePhotoProps {
@@ -11,6 +13,7 @@ export interface CapturePhotoProps {
 
 const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhoto }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [dataUri, setDataUri] = useState(null);
 
   const showCam = useCallback(() => {
@@ -29,12 +32,18 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
   }, [onCapturePhoto]);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ maxWidth: '64px' }}>
-        <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
+    <div className={styles.container}>
+      <div className={styles.imageContainer}>
+        {dataUri || initialState ? <img src={dataUri || initialState} alt="Preview" /> : <p>No image to display</p>}
       </div>
-      <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
-        {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
+      <Button
+        kind="secondary"
+        onClick={showCam}
+        className={styles.button}
+        renderIcon={Edit}
+        size={isTablet ? 'lg' : 'sm'}
+      >
+        {initialState ? t('changeImage', 'Change') : t('editImage', 'Edit')}
       </Button>
     </div>
   );
