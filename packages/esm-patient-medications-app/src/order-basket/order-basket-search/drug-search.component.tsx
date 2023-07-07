@@ -29,8 +29,6 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
   const resetSearchTerm = () => { 
     setSearchTerm ('');
   }
-  // eslint-disable-next-line no-console
-console.log(searchTerm);
 
   return (
     <div className={styles.searchPopupContainer}>
