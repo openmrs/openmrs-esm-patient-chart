@@ -5,7 +5,7 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import { OrderBasketItem } from '../../types/order-basket-item';
 import styles from './order-basket-search.scss';
-import { debounce } from 'lodash';
+import debounce  from 'lodash-es/debounce';
 
 export interface OrderBasketSearchProps {
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
@@ -35,7 +35,6 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
       <Search
         size="lg"
         light={isTablet}
-        // value={searchTerm}
         placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
         labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
         onChange={handleSearchTermChange}
