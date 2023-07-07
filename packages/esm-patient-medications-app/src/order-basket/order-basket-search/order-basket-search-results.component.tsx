@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
+import React, { useMemo } from 'react';
+import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
@@ -8,36 +8,23 @@ import { ConfigObject } from '../../config-schema';
 import styles from './order-basket-search-results.scss';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import { Drug } from '../../types/order';
-import debounce from 'lodash/debounce';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
+  onSearchTermClear: () => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  setSearchTerm,
+  onSearchTermClear,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [currentTerm, setCurrentTerm] = useState(searchTerm);
+  const { drugs, isLoading, error } = useDrugSearch(searchTerm);
 
-  useEffect(() => {
-    const debouncedSetCurrentTerm = debounce((term) => {
-      setCurrentTerm(term);
-    }, 300);
-
-    debouncedSetCurrentTerm(searchTerm);
-
-    return () => debouncedSetCurrentTerm.cancel();
-  }, [searchTerm]);
-
-  const { drugs, isLoading, error } = useDrugSearch(currentTerm);
-
-  if (!currentTerm) {
+  if (!searchTerm) {
     return null;
   }
 
@@ -50,8 +37,8 @@ export default function OrderBasketSearchResults({
       <Tile className={styles.emptyState}>
         <div>
           <h4 className={styles.productiveHeading01}>
-            {t('errorFetchingDrugResults', 'Error fetching results for "{currentTerm}"', {
-              currentTerm,
+            {t('errorFetchingDrugResults', 'Error fetching results for "{searchTerm}"', {
+              searchTerm,
             })}
           </h4>
           <p className={styles.bodyShort01}>
@@ -68,13 +55,13 @@ export default function OrderBasketSearchResults({
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{currentTerm}"', {
+              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
                 count: drugs?.length,
-                currentTerm,
+                searchTerm,
                 plural: drugs?.length > 1 ? 's' : '',
               })}
             </span>
-            <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
+            <Button kind="ghost" onClick={onSearchTermClear} size={isTablet ? 'md' : 'sm'}>
               {t('clearSearchResults', 'Clear Results')}
             </Button>
           </div>
@@ -88,13 +75,13 @@ export default function OrderBasketSearchResults({
         <Tile className={styles.emptyState}>
           <div>
             <h4 className={styles.productiveHeading01}>
-              {t('noResultsForDrugSearch', 'No results to display for "{currentTerm}"', {
-                currentTerm,
+              {t('noResultsForDrugSearch', 'No results to display for "{searchTerm}"', {
+                searchTerm,
               })}
             </h4>
             <p className={styles.bodyShort01}>
               <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={() => setSearchTerm('')}>
+              <span className={styles.link} role="link" tabIndex={0} onClick={onSearchTermClear}>
                 {t('searchAgain', 'search again')}
               </span>{' '}
               <span>{t('usingADifferentTerm', 'using a different term')}</span>
