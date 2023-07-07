@@ -49,7 +49,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               visits.map((visit, i) => (
                 <div className={styles.container} key={i}>
                   <div className={styles.header}>
-                    <div>
+                    <div className={styles.visitInfo}>
                       <div>
                         <h4 className={styles.visitType}>{visit?.visitType?.display}</h4>
                         <div className={styles.displayFlex}>
