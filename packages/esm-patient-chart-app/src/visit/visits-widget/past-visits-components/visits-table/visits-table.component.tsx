@@ -148,7 +148,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     }));    
   }, [paginatedVisits]);
 
-  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem.value);
+  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
 
   const handleDeleteEncounter = React.useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
