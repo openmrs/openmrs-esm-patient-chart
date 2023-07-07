@@ -52,9 +52,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    .visitActions {
-      padding-left: spacing.$spacing-09;
-    }
   }
 }
 
@@ -191,10 +188,6 @@ html[dir='rtl'] {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      .visitActions {
-        padding-left: unset;
-        padding-right: spacing.$spacing-09;
-      }
     }
   }
 }
