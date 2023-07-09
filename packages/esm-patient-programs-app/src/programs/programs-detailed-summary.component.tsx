@@ -122,7 +122,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} data-testid="program-table">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -139,7 +139,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                     <TableHeader />
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="playwright">
+                <TableBody data-testid="programsTable">
                   {rows.map((row, i) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
