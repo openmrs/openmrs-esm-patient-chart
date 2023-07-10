@@ -34,16 +34,6 @@ export const esmPatientChartSchema = {
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
     _default: true,
   },
-  startVisitLabel: {
-    _type: Type.String,
-    _description: 'Custom label to use on the start visit actions',
-    _default: '',
-  },
-  endVisitLabel: {
-    _type: Type.String,
-    _description: 'Custom label to use on the end visit actions',
-    _default: '',
-  },
   visitAttributeTypes: {
     _type: Type.Array,
     _description: 'List of visit attribute types shown when filling the visit form',

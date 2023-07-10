@@ -142,7 +142,7 @@ const VisitHeader: React.FC = () => {
   const [showVisitHeader, setShowVisitHeader] = useState(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
-  const { startVisitLabel, endVisitLabel, logo } = useConfig();
+  const { logo } = useConfig();
   const { systemVisitEnabled } = useSystemVisitSetting();
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
@@ -213,18 +213,18 @@ const VisitHeader: React.FC = () => {
                 <ExtensionSlot name="visit-header-right-slot" />
                 {!hasActiveVisit && !isDeceased && (
                   <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                    {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
+                    {t('startAVisit', 'Start a visit')}
                   </Button>
                 )}
-                {currentVisit !== null && endVisitLabel && (
+                {currentVisit !== null && (
                   <>
                     <HeaderGlobalAction
                       className={styles.headerGlobalBarButton}
-                      aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
+                      aria-label={t('endVisit', 'End visit')}
                       onClick={() => openModal(patient?.id)}
                     >
                       <Button as="div" className={styles.startVisitButton}>
-                        {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
+                        {t('endVisit', 'End visit')}
                       </Button>
                     </HeaderGlobalAction>
                   </>
@@ -252,10 +252,8 @@ const VisitHeader: React.FC = () => {
     patient,
     showHamburger,
     showVisitHeader,
-    startVisitLabel,
     t,
     toggleSideMenu,
-    endVisitLabel,
     openModal,
     currentVisit,
     logo,
