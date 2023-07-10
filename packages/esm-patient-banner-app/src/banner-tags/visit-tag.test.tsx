@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import ActiveVisitBannerTag from './active-visit-tag.component';
+import VisitTag from './visit-tag.component';
 import { formatDatetime } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
@@ -13,7 +13,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useVisitOrOfflineVisit: jest.fn(),
 }));
 
-describe('ActiveVisitBannerTag: ', () => {
+describe('VisitBannerTag: ', () => {
   it('renders an active visit tag when an active visit is ongoing', () => {
     mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
@@ -21,7 +21,7 @@ describe('ActiveVisitBannerTag: ', () => {
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: null };
-    render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
+    render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
 
     const visitMetadata =
       mockCurrentVisit.visitType.display +
@@ -45,7 +45,7 @@ describe('ActiveVisitBannerTag: ', () => {
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: null };
-    render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
+    render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
 
     const visitMetadata =
       currentVisit.visitType.display +
@@ -70,7 +70,7 @@ describe('ActiveVisitBannerTag: ', () => {
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: '2002-04-04' };
-    render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
+    render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
     expect(screen.queryByRole('button', { name: /Active Visit/i })).not.toBeInTheDocument();
   });
 
@@ -81,7 +81,7 @@ describe('ActiveVisitBannerTag: ', () => {
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: '2002-04-04' };
-    render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
+    render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
     expect(screen.getByRole('button', { name: /Retrospective Entry/i })).toBeInTheDocument();
   });
 });

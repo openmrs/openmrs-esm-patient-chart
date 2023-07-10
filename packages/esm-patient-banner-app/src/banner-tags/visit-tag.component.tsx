@@ -3,31 +3,31 @@ import { useTranslation } from 'react-i18next';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { Visit, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import styles from './active-visit-tag.scss';
+import styles from './visit-tag.scss';
 
-interface VisitBannerTagProps {
+interface VisitTagProps {
   patientUuid: string;
   patient: fhir.Patient;
 }
 
-const VisitBannerTag: React.FC<VisitBannerTagProps> = ({ patientUuid, patient }) => {
+const VisitTag: React.FC<VisitTagProps> = ({ patientUuid, patient }) => {
   const { currentVisit, isRetrospective } = useVisitOrOfflineVisit(patientUuid);
   const isNotDeceased = !patient.deceasedDateTime;
   return (
     currentVisit &&
     (isRetrospective ? (
-      <RetrospectiveEntryBannerTag currentVisit={currentVisit} />
+      <RetrospectiveEntryTag currentVisit={currentVisit} />
     ) : (
-      isNotDeceased && <ActiveVisitBannerTag currentVisit={currentVisit} />
+      isNotDeceased && <ActiveVisitTag currentVisit={currentVisit} />
     ))
   );
 };
 
-interface ActiveVisitBannerTagProps {
+interface ActiveVisitTagProps {
   currentVisit: Visit;
 }
 
-const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ currentVisit }) => {
+const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ currentVisit }) => {
   const { t } = useTranslation();
   return (
     <Toggletip align="bottom">
@@ -47,13 +47,12 @@ const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ currentVisi
   );
 };
 
-interface RetrospectiveEntryBannerTagProps {
+interface RetrospectiveEntryTagProps {
   currentVisit: Visit;
 }
 
-const RetrospectiveEntryBannerTag: React.FC<RetrospectiveEntryBannerTagProps> = ({ currentVisit }) => {
+const RetrospectiveEntryTag: React.FC<RetrospectiveEntryTagProps> = ({ currentVisit }) => {
   const { t } = useTranslation();
-  console.log(currentVisit);
   return (
     <Toggletip align="bottom">
       <ToggletipButton label={t('retrospectiveEntry', 'Retrospective Entry')}>
@@ -76,4 +75,4 @@ const RetrospectiveEntryBannerTag: React.FC<RetrospectiveEntryBannerTagProps> = 
   );
 };
 
-export default VisitBannerTag;
+export default VisitTag;

@@ -19,7 +19,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const activeVisitTag = getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options);
+export const visitTag = getAsyncLifecycle(() => import('./banner-tags/visit-tag.component'), options);
 
 export const deceasedPatientTag = getAsyncLifecycle(
   () => import('./banner-tags/deceased-patient-tag.component'),
