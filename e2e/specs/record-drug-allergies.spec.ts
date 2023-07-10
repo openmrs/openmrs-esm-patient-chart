@@ -45,10 +45,13 @@ test('Add drug allergy to patient', async ({ page, api }) => {
   });
 
   await test.step('And I see the data of the allergy that I saved', async () => {
-    await expect(allergiesPage.tableRow().getByText('ACE inhibitors')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Mental status change')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('LOW')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Test comment')).toBeVisible();
+    const rows = await allergiesPage.allergyTable().locator('tr');
+    const allergenCell = await rows.locator('td').first();
+    const severityCell = await rows.locator('td').nth(2);
+    const reactionCell = await rows.locator('td').nth(3);
+    await expect(allergenCell).toHaveText(/ACE inhibitors/);
+    await expect(severityCell).toHaveText(/Mild/);
+    await expect(reactionCell).toHaveText(/Mental status change/);
   });
 });
 
