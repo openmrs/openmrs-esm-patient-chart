@@ -11,7 +11,7 @@
     "serve": "ng serve --port 4200 --live-reload true",
     "debug": "yarn run serve",
     "build": "ng build --configuration production",
-    "lint": "eslint src --ext ts --fix --max-warnings=0"
+    "lint": "TIMING=1 eslint src --ext ts --fix --max-warnings=0"
   },
   "openmrs:develop": {
     "command": "yarn run serve",
