@@ -42,14 +42,11 @@ export const allergiesDetailedSummary = getAsyncLifecycle(
   options,
 );
 
-// t('allergies_link', 'Allergies')
+// t('Allergies')
 export const allergiesDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,
-    title: () =>
-      Promise.resolve(
-        window.i18next?.t('allergies_link', { defaultValue: 'Allergies', ns: moduleName }) ?? 'Allergies',
-      ),
+    moduleName,
   }),
   options,
 );

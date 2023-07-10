@@ -27,14 +27,11 @@ export const immunizationsDetailedSummary = getAsyncLifecycle(
 );
 
 export const immunizationsDashboardLink =
-  // t('immunizations_link', 'Immunizations')
+  // t('Immunizations')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('immunizations_link', { defaultValue: 'Immunizations', ns: moduleName }) ?? 'Immunizations',
-        ),
+      moduleName,
     }),
     options,
   );

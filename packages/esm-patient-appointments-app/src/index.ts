@@ -25,7 +25,10 @@ export const appointmentsDetailedSummary = getAsyncLifecycle(
   options,
 );
 
-export const appointmentsSummaryDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
+export const appointmentsSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...dashboardMeta, moduleName }),
+  options,
+);
 
 export const appointmentsFormWorkspace = getAsyncLifecycle(
   () => import('./appointments/appointments-form/appointments-form.component'),

@@ -49,14 +49,11 @@ export const formsDetailedOverview = getAsyncLifecycle(
 );
 
 export const formsAndNotesDashboardLink =
-  // t('forms_link', 'Forms & Notes')
+  // t('Forms & Notes')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('forms_link', { defaultValue: 'Forms & Notes', ns: moduleName }) ?? 'Forms & Notes',
-        ),
+      moduleName,
     }),
     options,
   );

@@ -32,14 +32,11 @@ export const externalOverview = getAsyncLifecycle(() => import('./overview/exter
 export const resultsViewer = getAsyncLifecycle(() => import('./results-viewer'), options);
 
 export const testResultsDashboardLink =
-  // t('testResults_link', 'Test Results')
+  // t('Test Results')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('testResults_link', { defaultValue: 'Test Results', ns: moduleName }) ?? 'Test Results',
-        ),
+      moduleName,
     }),
     options,
   );
