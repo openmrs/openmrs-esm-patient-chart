@@ -5,7 +5,7 @@
   },
   "extensions": [
     {
-      "name": "react-form-engine-widge",
+      "name": "react-form-engine-widget",
       "component": "formRenderer",
       "slot": "form-widget-slot"
     }
