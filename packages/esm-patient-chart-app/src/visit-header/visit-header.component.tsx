@@ -158,7 +158,7 @@ const VisitHeader: React.FC = () => {
     localStorage.removeItem('fromPage');
 
     setShowVisitHeader((prevState) => !prevState);
-    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
+    navigate({ to: `${window.spaBase}/${originPage || 'home'}` });
   }, []);
 
   const openModal = useCallback((patientUuid) => {

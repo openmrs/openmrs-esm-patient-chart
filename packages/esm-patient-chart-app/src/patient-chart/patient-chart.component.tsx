@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
-import { ExtensionSlot, setLeftNav, unsetLeftNav, useConfig, usePatient } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  setCurrentVisit,
+  setLeftNav,
+  unsetLeftNav,
+  useConfig,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import {
   changeWorkspaceContext,
@@ -27,8 +34,16 @@ const PatientChart: React.FC = () => {
   // The following hook takes care of the creation.
   useAutoCreatedOfflineVisit(patientUuid, offlineVisitTypeUuid);
 
+  // Keep state updated with the current patient. Anything used outside the patient
+  // chart (e.g., the current visit is used by the Active Visit Tag used in the
+  // patient search) must be updated in the callback, which is called when the patient
+  // chart unmounts. Workspaces are only used inside the patient chart so we just
+  // need to update those when we enter a new patient chart.
   useEffect(() => {
     changeWorkspaceContext(patientUuid);
+    return () => {
+      setCurrentVisit(null, null);
+    };
   }, [patientUuid]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
