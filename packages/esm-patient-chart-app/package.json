@@ -46,7 +46,9 @@
     "react": "18.x",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",
-    "rxjs": "6.x"
+    "rxjs": "6.x",
+    "single-spa": "5.x",
+    "single-spa-react": "5.x"
   },
   "devDependencies": {
     "@types/uuid": "^8.3.0",
