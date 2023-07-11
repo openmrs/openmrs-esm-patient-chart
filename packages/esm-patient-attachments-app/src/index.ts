@@ -16,7 +16,7 @@ export const attachmentsOverview = getAsyncLifecycle(() => import('./attachments
   moduleName,
 });
 
-// t('Attachments')
+// t('Attachments', 'Attachments')
 export const attachmentsSummaryResultsDashboard = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,

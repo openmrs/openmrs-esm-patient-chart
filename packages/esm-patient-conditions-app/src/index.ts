@@ -29,7 +29,7 @@ export const conditionsDetailedSummary = getAsyncLifecycle(
 export const conditionsWidget = getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options);
 
 export const conditionsDashboardLink =
-  // t('Conditions')
+  // t('Conditions', 'Conditions')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

@@ -49,7 +49,7 @@ export const formsDetailedOverview = getAsyncLifecycle(
 );
 
 export const formsAndNotesDashboardLink =
-  // t('Forms & Notes')
+  // t('Forms & Notes', 'Forms & Notes')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

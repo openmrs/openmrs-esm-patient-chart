@@ -25,6 +25,7 @@ export const appointmentsDetailedSummary = getAsyncLifecycle(
   options,
 );
 
+// t('Appointments', 'Appointments')
 export const appointmentsSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
   options,

@@ -14,7 +14,7 @@
     "analyze": "webpack --mode=production --env analyze=true",
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

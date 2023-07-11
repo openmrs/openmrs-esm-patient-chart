@@ -63,7 +63,7 @@ export function startupApp() {
 export const root = getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
 
 export const patientSummaryDashboardLink =
-  // t('Patient Summary')
+  // t('Patient Summary', 'Patient Summary')
   getSyncLifecycle(
     createDashboardLink({
       ...summaryDashboardMeta,
@@ -136,7 +136,7 @@ export const addPastVisitPatientSearchActionButton = getAsyncLifecycle(
 );
 
 export const encountersSummaryDashboardLink =
-  // t('Visits')
+  // t('Visits', 'Visits')
   getSyncLifecycle(
     createDashboardLink({
       ...encountersDashboardMeta,

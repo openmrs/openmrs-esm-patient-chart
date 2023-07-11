@@ -41,7 +41,7 @@
   "medicationDurationAndUnit": "សម្រាប់ {រយៈពេល} {ឯកតារយៈពេល}",
   "medicationIndefiniteDuration": "រយៈពេលមិនកំណត់",
   "medications": "Medications",
-  "medications_link": "ថ្នាំ",
+  "Medications": "ថ្នាំ",
   "modify": "កែប្រែ",
   "none": "គ្មាន",
   "noResultsForDrugSearch": "No results to display for \"{searchTerm}\"",
