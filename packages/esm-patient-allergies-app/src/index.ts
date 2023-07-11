@@ -42,7 +42,7 @@ export const allergiesDetailedSummary = getAsyncLifecycle(
   options,
 );
 
-// t('Allergies')
+// t('Allergies', 'Allergies')
 export const allergiesDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,

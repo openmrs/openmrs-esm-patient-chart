@@ -43,7 +43,7 @@ export const biometricsDetailedSummary = getAsyncLifecycle(
 );
 
 export const vitalsAndBiometricsDashboardLink =
-  // t('Vitals & Biometrics')
+  // t('Vitals & Biometrics', 'Vitals & Biometrics')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

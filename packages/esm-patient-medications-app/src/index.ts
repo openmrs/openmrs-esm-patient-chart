@@ -23,7 +23,7 @@ export const activeMedications = getAsyncLifecycle(() => import('./medications/a
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
 
 export const medicationsDashboardLink =
-  // t('Medications')
+  // t('Medications', 'Medications')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

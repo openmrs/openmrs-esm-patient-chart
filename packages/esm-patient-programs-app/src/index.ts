@@ -24,7 +24,7 @@ export const programsDetailedSummary = getAsyncLifecycle(
 );
 
 export const programsDashboardLink =
-  // t('Programs')
+  // t('Programs', 'Programs')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

@@ -27,7 +27,7 @@ export const immunizationsDetailedSummary = getAsyncLifecycle(
 );
 
 export const immunizationsDashboardLink =
-  // t('Immunizations')
+  // t('Immunizations', 'Immunizations')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,

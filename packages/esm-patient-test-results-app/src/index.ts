@@ -32,7 +32,7 @@ export const externalOverview = getAsyncLifecycle(() => import('./overview/exter
 export const resultsViewer = getAsyncLifecycle(() => import('./results-viewer'), options);
 
 export const testResultsDashboardLink =
-  // t('Test Results')
+  // t('Test Results', 'Test Results')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
