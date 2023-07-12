@@ -3,8 +3,6 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
-  OverflowMenu,
-  OverflowMenuItem,
   TableContainer,
   Table,
   TableBody,
@@ -14,11 +12,12 @@ import {
   TableCell,
   DataTableHeader,
 } from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { DefaultWorkspaceProps, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getStartedVisit, VisitMode, VisitStatus } from '@openmrs/esm-framework';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
+import { setCurrentVisit } from '@openmrs/esm-framework';
 
 const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t, i18n } = useTranslation();
@@ -37,8 +36,8 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   );
 
   const rowData = useMemo(() => {
-    return pastVisits?.map((visit, index) => ({
-      id: `${index}`,
+    return pastVisits?.map((visit) => ({
+      id: `${visit.uuid}`,
       startDate: new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' }),
       visitType: visit.visitType.display,
       location: visit.location?.display,
@@ -49,10 +48,13 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     }));
   }, [locale, pastVisits]);
 
-  const handleOpenVisitForm = useCallback(() => {
-    launchPatientWorkspace('start-visit-workspace-form');
-    closeWorkspace();
-  }, [closeWorkspace]);
+  const handleSelectVisit = useCallback(
+    (visitUuid: string) => {
+      closeWorkspace();
+      setCurrentVisit(patientUuid, visitUuid);
+    },
+    [closeWorkspace, patientUuid],
+  );
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -89,19 +91,14 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <OverflowMenu ariaLabel="Actions menu" flipped selectorPrimaryFocus="option-two">
-                          <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
-                          <OverflowMenuItem
-                            onClick={() => {
-                              getStartedVisit.next({
-                                mode: VisitMode.LOADING,
-                                visitData: rowData[rowIndex].visit,
-                                status: VisitStatus.ONGOING,
-                              });
-                            }}
-                            itemText={t('loadVisitInfo', 'Load Visit Info')}
-                          />
-                        </OverflowMenu>
+                        <Button
+                          renderIcon={Edit}
+                          hasIconOnly
+                          kind="ghost"
+                          iconDescription={t('editThisVisit', 'Edit this visit')}
+                          tooltipPosition="left"
+                          onClick={() => handleSelectVisit(row.id)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

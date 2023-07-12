@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, setCurrentVisit } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import PastVisitOverview from './past-visit-overview.component';
 
@@ -18,7 +18,7 @@ const mockPastVisits = {
       {
         uuid: '1f0b35e2-ab94-4f96-a439-ba67e4fe22b0',
         encounters: [],
-        patient: { uuid: 'b0d24286-3bcc-4010-9d27-ffb33e99774d' },
+        patient: { uuid: mockPatient.id },
         visitType: { uuid: 'e89b4b06-8d7a-40e6-b5ad-d3209f47040b', name: 'ECH', display: 'ECH' },
         attributes: [],
         location: { uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453', name: 'Laboratory', display: 'Laboratory' },
@@ -28,7 +28,7 @@ const mockPastVisits = {
       {
         uuid: '2fcf6cbc-99e0-4b6a-9ecc-a66b455bff15',
         encounters: [],
-        patient: { uuid: 'b0d24286-3bcc-4010-9d27-ffb33e99774d' },
+        patient: { uuid: mockPatient.id },
         visitType: { uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', name: 'Facility Visit', display: 'Facility Visit' },
         attributes: [],
         location: {
@@ -44,8 +44,14 @@ const mockPastVisits = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockSetCurrentVisit = setCurrentVisit as jest.Mock;
 
 describe('PastVisitOverview', () => {
+  beforeEach(() => {
+    testProps.closeWorkspace.mockClear();
+    mockSetCurrentVisit.mockClear();
+  });
+
   it(`renders a tabular overview view of the patient's past visits data`, async () => {
     const user = userEvent.setup();
 
@@ -69,6 +75,19 @@ describe('PastVisitOverview', () => {
 
     await user.click(cancelButton);
 
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+  });
+
+  it(`will enter retrospective entry mode for a specific visit`, async () => {
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
+    renderPastVisitOverview();
+    await waitForLoadingToFinish();
+    const editButtons = screen.queryAllByLabelText('Edit this visit');
+    expect(editButtons.length).toBe(2);
+    await user.click(editButtons[1]);
+
+    expect(mockSetCurrentVisit).toBeCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });
