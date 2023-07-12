@@ -7,7 +7,7 @@
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
+    "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc"
   },
   "browserslist": [
