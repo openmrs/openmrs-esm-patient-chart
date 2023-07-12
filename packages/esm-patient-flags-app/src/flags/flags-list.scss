@@ -1,7 +1,6 @@
 @use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .listWrapper {
   margin: spacing.$spacing-05;
@@ -116,7 +115,7 @@
 
 .tabletButtonSet {
   padding: spacing.$spacing-06 spacing.$spacing-05;
-  background-color: $ui-02;
+  background-color: colors.$white;
 }
 
 .desktopButtonSet {
@@ -161,13 +160,11 @@
 .content {
   max-width: spacing.$spacing-13;
   @include type.type-style('heading-compact-02');
-  color: $text-02;
   margin-bottom: spacing.$spacing-05;
 }
 
 .helper {
   @include type.type-style('body-compact-01');
-  color: $text-02;
 }
 
 .loader {
