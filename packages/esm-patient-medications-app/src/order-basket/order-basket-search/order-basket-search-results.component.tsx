@@ -58,7 +58,7 @@ export default function OrderBasketSearchResults({
               {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
                 count: drugs?.length,
                 searchTerm,
-                plural: drugs?.length > 1 ? 's' : '',
+                plural: drugs?.length === 0 || drugs?.length > 1 ? 's' : '',
               })}
             </span>
             <Button kind="ghost" onClick={onSearchTermClear} size={isTablet ? 'md' : 'sm'}>
