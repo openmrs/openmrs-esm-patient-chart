@@ -21,6 +21,7 @@ interface ConfigurableFormsProps {
   pageUrl: string;
   urlLabel: string;
   error: Error;
+  mutateForms: () => void;
 }
 
 const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
@@ -33,6 +34,7 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
   pageUrl,
   urlLabel,
   error,
+  mutateForms,
 }) => {
   const [selectedFormCategoryIndex, setSelectedFormCategoryIndex] = useState(0);
   const isTablet = useLayoutType() === 'tablet';
@@ -88,6 +90,7 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
       </div>

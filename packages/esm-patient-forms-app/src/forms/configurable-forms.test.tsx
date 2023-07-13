@@ -13,6 +13,7 @@ const testProps = {
   pageUrl: '/patient/1234',
   urlLabel: 'Go to patient dashboard',
   error: null,
+  mutateForms: jest.fn(),
 };
 
 jest.mock('@openmrs/esm-framework', () => {

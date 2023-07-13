@@ -82,6 +82,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         pageUrl={pageUrl}
         urlLabel={urlLabel}
         error={error}
+        mutateForms={mutateForms}
       />
     );
   }
