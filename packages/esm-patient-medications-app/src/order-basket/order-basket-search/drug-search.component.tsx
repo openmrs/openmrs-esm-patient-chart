@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import { OrderBasketItem } from '../../types/order-basket-item';
 import styles from './order-basket-search.scss';
-import debounce from 'lodash-es/debounce';
 
 export interface OrderBasketSearchProps {
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
