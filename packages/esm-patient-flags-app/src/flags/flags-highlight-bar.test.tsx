@@ -1,11 +1,11 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { screen, render } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockPatientFlags } from '../../../../__mocks__/patient-flags.mock';
 import { usePatientFlags } from './hooks/usePatientFlags';
-import Flags from './flags.component';
+import FlagsHighlightBar from './flags-highlight-bar.component';
 
 const mockedUsePatientFlags = usePatientFlags as jest.Mock;
 
@@ -27,7 +27,7 @@ jest.mock('./hooks/usePatientFlags', () => {
   };
 });
 
-it('renders flags in the patient flags slot', async () => {
+it('renders a highlights bar showing a summary of the available flags', async () => {
   const user = userEvent.setup();
 
   mockedUsePatientFlags.mockReturnValue({
@@ -36,10 +36,17 @@ it('renders flags in the patient flags slot', async () => {
     error: null,
   });
 
-  renderFlags();
+  renderFlagsHighlightBar();
+
+  const riskFlag = screen.getByRole('button', { name: /risk flag/i });
+  expect(riskFlag).toBeInTheDocument();
+  expect(screen.getByText('🚩')).toBeInTheDocument();
+  expect(screen.getByText(/risk flag/)).toBeInTheDocument();
+
+  await user.click(riskFlag);
 
   const flags = screen.getAllByRole('button', { name: /flag/i });
-  expect(flags).toHaveLength(3);
+  expect(flags).toHaveLength(5);
   expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
   expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
   expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
@@ -50,8 +57,14 @@ it('renders flags in the patient flags slot', async () => {
   await user.click(editButton);
 
   expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+
+  const closeButton = screen.getByRole('button', { name: /close flags bar/i });
+
+  await user.click(closeButton);
+
+  expect(screen.getAllByRole('button', { name: /flag/i })).not.toEqual(5);
 });
 
-function renderFlags() {
-  return render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={() => {}} showHighlightBar={false} />);
+function renderFlagsHighlightBar() {
+  return render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
 }

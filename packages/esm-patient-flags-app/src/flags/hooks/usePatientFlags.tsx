@@ -22,18 +22,22 @@ interface FlagsFetchResponse {
  * @param patientUuid Unique patient idenfier
  * @returns An array of patient identifiers
  */
-export function useFlagsFromPatient(patientUuid: string) {
-  const { data, error, isValidating, mutate } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(
-    `/ws/rest/v1/patientflags/patientflag?patient=${patientUuid}&v=full`,
+export function usePatientFlags(patientUuid: string) {
+  const url = `/ws/rest/v1/patientflags/patientflag?patient=${patientUuid}&v=full`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(
+    patientUuid ? url : null,
     openmrsFetch,
   );
+
   const result = {
     flags: data?.data?.results ?? [],
-    flagLoadingError: error,
-    isLoadingFlags: !data && !error,
-    isValidatingFlags: isValidating,
-    mutate,
+    error: error,
+    isLoading: isLoading,
+    isValidating: isValidating,
+    mutate: mutate,
   };
+
   return result;
 }
 

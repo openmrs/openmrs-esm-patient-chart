@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useCurrentPath, useFlagsFromPatient } from './hooks/usePatientFlags';
+import { useCurrentPath, usePatientFlags } from './hooks/usePatientFlags';
 import Flags from './flags.component';
 import styles from './flags-highlight-bar.scss';
 
@@ -11,9 +11,9 @@ interface FlagsHighlightBarProps {
 }
 
 const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
   const path = useCurrentPath();
-  const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
+  const { t } = useTranslation();
+  const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
   const riskFlags = filteredFlags.filter((f) => f.tags.some((t) => t.display.includes('risk')));
 
@@ -31,12 +31,12 @@ const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) =>
     return null;
   }
 
-  if (isLoadingFlags) {
+  if (isLoading) {
     <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} />;
   }
 
-  if (flagLoadingError) {
-    return <div>{flagLoadingError.message}</div>;
+  if (error) {
+    return <div>{error.message}</div>;
   }
 
   return (

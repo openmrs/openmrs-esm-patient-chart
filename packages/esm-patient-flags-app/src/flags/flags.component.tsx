@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { Close, Edit } from '@carbon/react/icons';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useFlagsFromPatient } from './hooks/usePatientFlags';
+import { usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags.scss';
 
 interface FlagsProps {
@@ -14,7 +14,7 @@ interface FlagsProps {
 
 const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, showHighlightBar }) => {
   const { t } = useTranslation();
-  const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
+  const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
 
   const handleClickEditFlags = useCallback(() => launchPatientWorkspace('edit-flags-side-panel-form'), []);
@@ -69,7 +69,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
     );
   };
 
-  if (!isLoadingFlags && !flagLoadingError) {
+  if (!isLoading && !error) {
     return (
       <div className={styles.container}>
         <div className={styles.flagsContainer}>

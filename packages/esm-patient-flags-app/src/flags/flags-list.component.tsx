@@ -7,19 +7,21 @@ import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle,
 import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
 import { getFlagType } from './utils';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { useFlagsFromPatient, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
+import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
 import styles from './flags-list.scss';
+
+type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
 
 const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
-  const { flags, isLoadingFlags, flagLoadingError, mutate } = useFlagsFromPatient(patientUuid);
+  const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
 
   const searchRef = useRef(null);
   const [isEnabling, setIsEnabling] = useState(false);
   const [isDisabling, setIsDisabling] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('A - Z');
+  const [sortBy, setSortBy] = useState<dropdownFilter>('A - Z');
 
   const sortedRows = useMemo(() => {
     if (!sortBy) {
@@ -44,7 +46,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
 
   const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), [setSearchTerm]);
 
-  const handleSortByChange = ({ selectedItem }: { selectedItem: string }) => setSortBy(selectedItem);
+  const handleSortByChange = ({ selectedItem }) => setSortBy(selectedItem);
 
   const handleEnableFlag = async (flagUuid) => {
     setIsEnabling(true);
@@ -92,12 +94,12 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     }
   };
 
-  if (isLoadingFlags) {
+  if (isLoading) {
     return <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />;
   }
 
-  if (flagLoadingError) {
-    return <div>{flagLoadingError.message}</div>;
+  if (error) {
+    return <div>{error.message}</div>;
   }
 
   return (
