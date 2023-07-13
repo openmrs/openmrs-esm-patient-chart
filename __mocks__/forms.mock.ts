@@ -76,3 +76,54 @@ export const mockPatientEncounters = [
     },
   },
 ];
+
+export const mockConfigurableForms = [
+  {
+    form: {
+      uuid: '03767614-1384-4ce3-aea9-27e2f4e67d01',
+      encounterType: {
+        uuid: 'f091b067-bea5-4657-8445-cfec05dc46a2',
+        display: 'Gender Based Violence Screening',
+      },
+      name: 'Gender Based Violence Screening',
+      display: 'Gender Based Violence Screening',
+      version: '1',
+      published: true,
+      retired: false,
+      formCategory: 'available',
+    },
+    associatedEncounters: [],
+  },
+  {
+    form: {
+      uuid: '7b1ec2d5-a4ad-4ffc-a0d3-ff1ea68e293c',
+      encounterType: {
+        uuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+        display: 'Alcohol and Drug Abuse Screening',
+      },
+      name: 'Alcohol and Drug Abuse Screening(CAGE-AID/CRAFFT)',
+      display: 'Alcohol and Drug Abuse Screening(CAGE-AID/CRAFFT)',
+      version: '1',
+      published: true,
+      retired: false,
+      formCategory: 'completed',
+    },
+    associatedEncounters: [],
+  },
+  {
+    form: {
+      uuid: 'c483f10f-d9ee-4b0d-9b8c-c24c1ec24701',
+      encounterType: {
+        uuid: '54df6991-13de-4efc-a1a9-2d5ac1b72ff8',
+        display: 'Enhanced Adherence Screening',
+      },
+      name: 'Enhanced Adherence Screening',
+      display: 'Enhanced Adherence Screening',
+      version: '1',
+      published: true,
+      retired: false,
+      formCategory: 'available',
+    },
+    associatedEncounters: [],
+  },
+];

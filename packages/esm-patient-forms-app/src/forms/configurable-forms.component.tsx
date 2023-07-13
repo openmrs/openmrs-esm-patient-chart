@@ -9,6 +9,7 @@ import { CompletedFormInfo } from '../types';
 import EmptyFormView from './empty-form.component';
 import FormView from './form-view.component';
 import styles from './forms.scss';
+import uniqBy from 'lodash-es/uniqBy';
 
 interface ConfigurableFormsProps {
   formsToDisplay: Array<CompletedFormInfo>;
@@ -38,7 +39,10 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
   const { t } = useTranslation();
 
   const configurableForms =
-    formsToDisplay?.flatMap((form) => ({ formCategory: form.form.formCategory, ...form })) ?? [];
+    uniqBy(
+      formsToDisplay?.flatMap((form) => ({ formCategory: form.form.formCategory, ...form })),
+      (displayForm) => displayForm?.form?.uuid,
+    ) ?? [];
   const formCategories = Array.from(new Set(configurableForms?.flatMap(({ form }) => form.formCategory)));
   const configFormsToDisplay = groupBy<Record<string, CompletedFormInfo>>(configurableForms, 'formCategory');
 
@@ -70,7 +74,7 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
             selectedIndex={0}
           >
             {formCategories?.map((form, index) => (
-              <Switch name={index} text={capitalize(form)} />
+              <Switch key={form} name={index} text={capitalize(form)} />
             ))}
           </ContentSwitcher>
         </div>
