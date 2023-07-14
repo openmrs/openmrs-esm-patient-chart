@@ -163,10 +163,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
     [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspace, t],
   );
 
-  const onError = (error) => {
-    console.error(error);
-  };
-
   const programSelect = (
     <Controller
       name="selectedProgram"
@@ -281,7 +277,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
     },
   ];
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack className={styles.formContainer} gap={7}>
         {!eligiblePrograms.length && (
           <InlineNotification
