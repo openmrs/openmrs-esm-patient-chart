@@ -23,10 +23,6 @@ $bottom-nav-height: 4rem;
   :global(.cds--side-nav__overlay-active) {
     background-color: transparent;
   }
-
-  :global(.cds--side-nav) {
-    overflow: auto;
-  }
 }
 
 // Tablet side nav scrolling
@@ -34,8 +30,8 @@ $bottom-nav-height: 4rem;
   .patientChartWrapper {
     :global(.cds--side-nav) {
       height: calc(100vh - 3rem - $bottom-nav-height);
+    }
   }
- }
 }
 
 .caption01 {
