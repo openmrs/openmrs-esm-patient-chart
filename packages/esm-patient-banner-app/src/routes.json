@@ -5,9 +5,9 @@
   },
   "extensions": [
     {
-      "name": "active-visit-tag",
+      "name": "visit-tag",
       "slot": "patient-banner-tags-slot",
-      "component": "activeVisitTag",
+      "component": "visitTag",
       "online": true,
       "offline": true
     },

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -22,22 +22,39 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   onTransition,
   hideActionsOverflow,
 }) => {
-  const { excludePatientIdentifierCodeTypes } = useConfig();
   const { t } = useTranslation();
-  const overflowMenuRef = React.useRef(null);
+  const overflowMenuRef = useRef(null);
+  const patientBannerRef = useRef(null);
+  const [isTabletViewport, setIsTabletViewport] = useState(false);
+  const { excludePatientIdentifierCodeTypes } = useConfig();
+
+  useEffect(() => {
+    const currentRef = patientBannerRef.current;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsTabletViewport(entry.contentRect.width < 1023);
+      }
+    });
+    resizeObserver.observe(patientBannerRef.current);
+    return () => {
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
+      }
+    };
+  }, [patientBannerRef, setIsTabletViewport]);
 
   // Ensure we have emptyStateText and record translation keys
   // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
 
-  const patientActionsSlotState = React.useMemo(
+  const patientActionsSlotState = useMemo(
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],
   );
 
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
+  const patientPhotoSlotState = useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
-  const [showContactDetails, setShowContactDetails] = React.useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
@@ -88,6 +105,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     <div
       className={`${styles.container} ${isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer}`}
       role="banner"
+      ref={patientBannerRef}
     >
       <div
         onClick={handleNavigateToPatientChart}
@@ -163,6 +181,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       </div>
       {showContactDetails && (
         <ContactDetails
+          isTabletViewport={isTabletViewport}
           address={patient?.address ?? []}
           telecom={patient?.telecom ?? []}
           patientId={patient?.id}

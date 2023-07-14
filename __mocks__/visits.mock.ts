@@ -59,7 +59,6 @@ export const mockCurrentVisit = {
   patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
   visitType: {
     uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-    name: 'Facility Visit',
     display: 'Facility Visit',
   },
   attributes: [],

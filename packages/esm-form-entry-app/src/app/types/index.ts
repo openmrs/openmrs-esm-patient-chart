@@ -436,3 +436,23 @@ export interface MetaData {
   discontinuationDateQuestionId: string;
   enrollmentDateQuestionId: string;
 }
+
+export interface Identifier {
+  uuid?: string;
+  identifier: string;
+  identifierType: OpenmrsResource;
+  location: OpenmrsResource;
+}
+
+export interface PatientModel {
+  sex: string;
+  birthdate: Date;
+  age: number;
+  gendercreatconstant?: number;
+  identifiers: Array<Identifier>;
+}
+
+export interface IdentifierPayload {
+  newIdentifiers: Array<any>;
+  currentIdentifiers: Array<any>;
+}

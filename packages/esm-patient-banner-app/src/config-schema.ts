@@ -14,14 +14,24 @@ export const configSchema = {
       _default: [],
     },
   },
-  customAddressLabel: {
-    _type: Type.Object,
-    _description: 'Whether to use custom labels for addresses',
-    _default: {},
+  useCustomAddressLabel: {
+    enabled: {
+      _type: Type.Boolean,
+      _description: 'whether to enable using custom address labels',
+      _default: false,
+    },
+    customAddressLabel: {
+      _type: Type.Object,
+      _description: 'custom labels for addresses',
+      _default: {},
+    },
   },
 };
 
 export interface ConfigObject {
   contactAttributeType: Array<string>;
-  customAddressLabel: Object;
+  useCustomAddressLabel: {
+    enabled: boolean;
+    customAddressLabel: Object;
+  };
 }

@@ -25,7 +25,6 @@ describe('StopVisitOverflowMenuItem', () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
-    mockUseConfig.mockReturnValue({ endVisitLabel: '' });
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
@@ -41,11 +40,10 @@ describe('StopVisitOverflowMenuItem', () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
-    mockUseConfig.mockReturnValue({ endVisitLabel: 'Checkout' });
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const endVisitButton = screen.getByRole('menuitem', { name: /Checkout/ });
+    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/ });
     expect(endVisitButton).toBeInTheDocument();
 
     // should launch the form

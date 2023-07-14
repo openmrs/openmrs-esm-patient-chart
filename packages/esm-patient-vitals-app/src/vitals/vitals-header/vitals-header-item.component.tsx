@@ -1,5 +1,4 @@
 import React from 'react';
-import { CircleSolid } from '@carbon/react/icons';
 import { ObservationInterpretation } from '../vitals.resource';
 import styles from './vitals-header-item.scss';
 

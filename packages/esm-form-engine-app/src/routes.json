@@ -3,6 +3,12 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "extensions": [],
+  "extensions": [
+    {
+      "name": "react-form-engine-widget",
+      "component": "formRenderer",
+      "slot": "form-widget-slot"
+    }
+  ],
   "pages": []
 }
