@@ -64,6 +64,7 @@ $actionPanelOffset: 3rem;
     justify-content: stretch;
 
     & div {
+      // bottom nav links
       & button {
         height: spacing.$spacing-10;
       }
