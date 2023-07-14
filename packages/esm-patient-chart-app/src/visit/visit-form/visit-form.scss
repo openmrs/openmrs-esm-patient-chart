@@ -81,3 +81,22 @@
   margin-top: spacing.$spacing-04;
 }
 
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    & section {
+      display: flex;
+      gap: 4rem;
+
+      .sectionTitle {
+        flex-basis: 30%;
+        min-width: 8rem;
+        text-align: left;
+      }
+
+      .sectionField {
+        flex-basis: 70%;
+      }
+    }
+  }
+}
+

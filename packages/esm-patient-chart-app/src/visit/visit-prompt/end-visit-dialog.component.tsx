@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { parseDate, setCurrentVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
 import styles from './end-visit-dialog.scss';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
@@ -14,46 +14,51 @@ interface EndVisitDialogProps {
 
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { currentVisit, mutate } = useVisit(patientUuid);
+  const { currentVisit, isRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const endCurrentVisit = () => {
-    const endVisitPayload = {
-      location: currentVisit.location.uuid,
-      startDatetime: parseDate(currentVisit.startDatetime),
-      visitType: currentVisit.visitType.uuid,
-      stopDatetime: new Date(),
-    };
+    if (isRetrospective) {
+      setCurrentVisit(null, null);
+      closeModal();
+    } else {
+      const endVisitPayload = {
+        location: currentVisit.location.uuid,
+        startDatetime: parseDate(currentVisit.startDatetime),
+        visitType: currentVisit.visitType.uuid,
+        stopDatetime: new Date(),
+      };
 
-    const abortController = new AbortController();
-    updateVisit(currentVisit.uuid, endVisitPayload, abortController)
-      .pipe(first())
-      .subscribe(
-        (response) => {
-          if (response.status === 200) {
-            if (queueEntry) {
-              removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, abortController);
+      const abortController = new AbortController();
+      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
+        .pipe(first())
+        .subscribe(
+          (response) => {
+            if (response.status === 200) {
+              if (queueEntry) {
+                removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, abortController);
+              }
+              mutate();
+              closeModal();
+
+              showToast({
+                critical: true,
+                kind: 'success',
+                description: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+                title: t('visitEnded', 'Visit ended'),
+              });
             }
-            mutate();
-            closeModal();
-
-            showToast({
+          },
+          (error) => {
+            showNotification({
+              title: t('endVisitError', 'Error ending active visit'),
+              kind: 'error',
               critical: true,
-              kind: 'success',
-              description: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
-              title: t('visitEnded', 'Visit ended'),
+              description: error?.message,
             });
-          }
-        },
-        (error) => {
-          showNotification({
-            title: t('endVisitError', 'Error ending active visit'),
-            kind: 'error',
-            critical: true,
-            description: error?.message,
-          });
-        },
-      );
+          },
+        );
+    }
   };
 
   return (

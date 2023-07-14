@@ -19,3 +19,5 @@ export function startupApp() {
     load: getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options),
   });
 }
+
+export const formRenderer = getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options);

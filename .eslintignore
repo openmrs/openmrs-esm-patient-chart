@@ -1,4 +1,4 @@
 src/**/*.test.tsx
 src/**/*.spec.tsx
-**/*.d.tsx
+**/*.d.ts
 **/node_modules/**/*

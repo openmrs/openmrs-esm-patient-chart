@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
@@ -15,19 +16,32 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
 
+  const handleSearchTermChange = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event?.target?.value?.trim();
+
+    if (!input) {
+      setSearchTerm('');
+    }
+
+    setSearchTerm(input);
+  }, 300);
+
+  const resetSearchTerm = () => {
+    setSearchTerm('');
+  };
+
   return (
     <div className={styles.searchPopupContainer}>
       <Search
         size="lg"
         light={isTablet}
-        value={searchTerm}
         placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
         labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-        onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
+        onChange={handleSearchTermChange}
       />
       <OrderBasketSearchResults
         searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        onSearchTermClear={resetSearchTerm}
         onSearchResultClicked={onSearchResultClicked}
       />
     </div>

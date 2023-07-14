@@ -6,7 +6,7 @@ import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { Encounter, FormSchema, Order } from '../types';
+import { Encounter, FormSchema, Identifier, Order } from '../types';
 import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
@@ -16,6 +16,8 @@ import { CreateFormParams, FormCreationService } from '../form-creation/form-cre
 import { ConceptService } from '../services/concept.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ProgramResourceService } from '../openmrs-api/program-resource.service';
+import { FormDataSourceService } from '../form-data-source/form-data-source.service';
+import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 
 type FormState =
   | 'initial'
@@ -58,6 +60,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly translateService: TranslateService,
     private readonly ngZone: NgZone,
     private readonly programService: ProgramResourceService,
+    private readonly formDataSourceService: FormDataSourceService,
+    private readonly patientResourceService: PatientResourceService,
   ) {}
 
   public ngOnInit() {
@@ -116,6 +120,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+    const patient = this.singleSpaPropsService.getPropOrThrow('patient');
+    const identifiers = this.formDataSourceService.getPatientObject(patient)?.identifiers ?? [];
     const language = window.i18next?.language?.substring(0, 2) ?? '';
     this.translateService.addLangs([language]);
     this.translateService.use(language);
@@ -126,6 +132,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       encounter: encounterOrSyncItemId
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
         : of<Encounter>(null),
+      patientIdentifiers: of<Array<Identifier>>(identifiers),
     }).pipe(
       mergeMap((result) =>
         this.loadPatientPreviousEncounters(result.formSchema).pipe(
@@ -184,53 +191,65 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     }
 
     this.changeState('submitting');
-    const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
-    this.formSubmissionService.submitPayload(this.form).subscribe(
-      ({ encounter }) => {
-        this.onPostResponse(encounter);
-        const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-        this.changeState('submitted');
-
-        if (!isOffline && encounter?.uuid) {
-          this.encounterResourceService
-            .getEncounterByUuid(encounter.uuid)
-            .pipe(take(1))
-            .subscribe((encounter) => {
-              if (Array.isArray(encounter?.orders)) {
-                const submittedOrders = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
-                this.showLabOrdersNotification(submittedOrders);
-              }
-            });
-        }
-
-        this.programService.handleProgramEnrollmentAndDiscontinuation(
-          this.form,
-          this.singleSpaPropsService.getProp('patientUuid'),
-          encounterToSubmit,
-        );
-        showToast({
-          critical: true,
-          kind: 'success',
-          description: `The form has been submitted successfully.`,
-          title: this.form.schema.name,
-        });
-
-        this.closeForm();
-      },
-      (error: Error) => {
-        this.changeState('submissionError');
-        showToast({
-          critical: true,
+    this.patientResourceService.validateIdentifiers(this.form).subscribe((resp) => {
+      if (resp.length > 0) {
+        this.changeState('readyWithValidationErrors');
+        showNotification({
+          title: 'Patient identifier duplication',
+          description:
+            'The identifier provided is already associated with an existing patient. Please check the identifier and try again.',
           kind: 'error',
-          description: `An error has occurred while submitting the form. Error: ${JSON.stringify(
-            error?.message,
-            null,
-            2,
-          )}.`,
-          title: this.form.schema.name,
+          critical: true,
         });
-      },
-    );
+      } else {
+        const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
+        this.formSubmissionService.submitPayload(this.form).subscribe(
+          ({ encounter }) => {
+            this.onPostResponse(encounter);
+            const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
+            this.changeState('submitted');
+
+            if (!isOffline && encounter?.uuid) {
+              this.encounterResourceService
+                .getEncounterByUuid(encounter.uuid)
+                .pipe(take(1))
+                .subscribe((encounter) => {
+                  if (Array.isArray(encounter?.orders)) {
+                    const submittedOrders = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
+                    this.showLabOrdersNotification(submittedOrders);
+                  }
+                });
+            }
+
+            this.programService.handleProgramEnrollmentAndDiscontinuation(
+              this.form,
+              this.singleSpaPropsService.getProp('patientUuid'),
+              encounterToSubmit,
+            );
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: `The form has been submitted successfully.`,
+              title: this.form.schema.name,
+            });
+
+            this.closeForm();
+          },
+          (error: Error) => {
+            this.changeState('submissionError');
+            showNotification({
+              critical: true,
+              kind: 'error',
+              description: `An error has occurred while submitting the form. Error: ${this.extractErrorMessagesFromResponse(
+                error,
+              )}.`,
+              title: this.form.schema.name,
+              millis: 5000,
+            });
+          },
+        );
+      }
+    });
   }
 
   /**
@@ -305,5 +324,28 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       obj[this.formUuid] = state;
       store.setState(obj);
     }
+  }
+
+  /**
+   * Extracts error messages from a given error response object.
+   * If fieldErrors are present, it extracts the error messages from each field.
+   * Otherwise, it returns the top-level error message.
+   *
+   * @param {object} errorObject - The error response object.
+   * @returns {string[]} An array of error messages.
+   */
+  private extractErrorMessagesFromResponse(errorObject) {
+    const error = errorObject?.error?.error;
+    const fieldErrors = errorObject?.responseBody?.error?.fieldErrors;
+
+    if (error) {
+      return error?.message;
+    }
+
+    if (!fieldErrors) {
+      return [errorObject?.responseBody?.error?.message ?? errorObject?.message];
+    }
+
+    return Object.values(fieldErrors).flatMap((errors: Array<Error>) => errors.map((error) => error.message));
   }
 }

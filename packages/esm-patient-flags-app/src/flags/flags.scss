@@ -1,0 +1,65 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flagsContainer {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: spacing.$spacing-02;
+  row-gap: spacing.$spacing-03;
+  align-items: center;
+  width: 100%;
+}
+
+.actionButton {
+  max-height: spacing.$spacing-08;
+}
+
+.flagIcon {
+  margin-right: spacing.$spacing-02;
+}
+
+.flagTag {
+  padding: 0 spacing.$spacing-03;
+  span {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.infoFlagTag {
+  padding: 0 spacing.$spacing-03;
+  background-color: colors.$orange-20;
+  color: #934412;
+}
+
+.highlightBarContainer {
+  display: flex;
+  align-items: center;
+  padding: spacing.$spacing-03;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.tooltipPadding {
+  padding: spacing.$spacing-02;
+}
+
+.content {
+  p {
+    @include type.type-style("body-01");
+  }
+
+  .title {
+    @include type.type-style("heading-compact-01");
+  }
+  
+  .message {
+    margin-top: spacing.$spacing-03;
+    color: colors.$gray-30;
+  }
+}

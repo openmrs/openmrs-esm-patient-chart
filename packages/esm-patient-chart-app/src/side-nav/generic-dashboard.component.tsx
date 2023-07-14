@@ -45,7 +45,12 @@ export default function GenericDashboard({ basePath }: GenericDashboardProps) {
   const config = useConfig<GenericDashboardConfig>();
   return (
     <BrowserRouter>
-      <DashboardExtension path={config.path} title={config.title} basePath={basePath} />
+      <DashboardExtension
+        path={config.path}
+        title={config.title}
+        basePath={basePath}
+        moduleName="@openmrs/esm-patient-chart-app"
+      />
     </BrowserRouter>
   );
 }

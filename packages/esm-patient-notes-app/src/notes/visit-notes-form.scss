@@ -35,6 +35,7 @@
 
 .emptyResults {
   @include type.type-style("body-compact-01");
+  margin-top: 0.25rem;
   color: $text-02;
   min-height: 1rem;
 }
@@ -70,7 +71,6 @@
   display: grid;
   grid-template-columns: 50% 10% 1fr;
   margin: 0.5rem 1rem;
-  width: 100%;
 }
 
 .formContainer {
@@ -91,4 +91,59 @@
 
 .row {
   margin: 0.5rem 0rem 2.75rem;
+}
+
+.skeleton {
+  margin-top: 0.25rem;
+  height: 2.5rem;
+}
+
+.errorMessage {
+  color: $danger;
+}
+
+.diagnosisErrorOutline{
+  :global(.cds--search-input):focus {
+    outline: 2.5px solid $danger
+  }
+
+  :global(.cds--search-magnifier) {
+    svg {
+      fill: $danger
+    }
+  }
+}
+
+.errorMessage {
+  @include type.type-style("label-02");
+  color: $danger;
+  margin-top: 0.5rem;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .row {
+    display: flex;
+    gap: 4rem;
+
+    :global(.cds--col-sm-1) {
+      flex-basis: 30%;
+      min-width: 8rem;
+      text-align: left;
+    }
+
+    :global(.cds--col-sm-3) {
+      flex-basis: 70%;
+    }
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .diagnosis {
+    padding: 0.75rem;
+  }
+
+  .skeleton {
+    margin-top: 0.25rem;
+    height: 2rem;
+  }
 }

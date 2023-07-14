@@ -5,23 +5,13 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]  
     },
-    "test": {
-      "dependsOn": [],
-      "outputs": []
-    },
+    "test": {},
     "lint": {
-      "dependsOn": ["^lint"],
-      "outputs": []
+      "dependsOn": ["^lint"]
     },
     "typescript": {
-      "dependsOn": ["^typescript"],
-      "outputs": []
+      "dependsOn": ["^typescript"]
     },
-    "extract-translations": {
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
-    }
+    "extract-translations": {}
   }
 }
