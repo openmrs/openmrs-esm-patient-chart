@@ -20,23 +20,11 @@ test('Add environmental allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('And I click the Environmental allergen tab', async () => {
+  await test.step('And I filled the form', async () => {
     await allergiesPage.page.getByText('Environmental').click();
-  });
-
-  await test.step('Then I click the Environmental allergen option', async () => {
     await allergiesPage.page.getByText('Dust').click();
-  });
-
-  await test.step('Then I click the reaction option', async () => {
     await allergiesPage.page.getByText('Mental status change').click();
-  });
-
-  await test.step('Then I click the severity option', async () => {
-    await allergiesPage.page.getByText('Mild').click();
-  });
-
-  await test.step('Then I fill the comment section', async () => {
+    await allergiesPage.page.getByText('Mild').click()
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
@@ -49,10 +37,15 @@ test('Add environmental allergy to patient', async ({ page, api }) => {
   });
 
   await test.step('And I see the data of the allergy that I saved', async () => {
-    await expect(allergiesPage.tableRow().getByText('Dust')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Mental status change')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('LOW')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Test comment')).toBeVisible();
+    const rows = allergiesPage.allergyTable().locator('tr');
+    const allergenCell = rows.locator('td:first-child');
+    const severityCell = rows.locator('td:nth-child(2)');
+    const reactionCell = rows.locator('td:nth-child(3)');
+    const commentCell = rows.locator('td:nth-child(4)');
+    await expect(allergenCell.getByText('Dust')).toBeVisible();
+    await expect(reactionCell.getByText('Mental status change')).toBeVisible();
+    await expect(severityCell.getByText('LOW')).toBeVisible();
+    await expect(commentCell.getByText('Test comment')).toBeVisible();
   });
 });
 

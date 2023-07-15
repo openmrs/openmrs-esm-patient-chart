@@ -20,23 +20,11 @@ test('Add Food allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('And I click the Food allergen tab', async () => {
+  await test.step('Then I filled the form', async () => {
     await allergiesPage.page.getByText('Food').click();
-  });
-
-  await test.step('Then I click the Food allergen option', async () => {
     await allergiesPage.page.getByText('Eggs').click();
-  });
-
-  await test.step('Then I click the reaction option', async () => {
     await allergiesPage.page.getByText('Mental status change').click();
-  });
-
-  await test.step('Then I click the severity option', async () => {
     await allergiesPage.page.getByText('Mild').click();
-  });
-
-  await test.step('Then I fill the comment section', async () => {
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
@@ -49,10 +37,15 @@ test('Add Food allergy to patient', async ({ page, api }) => {
   });
 
   await test.step('And I see the data of the allergy that I saved', async () => {
-    await expect(allergiesPage.tableRow().getByText('Eggs')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Mental status change')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('LOW')).toBeVisible();
-    await expect(allergiesPage.tableRow().getByText('Test comment')).toBeVisible();
+    const rows = await allergiesPage.allergyTable().locator('tr');
+    const allergenCell = rows.locator('td:first-child');
+    const severityCell = rows.locator('td:nth-child(2)');
+    const reactionCell = rows.locator('td:nth-child(3)');
+    const commentCell = rows.locator('td:nth-child(4)');
+    await expect(allergenCell.getByText('Eggs')).toBeVisible();
+    await expect(reactionCell.getByText('Mental status change')).toBeVisible();
+    await expect(severityCell.getByText('LOW')).toBeVisible();
+    await expect(commentCell.getByText('Test comment')).toBeVisible();
   });
 });
 
