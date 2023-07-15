@@ -1,12 +1,14 @@
 import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, Patient } from '../commands';
-
+import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
+import { Visit } from '@openmrs/esm-framework';
 let patient: Patient;
+let visit: Visit;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
+  visit = await startVisit(api, patient.uuid);
 });
 
 test('Record Vitals of the patient', async ({ page, api }) => {
@@ -14,11 +16,6 @@ test('Record Vitals of the patient', async ({ page, api }) => {
 
   await test.step('When I visit the patient biometirics and vitals page', async () => {
     await vitalsPage.goto(patient.uuid);
-  });
-
-  await test.step('And I start a visit', async () => {
-    await vitalsPage.startVisit();
-    await expect(vitalsPage.page.getByText('Active Visit')).toBeVisible();
   });
 
   await test.step('And I click record vital signs button', async () => {
@@ -63,5 +60,6 @@ test('Record Vitals of the patient', async ({ page, api }) => {
   });
 });
 test.afterEach(async ({ api }) => {
+  await endVisit(api, visit.uuid);
   await deletePatient(api, patient.uuid);
 });
