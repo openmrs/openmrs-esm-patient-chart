@@ -3,6 +3,7 @@ import { BiometricsAndVitalsPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
 import { Visit } from '@openmrs/esm-framework';
+
 let patient: Patient;
 let visit: Visit;
 
