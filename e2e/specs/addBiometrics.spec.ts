@@ -23,21 +23,19 @@ test('Record biometrics of the patient', async ({ page, api }) => {
     await biometricsPage.page.getByText('Record biometrics').click();
   });
 
-  await test.step('And I enter the height value', async () => {
-    await biometricsPage.page.locator('#Height').fill('170');
-  });
-
-  await test.step('Then I enter the weight value', async () => {
-    await biometricsPage.page.locator('#Weight').fill('65');
-  });
-
-  await test.step('And I check the BMI value', async () => {
-    await expect(biometricsPage.page.locator('#BMI')).toHaveValue('22.5');
-    await biometricsPage.page.locator('#MUAC').fill('25');
+  await test.step('And I fill the form', async () => {
+    await biometricsPage.page.getByTitle('#Height').fill('170');
+    await biometricsPage.page.getByTitle('#Weight').fill('65');
+    await expect(biometricsPage.page.getByTitle('#BMI')).toHaveValue('22.5');
+    await biometricsPage.page.getByTitle('#MUAC').fill('25');
   });
 
   await test.step('Then I submit the form', async () => {
     await biometricsPage.page.getByText('Save').click();
+  });
+
+  await test.step('And I should see the success message', async () => {
+    await expect(biometricsPage.page.getByText('saved')).toBeVisible();
   });
 
   await test.step('Then I should see the biometrics record', async () => {

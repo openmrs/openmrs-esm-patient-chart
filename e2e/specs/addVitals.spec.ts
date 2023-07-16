@@ -23,17 +23,21 @@ test('Record Vitals of the patient', async ({ page, api }) => {
   });
 
   await test.step('Then I filled the form', async () => {
-    await vitalsPage.page.locator('#systolic').fill('120');
-    await vitalsPage.page.locator('#diastolic').fill('80');
-    await vitalsPage.page.locator('#Pulse').fill('80');
+    await vitalsPage.page.getByTitle('systolic').fill('120');
+    await vitalsPage.page.getByTitle('diastolic').fill('80');
+    await vitalsPage.page.getByTitle('Pulse').fill('80');
     await vitalsPage.page.getByTitle('Respiration Rate').fill('20');
     await vitalsPage.page.getByTitle('Oxygen Saturation').fill('98');
-    await vitalsPage.page.locator('#Temperature').type('37');
-    await vitalsPage.page.locator('#Notes').fill('Test notes');
+    await vitalsPage.page.getByTitle('Temperature').type('37');
+    await vitalsPage.page.getByTitle('Notes').fill('Test notes');
   });
 
   await test.step('And I click the save button', async () => {
     await vitalsPage.page.getByText('Save').click();
+  });
+
+  await test.step('And I should see the success message', async () => {
+    await expect(vitalsPage.page.getByText('saved')).toBeVisible();
   });
 
   await test.step('Then I should see the vitals record', async () => {
