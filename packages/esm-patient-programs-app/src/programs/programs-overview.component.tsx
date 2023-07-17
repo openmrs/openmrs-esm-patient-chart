@@ -143,7 +143,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} data-testid="playwright">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -159,7 +159,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="playwright1">
+                <TableBody data-testid="programs-tabl">
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
