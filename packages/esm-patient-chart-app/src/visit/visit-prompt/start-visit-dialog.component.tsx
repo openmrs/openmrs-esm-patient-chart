@@ -20,7 +20,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   launchPatientChart,
 }) => {
   const { t } = useTranslation();
-  const rdeFeatureEnabled = useFeatureFlag("rde");
+  const rdeFeatureEnabled = useFeatureFlag('rde');
 
   const handleEditPastVisit = useCallback(() => {
     if (launchPatientChart) {
@@ -48,23 +48,24 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   }, [closeModal, patientUuid, launchPatientChart]);
 
   const modalHeaderText =
-    (rdeFeatureEnabled && visitType === 'past') ? t('addAPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
+    rdeFeatureEnabled && visitType === 'past'
+      ? t('addAPastVisit', 'Add a past visit')
+      : t('noActiveVisit', 'No active visit');
 
-  const modalBodyText =
-    (rdeFeatureEnabled ? (
-      visitType === 'past'
+  const modalBodyText = rdeFeatureEnabled
+    ? visitType === 'past'
       ? t(
           'addPastVisitText',
           'You can add a new past visit or update an old one. Choose from one of the options below to continue.',
         )
       : t(
           'noActiveVisitText',
-          "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue."
-        ))
-        : t(
-          "noActiveVisitNoRDEText",
-          "You can't add data to the patient chart without an active visit. Would you like to start a new visit?")
-    )
+          "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
+        )
+    : t(
+        'noActiveVisitNoRDEText',
+        "You can't add data to the patient chart without an active visit. Would you like to start a new visit?",
+      );
 
   return (
     <div>
@@ -78,10 +79,11 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        { rdeFeatureEnabled &&
-        <Button kind="secondary" onClick={handleEditPastVisit}>
-          {t('editPastVisit', 'Edit past visit')}
-        </Button> }
+        {rdeFeatureEnabled && (
+          <Button kind="secondary" onClick={handleEditPastVisit}>
+            {t('editPastVisit', 'Edit past visit')}
+          </Button>
+        )}
         <Button kind="primary" onClick={handleStartNewVisit}>
           {t('startNewVisit', 'Start new visit')}
         </Button>
