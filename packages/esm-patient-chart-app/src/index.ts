@@ -4,6 +4,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   defineExtensionConfigSchema,
+  registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
@@ -58,6 +59,8 @@ export function startupApp() {
       parent: spaBasePath,
     },
   ]);
+
+  registerFeatureFlag("rde", "Retrospective Data Entry", "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.")
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
