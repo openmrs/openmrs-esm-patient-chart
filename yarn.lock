@@ -5560,7 +5560,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5672,7 +5672,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -5717,7 +5717,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -5734,7 +5734,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -5755,7 +5755,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -5774,7 +5774,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5795,7 +5795,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: ^18.x
     react-i18next: 11.x
@@ -5913,7 +5913,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5930,7 +5930,7 @@ __metadata:
     webpack: ^5.75.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5949,7 +5949,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5968,7 +5968,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -5987,7 +5987,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -6005,7 +6005,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -6024,7 +6024,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -6046,7 +6046,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -6066,7 +6066,7 @@ __metadata:
     webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 4.x
+    "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
