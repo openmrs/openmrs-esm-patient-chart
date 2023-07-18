@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
 import { launchPatientChartWithWorkspaceOpen, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
-// FIXME
-import { useFeatureFlag } from '@openmrs/esm-framework/src/internal';
+import { useFeatureFlag } from '@openmrs/esm-framework';
 
 interface StartVisitDialogProps {
   patientUuid: string;
