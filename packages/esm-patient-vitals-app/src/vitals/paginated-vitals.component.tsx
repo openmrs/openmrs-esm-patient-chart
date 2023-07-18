@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   DataTableRow,
@@ -13,6 +13,7 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
+import orderBy from 'lodash-es/orderBy';
 
 interface PaginatedVitalsProps {
   tableRows: Array<DataTableRow>;
@@ -20,12 +21,18 @@ interface PaginatedVitalsProps {
   pageUrl: string;
   urlLabel: string;
   tableHeaders: Array<any>;
+  isPrinting: boolean;
 }
 
-const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
-  const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
+const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
+  tableRows,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  tableHeaders,
+  isPrinting,
+}) => {
   const isTablet = useLayoutType() === 'tablet';
-
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
@@ -41,12 +48,44 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
     }
   };
 
+  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+
+  const sortDate = (myArray, order) =>
+    order === 'ASC'
+      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
+      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+
+  const { key, order } = sortParams;
+
+  const sortedData =
+    key === 'encounterDate'
+      ? sortDate(tableRows, order)
+      : order === 'DESC'
+      ? orderBy(tableRows, [key], ['desc'])
+      : orderBy(tableRows, [key], ['asc']);
+
+  function customSortRow(vitalA, vitalB, { sortDirection, sortStates, ...props }) {
+    const { key } = props;
+    setSortParams({ key, order: sortDirection });
+  }
+
+  const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
+
+  const rows = isPrinting ? sortedData : paginatedVitals;
+
   return (
     <div>
-      <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+      <DataTable
+        rows={rows}
+        sortRow={customSortRow}
+        headers={tableHeaders}
+        isSortable
+        size={isTablet ? 'lg' : 'sm'}
+        useZebraStyles
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()} className={styles.customRow}>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -82,15 +121,17 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
           </TableContainer>
         )}
       </DataTable>
-      <PatientChartPagination
-        pageNumber={currentPage}
-        totalItems={tableRows.length}
-        currentItems={paginatedVitals.length}
-        pageSize={pageSize}
-        onPageNumberChange={({ page }) => goTo(page)}
-        dashboardLinkUrl={pageUrl}
-        dashboardLinkLabel={urlLabel}
-      />
+      {!isPrinting ? (
+        <PatientChartPagination
+          pageNumber={currentPage}
+          totalItems={tableRows.length}
+          currentItems={paginatedVitals.length}
+          pageSize={pageSize}
+          onPageNumberChange={({ page }) => goTo(page)}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
+        />
+      ) : null}
     </div>
   );
 };

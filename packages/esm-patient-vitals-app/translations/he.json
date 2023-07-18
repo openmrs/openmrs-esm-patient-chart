@@ -19,6 +19,8 @@
   "numericInputError": "חייב להיות מספר בטווח התקין",
   "overdue": "מאחר",
   "oxygenSaturation": "רווי חמצן",
+  "print": "Print",
+  "printedBy": "Printed by",
   "pulse": "דופק",
   "record": "רשומה",
   "recordBiometrics": "רשום מדדים ביומטריים",

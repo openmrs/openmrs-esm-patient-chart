@@ -80,3 +80,22 @@ td {
 .high::after {
   content: " ↑";
 }
+
+@media print {
+
+  @page {
+    size: auto;
+    margin: spacing.$spacing-10;
+  }
+}
+.footer{
+  display: none;
+}
+
+@media print {
+
+  @page {
+    size: auto;
+    margin: 4rem;
+  }
+}

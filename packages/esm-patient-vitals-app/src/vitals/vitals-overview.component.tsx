@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
-import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
+import { Add, ChartLineSmooth, Table, Printer } from '@carbon/react/icons';
 import {
   CardHeader,
   EmptyState,
@@ -12,13 +12,15 @@ import {
   useVitalsConceptMetadata,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
-import { formatDate, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import PaginatedVitals from './paginated-vitals.component';
 import VitalsChart from './vitals-chart.component';
 import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
 import { launchVitalsForm } from './vitals-utils';
+import { useReactToPrint } from 'react-to-print';
+import PrintComponent from './print/print.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -40,13 +42,30 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const [chartView, setChartView] = React.useState<boolean>();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
-
+  const [isPrinting, setIsPrinting] = useState(false);
+  const componentRef = useRef(null);
+  const patient = usePatient(patientUuid);
+  const { excludePatientIdentifierCodeTypes } = useConfig();
   const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(() => {
     launchVitalsForm(currentVisit, config);
   }, [config, currentVisit]);
+
+  const patientDetails = useMemo(() => {
+    const identifiers =
+      patient?.patient?.identifier?.filter(
+        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+      ) ?? [];
+    return {
+      name: patient?.patient?.name?.[0].given + ' ' + patient?.patient?.name?.[0].family,
+      age: age(patient?.patient?.birthDate),
+      gender: patient?.patient?.gender,
+      location: patient?.patient?.address?.[0].city,
+      patientIdentifier: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+    };
+  }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
@@ -86,6 +105,30 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     [vitals],
   );
 
+  const promiseResolveRef = useRef(null);
+
+  useEffect(() => {
+    if (isPrinting && promiseResolveRef.current) {
+      promiseResolveRef.current();
+    }
+  }, [isPrinting]);
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+
+    onBeforeGetContent: () =>
+      new Promise((resolve) => {
+        if (patient && patient.patient && headerTitle) {
+          promiseResolveRef.current = resolve;
+          setIsPrinting(true);
+        }
+      }),
+    onAfterPrint: () => {
+      promiseResolveRef.current = null;
+      setIsPrinting(false);
+    },
+  });
+
   return (
     <>
       {(() => {
@@ -112,6 +155,17 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                   </ContentSwitcher>
                   <>
                     <span className={styles.divider}>|</span>
+                    {config.vitals.showPrintButton && !chartView && (
+                      <Button
+                        kind="ghost"
+                        renderIcon={Printer}
+                        iconDescription="Add vitals"
+                        className={styles.printButton}
+                        onClick={handlePrint}
+                      >
+                        {t('print', 'Print')}
+                      </Button>
+                    )}
                     <Button
                       kind="ghost"
                       renderIcon={Add}
@@ -126,13 +180,17 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
               {chartView ? (
                 <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
               ) : (
-                <PaginatedVitals
-                  tableRows={tableRows}
-                  pageSize={pageSize}
-                  urlLabel={urlLabel}
-                  pageUrl={pageUrl}
-                  tableHeaders={tableHeaders}
-                />
+                <div ref={componentRef} className={styles.printpage}>
+                  <PrintComponent subheader={headerTitle} patientDetails={patientDetails} />
+                  <PaginatedVitals
+                    isPrinting={isPrinting}
+                    tableRows={tableRows}
+                    pageSize={pageSize}
+                    urlLabel={urlLabel}
+                    pageUrl={pageUrl}
+                    tableHeaders={tableHeaders}
+                  />
+                </div>
               )}
             </div>
           );

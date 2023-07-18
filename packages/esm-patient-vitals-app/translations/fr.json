@@ -19,6 +19,8 @@
   "numericInputError": "Doit être un nombre dans des intervalles acceptables",
   "overdue": "Overdue",
   "oxygenSaturation": "Saturation d'oxygène",
+  "print": "Print",
+  "printedBy": "Printed by",
   "pulse": "Battement",
   "record": "Record",
   "recordBiometrics": "Enregistrer la biométrie",
