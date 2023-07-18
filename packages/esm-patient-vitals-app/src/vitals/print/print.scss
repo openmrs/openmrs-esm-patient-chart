@@ -10,7 +10,7 @@
   }
 }
 
-.subheader{
+.subheader {
   text-align: center;   
   @include type.type-style('heading-compact-02');
   font-size: spacing.$spacing-05;
@@ -34,7 +34,7 @@
 }
 
 @media print {
-  .header{
+  .header {
     display: flex;
     background-color: colors.$white;
     align-items: center;
@@ -59,15 +59,16 @@
     font-style: italic;
     margin-left: spacing.$spacing-06;
   }
+
   .gender {
     text-transform: capitalize;
   }
+
   .printedBy {
     text-transform: capitalize;
     margin-left: spacing.$spacing-02;
     margin-right: spacing.$spacing-02;
     font-weight: bold;
-
   }
   
   .logo {
