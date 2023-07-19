@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { Close, Edit } from '@carbon/react/icons';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useFeatureFlag } from '@openmrs/esm-framework';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags.scss';
 
@@ -14,6 +15,7 @@ interface FlagsProps {
 
 const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, showHighlightBar }) => {
   const { t } = useTranslation();
+  const patientFlagsEnabled = useFeatureFlag('patientFlags');
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
 
@@ -69,7 +71,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
     );
   };
 
-  if (!isLoading && !error) {
+  if (!isLoading && !error && patientFlagsEnabled) {
     return (
       <div className={styles.container}>
         <div className={styles.flagsContainer}>
