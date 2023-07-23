@@ -31,7 +31,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const {
     data: appointmentsData,
-    isError,
+    error,
     isLoading,
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
@@ -42,8 +42,8 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
     });
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-  if (isError) {
-    return <ErrorState headerTitle={headerTitle} error={isError} />;
+  if (error) {
+    return <ErrorState headerTitle={headerTitle} error={error} />;
   }
   if (Object.keys(appointmentsData)?.length) {
     return (

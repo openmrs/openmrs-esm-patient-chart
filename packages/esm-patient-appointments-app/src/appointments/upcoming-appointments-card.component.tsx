@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
+import dayjs from 'dayjs';
 
 import {
   Checkbox,
@@ -14,13 +15,13 @@ import {
 } from '@carbon/react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { useAppointments } from './appointments.resource';
+import type { Appointment } from '../types';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-
 import styles from './upcoming-appointments-card.scss';
-import dayjs from 'dayjs';
+
 interface UpcomingAppointmentsProps {
   patientUuid: string;
-  setUpcomingAppointment: (value: any) => void;
+  setUpcomingAppointment: (value: Appointment) => void;
 }
 
 const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patientUuid, setUpcomingAppointment }) => {
@@ -30,18 +31,19 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
-  const { data: appointmentsData, isError, isLoading } = useAppointments(patientUuid, startDate, ac);
+  const { data: appointmentsData, error, isLoading } = useAppointments(patientUuid, startDate, ac);
 
   const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
     ? appointmentsData?.upcomingAppointments
     : [];
   const appointments = todaysAppointments.concat(futureAppointments);
-  const upcomingAppointment = !isEmpty(appointments)
+  const upcomingAppointments = !isEmpty(appointments)
     ? appointments?.filter(({ dateHonored }) => dateHonored === null)
     : [];
-  if (isError) {
-    return <ErrorState headerTitle={headerTitle} error={isError} />;
+
+  if (error) {
+    return <ErrorState headerTitle={headerTitle} error={error} />;
   }
   if (isLoading) {
     <span>
@@ -49,9 +51,9 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
     </span>;
   }
 
-  if (upcomingAppointment?.length) {
+  if (upcomingAppointments?.length) {
     const structuredListBodyRowGenerator = () => {
-      return upcomingAppointment.map((appointment, i) => (
+      return upcomingAppointments.map((appointment, i) => (
         <StructuredListRow label key={`row-${i}`} className={styles.structuredList}>
           <StructuredListCell>{formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}</StructuredListCell>
           <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
@@ -74,7 +76,7 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
         <div>
           <p className={styles.sectionTitle}>{headerTitle}</p>
           <span className={styles.headerLabel}>
-            {t('appointmentToFulfill', 'Select appointment(s) to fulfill')}
+            {t('appointmentsToFulfill', 'Select appointments to fulfill')}
           </span>{' '}
         </div>
 

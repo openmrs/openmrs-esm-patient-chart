@@ -13,7 +13,7 @@
   "appointments": "Rendez-vous",
   "Appointments": "Appointments",
   "appointmentScheduled": "Rendez-vous agendé",
-  "appointmentToFulfill": "Select appointment(s) to fulfill",
+  "appointmentsToFulfill": "Select appointments to fulfill",
   "appointmentType": "Type de rendez-vous",
   "appointmentType_title": "Appointment Type",
   "cancel": "Cancel",

@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
+import isToday from 'dayjs/plugin/isToday';
+dayjs.extend(isToday);
 import { openmrsFetch } from '@openmrs/esm-framework';
-import {
+import type {
   AppointmentPayload,
   AppointmentService,
   AppointmentsFetchResponse,
   RecurringAppointmentsPayload,
 } from '../types';
-import isToday from 'dayjs/plugin/isToday';
-dayjs.extend(isToday);
 
 const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -31,7 +31,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
     });
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
-    appointmentsSearchUrl,
+    patientUuid ? appointmentsSearchUrl : null,
     fetcher,
   );
 
@@ -56,10 +56,10 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
 
   return {
     data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
-    isError: error,
-    isLoading,
-    isValidating,
-    mutate,
+    error: error,
+    isLoading: isLoading,
+    isValidating: isValidating,
+    mutate: mutate,
   };
 }
 
@@ -71,8 +71,8 @@ export function useAppointmentService() {
 
   return {
     data: data ? data.data : null,
-    isError: error,
-    isLoading,
+    error: error,
+    isLoading: isLoading,
   };
 }
 
@@ -113,14 +113,16 @@ export function getAppointmentService(abortController: AbortController, uuid) {
   });
 }
 
-export const cancelAppointment = async (toStatus: string, appointmentUuid: string, ac: AbortController) => {
+export async function cancelAppointment(toStatus: string, appointmentUuid: string, ac: AbortController) {
   const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
   const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: ac.signal,
   });
-};
+}
