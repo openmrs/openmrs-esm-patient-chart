@@ -1,5 +1,5 @@
 import { createGlobalStore } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 
 function getPatientUuidFromUrl(): string {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);

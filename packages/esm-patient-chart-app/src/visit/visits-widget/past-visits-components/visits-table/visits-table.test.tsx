@@ -1,11 +1,10 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor, within } from '@testing-library/react';
-import { getConfig, useConfig, usePagination, showModal, userHasAccess } from '@openmrs/esm-framework';
-import { renderWithSwr } from '../../../../../../../tools/test-helpers';
-import { mockEncounters } from '../../../../../../../__mocks__/visits.mock';
+import { screen, waitFor } from '@testing-library/react';
+import { getConfig, useConfig, usePagination } from '@openmrs/esm-framework';
+import { mockPatient, renderWithSwr } from '../../../../../../../tools/test-helpers';
+import { mockEncounters } from '../../../../__mocks__/visits.mock';
 import VisitsTable from './visits-table.component';
-import { mockPatient } from '../../../../../../../__mocks__/patient.mock';
 
 jest.setTimeout(10000);
 
@@ -15,16 +14,16 @@ const testProps = {
   visits: mockEncounters,
 };
 
+const mockedGetConfig = getConfig as jest.Mock;
+const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePagination = usePagination as jest.Mock;
-const mockShowModal = showModal as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
-const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
   return {
     ...originalModule,
+    getConfig: jest.fn().mockResolvedValue({ htmlFormEntryForms: [] }),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
@@ -35,10 +34,10 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('EncounterList', () => {
-  it('renders an empty state when no encounters are available', () => {
+  it('renders an empty state when no encounters are available', async () => {
     testProps.visits = [];
 
-    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
+    mockedGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
       goTo: () => {},
@@ -47,8 +46,10 @@ describe('EncounterList', () => {
 
     renderVisitsTable();
 
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('table')).not.toBeInTheDocument();
+      expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
+    });
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
@@ -115,9 +116,8 @@ describe('EncounterList', () => {
 });
 
 describe('Delete Encounter', () => {
-  it('delete a patient encounter', async () => {
+  it('Clicking the `Delete` button deletes an encounter', async () => {
     const user = userEvent.setup();
-
     testProps.visits = mockEncounters;
 
     mockedUsePagination.mockImplementationOnce(() => ({
@@ -134,14 +134,15 @@ describe('Delete Encounter', () => {
     const expandEncounterButton = screen.getAllByRole('button', { name: /expand current row/i });
 
     await waitFor(() => user.click(expandEncounterButton[0]));
+
     expect(screen.getByRole('button', { name: /Delete this encounter/i })).toBeInTheDocument();
 
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
-
     await waitFor(() => user.click(deleteButton));
   });
 });
 
 function renderVisitsTable() {
+  // FIXME: fix types
   renderWithSwr(<VisitsTable {...testProps} />);
 }

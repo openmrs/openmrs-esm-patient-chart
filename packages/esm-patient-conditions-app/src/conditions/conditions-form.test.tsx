@@ -3,18 +3,16 @@ import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showToast } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { searchedCondition } from '../../../../__mocks__/conditions.mock';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { searchedCondition } from '../__mocks__/conditions.mock';
+import { getByTextWithMarkup, mockPatient } from '../../../../tools/test-helpers';
 import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm from './conditions-form.component';
-import { z } from 'zod';
 
 jest.setTimeout(10000);
 
 jest.mock('zod', () => {
   const originalModule = jest.requireActual('zod');
-  const mockZod = {
+  const mockedZod = {
     ...originalModule,
     z: {
       ...originalModule.z,
@@ -26,7 +24,7 @@ jest.mock('zod', () => {
       })),
     },
   };
-  return mockZod;
+  return mockedZod;
 });
 
 const utc = require('dayjs/plugin/utc');

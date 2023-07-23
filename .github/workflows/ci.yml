@@ -45,7 +45,7 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
       
       - name: Run tests
-        run: yarn run test
+        run: yarn turbo test --color --concurrency=5
       
       - name: Run lint and typecheck
         run: yarn turbo run lint typescript --color

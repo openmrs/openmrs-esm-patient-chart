@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
-import { mockDrugOrderTemplates, mockDrugSearchResultItems } from '../../../../../__mocks__/medication.mock';
+import { mockDrugOrderTemplates, mockDrugSearchResultItems } from '../../__mocks__/medication.mock';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 

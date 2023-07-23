@@ -2,7 +2,7 @@ import React from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 
