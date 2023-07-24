@@ -24,6 +24,7 @@ jest.mock('@openmrs/esm-framework', () => {
         visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       };
     }),
+    useConnectedExtensions: jest.fn(() => []),
   };
 });
 

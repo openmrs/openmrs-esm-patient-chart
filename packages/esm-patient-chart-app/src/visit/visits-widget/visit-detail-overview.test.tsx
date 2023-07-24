@@ -26,6 +26,7 @@ jest.mock('@openmrs/esm-framework', () => {
     // useConfig: jest.fn().mockImplementation(() => ({ showAllEncountersTab: true })),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
+    useConnectedExtensions: jest.fn(() => []),
   };
 });
 
