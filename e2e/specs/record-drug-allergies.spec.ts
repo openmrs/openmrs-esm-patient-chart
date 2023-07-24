@@ -20,22 +20,22 @@ test('Add drug allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('Then I filled the form', async () => {
+  await test.step('And I filled the form', async () => {
     await allergiesPage.page.getByText('ACE inhibitors').click();
     await allergiesPage.page.getByText('Mental status change').click();
     await allergiesPage.page.getByText('Mild').click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
-  await test.step('Then I submit the form', async () => {
+  await test.step('And I submit the form', async () => {
     await allergiesPage.page.getByText('Save').click();
   });
 
-  await test.step('And I see the Allergy Saved message', async () => {
+  await test.step('Then I see the Allergy Saved message', async () => {
     await expect(allergiesPage.page.getByText('saved')).toBeVisible();
   });
 
-  await test.step('And I see the data of the allergy that I saved', async () => {
+  await test.step('Then I see the data of the allergy that I saved', async () => {
     const rows = allergiesPage.allergyTable().locator('tr');
     const allergenCell = rows.locator('td:first-child');
     const severityCell = rows.locator('td:nth-child(2)');
