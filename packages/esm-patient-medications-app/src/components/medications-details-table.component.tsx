@@ -132,7 +132,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       sortKey: dayjs(medication.dateActivated).toDate(),
       content: (
         <div className={styles.startDateColumn}>
-          <p>{formatDate(new Date(medication.dateActivated))}</p>
+          <span>{formatDate(new Date(medication.dateActivated))}</span>
           <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
         </div>
       ),
@@ -220,7 +220,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   );
 };
 
-function InfoTooltip({ orderer }) {
+function InfoTooltip({ orderer }: { orderer: string }) {
   return (
     <IconButton
       className={styles.tooltip}
