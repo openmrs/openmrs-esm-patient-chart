@@ -2,7 +2,7 @@ import React from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 
@@ -19,10 +19,11 @@ export default function OrderBasketItemList({
 }: OrderBasketItemListProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const newOrderBasketItems = orderBasketItems.filter((x) => x.action === 'NEW');
-  const renewedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'RENEWED');
-  const revisedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'REVISE');
-  const discontinuedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'DISCONTINUE');
+
+  const newOrderBasketItems = orderBasketItems.filter((item) => item.action === 'NEW');
+  const renewedOrderBasketItems = orderBasketItems.filter((item) => item.action === 'RENEWED');
+  const revisedOrderBasketItems = orderBasketItems.filter((item) => item.action === 'REVISE');
+  const discontinuedOrderBasketItems = orderBasketItems.filter((item) => item.action === 'DISCONTINUE');
 
   return (
     <div className={isTablet ? `${styles.orderBasketContainerTablet}` : `${styles.orderBasketContainerDesktop}`}>
@@ -48,8 +49,9 @@ export default function OrderBasketItemList({
             </div>
           ) : (
             <h4 className={styles.orderCategoryHeading}>
-              {t('ordersAlreadyInBasketWithCount', '{count} item(s) already in your basket', {
+              {t('ordersAlreadyInBasketWithCount', '{count} item{plural} already in your basket', {
                 count: newOrderBasketItems.length,
+                plural: newOrderBasketItems.length > 1 ? 's' : '',
               })}
             </h4>
           )}
@@ -67,8 +69,9 @@ export default function OrderBasketItemList({
       {renewedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t('renewedOrders', '{count} order(s) being renewed (continued)', {
+            {t('renewedOrders', '{count} order{plural} being renewed (continued)', {
               count: renewedOrderBasketItems.length,
+              plural: renewedOrderBasketItems.length > 1 ? 's' : '',
             })}
           </h4>
           {renewedOrderBasketItems.map((item, index) => (
@@ -85,8 +88,9 @@ export default function OrderBasketItemList({
       {revisedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t('revisedOrders', '{count} order(s) being modified (revised)', {
+            {t('revisedOrders', '{count} order{plural} being modified (revised)', {
               count: revisedOrderBasketItems.length,
+              plural: revisedOrderBasketItems.length > 1 ? 's' : '',
             })}
           </h4>
           {revisedOrderBasketItems.map((item, index) => (
@@ -103,8 +107,9 @@ export default function OrderBasketItemList({
       {discontinuedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t('discontinuedOrders', '{count} discontinued order(s)', {
+            {t('discontinuedOrdersCount', '{count} order{plural} being discontinued', {
               count: discontinuedOrderBasketItems.length,
+              plural: discontinuedOrderBasketItems.length > 1 ? 's' : '',
             })}
           </h4>
           {discontinuedOrderBasketItems.map((item, index) => (
