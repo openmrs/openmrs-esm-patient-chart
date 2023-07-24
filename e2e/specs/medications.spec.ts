@@ -60,7 +60,7 @@ test('Should add, modify, discontinue and reorder medication', async ({ page,api
         await expect(medicationPage.activeMedicationTable().getByText('QUANTITY 30 Tablet')).toBeVisible();
     });
 
-    await test.step('Then I modify the medication', async () => {
+    await test.step('When I modify the medication', async () => {
         await medicationPage.activeMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
         await medicationPage.page.getByRole('menuitem', { name: 'Modify' }).click();
         await medicationPage.page.getByRole('listitem').filter({ hasText: 'ModifyAspirin 162.5mg — 162.5mg — TabletDOSE 1 Tablet — Oral — Once daily — REFI' }).click();
@@ -81,7 +81,7 @@ test('Should add, modify, discontinue and reorder medication', async ({ page,api
         await expect(medicationPage.activeMedicationTable().getByText('QUANTITY 60 Tablet')).toBeVisible();
     });
 
-    await test.step('Then I discontinue the medication', async () => {
+    await test.step('When I discontinue the medication', async () => {
         await medicationPage.activeMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
         await medicationPage.page.getByRole('menuitem', { name: 'Discontinue' }).click();
         await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
@@ -95,7 +95,7 @@ test('Should add, modify, discontinue and reorder medication', async ({ page,api
         await expect(medicationPage.pastMedicationTable().getByText('QUANTITY 60 Tablet')).toBeVisible();
     });
 
-    await test.step('Then I reorder the medication', async () => {
+    await test.step('When I reorder the medication', async () => {
         await medicationPage.pastMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
         await medicationPage.page.getByRole('menuitem', { name: 'Reorder' }).click();
         await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
