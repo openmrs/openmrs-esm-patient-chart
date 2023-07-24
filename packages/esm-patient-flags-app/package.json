@@ -15,10 +15,9 @@
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "test:watch":"cross-env TZ=UTC jest --watch --config jest.config.js",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
     "coverage": "yarn test --coverage",
     "verify": "turbo lint typescript coverage",
-    "coverage": "yarn test --coverage",
     "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
