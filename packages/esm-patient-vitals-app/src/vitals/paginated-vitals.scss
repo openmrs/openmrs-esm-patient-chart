@@ -1,22 +1,21 @@
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 td {
   &.criticallyLow, &.criticallyHigh, &.low, &.high {
     td:nth-child(2) {
       @include type.type-style("heading-compact-01");
-      
     }
   }
 
   &.criticallyLow, &.criticallyHigh {
-    outline: 2px solid $danger;
+    outline: 2px solid colors.$red-60;
     outline-offset: -1px;
   }
 
   &.low, &.high {
-    outline: 1px solid black;
+    outline: 1px solid colors.$black-100;
   }
 
   &.criticallyLow {
@@ -79,23 +78,4 @@ td {
 
 .high::after {
   content: " ↑";
-}
-
-@media print {
-
-  @page {
-    size: auto;
-    margin: spacing.$spacing-10;
-  }
-}
-.footer{
-  display: none;
-}
-
-@media print {
-
-  @page {
-    size: auto;
-    margin: 4rem;
-  }
 }

@@ -1,17 +1,17 @@
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetCard {
-  background-color: $ui-background;
-  border: 1px solid $ui-03;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
 }
 
 .divider {
   width: 1px;
   height: spacing.$spacing-05;
-  color: $ui-03;
-  margin: 0rem 0rem 0rem spacing.$spacing-05;
+  color: colors.$gray-20;
+  margin-left: spacing.$spacing-05;
 }
 
 .vitalsHeaderActionItems {
@@ -39,6 +39,7 @@
   flex: 1 1 0%;
   justify-content: end;
 }
+
 .printButton {
   margin-left: 1.25rem;
 }

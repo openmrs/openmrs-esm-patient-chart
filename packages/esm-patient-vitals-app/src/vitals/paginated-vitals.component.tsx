@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -13,15 +13,13 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
-import orderBy from 'lodash-es/orderBy';
-
 interface PaginatedVitalsProps {
-  tableRows: Array<DataTableRow>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<any>;
-  isPrinting: boolean;
+  tableRows: Array<Record<string, string>>;
+  tableHeaders: Array<Record<string, string | boolean>>;
+  isPrinting?: boolean;
 }
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({

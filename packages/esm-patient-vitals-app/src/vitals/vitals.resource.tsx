@@ -1,11 +1,10 @@
-import useSWR from 'swr';
+import { useCallback, useMemo } from 'react';
+import useSwrInfinite from 'swr/infinite';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FetchResponse } from '@openmrs/esm-framework';
 import { ObsMetaInfo, ConceptMetadata, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { calculateBodyMassIndex } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
-import { useCallback, useMemo } from 'react';
-import useSwrInfinite from 'swr/infinite';
 
 interface ObsRecord {
   concept: string;
@@ -44,6 +43,10 @@ interface VitalsFetchResponse {
   meta: {
     lastUpdated: string;
   };
+  link: Array<{
+    relation: string;
+    url: string;
+  }>;
   resourceType: string;
   total: number;
   type: string;
@@ -54,35 +57,41 @@ export const pageSize = 100;
 export function useVitals(patientUuid: string, includeBiometrics: boolean = false) {
   const { concepts } = useConfig();
   const { conceptMetadata } = useVitalsConceptMetadata();
+  const biometricsConcepts = [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid];
+
+  const conceptUuids = includeBiometrics
+    ? Object.values(concepts).join(',')
+    : Object.values(concepts)
+        .filter((uuid) => !biometricsConcepts.includes(uuid))
+        .join(',');
+
   const getUrl = useCallback(
     (page, prevPageData) => {
       if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
         return null;
       }
-      let url =
-        `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-        Object.values(concepts).join(',') +
-        '&_summary=data&_sort=-date' +
-        `&_count=${pageSize}
-          `;
+
+      let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&`;
+      let urlSearchParams = new URLSearchParams();
+
+      urlSearchParams.append('code', conceptUuids);
+      urlSearchParams.append('_summary', 'data');
+      urlSearchParams.append('_sort', '-date');
+      urlSearchParams.append('_count', pageSize.toString());
+
       if (page) {
-        url += `&_getpagesoffset=${page * pageSize}`;
+        urlSearchParams.append('_getpagesoffset', (page * pageSize).toString());
       }
-      return url;
+
+      return url + urlSearchParams.toString();
     },
-    [concepts, patientUuid],
+    [conceptUuids, patientUuid],
   );
 
-  const { data, isValidating, setSize, error, size, mutate } = useSwrInfinite<
-    FetchResponse<{
-      link: any;
-      entry: any;
-      results: Array<VitalsFetchResponse>;
-      links: Array<{ relation: 'prev' | 'next' }>;
-      total: number;
-    }>,
-    Error
-  >(getUrl, openmrsFetch);
+  const { data, isValidating, setSize, error, size, mutate } = useSwrInfinite<{ data: VitalsFetchResponse }, Error>(
+    getUrl,
+    openmrsFetch,
+  );
 
   const getVitalSignKey = (conceptUuid: string): string => {
     switch (conceptUuid) {

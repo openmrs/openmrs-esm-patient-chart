@@ -1,62 +1,48 @@
-@use "@carbon/styles/scss/spacing";
 @use '@carbon/styles/scss/colors';
+@use "@carbon/styles/scss/spacing";
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-
 
 @media screen {
-  .printpage {
+  .printPage {
+    background-color: colors.$white;
     display: none;
   }
 }
 
-.subheader {
-  text-align: center;   
-  @include type.type-style('heading-compact-02');
-  font-size: spacing.$spacing-05;
-  color: colors.$gray-70;
-  margin-top: spacing.$spacing-04;
-  padding: spacing.$spacing-04 spacing.$spacing-05;
-}
-
-.patientDetails {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: colors.$black;
-  padding: spacing.$spacing-06;
-  margin: 0 spacing.$spacing-03 0;
-} 
-
-.patientName {
-  @include type.type-style('heading-compact-01');
-  color: colors.$black;
-}
-
 @media print {
+  @page {
+    size: auto;
+    margin: spacing.$spacing-08;
+  }
+
   .header {
     display: flex;
-    background-color: colors.$white;
     align-items: center;
-  }
-  
-  .logo {
-    flex: 1;
-    padding: spacing.$spacing-04;
+    justify-content: space-between;
+    background-color: colors.$white;
   }
   
   .patientDetails {
-    flex: 4;
+    @include type.type-style('body-compact-02');
+    margin: 0 spacing.$spacing-03;
+  }
+
+  .patientInfo {
+    color: colors.$gray-80;
+    @include type.type-style('body-compact-02');
+  } 
+
+  .name {
+    @include type.type-style('heading-compact-02');
+    margin-right: spacing.$spacing-03;
   }
   
   .footer {
-    flex: 3;
     font-size: spacing.$spacing-04;
     display: flex;
   }
 
   .date {
-    font-style: italic;
     margin-left: spacing.$spacing-06;
   }
 
@@ -65,29 +51,14 @@
   }
 
   .printedBy {
-    text-transform: capitalize;
-    margin-left: spacing.$spacing-02;
-    margin-right: spacing.$spacing-02;
-    font-weight: bold;
-  }
-  
-  .logo {
-    flex: 1;
-    padding: 10px;
-  }
-  
-  .patientDetails {
-    flex: 4;
-  }
-  
-  .footer {
-    flex: 3;
-    font-size: 12px;
-    display: flex;
+    @include type.type-style('body-compact-01');
+    margin: 0 spacing.$spacing-02;
   }
 
-  .date {
-    font-style: italic;
-    margin-left: 10px;
+  .subheader {
+    @include type.type-style('heading-03');
+    color: colors.$gray-70;
+    padding: spacing.$spacing-03;
+    text-align: center;   
   }
 }
