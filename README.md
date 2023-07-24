@@ -69,19 +69,18 @@ To run tests in `watch` mode, run:
 yarn turbo test:watch
 ```
 
-To generate a `coverage` report, run:
-
-```bash
-yarn turbo coverage
-```
-
 To run tests for a specific package, run:
 
 ```bash
 yarn turbo test --filter="<package-name>"
-
 # For example, to run tests for just the Conditions app, run:
 yarn turbo test --filter="esm-patient-conditions-app"
+```
+
+To generate a `coverage` report, run:
+
+```bash
+yarn turbo coverage
 ```
 
 By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
