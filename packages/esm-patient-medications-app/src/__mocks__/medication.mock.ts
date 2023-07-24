@@ -1,4 +1,4 @@
-import { Drug } from '../packages/esm-patient-medications-app/src/types/order';
+import type { Drug } from '../types/order';
 
 export const mockDrugSearchResultItems: Array<Drug> = [
   {

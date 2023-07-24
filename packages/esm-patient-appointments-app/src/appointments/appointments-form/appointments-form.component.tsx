@@ -326,7 +326,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 <ResponsiveWrapper isTablet={isTablet}>
                   <DatePicker
                     datePickerType="range"
-                    light={isTablet}
                     dateFormat={datePickerFormat}
                     onChange={([startDate, endDate]) => {
                       setStartDateText(dayjs(new Date(startDate)).format(dateFormat));
@@ -364,6 +363,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
                 <ResponsiveWrapper isTablet={isTablet}>
                   <NumberInput
+                    hideSteppers
                     id="repeatNumber"
                     min={1}
                     max={356}
@@ -417,7 +417,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <DatePicker
                     datePickerType="single"
                     dateFormat={datePickerFormat}
-                    light={isTablet}
                     value={startDate}
                     onChange={([date]) => setStartDate(date)}
                   >
@@ -446,14 +445,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('note', 'Note')}</span>
-          <TextArea
-            id="appointmentNote"
-            light={isTablet}
-            value={appointmentNote}
-            labelText={t('appointmentNoteLabel', 'Write an additional note')}
-            placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-            onChange={(event) => setAppointmentNote(event.target.value)}
-          />
+          <ResponsiveWrapper isTablet={isTablet}>
+            <TextArea
+              id="appointmentNote"
+              value={appointmentNote}
+              labelText={t('appointmentNoteLabel', 'Write an additional note')}
+              placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+              onChange={(event) => setAppointmentNote(event.target.value)}
+            />
+          </ResponsiveWrapper>
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
@@ -477,12 +477,12 @@ function TimeAndDuration({ duration, isTablet, startTime, setDuration, setTimeFo
     <React.Fragment>
       <ResponsiveWrapper isTablet={isTablet}>
         <TimePicker
+          id="time-picker"
           pattern="([\d]+:[\d]{2})"
           onChange={(event) => setStartTime(event.target.value)}
           value={startTime}
           style={{ marginLeft: '0.125rem', flex: 'none' }}
           labelText={t('time', 'Time')}
-          id="time-picker"
         >
           <TimePickerSelect
             id="time-picker-select-1"
@@ -497,16 +497,17 @@ function TimeAndDuration({ duration, isTablet, startTime, setDuration, setTimeFo
       </ResponsiveWrapper>
       <ResponsiveWrapper isTablet={isTablet}>
         <NumberInput
+          hideSteppers
           id="duration"
           min={0}
           max={1440}
           label={t('durationInMinutes', 'Duration (minutes)')}
           invalidText={t('invalidNumber', 'Number is not valid')}
           size="md"
-          value={duration}
           onChange={(e, { value }) => {
             setDuration(value);
           }}
+          value={duration}
         />
       </ResponsiveWrapper>
     </React.Fragment>

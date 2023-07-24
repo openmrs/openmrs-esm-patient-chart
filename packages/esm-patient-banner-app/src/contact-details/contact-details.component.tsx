@@ -102,7 +102,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
                     </li>
                   ))
                 ) : (
-                  <li>
+                  <li key={`address-${key}`}>
                     {useCustomAddressLabelEnabled ? t(customAddressLabel[key]) : t(key)}: {value}
                   </li>
                 ),

@@ -1,11 +1,11 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+
+import { mockConditions, mockFhirConditionsResponse } from '../__mocks__/conditions.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
 const testProps = {

@@ -1,11 +1,10 @@
 import React from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { fireEvent, screen, within } from '@testing-library/react';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockDrugOrders } from '../../../../__mocks__/medication.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import ActiveMedications from './active-medications.component';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { fireEvent, screen, within } from '@testing-library/react';
+import { mockDrugOrders } from '../__mocks__/medication.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import ActiveMedications from './active-medications.component';
 
 const testProps = {
   patientUuid: mockPatient.id,

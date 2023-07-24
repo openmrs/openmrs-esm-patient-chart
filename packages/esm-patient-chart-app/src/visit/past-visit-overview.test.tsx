@@ -1,9 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, setCurrentVisit } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import PastVisitOverview from './past-visit-overview.component';
 
 const testProps = {

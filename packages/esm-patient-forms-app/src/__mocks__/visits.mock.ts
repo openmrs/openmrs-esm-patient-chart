@@ -1,14 +1,3 @@
-enum VisitMode {
-  NEWVISIT = 'startVisit',
-  EDITVISIT = 'editVisit',
-  LOADING = 'loadingVisit',
-}
-
-enum VisitStatus {
-  NOTSTARTED = 'notStarted',
-  ONGOING = 'ongoing',
-}
-
 export const mockVisitTypes = [
   {
     uuid: 'some-uuid1',
@@ -62,7 +51,7 @@ export const mockCurrentVisit = {
     display: 'Facility Visit',
   },
   attributes: [],
-  startDatetime: new Date('2021-03-16T08:16:00.000+0000'),
+  startDatetime: '2021-03-16T08:16:00.000+0000',
   stopDatetime: null,
   location: {
     uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',

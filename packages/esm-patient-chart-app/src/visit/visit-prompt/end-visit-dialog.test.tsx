@@ -3,7 +3,7 @@ import { of, throwError } from 'rxjs';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
+import { mockCurrentVisit } from '../../__mocks__/visits.mock';
 import EndVisitDialog from './end-visit-dialog.component';
 
 const endVisitPayload = {

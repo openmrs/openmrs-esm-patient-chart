@@ -277,23 +277,24 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           <section>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id="visitDate"
-                light={isTablet}
-                style={{ paddingBottom: '1rem' }}
-                maxDate={new Date().toISOString()}
-                onChange={([date]) => setVisitDate(date)}
-                value={visitDate}
-              >
-                <DatePickerInput
-                  id="visitStartDateInput"
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DatePicker
+                  dateFormat="d/m/Y"
+                  datePickerType="single"
+                  id="visitDate"
+                  style={{ paddingBottom: '1rem' }}
+                  maxDate={new Date().toISOString()}
+                  onChange={([date]) => setVisitDate(date)}
+                  value={visitDate}
+                >
+                  <DatePickerInput
+                    id="visitStartDateInput"
+                    labelText={t('date', 'Date')}
+                    placeholder="dd/mm/yyyy"
+                    style={{ width: '100%' }}
+                  />
+                </DatePicker>
+              </ResponsiveWrapper>
               <ResponsiveWrapper isTablet={isTablet}>
                 <TimePicker
                   id="visitStartTime"

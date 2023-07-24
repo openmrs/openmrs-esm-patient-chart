@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 import PatientBanner from './patient-banner.component';
 
 class ResizeObserverMock {

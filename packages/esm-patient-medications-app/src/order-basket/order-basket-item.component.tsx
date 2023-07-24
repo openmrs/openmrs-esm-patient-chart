@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ClickableTile, Tile, IconButton } from '@carbon/react';
-import { TrashCan, Warning, Add } from '@carbon/react/icons';
-import { OrderBasketItem } from '../types/order-basket-item';
+import { Button, ClickableTile, Tile } from '@carbon/react';
+import { TrashCan, Warning } from '@carbon/react/icons';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './order-basket-item.scss';
 

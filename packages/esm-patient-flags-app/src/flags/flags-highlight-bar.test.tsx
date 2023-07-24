@@ -2,8 +2,8 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockPatientFlags } from '../../../../__mocks__/patient-flags.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatientFlags } from '../__mocks__/patient-flags.mock';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsHighlightBar from './flags-highlight-bar.component';
 

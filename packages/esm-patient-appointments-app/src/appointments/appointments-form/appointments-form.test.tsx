@@ -1,12 +1,11 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import { mockLocations, mockLocationsDataResponse } from '../../../../../__mocks__/location.mock';
+import { mockLocations, mockLocationsDataResponse } from '../../__mocks__/location.mock';
 import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
-import { mockSessionDataResponse } from '../../../../../__mocks__/session.mock';
-import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../../__mocks__/appointments.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
+import { mockSessionDataResponse } from '../../__mocks__/session.mock';
+import { mockUseAppointmentServiceData } from '../../__mocks__/appointments.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
 import { saveAppointment } from '../appointments.resource';
 import AppointmentForm from './appointments-form.component';
 

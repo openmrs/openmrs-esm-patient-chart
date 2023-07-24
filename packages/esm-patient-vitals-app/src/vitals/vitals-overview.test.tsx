@@ -2,15 +2,14 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   formattedVitals,
   mockConceptMetadata,
   mockFhirVitalsResponse,
   mockVitalsConfig,
   mockVitalsSignsConcept,
-} from '../../../../__mocks__/vitals.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+} from '../__mocks__/vitals.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import VitalsOverview from './vitals-overview.component';
 
 const testProps = {

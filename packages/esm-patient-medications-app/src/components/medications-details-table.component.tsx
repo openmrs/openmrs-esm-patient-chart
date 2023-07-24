@@ -23,8 +23,8 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
-import { Order } from '../types/order';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { Order } from '../types/order';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 import styles from './medications-details-table.scss';
 
