@@ -12,7 +12,6 @@
   "emptyStateText": "There are no {{displayText}} to display for this patient",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
   "enterSecondaryDiagnoses": "Enter Secondary diagnoses",
-  "goToSummary": "Go to Summary",
   "image": "Image",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",
   "noMatchingDiagnoses": "No diagnoses found matching",
