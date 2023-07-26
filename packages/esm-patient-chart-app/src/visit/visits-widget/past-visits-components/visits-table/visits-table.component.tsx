@@ -145,7 +145,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
       datetime: formatDatetime(parseDate(encounter.datetime)),
-    })); 
+    }));
   }, [paginatedVisits]);
 
   const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
@@ -300,7 +300,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   className={styles.menuItem}
                                   itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                   onClick={() => {
-                                    handleDeleteEncounter(row.id, row.form?.display)
+                                    const rowToDelete = rows.find((rowElement) => rowElement.id === row.id);
+                                    handleDeleteEncounter(rowToDelete.id, rowToDelete.form?.display);
                                   }}
                                   hasDivider
                                   isDelete
