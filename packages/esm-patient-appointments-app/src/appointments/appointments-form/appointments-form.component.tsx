@@ -661,3 +661,4 @@ function TimeAndDuration({ isTablet, t, setValue, getValues, watch, control, ser
 }
 
 export default AppointmentsForm;
+
