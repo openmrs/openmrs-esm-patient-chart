@@ -28,4 +28,5 @@ export const endVisit = async (api: APIRequestContext, uuid: string) => {
   });
 
   await expect(visitRes.ok()).toBeTruthy();
+  return await visitRes.json();
 };
