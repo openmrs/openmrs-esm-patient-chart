@@ -54,8 +54,8 @@ $openmrs-background-grey: #ededed;
 }
 
 .inputContainer {
-  display: flex; 
-  flex-flow: row wrap; 
+  display: flex;
+  flex-flow: row wrap;
   gap: spacing.$spacing-05;
   align-items: center;
 }
@@ -88,4 +88,18 @@ $openmrs-background-grey: #ededed;
 .weekSelect {
   max-inline-size: fit-content;
   padding-top: spacing.$spacing-03;
+}
+
+:global(.cds--select-input):focus {
+  outline: 2.5px solid colors.$red-60
+}
+
+.errorMessage {
+@include type.type-style("label-02");
+color: colors.$red-60;
+margin-top: 0.5rem;
+}
+
+:global(.cds--number input[type=number]):focus {
+  outline: 2.5px solid colors.$red-60;
 }
