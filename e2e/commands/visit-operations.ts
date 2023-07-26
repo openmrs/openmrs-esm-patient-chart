@@ -18,7 +18,7 @@ export const startVisit = async (api: APIRequestContext, patientId: string): Pro
 };
 
 export const endVisit = async (api: APIRequestContext, uuid: string) => {
-  await api.post(`visit/${uuid}`, {
+  const visitRes = await api.post(`visit/${uuid}`, {
     data: {
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
       startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
@@ -26,4 +26,6 @@ export const endVisit = async (api: APIRequestContext, uuid: string) => {
       stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
     },
   });
+
+  await expect(visitRes.ok()).toBeTruthy();
 };
