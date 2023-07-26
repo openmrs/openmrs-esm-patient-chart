@@ -49,5 +49,4 @@ describe('VisitBannerTag: ', () => {
     render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
     expect(screen.queryByRole('button', { name: /Active Visit/i })).not.toBeInTheDocument();
   });
-
 });
