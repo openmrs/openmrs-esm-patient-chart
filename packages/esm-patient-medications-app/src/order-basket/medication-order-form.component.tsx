@@ -1,4 +1,5 @@
-import React, { FormEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   ButtonSet,
@@ -20,10 +21,8 @@ import {
 import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
-import styles from './medication-order-form.scss';
-import capitalize from 'lodash-es/capitalize';
 import { ConfigObject } from '../config-schema';
 import {
   DosingUnit,
@@ -32,6 +31,7 @@ import {
   MedicationRoute,
   QuantityUnit,
 } from '../api/drug-order-template';
+import styles from './medication-order-form.scss';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -79,7 +79,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const template = initialOrderBasketItem.template;
-  const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
+  const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
   const handleFormSubmission = (e) => {

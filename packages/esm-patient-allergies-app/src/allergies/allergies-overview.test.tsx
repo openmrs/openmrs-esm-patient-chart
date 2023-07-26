@@ -1,9 +1,13 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockAllergies, mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockAllergies, mockFhirAllergyIntoleranceResponse } from '../__mocks__/allergies.mock';
+import {
+  mockPatient,
+  patientChartBasePath,
+  renderWithSwr,
+  waitForLoadingToFinish,
+} from '../../../../tools/test-helpers';
 import AllergiesOverview from './allergies-overview.component';
 
 const testProps = {

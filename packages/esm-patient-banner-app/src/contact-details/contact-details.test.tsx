@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import ContactDetails from './contact-details.component';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { usePatientAttributes, usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
+import ContactDetails from './contact-details.component';
 
 const mockedUsePatientAttributes = usePatientAttributes as jest.Mock;
 const mockedUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;

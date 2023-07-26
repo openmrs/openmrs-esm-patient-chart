@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  TableContainer,
+  DataTableCustomRenderProps,
+  DataTableHeader,
+  DataTableRow,
+  Layer,
   Search,
+  SkeletonPlaceholder,
+  TableContainer,
   Table,
   TableHead,
   TableRow,
   TableHeader,
   TableBody,
   TableCell,
-  DataTableCustomRenderProps,
-  DataTableHeader,
-  DataTableRow,
   Toggle,
-  SkeletonPlaceholder,
 } from '@carbon/react';
 import {
   isDesktop,
@@ -86,14 +87,15 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
           }: DataTableCustomRenderProps) => (
             <TableContainer {...getTableContainerProps()}>
               <div className={styles.tableHeaderContainer}>
-                <Search
-                  className={styles.tableSearch}
-                  labelText={t('offlinePatientsTableSearchLabel', 'Search this list')}
-                  placeholder={t('offlinePatientsTableSearchPlaceholder', 'Search this list')}
-                  size={toolbarItemSize}
-                  onChange={onInputChange}
-                  light
-                />
+                <Layer>
+                  <Search
+                    className={styles.tableSearch}
+                    labelText={t('offlinePatientsTableSearchLabel', 'Search this list')}
+                    placeholder={t('offlinePatientsTableSearchPlaceholder', 'Search this list')}
+                    size={toolbarItemSize}
+                    onChange={onInputChange}
+                  />
+                </Layer>
               </div>
               <Table {...getTableProps()} isSortable useZebraStyles>
                 <TableHead>

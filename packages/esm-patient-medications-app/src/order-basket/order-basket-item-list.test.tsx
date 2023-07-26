@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockMedicationOrderSearchResults } from '../../../../__mocks__/medication.mock';
+import { mockMedicationOrderSearchResults } from '../__mocks__/medication.mock';
 import OrderBasketItemList from './order-basket-item-list.component';
 
 const mockOnItemClicked = jest.fn();

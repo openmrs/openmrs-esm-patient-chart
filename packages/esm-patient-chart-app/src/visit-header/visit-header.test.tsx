@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import {
   useAssignedExtensions,
   useLayoutType,
@@ -9,14 +8,12 @@ import {
   usePatient,
   useVisit,
   navigate,
-  useConfig,
   showModal,
 } from '@openmrs/esm-framework';
-import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import VisitHeader from './visit-header.component';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;

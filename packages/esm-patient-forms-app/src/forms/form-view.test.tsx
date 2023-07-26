@@ -1,11 +1,11 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockForms } from '../../../../__mocks__/forms.mock';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
+import { mockForms } from '../__mocks__/forms.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 import FormView from './form-view.component';
 
 const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;

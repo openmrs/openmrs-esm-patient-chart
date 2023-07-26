@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../../tools/test-helpers';
 import ChartReview from './chart-review.component';
 
 const mockUseExtensionStore = useExtensionStore as jest.Mock;

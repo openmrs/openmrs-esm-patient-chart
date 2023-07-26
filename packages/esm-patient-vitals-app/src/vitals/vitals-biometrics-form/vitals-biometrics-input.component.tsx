@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { FormLabel, TextArea, TextInput } from '@carbon/react';
+import { FormLabel, Layer, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './vitals-biometrics-input.scss';
@@ -58,44 +58,46 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
-          {textFields.map((val) => {
+          {textFields.map((val, i) => {
             return val.type === 'number' ? (
-              <Fragment key={val.name}>
-                <TextInput
-                  style={{ ...textFieldStyles }}
-                  className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
-                    !isWithinNormalRange && styles.danger
-                  }`}
-                  id={val.name}
-                  invalid={invalid}
-                  type={val.type}
-                  min={val.min}
-                  max={val.max}
-                  name={val.name}
-                  onChange={(e) => checkValidity(e.target.value)}
-                  onInput={onInputChange}
-                  labelText={''}
-                  value={val.value}
-                  title={val.name}
-                  light={isTablet}
-                />
+              <Fragment key={`vitals-text-input-${val.name}-${i}`}>
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <TextInput
+                    style={{ ...textFieldStyles }}
+                    className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
+                      !isWithinNormalRange && styles.danger
+                    }`}
+                    id={val.name}
+                    invalid={invalid}
+                    type={val.type}
+                    min={val.min}
+                    max={val.max}
+                    name={val.name}
+                    onChange={(e) => checkValidity(e.target.value)}
+                    onInput={onInputChange}
+                    labelText={''}
+                    value={val.value}
+                    title={val.name}
+                  />
+                </ResponsiveWrapper>
                 {val?.separator}
               </Fragment>
             ) : (
-              <TextArea
-                key={val.name}
-                style={{ ...textFieldStyles }}
-                className={styles.textarea}
-                id={val.name}
-                name={val.name}
-                labelText={''}
-                onChange={onInputChange}
-                rows={2}
-                placeholder={placeholder}
-                value={val.value}
-                title={val.name}
-                light={isTablet}
-              />
+              <ResponsiveWrapper key={`vitals-text-area-${val.name}-${i}`} isTablet={isTablet}>
+                <TextArea
+                  key={val.name}
+                  style={{ ...textFieldStyles }}
+                  className={styles.textarea}
+                  id={val.name}
+                  name={val.name}
+                  labelText={''}
+                  onChange={onInputChange}
+                  rows={2}
+                  placeholder={placeholder}
+                  value={val.value}
+                  title={val.name}
+                />
+              </ResponsiveWrapper>
             );
           })}
         </div>
@@ -109,5 +111,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     </div>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default VitalsBiometricInput;

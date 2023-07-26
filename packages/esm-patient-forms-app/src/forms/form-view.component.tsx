@@ -140,14 +140,15 @@ const FormView: React.FC<FormViewProps> = ({
               <TableContainer className={styles.tableContainer}>
                 <TableToolbar className={styles.tableToolbar} {...getToolbarProps()}>
                   <TableToolbarContent>
-                    <TableToolbarSearch
-                      className={styles.searchInput}
-                      expanded
-                      light
-                      onChange={(event) => handleSearch(event.target.value)}
-                      placeholder={t('searchForAForm', 'Search for a form')}
-                      size={isTablet ? 'lg' : 'sm'}
-                    />
+                    <Layer>
+                      <TableToolbarSearch
+                        className={styles.searchInput}
+                        expanded
+                        onChange={(event) => handleSearch(event.target.value)}
+                        placeholder={t('searchForAForm', 'Search for a form')}
+                        size={isTablet ? 'lg' : 'sm'}
+                      />
+                    </Layer>
                   </TableToolbarContent>
                 </TableToolbar>
                 <Table {...getTableProps()} className={styles.table}>

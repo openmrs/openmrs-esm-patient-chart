@@ -384,7 +384,7 @@ export const mockUseAppointmentServiceData = [
     startDateTime: new Date().toISOString(),
     endTime: '',
     maxAppointmentsLimit: null,
-    durationMins: null,
+    durationMins: 15,
     location: {},
     uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
     color: '#006400',

@@ -522,6 +522,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             {!isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 <ResponsiveWrapper isTablet={isTablet}>
+
                   <Controller
                     name="appointmentDateTime"
                     control={control}
@@ -559,6 +560,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('note', 'Note')}</span>
+
           <Controller
             name="appointmentNote"
             control={control}
