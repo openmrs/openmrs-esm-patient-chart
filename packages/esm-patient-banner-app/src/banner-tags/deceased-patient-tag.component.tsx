@@ -28,5 +28,5 @@ const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ pat
   );
 };
 
-export { DeceasedPatientBannerTagProps }
+export { DeceasedPatientBannerTagProps };
 export default DeceasedPatientBannerTag;

@@ -1,14 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Header,
-  HeaderGlobalAction,
-  HeaderGlobalBar,
-  HeaderMenuButton,
-  Tag,
-  Tooltip,
-} from '@carbon/react';
+import { Button, Header, HeaderGlobalAction, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import { CloseFilled } from '@carbon/react/icons';
 import {
   age,
@@ -93,12 +85,18 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   return (
     <>
       {patientNameIsTooLong ? (
-        <Tooltip align="bottom-left" width={100} label={
-          <>
-          <p className={styles.tooltipPatientName}>{name}</p>
-          <p className={styles.tooltipPatientInfo}>{`${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`}</p>
-        </>
-        }>
+        <Tooltip
+          align="bottom-left"
+          width={100}
+          label={
+            <>
+              <p className={styles.tooltipPatientName}>{name}</p>
+              <p className={styles.tooltipPatientInfo}>{`${parseInt(age(patient?.birthDate))}, ${getGender(
+                patient?.gender,
+              )}`}</p>
+            </>
+          }
+        >
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -192,9 +190,7 @@ const VisitHeader: React.FC = () => {
         </div>
       </ConfigurableLink>
       <div className={styles.navDivider} />
-      <div className={styles.patientDetails}>
-        { patient && <PatientInfo patient={patient} />}
-      </div>
+      <div className={styles.patientDetails}>{patient && <PatientInfo patient={patient} />}</div>
       {currentVisitIsRetrospective && <RetrospectiveVisitLabel currentVisit={currentVisit} />}
       <HeaderGlobalBar>
         {systemVisitEnabled && (
@@ -231,6 +227,6 @@ const VisitHeader: React.FC = () => {
       <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
     </Header>
   );
-}
+};
 
 export default VisitHeader;

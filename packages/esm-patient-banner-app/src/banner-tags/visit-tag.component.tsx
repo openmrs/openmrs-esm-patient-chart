@@ -13,10 +13,8 @@ interface VisitTagProps {
 function VisitTag({ patientUuid, patient }: VisitTagProps) {
   const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const isNotDeceased = !patient.deceasedDateTime;
-  return (
-    activeVisit && isNotDeceased && <ActiveVisitTag activeVisit={activeVisit} />
-  );
-};
+  return activeVisit && isNotDeceased && <ActiveVisitTag activeVisit={activeVisit} />;
+}
 
 interface ActiveVisitTagProps {
   activeVisit: Visit;
@@ -42,5 +40,5 @@ const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ activeVisit }) => {
   );
 };
 
-export { VisitTagProps }
+export { VisitTagProps };
 export default VisitTag;
