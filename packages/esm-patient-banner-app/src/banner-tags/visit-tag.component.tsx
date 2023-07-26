@@ -10,24 +10,19 @@ interface VisitTagProps {
   patient: fhir.Patient;
 }
 
-const VisitTag: React.FC<VisitTagProps> = ({ patientUuid, patient }) => {
-  const { currentVisit, isRetrospective } = useVisitOrOfflineVisit(patientUuid);
+function VisitTag({ patientUuid, patient }: VisitTagProps) {
+  const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const isNotDeceased = !patient.deceasedDateTime;
   return (
-    currentVisit &&
-    (isRetrospective ? (
-      <RetrospectiveEntryTag currentVisit={currentVisit} />
-    ) : (
-      isNotDeceased && <ActiveVisitTag currentVisit={currentVisit} />
-    ))
+    activeVisit && isNotDeceased && <ActiveVisitTag activeVisit={activeVisit} />
   );
 };
 
 interface ActiveVisitTagProps {
-  currentVisit: Visit;
+  activeVisit: Visit;
 }
 
-const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ currentVisit }) => {
+const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ activeVisit }) => {
   const { t } = useTranslation();
   return (
     <Toggletip align="bottom">
@@ -36,10 +31,10 @@ const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ currentVisit }) => {
       </ToggletipButton>
       <ToggletipContent>
         <div role="tooltip">
-          <h6 className={styles.heading}>{currentVisit?.visitType?.display}</h6>
+          <h6 className={styles.heading}>{activeVisit?.visitType?.display}</h6>
           <span>
             <span className={styles.tooltipSmallText}>{t('started', 'Started')}: </span>
-            <span>{formatDatetime(parseDate(currentVisit?.startDatetime), { mode: 'wide' })}</span>
+            <span>{formatDatetime(parseDate(activeVisit?.startDatetime), { mode: 'wide' })}</span>
           </span>
         </div>
       </ToggletipContent>
@@ -47,32 +42,5 @@ const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ currentVisit }) => {
   );
 };
 
-interface RetrospectiveEntryTagProps {
-  currentVisit: Visit;
-}
-
-const RetrospectiveEntryTag: React.FC<RetrospectiveEntryTagProps> = ({ currentVisit }) => {
-  const { t } = useTranslation();
-  return (
-    <Toggletip align="bottom">
-      <ToggletipButton label={t('retrospectiveEntry', 'Retrospective Entry')}>
-        <Tag type="purple">{t('retrospectiveEntry', 'Retrospective Entry')}</Tag>
-      </ToggletipButton>
-      <ToggletipContent>
-        <div role="tooltip">
-          <h6 className={styles.heading}>{currentVisit?.visitType?.display}</h6>
-          <div>
-            <span className={styles.tooltipSmallText}>{t('startDate', 'Start date')}: </span>
-            <span>{formatDatetime(parseDate(currentVisit?.startDatetime), { mode: 'wide' })}</span>
-          </div>
-          <div>
-            <span className={styles.tooltipSmallText}>{t('endDate', 'End date')}: </span>
-            <span>{formatDatetime(parseDate(currentVisit?.stopDatetime), { mode: 'wide' })}</span>
-          </div>
-        </div>
-      </ToggletipContent>
-    </Toggletip>
-  );
-};
-
+export { VisitTagProps }
 export default VisitTag;
