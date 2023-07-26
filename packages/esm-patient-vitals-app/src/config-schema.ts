@@ -55,6 +55,23 @@ export const configSchema = {
       _type: Type.UUID,
       _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
     },
+    logo: {
+      src: {
+        _type: Type.String,
+        _default: null,
+        _description: 'A path or URL to an image. Defaults to the OpenMRS SVG sprite.',
+      },
+      alt: {
+        _type: Type.String,
+        _default: 'Logo',
+        _description: 'Alt text, shown on hover',
+      },
+      name: {
+        _type: Type.String,
+        _default: null,
+        _description: 'The organization name displayed when image is absent',
+      },
+    },
     showPrintButton: {
       _type: Type.Boolean,
       _default: false,
