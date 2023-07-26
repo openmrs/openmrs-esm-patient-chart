@@ -209,7 +209,7 @@ const FormView: React.FC<FormViewProps> = ({
                             </label>
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            {row.cells[0].value && (
+                            {row.cells[1].value && (
                               <Button
                                 hasIconOnly
                                 renderIcon={Edit}
