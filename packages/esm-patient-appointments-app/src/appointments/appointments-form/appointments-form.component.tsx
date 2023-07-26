@@ -29,8 +29,8 @@ import {
   useAppointments,
   useAppointmentService,
 } from './../appointments.resource';
+import type { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../../constants';
-import { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import styles from './appointments-form.scss';
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
@@ -64,7 +64,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const [appointmentNote, setAppointmentNote] = useState(appointment?.comments || '');
   const [selectedAppointmentType, setSelectedAppointmentType] = useState(appointment?.appointmentKind || '');
   const [selectedService, setSelectedService] = useState(appointment?.service?.name || '');
-  const [isRecurringAppointment, setIsRecurringAppointment] = useState<boolean>(false);
+  const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [startDate, setStartDate] = useState<Date>(
     appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date(),
   );
@@ -111,10 +111,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
   }
-
-  const isRecurringPatternTypeWeek = (): boolean => {
-    return recurringPatternType == 'WEEK';
-  };
 
   const handleMultiselectChange = (e) => {
     setSelectedDaysOfWeekText(() => {
@@ -241,56 +237,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  const timeDurationLayout = () => {
-    return (
-      <div className={styles.inLine}>
-        <ResponsiveWrapper isTablet={isTablet}>
-          <TimePicker
-            pattern="([\d]+:[\d]{2})"
-            onChange={(event) => setStartTime(event.target.value)}
-            value={startTime}
-            style={{ marginLeft: '0.125rem', flex: 'none' }}
-            labelText={t('time', 'Time')}
-            id="time-picker"
-          >
-            <TimePickerSelect
-              id="time-picker-select-1"
-              onChange={(event) => setTimeFormat(event.target.value as amPm)}
-              value={timeFormat}
-              aria-label={t('time', 'Time')}
-            >
-              <SelectItem value="AM" text="AM" />
-              <SelectItem value="PM" text="PM" />
-            </TimePickerSelect>
-          </TimePicker>
-        </ResponsiveWrapper>
-        <ResponsiveWrapper isTablet={isTablet}>
-          <div className={styles.duration}>
-            <NumberInput
-              id="duration"
-              min={0}
-              max={1440}
-              label={t('duration', 'Duration')}
-              invalidText={t('invalidNumber', 'Number is not valid')}
-              helperText="Value in minutes"
-              size="md"
-              value={duration}
-              onChange={(e, { value }) => {
-                setDuration(value);
-              }}
-            />
-          </div>
-        </ResponsiveWrapper>
-      </div>
-    );
-  };
-
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
-          <span>{t('location', 'Location')}</span>
-          <div className={styles.selectContainer}>
+          <span className={styles.heading}>{t('location', 'Location')}</span>
+          <div>
             <ResponsiveWrapper isTablet={isTablet}>
               <Select
                 id="location"
@@ -311,7 +263,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           </div>
         </section>
         <section className={styles.formGroup}>
-          <span>{t('service', 'Service')}</span>
+          <span className={styles.heading}>{t('service', 'Service')}</span>
           <ResponsiveWrapper isTablet={isTablet}>
             <Select
               id="service"
@@ -332,7 +284,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
 
         <section className={styles.formGroup}>
-          <span>{t('appointmentType_title', 'Appointment Type')}</span>
+          <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
           <ResponsiveWrapper isTablet={isTablet}>
             <Select
               disabled={!appointmentTypes?.length}
@@ -356,79 +308,91 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
 
         <section className={styles.formGroup}>
-          <span>{t('dateTime', 'Date & Time')}</span>
-          <fieldset>
-            <Toggle
-              className={styles.toggleLabel}
-              labelA={t('recurringAppointment', 'Recurring appointment')}
-              labelB={t('recurringAppointment', 'Recurring appointment')}
-              id="recurringToggled"
-              onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
-            />
-          </fieldset>
-          {isRecurringAppointment ? (
-            <>
-              <div className={styles.rangeDatePickerControl}>
-                <div className={styles.inLine}>
-                  <ResponsiveWrapper isTablet={isTablet}>
-                    <DatePicker
-                      datePickerType="range"
-                      light={isTablet}
-                      dateFormat={datePickerFormat}
-                      onChange={([startDate, endDate]) => {
-                        setStartDateText(dayjs(new Date(startDate)).format(dateFormat));
-                        setStartDate(new Date(startDate));
-                        setRecurringPatternEndDateText(dayjs(new Date(endDate)).format(dateFormat));
-                        setRecurringPatternEndDate(new Date(endDate));
-                      }}
-                    >
-                      <DatePickerInput
-                        id="startDatePickerInput"
-                        labelText={t('startDate', 'Start date')}
-                        style={{ width: '100%' }}
-                        value={startDateText}
-                      />
-                      <DatePickerInput
-                        id="endDatePickerInput"
-                        labelText={t('endDate', 'End date')}
-                        style={{ width: '100%' }}
-                        placeholder={datePickerPlaceHolder}
-                        value={recurringPatternEndDateText}
-                      />
-                    </DatePicker>
-                  </ResponsiveWrapper>
-                  {timeDurationLayout()}
-                </div>
-                <div className={styles.inLine}>
-                  <ResponsiveWrapper isTablet={isTablet}>
-                    <NumberInput
-                      id="repeatNumber"
-                      min={1}
-                      max={356}
-                      label={t('repeatEvery', 'Repeat every')}
-                      invalidText={t('invalidNumber', 'Number is not valid')}
-                      size="md"
-                      value={recurringPatternPeriod}
-                      onChange={(e, { value }) => {
-                        setRecurringPatternPeriod(value);
-                      }}
+          <span className={styles.heading}>{t('recurringAppointment', 'Recurring Appointment')}</span>
+          <Toggle
+            id="recurringToggle"
+            labelB={t('yes', 'Yes')}
+            labelA={t('no', 'No')}
+            labelText={t('isRecurringAppointment', 'Is this a recurring appoinment?')}
+            onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
+          />
+        </section>
+
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
+          <div>
+            {isRecurringAppointment && (
+              <div className={styles.inputContainer}>
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <DatePicker
+                    datePickerType="range"
+                    dateFormat={datePickerFormat}
+                    onChange={([startDate, endDate]) => {
+                      setStartDateText(dayjs(new Date(startDate)).format(dateFormat));
+                      setStartDate(new Date(startDate));
+                      setRecurringPatternEndDateText(dayjs(new Date(endDate)).format(dateFormat));
+                      setRecurringPatternEndDate(new Date(endDate));
+                    }}
+                  >
+                    <DatePickerInput
+                      id="startDatePickerInput"
+                      labelText={t('startDate', 'Start date')}
+                      style={{ width: '100%' }}
+                      value={startDateText}
                     />
-                  </ResponsiveWrapper>
-                  <ResponsiveWrapper isTablet={isTablet}>
-                    <RadioButtonGroup
-                      name="radio-button-group"
-                      className={styles.recurringPatternType}
-                      valueSelected={recurringPatternType}
-                      onChange={(type) => setRecurringPatternType(type)}
-                    >
-                      <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
-                      <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
-                    </RadioButtonGroup>
-                  </ResponsiveWrapper>
-                </div>
-                {isRecurringPatternTypeWeek() && (
+                    <DatePickerInput
+                      id="endDatePickerInput"
+                      labelText={t('endDate', 'End date')}
+                      style={{ width: '100%' }}
+                      placeholder={datePickerPlaceHolder}
+                      value={recurringPatternEndDateText}
+                    />
+                  </DatePicker>
+                </ResponsiveWrapper>
+
+                <TimeAndDuration
+                  duration={duration}
+                  isTablet={isTablet}
+                  startTime={startTime}
+                  setDuration={setDuration}
+                  setTimeFormat={setTimeFormat}
+                  setStartTime={setStartTime}
+                  timeFormat={timeFormat}
+                  t={t}
+                />
+
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <NumberInput
+                    hideSteppers
+                    id="repeatNumber"
+                    min={1}
+                    max={356}
+                    label={t('repeatEvery', 'Repeat every')}
+                    invalidText={t('invalidNumber', 'Number is not valid')}
+                    size="md"
+                    value={recurringPatternPeriod}
+                    onChange={(e, { value }) => {
+                      setRecurringPatternPeriod(value);
+                    }}
+                  />
+                </ResponsiveWrapper>
+
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <RadioButtonGroup
+                    legendText={t('period', 'Period')}
+                    name="radio-button-group"
+                    onChange={(type) => setRecurringPatternType(type)}
+                    valueSelected={recurringPatternType}
+                  >
+                    <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
+                    <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
+                  </RadioButtonGroup>
+                </ResponsiveWrapper>
+
+                {recurringPatternType === 'WEEK' && (
                   <div>
                     <MultiSelect
+                      className={styles.weekSelect}
                       label={selectedDaysOfWeekText}
                       id="daysOfWeek"
                       items={weekDays}
@@ -445,15 +409,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              <div className={styles.inLine}>
+            )}
+
+            {!isRecurringAppointment && (
+              <div className={styles.inputContainer}>
                 <ResponsiveWrapper isTablet={isTablet}>
                   <DatePicker
                     datePickerType="single"
                     dateFormat={datePickerFormat}
-                    light={isTablet}
                     value={startDate}
                     onChange={([date]) => setStartDate(date)}
                   >
@@ -465,21 +428,32 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     />
                   </DatePicker>
                 </ResponsiveWrapper>
-                {timeDurationLayout()}
+
+                <TimeAndDuration
+                  duration={duration}
+                  isTablet={isTablet}
+                  startTime={startTime}
+                  setDuration={setDuration}
+                  setTimeFormat={setTimeFormat}
+                  setStartTime={setStartTime}
+                  timeFormat={timeFormat}
+                  t={t}
+                />
               </div>
-            </>
-          )}
+            )}
+          </div>
         </section>
         <section className={styles.formGroup}>
-          <span>{t('note', 'Note')}</span>
-          <TextArea
-            id="appointmentNote"
-            light={isTablet}
-            value={appointmentNote}
-            labelText={t('appointmentNoteLabel', 'Write an additional note')}
-            placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-            onChange={(event) => setAppointmentNote(event.target.value)}
-          />
+          <span className={styles.heading}>{t('note', 'Note')}</span>
+          <ResponsiveWrapper isTablet={isTablet}>
+            <TextArea
+              id="appointmentNote"
+              value={appointmentNote}
+              labelText={t('appointmentNoteLabel', 'Write an additional note')}
+              placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+              onChange={(event) => setAppointmentNote(event.target.value)}
+            />
+          </ResponsiveWrapper>
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
@@ -496,6 +470,48 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
 function ResponsiveWrapper({ children, isTablet }) {
   return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
+}
+
+function TimeAndDuration({ duration, isTablet, startTime, setDuration, setTimeFormat, setStartTime, timeFormat, t }) {
+  return (
+    <React.Fragment>
+      <ResponsiveWrapper isTablet={isTablet}>
+        <TimePicker
+          id="time-picker"
+          pattern="([\d]+:[\d]{2})"
+          onChange={(event) => setStartTime(event.target.value)}
+          value={startTime}
+          style={{ marginLeft: '0.125rem', flex: 'none' }}
+          labelText={t('time', 'Time')}
+        >
+          <TimePickerSelect
+            id="time-picker-select-1"
+            onChange={(event) => setTimeFormat(event.target.value as amPm)}
+            value={timeFormat}
+            aria-label={t('time', 'Time')}
+          >
+            <SelectItem value="AM" text="AM" />
+            <SelectItem value="PM" text="PM" />
+          </TimePickerSelect>
+        </TimePicker>
+      </ResponsiveWrapper>
+      <ResponsiveWrapper isTablet={isTablet}>
+        <NumberInput
+          hideSteppers
+          id="duration"
+          min={0}
+          max={1440}
+          label={t('durationInMinutes', 'Duration (minutes)')}
+          invalidText={t('invalidNumber', 'Number is not valid')}
+          size="md"
+          onChange={(e, { value }) => {
+            setDuration(value);
+          }}
+          value={duration}
+        />
+      </ResponsiveWrapper>
+    </React.Fragment>
+  );
 }
 
 export default AppointmentsForm;

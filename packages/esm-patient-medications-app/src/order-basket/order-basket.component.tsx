@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
 import { showModal, showToast, useConfig, useLayoutType, useSession, useStore } from '@openmrs/esm-framework';
@@ -6,13 +6,14 @@ import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-pat
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
-import { OrderBasketItem } from '../types/order-basket-item';
 import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
+
 export interface OrderBasketProps {
   closeWorkspace(): void;
   patientUuid: string;

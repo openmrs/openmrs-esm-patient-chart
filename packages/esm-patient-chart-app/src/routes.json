@@ -50,12 +50,14 @@
     {
       "name": "add-past-visit-button",
       "slot": "patient-actions-slot",
-      "component": "addPastVisitActionButton"
+      "component": "addPastVisitActionButton",
+      "featureFlag": "rde"
     },
     {
       "name": "add-past-visit-button",
       "slot": "patient-search-actions-slot",
-      "component": "addPastVisitPatientSearchActionButton"
+      "component": "addPastVisitPatientSearchActionButton",
+      "featureFlag": "rde"
     },
     {
       "name": "encounters-summary-dashboard",
@@ -147,28 +149,6 @@
     {
       "name": "delete-encounter-modal",
       "component": "deleteEncounterModal"
-    },
-    {
-      "name": "edit-flags-side-panel-form",
-      "component": "editFlagsSidePanel",
-      "meta": {
-        "title": "Edit patient flags"
-      }
-    },
-    {
-      "name": "patient-flag-tags",
-      "slot": "patient-highlights-bar-slot",
-      "component": "patientFlagTags",
-      "order": 0
-    },
-    {
-      "name": "patient-flags-overview",
-      "slot": "patient-chart-summary-dashboard-slot",
-      "component": "patientFlagsOverview",
-      "meta": {
-        "columnSpan": 4
-      },
-      "order": 0
     }
   ],
   "pages": [

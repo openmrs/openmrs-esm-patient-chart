@@ -1,23 +1,23 @@
 import React, { useMemo } from 'react';
-import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
+import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../../types/order-basket-item';
+import type { Drug } from '../../types/order';
+import type { OrderBasketItem } from '../../types/order-basket-item';
 import { ConfigObject } from '../../config-schema';
-import styles from './order-basket-search-results.scss';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
-import { Drug } from '../../types/order';
+import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
+  onSearchTermClear: () => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  setSearchTerm,
+  onSearchTermClear,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
@@ -58,10 +58,10 @@ export default function OrderBasketSearchResults({
               {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
                 count: drugs?.length,
                 searchTerm,
-                plural: drugs?.length > 1 ? 's' : '',
+                plural: drugs?.length === 0 || drugs?.length > 1 ? 's' : '',
               })}
             </span>
-            <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
+            <Button kind="ghost" onClick={onSearchTermClear} size={isTablet ? 'md' : 'sm'}>
               {t('clearSearchResults', 'Clear Results')}
             </Button>
           </div>
@@ -81,7 +81,7 @@ export default function OrderBasketSearchResults({
             </h4>
             <p className={styles.bodyShort01}>
               <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={() => setSearchTerm('')}>
+              <span className={styles.link} role="link" tabIndex={0} onClick={onSearchTermClear}>
                 {t('searchAgain', 'search again')}
               </span>{' '}
               <span>{t('usingADifferentTerm', 'using a different term')}</span>

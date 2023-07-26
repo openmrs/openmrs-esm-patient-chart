@@ -43,15 +43,11 @@ export const biometricsDetailedSummary = getAsyncLifecycle(
 );
 
 export const vitalsAndBiometricsDashboardLink =
-  // t('biometrics_link', 'Vitals & Biometrics')
+  // t('Vitals & Biometrics', 'Vitals & Biometrics')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('biometrics_link', { defaultValue: 'Vitals & Biometrics', ns: moduleName }) ??
-            'Vitals & Biometrics',
-        ),
+      moduleName,
     }),
     options,
   );

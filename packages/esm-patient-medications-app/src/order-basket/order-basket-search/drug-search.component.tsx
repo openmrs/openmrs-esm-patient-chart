@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
-import { Search } from '@carbon/react';
+import { Layer, Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
+import type { OrderBasketItem } from '../../types/order-basket-item';
 import OrderBasketSearchResults from './order-basket-search-results.component';
-import { OrderBasketItem } from '../../types/order-basket-item';
 import styles from './order-basket-search.scss';
 
 export interface OrderBasketSearchProps {
@@ -15,21 +16,39 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
 
+  const handleSearchTermChange = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event?.target?.value?.trim();
+
+    if (!input) {
+      setSearchTerm('');
+    }
+
+    setSearchTerm(input);
+  }, 300);
+
+  const resetSearchTerm = () => {
+    setSearchTerm('');
+  };
+
   return (
     <div className={styles.searchPopupContainer}>
-      <Search
-        size="lg"
-        light={isTablet}
-        value={searchTerm}
-        placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-        labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-        onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
-      />
+      <ResponsiveWrapper isTablet={isTablet}>
+        <Search
+          size="lg"
+          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          onChange={handleSearchTermChange}
+        />
+      </ResponsiveWrapper>
       <OrderBasketSearchResults
         searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        onSearchTermClear={resetSearchTerm}
         onSearchResultClicked={onSearchResultClicked}
       />
     </div>
   );
+}
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }

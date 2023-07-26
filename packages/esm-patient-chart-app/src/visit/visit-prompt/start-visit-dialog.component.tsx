@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
 import { launchPatientChartWithWorkspaceOpen, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
+import { useFeatureFlag } from '@openmrs/esm-framework';
 
 interface StartVisitDialogProps {
   patientUuid: string;
@@ -18,6 +19,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   launchPatientChart,
 }) => {
   const { t } = useTranslation();
+  const rdeFeatureEnabled = useFeatureFlag('rde');
 
   const handleEditPastVisit = useCallback(() => {
     if (launchPatientChart) {
@@ -45,10 +47,12 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   }, [closeModal, patientUuid, launchPatientChart]);
 
   const modalHeaderText =
-    visitType === 'past' ? t('addAPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
+    rdeFeatureEnabled && visitType === 'past'
+      ? t('addAPastVisit', 'Add a past visit')
+      : t('noActiveVisit', 'No active visit');
 
-  const modalBodyText =
-    visitType === 'past'
+  const modalBodyText = rdeFeatureEnabled
+    ? visitType === 'past'
       ? t(
           'addPastVisitText',
           'You can add a new past visit or update an old one. Choose from one of the options below to continue.',
@@ -56,7 +60,11 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
       : t(
           'noActiveVisitText',
           "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
-        );
+        )
+    : t(
+        'noActiveVisitNoRDEText',
+        "You can't add data to the patient chart without an active visit. Would you like to start a new visit?",
+      );
 
   return (
     <div>
@@ -70,9 +78,11 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="secondary" onClick={handleEditPastVisit}>
-          {t('editPastVisit', 'Edit past visit')}
-        </Button>
+        {rdeFeatureEnabled && (
+          <Button kind="secondary" onClick={handleEditPastVisit}>
+            {t('editPastVisit', 'Edit past visit')}
+          </Button>
+        )}
         <Button kind="primary" onClick={handleStartNewVisit}>
           {t('startNewVisit', 'Start new visit')}
         </Button>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   DataTable,
@@ -25,7 +26,6 @@ import {
 } from '@carbon/react';
 import { Edit, TrashCan } from '@carbon/react/icons';
 import {
-  Visit,
   formatDatetime,
   getConfig,
   isDesktop,
@@ -39,13 +39,11 @@ import {
   userHasAccess,
 } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import isEmpty from 'lodash-es/isEmpty';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
-import EncounterObservations from '../../encounter-observations';
 import { deleteEncounter } from './visits-table.resource';
-import styles from './visits-table.scss';
 import { MappedEncounter } from '../../visit.resource';
-import { KeyedMutator } from 'swr';
+import EncounterObservations from '../../encounter-observations';
+import styles from './visits-table.scss';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -69,6 +67,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const session = useSession();
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
+
   useEffect(() => {
     getConfig('@openmrs/esm-patient-forms-app').then((config) => {
       setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
@@ -99,11 +98,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
-    showAllEncounters && {
+  ];
+
+  if (showAllEncounters) {
+    tableHeaders.push({
       id: 2,
       header: t('visitType', 'Visit type'),
       key: 'visitType',
-    },
+    });
+  }
+
+  tableHeaders.push(
     {
       id: 3,
       header: t('encounterType', 'Encounter type'),
@@ -114,7 +119,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       header: t('provider', 'Provider'),
       key: 'provider',
     },
-  ];
+  );
 
   const launchWorkspace = (
     formUuid: string,

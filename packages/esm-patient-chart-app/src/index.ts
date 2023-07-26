@@ -4,6 +4,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   defineExtensionConfigSchema,
+  registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
@@ -58,19 +59,22 @@ export function startupApp() {
       parent: spaBasePath,
     },
   ]);
+
+  registerFeatureFlag(
+    'rde',
+    'Retrospective Data Entry',
+    "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.",
+  );
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), { featureName: 'patient-chart', moduleName });
 
 export const patientSummaryDashboardLink =
-  // t('summary_link', 'Patient Summary')
+  // t('Patient Summary', 'Patient Summary')
   getSyncLifecycle(
     createDashboardLink({
       ...summaryDashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('summary_link', { defaultValue: 'Patient Summary', ns: moduleName }) ?? 'Patient Summary',
-        ),
+      moduleName,
     }),
     {
       featureName: 'summary-dashboard',
@@ -139,12 +143,11 @@ export const addPastVisitPatientSearchActionButton = getAsyncLifecycle(
 );
 
 export const encountersSummaryDashboardLink =
-  // t('encounters_link', 'Visits')
+  // t('Visits', 'Visits')
   getSyncLifecycle(
     createDashboardLink({
       ...encountersDashboardMeta,
-      title: () =>
-        Promise.resolve(window.i18next?.t('encounters_link', { defaultValue: 'Visits', ns: moduleName }) ?? 'Visits'),
+      moduleName,
     }),
     { featureName: 'encounter', moduleName },
   );
@@ -235,21 +238,3 @@ export const deleteEncounterModal = getAsyncLifecycle(
     moduleName,
   },
 );
-
-export const patientFlagTags = getAsyncLifecycle(
-  () => import('./patient-flags/patient-flags-highlight-bar.component'),
-  {
-    featureName: 'patient-flag-tags',
-    moduleName,
-  },
-);
-
-export const patientFlagsOverview = getAsyncLifecycle(() => import('./patient-flags/patient-flags.component'), {
-  featureName: 'patient-flags-overview',
-  moduleName,
-});
-
-export const editFlagsSidePanel = getAsyncLifecycle(() => import('./patient-flags/patient-flags-list.component'), {
-  featureName: 'edit-flags-side-panel-form',
-  moduleName,
-});

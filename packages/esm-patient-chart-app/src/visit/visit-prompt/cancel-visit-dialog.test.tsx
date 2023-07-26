@@ -2,12 +2,12 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useVisit, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
-import { mockVisitQueueEntries } from '../../../../../__mocks__/visitQueueEntry.mock';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import CancelVisitDialog from './cancel-visit-dialog.component';
+import { mockCurrentVisit } from '../../__mocks__/visits.mock';
+import { mockPatient } from '../../../../../tools/test-helpers';
+import { mockVisitQueueEntries } from '../../__mocks__/visitQueueEntry.mock';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
+import CancelVisitDialog from './cancel-visit-dialog.component';
 
 const mockUseVisit = useVisit as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

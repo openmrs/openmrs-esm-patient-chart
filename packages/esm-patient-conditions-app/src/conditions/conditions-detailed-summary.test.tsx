@@ -3,9 +3,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockFhirConditionsResponse } from '../__mocks__/conditions.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
