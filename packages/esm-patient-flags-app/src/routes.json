@@ -9,13 +9,15 @@
       "component": "editFlagsSidePanel",
       "meta": {
         "title": "Edit patient flags"
-      }
+      },
+      "featureFlag": "patientFlags"
     },
     {
       "name": "patient-flag-tags",
       "slot": "patient-highlights-bar-slot",
       "component": "flagTags",
-      "order": 0
+      "order": 0,
+      "featureFlag": "patientFlags"
     },
     {
       "name": "patient-flags-overview",
@@ -24,7 +26,8 @@
       "meta": {
         "columnSpan": 4
       },
-      "order": 0
+      "order": 0,
+      "featureFlag": "patientFlags"
     }
   ],
   "pages": []
