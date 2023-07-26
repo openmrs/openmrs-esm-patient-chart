@@ -13,7 +13,7 @@ interface VisitTagProps {
 function VisitTag({ patientUuid, patient }: VisitTagProps) {
   const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const isNotDeceased = !patient.deceasedDateTime;
-  return activeVisit && isNotDeceased && <ActiveVisitTag activeVisit={activeVisit} />;
+  return (activeVisit && isNotDeceased) ? <ActiveVisitTag activeVisit={activeVisit} />: null;
 }
 
 interface ActiveVisitTagProps {
