@@ -113,5 +113,4 @@ test('Should add, modify, discontinue and reorder medication', async ({ page,api
 test.afterEach(async ({ api }) => {
     await endVisit(api, patient.uuid);
     await deletePatient(api, patient.uuid);
-  });
-  
+});
