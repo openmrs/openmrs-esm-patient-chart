@@ -20,7 +20,7 @@ test('Add Food allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('Then I filled the form', async () => {
+  await test.step('Ab=nd I filled the form', async () => {
     await allergiesPage.page.getByText('Food').click();
     await allergiesPage.page.getByText('Eggs').click();
     await allergiesPage.page.getByText('Mental status change').click();
@@ -28,15 +28,15 @@ test('Add Food allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
-  await test.step('Then I click the save button', async () => {
+  await test.step('And I click the save button', async () => {
     await allergiesPage.page.getByText('Save').click();
   });
 
-  await test.step('And I see the Allergy saved message', async () => {
+  await test.step('Then I should see the Allergy Saved notification', async () => {
     await expect(allergiesPage.page.getByText('saved')).toBeVisible();
   });
 
-  await test.step('And I see the data of the allergy that I saved', async () => {
+  await test.step('And I see the recorded allergy data', async () => {
     const rows = await allergiesPage.allergyTable().locator('tr');
     const allergenCell = rows.locator('td:first-child');
     const severityCell = rows.locator('td:nth-child(2)');
