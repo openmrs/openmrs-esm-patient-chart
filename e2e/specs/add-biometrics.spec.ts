@@ -24,10 +24,10 @@ test('Record biometrics of the patient', async ({ page, api }) => {
   });
 
   await test.step('And I fill the form', async () => {
-    await biometricsPage.page.getByTitle('#Height').fill('170');
-    await biometricsPage.page.getByTitle('#Weight').fill('65');
-    await expect(biometricsPage.page.getByTitle('#BMI')).toHaveValue('22.5');
-    await biometricsPage.page.getByTitle('#MUAC').fill('25');
+    await biometricsPage.page.getByTitle('Height').fill('170');
+    await biometricsPage.page.getByTitle('Weight').fill('65');
+    await expect(biometricsPage.page.getByTitle('BMI')).toHaveValue('22.5');
+    await biometricsPage.page.getByTitle('MUAC').fill('25');
   });
 
   await test.step('And I submit the form', async () => {
@@ -39,6 +39,7 @@ test('Record biometrics of the patient', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the biometrics record', async () => {
+    await biometricsPage.page.reload();
     await expect(biometricsPage.biometricsTable().getByText('170')).toBeVisible();
     await expect(biometricsPage.biometricsTable().getByText('65')).toBeVisible();
     await expect(biometricsPage.biometricsTable().getByText('22.5')).toBeVisible();
