@@ -37,7 +37,7 @@ test('Record Vitals of the patient', async ({ page, api }) => {
     await vitalsPage.page.getByText('Save').click();
   });
 
-  await test.step('Then I should see the success message', async () => {
+  await test.step('And I should see the success message', async () => {
     await expect(vitalsPage.page.getByText('saved')).toBeVisible();
   });
 
@@ -49,6 +49,7 @@ test('Record Vitals of the patient', async ({ page, api }) => {
     await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '20 ↑' })).toBeVisible();
   });
 });
+
 test.afterEach(async ({ api }) => {
   await endVisit(api, visit.uuid);
   await deletePatient(api, patient.uuid);

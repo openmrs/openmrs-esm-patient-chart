@@ -34,7 +34,7 @@ test('Record biometrics of the patient', async ({ page, api }) => {
     await biometricsPage.page.getByText('Save').click();
   });
 
-  await test.step('Then I should see the success message', async () => {
+  await test.step('And I should see the success message', async () => {
     await expect(biometricsPage.page.getByText('saved')).toBeVisible();
   });
 
