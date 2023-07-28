@@ -32,6 +32,7 @@ export interface ActiveMedicationsProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
+  showAddButton?: boolean;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
@@ -42,6 +43,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   isValidating,
   title,
   medications,
+  showAddButton,
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
@@ -153,14 +155,14 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             <InlineLoading />
           </span>
         ) : null}
-        <Button
+        { (showAddButton ?? true) ?        <Button
           kind="ghost"
           renderIcon={(props) => <Add size={16} {...props} />}
           iconDescription="Launch order basket"
           onClick={launchOrderBasket}
         >
           {t('add', 'Add')}
-        </Button>
+        </Button> : null }
       </CardHeader>
       <DataTable
         data-floating-menu-container

@@ -89,7 +89,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 isValidating={isValidating}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
-                showDiscontinueButton={true}
+                showDiscontinueButton={false}
                 showModifyButton={true}
                 showReorderButton={true}
                 patientUuid={patientUuid}

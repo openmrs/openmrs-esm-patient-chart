@@ -192,6 +192,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
                   isValidating={isValidating}
                   title={t('activeMedicationsTableTitle', 'Active Medications')}
                   medications={activePatientOrders}
+                  showAddButton={false}
                   showDiscontinueButton={true}
                   showModifyButton={true}
                   showReorderButton={false}
