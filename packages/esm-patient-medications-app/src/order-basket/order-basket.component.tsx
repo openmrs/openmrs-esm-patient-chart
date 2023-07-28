@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
 import { showModal, showToast, useConfig, useLayoutType, useSession, useStore } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
@@ -67,14 +67,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     }
   }, [medicationOrderFormItem, config, sessionObject]);
 
-  const handleSearchResultClicked = useCallback((searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
-    if (directlyAddToBasket) {
-      setItems([...patientOrderItems, searchResult]);
-    } else {
-      openMedicationOrderFormForAddingNewOrder(searchResult);
-    }
-  }, [patientOrderItems]);
-
   const openMedicationOrderForm = (item: OrderBasketItem, onSigned: (finalizedOrder: OrderBasketItem) => void) => {
     setMedicationOrderFormItem(item);
     setOnMedicationOrderFormSign((_) => (finalizedOrder) => {
@@ -91,6 +83,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     setCreatingEncounterError(false);
     let orderEncounterUuid = encounterUuid;
     // If there's no encounter present, stop the order from being created and create an encounter.
+    // TODO: What? Ok then what are we doing with this orderEncounterUuid returned from createEmptyEncounter?
+    // What's supposed to happen here?
     if (!orderEncounterUuid) {
       orderEncounterUuid = await createEmptyEncounter(
         patientUuid,
@@ -106,8 +100,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         .catch((e) => {
           setCreatingEncounterError(true);
           return null;
-        });    
-      return;  // don't create the order
+        });
+      return; // don't create the order
     }
 
     orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then(async (erroredItems) => {
@@ -116,58 +110,65 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       if (erroredItems.length == 0) {
         mutateOrders();
         closeWorkspace();
-
-        const orderedString = patientOrderItems.filter((item) => ['NEW', 'RENEWED'].includes(item.action)).map((item) => item.drug?.display).join(', ');
-        const updatedString = patientOrderItems.filter((item) => item.action === 'REVISE').map((item) => item.drug?.display).join(', ');
-        const discontinuedString = patientOrderItems.filter((item) => item.action === 'DISCONTINUE').map((item) => item.drug?.display).join(', ');
-
-        showToast({
-          critical: true,
-          kind: 'success',
-          title: t('orderCompleted', 'Medications updated'),
-          description: (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
-            (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
-            (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
-        });
+        showDrugSuccessToast(t, patientOrderItems);
       } else {
         mutateOrders();
-        showToast({
-          critical: true,
-          kind: 'error',
-          title: t('error', 'Error'),
-          description: t(
-            'errorSavingMedicationOrder',
-            'There were errors saving some medication orders.')
-        });
+        showDrugFailureToast(t);
       }
     });
 
     return () => abortController.abort();
-  }, [mutateOrders, closeWorkspace, patientOrderItems, patientUuid, encounterUuid, activeVisitRequired, currentVisit, session, config]);
+  }, [
+    mutateOrders,
+    mutateEncounterUuid,
+    closeWorkspace,
+    patientOrderItems,
+    patientUuid,
+    encounterUuid,
+    activeVisitRequired,
+    currentVisit,
+    session,
+    config,
+    setItems,
+    t,
+  ]);
 
   const handleCancelClicked = () => {
     setItems([]);
     closeWorkspace();
   };
 
-  const openMedicationOrderFormForAddingNewOrder = (newOrderBasketItem: OrderBasketItem) => {
-    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...patientOrderItems, finalizedOrder]));
-  };
+  const handleSearchResultClicked = useCallback(
+    (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
+      if (directlyAddToBasket) {
+        setItems([...patientOrderItems, searchResult]);
+      } else {
+        openMedicationOrderForm(searchResult, (finalizedOrder) => setItems([...patientOrderItems, finalizedOrder]));
+      }
+    },
+    [patientOrderItems, setItems],
+  );
 
-  const openMedicationOrderFormToUpdateExistingOrder = useCallback((order: OrderBasketItem) => {
-    const existingOrderIndex = patientOrderItems.indexOf(order)
-    openMedicationOrderForm(order, (finalizedOrder) => {
+  const openMedicationOrderFormToUpdateExistingOrder = useCallback(
+    (order: OrderBasketItem) => {
+      const existingOrderIndex = patientOrderItems.indexOf(order);
+      openMedicationOrderForm(order, (finalizedOrder) => {
+        const newOrders = [...patientOrderItems];
+        newOrders[existingOrderIndex] = finalizedOrder;
+        setItems(newOrders);
+      });
+    },
+    [patientOrderItems, setItems],
+  );
+
+  const openMedicationOrderFormToRemoveItem = useCallback(
+    (order: OrderBasketItem) => {
       const newOrders = [...patientOrderItems];
-      newOrders[existingOrderIndex] = finalizedOrder;
+      newOrders.splice(patientOrderItems.indexOf(order), 1);
       setItems(newOrders);
-    });
-  }, [patientOrderItems]);
-
-  const openMedicationOrderFormToRemoveItem = useCallback((order: OrderBasketItem) => {
-    const newOrders = [...patientOrderItems];
-    newOrders.splice(patientOrderItems.indexOf(order), 1);
-    setItems(newOrders);
-  }, [patientOrderItems]);
+    },
+    [patientOrderItems, setItems],
+  );
 
   if (isMedicationOrderFormVisible) {
     return (
@@ -255,5 +256,39 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     </>
   );
 };
+
+function showDrugSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[]) {
+  const orderedString = patientOrderItems
+    .filter((item) => ['NEW', 'RENEWED'].includes(item.action))
+    .map((item) => item.drug?.display)
+    .join(', ');
+  const updatedString = patientOrderItems
+    .filter((item) => item.action === 'REVISE')
+    .map((item) => item.drug?.display)
+    .join(', ');
+  const discontinuedString = patientOrderItems
+    .filter((item) => item.action === 'DISCONTINUE')
+    .map((item) => item.drug?.display)
+    .join(', ');
+
+  showToast({
+    critical: true,
+    kind: 'success',
+    title: t('orderCompleted', 'Medications updated'),
+    description:
+      (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
+      (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
+      (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
+  });
+}
+
+function showDrugFailureToast(t: TFunction) {
+  showToast({
+    critical: true,
+    kind: 'error',
+    title: t('error', 'Error'),
+    description: t('errorSavingMedicationOrder', 'There were errors saving some medication orders.'),
+  });
+}
 
 export default OrderBasket;

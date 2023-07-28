@@ -8,7 +8,7 @@ import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
  * SWR-based data fetcher for patient orders.
- * 
+ *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  * @param status Allows fetching either all orders or only active orders.
  */
@@ -28,12 +28,14 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     openmrsFetch,
   );
 
-  const mutateOrders = useCallback(() => mutate(
-    key => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)
-  ), []);
+  const mutateOrders = useCallback(
+    () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)),
+    [patientUuid],
+  );
 
   const drugOrders = useMemo(
-    () => data?.data?.results
+    () =>
+      data?.data?.results
         ? data.data.results
             .filter((order) => order.orderType.display === 'Drug Order')
             ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))

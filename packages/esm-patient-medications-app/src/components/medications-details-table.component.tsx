@@ -155,14 +155,16 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             <InlineLoading />
           </span>
         ) : null}
-        { (showAddButton ?? true) ?        <Button
-          kind="ghost"
-          renderIcon={(props) => <Add size={16} {...props} />}
-          iconDescription="Launch order basket"
-          onClick={launchOrderBasket}
-        >
-          {t('add', 'Add')}
-        </Button> : null }
+        {showAddButton ?? true ? (
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Launch order basket"
+            onClick={launchOrderBasket}
+          >
+            {t('add', 'Add')}
+          </Button>
+        ) : null}
       </CardHeader>
       <DataTable
         data-floating-menu-container
