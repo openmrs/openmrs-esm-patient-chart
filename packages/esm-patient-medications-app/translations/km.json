@@ -55,7 +55,7 @@
   "orderCompleted": "វេជ្ជបញ្ជាត្រូវបានដាក់",
   "orderCompletedSuccessText": "វេជ្ជបញ្ជារបស់អ្នកបានបញ្ចប់ហើយ។ ឥឡូវនេះមុខថ្នាំនឹងបង្ហាញនៅលើទំព័រវេជ្ជបញ្ជា។",
   "orderForm": "ទម្រង់វេជ្ជបញ្ជា",
-  "ordersAlreadyInBasketWithCountfalseother": "{count} item(s) already in your basket",
+  "ordersAlreadyInBasketWithCountfalseother": "{count} item(s) are in your basket",
   "pastMedicationsDisplayText": "ថ្នាំដែលបានប្រើប្រាស់កន្លងមក",
   "pastMedicationsHeaderTitle": "ថ្នាំដែលបានប្រើប្រាស់កន្លងមក",
   "pastMedicationsTableTitle": "ថ្នាំដែលបានប្រើប្រាស់កន្លងមក",
