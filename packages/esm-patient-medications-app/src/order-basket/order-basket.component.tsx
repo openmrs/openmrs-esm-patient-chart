@@ -91,6 +91,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
 
     setCreatingEncounterError(false);
     let orderEncounterUuid = encounterUuid;
+    // If there's no encounter present, stop the order from being created and create an encounter.
     if (!orderEncounterUuid) {
       orderEncounterUuid = await createEmptyEncounter(
         patientUuid,
@@ -106,12 +107,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         .catch((e) => {
           setCreatingEncounterError(true);
           return null;
-        });
+        });    
+      return;  // don't create the order
     }
-
-    // If there's no encounter present, saving an order will throw an error
-    // Hence returning beforehand, notifying the user.
-    if (!orderEncounterUuid) return;
 
     orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then((erroredItems) => {
       setItems(erroredItems);
@@ -126,7 +124,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
           title: t('orderCompleted', 'Order placed'),
           description: t(
             'orderCompletedSuccessText',
-            'Your order is complete. The items will now appear on the Orders page.',
+            'Your order is complete. The items will now appear on the Medications page.',
           ),
         });
       }

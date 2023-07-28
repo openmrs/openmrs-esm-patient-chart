@@ -55,7 +55,7 @@
   "orderBasketWithCountfalseone": "Order basket ({count})",
   "orderBasketWithCountfalseother": "Order basket ({count})",
   "orderCompleted": "Order placed",
-  "orderCompletedSuccessText": "Your order is complete. The items will now appear on the Orders page.",
+  "orderCompletedSuccessText": "Your order is complete. The items will now appear on the Medications page.",
   "orderForm": "Order Form",
   "ordersAlreadyInBasketWithCountfalseone": "{count} item(s) are in your basket",
   "ordersAlreadyInBasketWithCountfalseother": "{count} item(s) are in your basket",
