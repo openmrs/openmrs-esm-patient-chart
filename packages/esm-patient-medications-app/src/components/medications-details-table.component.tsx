@@ -272,7 +272,7 @@ function OrderBasketItemActions({
         },
         frequency: {
           valueCoded: medication.frequency?.uuid,
-          value: medication.frequency.display,
+          value: medication.frequency?.display,
         },
         route: {
           valueCoded: medication.route?.uuid,
@@ -298,8 +298,8 @@ function OrderBasketItemActions({
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
         quantityUnits: {
-          value: medication.quantityUnits.display,
-          valueCoded: medication.quantityUnits.uuid,
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
         },
       },
     ]);

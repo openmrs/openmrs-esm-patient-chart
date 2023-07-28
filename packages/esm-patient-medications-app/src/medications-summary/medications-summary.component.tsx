@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { parseDate, useConfig } from '@openmrs/esm-framework';
+import { parseDate } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import type { Order } from '../types/order';
 import { usePatientOrders } from '../api/api';
-import { ConfigObject } from '../config-schema';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 
@@ -15,7 +14,6 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   const {
