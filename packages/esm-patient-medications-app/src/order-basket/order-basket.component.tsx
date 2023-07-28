@@ -67,13 +67,13 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     }
   }, [medicationOrderFormItem, config, sessionObject]);
 
-  const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
+  const handleSearchResultClicked = useCallback((searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
       setItems([...patientOrderItems, searchResult]);
     } else {
       openMedicationOrderFormForAddingNewOrder(searchResult);
     }
-  };
+  }, [patientOrderItems]);
 
   const openMedicationOrderForm = (item: OrderBasketItem, onSigned: (finalizedOrder: OrderBasketItem) => void) => {
     setMedicationOrderFormItem(item);
@@ -117,14 +117,27 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         mutateOrders();
         closeWorkspace();
 
+        const orderedString = patientOrderItems.filter((item) => ['NEW', 'RENEWED'].includes(item.action)).map((item) => item.drug?.display).join(', ');
+        const updatedString = patientOrderItems.filter((item) => item.action === 'REVISE').map((item) => item.drug?.display).join(', ');
+        const discontinuedString = patientOrderItems.filter((item) => item.action === 'DISCONTINUE').map((item) => item.drug?.display).join(', ');
+
         showToast({
           critical: true,
           kind: 'success',
-          title: t('orderCompleted', 'Order placed'),
+          title: t('orderCompleted', 'Medications updated'),
+          description: (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
+            (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
+            (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
+        });
+      } else {
+        mutateOrders();
+        showToast({
+          critical: true,
+          kind: 'error',
+          title: t('error', 'Error'),
           description: t(
-            'orderCompletedSuccessText',
-            'Your order is complete. The items will now appear on the Medications page.',
-          ),
+            'errorSavingMedicationOrder',
+            'There were errors saving some medication orders.')
         });
       }
     });
@@ -150,6 +163,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     });
   }, [patientOrderItems]);
 
+  const openMedicationOrderFormToRemoveItem = useCallback((order: OrderBasketItem) => {
+    const newOrders = [...patientOrderItems];
+    newOrders.splice(patientOrderItems.indexOf(order), 1);
+    setItems(newOrders);
+  }, [patientOrderItems]);
+
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
@@ -159,12 +178,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       />
     );
   }
-
-  const openMedicationOrderFormToRemoveItem = useCallback((order: OrderBasketItem) => {
-    const newOrders = [...patientOrderItems];
-    newOrders.splice(patientOrderItems.indexOf(order), 1);
-    setItems(newOrders);
-  }, [patientOrderItems]);
 
   return (
     <>
