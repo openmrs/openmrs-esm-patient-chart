@@ -1,16 +1,16 @@
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
 import type { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
- * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
- * returns a patient's current orders.
+ * SWR-based data fetcher for patient orders.
+ * 
  * @param patientUuid The UUID of the patient whose orders should be fetched.
- * @param status The status/the kind of orders to be fetched.
+ * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
   const { careSettingUuid, drugOrderTypeUUID } = useConfig() as ConfigObject;
@@ -23,14 +23,17 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
   const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
     openmrsFetch,
   );
 
+  const mutateOrders = useCallback(() => mutate(
+    key => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)
+  ), []);
+
   const drugOrders = useMemo(
-    () =>
-      data?.data?.results
+    () => data?.data?.results
         ? data.data.results
             .filter((order) => order.orderType.display === 'Drug Order')
             ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
@@ -43,7 +46,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     error: error,
     isLoading,
     isValidating,
-    mutateOrders: mutate,
+    mutate: mutateOrders,
   };
 }
 
@@ -115,7 +118,7 @@ export function useSystemVisitSetting() {
   return results;
 }
 
-export function useOrderEncounter(patientUuid): {
+export function useOrderEncounter(patientUuid: string): {
   activeVisitRequired: boolean;
   isLoading: boolean;
   error: Error;

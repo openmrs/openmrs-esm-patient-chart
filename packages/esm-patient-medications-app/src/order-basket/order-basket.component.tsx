@@ -25,8 +25,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const store = useStore(orderBasketStore);
   const setItems = useCallback((items: OrderBasketItem[]) => orderBasketStoreActions.setOrderBasketItems(items), []);
   const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
-
-  const { mutateOrders } = usePatientOrders(patientUuid, 'ACTIVE');
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
@@ -51,6 +49,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     error,
     isLoading: isLoadingOrders,
     isValidating,
+    mutate: mutateOrders,
   } = usePatientOrders(patientUuid, 'ACTIVE');
   const noCurrentVisit = activeVisitRequired && !currentVisit;
 
@@ -86,7 +85,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     setIsMedicationOrderFormVisible(true);
   };
 
-  const handleSaveClicked = async () => {
+  const handleSaveClicked = useCallback(async () => {
     const abortController = new AbortController();
 
     setCreatingEncounterError(false);
@@ -111,7 +110,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       return;  // don't create the order
     }
 
-    orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then((erroredItems) => {
+    orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then(async (erroredItems) => {
       setItems(erroredItems);
 
       if (erroredItems.length == 0) {
@@ -131,7 +130,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     });
 
     return () => abortController.abort();
-  };
+  }, [mutateOrders, closeWorkspace, patientOrderItems, patientUuid, encounterUuid, activeVisitRequired, currentVisit, session, config]);
 
   const handleCancelClicked = () => {
     setItems([]);
@@ -142,20 +141,14 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...patientOrderItems, finalizedOrder]));
   };
 
-  const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
-    const order = patientOrderItems[existingOrderIndex];
+  const openMedicationOrderFormToUpdateExistingOrder = useCallback((order: OrderBasketItem) => {
+    const existingOrderIndex = patientOrderItems.indexOf(order)
     openMedicationOrderForm(order, (finalizedOrder) => {
       const newOrders = [...patientOrderItems];
       newOrders[existingOrderIndex] = finalizedOrder;
       setItems(newOrders);
     });
-  };
-
-  useEffect(() => {
-    if (errorFetchingEncounterUuid || createEmptyEncounter) {
-      console.error(errorFetchingEncounterUuid ?? createEmptyEncounter);
-    }
-  }, [errorFetchingEncounterUuid, creatingEncounterError]);
+  }, [patientOrderItems]);
 
   if (isMedicationOrderFormVisible) {
     return (
@@ -167,6 +160,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     );
   }
 
+  const openMedicationOrderFormToRemoveItem = useCallback((order: OrderBasketItem) => {
+    const newOrders = [...patientOrderItems];
+    newOrders.splice(patientOrderItems.indexOf(order), 1);
+    setItems(newOrders);
+  }, [patientOrderItems]);
+
   return (
     <>
       <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} />
@@ -174,12 +173,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
             orderBasketItems={patientOrderItems}
-            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(patientOrderItems.indexOf(order))}
-            onItemRemoveClicked={(order) => {
-              const newOrders = [...patientOrderItems];
-              newOrders.splice(patientOrderItems.indexOf(order), 1);
-              setItems(newOrders);
-            }}
+            onItemClicked={openMedicationOrderFormToUpdateExistingOrder}
+            onItemRemoveClicked={openMedicationOrderFormToRemoveItem}
           />
           {(() => {
             if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
