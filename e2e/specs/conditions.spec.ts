@@ -7,7 +7,7 @@ let patient: Patient;
 
 test.beforeEach(async ({ api }) => {
     patient = await generateRandomPatient(api);
-  });
+});
 
 test('Should add, delete and edit a condition', async ({page, api}) => {
     const conditionsPage = new ConditionsPage(page);
