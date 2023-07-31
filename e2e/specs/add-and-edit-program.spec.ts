@@ -8,6 +8,7 @@ let patient: Patient;
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
+
 test('Should add a program and edit program', async ({ page, api }) => {
   const programPage = new ProgramPage(page);
   const row = programPage.table().locator('tr');
@@ -67,6 +68,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
     await expect(LocationCell.getByText('Community Outreach')).toBeVisible();
   });
 });
+
 test.afterEach(async ({ api }) => {
   await deletePatient(api, patient.uuid);
 });

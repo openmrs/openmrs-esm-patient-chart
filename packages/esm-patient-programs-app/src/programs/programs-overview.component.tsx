@@ -159,7 +159,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="programs-tabl">
+                <TableBody>
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
