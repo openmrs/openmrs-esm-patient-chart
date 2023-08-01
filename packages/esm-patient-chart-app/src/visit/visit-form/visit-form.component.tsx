@@ -269,7 +269,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="patient-details-header-slot" state={state} />
           </Row>
         )}
         <Stack gap={1} className={styles.container}>

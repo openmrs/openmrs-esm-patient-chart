@@ -1,24 +1,24 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.container:after {
-	content: '';
-	height: 100%;
-	width: 1px;
-	position: absolute;
-	right: 0;
-	top: 0;
-	background-color: $color-gray-30;
-	margin: 0 1rem;
+.container {
+  @include type.type-style('body-compact-01');
+  width: 100%;
+  padding: 0.5rem;
 }
 
-.details {
-	margin-top: 5px;
-	@include type.type-style('body-compact-01');
-	color: $text-02;
+.loadingContainer {
+  display: flex;
+  height: 4.5rem;
+}
+
+.loading {
+  justify-content: center;
 }
 
 .name {
-	@include type.type-style('body-compact-02');
-	
+	@include type.type-style('productive-heading-02');
+  margin-right: 0.5rem;
+  font-weight: normal;
+
 }

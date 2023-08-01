@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { useBiometrics } from './biometrics.resource';
@@ -15,29 +14,17 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const { data: conceptUnits } = useVitalsConceptMetadata();
-  const { biometrics, isLoading } = useBiometrics(patientUuid, config.concepts);
+  const { biometrics } = useBiometrics(patientUuid, config.concepts);
   const weightData = biometrics?.filter((result) => result.weight);
 
-  if (isLoading) {
-    return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
-  }
-  if (biometrics?.length) {
+  if (biometrics?.length > 0) {
     return (
-      <div>
-        <p className={styles.label}>{t('weight', 'Weight')}</p>
-        <p className={styles.content}>
-          <span className={styles.value}>{weightData?.[0]?.weight}</span>{' '}
-          {conceptUnits.get(config.concepts.weightUuid) ?? ''}
-        </p>
-      </div>
+      <span className={styles.weight}>
+        <span className={styles.value}>{weightData?.[0]?.weight}</span>{' '}
+        {conceptUnits.get(config.concepts.weightUuid) ?? ''}
+      </span>
     );
   }
-  return (
-    <div>
-      <p className={styles.label}>{t('weight', 'Weight')}</p>
-      <p className={styles.content}>--</p>
-    </div>
-  );
 };
 
 export default WeightTile;

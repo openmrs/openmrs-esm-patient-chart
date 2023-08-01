@@ -33,11 +33,11 @@
         "columns": 1,
         "path": "Vitals & Biometrics"
       }
-    }, 
+    },
     {
       "name": "weight-tile",
       "component": "weightTile",
-      "slot": "visit-form-header-slot",
+      "slot": "weight-tile-slot",
       "order": 2
     }
   ],

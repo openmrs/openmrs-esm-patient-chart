@@ -6,25 +6,9 @@
   },
   "extensions": [
     {
-      "name": "patient-details-tile",
-      "component": "patientDetailsTile",
-      "slot": "patient-details-header-slot",
-      "online": true,
-      "offline": true,
-      "order": 1
-    },
-    {
-      "name": "weight-tile",
-      "component": "weightTile",
-      "slot": "patient-details-header-slot",
-      "online": true,
-      "offline": true,
-      "order": 2
-    },
-    {
       "name": "allergy-tile",
       "component": "allergyTile",
-      "slot": "patient-details-header-slot",
+      "slot": "allergy-tile-slot",
       "online": true,
       "offline": true,
       "order": 3

@@ -270,7 +270,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       {isTablet && (
         <Row className={styles.headerGridRow}>
-          <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+          <ExtensionSlot name="patient-details-header-slot" state={state} />
         </Row>
       )}
       <Stack className={styles.formContainer} gap={2}>

@@ -8,12 +8,6 @@
   margin: 0;
 }
 
-.content {
-  display: grid;
-  grid-template-columns: 50% 10% 1fr;
-  margin: 0.5rem 1rem;
-}
-
 .container {
   border: solid 1px $ui-03;
   margin: 0rem 1rem 1rem;

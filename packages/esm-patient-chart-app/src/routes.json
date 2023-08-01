@@ -103,8 +103,8 @@
       }
     },
     {
-      "name": "patient-details-tile",
-      "slot": "visit-form-header-slot",
+      "name": "patient-details-header",
+      "slot": "patient-details-header-slot",
       "component": "patientDetailsTile",
       "order": 1
     },
