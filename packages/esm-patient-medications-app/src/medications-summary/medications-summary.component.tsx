@@ -88,7 +88,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
                 showDiscontinueButton={false}
-                showModifyButton={true}
+                showModifyButton={false}
                 showReorderButton={true}
                 patientUuid={patientUuid}
               />
