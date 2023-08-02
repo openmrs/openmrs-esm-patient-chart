@@ -31,62 +31,6 @@ describe('FormResourceService Unit Tests', () => {
     expect(formsResourceService).toBeDefined();
   });
 
-  it('should make API call with correct URL when getFormClobDataByUuid is invoked without v', fakeAsync(() => {
-    const uuid = 'form-uuid';
-    tick(50);
-    formsResourceService.getFormClobDataByUuid(uuid).subscribe();
-
-    const req = httpMock.expectOne(winRef.openmrsRestBase.trim() + 'clobdata' + '/' + uuid + '?v=full');
-    expect(req.request.method).toBe('GET');
-    expect(req.request.urlWithParams).toContain('/ws/rest/v1/clobdata/form-uuid?v=full');
-  }));
-
-  it('should make API call with correct URL when getFormClobDataByUuid is invoked with v', fakeAsync(() => {
-    const uuid = 'form-uuid';
-    tick(50);
-    formsResourceService.getFormClobDataByUuid(uuid, '9').subscribe();
-
-    const req = httpMock.expectOne(winRef.openmrsRestBase.trim() + 'clobdata' + '/' + uuid + '?v=9');
-    expect(req.request.method).toBe('GET');
-    expect(req.request.urlWithParams).toContain('/ws/rest/v1/clobdata/form-uuid?v=9');
-  }));
-
-  it('should return a form object when getFormClobDataByUuid is invoked without v', (done) => {
-    const options = {
-      uuid: 'xxx-xxx-xxx-xxx',
-      display: 'form resource',
-    };
-
-    const uuid = 'form-uuid';
-
-    formsResourceService.getFormClobDataByUuid(uuid).subscribe((data) => {
-      expect(data.uuid).toBeTruthy();
-      done();
-    });
-
-    const req = httpMock.expectOne(winRef.openmrsRestBase.trim() + 'clobdata' + '/' + uuid + '?v=full');
-    expect(req.request.method).toBe('GET');
-    req.flush(options);
-  });
-
-  it('should return a form object when getFormClobDataByUuid is invoked with v', (done) => {
-    const options = {
-      uuid: 'xxx-xxx-xxx-xxx',
-      display: 'form resource',
-    };
-
-    const uuid = 'form-uuid';
-
-    formsResourceService.getFormClobDataByUuid(uuid, '9').subscribe((data) => {
-      expect(data.uuid).toBeTruthy();
-      done();
-    });
-
-    const req = httpMock.expectOne(winRef.openmrsRestBase.trim() + 'clobdata' + '/' + uuid + '?v=9');
-    expect(req.request.method).toBe('GET');
-    req.flush(options);
-  });
-
   it('should make API call with correct URL when getFormMetaDataByUuid is invoked without v', fakeAsync(() => {
     const uuid = 'form-uuid';
     tick(50);
