@@ -10,7 +10,7 @@ interface AllergyTileInterface {
 
 const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { allergies, isLoading } = useAllergies(patientUuid);
+  const { allergies } = useAllergies(patientUuid);
 
   if (allergies?.length) {
     return (

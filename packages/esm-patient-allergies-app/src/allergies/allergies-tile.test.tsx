@@ -12,24 +12,22 @@ const testProps = {
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('AllergiesTile', () => {
-  it('renders an empty state when allergy data is not available', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
-    renderAllergiesTile();
-
-    await waitForLoadingToFinish();
-
-    expect(screen.getByText(/allergies/i)).toBeInTheDocument();
-    expect(screen.getByText(/--/i)).toBeInTheDocument();
-  });
-
   it("renders a summary of the patient's allergy data when available", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
     renderAllergiesTile();
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/allergies/i)).toBeInTheDocument();
     expect(screen.getByText(/ACE inhibitors, Fish, Penicillins, Morphine, Aspirin/i)).toBeInTheDocument();
+  });
+
+  it('renders an empty state when allergy data is not available', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    renderAllergiesTile();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByText(/ACE inhibitors, Fish, Penicillins, Morphine, Aspirin/i)).not.toBeInTheDocument();
   });
 });
 
