@@ -6,7 +6,6 @@ import {
   OrderTemplate,
   QuantityUnit,
 } from '../api/drug-order-template';
-import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Drug } from './order';
 
 export interface OrderBasketItem {
@@ -24,6 +23,7 @@ export interface OrderBasketItem {
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
+  // TODO: This is unused
   startDate: Date | string;
   durationUnit: DurationUnit;
   duration: number | null;

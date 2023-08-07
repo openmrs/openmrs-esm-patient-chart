@@ -268,12 +268,13 @@ export class FormCreationService {
     const { session, formSchema, encounter } = createFormParams;
     const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
     const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
 
     try {
       if (session) {
         form.valueProcessingInfo.personUuid = patientUuid;
         form.valueProcessingInfo.patientUuid = patientUuid;
-        form.valueProcessingInfo.formUuid = formSchema.uuid;
+        form.valueProcessingInfo.formUuid = formUuid;
         form.valueProcessingInfo.providerUuid = session.currentProvider?.uuid;
 
         if (formSchema.encounterType) {
