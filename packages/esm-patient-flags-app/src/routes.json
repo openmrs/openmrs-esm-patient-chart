@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "edit-flags-side-panel-form",
+      "component": "editFlagsSidePanel",
+      "meta": {
+        "title": "Edit patient flags"
+      },
+      "featureFlag": "patientFlags"
+    },
+    {
+      "name": "patient-flag-tags",
+      "slot": "patient-highlights-bar-slot",
+      "component": "flagTags",
+      "order": 0,
+      "featureFlag": "patientFlags"
+    },
+    {
+      "name": "patient-flags-overview",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "component": "flagsOverview",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 0,
+      "featureFlag": "patientFlags"
+    }
+  ],
+  "pages": []
+}

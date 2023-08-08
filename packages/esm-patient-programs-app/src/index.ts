@@ -24,12 +24,11 @@ export const programsDetailedSummary = getAsyncLifecycle(
 );
 
 export const programsDashboardLink =
-  // t('programs_link', 'Programs')
+  // t('Programs', 'Programs')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(window.i18next?.t('programs_link', { defaultValue: 'Programs', ns: moduleName }) ?? 'Programs'),
+      moduleName,
     }),
     options,
   );

@@ -29,14 +29,11 @@ export const conditionsDetailedSummary = getAsyncLifecycle(
 export const conditionsWidget = getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options);
 
 export const conditionsDashboardLink =
-  // t('conditions_link', 'Conditions')
+  // t('Conditions', 'Conditions')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      title: () =>
-        Promise.resolve(
-          window.i18next?.t('conditions_link', { defaultValue: 'Conditions', ns: moduleName }) ?? 'Conditions',
-        ),
+      moduleName,
     }),
     options,
   );

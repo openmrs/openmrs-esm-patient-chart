@@ -3,10 +3,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockEnrolledProgramsResponse } from '../__mocks__/programs.mock';
+
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ProgramsOverview from './programs-overview.component';
+
+jest.setTimeout(5000);
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;

@@ -1,0 +1,38 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+
+.flagSummary {
+  padding: spacing.$spacing-03;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.flagIcon {
+  margin-right: spacing.$spacing-02;
+}
+
+.arrow { 
+  margin-left: spacing.$spacing-05;
+}
+
+.flagsHighlightTag {
+  padding: 0 spacing.$spacing-03;
+  border: none;
+  span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.highlightBarContainer {
+  padding: 0 spacing.$spacing-03;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.loader {
+  align-items: center;
+  display: flex;
+  min-height: spacing.$spacing-05;
+  padding: spacing.$spacing-05;
+  width: 100%;
+}

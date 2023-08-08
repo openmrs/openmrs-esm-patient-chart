@@ -3,8 +3,8 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePatient, useVisit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { mockPatient } from '../../../../tools/test-helpers';
 import StartVisitOverflowMenuItem from './start-visit.component';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 
 const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;

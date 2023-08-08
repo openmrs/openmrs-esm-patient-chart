@@ -23,8 +23,8 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
-import { Order } from '../types/order';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { Order } from '../types/order';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 import styles from './medications-details-table.scss';
 
@@ -32,6 +32,7 @@ export interface ActiveMedicationsProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
+  showAddButton?: boolean;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
@@ -42,6 +43,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   isValidating,
   title,
   medications,
+  showAddButton,
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
@@ -132,7 +134,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       sortKey: dayjs(medication.dateActivated).toDate(),
       content: (
         <div className={styles.startDateColumn}>
-          <p>{formatDate(new Date(medication.dateActivated))}</p>
+          <span>{formatDate(new Date(medication.dateActivated))}</span>
           <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
         </div>
       ),
@@ -153,14 +155,16 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             <InlineLoading />
           </span>
         ) : null}
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <Add size={16} {...props} />}
-          iconDescription="Launch order basket"
-          onClick={launchOrderBasket}
-        >
-          {t('add', 'Add')}
-        </Button>
+        {showAddButton ?? true ? (
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Launch order basket"
+            onClick={launchOrderBasket}
+          >
+            {t('add', 'Add')}
+          </Button>
+        ) : null}
       </CardHeader>
       <DataTable
         data-floating-menu-container
@@ -220,7 +224,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   );
 };
 
-function InfoTooltip({ orderer }) {
+function InfoTooltip({ orderer }: { orderer: string }) {
   return (
     <IconButton
       className={styles.tooltip}
@@ -270,7 +274,7 @@ function OrderBasketItemActions({
         },
         frequency: {
           valueCoded: medication.frequency?.uuid,
-          value: medication.frequency.display,
+          value: medication.frequency?.display,
         },
         route: {
           valueCoded: medication.route?.uuid,
@@ -296,8 +300,8 @@ function OrderBasketItemActions({
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
         quantityUnits: {
-          value: medication.quantityUnits.display,
-          valueCoded: medication.quantityUnits.uuid,
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
         },
       },
     ]);

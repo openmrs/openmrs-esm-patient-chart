@@ -155,8 +155,7 @@ export interface FormMetadataObject {
   resources: Array<{ name: string; valueReference: string }>;
 }
 
-export interface FormSchemaAndTranslations {
-  schema: FormSchema;
+export interface FormSchemaAndTranslations extends FormSchema {
   translations?: Record<string, string>;
 }
 
@@ -435,4 +434,24 @@ export interface MetaData {
   uuid: string;
   discontinuationDateQuestionId: string;
   enrollmentDateQuestionId: string;
+}
+
+export interface Identifier {
+  uuid?: string;
+  identifier: string;
+  identifierType: OpenmrsResource;
+  location: OpenmrsResource;
+}
+
+export interface PatientModel {
+  sex: string;
+  birthdate: Date;
+  age: number;
+  gendercreatconstant?: number;
+  identifiers: Array<Identifier>;
+}
+
+export interface IdentifierPayload {
+  newIdentifiers: Array<any>;
+  currentIdentifiers: Array<any>;
 }

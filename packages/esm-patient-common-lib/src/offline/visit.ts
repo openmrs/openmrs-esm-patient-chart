@@ -62,9 +62,11 @@ export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit
   }, [patientUuid]);
 
   return {
+    activeVisit: offlineVisitState.data,
     currentVisit: offlineVisitState.data,
     isLoading: offlineVisitState.isLoading,
     isValidating: false,
+    currentVisitIsRetrospective: false,
     error: offlineVisitState.error,
     mutate: () => {},
   };

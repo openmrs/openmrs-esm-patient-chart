@@ -1,14 +1,14 @@
 import React, { Fragment, useState } from 'react';
-import { FormLabel, TextArea, TextInput } from '@carbon/react';
+import { FormLabel, Layer, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './vitals-biometrics-input.scss';
 
 interface VitalsBiometricInputProps {
   title: string;
-  colorCode?: string;
+  muacColorCode?: string;
   useMuacColors?: boolean;
-  onInputChange(evnt): void;
+  onInputChange(event): void;
   textFields: Array<{
     name: string;
     separator?: string;
@@ -24,7 +24,7 @@ interface VitalsBiometricInputProps {
   textFieldStyles?: React.CSSProperties;
   placeholder?: string;
   disabled?: boolean;
-  inputIsNormal: boolean;
+  isWithinNormalRange?: boolean;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
@@ -36,15 +36,15 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   textFieldWidth,
   placeholder,
   disabled,
-  inputIsNormal,
-  colorCode,
+  muacColorCode,
   useMuacColors,
+  isWithinNormalRange = true,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [invalid, setInvalid] = useState<boolean>(false);
+  const [invalid, setInvalid] = useState(false);
 
-  function check(value) {
+  function checkValidity(value) {
     setInvalid(!(Number(value) || value === ''));
   }
 
@@ -53,55 +53,57 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
         className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${
-          !inputIsNormal && styles.danger
-        } ${useMuacColors ? colorCode : undefined}`}
+          !isWithinNormalRange && styles.danger
+        } ${useMuacColors ? muacColorCode : undefined}`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
-          {textFields.map((val) => {
+          {textFields.map((val, i) => {
             return val.type === 'number' ? (
-              <Fragment key={val.name}>
-                <TextInput
-                  style={{ ...textFieldStyles }}
-                  className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
-                    !inputIsNormal && styles.danger
-                  }`}
-                  id={val.name}
-                  invalid={invalid}
-                  type={val.type}
-                  min={val.min}
-                  max={val.max}
-                  name={val.name}
-                  onChange={(e) => check(e.target.value)}
-                  onInput={onInputChange}
-                  labelText={''}
-                  value={val.value}
-                  title={val.name}
-                  light={isTablet}
-                />
+              <Fragment key={`vitals-text-input-${val.name}-${i}`}>
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <TextInput
+                    style={{ ...textFieldStyles }}
+                    className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
+                      !isWithinNormalRange && styles.danger
+                    }`}
+                    id={val.name}
+                    invalid={invalid}
+                    type={val.type}
+                    min={val.min}
+                    max={val.max}
+                    name={val.name}
+                    onChange={(e) => checkValidity(e.target.value)}
+                    onInput={onInputChange}
+                    labelText={''}
+                    value={val.value}
+                    title={val.name}
+                  />
+                </ResponsiveWrapper>
                 {val?.separator}
               </Fragment>
             ) : (
-              <TextArea
-                key={val.name}
-                style={{ ...textFieldStyles }}
-                className={styles.textarea}
-                id={val.name}
-                name={val.name}
-                labelText={''}
-                onChange={onInputChange}
-                rows={2}
-                placeholder={placeholder}
-                value={val.value}
-                title={val.name}
-                light={isTablet}
-              />
+              <ResponsiveWrapper key={`vitals-text-area-${val.name}-${i}`} isTablet={isTablet}>
+                <TextArea
+                  key={val.name}
+                  style={{ ...textFieldStyles }}
+                  className={styles.textarea}
+                  id={val.name}
+                  name={val.name}
+                  labelText={''}
+                  onChange={onInputChange}
+                  rows={2}
+                  placeholder={placeholder}
+                  value={val.value}
+                  title={val.name}
+                />
+              </ResponsiveWrapper>
             );
           })}
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
-      {!inputIsNormal || invalid ? (
+      {!isWithinNormalRange || invalid ? (
         <FormLabel className={styles.danger}>
           {t('numericInputError', 'Must be a number with in acceptable ranges')}
         </FormLabel>
@@ -109,5 +111,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     </div>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default VitalsBiometricInput;

@@ -1,4 +1,4 @@
-import { Drug } from '../types/order';
+import type { Drug } from '../types/order';
 
 export interface DrugOrderTemplate {
   uuid: string;

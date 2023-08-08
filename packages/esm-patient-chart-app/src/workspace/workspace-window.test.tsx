@@ -7,7 +7,7 @@ import {
   registerWorkspace,
   WorkspaceWindowSizeProvider,
 } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 import WorkspaceWindow from './workspace-window.component';
 
 const mockExtensionRegistry = {};

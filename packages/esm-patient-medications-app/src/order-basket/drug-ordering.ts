@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
-import { OrderBasketItem } from '../types/order-basket-item';
-import { postOrder } from '../api/api';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
-import { OrderPost } from '../types/order';
+import type { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderPost } from '../types/order';
+import { postOrder } from '../api/api';
 
 export async function orderDrugs(
   orderBasketItems: Array<OrderBasketItem>,
