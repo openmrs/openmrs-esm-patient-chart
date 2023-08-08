@@ -1,4 +1,4 @@
-import { ModalBody, Button } from '@carbon/react';
+import { ModalBody, Button, DatePickerInput, DatePicker } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './print.scss';
@@ -14,7 +14,6 @@ import {
 } from '@carbon/react';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
-import { DatePickerInput, DatePicker } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
 
 function Print({ patientUuid }) {
