@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { ContentSwitcher, Switch } from '@carbon/react';
+import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
@@ -12,6 +12,8 @@ import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
+import { Printer } from '@carbon/react/icons';
+import { ConfigObject } from '../config-schema';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -52,17 +54,25 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
+  const config = useConfig() as ConfigObject;
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
   const { totalResultsCount } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
+  const showPrintButton = config.showPrintButton;
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
       to: testResultsBasePath(`/patient/${patientUuid}/chart`),
     });
   }, [patientUuid]);
+
+  const launchPrintDialog = () => {
+    const showModel = showModal('print', {
+      closeCancelModal: () => showModel(),
+    });
+  };
 
   if (isTablet) {
     return (
@@ -127,6 +137,17 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               <Switch name="panel" text={t('panel', 'Panel')} />
               <Switch name="tree" text={t('tree', 'Tree')} />
             </ContentSwitcher>
+            {showPrintButton && (
+              <Button
+                kind="ghost"
+                size={isTablet ? 'md' : 'sm'}
+                renderIcon={Printer}
+                iconDescription="Print results"
+                onClick={launchPrintDialog}
+              >
+                {t('print', 'Print')}
+              </Button>
+            )}
           </div>
         </div>
         <div className={styles.rightSectionHeader}>

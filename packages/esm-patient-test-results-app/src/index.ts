@@ -30,6 +30,7 @@ export function startupApp() {
 export const externalOverview = getAsyncLifecycle(() => import('./overview/external-overview.component'), options);
 
 export const resultsViewer = getAsyncLifecycle(() => import('./results-viewer'), options);
+export const print = getAsyncLifecycle(() => import('./print/print.component'), options);
 
 export const testResultsDashboardLink =
   // t('Test Results', 'Test Results')
