@@ -1,8 +1,11 @@
-import { ModalBody, Button, DatePickerInput, DatePicker } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './print.scss';
 import {
+  ModalBody,
+  Button,
+  DatePickerInput,
+  DatePicker,
   DataTable,
   TableContainer,
   Table,
