@@ -5,7 +5,7 @@ import { parseDate } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import type { Order } from '../types/order';
 import { usePatientOrders } from '../api/api';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 
 export interface MedicationsSummaryProps {

@@ -6,7 +6,7 @@ import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-pat
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore, orderBasketStoreActions } from './order-basket-store';
 import type { OrderBasketItem } from '../types/order-basket-item';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';

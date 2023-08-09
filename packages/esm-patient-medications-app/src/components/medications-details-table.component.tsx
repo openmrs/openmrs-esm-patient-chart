@@ -21,11 +21,10 @@ import { Add, User } from '@carbon/react/icons';
 import { formatDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { compare } from '../utils/compare';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../order-basket/order-basket-store';
 import type { Order } from '../types/order';
 import type { OrderBasketItem } from '../types/order-basket-item';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
@@ -439,6 +438,26 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
+}
+
+/**
+ * Enables a comparison of arbitrary values with support for undefined/null.
+ * Requires the `<` and `>` operators to return something reasonable for the provided values.
+ */
+function compare<T>(x?: T, y?: T) {
+  if (x == undefined && y == undefined) {
+    return 0;
+  } else if (x == undefined) {
+    return -1;
+  } else if (y == undefined) {
+    return 1;
+  } else if (x < y) {
+    return -1;
+  } else if (x > y) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 export default MedicationsDetailsTable;
