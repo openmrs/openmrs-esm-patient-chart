@@ -522,7 +522,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             {!isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 <ResponsiveWrapper isTablet={isTablet}>
-
                   <Controller
                     name="appointmentDateTime"
                     control={control}
@@ -583,11 +582,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button
-          className={styles.button}
-          disabled={isSubmitting}
-          onClick={handleSubmit(handleSaveAppointment)}
-        >
+        <Button className={styles.button} disabled={isSubmitting} onClick={handleSubmit(handleSaveAppointment)}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
@@ -663,4 +658,3 @@ function TimeAndDuration({ isTablet, t, setValue, getValues, watch, control, ser
 }
 
 export default AppointmentsForm;
-
