@@ -1,5 +1,5 @@
 import React from 'react';
-import MedicationsSummary from '../medications-summary/medications-summary.component';
+import MedicationsSummary from './medications-summary.component';
 
 export interface RootMedicationSummaryProps {
   patientUuid: string;

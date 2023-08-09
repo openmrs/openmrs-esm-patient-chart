@@ -4,9 +4,9 @@ import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
 import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore } from '../order-basket/order-basket-store';
 import styles from './order-basket-action-button.scss';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
   const layout = useLayoutType();

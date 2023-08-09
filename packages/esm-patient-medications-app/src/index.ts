@@ -16,11 +16,11 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const medicationsSummary = getAsyncLifecycle(() => import('./medications/root-medication-summary'), options);
+export const medicationsSummary = getAsyncLifecycle(() => import('./medications-summary/root-medication-summary'), options);
 
-export const activeMedications = getAsyncLifecycle(() => import('./medications/active-medications.component'), options);
+export const activeMedications = getAsyncLifecycle(() => import('./active-medications/active-medications.component'), options);
 
-export const orderBasketWorkspace = getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
+export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/root-order-basket'), options);
 
 export const medicationsDashboardLink =
   // t('Medications', 'Medications')

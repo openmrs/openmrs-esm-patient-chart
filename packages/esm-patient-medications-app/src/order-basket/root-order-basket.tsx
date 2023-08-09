@@ -1,5 +1,5 @@
 import React from 'react';
-import OrderBasket from '../order-basket/order-basket.component';
+import OrderBasket from './order-basket.component';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 export default function RootOrderBasket({ patientUuid, closeWorkspace }: DefaultWorkspaceProps) {
