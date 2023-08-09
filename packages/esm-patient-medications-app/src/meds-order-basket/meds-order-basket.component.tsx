@@ -3,15 +3,15 @@ import { TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
 import { showModal, showToast, useConfig, useLayoutType, useSession, useStore } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { orderDrugs } from './drug-ordering';
+import { orderDrugs } from '../add-drug-order/drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
 import { getOrderItems, orderBasketStore, orderBasketStoreActions } from './order-basket-store';
 import type { OrderBasketItem } from '../types/order-basket-item';
-import MedicationOrderForm from './medication-order-form.component';
+import MedicationOrderForm from '../add-drug-order/medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
-import OrderBasketSearch from './order-basket-search/drug-search.component';
+import OrderBasketSearch from '../add-drug-order/order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
@@ -30,15 +30,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const session = useSession();
-  const {
-    activeVisitRequired,
-    isLoading: isLoadingEncounterUuid,
-    encounterUuid,
-    error: errorFetchingEncounterUuid,
-    mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid);
-  const [creatingEncounterError, setCreatingEncounterError] = useState(false);
+
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -51,14 +43,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     isValidating,
     mutate: mutateOrders,
   } = usePatientOrders(patientUuid, 'ACTIVE');
-  const noCurrentVisit = activeVisitRequired && !currentVisit;
-
-  const openStartVisitDialog = useCallback(() => {
-    const dispose = showModal('start-visit-dialog', {
-      patientUuid,
-      closeModal: () => dispose(),
-    });
-  }, [patientUuid]);
 
   useEffect(() => {
     if (medicationOrderFormItem) {
@@ -75,67 +59,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       onSigned(finalizedOrder);
     });
     setIsMedicationOrderFormVisible(true);
-  };
-
-  const handleSaveClicked = useCallback(async () => {
-    const abortController = new AbortController();
-
-    setCreatingEncounterError(false);
-    let orderEncounterUuid = encounterUuid;
-    // If there's no encounter present, stop the order from being created and create an encounter.
-    // TODO: What? Ok then what are we doing with this orderEncounterUuid returned from createEmptyEncounter?
-    // What's supposed to happen here?
-    if (!orderEncounterUuid) {
-      orderEncounterUuid = await createEmptyEncounter(
-        patientUuid,
-        config?.drugOrderEncounterType,
-        activeVisitRequired ? currentVisit?.uuid : null,
-        session?.sessionLocation?.uuid,
-        abortController,
-      )
-        .then((uuid) => {
-          mutateEncounterUuid();
-          return uuid;
-        })
-        .catch((e) => {
-          setCreatingEncounterError(true);
-          return null;
-        });
-      return; // don't create the order
-    }
-
-    orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then(async (erroredItems) => {
-      setItems(erroredItems);
-
-      if (erroredItems.length == 0) {
-        mutateOrders();
-        closeWorkspace();
-        showDrugSuccessToast(t, patientOrderItems);
-      } else {
-        mutateOrders();
-        showDrugFailureToast(t);
-      }
-    });
-
-    return () => abortController.abort();
-  }, [
-    mutateOrders,
-    mutateEncounterUuid,
-    closeWorkspace,
-    patientOrderItems,
-    patientUuid,
-    encounterUuid,
-    activeVisitRequired,
-    currentVisit,
-    session,
-    config,
-    setItems,
-    t,
-  ]);
-
-  const handleCancelClicked = () => {
-    setItems([]);
-    closeWorkspace();
   };
 
   const handleSearchResultClicked = useCallback(
@@ -215,29 +138,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         </div>
 
         <div>
-          {(creatingEncounterError || errorFetchingEncounterUuid) && (
-            <InlineNotification
-              kind="error"
-              title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
-              subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
-              lowContrast={true}
-              className={styles.inlineNotification}
-              inline
-            />
-          )}
-          {noCurrentVisit && (
-            <ActionableNotification
-              kind="error"
-              actionButtonLabel={t('startVisit', 'Start visit')}
-              onActionButtonClick={openStartVisitDialog}
-              title={t('startAVisitToRecordOrders', 'Start a visit to order')}
-              subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
-              lowContrast={true}
-              inline
-              className={styles.actionNotification}
-              hasFocus
-            />
-          )}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
             <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
               {t('cancel', 'Cancel')}

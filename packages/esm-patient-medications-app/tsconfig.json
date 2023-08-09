@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../esm-patient-orders-app/src/order-basket-action-button/order-basket-action-button.component.tsx"],
   "exclude": ["src/**/*.test.tsx"]
 }

@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
+import { useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { getOrderItems, orderBasketStore } from '../order-basket/order-basket-store';
+import { useOrderBasket } from '../order-basket/useOrderBasket';
 import styles from './order-basket-action-button.scss';
 import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 
@@ -12,13 +12,9 @@ const OrderBasketActionButton: React.FC = () => {
   const layout = useLayoutType();
   const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
-  const { items } = useStore(orderBasketStore);
+  const { orders } = useOrderBasket();
   const { patientUuid } = usePatient();
-
   const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
-
-  const patientOrderItems = useMemo(() => getOrderItems(items, patientUuid), [items, patientUuid]);
-
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet') {
@@ -31,8 +27,7 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={16} />{' '}
-          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
+          <ShoppingCart size={16} /> {orders?.length > 0 && <Tag className={styles.countTag}>{orders?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order basket')}</span>
       </Button>
@@ -47,7 +42,7 @@ const OrderBasketActionButton: React.FC = () => {
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
+          {orders?.length > 0 && <Tag className={styles.countTag}>{orders?.length}</Tag>}
         </div>
       )}
       hasIconOnly

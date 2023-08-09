@@ -5,10 +5,10 @@ import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const moduleName = '@openmrs/esm-patient-medications-app';
+const moduleName = '@openmrs/esm-patient-orders-app';
 
 const options = {
-  featureName: 'patient-medications',
+  featureName: 'patient-orders',
   moduleName,
 };
 
@@ -16,17 +16,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const medicationsSummary = getAsyncLifecycle(
-  () => import('./medications-summary/medications-summary.component'),
-  options,
-);
-
-export const activeMedications = getAsyncLifecycle(
-  () => import('./active-medications/active-medications.component'),
-  options,
-);
-
-export const drugOrderPanel = getAsyncLifecycle(() => import('./drug-order-panel/drug-order-panel.component'), options);
+export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.component'), options);
 
 export const medicationsDashboardLink =
   // t('Medications', 'Medications')
@@ -37,3 +27,8 @@ export const medicationsDashboardLink =
     }),
     options,
   );
+
+export const orderBasketActionMenu = getAsyncLifecycle(
+  () => import('./order-basket-action-button/order-basket-action-button.component'),
+  options,
+);
