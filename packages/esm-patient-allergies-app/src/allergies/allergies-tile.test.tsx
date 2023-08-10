@@ -16,16 +16,12 @@ describe('AllergiesTile', () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
     renderAllergiesTile();
 
-    await waitForLoadingToFinish();
-
     expect(screen.getByText(/ACE inhibitors, Fish, Penicillins, Morphine, Aspirin/i)).toBeInTheDocument();
   });
 
   it('renders an empty state when allergy data is not available', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
     renderAllergiesTile();
-
-    await waitForLoadingToFinish();
 
     expect(screen.getByText(/ACE inhibitors, Fish, Penicillins, Morphine, Aspirin/i)).not.toBeInTheDocument();
   });
