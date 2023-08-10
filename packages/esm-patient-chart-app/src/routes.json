@@ -103,12 +103,6 @@
       }
     },
     {
-      "name": "patient-details-header",
-      "slot": "patient-details-header-slot",
-      "component": "patientDetailsTile",
-      "order": 1
-    },
-    {
       "name": "nav-group",
       "component": "genericNavGroup"
     },

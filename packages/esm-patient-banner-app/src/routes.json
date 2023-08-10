@@ -24,6 +24,12 @@
       "component": "patientBanner",
       "online": true,
       "offline": true
+    },
+    {
+      "name": "patient-details-header",
+      "slot": "patient-details-header-slot",
+      "component": "patientDetailsTile",
+      "order": 1
     }
   ]
 }

@@ -175,14 +175,6 @@ export const markPatientDeceasedForm = getAsyncLifecycle(() => import('./decease
   moduleName,
 });
 
-export const patientDetailsTile = getAsyncLifecycle(
-  () => import('./patient-details-tile/patient-details-tile.component'),
-  {
-    featureName: 'patient-details-tile',
-    moduleName,
-  },
-);
-
 export const genericNavGroup = getAsyncLifecycle(() => import('./side-nav/generic-nav-group.component'), {
   featureName: 'Nav group',
   moduleName,

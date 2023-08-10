@@ -27,3 +27,11 @@ export const deceasedPatientTag = getAsyncLifecycle(
 );
 
 export const patientBanner = getAsyncLifecycle(() => import('./banner/patient-banner.component'), options);
+
+export const patientDetailsTile = getAsyncLifecycle(
+  () => import('./patient-details-tile/patient-details-tile.component'),
+  {
+    featureName: 'patient-details-tile',
+    moduleName,
+  },
+);
