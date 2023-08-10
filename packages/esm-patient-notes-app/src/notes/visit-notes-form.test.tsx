@@ -3,16 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { showNotification, useConfig, useSession } from '@openmrs/esm-framework';
-import { fetchConceptDiagnosisByName, useLocationUuid, useProviderUuid, saveVisitNote } from './visit-notes.resource';
-import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { fetchConceptDiagnosisByName, saveVisitNote } from './visit-notes.resource';
+import { ConfigMock } from '../__mocks__/chart-widgets-config.mock';
 import {
   diagnosisSearchResponse,
   mockFetchLocationByUuidResponse,
   mockFetchProviderByUuidResponse,
-} from '../../../../__mocks__/visit-notes.mock';
-import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+} from '../__mocks__/visit-notes.mock';
+import { mockSessionDataResponse } from '../__mocks__/session.mock';
+import { mockPatient, getByTextWithMarkup } from '../../../../tools/test-helpers';
 import VisitNotesForm from './visit-notes-form.component';
 
 const testProps = {
@@ -21,9 +20,7 @@ const testProps = {
   promptBeforeClosing: jest.fn(),
 };
 
-const mockFetchDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
-const mockUseLocationUuid = useLocationUuid as jest.Mock;
-const mockUseProviderUuid = useProviderUuid as jest.Mock;
+const mockFetchConceptDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
@@ -59,7 +56,7 @@ jest.mock('./visit-notes.resource', () => ({
 }));
 
 test('renders the visit notes form with all the relevant fields and values', () => {
-  mockFetchDiagnosisByName.mockReturnValue(of([]));
+  mockFetchConceptDiagnosisByName.mockReturnValue(of([]));
 
   renderVisitNotesForm();
 
@@ -73,8 +70,9 @@ test('renders the visit notes form with all the relevant fields and values', () 
   expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
 });
 
-test('typing in the diagnosis search input triggers a search', async () => {
-  mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+test.only('typing in the diagnosis search input triggers a search', async () => {
+  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+
   renderVisitNotesForm();
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
@@ -99,12 +97,13 @@ test('typing in the diagnosis search input triggers a search', async () => {
 });
 
 test('renders an error message when no matching diagnoses are found', async () => {
-  mockFetchDiagnosisByName.mockReturnValue(of([]));
+  const user = userEvent.setup();
+  mockFetchConceptDiagnosisByName.mockReturnValue(of([]));
 
   renderVisitNotesForm();
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'COVID-21');
+  await user.type(searchBox, 'COVID-21');
 
   expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
 });
@@ -139,7 +138,7 @@ test('renders a success toast notification upon successfully recording a visit n
   };
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' });
-  mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
 
   renderVisitNotesForm();
 
@@ -173,7 +172,7 @@ test('renders an error notification if there was a problem recording a condition
   };
 
   mockSaveVisitNote.mockRejectedValueOnce(error);
-  mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
 
   renderVisitNotesForm();
 
@@ -202,8 +201,6 @@ test('renders an error notification if there was a problem recording a condition
 });
 
 function renderVisitNotesForm() {
-  mockUseLocationUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
-  mockUseProviderUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
   mockUseConfig.mockReturnValue(ConfigMock);
   mockUseSession.mockReturnValue(mockSessionDataResponse);
   render(<VisitNotesForm {...testProps} />);

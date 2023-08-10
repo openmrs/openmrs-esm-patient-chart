@@ -1,4 +1,5 @@
-import React, { FormEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   ButtonSet,
@@ -20,10 +21,8 @@ import {
 import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
-import styles from './medication-order-form.scss';
-import capitalize from 'lodash-es/capitalize';
 import { ConfigObject } from '../config-schema';
 import {
   DosingUnit,
@@ -32,6 +31,7 @@ import {
   MedicationRoute,
   QuantityUnit,
 } from '../api/drug-order-template';
+import styles from './medication-order-form.scss';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -75,11 +75,9 @@ function InputWrapper({ children }) {
 
 export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
   const { t } = useTranslation();
-  const layout = useLayoutType();
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
-  const template = initialOrderBasketItem.template;
-  const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
+  const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
   const handleFormSubmission = (e) => {
@@ -130,17 +128,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
-
-  const doseWithUnitsLabel = template ? (
-    `(${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value})`
-  ) : (
-    <>
-      {initialOrderBasketItem?.drug?.strength && <>&mdash; {initialOrderBasketItem?.drug?.strength.toLowerCase()}</>}{' '}
-      {initialOrderBasketItem?.drug?.dosageForm?.display && (
-        <> &mdash; {initialOrderBasketItem?.drug?.dosageForm?.display.toLowerCase()}</>
-      )}
-    </>
-  );
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -405,6 +392,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <section className={styles.formSection}>
           <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription duration')}</h3>
           <Grid className={styles.gridRow}>
+            {/* TODO: This input does nothing */}
             <Column lg={16} md={4} sm={4}>
               <div className={styles.fullWidthDatePickerContainer}>
                 <InputWrapper>

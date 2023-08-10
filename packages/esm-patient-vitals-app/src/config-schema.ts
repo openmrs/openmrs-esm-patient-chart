@@ -55,6 +55,29 @@ export const configSchema = {
       _type: Type.UUID,
       _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
     },
+    logo: {
+      src: {
+        _type: Type.String,
+        _default: null,
+        _description: 'A path or URL to an image. Defaults to the OpenMRS SVG sprite.',
+      },
+      alt: {
+        _type: Type.String,
+        _default: 'Logo',
+        _description: 'Alt text, shown on hover',
+      },
+      name: {
+        _type: Type.String,
+        _default: null,
+        _description: 'The organization name displayed when image is absent',
+      },
+    },
+    showPrintButton: {
+      _type: Type.Boolean,
+      _default: false,
+      _description:
+        'Determines whether or not to display the Print button in the vitals datatable header. If set to true, a Print button gets shown as the right-most item in the table header. When clicked, this button enables the user to print out the contents of the table',
+    },
     formUuid: {
       _type: Type.UUID,
       _default: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
@@ -90,6 +113,7 @@ export interface ConfigObject {
     formUuid: string;
     formName: string;
     useMuacColors: boolean;
+    showPrintButton: boolean;
   };
   biometrics: BiometricsConfigObject;
 }

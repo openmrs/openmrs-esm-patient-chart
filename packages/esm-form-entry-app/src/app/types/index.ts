@@ -155,8 +155,7 @@ export interface FormMetadataObject {
   resources: Array<{ name: string; valueReference: string }>;
 }
 
-export interface FormSchemaAndTranslations {
-  schema: FormSchema;
+export interface FormSchemaAndTranslations extends FormSchema {
   translations?: Record<string, string>;
 }
 

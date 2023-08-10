@@ -12,7 +12,6 @@
   "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "enterPrimaryDiagnoses": "Mettre les diagnostics principaux",
   "enterSecondaryDiagnoses": "Mettre les diagnostics secondaires",
-  "goToSummary": "Allerr à la vue d'ensemble",
   "image": "Image",
   "imageUploadHelperText": "Téléchargez une image ou utilisez l'appareil photo de cet appareil pour prendre une photo",
   "noMatchingDiagnoses": "Aucun diagnostic trouvé correspondant",

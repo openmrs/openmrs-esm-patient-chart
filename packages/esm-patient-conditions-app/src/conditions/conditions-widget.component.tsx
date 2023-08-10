@@ -200,28 +200,29 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 name="search"
                 control={control}
                 render={({ field: { onChange, value, onBlur } }) => (
-                  <Search
-                    ref={searchInputRef}
-                    size="md"
-                    id="conditionsSearch"
-                    labelText={t('enterCondition', 'Enter condition')}
-                    light={isTablet}
-                    placeholder={t('searchConditions', 'Search conditions')}
-                    className={formState?.errors?.search && styles.conditionsError}
-                    onChange={onChange}
-                    renderIcon={formState?.errors?.search && <WarningFilled />}
-                    onBlur={onBlur}
-                    onClear={() => setSelectedCondition(null)}
-                    disabled={editing}
-                    value={(() => {
-                      if (selectedCondition) {
-                        return selectedCondition.display;
-                      }
-                      if (getValues('search')) {
-                        return value;
-                      }
-                    })()}
-                  />
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <Search
+                      ref={searchInputRef}
+                      size="md"
+                      id="conditionsSearch"
+                      labelText={t('enterCondition', 'Enter condition')}
+                      placeholder={t('searchConditions', 'Search conditions')}
+                      className={formState?.errors?.search && styles.conditionsError}
+                      onChange={onChange}
+                      renderIcon={formState?.errors?.search && <WarningFilled />}
+                      onBlur={onBlur}
+                      onClear={() => setSelectedCondition(null)}
+                      disabled={editing}
+                      value={(() => {
+                        if (selectedCondition) {
+                          return selectedCondition.display;
+                        }
+                        if (getValues('search')) {
+                          return value;
+                        }
+                      })()}
+                    />
+                  </ResponsiveWrapper>
                 )}
               />
               {formState?.errors?.search && <p className={styles.errorMessage}>{formState?.errors?.search?.message}</p>}
@@ -263,19 +264,20 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="onsetDateTime"
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
-              <DatePicker
-                id="onsetDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                light={isTablet}
-                maxDate={dayjs().utc().format()}
-                placeholder="dd/mm/yyyy"
-                onChange={([date]) => onChange(date)}
-                onBlur={onBlur}
-                value={value}
-              >
-                <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
-              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DatePicker
+                  id="onsetDate"
+                  datePickerType="single"
+                  dateFormat="d/m/Y"
+                  maxDate={dayjs().utc().format()}
+                  placeholder="dd/mm/yyyy"
+                  onChange={([date]) => onChange(date)}
+                  onBlur={onBlur}
+                  value={value}
+                >
+                  <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
+                </DatePicker>
+              </ResponsiveWrapper>
             )}
           />
         </FormGroup>
@@ -302,20 +304,21 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="endDate"
             control={control}
             render={({ field: { onBlur, onChange, value } }) => (
-              <DatePicker
-                id="endDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                light={isTablet}
-                minDate={new Date(watch('onsetDateTime')).toISOString()}
-                maxDate={dayjs().utc().format()}
-                placeholder="dd/mm/yyyy"
-                onChange={([date]) => onChange(date)}
-                onBlur={onBlur}
-                value={value}
-              >
-                <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
-              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DatePicker
+                  id="endDate"
+                  datePickerType="single"
+                  dateFormat="d/m/Y"
+                  minDate={new Date(watch('onsetDateTime')).toISOString()}
+                  maxDate={dayjs().utc().format()}
+                  placeholder="dd/mm/yyyy"
+                  onChange={([date]) => onChange(date)}
+                  onBlur={onBlur}
+                  value={value}
+                >
+                  <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
+                </DatePicker>
+              </ResponsiveWrapper>
             )}
           />
         )}
@@ -323,5 +326,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     </div>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default ConditionsWidget;

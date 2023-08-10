@@ -14,11 +14,11 @@ interface EndVisitDialogProps {
 
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { currentVisit, isRetrospective, mutate } = useVisit(patientUuid);
+  const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const endCurrentVisit = () => {
-    if (isRetrospective) {
+    if (currentVisitIsRetrospective) {
       setCurrentVisit(null, null);
       closeModal();
     } else {

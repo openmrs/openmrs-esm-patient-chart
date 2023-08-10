@@ -2,7 +2,7 @@ import React from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from '../types/order-basket-item';
 import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 
@@ -48,7 +48,7 @@ export default function OrderBasketItemList({
             </div>
           ) : (
             <h4 className={styles.orderCategoryHeading}>
-              {t('ordersAlreadyInBasketWithCount', '{count} item(s) already in your basket', {
+              {t('ordersAlreadyInBasketWithCount', '{count} item(s) are in your basket', {
                 count: newOrderBasketItems.length,
               })}
             </h4>

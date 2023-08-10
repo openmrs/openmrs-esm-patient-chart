@@ -2,10 +2,10 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showNotification, showToast } from '@openmrs/esm-framework';
-import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
+import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../__mocks__/vitals.mock';
+import { mockPatient } from '../../../../../tools/test-helpers';
 import { savePatientVitals } from '../vitals.resource';
+import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
 const testProps = {
   closeWorkspace: () => {},

@@ -7,7 +7,7 @@ import {
   useVisitOrOfflineVisit,
   launchStartVisitPrompt,
 } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 import OrderBasketActionButton from './order-basket-action-button.component';
 import { useSystemVisitSetting } from '../api/api';
 
@@ -52,8 +52,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('../medications/order-basket-store.ts', () => {
-  const originalModule = jest.requireActual('../medications/order-basket-store');
+jest.mock('../order-basket/order-basket-store.ts', () => {
+  const originalModule = jest.requireActual('../order-basket/order-basket-store');
 
   return {
     ...originalModule,

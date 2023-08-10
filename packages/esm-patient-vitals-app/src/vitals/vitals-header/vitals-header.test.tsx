@@ -3,17 +3,21 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
+import {
+  mockPatient,
+  getByTextWithMarkup,
+  renderWithSwr,
+  waitForLoadingToFinish,
+} from '../../../../../tools/test-helpers';
 import {
   mockConceptMetadata,
   mockFhirVitalsResponse,
   mockVitalsConfig,
   mockVitalsSignsConcept,
-} from '../../../../../__mocks__/vitals.mock';
-import VitalsHeader from './vitals-header.component';
+} from '../../__mocks__/vitals.mock';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
-import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
+import { mockCurrentVisit } from '../../__mocks__/visits.mock';
+import VitalsHeader from './vitals-header.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
