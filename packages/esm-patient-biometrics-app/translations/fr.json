@@ -5,9 +5,7 @@
   "biometrics_lower": "biometrics",
   "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "goToSummary": "Go to Summary",
-  "loading": "Loading",
   "record": "Record",
   "seeAll": "See all",
-  "Vitals & Biometrics": "Vitals & Biometrics",
-  "weight": "Weight"
+  "Vitals & Biometrics": "Vitals & Biometrics"
 }

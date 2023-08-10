@@ -5,9 +5,7 @@
   "biometrics_lower": "מדדים ביומטריים",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "goToSummary": "עבור לסיכום",
-  "loading": "טוען",
   "record": "רשומה",
   "seeAll": "ראה הכל",
-  "Vitals & Biometrics": "מדדים וביומטריה",
-  "weight": "משקל"
+  "Vitals & Biometrics": "מדדים וביומטריה"
 }

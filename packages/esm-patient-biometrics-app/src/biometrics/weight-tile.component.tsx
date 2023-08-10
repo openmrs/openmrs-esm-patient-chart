@@ -25,6 +25,8 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
       </span>
     );
   }
+
+  return <>--</>;
 };
 
 export default WeightTile;
