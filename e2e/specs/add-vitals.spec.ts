@@ -43,7 +43,7 @@ test('Record Vitals of the patient', async ({ page, api }) => {
 
   await test.step('Then I should see the vitals record', async () => {
     await vitalsPage.page.reload();
-    await expect(vitalsPage.vitalsTable().getByText('37')).toBeVisible();
+    await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '37' })).toBeVisible();
     await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '80', exact: true })).toBeVisible();
     await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '120 / 80' })).toBeVisible();
     await expect(vitalsPage.vitalsTable().getByText('98')).toBeVisible();
