@@ -196,7 +196,7 @@ export default function usePanelData() {
       groupedObservations,
       conceptData,
     }),
-    [panels, isLoadingObservations, groupedObservations, conceptData],
+    [panels, isLoadingObservations, groupedObservations, conceptData, isDoneLoading],
   );
   return panelsData;
 }
