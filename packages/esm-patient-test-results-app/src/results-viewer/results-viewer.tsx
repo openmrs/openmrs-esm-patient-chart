@@ -14,7 +14,6 @@ import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
 import { Printer } from '@carbon/react/icons';
 import { ConfigObject } from '../config-schema';
-import usePanelData from '../panel-view/usePanelData';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -62,7 +61,6 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
   const showPrintButton = config.showPrintButton;
-  const { isDoneLoading } = usePanelData();
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
@@ -140,7 +138,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               <Switch name="panel" text={t('panel', 'Panel')} />
               <Switch name="tree" text={t('tree', 'Tree')} />
             </ContentSwitcher>
-            {showPrintButton  && isDoneLoading && (
+            {showPrintButton && (
               <Button
                 kind="ghost"
                 size={isTablet ? 'md' : 'sm'}

@@ -81,15 +81,15 @@ function useConcepts(conceptUuids: Array<string>) {
         : null,
       // If there are no observations, hence no concept UUIDS, then it should return isLoading as false
       isLoading: conceptUuids?.length === 0 ? false : isLoading,
-      isDoneLoading: !isLoading && concepts?.length > 0,
     };
   }, [data, conceptUuids, isLoading]);
+
   return results;
 }
 
 export default function usePanelData() {
   const { observations: fhirObservations, conceptUuids, isLoading: isLoadingObservations } = useObservations();
-  const { isLoading: isLoadingConcepts, concepts, isDoneLoading } = useConcepts(conceptUuids);
+  const { isLoading: isLoadingConcepts, concepts } = useConcepts(conceptUuids);
 
   const conceptData: Record<string, ConceptMeta> = useMemo(
     () =>
@@ -192,12 +192,12 @@ export default function usePanelData() {
     () => ({
       panels,
       isLoading: isLoadingObservations,
-      isDoneLoading,
       groupedObservations,
       conceptData,
     }),
-    [panels, isLoadingObservations, groupedObservations, conceptData, isDoneLoading],
+    [panels, isLoadingObservations, groupedObservations, conceptData],
   );
+
   return panelsData;
 }
 
