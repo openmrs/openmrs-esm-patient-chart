@@ -99,14 +99,14 @@ test('clicking the Record active medications link or the Add button opens the or
   await waitForLoadingToFinish();
   const orderLink = await screen.getByText('Record active medications');
   fireEvent.click(orderLink);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket');
 
   mockOpenmrsFetch.mockReturnValueOnce(mockDrugOrders);
   renderActiveMedications();
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket');
 });
 
 function renderActiveMedications() {

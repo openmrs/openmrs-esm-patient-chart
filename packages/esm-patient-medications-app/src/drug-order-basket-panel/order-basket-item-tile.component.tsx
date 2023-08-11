@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
-import type { OrderBasketItem } from '../types/order-basket-item';
 import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './order-basket-item.scss';
+import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib/src/order-basket/types';
+import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: OrderBasketItem;

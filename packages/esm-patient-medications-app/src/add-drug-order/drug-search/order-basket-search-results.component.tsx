@@ -3,8 +3,7 @@ import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carb
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
-import type { Drug } from '../../types/order';
-import type { OrderBasketItem } from '../../types/order-basket-item';
+import type { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';

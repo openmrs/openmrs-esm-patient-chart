@@ -17,14 +17,6 @@
   height: 4rem;
 }
 
-.spinner :global(.cds--loading__stroke) {
-  stroke: var(--brand-03);
-}
-
-.activeMedicationsContainer {
-  border: 1px solid $ui-03;
-}
-
 .tablet {
   padding: 1.5rem 1rem;
   background-color: $ui-02;
@@ -34,19 +26,12 @@
   padding: 0rem;
 }
 
-.button {
+.bottomButton {
   height: 4rem;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
-}
-
-.loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
 
 .inlineNotification, .actionNotification {

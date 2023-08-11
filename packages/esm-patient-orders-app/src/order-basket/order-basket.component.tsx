@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
-import { Button, ButtonSet, InlineNotification, ActionableNotification } from '@carbon/react';
+import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
-import { useOrderBasket } from './useOrderBasket';
 import type { OrderBasketItem } from '../types/order-basket-item';
 import styles from './order-basket.scss';
 
@@ -21,7 +20,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const config = useConfig() as ConfigObject;
   const session = useSession();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const { orders, setOrders, clearOrders } = useOrderBasket();
+  const { orders, clearOrders } = useOrderBasket();
   const {
     activeVisitRequired,
     isLoading: isLoadingEncounterUuid,
@@ -38,13 +37,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       closeModal: () => dispose(),
     });
   }, [patientUuid]);
-
-  const updateOrders = useCallback(
-    (orderGrouping: string, orders: Array<OrderBasketItem>) => {
-      setOrders(orderGrouping, orders);
-    },
-    [setOrders],
-  );
 
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
@@ -104,7 +96,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     <>
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
-          <ExtensionSlot name="order-basket-slot" state={updateOrders} />
+          <ExtensionSlot name="order-basket-slot" />
         </div>
 
         <div>
@@ -119,11 +111,11 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
             />
           )}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={handleCancel}>
+            <Button className={styles.bottomButton} kind="secondary" onClick={handleCancel}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button
-              className={styles.button}
+              className={styles.bottomButton}
               kind="primary"
               onClick={handleSave}
               disabled={!orders?.length || isLoadingEncounterUuid || (activeVisitRequired && !currentVisit)}

@@ -16,15 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useStore } from 'zustand';
 import { Add, User } from '@carbon/react/icons';
 import { formatDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, Order, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../order-basket/order-basket-store';
-import type { Order } from '../types/order';
-import type { OrderBasketItem } from '../types/order-basket-item';
-import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
@@ -49,11 +45,9 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
-  const store = useStore(orderBasketStore);
-  const setItems = useCallback((items) => orderBasketStoreActions.setOrderBasketItems(items), []);
-  const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
+  const { orders, setOrders } = useOrderBasket('medications');
 
   const tableHeaders = [
     {
@@ -207,8 +201,8 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                         showModifyButton={showModifyButton}
                         showReorderButton={showReorderButton}
                         medication={medications[rowIndex]}
-                        items={patientOrderItems}
-                        setItems={setItems}
+                        items={orders}
+                        setItems={setOrders}
                         openOrderBasket={launchOrderBasket}
                       />
                     </TableCell>

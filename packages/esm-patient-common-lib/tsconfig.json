@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../esm-patient-medications-app/src/drug-order-basket-panel/order-basket-item-tile.component.tsx", "../esm-patient-medications-app/src/drug-order-basket-panel/meds-order-basket-panel.test.tsx"],
   "exclude": ["src/**/*.test.tsx"]
 }

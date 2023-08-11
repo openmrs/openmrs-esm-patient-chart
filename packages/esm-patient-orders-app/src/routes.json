@@ -5,18 +5,6 @@
   },
   "extensions": [
     {
-      "name": "order-basket-workspace",
-      "component": "orderBasketWorkspace",
-      "meta": {
-        "title": {
-          "key": "orderBasket",
-          "default": "Order Basket"
-        },
-        "type": "order"
-      },
-      "order": 4 
-    },
-    {
       "name": "order-basket-action-menu",
       "component": "orderBasketActionMenu",
       "slot": "action-menu-chart-items-slot",

@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../esm-patient-common-lib/src/order-basket/useOrderBasket.ts"],
   "exclude": ["src/**/*.test.tsx"]
 }

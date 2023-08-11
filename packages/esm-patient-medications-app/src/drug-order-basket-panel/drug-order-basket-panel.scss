@@ -17,6 +17,7 @@
 }
 
 .desktopHeading {
+  background-color: white;
   h4 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
@@ -31,26 +32,23 @@
 }
 
 .desktopHeading, .tabletHeading {
+  display: flex;
+  justify-content: space-between;
   text-align: left;
   text-transform: capitalize;
   margin-bottom: spacing.$spacing-05;
-  
-  h4:after {
-    content: "";
-    display: block;
-    width: 2rem;
-    padding-top: 0.188rem;
-    border-bottom: 0.375rem solid var(--brand-03);
-  }
 }
 
-.heading:after {
-  content: "";
-  display: block;
-  width: 2rem;
-  padding-top: 0.188rem;
-  border-bottom: 0.375rem solid var(--brand-03);
+.title {
+  display: flex;
+  align-items: center;
 }
+
+.headingIcon {
+   margin: 0.3rem;
+   margin-right: 0.8rem;
+}
+
 
 .orderCategoryHeading {
   @extend .bodyShort01;
@@ -58,13 +56,23 @@
   margin: spacing.$spacing-05 0;
 }
 
+.desktopTile, .tabletTile {
+  padding: 0;
+  border-top: 1px solid #bae6ff;
+  border-right: none;
+  border-left: 4px solid #0072c3;
+}
+
 .desktopTile {
-  text-align: center;
   border: 1px solid $ui-03;
 }
 
-.tabletTile {
-  text-align: center;
+.collapsedTile {
+  border-bottom: none;
+  min-height: 0;
+  .orderBasketHeader {
+    margin-bottom: 0;
+  }
 }
 
 .orderBasketHeader {

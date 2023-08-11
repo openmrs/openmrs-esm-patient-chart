@@ -3,7 +3,7 @@ import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { mockMedicationOrderSearchResults } from '../__mocks__/medication.mock';
-import OrderBasketItemList from './order-basket-item-list.component';
+import { DrugOrderBasketPanel } from './drug-order-basket-panel.component';
 
 const mockOnItemClicked = jest.fn();
 const mockOnItemRemoved = jest.fn();
@@ -80,5 +80,5 @@ describe('OrderBasketItemList: ', () => {
 });
 
 function renderOrderBasketItemList() {
-  render(<OrderBasketItemList {...testProps} />);
+  render(<DrugOrderBasketPanel {...testProps} />);
 }

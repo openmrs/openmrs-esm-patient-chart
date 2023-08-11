@@ -2,20 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { useOrderBasket } from '../order-basket/useOrderBasket';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { useLaunchWorkspaceRequiringVisit, useOrderBasket, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket-action-button.scss';
-import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
   const layout = useLayoutType();
   const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { orders } = useOrderBasket();
-  const { patientUuid } = usePatient();
   const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit("order-basket");
 
   if (layout === 'tablet') {
     return (

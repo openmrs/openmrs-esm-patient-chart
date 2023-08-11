@@ -1,10 +1,9 @@
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
-import type { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { OrderPost, PatientMedicationFetchResponse, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
  * SWR-based data fetcher for patient orders.

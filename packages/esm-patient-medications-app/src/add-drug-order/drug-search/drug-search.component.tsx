@@ -3,7 +3,7 @@ import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '../../types/order-basket-item';
+import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
 

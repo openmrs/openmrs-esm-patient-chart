@@ -82,7 +82,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     await waitFor(() => user.click(orderBasketButton));
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 
@@ -99,7 +99,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     await waitFor(() => user.click(orderBasketButton));
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 

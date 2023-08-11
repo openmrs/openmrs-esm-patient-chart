@@ -21,7 +21,7 @@ import {
 import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '../types/order-basket-item';
+import type { OrderBasketItem } from "@openmrs/esm-patient-common-lib";
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
 import {
@@ -33,9 +33,9 @@ import {
 } from '../api/drug-order-template';
 import styles from './medication-order-form.scss';
 
-export interface MedicationOrderFormProps {
+export interface DrugOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
-  onSign: (finalizedOrder: OrderBasketItem) => void;
+  onSave: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
 }
 
@@ -73,7 +73,7 @@ function InputWrapper({ children }) {
   );
 }
 
-export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
+export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
@@ -82,7 +82,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
 
   const handleFormSubmission = (e) => {
     e.preventDefault();
-    onSign(orderBasketItem);
+    onSave(orderBasketItem);
   };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(
