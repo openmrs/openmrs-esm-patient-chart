@@ -34,8 +34,8 @@
       }
     },
     {
-      "name": "print",
-      "component": "print"
+      "name": "print-modal",
+      "component": "printModal"
     }
     
   ],

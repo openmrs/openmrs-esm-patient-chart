@@ -14,6 +14,7 @@ import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
 import { Printer } from '@carbon/react/icons';
 import { ConfigObject } from '../config-schema';
+import usePanelData from '../panel-view/usePanelData';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -61,6 +62,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
   const showPrintButton = config.showPrintButton;
+  const { isDoneLoading } = usePanelData();
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
@@ -68,11 +70,12 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     });
   }, [patientUuid]);
 
-  const launchPrintDialog = () => {
-    const showModel = showModal('print', {
-      closeCancelModal: () => showModel(),
+  const openPrintModal = useCallback(() => {
+    const dispose = showModal('print-modal', {
+      patientUuid,
+      closeDialog: () => dispose(),
     });
-  };
+  }, [patientUuid]);
 
   if (isTablet) {
     return (
@@ -137,13 +140,13 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               <Switch name="panel" text={t('panel', 'Panel')} />
               <Switch name="tree" text={t('tree', 'Tree')} />
             </ContentSwitcher>
-            {showPrintButton && (
+            {showPrintButton  && isDoneLoading && (
               <Button
                 kind="ghost"
                 size={isTablet ? 'md' : 'sm'}
                 renderIcon={Printer}
                 iconDescription="Print results"
-                onClick={launchPrintDialog}
+                onClick={openPrintModal}
               >
                 {t('print', 'Print')}
               </Button>

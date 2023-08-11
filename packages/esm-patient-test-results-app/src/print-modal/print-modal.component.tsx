@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import styles from './print.scss';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   ModalBody,
+  ModalFooter,
+  ModalHeader,
   Button,
   DatePickerInput,
   DatePicker,
@@ -15,22 +16,26 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import { age, formatDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import { useReactToPrint } from 'react-to-print';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import styles from './print-modal.scss';
 
-function Print({ patientUuid }) {
+function PrintModal({ patientUuid, closeDialog }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { panels } = usePanelData();
-  const componentRef = useRef(null);
+  const printContainerRef = useRef(null);
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString();
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const subheader = t('testReasults', 'Test Results');
+  const subheader = t('testReasults', 'Test results');
+  const displayText = t('testReasults', 'Test results');
+  const headerTitle = t('testReasults', 'Test results');
 
   const tableHeaders = [
     { key: 'testType', header: 'Test Type' },
@@ -39,16 +44,8 @@ function Print({ patientUuid }) {
     { key: 'normalRange', header: 'Normal Range' },
   ];
 
-  const fromDate = (date) => {
-    setSelectedFromDate(date);
-  };
-
-  const toDate = (date) => {
-    setSelectedToDate(date);
-  };
-
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => printContainerRef.current,
   });
 
   const patient = usePatient(patientUuid);
@@ -83,7 +80,6 @@ function Print({ patientUuid }) {
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
-  useEffect(() => {}, [selectedFromDate, selectedToDate]);
   const testResults = useMemo(() => {
     if (selectedFromDate && selectedToDate) {
       const selectedDateObj = new Date(selectedFromDate);
@@ -119,63 +115,45 @@ function Print({ patientUuid }) {
       };
     });
   }, [panels, selectedFromDate, selectedToDate]);
+  if (!testResults?.length) {
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+  }
 
   return (
     <div>
-      <ModalBody>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ marginRight: '0.5rem' }}> From:</span>
-                <DatePicker
-                  id="onsetDate"
-                  datePickerType="single"
-                  dateFormat="d/m/Y"
-                  light={isTablet}
-                  onChange={fromDate}
-                  value={selectedFromDate}
-                >
-                  <DatePickerInput
-                    id="onsetDateInput"
-                    style={{
-                      width: '100%',
-                      marginRight: '0.5rem',
-                      border: '1px solid #ccc',
-                      padding: '0.5rem',
-                      fontSize: 'smaller',
-                    }}
-                  />
-                </DatePicker>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ marginRight: '0.5rem' }}>To:</span>
-                <DatePicker
-                  id="onsetDate"
-                  datePickerType="single"
-                  dateFormat="d/m/Y"
-                  light={isTablet}
-                  onChange={toDate}
-                >
-                  <DatePickerInput
-                    id="onsetDateInput"
-                    style={{
-                      width: '100%',
-                      marginRight: '0.5rem',
-                      border: '1px solid #ccc',
-                      padding: '0.5rem',
-                      fontSize: 'smaller',
-                    }}
-                  />
-                </DatePicker>
-              </div>
-              <Button kind="secondary" size="sm" onClick={handlePrint}>
-                {t('print', 'Print')}
-              </Button>
-            </div>
+      <ModalHeader closeModal={closeDialog} title={t('printTestResults', 'Print test results')} />
+      <ModalBody style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        <div className={styles.datePickers}>
+          <div className={styles.dates}>
+            <span className={styles.datePickerLabel}> {t('from', 'From')}:</span>
+            <DatePicker id="onsetDate" datePickerType="single" dateFormat="d/m/Y" light={isTablet} onChange={date => setSelectedFromDate(date)}>
+              <DatePickerInput
+                size="sm"
+                style={{
+                  width: '100%',
+                  border: '1px solid #ccc',
+                  padding: '0.5rem',
+                  displayText: 'centre',
+                }}
+              />
+            </DatePicker>
+          </div>
+          <div className={styles.dates}>
+            <span className={styles.datePickerLabel}> {t('to', 'To')}:</span>
+            <DatePicker id="onsetDate" datePickerType="single" dateFormat="d/m/Y" light={isTablet} onChange={date => setSelectedToDate(date)}>
+              <DatePickerInput
+                size="sm"
+                style={{
+                  width: '100%',
+                  border: '1px solid #ccc',
+                  padding: '0.5rem',
+                  displayText: 'centre',
+                }}
+              />
+            </DatePicker>
           </div>
         </div>
-        <div ref={componentRef} className={styles.printpage}>
+        <div ref={printContainerRef} className={styles.printpage}>
           <div className={styles.printPage}>
             <header className={styles.header}>
               <svg role="img" width={110} height={40} viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
@@ -196,7 +174,7 @@ function Print({ patientUuid }) {
               <div className={styles.printedBy}>
                 {t('printedBy', 'Printed by')}
                 <span className={styles.printedBy}>
-                  {session.user.display} on {formattedDate}
+                  {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
                 </span>
               </div>
             </header>
@@ -205,53 +183,51 @@ function Print({ patientUuid }) {
               <h4>{subheader}</h4>
             </div>
           </div>
-
-          {testResults ? (
-            <DataTable
-              rows={testResults}
-              headers={tableHeaders}
-              isSortable
-              size={isTablet ? 'lg' : 'sm'}
-              useZebraStyles
-            >
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <TableContainer>
-                  <Table {...getTableProps()}>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader
-                            className={`${styles.productiveHeading01} ${styles.text02}`}
-                            {...getHeaderProps({
-                              header,
-                              isSortable: header.isSortable,
-                            })}
-                          >
-                            {header.header?.content ?? header.header}
-                          </TableHeader>
+          <DataTable rows={testResults} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}
+                        >
+                          {header.header?.content ?? header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </DataTable>
-          ) : (
-            ' There are no vital signs to display for this patient'
-          )}
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
         </div>
       </ModalBody>
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeDialog}>
+          {t('cancel', 'Cancel')}
+        </Button>
+
+        <Button kind="primary" onClick={handlePrint}>
+          {t('print', 'Print')}
+        </Button>
+      </ModalFooter>
     </div>
   );
 }
 
-export default Print;
+export default PrintModal;
