@@ -35,6 +35,9 @@ test('Should add a program and edit program', async ({ page, api }) => {
 
   await test.step('And I click on the Save button', async () => {
     await programPage.page.getByRole('button', { name: 'Save and close' }).click();
+  });
+
+  await test.step('And I should see the success message', async () => {
     await expect(programPage.page.getByText('saved')).toBeVisible();
   });
 
@@ -58,6 +61,9 @@ test('Should add a program and edit program', async ({ page, api }) => {
 
   await test.step('And I click on the Save button', async () => {
     await programPage.page.getByRole('button', { name: 'Save and close' }).click();
+  });
+
+  await test.step('And I should see the success message', async () => {
     await expect(programPage.page.getByText('updated')).toBeVisible();
   });
 
