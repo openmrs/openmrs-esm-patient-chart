@@ -1,4 +1,3 @@
-import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
