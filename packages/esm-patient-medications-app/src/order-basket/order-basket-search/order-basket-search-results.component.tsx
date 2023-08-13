@@ -3,11 +3,11 @@ import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carb
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
-import { OrderBasketItem } from '../../types/order-basket-item';
+import type { Drug } from '../../types/order';
+import type { OrderBasketItem } from '../../types/order-basket-item';
 import { ConfigObject } from '../../config-schema';
-import styles from './order-basket-search-results.scss';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
-import { Drug } from '../../types/order';
+import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;

@@ -1,14 +1,32 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType, Visit } from '@openmrs/esm-framework';
-import { Order, Encounter, Note, Observation, OrderItem, Diagnosis, mapEncounters } from '../visit.resource';
+import {
+  type AssignedExtension,
+  Extension,
+  ExtensionSlot,
+  formatTime,
+  parseDate,
+  useConfig,
+  useConnectedExtensions,
+  useLayoutType,
+  type Visit,
+} from '@openmrs/esm-framework';
+import {
+  type Order,
+  type Encounter,
+  type Note,
+  type Observation,
+  type OrderItem,
+  type Diagnosis,
+  mapEncounters,
+} from '../visit.resource';
 import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
+import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-summary.scss';
-import { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -20,10 +38,13 @@ interface VisitSummaryProps {
   patientUuid: string;
 }
 
+const visitSummaryPanelSlot = 'visit-summary-panels';
+
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -128,6 +149,14 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
+          {extensions.map((extension, index) => (
+            <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
+              {t(extension.meta.title, {
+                ns: extension.moduleName,
+                defaultValue: extension.meta.title,
+              })}
+            </Tab>
+          ))}
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -142,6 +171,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
           </TabPanel>
+          <ExtensionSlot name={visitSummaryPanelSlot}>
+            <TabPanel>
+              <Extension state={{ patientUuid, visit }} />
+            </TabPanel>
+          </ExtensionSlot>
         </TabPanels>
       </Tabs>
     </div>

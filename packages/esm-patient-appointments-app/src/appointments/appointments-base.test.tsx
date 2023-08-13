@@ -2,9 +2,13 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockAppointmentsData } from '../__mocks__/appointments.mock';
+import {
+  mockPatient,
+  patientChartBasePath,
+  renderWithSwr,
+  waitForLoadingToFinish,
+} from '../../../../tools/test-helpers';
 import AppointmentsBase from './appointments-base.component';
 
 const testProps = {

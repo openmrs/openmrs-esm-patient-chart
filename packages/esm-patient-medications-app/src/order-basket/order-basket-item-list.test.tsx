@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockMedicationOrderSearchResults } from '../../../../__mocks__/medication.mock';
+import { mockMedicationOrderSearchResults } from '../__mocks__/medication.mock';
 import OrderBasketItemList from './order-basket-item-list.component';
 
 const mockOnItemClicked = jest.fn();
@@ -32,7 +32,7 @@ describe('OrderBasketItemList: ', () => {
 
     const orderBasketItem = screen.getByRole('listitem');
     expect(orderBasketItem).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /item\(s\) already in your basket/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /item\(s\) are in your basket/i })).toBeInTheDocument();
     expect(getByTextWithMarkup(/New\s*Aspirin — 81mg — Tablet/)).toBeInTheDocument();
     expect(getByTextWithMarkup(/DOSE 81 mg — Oral — Once daily — REFILLS 0 QUANTITY 0/)).toBeInTheDocument();
 

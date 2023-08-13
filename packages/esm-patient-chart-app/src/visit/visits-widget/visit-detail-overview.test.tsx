@@ -2,14 +2,15 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { visitOverviewDetailMockData } from '../../../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
+import { visitOverviewDetailMockData } from '../../__mocks__/visits.mock';
 import VisitDetailOverview from './visit-detail-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
+
+jest.setTimeout(5000);
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
@@ -26,6 +27,7 @@ jest.mock('@openmrs/esm-framework', () => {
     // useConfig: jest.fn().mockImplementation(() => ({ showAllEncountersTab: true })),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
+    useConnectedExtensions: jest.fn(() => []),
   };
 });
 

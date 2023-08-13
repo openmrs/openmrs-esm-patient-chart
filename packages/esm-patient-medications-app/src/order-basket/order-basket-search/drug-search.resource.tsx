@@ -1,9 +1,9 @@
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { DrugOrderTemplate, OrderTemplate } from '../../api/drug-order-template';
-import { Drug } from '../../types/order';
-import { OrderBasketItem } from '../../types/order-basket-item';
+import type { DrugOrderTemplate, OrderTemplate } from '../../api/drug-order-template';
+import type { Drug } from '../../types/order';
+import type { OrderBasketItem } from '../../types/order-basket-item';
 
 export function useDrugSearch(query): {
   isLoading: boolean;
