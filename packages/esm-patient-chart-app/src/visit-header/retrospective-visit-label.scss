@@ -1,0 +1,17 @@
+.tooltipBox {
+  padding: 0.25rem;
+}
+
+.tooltipSmallText {
+  font-size: 80%;
+}
+
+.heading {
+  margin-bottom: 0.5rem; 
+}
+
+.definitionToolTip {
+  & > button{
+    border-bottom: none;
+  }
+}

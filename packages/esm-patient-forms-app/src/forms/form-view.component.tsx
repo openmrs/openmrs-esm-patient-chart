@@ -138,19 +138,17 @@ const FormView: React.FC<FormViewProps> = ({
           >
             {({ rows, headers, getHeaderProps, getTableProps, onInputChange, getToolbarProps }) => (
               <TableContainer className={styles.tableContainer}>
-                <TableToolbar className={styles.tableToolbar} {...getToolbarProps()}>
-                  <TableToolbarContent>
-                    <Layer>
-                      <TableToolbarSearch
-                        className={styles.searchInput}
-                        expanded
-                        onChange={(event) => handleSearch(event.target.value)}
-                        placeholder={t('searchForAForm', 'Search for a form')}
-                        size={isTablet ? 'lg' : 'sm'}
-                      />
-                    </Layer>
-                  </TableToolbarContent>
-                </TableToolbar>
+                <TableToolbarContent {...getToolbarProps()} style={{ justifyContent: 'flex-start' }}>
+                  <Layer style={{ width: '100%' }}>
+                    <TableToolbarSearch
+                      persistent
+                      expanded
+                      onChange={(event) => handleSearch(event.target.value)}
+                      placeholder={t('searchForAForm', 'Search for a form')}
+                      size={isTablet ? 'lg' : 'sm'}
+                    />
+                  </Layer>
+                </TableToolbarContent>
                 <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>

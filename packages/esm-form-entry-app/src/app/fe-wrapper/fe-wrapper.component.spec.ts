@@ -6,13 +6,11 @@ import { FeWrapperComponent } from './fe-wrapper.component';
 import { FormEntryModule } from '@openmrs/ngx-formentry';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
-import { of } from 'rxjs';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { OpenmrsApiModule } from '../openmrs-api/openmrs-api.module';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
-import { FormSubmittedComponent } from '../form-submitted/form-submitted.component';
 
 describe('FeWrapperComponent', () => {
   let component: FeWrapperComponent;
@@ -20,7 +18,7 @@ describe('FeWrapperComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [FeWrapperComponent, FormSubmittedComponent],
+      declarations: [FeWrapperComponent],
       imports: [BrowserModule, BrowserAnimationsModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
       providers: [
         {

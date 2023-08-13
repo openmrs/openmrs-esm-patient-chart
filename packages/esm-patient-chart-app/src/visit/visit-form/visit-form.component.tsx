@@ -78,7 +78,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const allVisitTypes = useVisitTypes();
   const { mutate } = useVisit(patientUuid);
@@ -282,7 +282,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <div>
           {isTablet && (
             <Row className={styles.headerGridRow}>
-              <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+              <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={visitHeaderSlotState} />
             </Row>
           )}
           <Stack gap={1} className={styles.container}>

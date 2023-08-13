@@ -48,7 +48,7 @@ export default function OrderBasketItemList({
             </div>
           ) : (
             <h4 className={styles.orderCategoryHeading}>
-              {t('ordersAlreadyInBasketWithCount', '{count} item(s) already in your basket', {
+              {t('ordersAlreadyInBasketWithCount', '{count} item(s) are in your basket', {
                 count: newOrderBasketItems.length,
               })}
             </h4>

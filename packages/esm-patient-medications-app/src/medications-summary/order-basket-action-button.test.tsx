@@ -52,8 +52,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('../medications/order-basket-store.ts', () => {
-  const originalModule = jest.requireActual('../medications/order-basket-store');
+jest.mock('../order-basket/order-basket-store.ts', () => {
+  const originalModule = jest.requireActual('../order-basket/order-basket-store');
 
   return {
     ...originalModule,
