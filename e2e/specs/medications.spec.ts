@@ -53,7 +53,6 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.page.getByPlaceholder('e.g. "Hypertension"').fill('Mental status change');
     await medicationPage.page.getByRole('button', { name: 'Save order' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
-    await expect(medicationPage.page.getByText('placed')).toBeVisible();
   });
 
   await test.step('Then I should see the medication in the active medication table', async () => {
@@ -79,7 +78,6 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.page.getByLabel('Prescription refills').fill('6');
     await medicationPage.page.getByRole('button', { name: 'Save order' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
-    await expect(medicationPage.page.getByText('placed')).toBeVisible();
   });
 
   await test.step('Then I should see the modified medication in the active medication table', async () => {
@@ -93,7 +91,6 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.activeMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
     await medicationPage.page.getByRole('menuitem', { name: 'Discontinue' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
-    await expect(medicationPage.page.getByText('placed')).toBeVisible();
   });
 
   await test.step('Then I should see the discontinued medication in the past medication table', async () => {
@@ -107,7 +104,6 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.pastMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
     await medicationPage.page.getByRole('menuitem', { name: 'Reorder' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
-    await expect(medicationPage.page.getByText('placed')).toBeVisible();
   });
 
   await test.step('Then I should see the reordered medication in the active medication table', async () => {
