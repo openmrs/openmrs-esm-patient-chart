@@ -33,7 +33,7 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'Whether to display the Print button in the Test Results dashboard. If set to true, a Print button is added next to the Tree-Panel switch. When clicked, a modal pops up with a printable version of the table and another Print button',
+      'Whether or not to display the print button in the Test Results dashboard. When set to `true`, a print button is shown to the right of the panel and tree view content switcher. When clicked, a modal pops up showing a datatable with the available test results. Once the user selects an appropriate date range, they can click on the print button in the modal to print the data',
   },
 };
 

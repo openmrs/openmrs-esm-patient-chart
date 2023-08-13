@@ -28,13 +28,9 @@ function PrintModal({ patientUuid, closeDialog }) {
   const session = useSession();
   const { panels } = usePanelData();
   const printContainerRef = useRef(null);
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString();
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const subheader = t('testReasults', 'Test results');
-  const displayText = t('testReasults', 'Test results');
   const headerTitle = t('testReasults', 'Test results');
 
   const tableHeaders = [
@@ -116,46 +112,43 @@ function PrintModal({ patientUuid, closeDialog }) {
     });
   }, [panels, selectedFromDate, selectedToDate]);
   if (!testResults?.length) {
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+    return <EmptyState displayText={headerTitle} headerTitle={headerTitle} />;
   }
 
   return (
     <div>
       <ModalHeader closeModal={closeDialog} title={t('printTestResults', 'Print test results')} />
-      <ModalBody style={{ maxHeight: '500px', overflowY: 'auto' }}>
+      <ModalBody className={styles.modalBody}>
         <div className={styles.datePickers}>
           <div className={styles.dates}>
             <span className={styles.datePickerLabel}> {t('from', 'From')}:</span>
-            <DatePicker id="onsetDate" datePickerType="single" dateFormat="d/m/Y" light={isTablet} onChange={date => setSelectedFromDate(date)}>
-              <DatePickerInput
-                size="sm"
-                style={{
-                  width: '100%',
-                  border: '1px solid #ccc',
-                  padding: '0.5rem',
-                  displayText: 'centre',
-                }}
-              />
+            <DatePicker
+              id="onsetDate"
+              datePickerType="single"
+              dateFormat="d/m/Y"
+              light={isTablet}
+              onChange={(date) => setSelectedFromDate(date)}
+            >
+              <DatePickerInput size="sm" />
             </DatePicker>
           </div>
           <div className={styles.dates}>
             <span className={styles.datePickerLabel}> {t('to', 'To')}:</span>
-            <DatePicker id="onsetDate" datePickerType="single" dateFormat="d/m/Y" light={isTablet} onChange={date => setSelectedToDate(date)}>
-              <DatePickerInput
-                size="sm"
-                style={{
-                  width: '100%',
-                  border: '1px solid #ccc',
-                  padding: '0.5rem',
-                  displayText: 'centre',
-                }}
-              />
+            <DatePicker
+              id="onsetDate"
+              datePickerType="single"
+              dateFormat="d/m/Y"
+              light={isTablet}
+              onChange={(date) => setSelectedToDate(date)}
+            >
+              <DatePickerInput size="sm" />
             </DatePicker>
           </div>
         </div>
-        <div ref={printContainerRef} className={styles.printpage}>
+        <div ref={printContainerRef}>
           <div className={styles.printPage}>
             <header className={styles.header}>
+              {/* OpenMRS Logo */}
               <svg role="img" width={110} height={40} viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fill-rule="evenodd"
@@ -180,7 +173,7 @@ function PrintModal({ patientUuid, closeDialog }) {
             </header>
 
             <div className={styles.subheader}>
-              <h4>{subheader}</h4>
+              <h4>{headerTitle}</h4>
             </div>
           </div>
           <DataTable rows={testResults} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
