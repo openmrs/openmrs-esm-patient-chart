@@ -278,7 +278,9 @@ export class FormCreationService {
         form.valueProcessingInfo.providerUuid = session.currentProvider?.uuid;
 
         if (formSchema.encounterType) {
-          form.valueProcessingInfo.encounterTypeUuid = formSchema.encounterType.uuid;
+          form.valueProcessingInfo.encounterTypeUuid = formSchema.encounterType;
+          form.valueProcessingInfo.encounterDatetime =
+            form.existingOrders?.encounterDatetime ?? new Date().toISOString();
         } else {
           throw new Error('Please associate the form with an encounter type.');
         }
