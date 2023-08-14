@@ -4,10 +4,10 @@ import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Layer, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
-import { getFlagType } from './utils';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
+import { getFlagType } from './utils';
 import styles from './flags-list.scss';
 
 type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';

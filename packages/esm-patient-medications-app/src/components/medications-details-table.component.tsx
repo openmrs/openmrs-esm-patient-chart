@@ -21,17 +21,17 @@ import { Add, User } from '@carbon/react/icons';
 import { formatDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { compare } from '../utils/compare';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../order-basket/order-basket-store';
 import type { Order } from '../types/order';
 import type { OrderBasketItem } from '../types/order-basket-item';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
+  showAddButton?: boolean;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
@@ -42,6 +42,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   isValidating,
   title,
   medications,
+  showAddButton,
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
@@ -153,14 +154,16 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             <InlineLoading />
           </span>
         ) : null}
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <Add size={16} {...props} />}
-          iconDescription="Launch order basket"
-          onClick={launchOrderBasket}
-        >
-          {t('add', 'Add')}
-        </Button>
+        {showAddButton ?? true ? (
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Launch order basket"
+            onClick={launchOrderBasket}
+          >
+            {t('add', 'Add')}
+          </Button>
+        ) : null}
       </CardHeader>
       <DataTable
         data-floating-menu-container
@@ -270,7 +273,7 @@ function OrderBasketItemActions({
         },
         frequency: {
           valueCoded: medication.frequency?.uuid,
-          value: medication.frequency.display,
+          value: medication.frequency?.display,
         },
         route: {
           valueCoded: medication.route?.uuid,
@@ -296,8 +299,8 @@ function OrderBasketItemActions({
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
         quantityUnits: {
-          value: medication.quantityUnits.display,
-          valueCoded: medication.quantityUnits.uuid,
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
         },
       },
     ]);
@@ -435,6 +438,26 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
+}
+
+/**
+ * Enables a comparison of arbitrary values with support for undefined/null.
+ * Requires the `<` and `>` operators to return something reasonable for the provided values.
+ */
+function compare<T>(x?: T, y?: T) {
+  if (x == undefined && y == undefined) {
+    return 0;
+  } else if (x == undefined) {
+    return -1;
+  } else if (y == undefined) {
+    return 1;
+  } else if (x < y) {
+    return -1;
+  } else if (x > y) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 export default MedicationsDetailsTable;

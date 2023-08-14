@@ -14,11 +14,6 @@
       "order": 5
     },
     {
-      "name": "notes-details-widget",
-      "component": "notesDetailedSummary",
-      "slot": "patient-chart-form-dashboard-slot"
-    },
-    {
       "name": "visit-note-nav-button",
       "component": "visitNotesActionButton",
       "slot": "action-menu-chart-items-slot",

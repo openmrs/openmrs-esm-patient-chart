@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.24.0"
+    "webservices.rest": "^2.24.0",
+    "o3forms": "*"
   },
   "extensions": [
     {

@@ -13,7 +13,6 @@ import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
-import { ConceptService } from '../services/concept.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ProgramResourceService } from '../openmrs-api/program-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
@@ -56,7 +55,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly patientPreviousEncounter: PatientPreviousEncounterService,
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
-    private readonly conceptService: ConceptService,
     private readonly translateService: TranslateService,
     private readonly ngZone: NgZone,
     private readonly programService: ProgramResourceService,
@@ -86,23 +84,19 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         take(1),
         map((createFormParams) => from(this.formCreationService.initAndCreateForm(createFormParams))),
         concatAll(),
-        mergeMap(async (form) => {
-          const unlabeledConcepts = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(form.schema);
-          return {
-            form,
-            concepts: await this.conceptService.searchConceptsByIdentifiers(unlabeledConcepts).toPromise(),
-          };
-        }),
       )
       .subscribe(
-        ({ form, concepts }) => {
+        (form) => {
           this.form = form;
-          if (concepts) {
-            this.labelMap = concepts.reduce((acc, current) => {
-              if (Boolean(current)) {
-                acc[current.identifier] = current.display;
+          if (Boolean(form.schema?.conceptReferences)) {
+            this.labelMap = Object.entries(
+              form.schema?.conceptReferences as {
+                [reference: string]: { uuid?: string | null; display?: string | null };
+              },
+            ).reduce((acc: { [reference: string]: string }, current) => {
+              if (current && current[0] && current[1]?.display) {
+                acc[current[0]] = current[1].display;
               }
-
               return acc;
             }, {});
           }
