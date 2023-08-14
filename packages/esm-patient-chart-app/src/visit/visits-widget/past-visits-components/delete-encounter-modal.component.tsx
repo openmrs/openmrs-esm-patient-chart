@@ -15,11 +15,13 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   encounterTypeName,
 }) => {
   const { t } = useTranslation();
+  const handleCancel = () => close();
+  const handleDelete = () => onConfirmation?.();
 
   return (
     <>
       <ModalHeader closeModal={close} className={styles.productiveHeading03}>
-        {t('deleteEncounter', 'Delete Encounter')} ?
+        {t('deleteEncounter', 'Delete Encounter')}?
       </ModalHeader>
       <ModalBody>
         <p className={styles.bodyLong01}>
@@ -31,10 +33,10 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
         </p>
       </ModalBody>
       <ModalFooter>
-        <Button size="lg" kind="secondary" onClick={() => close()}>
+        <Button size="lg" kind="secondary" onClick={handleCancel}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button size="lg" kind="danger" onClick={() => onConfirmation?.()} autoFocus>
+        <Button autoFocus kind="danger" onClick={handleDelete} size="lg">
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>
