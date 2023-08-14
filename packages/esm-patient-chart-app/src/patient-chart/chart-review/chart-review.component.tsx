@@ -27,10 +27,10 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
-  setIsContained?: (isContained: boolean) => void;
+  fullWidthWidgets?: (isWidgetFullWidth: boolean) => void;
 }
 
-const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setIsContained }) => {
+const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, fullWidthWidgets }) => {
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
@@ -51,10 +51,10 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
 
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
-    if (setIsContained) {
-      setIsContained(activeDashboard.fullWidth ?? false);
+    if (fullWidthWidgets) {
+      fullWidthWidgets(activeDashboard.fullWidth ?? false);
     }
-  }, [dashboard, defaultDashboard, setIsContained]);
+  }, [dashboard, defaultDashboard, fullWidthWidgets]);
 
   if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
     return null;

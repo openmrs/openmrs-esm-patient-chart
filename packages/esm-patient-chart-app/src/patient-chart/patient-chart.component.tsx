@@ -27,7 +27,7 @@ const PatientChart: React.FC = () => {
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
-  const [isContentContained, setIsContentContained] = useState(false);
+  const [isWidgetFullWidth, setIsWidgetFullWidth] = useState(false);
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
@@ -72,8 +72,8 @@ const PatientChart: React.FC = () => {
                 <ExtensionSlot name="patient-info-slot" state={state} />
               </aside>
               <div className={styles.grid}>
-                <div className={`${styles.chartReview} ${!isContentContained ? styles.widthContained : ''}`}>
-                  <ChartReview {...state} view={view} setIsContained={setIsContentContained} />
+                <div className={`${styles.chartReview} ${!isWidgetFullWidth ? styles.widthContained : ''}`}>
+                  <ChartReview {...state} view={view} fullWidthWidgets={setIsWidgetFullWidth} />
                   <WorkspaceNotification />
                 </div>
               </div>
