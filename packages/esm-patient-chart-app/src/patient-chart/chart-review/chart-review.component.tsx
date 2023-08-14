@@ -47,13 +47,14 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
   const defaultDashboard = dashboards.filter((dashboard) => dashboard.path)[0];
   const dashboard = useMemo(() => {
     return dashboards.find((dashboard) => dashboard.path === view);
-  }, [view]);
+  }, [dashboards, view]);
 
   useEffect(() => {
+    const activeDashboard = dashboard ?? defaultDashboard;
     if (setIsContained) {
-      setIsContained(dashboard.fullWidth);
+      setIsContained(activeDashboard.fullWidth ?? false);
     }
-  }, [dashboard]);
+  }, [dashboard, defaultDashboard, setIsContained]);
 
   if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
     return null;
