@@ -57,7 +57,7 @@ const medicationOrderFormSchema = z.object({
   patientInstructions: z.string().nullable(),
   asNeeded: z.boolean(),
   asNeededCondition: z.string().nullable(),
-  duration: z.number().refine((value) => value < 1, { message: "Value can't be less than one" }),,
+  duration: z.number().refine((value) => value >= 1, { message: "Value can't be less than one" }),
   durationUnit: comboSchema,
   pillsDispensed: z.number(),
   quantityUnits: comboSchema,
@@ -499,7 +499,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     size="lg"
                     id="durationInput"
                     label={t('duration', 'Duration')}
-                    min={1}
+                    min={0}
                     step={1}
                     max={99}
                     allowEmpty={true}
