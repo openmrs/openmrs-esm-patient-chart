@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
@@ -27,15 +27,12 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
+  setIsContained?: (isContained: boolean) => void;
 }
 
-const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view }) => {
+const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setIsContained }) => {
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
-
-  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
-    return null;
-  }
 
   const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
     getDashboardDefinition(e.meta, e.config),
@@ -48,7 +45,19 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards.filter((dashboard) => dashboard.path)[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.path === view);
+  const dashboard = useMemo(() => {
+    return dashboards.find((dashboard) => dashboard.path === view);
+  }, [view]);
+
+  useEffect(() => {
+    if (setIsContained) {
+      setIsContained(dashboard.fullWidth);
+    }
+  }, [dashboard]);
+
+  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
+    return null;
+  }
 
   if (!defaultDashboard) {
     return null;

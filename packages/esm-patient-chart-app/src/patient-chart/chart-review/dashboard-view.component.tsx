@@ -22,6 +22,7 @@ export interface DashboardConfig {
   path: string;
   columns: number;
   hideDashboardTitle?: boolean;
+  fullWidth?: boolean;
 }
 
 interface DashboardViewProps {
