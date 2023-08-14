@@ -3,21 +3,40 @@ import {
   launchStartVisitPrompt,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
-import { useCallback } from 'react';
-import { useSystemVisitSetting } from '../../esm-patient-medications-app/src/api/api';
-import { usePatient } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+
+import { useCallback, useMemo } from 'react';
+import { FetchResponse, openmrsFetch, usePatient } from '@openmrs/esm-framework';
 
 export function useLaunchWorkspaceRequiringVisit(workspaceName: string) {
   const { patientUuid } = usePatient();
   const { systemVisitEnabled } = useSystemVisitSetting();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchOrderBasket = useCallback(() => {
+  const launchOrderBasket = useCallback((additionalProps?: object) => {
     if (!systemVisitEnabled || currentVisit) {
-      launchPatientWorkspace(workspaceName);
+      launchPatientWorkspace(workspaceName, additionalProps);
     } else {
       launchStartVisitPrompt();
     }
   }, [currentVisit, systemVisitEnabled, workspaceName]);
   return launchOrderBasket;
+}
+
+function useSystemVisitSetting() {
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
+    `/ws/rest/v1/systemsetting/visits.enabled?v=custom:(value)`,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      systemVisitEnabled: (data?.data?.value ?? 'true').toLowerCase() === 'true',
+      errorFetchingSystemVisitSetting: error,
+      isLoadingSystemVisitSetting: isLoading,
+    }),
+    [data, isLoading, error],
+  );
+
+  return results;
 }

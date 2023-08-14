@@ -20,7 +20,7 @@ export default function OrderBasketItemList({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const newOrderBasketItems = orderBasketItems.filter((x) => x.action === 'NEW');
-  const renewedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'RENEWED');
+  const renewedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'RENEW');
   const revisedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'REVISE');
   const discontinuedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'DISCONTINUE');
 

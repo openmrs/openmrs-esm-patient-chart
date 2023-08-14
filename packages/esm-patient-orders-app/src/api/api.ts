@@ -1,55 +1,28 @@
-import useSWR, { mutate } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
-import type { OrderPost, PatientMedicationFetchResponse } from '../types/order';
-import { ConfigObject } from '../config-schema';
+import { FetchResponse, openmrsFetch, OpenmrsResource, parseDate, Visit } from '@openmrs/esm-framework';
+import type { OrderPost } from '@openmrs/esm-patient-common-lib';
 import { useCallback, useMemo } from 'react';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
- * SWR-based data fetcher for patient orders. Note that 'mutate' will cause orders to be
- * refetched for all components using `usePatientOrders` with the current patient, regardless
- * of status.
+ * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
+ * Refreshes patient orders for all kinds of orders.
  *
- * @param patientUuid The UUID of the patient whose orders should be fetched.
- * @param status Allows fetching either all orders or only active orders. Default: "any"
+ * @param patientUuid The UUID of the patient to get an order mutate function for.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any' = 'any') {
-  const { careSettingUuid, drugOrderTypeUUID } = useConfig() as ConfigObject;
-  const customRepresentation =
-    'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
-    'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
-    'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
-    'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
-    'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
-    'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
-  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
-
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
-    patientUuid ? ordersUrl : null,
-    openmrsFetch,
-  );
-
+export function useMutatePatientOrders(patientUuid: string) {
+  const { mutate } = useSWRConfig()
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)),
+    () => mutate((key) => {
+      const result = typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`);
+      console.log(result, 'key', key)
+      return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)
+    }),
     [patientUuid],
   );
 
-  const drugOrders = useMemo(
-    () =>
-      data?.data?.results
-        ? data.data.results
-            .filter((order) => order.orderType.display === 'Drug Order')
-            ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
-        : null,
-    [data],
-  );
-
   return {
-    data: data ? drugOrders : null,
-    error: error,
-    isLoading,
-    isValidating,
     mutate: mutateOrders,
   };
 }
@@ -72,16 +45,26 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
 export function createEmptyEncounter(
   patientUuid: string,
   drugOrderEncounterType: string,
-  currentVisitUuid: string,
+  activeVisit: Visit | null,
   sessionLocationUuid: string,
   abortController?: AbortController,
 ) {
+  const now = new Date();
+  const visitStartDate = parseDate(activeVisit?.startDatetime);
+  const visitEndDate = parseDate(activeVisit?.stopDatetime);
+  let encounterDate: Date;
+  if (!activeVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
+    now
+  } else {
+    console.warn("createEmptyEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.")
+    visitStartDate;
+  }
   const emptyEncounter = {
     patient: patientUuid,
     location: sessionLocationUuid,
     encounterType: drugOrderEncounterType,
-    encounterDatetime: new Date().toISOString(),
-    visit: currentVisitUuid,
+    encounterDatetime: encounterDate,
+    visit: activeVisit?.uuid,
     obs: [],
   };
 

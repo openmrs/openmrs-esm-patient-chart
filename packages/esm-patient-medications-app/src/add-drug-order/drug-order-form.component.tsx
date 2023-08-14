@@ -30,7 +30,7 @@ import {
   MedicationFrequency,
   MedicationRoute,
   QuantityUnit,
-} from '../api/drug-order-template';
+} from '@openmrs/esm-patient-common-lib';
 import styles from './medication-order-form.scss';
 
 export interface DrugOrderFormProps {

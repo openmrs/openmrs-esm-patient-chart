@@ -6056,7 +6056,7 @@ __metadata:
     rxjs: ^6.6.3
     sass: ^1.54.3
     swc-loader: ^0.2.3
-    swr: ^2.0.1
+    swr: ^2.2.1
     turbo: ^1.5.5
     typescript: ^4.0.3
     webpack-cli: ^4.10.0
@@ -10495,6 +10495,13 @@ __metadata:
   version: 3.0.0
   resolution: "cli-width@npm:3.0.0"
   checksum: 4c94af3769367a70e11ed69aa6095f1c600c0ff510f3921ab4045af961820d57c0233acfa8b6396037391f31b4c397e1f614d234294f979ff61430a6c166c3f6
+  languageName: node
+  linkType: hard
+
+"client-only@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "client-only@npm:0.0.1"
+  checksum: 0c16bf660dadb90610553c1d8946a7fdfb81d624adea073b8440b7d795d5b5b08beb3c950c6a2cf16279365a3265158a236876d92bce16423c485c322d7dfaf8
   languageName: node
   linkType: hard
 
@@ -25579,6 +25586,18 @@ __metadata:
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0
   checksum: 5466e46a80bccf722c212ea3f14668b4e7f047d958f3da7252fba3529e6b1773a1762aa4bbf43aec104cc50625dbd55380539eeef59fd5ad9ebca6ad0552f45d
+  languageName: node
+  linkType: hard
+
+"swr@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "swr@npm:2.2.1"
+  dependencies:
+    client-only: ^0.0.1
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    react: ^16.11.0 || ^17.0.0 || ^18.0.0
+  checksum: 62ff1b8132966fc977df192cf4452bab94c73dbea304a1438745f27041917154dad32448d8a65fb40d5e3de0b1751ef3fd57b1d71ba450e031517f009d0fc052
   languageName: node
   linkType: hard
 

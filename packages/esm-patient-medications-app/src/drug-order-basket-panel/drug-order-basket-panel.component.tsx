@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
@@ -8,14 +8,15 @@ import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import styles from './drug-order-basket-panel.scss';
 import RxIcon from './rx-icon.component';
+import { prepMedicationOrderPostData } from '../api/api';
 
 export default function DrugOrderPanel({}) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket('medications');
+  const { orders, setOrders } = useOrderBasket('medications', prepMedicationOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const newOrderBasketItems = orders.filter((x) => x.action === 'NEW');
-  const renewedOrderBasketItems = orders.filter((x) => x.action === 'RENEWED');
+  const renewedOrderBasketItems = orders.filter((x) => x.action === 'RENEW');
   const revisedOrderBasketItems = orders.filter((x) => x.action === 'REVISE');
   const discontinuedOrderBasketItems = orders.filter((x) => x.action === 'DISCONTINUE');
 
@@ -35,6 +36,10 @@ export default function DrugOrderPanel({}) {
     },
     [orders, setOrders],
   );
+
+  useEffect(() => {
+    setIsExpanded(orders.length > 0);
+  }, [orders])
 
   return (
     <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
@@ -70,19 +75,6 @@ export default function DrugOrderPanel({}) {
       <>
         {newOrderBasketItems.length > 0 && (
           <>
-            {isTablet ? (
-              <div className={styles.orderBasketHeader}>
-                <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-                  {t('orderBasketWithCount', 'Order basket ({count})', { count: newOrderBasketItems.length })}
-                </h4>
-              </div>
-            ) : (
-              <h4 className={styles.orderCategoryHeading}>
-                {t('ordersAlreadyInBasketWithCount', '{count} item(s) are in your basket', {
-                  count: newOrderBasketItems.length,
-                })}
-              </h4>
-            )}
             {newOrderBasketItems.map((order, index) => (
               <OrderBasketItemTile
                 key={index}
@@ -96,11 +88,6 @@ export default function DrugOrderPanel({}) {
 
         {renewedOrderBasketItems.length > 0 && (
           <>
-            <h4 className={styles.orderCategoryHeading}>
-              {t('renewedOrders', '{count} order(s) being renewed (continued)', {
-                count: renewedOrderBasketItems.length,
-              })}
-            </h4>
             {renewedOrderBasketItems.map((item, index) => (
               <OrderBasketItemTile
                 key={index}
@@ -114,11 +101,6 @@ export default function DrugOrderPanel({}) {
 
         {revisedOrderBasketItems.length > 0 && (
           <>
-            <h4 className={styles.orderCategoryHeading}>
-              {t('revisedOrders', '{count} order(s) being modified (revised)', {
-                count: revisedOrderBasketItems.length,
-              })}
-            </h4>
             {revisedOrderBasketItems.map((item, index) => (
               <OrderBasketItemTile
                 key={index}
@@ -132,11 +114,6 @@ export default function DrugOrderPanel({}) {
 
         {discontinuedOrderBasketItems.length > 0 && (
           <>
-            <h4 className={styles.orderCategoryHeading}>
-              {t('discontinuedOrders', '{count} discontinued order(s)', {
-                count: discontinuedOrderBasketItems.length,
-              })}
-            </h4>
             {discontinuedOrderBasketItems.map((item, index) => (
               <OrderBasketItemTile
                 key={index}

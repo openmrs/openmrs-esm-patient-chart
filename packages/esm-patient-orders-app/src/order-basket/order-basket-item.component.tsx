@@ -111,8 +111,8 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: OrderBasketIte
   switch (orderBasketItem.action) {
     case 'NEW':
       return <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;
-    case 'RENEWED':
-      return <span className={styles.orderActionRenewLabel}>{t('orderActionRenewed', 'Renew')}</span>;
+    case 'RENEW':
+      return <span className={styles.orderActionRenewLabel}>{t('orderActionRenew', 'Renew')}</span>;
     case 'REVISE':
       return <span className={styles.orderActionRevisedLabel}>{t('orderActionRevised', 'Modify')}</span>;
     case 'DISCONTINUE':

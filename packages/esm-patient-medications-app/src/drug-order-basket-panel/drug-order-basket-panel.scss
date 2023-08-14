@@ -36,7 +36,6 @@
   justify-content: space-between;
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
 }
 
 .title {
@@ -49,22 +48,11 @@
    margin-right: 0.8rem;
 }
 
-
-.orderCategoryHeading {
-  @extend .bodyShort01;
-  color: $text-02;
-  margin: spacing.$spacing-05 0;
-}
-
 .desktopTile, .tabletTile {
   padding: 0;
   border-top: 1px solid #bae6ff;
   border-right: none;
   border-left: 4px solid #0072c3;
-}
-
-.desktopTile {
-  border: 1px solid $ui-03;
 }
 
 .collapsedTile {
@@ -73,22 +61,6 @@
   .orderBasketHeader {
     margin-bottom: 0;
   }
-}
-
-.orderBasketHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: spacing.$spacing-04 0 0 spacing.$spacing-05;
-  background-color: $ui-background;
-}
-
-.orderBasketHeader > h4:after {
-  content: "";
-  display: block;
-  width: 2rem;
-  padding-top: 3px;
-  border-bottom: 0.375rem solid var(--brand-03);
 }
 
 .orderBasketContainerDesktop {

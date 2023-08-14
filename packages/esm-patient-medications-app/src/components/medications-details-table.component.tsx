@@ -22,6 +22,7 @@ import { CardHeader, Order, OrderBasketItem, useOrderBasket } from '@openmrs/esm
 import { useTranslation } from 'react-i18next';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
+import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order-workspace.component';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -45,7 +46,8 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
   const { orders, setOrders } = useOrderBasket('medications');
 
@@ -153,7 +155,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Launch order basket"
-            onClick={launchOrderBasket}
+            onClick={launchAddDrugOrder}
           >
             {t('add', 'Add')}
           </Button>
@@ -204,6 +206,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                         items={orders}
                         setItems={setOrders}
                         openOrderBasket={launchOrderBasket}
+                        openDrugOrderForm={launchAddDrugOrder}
                       />
                     </TableCell>
                   </TableRow>
@@ -240,6 +243,7 @@ function OrderBasketItemActions({
   items,
   setItems,
   openOrderBasket,
+  openDrugOrderForm,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -248,6 +252,7 @@ function OrderBasketItemActions({
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
   openOrderBasket: () => void;
+  openDrugOrderForm: (additionalProps?: AddDrugOrderWorkspaceAdditionalProps) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -302,53 +307,54 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
+    const newItem: OrderBasketItem = {
+      uuid: medication.uuid,
+      previousOrder: medication.uuid,
+      startDate: new Date(),
+      action: 'REVISE',
+      drug: medication.drug,
+      dosage: medication.dose,
+      unit: {
+        value: medication.doseUnits?.display,
+        valueCoded: medication.doseUnits?.uuid,
+      },
+      frequency: {
+        valueCoded: medication.frequency?.uuid,
+        value: medication.frequency?.display,
+      },
+      route: {
+        valueCoded: medication.route?.uuid,
+        value: medication.route?.display,
+      },
+      commonMedicationName: medication.drug?.display,
+      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+      freeTextDosage:
+        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      patientInstructions:
+        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      asNeeded: medication.asNeeded,
+      asNeededCondition: medication.asNeededCondition,
+      duration: medication.duration,
+      durationUnit: {
+        valueCoded: medication.durationUnits?.uuid,
+        value: medication.durationUnits?.display,
+      },
+      pillsDispensed: medication.quantity,
+      numRefills: medication.numRefills,
+      indication: medication.orderReasonNonCoded,
+      orderer: medication.orderer?.uuid,
+      careSetting: medication.careSetting?.uuid,
+      quantityUnits: {
+        value: medication.quantityUnits?.display,
+        valueCoded: medication.quantityUnits?.uuid,
+      },
+    }
     setItems([
       ...items,
-      {
-        uuid: medication.uuid,
-        previousOrder: medication.uuid,
-        startDate: new Date(),
-        action: 'REVISE',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        asNeeded: medication.asNeeded,
-        asNeededCondition: medication.asNeededCondition,
-        duration: medication.duration,
-        durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
-          value: medication.durationUnits?.display,
-        },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer?.uuid,
-        careSetting: medication.careSetting?.uuid,
-        quantityUnits: {
-          value: medication.quantityUnits?.display,
-          valueCoded: medication.quantityUnits?.uuid,
-        },
-      },
+      newItem
     ]);
-    openOrderBasket();
-  }, [items, setItems, medication, openOrderBasket]);
+    openDrugOrderForm({ order: newItem });
+  }, [items, setItems, medication, openDrugOrderForm]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -357,7 +363,7 @@ function OrderBasketItemActions({
         uuid: medication.uuid,
         previousOrder: null,
         startDate: new Date(),
-        action: 'RENEWED',
+        action: 'RENEW',
         drug: medication.drug,
         dosage: medication.dose,
         unit: {

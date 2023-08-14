@@ -2,11 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { useOrderBasket, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { orderDrugs } from './drug-ordering';
+import { postOrders, useOrderBasket, useVisitOrOfflineVisit, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
-import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
-import type { OrderBasketItem } from '../types/order-basket-item';
+import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
@@ -19,7 +17,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
   const session = useSession();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
   const {
     activeVisitRequired,
@@ -29,7 +27,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     mutate: mutateEncounterUuid,
   } = useOrderEncounter(patientUuid);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
-  const { mutate: mutateOrders } = usePatientOrders(patientUuid);
+  const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -48,7 +46,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
         orderEncounterUuid = await createEmptyEncounter(
           patientUuid,
           config?.drugOrderEncounterType,
-          activeVisitRequired ? currentVisit?.uuid : null,
+          activeVisitRequired ? activeVisit : null,
           session?.sessionLocation?.uuid,
           abortController,
         );
@@ -60,15 +58,13 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
       }
     }
 
-    const erroredItems = await orderDrugs(orders, patientUuid, orderEncounterUuid, abortController);
+    const erroredItems = await postOrders(orderEncounterUuid, abortController);
     clearOrders({ exceptThoseMatching: (item) => erroredItems.includes(item) });
-
+    mutateOrders();
     if (erroredItems.length == 0) {
-      mutateOrders();
       closeWorkspace();
       showOrderSuccessToast(t, orders);
     } else {
-      mutateOrders();
       showOrderFailureToast(t);
     }
 
@@ -81,7 +77,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
     patientUuid,
     encounterUuid,
     activeVisitRequired,
-    currentVisit,
+    activeVisit,
     session,
     config,
     t,
@@ -118,14 +114,14 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
               className={styles.bottomButton}
               kind="primary"
               onClick={handleSave}
-              disabled={!orders?.length || isLoadingEncounterUuid || (activeVisitRequired && !currentVisit)}
+              disabled={!orders?.length || isLoadingEncounterUuid || (activeVisitRequired && !activeVisit)}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>
           </ButtonSet>
         </div>
       </div>
-      {activeVisitRequired && !currentVisit && (
+      {activeVisitRequired && !activeVisit && (
         <ActionableNotification
           kind="error"
           actionButtonLabel={t('startVisit', 'Start visit')}
@@ -144,7 +140,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
 
 function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[]) {
   const orderedString = patientOrderItems
-    .filter((item) => ['NEW', 'RENEWED'].includes(item.action))
+    .filter((item) => ['NEW', 'RENEW'].includes(item.action))
     .map((item) => item.drug?.display)
     .join(', ');
   const updatedString = patientOrderItems

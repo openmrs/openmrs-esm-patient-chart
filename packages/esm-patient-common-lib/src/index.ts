@@ -10,7 +10,7 @@ export * from './nav-group/createDashboardGroup';
 export * from './nav-group/DashboardGroupExtension';
 export * from './nav-group/nav-group';
 export * from './offline/visit';
-export * from './order-basket';
+export * from './orders';
 export * from './pagination';
 export * from './patient-summary/patient-summary-extension-order';
 export * from './programs/usePatientProgramEnrollment';

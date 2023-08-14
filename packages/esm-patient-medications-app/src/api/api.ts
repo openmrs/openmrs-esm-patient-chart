@@ -1,9 +1,8 @@
 import useSWR, { mutate } from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { OrderPost, PatientMedicationFetchResponse, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { OrderBasketItem, OrderPost, PatientMedicationFetchResponse } from '@openmrs/esm-patient-common-lib';
 
 /**
  * SWR-based data fetcher for patient orders.
@@ -44,124 +43,89 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
 
   return {
     data: data ? drugOrders : null,
-    error: error,
+    error,
     isLoading,
     isValidating,
     mutate: mutateOrders,
   };
 }
 
-export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
-    signal: abortController.signal,
-  });
-}
-
-export function getMedicationByUuid(abortController: AbortController, orderUuid: string) {
-  return openmrsFetch(
-    `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,route:(uuid,display),action,urgency,display,drug:(display,strength),frequency:(display),dose,doseUnits:(display),orderer,dateStopped,dateActivated,previousOrder,numRefills,duration,durationUnits:(display),dosingInstructions)`,
-    {
-      signal: abortController.signal,
-    },
-  );
-}
-
-export function createEmptyEncounter(
+export function prepMedicationOrderPostData(
+  order: OrderBasketItem,
   patientUuid: string,
-  drugOrderEncounterType: string,
-  currentVisitUuid: string,
-  sessionLocationUuid: string,
-  abortController?: AbortController,
-) {
-  const emptyEncounter = {
-    patient: patientUuid,
-    location: sessionLocationUuid,
-    encounterType: drugOrderEncounterType,
-    encounterDatetime: new Date().toISOString(),
-    visit: currentVisitUuid,
-    obs: [],
-  };
-
-  return openmrsFetch<OpenmrsResource>('/ws/rest/v1/encounter', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: emptyEncounter,
-    signal: abortController?.signal,
-  }).then((res) => res?.data?.uuid);
-}
-
-export function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/order`, {
-    method: 'POST',
-    signal: abortController?.signal,
-    headers: { 'Content-Type': 'application/json' },
-    body,
-  });
-}
-
-export function useSystemVisitSetting() {
-  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
-    `/ws/rest/v1/systemsetting/visits.enabled?v=custom:(value)`,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      systemVisitEnabled: (data?.data?.value ?? 'true').toLowerCase() === 'true',
-      errorFetchingSystemVisitSetting: error,
-      isLoadingSystemVisitSetting: isLoading,
-    }),
-    [data, isLoading, error],
-  );
-
-  return results;
-}
-
-export function useOrderEncounter(patientUuid: string): {
-  activeVisitRequired: boolean;
-  isLoading: boolean;
-  error: Error;
-  encounterUuid: string;
-  mutate: Function;
-} {
-  const { systemVisitEnabled, isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting } = useSystemVisitSetting();
-
-  const [nowDateString] = new Date().toISOString().split('T');
-  const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
-    !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
-      ? `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
-      : null,
-    openmrsFetch,
-  );
-  const visit = useVisitOrOfflineVisit(patientUuid);
-
-  const results = useMemo(() => {
-    if (isLoadingSystemVisitSetting || errorFetchingSystemVisitSetting) {
-      return {
-        activeVisitRequired: false,
-        isLoading: isLoadingSystemVisitSetting,
-        error: errorFetchingSystemVisitSetting,
-        encounterUuid: null,
-        mutate: () => {},
-      };
-    }
-    return systemVisitEnabled
-      ? {
-          activeVisitRequired: true,
-          isLoading: visit?.isLoading,
-          encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
-          error: visit?.error,
-          mutate: visit?.mutate,
-        }
-      : {
-          activeVisitRequired: false,
-          isLoading: todayEncounter?.isLoading,
-          encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
-          error: todayEncounter?.error,
-          mutate: todayEncounter?.mutate,
-        };
-  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
-  return results;
+  encounterUuid: string,
+): OrderPost {
+  if (order.action === 'NEW' || order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      patient: patientUuid,
+      type: 'drugorder',
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      drug: order.drug.uuid,
+      dose: order.dosage,
+      doseUnits: order.unit?.valueCoded,
+      route: order.route?.valueCoded,
+      frequency: order.frequency?.valueCoded,
+      asNeeded: order.asNeeded,
+      asNeededCondition: order.asNeededCondition,
+      numRefills: order.numRefills,
+      quantity: order.pillsDispensed,
+      quantityUnits: order.quantityUnits?.valueCoded,
+      duration: order.duration,
+      durationUnits: order.durationUnit?.valueCoded,
+      dosingType: order.isFreeTextDosage
+        ? 'org.openmrs.FreeTextDosingInstructions'
+        : 'org.openmrs.SimpleDosingInstructions',
+      dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      concept: order.drug.concept.uuid,
+      orderReasonNonCoded: order.indication,
+      dateActivated: toOmrsIsoString(new Date()),
+    };
+  } else if (order.action === 'REVISE') {
+    return {
+      action: 'REVISE',
+      patient: patientUuid,
+      type: 'drugorder',
+      previousOrder: order.previousOrder,
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      drug: order.drug.uuid,
+      dose: order.dosage,
+      doseUnits: order.unit?.valueCoded,
+      route: order.route?.valueCoded,
+      frequency: order.frequency?.valueCoded,
+      asNeeded: order.asNeeded,
+      asNeededCondition: order.asNeededCondition,
+      numRefills: order.numRefills,
+      quantity: order.pillsDispensed,
+      quantityUnits: order.quantityUnits?.valueCoded,
+      duration: order.duration,
+      durationUnits: order.durationUnit?.valueCoded,
+      dosingType: order.isFreeTextDosage
+        ? 'org.openmrs.FreeTextDosingInstructions'
+        : 'org.openmrs.SimpleDosingInstructions',
+      dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      concept: order.drug.concept.uuid,
+      orderReasonNonCoded: order.indication,
+      dateActivated: toOmrsIsoString(new Date()),
+    };
+  } else if (order.action === 'DISCONTINUE') {
+    return {
+      action: 'DISCONTINUE',
+      type: 'drugorder',
+      previousOrder: order.previousOrder,
+      patient: patientUuid,
+      careSetting: order.careSetting,
+      encounter: encounterUuid,
+      orderer: order.orderer,
+      concept: order.drug.concept.uuid,
+      drug: order.drug.uuid,
+      orderReasonNonCoded: null,
+    };
+  } else {
+    throw new Error(`Unknown order action ${order.action}. This is a development error.`);
+  }
 }
