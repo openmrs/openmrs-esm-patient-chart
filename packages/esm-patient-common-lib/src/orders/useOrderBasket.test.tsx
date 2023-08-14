@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { useOrderBasket } from './order-basket';
+import { useOrderBasket } from './useOrderBasket';
 import { OrderBasketItem } from './types';
 
 jest.mock('../get-patient-uuid-from-url', () => ({

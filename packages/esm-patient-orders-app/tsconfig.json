@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "../esm-patient-common-lib/src/orders/order-basket.ts", "../esm-patient-medications-app/src/api/drug-ordering.ts", "../esm-patient-common-lib/src/orders/drug-order-template.ts"],
+  "include": ["src/**/*", "../esm-patient-common-lib/src/orders/store.ts", "../esm-patient-medications-app/src/api/drug-ordering.ts", "../esm-patient-common-lib/src/orders/drug-order-template.ts"],
   "exclude": ["src/**/*.test.tsx"]
 }
