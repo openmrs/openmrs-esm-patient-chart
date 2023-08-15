@@ -9,7 +9,7 @@ import {
 import { DrugOrderForm } from './drug-order-form.component';
 import { showToast, useConfig, usePatient, useSession } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
-import { usePatientOrders } from '../api/api';
+import { prepMedicationOrderPostData, usePatientOrders } from '../api/api';
 import { useTranslation } from 'react-i18next';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
@@ -20,7 +20,7 @@ export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrd
 
 export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorkspace }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket('medications');
+  const { orders, setOrders } = useOrderBasket('medications', prepMedicationOrderPostData);
   const patient = usePatient();
   const activeOrders = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
