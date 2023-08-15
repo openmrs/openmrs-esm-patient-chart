@@ -42,6 +42,7 @@
 .printedBy {
   @include type.type-style('body-compact-01');
   margin: 0 spacing.$spacing-02;
+  font-size: smaller;
 }
 
 .subheader {
