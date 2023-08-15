@@ -1,5 +1,4 @@
 import useSWRImmutable from 'swr/immutable';
-
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 
