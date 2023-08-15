@@ -1,16 +1,13 @@
-import { openmrsFetch } from "@openmrs/esm-framework";
-import { getPatientUuidFromUrl } from "../get-patient-uuid-from-url";
-import { OrderBasketStore, orderBasketStore } from "./store";
-import { OrderBasketItem, OrderPost } from "./types";
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
+import { OrderBasketStore, orderBasketStore } from './store';
+import { OrderBasketItem, OrderPost } from './types';
 
-export async function postOrders(
-  encounterUuid: string,
-  abortController: AbortController,
-) {
+export async function postOrders(encounterUuid: string, abortController: AbortController) {
   const patientUuid = getPatientUuidFromUrl();
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
-  
+
   const erroredItems: Array<OrderBasketItem> = [];
   for (let grouping in patientItems) {
     const orders = patientItems[grouping];

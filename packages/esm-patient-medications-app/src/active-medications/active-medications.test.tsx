@@ -70,7 +70,7 @@ describe('ActiveMedications: ', () => {
   });
 
   test('renders a tabular overview of the active medications recorded for a patient', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData }});
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
     renderActiveMedications();
 
@@ -91,7 +91,7 @@ describe('ActiveMedications: ', () => {
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good — END DATE 14-Aug-2023/,
       /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {duration} {durationUnit} — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
-      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {duration} {durationUnit} INDICATION Heart — QUANTITY 30 Tablet/
+      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {duration} {durationUnit} INDICATION Heart — QUANTITY 30 Tablet/,
     ];
 
     expectedTableRows.map((row) =>
@@ -110,7 +110,7 @@ test('clicking the Record active medications link opens the order basket form', 
 });
 
 test('clicking the Add button opens the order basket form', async () => {
-  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData }});
+  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
   renderActiveMedications();
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });

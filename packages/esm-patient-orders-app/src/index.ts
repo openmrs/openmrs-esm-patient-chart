@@ -18,10 +18,10 @@ export function startupApp() {
 
 registerWorkspace({
   name: 'order-basket',
-  title: "Order Basket",
+  title: 'Order Basket',
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
-  type: "order"
-})
+  type: 'order',
+});
 
 export const medicationsDashboardLink =
   // t('Medications', 'Medications')

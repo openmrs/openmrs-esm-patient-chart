@@ -2,7 +2,13 @@ import React, { useCallback, useState } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { postOrders, useOrderBasket, useVisitOrOfflineVisit, OrderBasketItem, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import {
+  postOrders,
+  useOrderBasket,
+  useVisitOrOfflineVisit,
+  OrderBasketItem,
+  DefaultWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
@@ -65,23 +71,24 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
 
     return () => abortController.abort();
   }, [
-    mutateOrders,
-    mutateEncounterUuid,
+    activeVisit,
+    activeVisitRequired,
+    clearOrders,
     closeWorkspace,
+    config,
+    encounterUuid,
+    mutateEncounterUuid,
+    mutateOrders,
     orders,
     patientUuid,
-    encounterUuid,
-    activeVisitRequired,
-    activeVisit,
     session,
-    config,
     t,
   ]);
 
   const handleCancel = useCallback(() => {
     clearOrders();
     closeWorkspace();
-  }, []);
+  }, [clearOrders, closeWorkspace]);
 
   return (
     <>

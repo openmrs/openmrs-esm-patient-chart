@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import OrderBasketItemTile from './order-basket-item-tile.component';
-import styles from './drug-order-basket-panel.scss';
-import RxIcon from './rx-icon.component';
+import { launchPatientWorkspace, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
+import styles from './drug-order-basket-panel.scss';
+import OrderBasketItemTile from './order-basket-item-tile.component';
+import RxIcon from './rx-icon.component';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
@@ -25,7 +24,7 @@ export default function DrugOrderBasketPanelExtension() {
 
   const openDrugSearch = () => {
     launchPatientWorkspace('add-drug-order');
-  }
+  };
 
   const openDrugForm = (order: OrderBasketItem) => {
     launchPatientWorkspace('add-drug-order', { order });
@@ -42,7 +41,7 @@ export default function DrugOrderBasketPanelExtension() {
 
   useEffect(() => {
     setIsExpanded(orders.length > 0);
-  }, [orders])
+  }, [orders]);
 
   return (
     <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
@@ -65,7 +64,9 @@ export default function DrugOrderBasketPanelExtension() {
           <Button
             hasIconOnly
             kind="ghost"
-            renderIcon={(props) => isExpanded ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />}
+            renderIcon={(props) =>
+              isExpanded ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+            }
             iconDescription="View"
             disabled={orders.length === 0}
             onClick={() => setIsExpanded(!isExpanded)}
@@ -75,59 +76,60 @@ export default function DrugOrderBasketPanelExtension() {
         </div>
       </div>
       {isExpanded && (
-      <>
-        {newOrderBasketItems.length > 0 && (
-          <>
-            {newOrderBasketItems.map((order, index) => (
-              <OrderBasketItemTile
-                key={index}
-                orderBasketItem={order}
-                onItemClick={() => openDrugForm(order)}
-                onRemoveClick={() => removeMedication(order)}
-              />
-            ))}
-          </>
-        )}
+        <>
+          {newOrderBasketItems.length > 0 && (
+            <>
+              {newOrderBasketItems.map((order, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={order}
+                  onItemClick={() => openDrugForm(order)}
+                  onRemoveClick={() => removeMedication(order)}
+                />
+              ))}
+            </>
+          )}
 
-        {renewedOrderBasketItems.length > 0 && (
-          <>
-            {renewedOrderBasketItems.map((item, index) => (
-              <OrderBasketItemTile
-                key={index}
-                orderBasketItem={item}
-                onItemClick={() => openDrugForm(item)}
-                onRemoveClick={() => removeMedication(item)}
-              />
-            ))}
-          </>
-        )}
+          {renewedOrderBasketItems.length > 0 && (
+            <>
+              {renewedOrderBasketItems.map((item, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={item}
+                  onItemClick={() => openDrugForm(item)}
+                  onRemoveClick={() => removeMedication(item)}
+                />
+              ))}
+            </>
+          )}
 
-        {revisedOrderBasketItems.length > 0 && (
-          <>
-            {revisedOrderBasketItems.map((item, index) => (
-              <OrderBasketItemTile
-                key={index}
-                orderBasketItem={item}
-                onItemClick={() => openDrugForm(item)}
-                onRemoveClick={() => removeMedication(item)}
-              />
-            ))}
-          </>
-        )}
+          {revisedOrderBasketItems.length > 0 && (
+            <>
+              {revisedOrderBasketItems.map((item, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={item}
+                  onItemClick={() => openDrugForm(item)}
+                  onRemoveClick={() => removeMedication(item)}
+                />
+              ))}
+            </>
+          )}
 
-        {discontinuedOrderBasketItems.length > 0 && (
-          <>
-            {discontinuedOrderBasketItems.map((item, index) => (
-              <OrderBasketItemTile
-                key={index}
-                orderBasketItem={item}
-                onItemClick={() => openDrugForm(item)}
-                onRemoveClick={() => removeMedication(item)}
-              />
-            ))}
-          </>
-        )}
-      </>)}
+          {discontinuedOrderBasketItems.length > 0 && (
+            <>
+              {discontinuedOrderBasketItems.map((item, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={item}
+                  onItemClick={() => openDrugForm(item)}
+                  onRemoveClick={() => removeMedication(item)}
+                />
+              ))}
+            </>
+          )}
+        </>
+      )}
     </Tile>
   );
 }

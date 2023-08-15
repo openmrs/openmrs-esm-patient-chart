@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import {
   Button,
@@ -6,31 +7,30 @@ import {
   Checkbox,
   Column,
   ComboBox,
+  DatePicker,
+  DatePickerInput,
   Form,
   FormGroup,
   Grid,
+  InlineNotification,
+  Layer,
+  NumberInput,
   TextArea,
   TextInput,
   Toggle,
-  NumberInput,
-  DatePicker,
-  DatePickerInput,
-  InlineNotification,
-  Layer,
 } from '@carbon/react';
-import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from "@openmrs/esm-patient-common-lib";
-import { useOrderConfig } from '../api/order-config';
-import { ConfigObject } from '../config-schema';
+import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
+import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
   DosingUnit,
   DurationUnit,
   MedicationFrequency,
   MedicationRoute,
+  OrderBasketItem,
   QuantityUnit,
 } from '@openmrs/esm-patient-common-lib';
+import { useOrderConfig } from '../api/order-config';
+import { ConfigObject } from '../config-schema';
 import styles from './medication-order-form.scss';
 
 export interface DrugOrderFormProps {

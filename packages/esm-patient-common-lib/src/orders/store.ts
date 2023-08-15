@@ -13,7 +13,7 @@ export interface OrderBasketStore {
   };
   postDataPrepFunctions: {
     [grouping: string]: PostDataPrepFunction;
-  }
+  };
 }
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('order-basket', {

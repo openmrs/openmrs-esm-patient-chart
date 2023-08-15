@@ -348,11 +348,8 @@ function OrderBasketItemActions({
         value: medication.quantityUnits?.display,
         valueCoded: medication.quantityUnits?.uuid,
       },
-    }
-    setItems([
-      ...items,
-      newItem
-    ]);
+    };
+    setItems([...items, newItem]);
     openDrugOrderForm({ order: newItem });
   }, [items, setItems, medication, openDrugOrderForm]);
 

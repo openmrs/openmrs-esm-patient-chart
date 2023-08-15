@@ -30,7 +30,7 @@ const orderBasketStoreActions = {
         [grouping]: value,
       },
     };
-  }
+  },
 };
 
 function getOrderItems(items: OrderBasketStore['items'], grouping?: string | null): Array<OrderBasketItem> {
@@ -78,16 +78,25 @@ type UseOrderBasketReturn<T> = {
  */
 export function useOrderBasket(): UseOrderBasketReturn<void>;
 export function useOrderBasket(grouping: string): UseOrderBasketReturn<string>;
-export function useOrderBasket(grouping: string, postDataPrepFunction: PostDataPrepFunction): UseOrderBasketReturn<string>;
-export function useOrderBasket(grouping?: string | null, postDataPrepFunction?: PostDataPrepFunction): UseOrderBasketReturn<string | void> {
-  const { items, postDataPrepFunctions, setOrderBasketItems, setPostDataPrepFunctionForGrouping } = useStoreWithActions(orderBasketStore, orderBasketStoreActions);
+export function useOrderBasket(
+  grouping: string,
+  postDataPrepFunction: PostDataPrepFunction,
+): UseOrderBasketReturn<string>;
+export function useOrderBasket(
+  grouping?: string | null,
+  postDataPrepFunction?: PostDataPrepFunction,
+): UseOrderBasketReturn<string | void> {
+  const { items, postDataPrepFunctions, setOrderBasketItems, setPostDataPrepFunctionForGrouping } = useStoreWithActions(
+    orderBasketStore,
+    orderBasketStoreActions,
+  );
   const orders = getOrderItems(items, grouping);
 
   useEffect(() => {
     if (postDataPrepFunction && !postDataPrepFunctions[grouping]) {
       setPostDataPrepFunctionForGrouping(grouping, postDataPrepFunction);
     }
-  }, []);
+  }, [postDataPrepFunction, grouping, postDataPrepFunctions, setPostDataPrepFunctionForGrouping]);
 
   if (typeof grouping === 'string') {
     const setOrders = (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => {

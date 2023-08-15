@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { FetchResponse, openmrsFetch, OpenmrsResource, parseDate, Visit } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
-import type { OrderPost } from '@openmrs/esm-patient-common-lib';
+import { OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
@@ -11,12 +10,13 @@ import type { OrderPost } from '@openmrs/esm-patient-common-lib';
  * @param patientUuid The UUID of the patient to get an order mutate function for.
  */
 export function useMutatePatientOrders(patientUuid: string) {
-  const { mutate } = useSWRConfig()
+  const { mutate } = useSWRConfig();
   const mutateOrders = useCallback(
-    () => mutate((key) => {
-      return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)
-    }),
-    [patientUuid],
+    () =>
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`);
+      }),
+    [patientUuid, mutate],
   );
 
   return {
@@ -51,9 +51,11 @@ export function createEmptyEncounter(
   const visitEndDate = parseDate(activeVisit?.stopDatetime);
   let encounterDate: Date;
   if (!activeVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
-    now
+    now;
   } else {
-    console.warn("createEmptyEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.")
+    console.warn(
+      'createEmptyEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
+    );
     visitStartDate;
   }
   const emptyEncounter = {

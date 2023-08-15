@@ -22,7 +22,7 @@ const mockUseVisitOrOfflineVisit = jest.fn(() => ({
   currentVisit: {
     uuid: '8ef90c91-14be-42dd-a1c0-e67fbf904470',
   },
-}))
+}));
 const mockGetPatientUuidFromUrl = jest.fn(() => mockPatient.id);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -42,19 +42,18 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => {
-  return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() }
-})
+  return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() };
+});
 
 describe('<OrderBasketActionButton/>', () => {
-
   beforeAll(() => {
     orderBasketStore.setState({
       items: {
         [mockPatient.id]: {
-          'medications': [{ name: 'order-01', uuid: 'some-uuid' } as unknown as OrderBasketItem]
-        }
-      }
-    })
+          medications: [{ name: 'order-01', uuid: 'some-uuid' } as unknown as OrderBasketItem],
+        },
+      },
+    });
     mockUsePatient.mockReturnValue({ patientUuid: mockPatient.id });
   });
 
@@ -106,7 +105,7 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display a count tag when orders are present on the desktop view', () => {
     mockedUseLayoutType.mockReturnValue('desktop');
     const { result } = renderHook(useOrderBasket);
-    expect(result.current.orders).toHaveLength(1);  // sanity check
+    expect(result.current.orders).toHaveLength(1); // sanity check
     render(<OrderBasketActionButton />);
 
     expect(screen.getByText(/medications/i)).toBeInTheDocument();

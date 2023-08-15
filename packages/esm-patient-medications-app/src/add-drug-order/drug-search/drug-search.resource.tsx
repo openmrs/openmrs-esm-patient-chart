@@ -1,21 +1,21 @@
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import type { Drug, DrugOrderTemplate, OrderTemplate, OrderBasketItem } from '@openmrs/esm-patient-common-lib'
+import type { Drug, DrugOrderTemplate, OrderTemplate, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugSearchResult {
-  uuid: string,
-  display: string, 
-  name: string,
-  strength: string,
+  uuid: string;
+  display: string;
+  name: string;
+  strength: string;
   dosageForm: {
-    display: string,
-    uuid: string,
-  },
+    display: string;
+    uuid: string;
+  };
   concept: {
-    display: string,
-    uuid: string,
-  }
+    display: string;
+    uuid: string;
+  };
 }
 
 export function useDrugSearch(query: string): {
