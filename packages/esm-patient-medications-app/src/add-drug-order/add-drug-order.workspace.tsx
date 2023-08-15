@@ -61,9 +61,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       finalizedOrder.careSetting = config.careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
-      const existingOrder = orders.find(
-        (order) => ordersEqual(order, finalizedOrder),
-      );
+      const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       newOrders[orders.indexOf(existingOrder)] = finalizedOrder;
       setOrders(newOrders);
       closeWorkspace();
@@ -75,12 +73,10 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   if (!currentOrder) {
     return <OrderBasketSearch onSearchResultClicked={chooseDrug} />;
   } else {
-    return (
-      <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />
-    );
+    return <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />;
   }
 }
 
 function ordersEqual(order1: OrderBasketItem, order2: OrderBasketItem) {
-  return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName
+  return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
 }

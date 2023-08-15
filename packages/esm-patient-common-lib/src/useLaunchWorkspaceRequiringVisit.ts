@@ -15,7 +15,6 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
   const launchOrderBasket = useCallback(
     (additionalProps?: T) => {
       if (!systemVisitEnabled || currentVisit) {
-        console.log("launching workspace", workspaceName, "with props", additionalProps);
         launchPatientWorkspace(workspaceName, additionalProps);
       } else {
         launchStartVisitPrompt();

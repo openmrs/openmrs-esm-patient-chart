@@ -5709,7 +5709,7 @@ __metadata:
     "@carbon/styles": ~1.14.0
     "@ng-select/ng-select": ^6.1.0
     "@ngx-translate/core": ^13.0.0
-    "@openmrs/esm-framework": ^5.1.0
+    "@openmrs/esm-framework": next
     "@openmrs/ngx-formentry": next
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
@@ -5749,7 +5749,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-framework@npm:5.1.0, @openmrs/esm-framework@npm:^5.1.0":
+"@openmrs/esm-framework@npm:5.1.0":
   version: 5.1.0
   resolution: "@openmrs/esm-framework@npm:5.1.0"
   dependencies:

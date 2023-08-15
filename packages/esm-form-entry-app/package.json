@@ -76,7 +76,7 @@
     "@angular/compiler-cli": "~12.2.16",
     "@angular/language-service": "~12.2.16",
     "@angular/localize": "~12.2.16",
-    "@openmrs/esm-framework": "^5.1.0",
+    "@openmrs/esm-framework": "next",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/webpack-env": "^1.17.0",

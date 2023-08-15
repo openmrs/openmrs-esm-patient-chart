@@ -46,7 +46,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
       try {
         orderEncounterUuid = await createEmptyEncounter(
           patientUuid,
-          config?.drugOrderEncounterType,
+          config?.orderEncounterType,
           activeVisitRequired ? activeVisit : null,
           session?.sessionLocation?.uuid,
           abortController,

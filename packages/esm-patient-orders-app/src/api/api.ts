@@ -6,7 +6,7 @@ import { OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openm
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
  * Refreshes patient orders for all kinds of orders.
- * 
+ *
  * TODO: This isn't working. See https://github.com/vercel/swr/issues/2746
  *
  * @param patientUuid The UUID of the patient to get an order mutate function for.
@@ -43,7 +43,7 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
 
 export function createEmptyEncounter(
   patientUuid: string,
-  drugOrderEncounterType: string,
+  orderEncounterType: string,
   activeVisit: Visit | null,
   sessionLocationUuid: string,
   abortController?: AbortController,
@@ -63,7 +63,7 @@ export function createEmptyEncounter(
   const emptyEncounter = {
     patient: patientUuid,
     location: sessionLocationUuid,
-    encounterType: drugOrderEncounterType,
+    encounterType: orderEncounterType,
     encounterDatetime: encounterDate,
     visit: activeVisit?.uuid,
     obs: [],
@@ -97,7 +97,8 @@ export function useOrderEncounter(patientUuid: string): {
 } {
   const { systemVisitEnabled, isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting } = useSystemVisitSetting();
 
-  const [nowDateString] = new Date().toISOString().split('T');
+  const now = new Date();
+  const nowDateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
   const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
     !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
       ? `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
