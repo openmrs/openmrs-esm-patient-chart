@@ -32,6 +32,7 @@ function PrintModal({ patientUuid, closeDialog }) {
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const headerTitle = t('testReasults', 'Test results');
+  const datePickerFormat = 'm/d/y';
 
   const tableHeaders = [
     { key: 'testType', header: 'Test Type' },
@@ -119,32 +120,20 @@ function PrintModal({ patientUuid, closeDialog }) {
     <div>
       <ModalHeader closeModal={closeDialog} title={t('printTestResults', 'Print test results')} />
       <ModalBody className={styles.modalBody}>
-        <div className={styles.datePickers}>
-          <div className={styles.dates}>
-            <span className={styles.datePickerLabel}> {t('from', 'From')}:</span>
-            <DatePicker
-              id="onsetDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              light={isTablet}
-              onChange={(date) => setSelectedFromDate(date)}
-            >
-              <DatePickerInput size="sm" />
-            </DatePicker>
-          </div>
-          <div className={styles.dates}>
-            <span className={styles.datePickerLabel}> {t('to', 'To')}:</span>
-            <DatePicker
-              id="onsetDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              light={isTablet}
-              onChange={(date) => setSelectedToDate(date)}
-            >
-              <DatePickerInput size="sm" />
-            </DatePicker>
-          </div>
-        </div>
+        <DatePicker
+          className={styles.datePickers}
+          datePickerType="range"
+          light={isTablet}
+          dateFormat={datePickerFormat}
+          value={[selectedFromDate, selectedToDate]}
+          onChange={([startDate, endDate]) => {
+            setSelectedFromDate(startDate);
+            setSelectedToDate(endDate);
+          }}
+        >
+          <DatePickerInput labelText={t('startDate', 'Start date')} placeholder={datePickerFormat} />
+          <DatePickerInput labelText={t('endDate', 'End date')} placeholder={datePickerFormat} />
+        </DatePicker>
         <div ref={printContainerRef}>
           <div className={styles.printPage}>
             <header className={styles.header}>

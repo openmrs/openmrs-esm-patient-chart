@@ -44,10 +44,6 @@
   margin: 0 spacing.$spacing-02;
 }
 
-.datePickerLabel {
-  margin-right: spacing.$spacing-03;
-}
-
 .subheader {
   @include type.type-style('heading-03');
   color: colors.$gray-70;
@@ -66,15 +62,6 @@
   display: flex;
   margin-bottom: spacing.$spacing-03;
   justify-content: flex-start;
-}
-
-.datePickerLabel {
-  margin-top: 0.3rem;
-}
-
-.dates {
-  display: flex;
-  justify-content:flex-start;
 }
 
 .modalBody {
