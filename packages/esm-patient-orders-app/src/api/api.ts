@@ -6,6 +6,8 @@ import { OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openm
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
  * Refreshes patient orders for all kinds of orders.
+ * 
+ * TODO: This isn't working. See https://github.com/vercel/swr/issues/2746
  *
  * @param patientUuid The UUID of the patient to get an order mutate function for.
  */

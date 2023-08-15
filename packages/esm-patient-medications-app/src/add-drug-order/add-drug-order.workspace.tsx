@@ -27,6 +27,12 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const config: ConfigObject = useConfig();
   const session = useSession();
 
+  const cancelDrugOrder = useCallback(() => {
+    setOrders(orders.filter((order) => !ordersEqual(order, currentOrder)));
+    closeWorkspace();
+    launchPatientWorkspace('order-basket');
+  }, [closeWorkspace, currentOrder, orders, setOrders]);
+
   const chooseDrug = useCallback(
     (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
       if (activeOrders.data?.find((existing) => existing.drug?.concept.uuid === searchResult.drug?.concept.uuid)) {
@@ -50,14 +56,13 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
     [setOrders, orders, closeWorkspace, activeOrders.data, t],
   );
 
-  const saveMedicationOrder = useCallback(
+  const saveDrugOrder = useCallback(
     (finalizedOrder: OrderBasketItem) => {
       finalizedOrder.careSetting = config.careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find(
-        (order) =>
-          order.action === finalizedOrder.action && order.commonMedicationName === finalizedOrder.commonMedicationName,
+        (order) => ordersEqual(order, finalizedOrder),
       );
       newOrders[orders.indexOf(existingOrder)] = finalizedOrder;
       setOrders(newOrders);
@@ -71,7 +76,11 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
     return <OrderBasketSearch onSearchResultClicked={chooseDrug} />;
   } else {
     return (
-      <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveMedicationOrder} onCancel={closeWorkspace} />
+      <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />
     );
   }
+}
+
+function ordersEqual(order1: OrderBasketItem, order2: OrderBasketItem) {
+  return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName
 }
