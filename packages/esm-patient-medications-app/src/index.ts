@@ -26,7 +26,7 @@ export const activeMedications = getAsyncLifecycle(
   options,
 );
 
-export const drugOrderPanel = getAsyncLifecycle(() => import('./drug-order-basket-panel/drug-order-basket-panel.component'), options);
+export const drugOrderPanel = getAsyncLifecycle(() => import('./drug-order-basket-panel/drug-order-basket-panel.extension'), options);
 
 export const medicationsDashboardLink =
   // t('Medications', 'Medications')
@@ -41,5 +41,5 @@ export const medicationsDashboardLink =
 registerWorkspace({
   name: 'add-drug-order',
   title: 'Add drug order',
-  load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order-workspace.component'), options),
+  load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order.workspace'), options),
 })

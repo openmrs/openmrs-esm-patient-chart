@@ -21,10 +21,11 @@ const OrderBasketActionButton: React.FC = () => {
         className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         role="button"
         tabIndex={0}
-        onClick={launchOrderBasket}
+        onClick={() => launchOrderBasket()}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={16} /> {orders?.length > 0 && <Tag className={styles.countTag}>{orders?.length}</Tag>}
+          <ShoppingCart size={16} />
+          {orders?.length > 0 && <Tag className={styles.countTag}>{orders?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order basket')}</span>
       </Button>
@@ -47,7 +48,7 @@ const OrderBasketActionButton: React.FC = () => {
       enterDelayMs={1000}
       tooltipAlignment="center"
       tooltipPosition="left"
-      onClick={launchOrderBasket}
+      onClick={() => launchOrderBasket()}
     />
   );
 };

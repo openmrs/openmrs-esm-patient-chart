@@ -17,5 +17,6 @@ export * from './programs/usePatientProgramEnrollment';
 export * from './time-helper';
 export * from './types';
 export * from './useLaunchWorkspaceRequiringVisit';
+export * from './useSystemVisitSetting';
 export * from './useVitalsConceptMetadata';
 export * from './workspaces';

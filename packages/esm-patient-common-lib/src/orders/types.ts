@@ -176,3 +176,5 @@ interface CommonMedicationProps {
 export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
 }
+
+export type PostDataPrepFunction = (order: OrderBasketItem, patientUuid: string, encounterUuid: string) => OrderPost;

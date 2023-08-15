@@ -3,9 +3,9 @@ import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carb
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
-import type { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
-import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
+import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
@@ -94,7 +94,7 @@ export default function OrderBasketSearchResults({
 }
 
 interface DrugSearchResultItemProps {
-  drug: Drug;
+  drug: DrugSearchResult;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
@@ -115,10 +115,6 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
     [templates, drug, config?.daysDurationUnit],
   );
 
-  const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
-    onSearchResultClicked(searchResult, directlyAddToBasket);
-  };
-
   return (
     <>
       {orderItems.map((orderItem, indx) => (
@@ -126,7 +122,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"
           className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-          onClick={() => handleSearchResultClicked(orderItem, false)}
+          onClick={() => onSearchResultClicked(orderItem, false)}
         >
           <div className={styles.searchResultTile}>
             <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
@@ -160,7 +156,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
               hasIconOnly={true}
               renderIcon={(props) => <ShoppingCart size={16} {...props} />}
               iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
-              onClick={() => handleSearchResultClicked(orderItem, true)}
+              onClick={() => onSearchResultClicked(orderItem, true)}
               tooltipPosition="left"
               tooltipAlignment="end"
             />

@@ -3,12 +3,27 @@ import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import type { Drug, DrugOrderTemplate, OrderTemplate, OrderBasketItem } from '@openmrs/esm-patient-common-lib'
 
-export function useDrugSearch(query): {
+export interface DrugSearchResult {
+  uuid: string,
+  display: string, 
+  name: string,
+  strength: string,
+  dosageForm: {
+    display: string,
+    uuid: string,
+  },
+  concept: {
+    display: string,
+    uuid: string,
+  }
+}
+
+export function useDrugSearch(query: string): {
   isLoading: boolean;
-  drugs: Array<Drug>;
+  drugs: Array<DrugSearchResult>;
   error: Error;
 } {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<Drug> }>, Error>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
     query
       ? `/ws/rest/v1/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
@@ -63,12 +78,12 @@ export function getDefault(template: OrderTemplate, prop: string) {
 }
 
 export function getTemplateOrderBasketItem(
-  drug: Drug,
-  configDefaultDurationConcept: {
+  drug: DrugSearchResult,
+  configDefaultDurationConcept?: {
     uuid: string;
     display: string;
   },
-  template: DrugOrderTemplate = null,
+  template?: DrugOrderTemplate,
 ): OrderBasketItem {
   return template
     ? {

@@ -1,6 +1,5 @@
 import { createGlobalStore } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from './types';
-import { OrderPost } from './types';
+import type { OrderBasketItem, PostDataPrepFunction } from './types';
 
 // The order basket holds order information for each patient. The orders are grouped by `key`
 // so that different parts of the application may manage their own order lists. For example,
@@ -16,8 +15,6 @@ export interface OrderBasketStore {
     [grouping: string]: PostDataPrepFunction;
   }
 }
-
-export type PostDataPrepFunction = (order: OrderBasketItem, patientUuid: string, encounterUuid: string) => OrderPost;
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('order-basket', {
   items: {},

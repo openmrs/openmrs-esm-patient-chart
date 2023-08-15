@@ -10,7 +10,10 @@ import styles from './drug-order-basket-panel.scss';
 import RxIcon from './rx-icon.component';
 import { prepMedicationOrderPostData } from '../api/api';
 
-export default function DrugOrderPanel({}) {
+/**
+ * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
+ */
+export default function DrugOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket('medications', prepMedicationOrderPostData);

@@ -19,7 +19,7 @@ export function startupApp() {
 registerWorkspace({
   name: 'order-basket',
   title: "Order Basket",
-  load: getAsyncLifecycle(() => import('./order-basket/order-basket.component'), options),
+  load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: "order"
 })
 
@@ -34,6 +34,6 @@ export const medicationsDashboardLink =
   );
 
 export const orderBasketActionMenu = getAsyncLifecycle(
-  () => import('./order-basket-action-button/order-basket-action-button.component'),
+  () => import('./order-basket-action-button/order-basket-action-button.extension'),
   options,
 );

@@ -1,9 +1,8 @@
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, OpenmrsResource, parseDate, Visit } from '@openmrs/esm-framework';
-import type { OrderPost } from '@openmrs/esm-patient-common-lib';
 import { useCallback, useMemo } from 'react';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import useSWR, { useSWRConfig } from 'swr';
+import { FetchResponse, openmrsFetch, OpenmrsResource, parseDate, Visit } from '@openmrs/esm-framework';
+import { useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
@@ -15,8 +14,6 @@ export function useMutatePatientOrders(patientUuid: string) {
   const { mutate } = useSWRConfig()
   const mutateOrders = useCallback(
     () => mutate((key) => {
-      const result = typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`);
-      console.log(result, 'key', key)
       return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)
     }),
     [patientUuid],
@@ -85,24 +82,6 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
     headers: { 'Content-Type': 'application/json' },
     body,
   });
-}
-
-export function useSystemVisitSetting() {
-  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
-    `/ws/rest/v1/systemsetting/visits.enabled?v=custom:(value)`,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      systemVisitEnabled: (data?.data?.value ?? 'true').toLowerCase() === 'true',
-      errorFetchingSystemVisitSetting: error,
-      isLoadingSystemVisitSetting: isLoading,
-    }),
-    [data, isLoading, error],
-  );
-
-  return results;
 }
 
 export function useOrderEncounter(patientUuid: string): {

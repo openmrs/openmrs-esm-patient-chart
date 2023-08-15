@@ -2,17 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { postOrders, useOrderBasket, useVisitOrOfflineVisit, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { postOrders, useOrderBasket, useVisitOrOfflineVisit, OrderBasketItem, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 
-export interface OrderBasketProps {
-  closeWorkspace(): void;
-  patientUuid: string;
-}
-
-const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }) => {
+const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;

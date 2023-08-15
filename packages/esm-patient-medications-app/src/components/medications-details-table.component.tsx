@@ -22,7 +22,7 @@ import { CardHeader, Order, OrderBasketItem, useOrderBasket } from '@openmrs/esm
 import { useTranslation } from 'react-i18next';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
-import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order-workspace.component';
+import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
