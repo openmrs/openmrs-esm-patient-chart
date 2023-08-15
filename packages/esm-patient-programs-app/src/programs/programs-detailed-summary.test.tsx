@@ -71,7 +71,7 @@ describe('ProgramsDetailedSummary ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a detailed tabular summary of the patient's program enrollments", async () => {
+  it('renders a detailed tabular summary of the patient program enrollments', async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
