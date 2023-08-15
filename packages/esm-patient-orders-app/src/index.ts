@@ -1,7 +1,6 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -22,16 +21,6 @@ registerWorkspace({
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
 });
-
-export const medicationsDashboardLink =
-  // t('Medications', 'Medications')
-  getSyncLifecycle(
-    createDashboardLink({
-      ...dashboardMeta,
-      moduleName,
-    }),
-    options,
-  );
 
 export const orderBasketActionMenu = getAsyncLifecycle(
   () => import('./order-basket-action-button/order-basket-action-button.extension'),
