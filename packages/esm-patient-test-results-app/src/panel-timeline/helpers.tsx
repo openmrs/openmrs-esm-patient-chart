@@ -1,15 +1,10 @@
 import * as React from 'react';
-import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { OBSERVATION_INTERPRETATION, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import { ObsRecord } from '../panel-view/types';
 import styles from './timeline.scss';
 import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { ParsedTimeType } from '../filter/filter-types';
 import { testResultsBasePath } from '../helpers';
-
-function getPatientUuidFromUrl(): string {
-  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
-  return match && match[1];
-}
 
 export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
