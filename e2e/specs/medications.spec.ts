@@ -51,6 +51,9 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.page.getByLabel('Quantity to dispense').fill('30');
     await medicationPage.page.getByLabel('Prescription refills').fill('3');
     await medicationPage.page.getByPlaceholder('e.g. "Hypertension"').fill('Mental status change');
+  });
+
+  await test.step('And I click on the "Save order" button', async () => {
     await medicationPage.page.getByRole('button', { name: 'Save order' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
   });
@@ -76,6 +79,9 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
     await medicationPage.page.getByText('Twice daily').click();
     await medicationPage.page.getByLabel('Quantity to dispense').fill('60');
     await medicationPage.page.getByLabel('Prescription refills').fill('6');
+  });
+
+  await test.step('And I click on the "Save order" button', async () => {
     await medicationPage.page.getByRole('button', { name: 'Save order' }).click();
     await medicationPage.page.getByRole('button', { name: 'Sign and close' }).click();
   });
