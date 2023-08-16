@@ -106,7 +106,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody data-testid="allergy-table">
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
