@@ -139,14 +139,14 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                     <TableHeader />
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody data-testid="program-table">
                   {rows.map((row, i) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} />
+                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid}/>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -184,6 +184,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
       hasIconOnly
       tooltipPosition="left"
       size={isTablet ? 'lg' : 'sm'}
+      data-testid="edit-program-button"
     />
   );
 }
