@@ -13,7 +13,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
   const programPage = new ProgramPage(page);
   const row = programPage.table().locator('tr');
   const programCell = row.locator('td:first-child');
-  const LocationCell = row.locator('td:nth-child(2)');
+  const locationCell = row.locator('td:nth-child(2)');
   const enrollmentDateCell = row.locator('td:nth-child(3)');
   const completionDateCell = row.locator('td:nth-child(4)');
 
@@ -45,7 +45,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
     await expect(programCell.getByText('HIV Care and Treatment')).toBeVisible();
     await expect(enrollmentDateCell.getByText('04-Jul-2023')).toBeVisible();
     await expect(completionDateCell.getByText('05-Jul-2023')).toBeVisible();
-    await expect(LocationCell.getByText('Outpatient Clinic')).toBeVisible();
+    await expect(locationCell.getByText('Outpatient Clinic')).toBeVisible();
   });
 
   await test.step('When I click on the Edit button', async () => {
@@ -71,7 +71,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
     await expect(programCell.getByText('HIV Care and Treatment')).toBeVisible();
     await expect(enrollmentDateCell.getByText('03-Jul-2023')).toBeVisible();
     await expect(completionDateCell.getByText('04-Jul-2023')).toBeVisible();
-    await expect(LocationCell.getByText('Community Outreach')).toBeVisible();
+    await expect(locationCell.getByText('Community Outreach')).toBeVisible();
   });
 });
 
