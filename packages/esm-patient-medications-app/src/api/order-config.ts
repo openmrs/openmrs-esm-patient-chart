@@ -1,7 +1,13 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { DosingUnit, DurationUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from './drug-order-template';
+import {
+  DosingUnit,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 
 export interface CommonConfigProps {
   uuid: string;

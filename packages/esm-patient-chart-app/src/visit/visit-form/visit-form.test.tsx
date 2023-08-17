@@ -3,9 +3,9 @@ import { of, throwError } from 'rxjs';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { saveVisit, showNotification, showToast } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import { mockLocations } from '../../../../../__mocks__/location.mock';
-import { mockVisitTypes } from '../../../../../__mocks__/visits.mock';
+import { mockLocations } from '../../__mocks__/location.mock';
+import { mockPatient } from '../../../../../tools/test-helpers';
+import { mockVisitTypes } from '../../__mocks__/visits.mock';
 import StartVisitForm from './visit-form.component';
 
 const mockCloseWorkspace = jest.fn();
@@ -189,7 +189,7 @@ describe('Visit Form', () => {
     );
   });
 
-  it('displays the unsaved change modal when a form has unsaved changes', async () => {
+  it('displays the `Unsaved changes` modal when a form has unsaved changes', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();

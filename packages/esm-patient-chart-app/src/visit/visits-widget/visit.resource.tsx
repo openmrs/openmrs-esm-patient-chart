@@ -97,10 +97,11 @@ export interface MappedEncounter {
   provider: string;
   visitUuid: string;
   visitType: string;
-  visitTypeUuid: string;
+  visitTypeUuid?: string;
   visitStartDatetime?: string;
   visitStopDatetime?: string;
 }
+
 export interface Encounter {
   uuid: string;
   diagnoses: Array<Diagnosis>;

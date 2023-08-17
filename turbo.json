@@ -5,7 +5,15 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]  
     },
-    "test": {},
+    "test": {
+      "dependsOn": ["^test"]
+    },
+    "test:watch": {
+      "dependsOn": ["^test:watch"]
+    },
+    "coverage": {
+      "dependsOn": ["^coverage"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

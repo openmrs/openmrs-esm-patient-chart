@@ -88,7 +88,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
       <p className={styles.heading}>{t('address', 'Address')}</p>
       <ul>
         {address ? (
-          <>
+          <React.Fragment>
             {Object.entries(address)
               .filter(([key]) => !['use', 'id'].some((k) => k === key))
               .map(([key, value]) =>
@@ -102,12 +102,12 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
                     </li>
                   ))
                 ) : (
-                  <li>
+                  <li key={`address-${key}`}>
                     {useCustomAddressLabelEnabled ? t(customAddressLabel[key]) : t(key)}: {value}
                   </li>
                 ),
               )}
-          </>
+          </React.Fragment>
         ) : (
           '--'
         )}
@@ -131,12 +131,16 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
         <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
       ) : (
         <ul>
-          {contactAttributes?.length > 0 ? (
-            contactAttributes.map(({ attributeType, value, uuid }) => (
-              <li key={uuid}>
-                {attributeType.display} : {value}
-              </li>
-            ))
+          {value ? (
+            <React.Fragment>
+              <li>{value}</li>
+              {contactAttributes?.length > 0 &&
+                contactAttributes.map(({ attributeType, value, uuid }) => (
+                  <li key={uuid}>
+                    {attributeType.display}: {value}
+                  </li>
+                ))}
+            </React.Fragment>
           ) : (
             <li>--</li>
           )}

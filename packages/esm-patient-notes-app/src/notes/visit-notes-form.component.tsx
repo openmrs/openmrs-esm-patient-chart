@@ -2,6 +2,9 @@ import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useStat
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, Controller, Control, FormState } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -13,12 +16,11 @@ import {
   Layer,
   Row,
   Search,
-  SearchSkeleton,
+  SkeletonText,
   Stack,
   Tag,
   TextArea,
   Tile,
-  SkeletonText,
 } from '@carbon/react';
 import { Add, WarningFilled } from '@carbon/react/icons';
 import {
@@ -30,28 +32,34 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import type { ConfigObject } from '../config-schema';
+import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
   fetchConceptDiagnosisByName,
   savePatientDiagnosis,
   saveVisitNote,
   useVisitNotes,
 } from './visit-notes.resource';
-import { ConfigObject } from '../config-schema';
-import { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-notes-form.scss';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, Control, FormState } from 'react-hook-form';
-import { z } from 'zod';
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
   primaryDiagnosisSearch: z.string({
-    required_error: 'Choose atleast one primary diagnosis',
+    required_error: 'Choose at least one primary diagnosis',
   }),
   secondaryDiagnosisSearch: z.string().optional(),
   clinicalNote: z.string().optional(),
 });
+
+interface DiagnosisSearchProps {
+  name: 'noteDate' | 'primaryDiagnosisSearch' | 'secondaryDiagnosisSearch' | 'clinicalNote';
+  labelText: string;
+  placeholder: string;
+  control: Control<VisitNotesFormData>;
+  handleSearch: (fieldName) => void;
+  error?: Object;
+}
 
 type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
 
@@ -276,20 +284,21 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               name="noteDate"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <DatePicker
-                  dateFormat="d/m/Y"
-                  datePickerType="single"
-                  light={isTablet}
-                  maxDate={new Date().toISOString()}
-                  value={value}
-                  onChange={([date]) => onChange(date)}
-                >
-                  <DatePickerInput
-                    id="visitDateTimePicker"
-                    labelText={t('visitDate', 'Visit date')}
-                    placeholder="dd/mm/yyyy"
-                  />
-                </DatePicker>
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <DatePicker
+                    dateFormat="d/m/Y"
+                    datePickerType="single"
+                    maxDate={new Date().toISOString()}
+                    value={value}
+                    onChange={([date]) => onChange(date)}
+                  >
+                    <DatePickerInput
+                      id="visitDateTimePicker"
+                      labelText={t('visitDate', 'Visit date')}
+                      placeholder="dd/mm/yyyy"
+                    />
+                  </DatePicker>
+                </ResponsiveWrapper>
               )}
             />
           </Column>
@@ -468,21 +477,22 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               name="clinicalNote"
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <TextArea
-                  id="additionalNote"
-                  light={isTablet}
-                  rows={rows}
-                  labelText={t('clinicalNoteLabel', 'Write your notes')}
-                  placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
-                  value={value}
-                  onBlur={onBlur}
-                  onChange={(event) => {
-                    onChange(event);
-                    const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                    const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
-                    setRows(newRows);
-                  }}
-                />
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <TextArea
+                    id="additionalNote"
+                    rows={rows}
+                    labelText={t('clinicalNoteLabel', 'Write your notes')}
+                    placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
+                    value={value}
+                    onBlur={onBlur}
+                    onChange={(event) => {
+                      onChange(event);
+                      const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                      const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                      setRows(newRows);
+                    }}
+                  />
+                </ResponsiveWrapper>
               )}
             />
           </Column>
@@ -548,22 +558,23 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
       control={control}
       render={({ field: { value, onChange, onBlur }, fieldState }) => (
         <>
-          <Search
-            ref={inputRef}
-            size={isTablet ? 'lg' : 'md'}
-            light={isTablet}
-            id={name}
-            labelText={labelText}
-            className={error && styles.diagnosisErrorOutline}
-            placeholder={placeholder}
-            renderIcon={error && <WarningFilled fill="red" />}
-            onChange={(e) => {
-              onChange(e);
-              handleSearch(name);
-            }}
-            value={value}
-            onBlur={onBlur}
-          />
+          <ResponsiveWrapper isTablet={isTablet}>
+            <Search
+              ref={inputRef}
+              size={isTablet ? 'lg' : 'md'}
+              id={name}
+              labelText={labelText}
+              className={error && styles.diagnosisErrorOutline}
+              placeholder={placeholder}
+              renderIcon={error && <WarningFilled fill="red" />}
+              onChange={(e) => {
+                onChange(e);
+                handleSearch(name);
+              }}
+              value={value}
+              onBlur={onBlur}
+            />
+          </ResponsiveWrapper>
           <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
@@ -571,11 +582,6 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
   );
 }
 
-interface DiagnosisSearchProps {
-  name: 'noteDate' | 'primaryDiagnosisSearch' | 'secondaryDiagnosisSearch' | 'clinicalNote';
-  labelText: string;
-  placeholder: string;
-  control: Control<VisitNotesFormData>;
-  handleSearch: (fieldName) => void;
-  error?: Object;
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }

@@ -1,3 +1,5 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .loading {
@@ -32,4 +34,10 @@
   flex-direction: column;
   justify-content: space-between;
   height: calc(100vh - 6rem);
+}
+
+.errorMessage {
+  @include type.type-style("label-02");
+  margin-top: spacing.$spacing-03;
+  color: $danger;
 }

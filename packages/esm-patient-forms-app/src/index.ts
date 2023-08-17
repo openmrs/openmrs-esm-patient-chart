@@ -6,9 +6,8 @@ import {
   subscribePrecacheStaticDependencies,
   syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
 import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
@@ -42,21 +41,6 @@ export function startupApp() {
     load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
   });
 }
-
-export const formsDetailedOverview = getAsyncLifecycle(
-  () => import('./forms/forms-detailed-overview.component'),
-  options,
-);
-
-export const formsAndNotesDashboardLink =
-  // t('Forms & Notes', 'Forms & Notes')
-  getSyncLifecycle(
-    createDashboardLink({
-      ...dashboardMeta,
-      moduleName,
-    }),
-    options,
-  );
 
 export const offlineFormOverviewCard = getAsyncLifecycle(
   () => import('./offline-forms/offline-forms-overview-card.component'),

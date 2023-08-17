@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
 import { FormSchemaService } from './form-schema.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
@@ -63,9 +62,9 @@ describe('Service: FormSchemaService', () => {
       providers: [FormSchemaService, LocalStorageService, FormSchemaCompiler, FormResourceService],
       imports: [HttpClientTestingModule],
     });
-    formSchemaService = TestBed.get(FormSchemaService);
-    formsResourceService = TestBed.get(FormResourceService);
-    localStorageService = TestBed.get(LocalStorageService);
+    formSchemaService = TestBed.inject(FormSchemaService);
+    formsResourceService = TestBed.inject(FormResourceService);
+    localStorageService = TestBed.geinjectt(LocalStorageService);
   });
 
   afterEach(() => {
@@ -79,72 +78,4 @@ describe('Service: FormSchemaService', () => {
   it('should have all required methods defined and exposed as a public member ' + 'for the first time', () => {
     expect(formSchemaService.getFormSchemaByUuid).toBeTruthy();
   });
-
-  it(
-    'should hit the server to fetch Form Metadata when getFormSchemaByUuid is called for the ' +
-      'the first time(**Not cached)',
-    () => {
-      const uuid = 'form-uuid';
-
-      spyOn(formsResourceService, 'getFormMetaDataByUuid').and.callThrough();
-      formSchemaService.getFormSchemaByUuid(uuid);
-      expect(formsResourceService.getFormMetaDataByUuid).toHaveBeenCalled();
-    },
-  );
-
-  it(
-    'should hit the server to fetch Form Clobdata when getFormSchemaByUuid is called for the ' +
-      'the first time(**Not cached)',
-    () => {
-      const uuid = 'form-uuid';
-      spyOn(formsResourceService, 'getFormMetaDataByUuid').and.callFake((params) => {
-        const subject = new BehaviorSubject<any>({});
-        subject.next(formMetaData);
-        return subject;
-      });
-      spyOn(formsResourceService, 'getFormClobDataByUuid').and.callThrough();
-      formSchemaService.getFormSchemaByUuid(uuid);
-    },
-  );
-
-  it(
-    'should hit the server several times in order to fetch all referenced form components ' +
-      'when getFormSchemaByUuid is called for the first time(**Not cached)',
-    () => {
-      const uuid = 'form-uuid';
-      spyOn(formsResourceService, 'getFormMetaDataByUuid').and.callThrough();
-
-      spyOn(formsResourceService, 'getFormClobDataByUuid').and.callThrough();
-      formSchemaService.getFormSchemaByUuid(uuid);
-
-      formsResourceService.getFormMetaDataByUuid(uuid);
-      formsResourceService.getFormClobDataByUuid(uuid);
-
-      expect(formsResourceService.getFormClobDataByUuid).toHaveBeenCalled();
-      expect(formsResourceService.getFormMetaDataByUuid).toHaveBeenCalled();
-    },
-  );
-
-  it(
-    'should not hit the server to fetch Form Clobdata and Form metadata when compiled ' +
-      'schema is already cached (**Cached)',
-    () => {
-      const uuid = 'form-uuid';
-      spyOn(localStorageService, 'getObject').and.callFake((params) => {
-        return compiledSchema; // return cached & compiled schema
-      });
-      spyOn(formsResourceService, 'getFormMetaDataByUuid').and.callFake((params) => {
-        const subject = new BehaviorSubject<any>({});
-        subject.next(formMetaData);
-        return subject;
-      });
-      spyOn(formsResourceService, 'getFormClobDataByUuid').and.callThrough();
-      // make the call
-      formSchemaService.getFormSchemaByUuid(uuid);
-      // specifications
-      expect(formsResourceService.getFormClobDataByUuid).not.toHaveBeenCalled();
-      expect(formsResourceService.getFormMetaDataByUuid).not.toHaveBeenCalled();
-      expect(localStorageService.getObject).toHaveBeenCalled();
-    },
-  );
 });

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-common-lib",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "license": "MPL-2.0",
   "description": "Library for common patient chart components",
   "browser": "dist/openmrs-esm-patient-common-lib.js",
@@ -8,6 +8,7 @@
   "source": true,
   "scripts": {
     "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
     "typescript": "tsc"
   },
   "browserslist": [

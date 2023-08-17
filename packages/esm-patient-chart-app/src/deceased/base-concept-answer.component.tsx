@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import styles from './deceased-form.scss';
+import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Search, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { Layer, RadioButton, RadioButtonGroup, Search } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { ConceptAnswer } from './deceased.resource';
+import type { ConceptAnswer } from './deceased.resource';
+import styles from './deceased-form.scss';
 
 interface BaseConceptAnswerProps {
   onChange: (event) => void;
@@ -41,12 +41,13 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop
       }`}
     >
-      <Search
-        onChange={(event) => handleSearch(event.target.value)}
-        placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
-        labelText=""
-        light={isTablet}
-      />
+      <ResponsiveWrapper isTablet={isTablet}>
+        <Search
+          onChange={(event) => handleSearch(event.target.value)}
+          placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+          labelText=""
+        />
+      </ResponsiveWrapper>
 
       {results.length ? (
         <>
@@ -81,5 +82,9 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
     </div>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default BaseConceptAnswer;

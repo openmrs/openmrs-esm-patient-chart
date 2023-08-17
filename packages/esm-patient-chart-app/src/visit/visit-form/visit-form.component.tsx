@@ -65,7 +65,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const allVisitTypes = useVisitTypes();
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
@@ -269,7 +269,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={visitHeaderSlotState} />
           </Row>
         )}
         <Stack gap={1} className={styles.container}>
@@ -277,23 +277,24 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           <section>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id="visitDate"
-                light={isTablet}
-                style={{ paddingBottom: '1rem' }}
-                maxDate={new Date().toISOString()}
-                onChange={([date]) => setVisitDate(date)}
-                value={visitDate}
-              >
-                <DatePickerInput
-                  id="visitStartDateInput"
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DatePicker
+                  dateFormat="d/m/Y"
+                  datePickerType="single"
+                  id="visitDate"
+                  style={{ paddingBottom: '1rem' }}
+                  maxDate={new Date().toISOString()}
+                  onChange={([date]) => setVisitDate(date)}
+                  value={visitDate}
+                >
+                  <DatePickerInput
+                    id="visitStartDateInput"
+                    labelText={t('date', 'Date')}
+                    placeholder="dd/mm/yyyy"
+                    style={{ width: '100%' }}
+                  />
+                </DatePicker>
+              </ResponsiveWrapper>
               <ResponsiveWrapper isTablet={isTablet}>
                 <TimePicker
                   id="visitStartTime"
