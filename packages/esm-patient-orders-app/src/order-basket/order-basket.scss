@@ -1,0 +1,39 @@
+@use '@carbon/styles/scss/spacing';
+@import "../root";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 9rem);
+}
+
+.orderBasketContainer {
+  margin: spacing.$spacing-05;
+}
+
+.orderBasketContainer :global(.cds--btn-set .cds--btn) {
+  max-width: 50%;
+  height: 4rem;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.bottomButton {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.inlineNotification, .actionNotification {
+  max-width: unset !important;
+}
