@@ -32,6 +32,8 @@ function PrintModal({ patientUuid, closeDialog }) {
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const headerTitle = t('testReasults', 'Test results');
+  const displayText = t('resultsAvailableWithinTheSelectedTimeframe' ,' test results found within the selected time period')
+
   const datePickerFormat = 'm/d/y';
 
   const tableHeaders = [
@@ -113,7 +115,7 @@ function PrintModal({ patientUuid, closeDialog }) {
     });
   }, [panels, selectedFromDate, selectedToDate]);
   if (!testResults?.length) {
-    return <EmptyState displayText={headerTitle} headerTitle={headerTitle} />;
+    return <EmptyState displayText={displayText} headerTitle={""} />;
   }
 
   return (
