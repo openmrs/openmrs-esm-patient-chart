@@ -16,17 +16,13 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useStore } from 'zustand';
 import { Add, User } from '@carbon/react/icons';
 import { formatDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, Order, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { compare } from '../utils/compare';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
-import type { Order } from '../types/order';
-import type { OrderBasketItem } from '../types/order-basket-item';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
+import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -50,11 +46,10 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
-  const store = useStore(orderBasketStore);
-  const setItems = useCallback((items) => orderBasketStoreActions.setOrderBasketItems(items), []);
-  const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
+  const { orders, setOrders } = useOrderBasket('medications');
 
   const tableHeaders = [
     {
@@ -160,7 +155,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Launch order basket"
-            onClick={launchOrderBasket}
+            onClick={launchAddDrugOrder}
           >
             {t('add', 'Add')}
           </Button>
@@ -208,9 +203,10 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                         showModifyButton={showModifyButton}
                         showReorderButton={showReorderButton}
                         medication={medications[rowIndex]}
-                        items={patientOrderItems}
-                        setItems={setItems}
+                        items={orders}
+                        setItems={setOrders}
                         openOrderBasket={launchOrderBasket}
+                        openDrugOrderForm={launchAddDrugOrder}
                       />
                     </TableCell>
                   </TableRow>
@@ -247,6 +243,7 @@ function OrderBasketItemActions({
   items,
   setItems,
   openOrderBasket,
+  openDrugOrderForm,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -255,6 +252,7 @@ function OrderBasketItemActions({
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
   openOrderBasket: () => void;
+  openDrugOrderForm: (additionalProps?: AddDrugOrderWorkspaceAdditionalProps) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -309,53 +307,51 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
-    setItems([
-      ...items,
-      {
-        uuid: medication.uuid,
-        previousOrder: medication.uuid,
-        startDate: new Date(),
-        action: 'REVISE',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        asNeeded: medication.asNeeded,
-        asNeededCondition: medication.asNeededCondition,
-        duration: medication.duration,
-        durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
-          value: medication.durationUnits?.display,
-        },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer?.uuid,
-        careSetting: medication.careSetting?.uuid,
-        quantityUnits: {
-          value: medication.quantityUnits?.display,
-          valueCoded: medication.quantityUnits?.uuid,
-        },
+    const newItem: OrderBasketItem = {
+      uuid: medication.uuid,
+      previousOrder: medication.uuid,
+      startDate: new Date(),
+      action: 'REVISE',
+      drug: medication.drug,
+      dosage: medication.dose,
+      unit: {
+        value: medication.doseUnits?.display,
+        valueCoded: medication.doseUnits?.uuid,
       },
-    ]);
-    openOrderBasket();
-  }, [items, setItems, medication, openOrderBasket]);
+      frequency: {
+        valueCoded: medication.frequency?.uuid,
+        value: medication.frequency?.display,
+      },
+      route: {
+        valueCoded: medication.route?.uuid,
+        value: medication.route?.display,
+      },
+      commonMedicationName: medication.drug?.display,
+      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+      freeTextDosage:
+        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      patientInstructions:
+        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      asNeeded: medication.asNeeded,
+      asNeededCondition: medication.asNeededCondition,
+      duration: medication.duration,
+      durationUnit: {
+        valueCoded: medication.durationUnits?.uuid,
+        value: medication.durationUnits?.display,
+      },
+      pillsDispensed: medication.quantity,
+      numRefills: medication.numRefills,
+      indication: medication.orderReasonNonCoded,
+      orderer: medication.orderer?.uuid,
+      careSetting: medication.careSetting?.uuid,
+      quantityUnits: {
+        value: medication.quantityUnits?.display,
+        valueCoded: medication.quantityUnits?.uuid,
+      },
+    };
+    setItems([...items, newItem]);
+    openDrugOrderForm({ order: newItem });
+  }, [items, setItems, medication, openDrugOrderForm]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -364,7 +360,7 @@ function OrderBasketItemActions({
         uuid: medication.uuid,
         previousOrder: null,
         startDate: new Date(),
-        action: 'RENEWED',
+        action: 'RENEW',
         drug: medication.drug,
         dosage: medication.dose,
         unit: {
@@ -439,6 +435,26 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
+}
+
+/**
+ * Enables a comparison of arbitrary values with support for undefined/null.
+ * Requires the `<` and `>` operators to return something reasonable for the provided values.
+ */
+function compare<T>(x?: T, y?: T) {
+  if (x == undefined && y == undefined) {
+    return 0;
+  } else if (x == undefined) {
+    return -1;
+  } else if (y == undefined) {
+    return 1;
+  } else if (x < y) {
+    return -1;
+  } else if (x > y) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 export default MedicationsDetailsTable;

@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -16,11 +16,20 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const medicationsSummary = getAsyncLifecycle(() => import('./medications/root-medication-summary'), options);
+export const medicationsSummary = getAsyncLifecycle(
+  () => import('./medications-summary/medications-summary.component'),
+  options,
+);
 
-export const activeMedications = getAsyncLifecycle(() => import('./medications/active-medications.component'), options);
+export const activeMedications = getAsyncLifecycle(
+  () => import('./active-medications/active-medications.component'),
+  options,
+);
 
-export const orderBasketWorkspace = getAsyncLifecycle(() => import('./medications/root-order-basket'), options);
+export const drugOrderPanel = getAsyncLifecycle(
+  () => import('./drug-order-basket-panel/drug-order-basket-panel.extension'),
+  options,
+);
 
 export const medicationsDashboardLink =
   // t('Medications', 'Medications')
@@ -32,7 +41,8 @@ export const medicationsDashboardLink =
     options,
   );
 
-export const orderBasketActionMenu = getAsyncLifecycle(
-  () => import('./medications-summary/order-basket-action-button.component'),
-  options,
-);
+registerWorkspace({
+  name: 'add-drug-order',
+  title: 'Add drug order',
+  load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order.workspace'), options),
+});

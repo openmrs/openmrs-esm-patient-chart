@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
-import { getConfig, useConfig, usePagination } from '@openmrs/esm-framework';
+import { getConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from '../../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../__mocks__/visits.mock';
 import VisitsTable from './visits-table.component';
@@ -15,7 +15,6 @@ const testProps = {
 };
 
 const mockedGetConfig = getConfig as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -54,7 +53,6 @@ describe('EncounterList', () => {
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
-
     testProps.visits = mockEncounters;
 
     mockedUsePagination.mockImplementationOnce(() => ({
@@ -129,8 +127,8 @@ describe('Delete Encounter', () => {
     renderVisitsTable();
 
     const table = screen.getByRole('table');
-
-    // expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
+    expect(table).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
     const expandEncounterButton = screen.getAllByRole('button', { name: /expand current row/i });
 
     await waitFor(() => user.click(expandEncounterButton[0]));
@@ -143,6 +141,5 @@ describe('Delete Encounter', () => {
 });
 
 function renderVisitsTable() {
-  // FIXME: fix types
   renderWithSwr(<VisitsTable {...testProps} />);
 }
