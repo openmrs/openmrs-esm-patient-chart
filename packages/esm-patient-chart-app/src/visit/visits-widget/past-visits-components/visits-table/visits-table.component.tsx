@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   DataTable,
@@ -25,7 +26,6 @@ import {
 } from '@carbon/react';
 import { Edit, TrashCan } from '@carbon/react/icons';
 import {
-  Visit,
   formatDatetime,
   getConfig,
   isDesktop,
@@ -39,13 +39,11 @@ import {
   userHasAccess,
 } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import isEmpty from 'lodash-es/isEmpty';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
-import EncounterObservations from '../../encounter-observations';
 import { deleteEncounter } from './visits-table.resource';
-import styles from './visits-table.scss';
 import { MappedEncounter } from '../../visit.resource';
-import { KeyedMutator } from 'swr';
+import EncounterObservations from '../../encounter-observations';
+import styles from './visits-table.scss';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -57,7 +55,7 @@ interface VisitTableProps {
 type FilterProps = {
   rowIds: Array<string>;
   headers: Array<DataTableHeader>;
-  cellsById: any;
+  cellsById: Record<string, Record<string, boolean | string | null | Record<string, unknown>>>;
   inputValue: string;
   getCellId: (row, key) => string;
 };
@@ -69,6 +67,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const session = useSession();
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
+
   useEffect(() => {
     getConfig('@openmrs/esm-patient-forms-app').then((config) => {
       setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
@@ -99,11 +98,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
-    showAllEncounters && {
+  ];
+
+  if (showAllEncounters) {
+    tableHeaders.push({
       id: 2,
       header: t('visitType', 'Visit type'),
       key: 'visitType',
-    },
+    });
+  }
+
+  tableHeaders.push(
     {
       id: 3,
       header: t('encounterType', 'Encounter type'),
@@ -114,7 +119,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       header: t('provider', 'Provider'),
       key: 'provider',
     },
-  ];
+  );
 
   const launchWorkspace = (
     formUuid: string,
@@ -139,7 +144,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
-      datetime: formatDatetime(parseDate(encounter?.datetime)),
+      datetime: formatDatetime(parseDate(encounter.datetime)),
     }));
   }, [paginatedVisits]);
 
@@ -161,7 +166,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
               });
               mutateVisits?.();
             })
-            .catch((error) => {
+            .catch(() => {
               showToast({
                 title: t('error', 'Error'),
                 description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
@@ -251,102 +256,105 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, index) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                      {showAllEncounters ? (
-                        <TableCell className="cds--table-column-menu">
-                          <Layer className={styles.layer}>
-                            <OverflowMenu
-                              data-floating-menu-container
-                              ariaLabel="Encounter table actions menu"
-                              size={desktopLayout ? 'sm' : 'lg'}
-                              flipped
-                            >
-                              <OverflowMenuItem
+                {rows.map((row) => {
+                  const selectedVisit = visits.find((visit) => visit.id === row.id);
+
+                  return (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                        {showAllEncounters ? (
+                          <TableCell className="cds--table-column-menu">
+                            <Layer className={styles.layer}>
+                              <OverflowMenu
+                                data-floating-menu-container
+                                ariaLabel="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
-                                className={styles.menuItem}
-                                itemText={t('goToThisEncounter', 'Go to this encounter')}
-                              />
-                              {userHasAccess(visits[index]?.editPrivilege, session?.user) && visits[index]?.form?.uuid && (
-                                <OverflowMenuItem
-                                  className={styles.menuItem}
-                                  itemText={t('editThisEncounter', 'Edit this encounter')}
-                                  size={desktopLayout ? 'sm' : 'lg'}
-                                  onClick={() => {
-                                    launchWorkspace(
-                                      visits[index]?.form?.uuid,
-                                      visits[index]?.visitUuid,
-                                      visits[index]?.id,
-                                      visits[index]?.form?.display,
-                                      visits[index]?.visitTypeUuid,
-                                      visits[index]?.visitStartDatetime,
-                                      visits[index]?.visitStopDatetime,
-                                    );
-                                  }}
-                                />
-                              )}
-                              {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
-                                <OverflowMenuItem
-                                  size={desktopLayout ? 'sm' : 'lg'}
-                                  className={styles.menuItem}
-                                  itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                  onClick={() => {
-                                    handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display);
-                                  }}
-                                  hasDivider
-                                  isDelete
-                                />
-                              )}
-                            </OverflowMenu>
-                          </Layer>
-                        </TableCell>
-                      ) : null}
-                    </TableExpandRow>
-                    {row.isExpanded ? (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
-                        <>
-                          <EncounterObservations observations={visits[index].obs} />
-                          {userHasAccess(visits[index]?.editPrivilege, session?.user) && (
-                            <>
-                              {visits[index]?.form?.uuid && (
-                                <Button
-                                  kind="ghost"
-                                  onClick={() => {
-                                    launchWorkspace(
-                                      visits[index].form.uuid,
-                                      visits[index].visitUuid,
-                                      visits[index].id,
-                                      visits[index].form.display,
-                                      visits[index].visitTypeUuid,
-                                      visits[index]?.visitStartDatetime,
-                                      visits[index]?.visitStopDatetime,
-                                    );
-                                  }}
-                                  renderIcon={(props) => <Edit size={16} {...props} />}
-                                >
-                                  {t('editThisEncounter', 'Edit this encounter')}
-                                </Button>
-                              )}
-                              <Button
-                                kind="danger--ghost"
-                                onClick={() => handleDeleteEncounter(visits[index]?.id, visits[index]?.form?.display)}
-                                renderIcon={(props) => <TrashCan size={16} {...props} />}
+                                flipped
                               >
-                                {t('deleteThisEncounter', 'Delete this encounter')}
-                              </Button>
-                            </>
-                          )}
-                        </>
-                      </TableExpandedRow>
-                    ) : (
-                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                    )}
-                  </React.Fragment>
-                ))}
+                                <OverflowMenuItem
+                                  size={desktopLayout ? 'sm' : 'lg'}
+                                  className={styles.menuItem}
+                                  itemText={t('goToThisEncounter', 'Go to this encounter')}
+                                />
+                                {userHasAccess(selectedVisit?.editPrivilege, session?.user) &&
+                                  selectedVisit?.form?.uuid && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      itemText={t('editThisEncounter', 'Edit this encounter')}
+                                      size={desktopLayout ? 'sm' : 'lg'}
+                                      onClick={() => {
+                                        launchWorkspace(
+                                          selectedVisit?.form?.uuid,
+                                          selectedVisit?.visitUuid,
+                                          selectedVisit?.id,
+                                          selectedVisit?.form?.display,
+                                          selectedVisit?.visitTypeUuid,
+                                          selectedVisit?.visitStartDatetime,
+                                          selectedVisit?.visitStopDatetime,
+                                        );
+                                      }}
+                                    />
+                                  )}
+                                {userHasAccess(selectedVisit?.editPrivilege, session?.user) && (
+                                  <OverflowMenuItem
+                                    size={desktopLayout ? 'sm' : 'lg'}
+                                    className={styles.menuItem}
+                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                    onClick={() => handleDeleteEncounter(selectedVisit.id, selectedVisit.form?.display)}
+                                    hasDivider
+                                    isDelete
+                                  />
+                                )}
+                              </OverflowMenu>
+                            </Layer>
+                          </TableCell>
+                        ) : null}
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
+                          <>
+                            <EncounterObservations observations={selectedVisit?.obs} />
+                            {userHasAccess(selectedVisit?.editPrivilege, session?.user) && (
+                              <>
+                                {selectedVisit?.form?.uuid && (
+                                  <Button
+                                    kind="ghost"
+                                    onClick={() => {
+                                      launchWorkspace(
+                                        selectedVisit.form.uuid,
+                                        selectedVisit.visitUuid,
+                                        selectedVisit.id,
+                                        selectedVisit.form.display,
+                                        selectedVisit.visitTypeUuid,
+                                        selectedVisit?.visitStartDatetime,
+                                        selectedVisit?.visitStopDatetime,
+                                      );
+                                    }}
+                                    renderIcon={(props) => <Edit size={16} {...props} />}
+                                  >
+                                    {t('editThisEncounter', 'Edit this encounter')}
+                                  </Button>
+                                )}
+                                <Button
+                                  kind="danger--ghost"
+                                  onClick={() => handleDeleteEncounter(selectedVisit?.id, selectedVisit?.form?.display)}
+                                  renderIcon={(props) => <TrashCan size={16} {...props} />}
+                                >
+                                  {t('deleteThisEncounter', 'Delete this encounter')}
+                                </Button>
+                              </>
+                            )}
+                          </>
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

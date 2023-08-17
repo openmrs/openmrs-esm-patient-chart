@@ -1,11 +1,10 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event/';
-import FormsList from './forms-list.component';
-import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import FormsList from './forms-list.component';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;

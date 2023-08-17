@@ -8,9 +8,9 @@ import { FormMetadataObject } from '../types';
 @Injectable()
 export class FormResourceService {
   constructor(private http: HttpClient, private windowRef: WindowRef) {}
-  public getFormClobDataByUuid(uuid: string, v: string = null): Observable<any> {
-    const url = `${this.windowRef.openmrsRestBase}clobdata/${uuid}`;
-    const params: HttpParams = new HttpParams().set('v', v && v.length > 0 ? v : 'full');
+  public getFormSchemaByFormUid(uuid: string, v: string = null): Observable<any> {
+    const url = `${this.windowRef.openmrsRestBase}o3/forms/${uuid}`;
+    const params: HttpParams = new HttpParams().set('v', v && v.length > 0 ? v : 'default');
     return this.http.get(url, { params });
   }
 

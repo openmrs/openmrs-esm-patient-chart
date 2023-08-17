@@ -5,23 +5,6 @@
   },
   "extensions": [
     {
-      "name": "patient-form-dashboard",
-      "component": "formsDetailedOverview",
-      "slot": "patient-chart-form-dashboard-slot",
-      "order": 0
-    },
-    {
-      "name": "forms-summary-dashboard",
-      "component": "formsAndNotesDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "slot": "patient-chart-form-dashboard-slot",
-        "columns": 1,
-        "path": "Forms & Notes"
-      },
-      "order": 12
-    },
-    {
       "name": "offline-tools-dashboard-forms-card",
       "component": "offlineFormOverviewCard",
       "slot": "offline-tools-dashboard-cards",

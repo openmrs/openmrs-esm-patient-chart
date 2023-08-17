@@ -7,6 +7,7 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  Layer,
   Row,
   DatePickerSkeleton,
   DataTableSkeleton,
@@ -84,24 +85,25 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             {!conceptAnswers ? (
               <DatePickerSkeleton />
             ) : (
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id="deceasedDate"
-                light={isTablet}
-                style={{ width: '100%', paddingBottom: '1rem' }}
-                maxDate={new Date().toISOString()}
-                onChange={([date]) => setNewDeceasedDate(date)}
-                value={newDeceasedDate}
-              >
-                <DatePickerInput
-                  id="deceasedDateInput"
-                  style={{ width: '100%' }}
-                  disabled={isDead}
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                />
-              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DatePicker
+                  dateFormat="d/m/Y"
+                  datePickerType="single"
+                  id="deceasedDate"
+                  style={{ width: '100%', paddingBottom: '1rem' }}
+                  maxDate={new Date().toISOString()}
+                  onChange={([date]) => setNewDeceasedDate(date)}
+                  value={newDeceasedDate}
+                >
+                  <DatePickerInput
+                    id="deceasedDateInput"
+                    style={{ width: '100%' }}
+                    disabled={isDead}
+                    labelText={t('date', 'Date')}
+                    placeholder="dd/mm/yyyy"
+                  />
+                </DatePicker>
+              </ResponsiveWrapper>
             )}
           </section>
           <section>
@@ -138,5 +140,9 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default MarkPatientDeceasedForm;

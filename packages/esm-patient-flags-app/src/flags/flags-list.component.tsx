@@ -3,11 +3,11 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
-import { getFlagType } from './utils';
+import { Button, ButtonSet, Dropdown, Form, InlineLoading, Layer, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
+import { getFlagType } from './utils';
 import styles from './flags-list.scss';
 
 type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
@@ -106,14 +106,15 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     <Form className={styles.formWrapper}>
       {/* The <div> below is required to maintain the page layout styling */}
       <div>
-        <Search
-          labelText={t('searchForAFlag', 'Search for a flag')}
-          light={isTablet}
-          placeholder={t('searchForAFlag', 'Search for a flag')}
-          ref={searchRef}
-          size={isTablet ? 'lg' : 'md'}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
+        <ResponsiveWrapper isTablet={isTablet}>
+          <Search
+            labelText={t('searchForAFlag', 'Search for a flag')}
+            placeholder={t('searchForAFlag', 'Search for a flag')}
+            ref={searchRef}
+            size={isTablet ? 'lg' : 'md'}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </ResponsiveWrapper>
         <Stack gap={4}>
           <div className={styles.listWrapper}>
             <div className={styles.flagsHeaderInfo}>
@@ -217,5 +218,9 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default FlagsList;

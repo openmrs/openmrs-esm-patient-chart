@@ -6,7 +6,6 @@ import { usePatientDeceased } from '../deceased/deceased.resource';
 
 interface MarkPatientAliveOverflowMenuItemProps {
   patientUuid?: string;
-  launchPatientChart?: boolean;
 }
 
 const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({ patientUuid }) => {

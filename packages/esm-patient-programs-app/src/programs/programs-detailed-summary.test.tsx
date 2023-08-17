@@ -3,9 +3,8 @@ import { screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockEnrolledProgramsResponse } from '../__mocks__/programs.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
 jest.setTimeout(20000);
@@ -72,7 +71,7 @@ describe('ProgramsDetailedSummary ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a detailed tabular summary of the patient's program enrollments", async () => {
+  it('renders a detailed tabular summary of the patient program enrollments', async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });

@@ -4,11 +4,10 @@ import {
   Button,
   ButtonSet,
   Checkbox,
-  DatePicker,
-  DatePickerInput,
   Form,
   InlineLoading,
   InlineNotification,
+  Layer,
   RadioButton,
   RadioButtonGroup,
   Row,
@@ -236,13 +235,14 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               </Tabs>
               {selectedAllergen === otherConceptUuid ? (
                 <div className={styles.input}>
-                  <TextInput
-                    light={isTablet}
-                    id="nonCodedAllergenType"
-                    labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
-                    onChange={(event) => setNonCodedAllergenType(event.target.value)}
-                    placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
-                  />
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <TextInput
+                      id="nonCodedAllergenType"
+                      labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
+                      onChange={(event) => setNonCodedAllergenType(event.target.value)}
+                      placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
+                    />
+                  </ResponsiveWrapper>
                 </div>
               ) : null}
             </section>
@@ -266,13 +266,14 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               </div>
               {allergicReactions.includes(otherConceptUuid) ? (
                 <div className={styles.input}>
-                  <TextInput
-                    light={isTablet}
-                    id="nonCodedAllergicReaction"
-                    labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
-                    onChange={(event) => setNonCodedAllergicReaction(event.target.value)}
-                    placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
-                  />
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <TextInput
+                      id="nonCodedAllergicReaction"
+                      labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
+                      onChange={(event) => setNonCodedAllergicReaction(event.target.value)}
+                      placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
+                    />
+                  </ResponsiveWrapper>
                 </div>
               ) : null}
             </section>
@@ -312,17 +313,18 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
               <div className={styles.wrapper}>
-                <TextArea
-                  className={styles.textbox}
-                  cols={20}
-                  light={!isTablet}
-                  id="comments"
-                  invalidText={t('invalidComment', 'Invalid comment, try again')}
-                  labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
-                  onChange={(event) => setComment(event.target.value)}
-                  placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
-                  rows={4}
-                />
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <TextArea
+                    className={styles.textbox}
+                    cols={20}
+                    id="comments"
+                    invalidText={t('invalidComment', 'Invalid comment, try again')}
+                    labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
+                    rows={4}
+                  />
+                </ResponsiveWrapper>
               </div>
             </section>
           </div>
@@ -343,6 +345,10 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
       </div>
     </Form>
   );
+}
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 export default AllergyForm;

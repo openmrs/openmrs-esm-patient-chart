@@ -31,14 +31,25 @@ import {
   createProgramEnrollment,
   useAvailablePrograms,
   useEnrollments,
-  customRepresentation,
   updateProgramEnrollment,
 } from './programs.resource';
 import styles from './programs-form.scss';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 interface ProgramsFormProps extends DefaultWorkspaceProps {
   programEnrollmentId?: string;
 }
+
+const programsFormSchema = z.object({
+  selectedProgram: z.string().refine((value) => value != '', 'Please select a valid program'),
+  enrollmentDate: z.date(),
+  completionDate: z.date().nullable(),
+  enrollmentLocation: z.string(),
+});
+
+export type ProgramsFormData = z.infer<typeof programsFormSchema>;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
   const { t } = useTranslation();
@@ -60,31 +71,34 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
     ? [currentProgram]
     : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
 
-  const [completionDate, setCompletionDate] = React.useState<Date>(
-    currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
-  );
-  const [enrollmentDate, setEnrollmentDate] = React.useState<Date>(
-    currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
-  );
-  const [selectedProgram, setSelectedProgram] = React.useState<string>(currentEnrollment?.program.uuid ?? '');
-  const [userLocation, setUserLocation] = React.useState<string>(currentEnrollment?.location.uuid ?? '');
+  const getLocationUuid = () => {
+    if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
+      return session?.sessionLocation?.uuid;
+    }
+    return currentEnrollment?.location.uuid ?? null;
+  };
 
-  if (!userLocation && session?.sessionLocation?.uuid) {
-    setUserLocation(session?.sessionLocation?.uuid);
-  }
+  const { control, handleSubmit, watch } = useForm<ProgramsFormData>({
+    mode: 'all',
+    resolver: zodResolver(programsFormSchema),
+    defaultValues: {
+      selectedProgram: currentEnrollment?.program.uuid ?? '',
+      enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
+      completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
+      enrollmentLocation: getLocationUuid() ?? '',
+    },
+  });
 
-  const handleSubmit = React.useCallback(
-    (event: SyntheticEvent<HTMLFormElement>) => {
-      event.preventDefault();
-
-      if (!selectedProgram) return;
+  const onSubmit = React.useCallback(
+    (data: ProgramsFormData) => {
+      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation } = data;
 
       const payload = {
         patient: patientUuid,
         program: selectedProgram,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
-        location: userLocation,
+        location: enrollmentLocation,
       };
 
       const abortController = new AbortController();
@@ -146,38 +160,126 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         sub.unsubscribe();
       };
     },
-    [
-      selectedProgram,
-      patientUuid,
-      enrollmentDate,
-      completionDate,
-      userLocation,
-      currentEnrollment,
-      mutateEnrollments,
-      closeWorkspace,
-      t,
-    ],
+    [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspace, t],
   );
+
   const programSelect = (
-    <Select
-      id="program"
-      invalidText={t('required', 'Required')}
-      labelText=""
-      onChange={(event) => setSelectedProgram(event.target.value)}
-    >
-      {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
-      {eligiblePrograms?.length > 0 &&
-        eligiblePrograms.map((program) => (
-          <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-            {program.display}
-          </SelectItem>
-        ))}
-    </Select>
+    <Controller
+      name="selectedProgram"
+      control={control}
+      render={({ fieldState, field: { onChange, value } }) => (
+        <>
+          <Select
+            id="program"
+            invalidText={t('required', 'Required')}
+            labelText=""
+            onChange={(event) => onChange(event.target.value)}
+            value={value}
+          >
+            <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
+            {eligiblePrograms?.length > 0 &&
+              eligiblePrograms.map((program) => (
+                <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                  {program.display}
+                </SelectItem>
+              ))}
+          </Select>
+          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
+        </>
+      )}
+    />
   );
+
+  const enrollmentDate = (
+    <Controller
+      name="enrollmentDate"
+      control={control}
+      render={({ field: { onChange, value } }) => (
+        <DatePicker
+          id="enrollmentDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          maxDate={new Date().toISOString()}
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => onChange(date)}
+          value={value}
+        >
+          <DatePickerInput id="enrollmentDateInput" labelText="" />
+        </DatePicker>
+      )}
+    />
+  );
+
+  const completionDate = (
+    <Controller
+      name="completionDate"
+      control={control}
+      render={({ field: { onChange, value } }) => (
+        <DatePicker
+          id="completionDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          minDate={new Date(watch('enrollmentDate')).toISOString()}
+          maxDate={new Date().toISOString()}
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => onChange(date)}
+          value={value}
+        >
+          <DatePickerInput id="completionDateInput" labelText="" />
+        </DatePicker>
+      )}
+    />
+  );
+
+  const enrollmentLocation = (
+    <Controller
+      name="enrollmentLocation"
+      control={control}
+      render={({ field: { onChange, value } }) => (
+        <Select
+          id="location"
+          invalidText="Required"
+          labelText=""
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+        >
+          {availableLocations?.length > 0 &&
+            availableLocations.map((location) => (
+              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                {location.display}
+              </SelectItem>
+            ))}
+        </Select>
+      )}
+    />
+  );
+
+  const formGroups = [
+    {
+      style: { maxWidth: '50%' },
+      legendText: t('programName', 'Program name'),
+      value: programSelect,
+    },
+    {
+      style: { maxWidth: '50%' },
+      legendText: t('dateEnrolled', 'Date enrolled'),
+      value: enrollmentDate,
+    },
+    {
+      style: { width: '50%' },
+      legendText: t('dateCompleted', 'Date completed'),
+      value: completionDate,
+    },
+    {
+      style: { width: '50%' },
+      legendText: t('enrollmentLocation', 'Enrollment location'),
+      value: enrollmentLocation,
+    },
+  ];
   return (
-    <Form className={styles.form} onSubmit={handleSubmit}>
+    <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack className={styles.formContainer} gap={7}>
-        {!eligiblePrograms.length ? (
+        {!eligiblePrograms.length && (
           <InlineNotification
             style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
             kind={'error'}
@@ -185,113 +287,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             subtitle={t('configurePrograms', 'Please configure programs to continue.')}
             title={t('noProgramsConfigured', 'No programs configured')}
           />
-        ) : null}
-        <FormGroup style={{ maxWidth: '50%' }} legendText={t('programName', 'Program name')}>
-          <div className={styles.selectContainer}>{isTablet ? <Layer>{programSelect}</Layer> : programSelect}</div>
-        </FormGroup>
-        <FormGroup style={{ maxWidth: '50%' }} legendText={t('dateEnrolled', 'Date enrolled')}>
-          {isTablet ? (
-            <Layer>
-              <DatePicker
-                id="enrollmentDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                maxDate={new Date().toISOString()}
-                placeholder="dd/mm/yyyy"
-                onChange={([date]) => setEnrollmentDate(date)}
-                value={enrollmentDate}
-              >
-                <DatePickerInput id="enrollmentDateInput" labelText="" />
-              </DatePicker>
-            </Layer>
-          ) : (
-            <DatePicker
-              id="enrollmentDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              maxDate={new Date().toISOString()}
-              placeholder="dd/mm/yyyy"
-              onChange={([date]) => setEnrollmentDate(date)}
-              value={enrollmentDate}
-            >
-              <DatePickerInput id="enrollmentDateInput" labelText="" />
-            </DatePicker>
-          )}
-        </FormGroup>
-        <FormGroup style={{ width: '50%' }} legendText={t('dateCompleted', 'Date completed')}>
-          {isTablet ? (
-            <Layer>
-              <DatePicker
-                id="completionDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                minDate={new Date(enrollmentDate).toISOString()}
-                maxDate={new Date().toISOString()}
-                placeholder="dd/mm/yyyy"
-                onChange={([date]) => setCompletionDate(date)}
-                value={completionDate}
-              >
-                <DatePickerInput id="completionDateInput" labelText="" />
-              </DatePicker>
-            </Layer>
-          ) : (
-            <DatePicker
-              id="completionDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              minDate={new Date(enrollmentDate).toISOString()}
-              maxDate={new Date().toISOString()}
-              placeholder="dd/mm/yyyy"
-              onChange={([date]) => setCompletionDate(date)}
-              value={completionDate}
-            >
-              <DatePickerInput id="completionDateInput" labelText="" />
-            </DatePicker>
-          )}
-        </FormGroup>
-        <FormGroup style={{ width: '50%' }} legendText={t('enrollmentLocation', 'Enrollment location')}>
-          {isTablet ? (
-            <Layer>
-              <Select
-                id="location"
-                invalidText="Required"
-                labelText=""
-                onChange={(event) => setUserLocation(event.target.value)}
-                value={userLocation}
-              >
-                {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
-                {availableLocations?.length > 0 &&
-                  availableLocations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </Layer>
-          ) : (
-            <Select
-              id="location"
-              invalidText="Required"
-              labelText=""
-              onChange={(event) => setUserLocation(event.target.value)}
-              value={userLocation}
-            >
-              {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
-              {availableLocations?.length > 0 &&
-                availableLocations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
-                  </SelectItem>
-                ))}
-            </Select>
-          )}
-        </FormGroup>
+        )}
+        {formGroups.map((group, i) => (
+          <FormGroup style={group.style} legendText={group.legendText} key={i}>
+            <div className={styles.selectContainer}>{isTablet ? <Layer>{group.value}</Layer> : group.value}</div>
+          </FormGroup>
+        ))}
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" disabled={!selectedProgram} type="submit">
+        <Button className={styles.button} kind="primary" type="submit">
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>

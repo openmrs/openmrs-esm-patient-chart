@@ -27,13 +27,15 @@
   "day": "Day",
   "daysOfWeek": "Days of the week",
   "discard": "បោះបង់",
-  "duration": "Duration",
+  "durationInMinutes": "Duration (minutes)",
   "edit": "Edit",
   "editAppointment": "Edit an appointment",
   "endDate": "End date",
   "invalidNumber": "Number is not valid",
+  "isRecurringAppointment": "Is this a recurring appoinment?",
   "loading": "កំពុងផ្ទុក",
   "location": "ទីតាំង",
+  "no": "No",
   "noContent": "No Content",
   "noCurrentAppointments": "There are no appointments scheduled for today to display for this patient",
   "noPastAppointments": "មិនមានការណាត់ជួបពីមុនដើម្បីបង្ហាញសម្រាប់អ្នកជំងឺនេះទេ",
@@ -42,6 +44,7 @@
   "noUpcomingAppointments": "មិនមានការណាត់ជួបនាពេលខាងមុខដើម្បីបង្ហាញសម្រាប់អ្នកជំងឺនេះទេ",
   "noUpcomingAppointmentsForPatient": "There are no upcoming appointments to display for this patient",
   "past": "អតីតកាល",
+  "period": "Period",
   "recurringAppointment": "Recurring appointment",
   "repeatEvery": "Repeat every",
   "saveAndClose": "រក្សាទុក និងបិទ",
@@ -57,5 +60,6 @@
   "type": "Type",
   "upcoming": "នាពេលខាងមុខ",
   "upcomingAppointments": "Upcoming appointments",
-  "week": "Week"
+  "week": "Week",
+  "yes": "Yes"
 }

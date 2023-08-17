@@ -1,13 +1,10 @@
 import React from 'react';
+import { getConfig } from '@openmrs/esm-framework';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  visitOverviewDetailMockData,
-  visitOverviewDetailMockDataNotEmpty,
-} from '../../../../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../../__mocks__/patient.mock';
+import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '../../../__mocks__/visits.mock';
+import { mockPatient } from '../../../../../../tools/test-helpers';
 import VisitSummary from './visit-summary.component';
-import { getConfig } from '@openmrs/esm-framework';
 
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 const mockGetConfig = getConfig as jest.Mock;
@@ -24,6 +21,7 @@ jest.mock('@openmrs/esm-framework', () => {
         visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       };
     }),
+    useConnectedExtensions: jest.fn(() => []),
   };
 });
 

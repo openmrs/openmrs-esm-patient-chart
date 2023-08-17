@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-entry-app",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "license": "MPL-2.0",
   "description": "Form engine entry capabilities for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-entry-app.js",
@@ -89,7 +89,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "openmrs": "next",
+    "openmrs": "^5.1.0",
     "protractor": "~7.0.0",
     "rxjs": "6",
     "style-loader": "2.x",
