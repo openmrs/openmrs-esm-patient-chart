@@ -19,6 +19,7 @@ import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
 import { spaBasePath } from '../constants';
+import { layoutMode } from './chart-review/dashboard-view.component';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -27,7 +28,7 @@ const PatientChart: React.FC = () => {
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
-  const [isWidgetFullWidth, setIsWidgetFullWidth] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<layoutMode>('contained');
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
@@ -72,8 +73,8 @@ const PatientChart: React.FC = () => {
                 <ExtensionSlot name="patient-info-slot" state={state} />
               </aside>
               <div className={styles.grid}>
-                <div className={`${styles.chartReview} ${!isWidgetFullWidth ? styles.widthContained : ''}`}>
-                  <ChartReview {...state} view={view} fullWidthWidgets={setIsWidgetFullWidth} />
+                <div className={`${styles.chartReview} ${layoutMode == 'contained' ? styles.widthContained : ''}`}>
+                  <ChartReview {...state} view={view} dashboardLayoutMode={setLayoutMode} />
                   <WorkspaceNotification />
                 </div>
               </div>

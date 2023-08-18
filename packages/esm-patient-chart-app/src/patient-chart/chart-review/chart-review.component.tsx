@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
-import { DashboardView, DashboardConfig } from './dashboard-view.component';
+import { DashboardView, DashboardConfig, layoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
@@ -27,10 +27,10 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
-  fullWidthWidgets?: (isWidgetFullWidth: boolean) => void;
+  dashboardLayoutMode?: (layoutMode: layoutMode) => void;
 }
 
-const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, fullWidthWidgets }) => {
+const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, dashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
@@ -51,10 +51,10 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, f
 
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
-    if (fullWidthWidgets) {
-      fullWidthWidgets(activeDashboard.fullWidth ?? false);
+    if (dashboardLayoutMode) {
+      dashboardLayoutMode(activeDashboard.layoutMode);
     }
-  }, [dashboard, defaultDashboard, fullWidthWidgets]);
+  }, [dashboard, defaultDashboard, dashboardLayoutMode]);
 
   if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
     return null;
