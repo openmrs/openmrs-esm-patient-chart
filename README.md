@@ -69,13 +69,19 @@ To run tests in `watch` mode, run:
 yarn turbo test:watch
 ```
 
-To run tests for a specific package, run:
+To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
 
 ```bash
-yarn turbo test --filter="<package-name>"
-# For example, to run tests for just the Conditions app, run:
 yarn turbo test --filter="esm-patient-conditions-app"
 ```
+
+To run a specific test file, run:
+
+```bash
+yarn turbo test -- visit-notes-form
+```
+
+The above command will run all tests in the `visit-notes-form` test file. You can optionally pass a `--watch` flag to run that specific test in `watch` mode.
 
 To generate a `coverage` report, run:
 
