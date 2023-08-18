@@ -29,9 +29,6 @@ const mockCurrentVisit = {
 };
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  get formEntrySub() {
-    return mockFormEntrySub();
-  },
   useVisitOrOfflineVisit: jest.fn(),
 }));
 

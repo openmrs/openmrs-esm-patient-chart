@@ -7,7 +7,6 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  formEntrySub,
   launchPatientWorkspace,
   useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
@@ -30,8 +29,10 @@ interface VitalsOverviewProps {
 }
 
 export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  formEntrySub.next({ formUuid, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+  launchPatientWorkspace('patient-form-entry-workspace', {
+    workspaceTitle: formName,
+    formInfo: { formUuid, encounterUuid },
+  });
 }
 
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {

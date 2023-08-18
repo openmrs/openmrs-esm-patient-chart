@@ -38,7 +38,7 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { MappedEncounter } from '../../visit.resource';
@@ -132,8 +132,10 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   ) => {
     const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
-      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime });
-      launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
+      launchPatientWorkspace('patient-form-entry-workspace', {
+        workspaceTitle: formName,
+        formInfo: { visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime, formUuid, encounterUuid },
+      });
     } else {
       navigate({
         to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,

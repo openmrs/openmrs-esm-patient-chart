@@ -1,45 +1,40 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
-import {
-  DefaultWorkspaceProps,
-  FormEntryProps,
-  formEntrySub,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { DefaultWorkspaceProps, FormEntryProps, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 interface FormEntryComponentProps extends DefaultWorkspaceProps {
   mutateForm: () => void;
+  formInfo: FormEntryProps;
 }
 
-const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm }) => {
+const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm, formInfo }) => {
+  const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid } = formInfo || {};
   const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
   const [showForm, setShowForm] = useState(true);
-
   const state = useMemo(
     () => ({
       view: 'form',
-      formUuid: selectedForm?.formUuid ?? null,
-      visitUuid: selectedForm?.visitUuid ?? currentVisit?.uuid ?? null,
-      visitTypeUuid: selectedForm?.visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
-      visitStartDatetime: selectedForm?.visitStartDatetime ?? currentVisit?.startDatetime ?? null,
-      visitStopDatetime: selectedForm?.visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
+      formUuid: formUuid ?? null,
+      visitUuid: visitUuid ?? currentVisit?.uuid ?? null,
+      visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
+      visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? null,
+      visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
       patientUuid: patientUuid ?? null,
       patient,
-      encounterUuid: selectedForm?.encounterUuid ?? null,
+      encounterUuid: encounterUuid ?? null,
       closeWorkspace: () => {
         typeof mutateForm === 'function' && mutateForm();
         closeWorkspace();
       },
     }),
     [
-      selectedForm?.formUuid,
-      selectedForm?.visitUuid,
-      selectedForm?.visitTypeUuid,
-      selectedForm?.encounterUuid,
-      selectedForm?.visitStartDatetime,
-      selectedForm?.visitStopDatetime,
+      formUuid,
+      visitUuid,
+      visitTypeUuid,
+      encounterUuid,
+      visitStartDatetime,
+      visitStopDatetime,
       currentVisit?.uuid,
       currentVisit?.visitType?.uuid,
       currentVisit?.startDatetime,
@@ -51,11 +46,6 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
     ],
   );
 
-  useEffect(() => {
-    const sub = formEntrySub.subscribe((form) => setSelectedForm(form));
-    return () => sub.unsubscribe();
-  }, []);
-
   // FIXME: This logic triggers a reload of the form when the formUuid changes. It's a workaround for the fact that the form doesn't reload when the formUuid changes.
   useEffect(() => {
     if (state.formUuid) {
@@ -66,11 +56,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
     }
   }, [state]);
 
-  return (
-    <div>
-      {showForm && selectedForm && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
-    </div>
-  );
+  return <div>{showForm && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}</div>;
 };
 
 export default FormEntry;
