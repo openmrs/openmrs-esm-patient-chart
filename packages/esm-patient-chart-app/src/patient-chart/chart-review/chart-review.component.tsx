@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
-import { DashboardView, DashboardConfig, layoutMode } from './dashboard-view.component';
+import { DashboardView, DashboardConfig, LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
@@ -27,7 +27,7 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
-  dashboardLayoutMode?: (layoutMode: layoutMode) => void;
+  dashboardLayoutMode?: (layoutMode: LayoutMode) => void;
 }
 
 const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, dashboardLayoutMode }) => {
@@ -52,7 +52,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, d
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
     if (dashboardLayoutMode) {
-      dashboardLayoutMode(activeDashboard.layoutMode);
+      dashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
     }
   }, [dashboard, defaultDashboard, dashboardLayoutMode]);
 

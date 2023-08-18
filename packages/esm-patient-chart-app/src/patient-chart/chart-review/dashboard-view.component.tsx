@@ -23,7 +23,7 @@ function getColumnsLayoutStyle(dashboard: DashboardConfig) {
  * - 'anchored' means that the dashboard widgets will occupy the full width of
  * the chart dashboard
  */
-export type layoutMode = 'contained' | 'anchored';
+export type LayoutMode = 'contained' | 'anchored';
 
 export interface DashboardConfig {
   slot: string;
@@ -31,7 +31,7 @@ export interface DashboardConfig {
   path: string;
   columns: number;
   hideDashboardTitle?: boolean;
-  layoutMode?: layoutMode;
+  layoutMode?: LayoutMode;
 }
 
 interface DashboardViewProps {
