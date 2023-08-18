@@ -30,6 +30,9 @@ test('Should add, delete and edit a condition', async ({page, api}) => {
         await page.getByLabel('Onset date').fill('10/07/2023');
         await page.getByLabel('Onset date').press('Tab');
         await page.getByRole('button', { name: 'Save & close' }).click();
+    });
+    
+    test.step('Then I should see the notification', async () => {
         await expect(conditionsPage.page.getByText('saved')).toBeVisible();
     });
 
@@ -49,6 +52,9 @@ test('Should add, delete and edit a condition', async ({page, api}) => {
         await page.getByLabel('End date').fill('11/07/2023');
         await page.getByLabel('End date').press('Tab');
         await page.getByRole('button', { name: 'Save & close' }).click();
+    });
+
+    test.step('Then I should see the notification', async () => {
         await expect(conditionsPage.page.getByText('updated')).toBeVisible();
     });
 
@@ -64,6 +70,9 @@ test('Should add, delete and edit a condition', async ({page, api}) => {
         await page.getByRole('button', { name: 'Edit or delete condition' }).click();
         await page.getByRole('menuitem', { name: 'Delete' }).click();
         await page.getByRole('button', { name: 'danger Delete' }).click();
+    });
+
+    test.step('Then I should see the notification', async () => {
         await expect(conditionsPage.page.getByText('Condition deleted successfully')).toBeVisible();
     });
 })
