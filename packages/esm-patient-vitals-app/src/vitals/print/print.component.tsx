@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useSession } from '@openmrs/esm-framework';
+import { interpolateUrl, useConfig, useSession } from '@openmrs/esm-framework';
 import styles from './print.scss';
 
 interface PrintComponentProps {
@@ -26,7 +26,7 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
     <div className={styles.printPage}>
       <header className={styles.header}>
         {logo?.src ? (
-          <img className={styles.logo} src={logo.src} alt={logo.alt} width={110} height={40} />
+          <img className={styles.logo} src={interpolateUrl(logo.src)} alt={logo.alt} width={110} height={40} />
         ) : logo?.name ? (
           logo.name
         ) : (

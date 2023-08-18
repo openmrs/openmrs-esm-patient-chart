@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api/api';
-import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
 
 interface ActiveMedicationsProps {
   patientUuid: string;
@@ -17,7 +16,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) =>
 
   const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
 
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
@@ -38,7 +37,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) =>
   }
   // Ensure we have emptyStateText and record translation keys
   // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
 };
 
 export default ActiveMedications;

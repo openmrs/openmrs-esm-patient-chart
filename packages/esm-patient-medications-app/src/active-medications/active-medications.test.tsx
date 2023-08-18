@@ -1,8 +1,7 @@
 import React from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { mockDrugOrders } from '../__mocks__/medication.mock';
+import { mockPatientDrugOrdersApiData } from '../__mocks__/medication.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
 
@@ -10,12 +9,18 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
+function renderActiveMedications() {
+  renderWithSwr(<ActiveMedications {...testProps} />);
+}
+
+const mockLaunchPatientWorkspace = jest.fn();
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
     useWorkspaces: jest.fn(() => {
       return { workspaces: [{ name: 'order-basket' }] };
     }),
@@ -65,7 +70,7 @@ describe('ActiveMedications: ', () => {
   });
 
   test('renders a tabular overview of the active medications recorded for a patient', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce(mockDrugOrders);
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
     renderActiveMedications();
 
@@ -83,8 +88,10 @@ describe('ActiveMedications: ', () => {
     });
 
     const expectedTableRows = [
-      /09-Sept-2021 -- Aspirin — 81mg — tablet DOSE 1 tablet — oral — once daily — indefinite duration/,
-      /09-Sept-2021 -- Efavirenz — 600mg — tablet DOSE 1 tablet — oral — once daily — indefinite duration/,
+      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
+      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good — END DATE 14-Aug-2023/,
+      /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {duration} {durationUnit} — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
+      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {duration} {durationUnit} INDICATION Heart — QUANTITY 30 Tablet/,
     ];
 
     expectedTableRows.map((row) =>
@@ -93,22 +100,20 @@ describe('ActiveMedications: ', () => {
   });
 });
 
-test('clicking the Record active medications link or the Add button opens the order basket form', async () => {
+test('clicking the Record active medications link opens the order basket form', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
   renderActiveMedications();
   await waitForLoadingToFinish();
   const orderLink = await screen.getByText('Record active medications');
   fireEvent.click(orderLink);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+});
 
-  mockOpenmrsFetch.mockReturnValueOnce(mockDrugOrders);
+test('clicking the Add button opens the order basket form', async () => {
+  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
   renderActiveMedications();
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
 });
-
-function renderActiveMedications() {
-  renderWithSwr(<ActiveMedications {...testProps} />);
-}

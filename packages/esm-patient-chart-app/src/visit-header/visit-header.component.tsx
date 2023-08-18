@@ -13,13 +13,13 @@ import {
   useConfig,
   showModal,
   ExtensionSlot,
+  interpolateUrl,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
-import { useSystemVisitSetting } from '../visit/visit.resource';
 import RetrospectiveVisitLabel from './retrospective-visit-label.component';
 
 interface PatientInfoProps {
@@ -179,7 +179,7 @@ const VisitHeader: React.FC = () => {
       <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
         <div className={styles.divider}>
           {logo?.src ? (
-            <img className={styles.logo} src={logo.src} alt={logo.alt} width={110} height={40} />
+            <img className={styles.logo} src={interpolateUrl(logo.src)} alt={logo.alt} width={110} height={40} />
           ) : logo?.name ? (
             logo.name
           ) : (

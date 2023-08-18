@@ -22,18 +22,6 @@
       "order": 4 
     },
     {
-      "name": "order-basket-workspace",
-      "component": "orderBasketWorkspace",
-      "meta": {
-        "title": {
-          "key": "orderBasket",
-          "default": "Order Basket"
-        },
-        "type": "order"
-      },
-      "order": 4 
-    },
-    {
       "name": "medications-summary-dashboard",
       "component": "medicationsDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -45,10 +33,10 @@
       }
     },
     {
-      "name": "order-basket-action-menu",
-      "component": "orderBasketActionMenu",
-      "slot": "action-menu-chart-items-slot",
-      "order": 0
+      "name": "drug-order-panel",
+      "component": "drugOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 1
     }
   ]
 }

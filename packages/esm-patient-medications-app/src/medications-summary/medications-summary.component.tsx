@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { parseDate } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import type { Order } from '../types/order';
+import { EmptyState, ErrorState, Order } from '@openmrs/esm-patient-common-lib';
 import { usePatientOrders } from '../api/api';
-import { useLaunchOrderBasket } from '../utils/useLaunchOrderBasket';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -14,7 +14,8 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchAddDrugWorkspace =
+    useLaunchWorkspaceRequiringVisit<AddDrugOrderWorkspaceAdditionalProps>('add-drug-order');
 
   const {
     data: allOrders,
@@ -69,7 +70,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
             );
           }
 
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
       </div>
       <div style={{ marginTop: '1.5rem' }}>
