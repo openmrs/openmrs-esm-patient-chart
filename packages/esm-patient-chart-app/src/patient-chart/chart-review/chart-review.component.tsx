@@ -27,10 +27,10 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
-  dashboardLayoutMode?: (layoutMode: LayoutMode) => void;
+  setDashboardLayoutMode?: (layoutMode: LayoutMode) => void;
 }
 
-const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, dashboardLayoutMode }) => {
+const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setDashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
@@ -51,10 +51,10 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, d
 
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
-    if (dashboardLayoutMode) {
-      dashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
+    if (setDashboardLayoutMode) {
+      setDashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
     }
-  }, [dashboard, defaultDashboard, dashboardLayoutMode]);
+  }, [dashboard, defaultDashboard, setDashboardLayoutMode]);
 
   if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
     return null;

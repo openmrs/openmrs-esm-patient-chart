@@ -17,11 +17,11 @@ function getColumnsLayoutStyle(dashboard: DashboardConfig) {
 }
 
 /**
- * The layout mode determines how space the chart dashboard widgets will occupy.
- * - 'contained' means that the dashboard is displayed in a container that is
- * centered on the page and has a fixed width (max-width: 60rem).
- * - 'anchored' means that the dashboard widgets will occupy the full width of
- * the chart dashboard
+ * The layout mode dictates the width occuppied by the chart dashboard widgets.
+ * - In 'contained' mode, the dashboard widgets are displayed in a centered
+ * container with a fixed width (max-width: 60rem).
+ * - In 'anchored' mode, the dashboard widgets expand to occupy the entire width
+ * of the chart dashboard
  */
 export type LayoutMode = 'contained' | 'anchored';
 

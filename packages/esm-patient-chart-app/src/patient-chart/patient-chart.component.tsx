@@ -74,7 +74,7 @@ const PatientChart: React.FC = () => {
               </aside>
               <div className={styles.grid}>
                 <div className={`${styles.chartReview} ${layoutMode == 'contained' ? styles.widthContained : ''}`}>
-                  <ChartReview {...state} view={view} dashboardLayoutMode={setLayoutMode} />
+                  <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
                   <WorkspaceNotification />
                 </div>
               </div>
