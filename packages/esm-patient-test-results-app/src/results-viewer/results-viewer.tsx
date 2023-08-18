@@ -130,14 +130,6 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
-            <ContentSwitcher
-              size={isTablet ? 'lg' : 'md'}
-              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
-              onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
-            >
-              <Switch name="panel" text={t('panel', 'Panel')} />
-              <Switch name="tree" text={t('tree', 'Tree')} />
-            </ContentSwitcher>
             {showPrintButton && (
               <Button
                 kind="ghost"
@@ -149,6 +141,14 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
                 {t('print', 'Print')}
               </Button>
             )}
+            <ContentSwitcher
+              size={isTablet ? 'lg' : 'md'}
+              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
+              onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
+            >
+              <Switch name="panel" text={t('panel', 'Panel')} />
+              <Switch name="tree" text={t('tree', 'Tree')} />
+            </ContentSwitcher>
           </div>
         </div>
         <div className={styles.rightSectionHeader}>

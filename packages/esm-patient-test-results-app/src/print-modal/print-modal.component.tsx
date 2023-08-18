@@ -19,7 +19,6 @@ import {
 import { age, formatDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import { useReactToPrint } from 'react-to-print';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './print-modal.scss';
 
 function PrintModal({ patientUuid, closeDialog }) {
@@ -31,9 +30,7 @@ function PrintModal({ patientUuid, closeDialog }) {
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const headerTitle = t('testReasults', 'Test results');
-  const displayText = t('resultsAvailableWithinTheSelectedTimeframe' ,' test results found within the selected time period')
-
+  const headerTitle = t('testResults', 'Test results');
   const datePickerFormat = 'm/d/y';
 
   const tableHeaders = [
@@ -81,42 +78,15 @@ function PrintModal({ patientUuid, closeDialog }) {
 
   const testResults = useMemo(() => {
     if (selectedFromDate && selectedToDate) {
-      const selectedDateObj = new Date(selectedFromDate);
-      const selectedToDateObj = new Date(selectedToDate);
-
       return panels
         .filter((panel) => {
           const panelDate = new Date(panel.effectiveDateTime);
-          return panelDate >= selectedDateObj && panelDate <= selectedToDateObj;
+          return panelDate >= new Date(selectedFromDate) && panelDate <= new Date(selectedToDate);
         })
-        .map((panel) => {
-          const panelDate = new Date(panel.effectiveDateTime);
-          const formattedPanelDate = panelDate.toLocaleDateString();
-          return {
-            id: panel.id,
-            testType: panel.name,
-            date: formattedPanelDate,
-            result: panel.value,
-            normalRange: panel?.meta?.range ?? '--',
-          };
-        });
+        .map((panel) => formatPanelForDisplay(panel));
     }
-
-    return panels.map((panel) => {
-      const panelDate = new Date(panel.effectiveDateTime);
-      const formattedPanelDate = panelDate.toLocaleDateString();
-      return {
-        id: panel.id,
-        testType: panel.name,
-        date: formattedPanelDate,
-        result: panel.value,
-        normalRange: panel?.meta?.range ?? '--',
-      };
-    });
+    return panels.map((panel) => formatPanelForDisplay(panel));
   }, [panels, selectedFromDate, selectedToDate]);
-  if (!testResults?.length) {
-    return <EmptyState displayText={displayText} headerTitle={""} />;
-  }
 
   return (
     <div>
@@ -167,51 +137,74 @@ function PrintModal({ patientUuid, closeDialog }) {
               <h4>{headerTitle}</h4>
             </div>
           </div>
-          <DataTable rows={testResults} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}
-                        >
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+          {testResults?.length ? (
+            <DataTable
+              rows={testResults}
+              headers={tableHeaders}
+              isSortable
+              size={isTablet ? 'lg' : 'sm'}
+              useZebraStyles
+            >
+              {({ rows, headers, getHeaderProps, getTableProps }) => (
+                <TableContainer>
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      <TableRow>
+                        {headers.map((header) => (
+                          <TableHeader
+                            className={`${styles.productiveHeading01} ${styles.text02}`}
+                            {...getHeaderProps({
+                              header,
+                              isSortable: header.isSortable,
+                            })}
+                          >
+                            {header.header?.content ?? header.header}
+                          </TableHeader>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </DataTable>
+          ) : (
+            <p className={styles.emptyState}>
+              {t('ThereAreNoTestResultsFound', 'There are no test results found within the specified date range')}
+            </p>
+          )}
         </div>
       </ModalBody>
-      <ModalFooter>
-        <Button kind="secondary" onClick={closeDialog}>
-          {t('cancel', 'Cancel')}
-        </Button>
+      {testResults?.length && (
+        <ModalFooter>
+          <Button kind="secondary" onClick={closeDialog}>
+            {t('cancel', 'Cancel')}
+          </Button>
 
-        <Button kind="primary" onClick={handlePrint}>
-          {t('print', 'Print')}
-        </Button>
-      </ModalFooter>
+          <Button kind="primary" onClick={handlePrint}>
+            {t('print', 'Print')}
+          </Button>
+        </ModalFooter>
+      )}
     </div>
   );
 }
-
 export default PrintModal;
+
+const formatPanelForDisplay = (panel) => {
+  return {
+    id: panel.id,
+    testType: panel.name,
+    date: formatDate(new Date(panel.effectiveDateTime)),
+    result: panel.value,
+    normalRange: panel?.meta?.range ?? '--',
+  };
+};
