@@ -30,7 +30,7 @@
   "testName": "Test name",
   "testResults": "test results",
   "testResults_title": "Test Results",
-  "ThereAreNoTestResultsFound": "There are no test results found within the specified date range",
+  "thereAreNoTestResultsFound": "There are no test results found within the specified date range",
   "timeline": "Timeline",
   "timeOfTest": "Time of Test",
   "tree": "Tree",
