@@ -30,7 +30,7 @@ function PrintModal({ patientUuid, closeDialog }) {
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const headerTitle = t('testResults', 'Test results');
+  const headerTitle = t('testResults_title', 'Test Results');
   const datePickerFormat = 'm/d/y';
 
   const tableHeaders = [
@@ -183,7 +183,7 @@ function PrintModal({ patientUuid, closeDialog }) {
           )}
         </div>
       </ModalBody>
-      {testResults?.length && (
+      {testResults?.length ? (
         <ModalFooter>
           <Button kind="secondary" onClick={closeDialog}>
             {t('cancel', 'Cancel')}
@@ -193,7 +193,7 @@ function PrintModal({ patientUuid, closeDialog }) {
             {t('print', 'Print')}
           </Button>
         </ModalFooter>
-      )}
+      ) : null}
     </div>
   );
 }
