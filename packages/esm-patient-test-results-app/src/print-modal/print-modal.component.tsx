@@ -178,7 +178,7 @@ function PrintModal({ patientUuid, closeDialog }) {
             </DataTable>
           ) : (
             <p className={styles.emptyState}>
-              {t('ThereAreNoTestResultsFound', 'There are no test results found within the specified date range')}
+              {t('thereAreNoTestResultsFound', 'There are no test results found within the specified date range')}
             </p>
           )}
         </div>
