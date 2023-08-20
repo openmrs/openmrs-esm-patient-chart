@@ -72,10 +72,6 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
   await test.step('Then I modify the medication', async () => {
     await medicationPage.activeMedicationTable().getByRole('button', { name: 'Actions menu' }).click();
     await medicationPage.page.getByRole('menuitem', { name: 'Modify' }).click();
-    await medicationPage.page
-      .getByRole('listitem')
-      .filter({ hasText: 'ModifyAspirin 162.5mg — 162.5mg — TabletDOSE 1 Tablet — Oral — Once daily — REFI' })
-      .click();
     await medicationPage.page.getByPlaceholder('Dose').fill('2');
     await medicationPage.page.getByPlaceholder('Frequency').click();
     await medicationPage.page.getByText('Twice daily').click();
