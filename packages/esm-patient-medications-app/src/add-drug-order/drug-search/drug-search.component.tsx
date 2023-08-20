@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef,useState } from 'react';
 import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
@@ -15,6 +15,7 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
+  const searchInputRef = useRef(null);
 
   const handleSearchTermChange = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event?.target?.value?.trim();
@@ -38,9 +39,11 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
           placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           onChange={handleSearchTermChange}
+          ref={searchInputRef}
         />
       </ResponsiveWrapper>
       <OrderBasketSearchResults
+        searchInputRef={searchInputRef}
         searchTerm={searchTerm}
         onSearchTermClear={resetSearchTerm}
         onSearchResultClicked={onSearchResultClicked}
