@@ -101,8 +101,8 @@ test('Should add, modify, discontinue and reorder medication', async ({ page, ap
 
   await test.step('Then I should see the discontinued medication in the past medication table', async () => {
     await medicationPage.page.reload();
-    await expect(medicationPage.pastMedicationTable().getByText('Aspirin 162.5mg')).toBeVisible();
-    await expect(medicationPage.pastMedicationTable().getByText('DOSE 2 tablet — oral — Twice daily')).toBeVisible();
+    await expect(medicationPage.pastMedicationTable().getByText('Aspirin 162.5mg — 162.5mg — tablet DOSE 2 tablet')).toBeVisible();
+    await expect(medicationPage.pastMedicationTable().getByText('oral — Twice daily')).toBeVisible();
     await expect(medicationPage.pastMedicationTable().getByText(' for 30 days — REFILLS 6')).toBeVisible();
     await expect(medicationPage.pastMedicationTable().getByText('QUANTITY 60 Tablet')).toBeVisible();
   });
