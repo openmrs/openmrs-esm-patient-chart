@@ -56,7 +56,11 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
     }
   }, [state]);
 
-  return <div>{showForm && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}</div>;
+  return (
+    <div>
+      {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
+    </div>
+  );
 };
 
 export default FormEntry;
