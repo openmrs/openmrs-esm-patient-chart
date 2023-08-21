@@ -1,4 +1,4 @@
-import React, { useRef,useState } from 'react';
+import React, { useRef, useState } from 'react';
 import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
@@ -6,6 +6,7 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
+import { useDebounce } from './drug-search.resource';
 
 export interface OrderBasketSearchProps {
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
@@ -15,20 +16,16 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
 
-  const handleSearchTermChange = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
-    const input = event?.target?.value?.trim();
-
-    if (!input) {
-      setSearchTerm('');
-    }
-
-    setSearchTerm(input);
-  }, 300);
-
-  const resetSearchTerm = () => {
+  const focusAndClearSearchInput = () => {
     setSearchTerm('');
+    searchInputRef.current?.focus();
+  };
+
+  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value ?? '');
   };
 
   return (
@@ -40,13 +37,13 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           onChange={handleSearchTermChange}
           ref={searchInputRef}
+          value={searchTerm}
         />
       </ResponsiveWrapper>
       <OrderBasketSearchResults
-        searchInputRef={searchInputRef}
-        searchTerm={searchTerm}
-        onSearchTermClear={resetSearchTerm}
+        searchTerm={debouncedSearchTerm}
         onSearchResultClicked={onSearchResultClicked}
+        focusAndClearSearchInput={focusAndClearSearchInput}
       />
     </div>
   );
