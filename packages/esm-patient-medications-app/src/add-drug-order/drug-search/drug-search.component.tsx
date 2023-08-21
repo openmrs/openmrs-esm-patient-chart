@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
