@@ -10,31 +10,19 @@ import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchTermClear: () => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
-  searchInputRef: RefObject<HTMLInputElement>;
+  focusAndClearSearchInput: () => void;
 }
 
 export default function OrderBasketSearchResults({
-  searchInputRef,
   searchTerm,
-  onSearchTermClear,
   onSearchResultClicked,
+  focusAndClearSearchInput,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
-const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
-  function handleClick() {
-    setIsSearchInputCleared(true);
-    searchInputRef.current.value = '';
-  }
-  useEffect(() => {
-    if (isSearchIputCleared && searchInputRef.current) {
-      searchInputRef.current.focus();
-      setIsSearchInputCleared(false);
-    }
-  }, [isSearchIputCleared, searchInputRef]);
+
   if (!searchTerm) {
     return null;
   }
@@ -72,7 +60,7 @@ const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
                 plural: drugs?.length === 0 || drugs?.length > 1 ? 's' : '',
               })}
             </span>
-            <Button kind="ghost" onClick={onSearchTermClear} size={isTablet ? 'md' : 'sm'}>
+            <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
               {t('clearSearchResults', 'Clear Results')}
             </Button>
           </div>
@@ -92,7 +80,7 @@ const [isSearchIputCleared, setIsSearchInputCleared] = useState(false);
             </h4>
             <p className={styles.bodyShort01}>
               <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={handleClick}>
+              <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
                 {t('searchAgain', 'search again')}
               </span>{' '}
               <span>{t('usingADifferentTerm', 'using a different term')}</span>
