@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
