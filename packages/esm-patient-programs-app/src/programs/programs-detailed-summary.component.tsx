@@ -146,7 +146,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid}/>
+                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} />
                       </TableCell>
                     </TableRow>
                   ))}
