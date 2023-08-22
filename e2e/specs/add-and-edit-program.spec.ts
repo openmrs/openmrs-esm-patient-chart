@@ -2,6 +2,7 @@ import { test } from '../core';
 import { ProgramPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { getByTestId, getByText } from '@testing-library/dom';
 
 let patient: Patient;
 
@@ -43,8 +44,8 @@ test('Should add a program and edit program', async ({ page, api }) => {
 
   await test.step('Then I should see the program in the patient chart', async () => {
     await expect(programCell).toHaveText('HIV Care and Treatment');
-    await expect(enrollmentDateCell).toHaveText('04-Jul-2023');
-    await expect(completionDateCell).toHaveText('05-Jul-2023');
+    await expect(enrollmentDateCell.getByText('04-Jul-2023')).toBeVisible();
+    await expect(completionDateCell.getByText('05-Jul-2023')).toBeVisible();
     await expect(locationCell).toHaveText('Outpatient Clinic');
   });
 
@@ -69,8 +70,8 @@ test('Should add a program and edit program', async ({ page, api }) => {
 
   await test.step('Then I should see the updated program in the patient chart', async () => {
     await expect(programCell).toHaveText('HIV Care and Treatment');
-    await expect(enrollmentDateCell).toHaveText('03-Jul-2023');
-    await expect(completionDateCell).toHaveText('04-Jul-2023');
+    await expect(enrollmentDateCell.getByText('03-Jul-2023')).toBeVisible();
+    await expect(completionDateCell.getByText('04-Jul-2023')).toBeVisible();
     await expect(locationCell).toHaveText('Community Outreach');
   });
 });

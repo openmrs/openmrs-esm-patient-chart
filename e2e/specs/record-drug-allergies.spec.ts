@@ -43,7 +43,7 @@ test('Add drug allergy to patient', async ({ page, api }) => {
     const commentCell = rows.locator('td:nth-child(4)');
     await expect(allergenCell).toHaveText('ACE inhibitors');
     await expect(reactionCell).toHaveText('Mental status change');
-    await expect(severityCell).toHaveText('LOW');
+    await expect(severityCell).toHaveText('low');
     await expect(commentCell).toHaveText('Test comment');
   });
 });
