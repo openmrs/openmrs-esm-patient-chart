@@ -39,12 +39,16 @@ test('Record biometrics of the patient', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the biometrics record', async () => {
-    const row = biometricsPage.biometricsTable().locator('tr')
+    const row = biometricsPage.biometricsTable().locator('tr');
+    const weightCell = row.locator('td:nth-child(2)');
+    const heightCell = row.locator('td:nth-child(3)');
+    const BMICell = row.locator('td:nth-child(4)');
+    const MUACCell = row.locator('td:nth-child(5)')
     await biometricsPage.page.reload();
-    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'170', exact:true})).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'65', exact:true})).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'22.5', exact:true})).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'25', exact:true})).toBeVisible();
+    await expect(heightCell).toHaveText('170');
+    await expect(weightCell).toHaveText('65');
+    await expect(BMICell).toHaveText('22.5');
+    await expect(MUACCell).toHaveText('25');
   });
 });
 
