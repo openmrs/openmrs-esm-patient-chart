@@ -39,11 +39,12 @@ test('Record biometrics of the patient', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the biometrics record', async () => {
+    const row = biometricsPage.biometricsTable().locator('tr')
     await biometricsPage.page.reload();
-    await expect(biometricsPage.biometricsTable().getByText('170')).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByText('65')).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByText('22.5')).toBeVisible();
-    await expect(biometricsPage.biometricsTable().getByText('25')).toBeVisible();
+    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'170', exact:true})).toBeVisible();
+    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'65', exact:true})).toBeVisible();
+    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'22.5', exact:true})).toBeVisible();
+    await expect(biometricsPage.biometricsTable().getByRole('cell', {name:'25', exact:true})).toBeVisible();
   });
 });
 
