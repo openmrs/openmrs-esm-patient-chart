@@ -46,7 +46,7 @@
 }
 
 .dynamicWidth {
-  width: calc(50% - 9.625rem);
+  width: 32.5rem;
 }
 
 /* Desktop */
@@ -62,7 +62,7 @@
 
   .container {
     margin-right: 2.825rem;
-    flex: 1;
+    width: 32.5rem;
     height: 100vh;
   }
 
@@ -80,7 +80,7 @@
 /* Small desktop */
 :global(.omrs-breakpoint-lt-large-desktop){
   .dynamicWidth {
-    width: calc(50% - 1.625rem);
+    width: 32.5rem;
   }
 }
 
