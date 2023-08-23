@@ -25,6 +25,10 @@
   }
 }
 
+.workspaceHidden {
+  width: 0;
+}
+
 .hide {
   display: none;
 }
@@ -59,15 +63,15 @@
     z-index: 1000;
   }
 
-  .container {
+  .workspaceOpen {
     margin-right: 3rem;
     height: 100vh;
   }
 
   .clinicalForm {
-    width: 32.25rem;
+    width: 32.5rem;
     .dynamicWidth {
-      width: 32.25rem;
+      width: 32.5rem;
     }
   }
 
@@ -81,9 +85,11 @@
   .headerGlobalBar {
     button {
       background-color: $ui-02;
+    }
+    :global(.cds--popover-container) {
       border-right: 1px solid $ui-03;
     }
-    button:last-child {
+    :global(.cds--popover-container):last-of-type {
       border-right: none;
     }
   }
@@ -91,13 +97,13 @@
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
-  .container {
+  .workspaceOpen {
     background-color: $ui-01;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 8001;
   }
 
   .header {
@@ -132,7 +138,7 @@
 // Overriding styles for RTL support
 html[dir='rtl'] {
   :global(.omrs-breakpoint-gt-tablet) {
-    .container {
+    .workspaceOpen {
       margin-left: 3rem;
       margin-right: unset;
     }
