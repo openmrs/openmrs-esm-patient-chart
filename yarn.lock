@@ -5710,7 +5710,7 @@ __metadata:
     "@ng-select/ng-select": ^6.1.0
     "@ngx-translate/core": ^13.0.0
     "@openmrs/esm-framework": next
-    "@openmrs/ngx-formentry": next
+    "@openmrs/ngx-formentry": ^3.1.1
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
     "@types/webpack-env": ^1.17.0
@@ -6396,9 +6396,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/ngx-formentry@npm:next":
-  version: 3.1.2-pre.200
-  resolution: "@openmrs/ngx-formentry@npm:3.1.2-pre.200"
+"@openmrs/ngx-formentry@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@openmrs/ngx-formentry@npm:3.1.1"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -6421,7 +6421,7 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: cb27ce70b8c4fe3744126fab0ff8afc80ad3215a09c618bd1fec221b244e4f3280198b0c1427e6b603fac95cac037501a4ccf838e645cb429194ba68bf485a38
+  checksum: adc375ddaf184b9afca3689c95fe1fb9acfb53eeac2b2e52a678f096746209f9953a1a6bb6509f9a7633391a0b8c872779f1542cb6ff04b7b07e8248a0ed41b4
   languageName: node
   linkType: hard
 
