@@ -122,7 +122,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.translateService.use(locale);
 
     import(
-      /* webpackInclude: /(en|fr)\.js$/ */
+      /* webpackInclude: /\.js$/ */
       `@angular/common/locales/${locale}.js`
     ).then((module) => {
       registerLocaleData(module.default);
