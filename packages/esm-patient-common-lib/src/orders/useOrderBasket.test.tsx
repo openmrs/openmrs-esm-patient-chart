@@ -1,7 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { useOrderBasket } from './useOrderBasket';
-import { OrderBasketItem } from './types';
-import { PostDataPrepFunction } from './store';
+import { OrderBasketItem, PostDataPrepFunction } from './types';
 
 jest.mock('../get-patient-uuid-from-url', () => ({
   getPatientUuidFromUrl: jest.fn(() => 'test-patient-uuid'),
