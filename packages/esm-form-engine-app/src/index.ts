@@ -17,6 +17,7 @@ export function startupApp() {
     name: 'patient-form-entry-workspace',
     title: 'Clinical Form',
     load: getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options),
+    variant: 'clinical-form',
   });
 }
 
