@@ -19,9 +19,6 @@ import { SingleSpaPropsService } from './single-spa-props/single-spa-props.servi
 import { FormCreationService } from './form-creation/form-creation.service';
 import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 import { ProgramResourceService } from './openmrs-api/program-resource.service';
-import { registerLocaleData } from '@angular/common';
-import localeFr from '@angular/common/locales/fr';
-registerLocaleData(localeFr);
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
