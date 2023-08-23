@@ -61,7 +61,7 @@ test('Should add, delete and edit a condition', async ({page, api}) => {
     });
 
     await test.step('Then I should see the notification', async () => {
-        await expect(conditionsPage.page.getByText('updated')).toBeVisible();
+        await expect(conditionsPage.page.getByText('Condition updated')).toBeVisible();
     });
 
     await test.step('And I see the condition in the list', async () => {
