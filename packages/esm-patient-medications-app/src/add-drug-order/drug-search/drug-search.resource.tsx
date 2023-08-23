@@ -1,5 +1,5 @@
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import type { Drug, DrugOrderTemplate, OrderTemplate, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
@@ -16,6 +16,22 @@ export interface DrugSearchResult {
     display: string;
     uuid: string;
   };
+}
+
+export function useDebounce(value: string, delay = 300) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }
 
 export function useDrugSearch(query: string): {

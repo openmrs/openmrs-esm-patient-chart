@@ -10,14 +10,14 @@ import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchTermClear: () => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  focusAndClearSearchInput: () => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  onSearchTermClear,
   onSearchResultClicked,
+  focusAndClearSearchInput,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -60,7 +60,7 @@ export default function OrderBasketSearchResults({
                 plural: drugs?.length === 0 || drugs?.length > 1 ? 's' : '',
               })}
             </span>
-            <Button kind="ghost" onClick={onSearchTermClear} size={isTablet ? 'md' : 'sm'}>
+            <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
               {t('clearSearchResults', 'Clear Results')}
             </Button>
           </div>
@@ -80,7 +80,7 @@ export default function OrderBasketSearchResults({
             </h4>
             <p className={styles.bodyShort01}>
               <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={onSearchTermClear}>
+              <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
                 {t('searchAgain', 'search again')}
               </span>{' '}
               <span>{t('usingADifferentTerm', 'using a different term')}</span>
