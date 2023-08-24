@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { useWorkspaces, useWorkspaceWindowSize } from '../workspaces';
+import { useWorkspaces } from '../workspaces';
 import styles from './siderail-action-button.scss';
 
 interface SiderailActionButtonProps {
@@ -21,17 +21,12 @@ export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
 }) => {
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
-  const {
-    windowSize: { size: workspaceSize },
-  } = useWorkspaceWindowSize();
 
   const workspaceIndex =
     workspaces?.findIndex(({ name }) =>
       typeof workspaceMatcher === 'function' ? workspaceMatcher(name) : name?.match(workspaceMatcher),
     ) ?? -1;
-  const isWorkspaceOpen =
-    workspaceIndex === 0 &&
-    (workspaceSize === 'normal' || workspaceSize === 'maximized' || workspaceSize === 'reopened');
+  const isWorkspaceOpen = workspaceIndex === 0;
   const isWorkspaceActive = workspaceIndex >= 0;
 
   if (layout === 'tablet') {

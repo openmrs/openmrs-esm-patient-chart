@@ -7,14 +7,10 @@ import VisitNoteActionButton from './visit-note-action-button.component';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useLayoutType: jest.fn(),
-  };
-});
+jest.mock('@carbon/react/icons', () => ({
+  ...(jest.requireActual('@carbon/react/icons') as jest.Mock),
+  Pen: jest.fn((props) => <div data-testid="pen-icon" {...props} />),
+}));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -25,6 +21,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
+jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
+  useWorkspaces: jest.fn().mockReturnValue({
+    workspaces: [{ name: 'visit-note-form-workspace' }],
+  }),
+}));
+
 describe('VisitNoteActionButton', () => {
   it('should display tablet view', async () => {
     const user = userEvent.setup();
@@ -33,6 +36,7 @@ describe('VisitNoteActionButton', () => {
 
     render(<VisitNoteActionButton />);
 
+    expect(screen.getByTestId('pen-icon').getAttribute('size')).toBe('16');
     const visitNoteButton = screen.getByRole('button', { name: /Visit note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
@@ -49,6 +53,7 @@ describe('VisitNoteActionButton', () => {
 
     render(<VisitNoteActionButton />);
 
+    expect(screen.getByTestId('pen-icon').getAttribute('size')).toBe('20');
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
