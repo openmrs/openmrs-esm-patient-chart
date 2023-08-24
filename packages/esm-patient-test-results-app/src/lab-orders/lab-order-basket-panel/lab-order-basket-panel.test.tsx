@@ -1,11 +1,11 @@
 import React from 'react';
 import { screen, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData, patientUuid } from '../__mocks__/medication.mock';
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
+import { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
-import { DrugOrderBasketItem } from '../types';
 
 const mockUseOrderBasket = jest.fn();
 
@@ -27,12 +27,12 @@ describe('OrderBasketPanel: ', () => {
     const medications = [
       getTemplateOrderBasketItem(mockDrugSearchResultApiData[0]),
       ...mockPatientDrugOrdersApiData.slice(0, 3),
-    ] as Array<DrugOrderBasketItem>;
+    ] as Array<OrderBasketItem>;
     medications[1].action = 'REVISE';
     medications[2].action = 'RENEW';
     medications[3].action = 'DISCONTINUE';
     let orders = [...medications];
-    const mockSetOrders = jest.fn((newOrders: Array<DrugOrderBasketItem>) => {
+    const mockSetOrders = jest.fn((newOrders: Array<OrderBasketItem>) => {
       orders = newOrders;
     });
     mockUseOrderBasket.mockImplementation(() => ({

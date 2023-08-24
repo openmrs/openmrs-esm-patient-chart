@@ -28,6 +28,19 @@ export const configSchema = {
       },
     ],
   },
+  orders: {
+    // What is this and should it default to null (show all orders)?
+    careSettingUuid: {
+      _type: Type.UUID,
+      _description: 'Only orders corresponding to this care setting will be displayed.',
+      _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
+    },
+    labOrderTypeUUID: {
+      _type: Type.UUID,
+      _description: "UUID for the 'Lab' order type",
+      _default: "52a447d3-a64a-11e3-9aeb-50e549534c5e",
+    },
+  }
 };
 
 export interface ObsTreeEntry {
@@ -36,4 +49,8 @@ export interface ObsTreeEntry {
 }
 export interface ConfigObject {
   concepts: Array<ObsTreeEntry>;
+  orders: {
+    careSettingUuid: string;
+    labOrderTypeUUID: string;
+  };
 }

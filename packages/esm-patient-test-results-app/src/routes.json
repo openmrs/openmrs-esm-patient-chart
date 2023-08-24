@@ -32,6 +32,12 @@
       "meta": {
         "columnSpan": 4
       }
+    },
+    {
+      "name": "lab-order-panel",
+      "component": "labOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 1
     }
   ],
   "pages": []

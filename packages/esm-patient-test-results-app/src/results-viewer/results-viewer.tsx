@@ -12,6 +12,7 @@ import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
+import { ConfigObject } from '../config-schema';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -24,8 +25,8 @@ interface ResultsViewerProps {
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
-  const conceptUuids = config?.concepts?.map((concept) => concept.conceptUuid) ?? [];
+  const config: ConfigObject = useConfig();
+  const conceptUuids = config.concepts.map((concept) => concept.conceptUuid) ?? [];
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
 
   if (error) {

@@ -21,24 +21,17 @@ import {
 } from '@carbon/react';
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import {
-  DosingUnit,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  OrderBasketItem,
-  QuantityUnit,
-} from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
 import styles from './medication-order-form.scss';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DosingUnit, DrugOrderBasketItem, DurationUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from '../types';
 
 export interface DrugOrderFormProps {
-  initialOrderBasketItem: OrderBasketItem;
-  onSave: (finalizedOrder: OrderBasketItem) => void;
+  initialOrderBasketItem: DrugOrderBasketItem;
+  onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
 }
 
@@ -75,15 +68,14 @@ function MedicationInfoHeader({
   unitValue,
   dosage,
 }: {
-  orderBasketItem: OrderBasketItem;
+  orderBasketItem: DrugOrderBasketItem;
   routeValue: string;
   unitValue: string;
   dosage: number;
 }) {
   const { t } = useTranslation();
 
-  return useMemo(
-    () => (
+  return (
       <div className={styles.medicationInfo} id="medicationInfo">
         <strong className={styles.productiveHeading02}>
           {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
@@ -103,17 +95,7 @@ function MedicationInfoHeader({
           </>
         ) : null}{' '}
       </div>
-    ),
-    [
-      dosage,
-      orderBasketItem.drug?.display,
-      orderBasketItem.drug?.dosageForm?.display,
-      orderBasketItem.drug?.strength,
-      routeValue,
-      t,
-      unitValue,
-    ],
-  );
+    )
 }
 
 function InputWrapper({ children }) {
@@ -186,7 +168,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: data.startDate,
     };
 
-    onSave(newBasketItems as OrderBasketItem);
+    onSave(newBasketItems as DrugOrderBasketItem);
   };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(

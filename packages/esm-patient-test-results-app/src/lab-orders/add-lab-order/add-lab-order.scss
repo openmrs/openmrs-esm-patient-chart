@@ -1,19 +1,14 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import "../root";
+@import "../../root";
 
 .orderForm {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
-  height: calc(100vh - spacing.$spacing-12);
-
-  input[data-invalid]:focus {
-    outline: 2px solid  #da1e28;
-     outline-offset: -2px;
-  }
+  height: calc(100vh - 9rem);
 
   :global(.cds--css-grid) {
     max-width: unset;
@@ -40,13 +35,6 @@
   }
 }
 
-.medicationInfo {
-  border: 0;
-  padding: spacing.$spacing-05;
-  margin-left: calc(spacing.$spacing-05 * -1);
-  box-sizing: border-box;
-}
-
 .inlineNotification {
   width: 100%;
   max-width: unset;
@@ -54,29 +42,14 @@
   margin-left: calc(spacing.$spacing-05 * -1);
 }
 
-.stickyMedicationInfo {
-  position: fixed;
-  background-color: #0072c3;
-  color: #ffffff;
-  top: spacing.$spacing-12;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  .medicationInfo {
-    margin: 0;
-  }
-}
-
 .patientHeader {
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-01;
-
+  
   span:first-of-type {
     margin-right: spacing.$spacing-03;
   }
-
+  
   .text02 {
     color: $text-02;
   }
@@ -115,13 +88,6 @@
         }
       }
     }
-  }
-}
-
-.numberInput {
-  :global(.cds--number__input-wrapper) input {
-  min-width: unset !important;
-  padding-right: spacing.$spacing-05;
   }
 }
 
@@ -172,8 +138,8 @@
   display: flex;
   align-items: center;
 
-  :global(.cds--layer-one),
-  :global(.cds--layer-two),
+  :global(.cds--layer-one), 
+  :global(.cds--layer-two), 
   :global(.cds--layer) {
     flex: 1;
   }
@@ -187,36 +153,16 @@
   margin-top: spacing.$spacing-05;
 }
 
-.customNumberInput {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-end;
-
-  :global(.cds--btn) {
-    background-color: #393939;
-  }
-
-  .customInput {
-    input {
-      text-align: center;
-    }
-  }
-}
-
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: 100%;
+    height: calc(100vh - 10rem);
     background-color: #ededed;
-  }
-
-  .stickyMedicationInfo {
-    top: spacing.$spacing-09;
   }
 
   .buttonSet {
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
   }
-}
 
+}
