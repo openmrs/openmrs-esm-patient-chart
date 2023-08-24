@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
-import { ArrowRight, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
+import { ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { patientChartWorkspaceHeaderSlot } from '../constants';
 import { isDesktop } from '../utils';
@@ -55,10 +55,14 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   }, [workspaces, patientUuid]);
 
   const workspaceTitle = workspaces[0]?.additionalProps?.['workspaceTitle'] ?? workspaces[0]?.title ?? '';
+  const workspaceVariant = workspaces[0]?.variant;
+  const closeWorkspace = workspaces[0]?.closeWorkspace ?? (() => {});
 
   return (
     <aside
-      className={`${styles.container} ${maximized ? `${styles.maximized}` : undefined} ${
+      className={`${styles.container} ${
+        workspaceVariant === 'clinical-form' ? styles.clinicalForm : styles.independent
+      } ${maximized ? `${styles.maximized}` : undefined} ${
         isWorkspaceWindowOpen
           ? `${styles.show}`
           : `${styles.hide}
@@ -74,32 +78,46 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
           <ExtensionSlot name={patientChartWorkspaceHeaderSlot} />
           {isDesktop(layout) && (
             <>
-              <Button
-                iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
-                hasIconOnly
-                kind="ghost"
-                onClick={toggleWindowState}
-                renderIcon={(props) =>
-                  maximized ? <Minimize size={16} {...props} /> : <Maximize size={16} {...props} />
-                }
-                tooltipPosition="bottom"
-              />
-              <Button
-                iconDescription={t('hide', 'Hide')}
-                hasIconOnly
-                kind="ghost"
-                onClick={() => updateWindowSize('hidden')}
-                renderIcon={(props) => <ArrowRight size={16} {...props} />}
-                tooltipPosition="bottom"
-                tooltipAlignment="end"
-              />
+              {workspaceVariant === 'clinical-form' && (
+                <Button
+                  iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
+                  hasIconOnly
+                  kind="ghost"
+                  onClick={toggleWindowState}
+                  renderIcon={(props) =>
+                    maximized ? <Minimize size={16} {...props} /> : <Maximize size={16} {...props} />
+                  }
+                  tooltipPosition="bottom"
+                />
+              )}
+              {workspaceVariant !== 'independent' ? (
+                <Button
+                  iconDescription={t('hide', 'Hide')}
+                  hasIconOnly
+                  kind="ghost"
+                  onClick={() => updateWindowSize('hidden')}
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  tooltipPosition="bottom"
+                  tooltipAlignment="end"
+                />
+              ) : (
+                <Button
+                  iconDescription={t('close', 'Close')}
+                  hasIconOnly
+                  kind="ghost"
+                  onClick={() => closeWorkspace()}
+                  renderIcon={(props) => <Close size={16} {...props} />}
+                  tooltipPosition="bottom"
+                  tooltipAlignment="end"
+                />
+              )}
             </>
           )}
           {layout === 'tablet' && (
             <Button
               iconDescription={t('close', 'Close')}
               hasIconOnly
-              onClick={() => workspaces[0]?.closeWorkspace()}
+              onClick={() => {}}
               renderIcon={(props) => <DownToBottom size={16} {...props} />}
               tooltipPosition="bottom"
               tooltipAlignment="end"
