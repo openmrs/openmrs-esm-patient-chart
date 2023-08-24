@@ -1,0 +1,66 @@
+import React from 'react';
+import { Button } from '@carbon/react';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { useWorkspaces, useWorkspaceWindowSize } from '../workspaces';
+import styles from './siderail-action-button.scss';
+
+interface SiderailActionButtonProps {
+  getIcon: (props: Object) => JSX.Element;
+  label: string;
+  iconDescription: string;
+  handler: () => void;
+  workspaceMatcher: RegExp | string | ((name: string) => boolean);
+}
+
+export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
+  getIcon,
+  label,
+  iconDescription,
+  handler,
+  workspaceMatcher,
+}) => {
+  const layout = useLayoutType();
+  const { workspaces } = useWorkspaces();
+  const {
+    windowSize: { size: workspaceSize },
+  } = useWorkspaceWindowSize();
+
+  const workspaceIndex =
+    workspaces?.findIndex(({ name }) =>
+      typeof workspaceMatcher === 'function' ? workspaceMatcher(name) : name?.match(workspaceMatcher),
+    ) ?? -1;
+  const isWorkspaceOpen =
+    workspaceIndex === 0 &&
+    (workspaceSize === 'normal' || workspaceSize === 'maximized' || workspaceSize === 'reopened');
+  const isWorkspaceActive = workspaceIndex >= 0;
+
+  if (layout === 'tablet') {
+    return (
+      <Button
+        kind="ghost"
+        className={`${styles.container} ${isWorkspaceActive && styles.active} ${isWorkspaceOpen && styles.open}`}
+        role="button"
+        tabIndex={0}
+        onClick={handler}
+      >
+        {getIcon({ size: 16 })}
+        <span>{label}</span>
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      className={`${styles.container} ${isWorkspaceActive && styles.active} ${isWorkspaceOpen && styles.open}`}
+      onClick={handler}
+      hasIconOnly
+      kind="ghost"
+      renderIcon={(props) => getIcon({ size: 20, ...props })}
+      iconDescription={iconDescription}
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
+      size="sm"
+    />
+  );
+};
