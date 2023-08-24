@@ -33,14 +33,11 @@
     border: spacing.$spacing-01 solid;
     @include brand-03(border-color);
     border-radius: 50%;
+    background-color: $ui-02;
 
     &:focus {
       border-color: var(--brand-03) !important;
     }
-  }
-
-  .open {
-    background-color: $ui-02;
   }
 
   .container {

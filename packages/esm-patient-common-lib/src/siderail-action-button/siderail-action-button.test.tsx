@@ -66,7 +66,7 @@ describe('SiderailActionButton', () => {
     expect(button).not.toHaveClass('active');
   });
 
-  it('should display have active className if workspace is collapsed(not closed)', async () => {
+  it('should have not active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ name: 'order-basket-workspace' }, { name: 'visit-note-form-workspace' }],
     });
@@ -88,11 +88,10 @@ describe('SiderailActionButton', () => {
     const button = screen.getByRole('button', { name: /Visit note/i });
     expect(button).toBeInTheDocument();
 
-    expect(button).toHaveClass('active');
-    expect(button).not.toHaveClass('open');
+    expect(button).not.toHaveClass('active');
   });
 
-  it('should display have open and active className if workspace is open', async () => {
+  it('should have active className if workspace is active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ name: 'visit-note-form-workspace' }, { name: 'order-basket-workspace' }],
     });
@@ -115,7 +114,6 @@ describe('SiderailActionButton', () => {
     expect(button).toBeInTheDocument();
 
     expect(button).toHaveClass('active');
-    expect(button).toHaveClass('open');
   });
 
   it('should display desktop view', async () => {
@@ -150,7 +148,7 @@ describe('SiderailActionButton', () => {
     expect(button).not.toHaveClass('active');
   });
 
-  it('should display have active className if workspace is collapsed(not closed)', async () => {
+  it('should display have active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ name: 'order-basket-workspace' }, { name: 'visit-note-form-workspace' }],
     });
@@ -172,11 +170,10 @@ describe('SiderailActionButton', () => {
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
 
-    expect(button).toHaveClass('active');
-    expect(button).not.toHaveClass('open');
+    expect(button).not.toHaveClass('active');
   });
 
-  it('should display have open and active className if workspace is open', async () => {
+  it('should display have open and active className if workspace is active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ name: 'visit-note-form-workspace' }, { name: 'order-basket-workspace' }],
     });
@@ -199,6 +196,5 @@ describe('SiderailActionButton', () => {
     expect(button).toBeInTheDocument();
 
     expect(button).toHaveClass('active');
-    expect(button).toHaveClass('open');
   });
 });

@@ -26,14 +26,13 @@ export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
     workspaces?.findIndex(({ name }) =>
       typeof workspaceMatcher === 'function' ? workspaceMatcher(name) : name?.match(workspaceMatcher),
     ) ?? -1;
-  const isWorkspaceOpen = workspaceIndex === 0;
-  const isWorkspaceActive = workspaceIndex >= 0;
+  const isWorkspaceActive = workspaceIndex === 0;
 
   if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isWorkspaceActive && styles.active} ${isWorkspaceOpen && styles.open}`}
+        className={`${styles.container} ${isWorkspaceActive && styles.active}`}
         role="button"
         tabIndex={0}
         onClick={handler}
@@ -46,7 +45,7 @@ export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
 
   return (
     <Button
-      className={`${styles.container} ${isWorkspaceActive && styles.active} ${isWorkspaceOpen && styles.open}`}
+      className={`${styles.container} ${isWorkspaceActive && styles.active}`}
       onClick={handler}
       hasIconOnly
       kind="ghost"
