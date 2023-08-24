@@ -11,7 +11,7 @@ const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { orders } = useOrderBasket();
-  const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
+  const isActiveWorkspace = workspaces?.find((workspace) => workspace.name?.match(/order/i));
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
 
   if (layout === 'tablet') {

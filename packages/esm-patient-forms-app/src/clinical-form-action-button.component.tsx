@@ -17,7 +17,7 @@ const ClinicalFormActionButton: React.FC = () => {
   const workspaceIndex = workspaces.findIndex(
     (workspace) => workspace.name === clinicalFormsWorkspace || workspace.name === formEntryWorkspace,
   );
-  const isActiveWorkspace = workspaceIndex === 0;
+  const isActiveWorkspace = workspaceIndex >= 0;
 
   const formEntryWorkspaces = workspaces.filter((w) => w.name === formEntryWorkspace);
   const recentlyOpenedForm = formEntryWorkspaces[0];

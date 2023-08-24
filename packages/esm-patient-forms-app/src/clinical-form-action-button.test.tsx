@@ -47,7 +47,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
           name: 'clinical-forms-workspace',
           title: 'Clinical form',
           preferredWindowSize: 'normal',
-          type: 'order',
+          type: 'form',
         },
       ],
       prompt: null,

@@ -38,7 +38,7 @@
           "key": "clinicalForm",
           "default": "Clinical form"
         },
-        "type": "order",
+        "type": "form",
         "variant": "clinical-form"
       }
     }
