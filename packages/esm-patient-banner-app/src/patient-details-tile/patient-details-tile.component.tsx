@@ -23,14 +23,16 @@ const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid
 
   return (
     <div className={styles.container}>
-      <span className={styles.name}>
-        {patient?.name[0].given.join(' ')} {patient?.name[0].family}
-      </span>
-      <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
-      <span>{formatDate(new Date(patient?.birthDate), { mode: 'wide', time: false })}</span> &middot;{''}
-      <span>
-        <ExtensionSlot name="weight-tile-slot" state={state} />
-      </span>
+      <div className={styles.wrapper}>
+        <div className={styles.name}>
+          {patient?.name[0].given.join(' ')} {patient?.name[0].family}
+        </div>
+        <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;
+        <span>{formatDate(new Date(patient?.birthDate), { mode: 'wide', time: false })}</span> &middot;
+        <span>
+          <ExtensionSlot name="weight-tile-slot" state={state} />
+        </span>
+      </div>
       <ExtensionSlot name="allergy-tile-slot" state={state} />
     </div>
   );

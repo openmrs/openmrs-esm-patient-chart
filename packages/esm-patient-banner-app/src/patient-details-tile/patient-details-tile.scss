@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -6,6 +7,19 @@
   width: 100%;
   padding: 0.5rem;
 }
+
+.wrapper {
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-inline: 0.5rem;
+    font-size: 14px;
+    color: colors.$gray-70;
+  }
+
+}
+
 
 .loadingContainer {
   display: flex;
@@ -18,7 +32,8 @@
 
 .name {
 	@include type.type-style('productive-heading-02');
-  margin-right: 0.5rem;
+  margin-inline: 0.5rem;
   font-weight: normal;
-
+  color: colors.$gray-100;
 }
+

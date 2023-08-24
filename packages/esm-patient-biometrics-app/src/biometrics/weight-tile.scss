@@ -14,5 +14,10 @@
 
 .value {
 	@include type.type-style('body-compact-01');
-	
+}
+
+.weight {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem
 }

@@ -19,10 +19,10 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
 
   if (biometrics?.length > 0) {
     return (
-      <span className={styles.weight}>
-        <span className={styles.value}>{weightData?.[0]?.weight}</span>{' '}
-        {conceptUnits.get(config.concepts.weightUuid) ?? ''}
-      </span>
+      <div className={styles.weight}>
+        <div className={styles.value}>{weightData?.[0]?.weight}</div>
+        <div>{conceptUnits.get(config.concepts.weightUuid) ?? ''}</div>
+      </div>
     );
   }
 
