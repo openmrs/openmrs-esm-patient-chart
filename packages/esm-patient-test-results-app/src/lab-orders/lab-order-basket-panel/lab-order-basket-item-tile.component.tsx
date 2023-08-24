@@ -32,7 +32,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
     >
       <div className={styles.orderBasketItemTile}>
         <p className={styles.clipTextWithEllipsis}>
-          <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;
+          <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>
           <br />
             <>
               <span className={styles.name}>{orderBasketItem.testType?.label}</span>

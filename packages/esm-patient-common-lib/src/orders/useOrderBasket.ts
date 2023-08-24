@@ -18,6 +18,7 @@ const orderBasketStoreActions = {
       items: {
         ...state?.items,
         [patientUuid]: {
+          ...state?.items?.[patientUuid],
           [grouping]: typeof value === 'function' ? value() : value,
         },
       },

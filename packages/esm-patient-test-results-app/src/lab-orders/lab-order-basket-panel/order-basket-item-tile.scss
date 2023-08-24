@@ -27,6 +27,12 @@
   align-items: center;
 }
 
+.orderActionNewLabel {
+  margin-bottom: 0.5625rem;
+  @extend .label01;
+  color: $support-02; 
+}
+
 .orderErrorText {
   color: $danger;
   display: flex;
