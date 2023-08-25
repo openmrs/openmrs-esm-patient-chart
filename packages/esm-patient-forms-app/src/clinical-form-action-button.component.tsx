@@ -26,6 +26,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   return (
     <SiderailActionButton
+      name={'clinical-form-action-menu'}
       getIcon={(props) => <Document {...props} />}
       label={t('clinicalForm', 'Clinical form')}
       iconDescription={t('form', 'Form')}

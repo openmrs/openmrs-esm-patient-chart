@@ -16,6 +16,7 @@ const OrderBasketActionButton: React.FC = () => {
 
   return (
     <SiderailActionButton
+      name={'order-basket-action-menu'}
       getIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart {...props} />

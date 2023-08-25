@@ -14,16 +14,26 @@ export interface Prompt {
   cancelText?: string;
 }
 
+export interface WorkspaceNavButtonProperties {
+  showAlertBadge: boolean;
+}
+
+export interface WorkspaceNavButton {
+  [x: string]: WorkspaceNavButtonProperties;
+}
+
 export interface WorkspaceStoreState {
   patientUuid: string | null;
   openWorkspaces: Array<OpenWorkspace>;
   prompt: Prompt | null;
+  workspaceNavButtons: WorkspaceNavButton;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(promptBeforeClosing?: boolean): void;
   closeWorkspace(): void;
+  hideWorkspace(): void;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -36,6 +46,7 @@ export interface WorkspaceRegistration {
   type?: string;
   variant?: 'independent' | 'clinical-form' | 'siderail';
   preferredWindowSize?: WorkspaceWindowState;
+  workspaceNavButton?: string;
 }
 
 let registeredWorkspaces: Record<string, WorkspaceRegistration> = {};
@@ -50,6 +61,7 @@ export function registerWorkspace(workspace: WorkspaceRegistration) {
     preferredWindowSize: workspace.preferredWindowSize ?? 'normal',
     type: workspace.type ?? 'form',
     variant: workspace.variant ?? 'independent',
+    workspaceNavButton: workspace.workspaceNavButton,
   };
 }
 
@@ -72,6 +84,7 @@ function getWorkspaceRegistration(name: string): WorkspaceRegistration {
         load: workspaceExtension.load,
         type: workspaceExtension.meta?.type ?? 'form',
         variant: workspaceExtension.meta?.variant ?? 'independent',
+        workspaceNavButton: workspaceExtension.meta?.workspaceNavButton,
       };
     } else {
       throw new Error(`No workspace named '${name}' has been registered.`);
@@ -112,6 +125,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const newWorkspace = {
     ...workspace,
     closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges),
+    hideWorkspace: () => hideWorkspace(name),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
@@ -194,6 +208,23 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
+export function hideWorkspace(name: string) {
+  const store = getWorkspaceStore();
+  const state = store.getState();
+  const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  const { workspaceNavButton } = getWorkspaceRegistration(name);
+  if (workspaceNavButton && promptCheckFcn && promptCheckFcn()) {
+    store.setState({
+      ...state,
+      workspaceNavButtons: {
+        [workspaceNavButton]: {
+          showAlertBadge: true,
+        },
+      },
+    });
+  }
+}
+
 export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
@@ -237,7 +268,12 @@ export function changeWorkspaceContext(patientUuid) {
   }
 }
 
-const initialState = { patientUuid: null, openWorkspaces: [], prompt: null };
+const initialState = {
+  patientUuid: null,
+  openWorkspaces: [],
+  prompt: null,
+  workspaceNavButtons: {},
+};
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
 }

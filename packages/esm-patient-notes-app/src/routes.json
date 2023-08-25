@@ -28,7 +28,8 @@
           "default": "Visit Note"
         },
         "type": "visit-note",
-        "variant": "siderail"
+        "variant": "siderail",
+        "workspaceNavButton": "visit-note-nav-button"
       }
     }
   ]

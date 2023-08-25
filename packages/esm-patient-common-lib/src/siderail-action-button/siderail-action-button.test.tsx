@@ -47,6 +47,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}
@@ -77,6 +78,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}
@@ -102,6 +104,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}
@@ -129,6 +132,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}
@@ -159,6 +163,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}
@@ -184,6 +189,7 @@ describe('SiderailActionButton', () => {
 
     render(
       <SiderailActionButton
+        name={'visit-note-nav-button'}
         getIcon={(props) => <Pen {...props} />}
         label={'Visit note'}
         iconDescription={'Note'}

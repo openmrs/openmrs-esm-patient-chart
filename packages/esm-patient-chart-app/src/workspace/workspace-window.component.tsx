@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
@@ -58,6 +58,11 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   const workspaceVariant = workspaces[0]?.variant;
   const closeWorkspace = workspaces[0]?.closeWorkspace ?? (() => {});
 
+  const hideWorkspace = useCallback(() => {
+    updateWindowSize('hidden');
+    workspaces?.[0]?.hideWorkspace?.();
+  }, [workspaces, updateWindowSize]);
+
   return (
     <aside
       className={`${styles.container} ${
@@ -95,7 +100,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   iconDescription={t('hide', 'Hide')}
                   hasIconOnly
                   kind="ghost"
-                  onClick={() => updateWindowSize('hidden')}
+                  onClick={() => hideWorkspace()}
                   renderIcon={(props) => <ArrowRight size={16} {...props} />}
                   tooltipPosition="bottom"
                   tooltipAlignment="end"

@@ -10,6 +10,7 @@ const VisitNoteActionButton: React.FC = () => {
 
   return (
     <SiderailActionButton
+      name={'visit-note-nav-button'}
       getIcon={(props) => <Pen {...props} />}
       label={t('visitNote', 'Visit note')}
       iconDescription={t('note', 'Note')}

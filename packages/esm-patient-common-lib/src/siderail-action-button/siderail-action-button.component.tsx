@@ -3,8 +3,10 @@ import { Button } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
 import styles from './siderail-action-button.scss';
+import { useWorkspaceNavButtons } from './useSiderailActionButton';
 
 interface SiderailActionButtonProps {
+  name: string;
   getIcon: (props: Object) => JSX.Element;
   label: string;
   iconDescription: string;
@@ -13,6 +15,7 @@ interface SiderailActionButtonProps {
 }
 
 export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
+  name,
   getIcon,
   label,
   iconDescription,
@@ -21,6 +24,7 @@ export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
 }) => {
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
+  const { showAlertBadge } = useWorkspaceNavButtons(name);
 
   const workspaceIndex =
     workspaces?.findIndex(({ name }) =>
