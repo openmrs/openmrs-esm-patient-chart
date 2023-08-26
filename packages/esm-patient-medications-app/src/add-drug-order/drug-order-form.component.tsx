@@ -23,7 +23,7 @@ import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
-import styles from './medication-order-form.scss';
+import styles from './drug-order-form.scss';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

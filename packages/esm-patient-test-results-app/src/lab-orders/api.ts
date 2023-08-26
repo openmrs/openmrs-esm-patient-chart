@@ -10,7 +10,7 @@ import { OrderBasketItem, OrderPost, PatientOrderFetchResponse } from '@openmrs/
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  * @param status Allows fetching either all orders or only active orders.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
+export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
   const { careSettingUuid, labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
   const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
 
@@ -27,10 +27,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
   const labOrders = useMemo(
     () =>
       data?.data?.results
-        ? data.data.results
-            // TODO
-            // .filter((order) => order.orderType.display === 'Lab Order')
-            ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
+        ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
         : null,
     [data],
   );
@@ -48,19 +45,15 @@ export interface LabOrderBasketItem extends OrderBasketItem {
   testType?: {
     label: string;
     conceptUuid: string;
-  }
+  };
   labReferenceNumber?: string;
   urgency?: string;
   instructions?: string;
 }
 
-export function prepLabOrderPostData(
-  order: LabOrderBasketItem,
-  patientUuid: string,
-  encounterUuid: string,
-): OrderPost {
+export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
   return {
-    action: "NEW",
+    action: 'NEW',
     patient: patientUuid,
     type: 'testorder',
     careSetting: order.careSetting,

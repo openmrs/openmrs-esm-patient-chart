@@ -1,4 +1,4 @@
-import useSWRImmutable from 'swr/immutable'
+import useSWRImmutable from 'swr/immutable';
 import { Concept } from '../../panel-view/types';
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
@@ -15,7 +15,7 @@ export interface UseTestType {
 }
 
 export function useTestTypes(): UseTestType {
-  const { data, error, isLoading, } = useSWRImmutable<FetchResponse<{ results: Array<Concept>}>>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<Concept> }>>(
     () => `/ws/rest/v1/concept?class=Test`,
     openmrsFetch,
     {
@@ -31,7 +31,7 @@ export function useTestTypes(): UseTestType {
       label: concept.display,
       conceptUuid: concept.uuid,
     }));
-  }, [data])
+  }, [data]);
 
   return {
     testTypes: testTypes,

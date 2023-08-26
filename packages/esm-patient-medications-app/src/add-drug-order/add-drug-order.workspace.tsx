@@ -1,10 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import OrderBasketSearch from './drug-search/drug-search.component';
-import {
-  DefaultWorkspaceProps,
-  launchPatientWorkspace,
-  useOrderBasket,
-} from '@openmrs/esm-patient-common-lib';
+import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
 import { showToast, useConfig, usePatient, useSession } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';

@@ -19,7 +19,7 @@ export interface OrderBasketStore {
 const initialState = {
   items: {},
   postDataPrepFunctions: {},
-}
+};
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('order-basket', initialState);
 

@@ -1,6 +1,5 @@
 import { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
-
 export interface DrugOrderBasketItem extends OrderBasketItem {
   drug: Drug;
   unit: DosingUnit;

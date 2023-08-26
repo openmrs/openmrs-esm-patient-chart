@@ -1,16 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import {
-    Button, ButtonSet, Column, ComboBox, Form, Layer,
-    Grid, TextInput
-} from '@carbon/react';
+import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, TextInput, InlineNotification } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
+import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import {
-    age, formatDate, parseDate, useConfig, useLayoutType, usePatient, useSession
-} from '@openmrs/esm-framework';
-import {
-    DefaultWorkspaceProps, launchPatientWorkspace, OrderBasketItem, useOrderBasket
+  DefaultWorkspaceProps,
+  launchPatientWorkspace,
+  OrderBasketItem,
+  useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { LabOrderBasketItem, prepLabOrderPostData } from '../api';
@@ -18,14 +16,17 @@ import styles from './add-lab-order.scss';
 import { TestType, useTestTypes } from './useTestTypes';
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
-const priorityOptions = [{ value: 'ROUTINE', label: "Routine" }, { value: 'STAT', label: "Stat" }];
+const priorityOptions = [
+  { value: 'ROUTINE', label: 'Routine' },
+  { value: 'STAT', label: 'Stat' },
+];
 // TODO add priority option `{ value: "ON_SCHEDULED_DATE", label: "On scheduled date" }` once the form supports a date.
 
 const emptyLabOrder: LabOrderBasketItem = {
-  action: "NEW",
+  action: 'NEW',
   urgency: priorityOptions[0].value,
   display: null,
-}
+};
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order: OrderBasketItem;
@@ -64,7 +65,14 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, config.orders.careSettingUuid, session.currentProvider.uuid],
+    [
+      orders,
+      setOrders,
+      closeWorkspace,
+      config.orders.careSettingUuid,
+      session.currentProvider.uuid,
+      inProgressLabOrder,
+    ],
   );
 
   return (
@@ -79,89 +87,100 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
         </div>
       )}
       {!isTablet && (
-          <div className={styles.backButton}>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription="Return to order basket"
-              size="sm"
-              onClick={cancelOrder}
-            >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-            </Button>
-          </div>
-        )}
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            iconDescription="Return to order basket"
+            size="sm"
+            onClick={cancelOrder}
+          >
+            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+          </Button>
+        </div>
+      )}
+      {errorLoadingTestTypes && (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          className={styles.inlineNotification}
+          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
+          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+        />
+      )}
       <Form className={styles.orderForm} onSubmit={handleFormSubmission} id="drugOrderForm">
         <div>
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
-                <InputWrapper>
-                  <ComboBox
-                    size="lg"
-                    id="testTypeInput"
-                    titleText={t('testType', 'Test type')}
-                    selectedItem={testTypes.find(t => t.conceptUuid == inProgressLabOrder?.testType?.conceptUuid)}
-                    items={testTypes}
-                    itemToString={(item: TestType) => item?.label}
-                    placeholder={t('testTypePlaceholder', 'Select one')}
-                    required
-                    onChange={({ selectedItem }: { selectedItem: TestType}) => {
-                      console.log("selectedItem", selectedItem);
-                      setInProgressLabOrder({
-                        ...inProgressLabOrder,
-                        display: selectedItem?.label,
-                        testType: selectedItem,
-                      })
-                    }
-                    }
-                  />
-                </InputWrapper>
-              </Column>
-              </Grid>
-              <Grid className={styles.gridRow}>
-              <Column lg={8} md={8} sm={4}>
-                  <InputWrapper>
-                    <TextInput
-                      size="lg"
-                      labelText={t('labReferenceNumber', 'Lab reference number')}
-                      maxLength={150}  // TODO set this to the actual width of the field in the MySQL database
-                      value={inProgressLabOrder.labReferenceNumber}
-                      onChange={(e) =>
-                        setInProgressLabOrder({
-                          ...inProgressLabOrder,
-                          labReferenceNumber: e.target.value,
-                        })
-                      }
-                    />
-                  </InputWrapper>
-                </Column>
-                </Grid>
-                <Grid className={styles.gridRow}>
-                <Column lg={8} md={8} sm={4}>
-                <InputWrapper>
-                  <ComboBox
-                    size="lg"
-                    id="priorityInput"
-                    titleText={t('priority', 'Priority')}
-                    selectedItem={priorityOptions.find(p => p.value == inProgressLabOrder?.urgency)}
-                    items={priorityOptions}
-                    itemToString={(item) => item?.label}
-                    onChange={({ selectedItem }) =>
-                      setInProgressLabOrder({
-                        ...inProgressLabOrder,
-                        urgency: selectedItem?.value ?? priorityOptions[0],
-                      })
-                    }
-                  />
-                </InputWrapper>
-              </Column>
-              </Grid>
-              <Grid className={styles.gridRow}>
-                <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <ComboBox
+                  size="lg"
+                  id="testTypeInput"
+                  titleText={t('testType', 'Test type')}
+                  selectedItem={testTypes.find((t) => t.conceptUuid == inProgressLabOrder?.testType?.conceptUuid)}
+                  items={testTypes}
+                  itemToString={(item: TestType) => item?.label}
+                  placeholder={
+                    isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                  }
+                  required
+                  disabled={isLoadingTestTypes}
+                  onChange={({ selectedItem }: { selectedItem: TestType }) => {
+                    setInProgressLabOrder({
+                      ...inProgressLabOrder,
+                      display: selectedItem?.label,
+                      testType: selectedItem,
+                    });
+                  }}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={8} md={8} sm={4}>
               <InputWrapper>
                 <TextInput
+                  id="labReferenceNumberInput"
                   size="lg"
+                  labelText={t('labReferenceNumber', 'Lab reference number')}
+                  maxLength={150}
+                  value={inProgressLabOrder.labReferenceNumber}
+                  onChange={(e) =>
+                    setInProgressLabOrder({
+                      ...inProgressLabOrder,
+                      labReferenceNumber: e.target.value,
+                    })
+                  }
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={8} md={8} sm={4}>
+              <InputWrapper>
+                <ComboBox
+                  size="lg"
+                  id="priorityInput"
+                  titleText={t('priority', 'Priority')}
+                  selectedItem={priorityOptions.find((p) => p.value == inProgressLabOrder?.urgency)}
+                  items={priorityOptions}
+                  itemToString={(item) => item?.label}
+                  onChange={({ selectedItem }) =>
+                    setInProgressLabOrder({
+                      ...inProgressLabOrder,
+                      urgency: selectedItem?.value ?? priorityOptions[0],
+                    })
+                  }
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <TextInput
                   id="additionalInstructionsInput"
+                  size="lg"
                   labelText={t('additionalInstructions', 'Additional instructions')}
                   // placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
                   value={inProgressLabOrder.instructions}
@@ -193,7 +212,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
         </ButtonSet>
       </Form>
     </>
-  );;
+  );
 }
 
 function InputWrapper({ children }) {

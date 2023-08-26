@@ -34,16 +34,16 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
         <p className={styles.clipTextWithEllipsis}>
           <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>
           <br />
-            <>
-              <span className={styles.name}>{orderBasketItem.testType?.label}</span>
-            </>
+          <>
+            <span className={styles.name}>{orderBasketItem.testType?.label}</span>
+          </>
           <span className={styles.label01}>
             {!!orderBasketItem.orderError && (
               <>
                 <br />
                 <span className={styles.orderErrorText}>
-                  <Warning size={16} /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span>{' '}
-                  &nbsp;
+                  <Warning size={16} /> &nbsp;{' '}
+                  <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
                   {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
                 </span>
               </>

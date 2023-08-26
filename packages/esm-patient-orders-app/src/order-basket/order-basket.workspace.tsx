@@ -32,7 +32,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
 
   useEffect(() => {
     promptBeforeClosing(() => false);
-  }, []);
+  }, [promptBeforeClosing]);
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -64,7 +64,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     }
 
     const erroredItems = await postOrders(orderEncounterUuid, abortController);
-    clearOrders({ exceptThoseMatching: (item) => erroredItems.map(e => e.display).includes(item.display) });
+    clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
     mutateOrders();
     if (erroredItems.length == 0) {
       closeWorkspace();

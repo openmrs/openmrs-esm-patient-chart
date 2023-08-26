@@ -52,4 +52,3 @@ registerWorkspace({
   title: 'Add lab order',
   load: getAsyncLifecycle(() => import('./lab-orders/add-lab-order/add-lab-order.workspace'), options),
 });
-  

@@ -38,9 +38,9 @@ export const configSchema = {
     labOrderTypeUUID: {
       _type: Type.UUID,
       _description: "UUID for the 'Lab' order type",
-      _default: "52a447d3-a64a-11e3-9aeb-50e549534c5e",
+      _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
     },
-  }
+  },
 };
 
 export interface ObsTreeEntry {
