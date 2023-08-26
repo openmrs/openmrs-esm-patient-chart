@@ -63,7 +63,6 @@
   "saveOrder": "שמירת הזמנה",
   "searchAgain": "חיפוש מחדש",
   "searchFieldPlaceholder": "חפש תרופה או סט הזמנות (לדוגמה: \"אספירין\")",
-  "searchResultsMatchesForTermfalsemany": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseone": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseother": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalsetwo": "{count} result{plural} for \"{searchTerm}\"",
