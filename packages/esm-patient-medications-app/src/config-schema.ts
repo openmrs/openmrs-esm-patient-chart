@@ -26,7 +26,7 @@ export const configSchema = {
   },
   showPrintButton: {
     _type: Type.Boolean,
-    _default: true,
+    _default: false,
     _description:
       'Determines whether or not to display the Print button in both the active and past medications datatable headers. If set to true, a Print button gets shown in both the active and past medications table headers. When clicked, this button enables the user to print out the contents of the table',
   },

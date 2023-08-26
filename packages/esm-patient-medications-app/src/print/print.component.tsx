@@ -29,7 +29,7 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
           logo.name
         ) : (
           // OpenMRS Logo
-          <svg role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
+          <svg role="img" width={110} height={40} viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
             <path
               fill-rule="evenodd"
               clip-rule="evenodd"
