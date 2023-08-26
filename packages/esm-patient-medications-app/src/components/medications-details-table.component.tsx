@@ -139,8 +139,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       content: (
         <div className={styles.startDateColumn}>
           <span>{formatDate(new Date(medication.dateActivated))}</span>
-          { !isPrinting && ( <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />)}
-
+          {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),
     },
@@ -276,20 +275,20 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                           {cell.value?.content ?? cell.value}
                         </TableCell>
                       ))}
-                       {!isPrinting && (
-                      <TableCell className="cds--table-column-menu">
-                        <OrderBasketItemActions
-                          showDiscontinueButton={showDiscontinueButton}
-                          showModifyButton={showModifyButton}
-                          showReorderButton={showReorderButton}
-                          medication={medications[rowIndex]}
-                          items={orders}
-                          setItems={setOrders}
-                          openOrderBasket={launchOrderBasket}
-                          openDrugOrderForm={launchAddDrugOrder}
-                        />
-                      </TableCell>
-                       )}
+                      {!isPrinting && (
+                        <TableCell className="cds--table-column-menu">
+                          <OrderBasketItemActions
+                            showDiscontinueButton={showDiscontinueButton}
+                            showModifyButton={showModifyButton}
+                            showReorderButton={showReorderButton}
+                            medication={medications[rowIndex]}
+                            items={orders}
+                            setItems={setOrders}
+                            openOrderBasket={launchOrderBasket}
+                            openDrugOrderForm={launchAddDrugOrder}
+                          />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

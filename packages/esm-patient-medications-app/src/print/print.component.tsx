@@ -46,11 +46,11 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
         </div>
 
         <div className={styles.printedBy}>
-                {t('printedBy', 'Printed by')}
-                <span className={styles.printedBy}>
-                  {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
-                </span>
-              </div>
+          {t('printedBy', 'Printed by')}
+          <span className={styles.printedBy}>
+            {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
+          </span>
+        </div>
       </header>
 
       <div className={styles.subheader}>
