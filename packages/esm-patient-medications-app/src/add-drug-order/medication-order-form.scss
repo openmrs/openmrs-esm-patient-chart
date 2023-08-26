@@ -10,11 +10,6 @@
   padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
   height: calc(100vh - spacing.$spacing-12);
 
-  input[data-invalid]:focus {
-    outline: 2px solid  #da1e28;
-     outline-offset: -2px;
-  }
-
   :global(.cds--css-grid) {
     max-width: unset;
   }
@@ -72,11 +67,11 @@
 .patientHeader {
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-01;
-
+  
   span:first-of-type {
     margin-right: spacing.$spacing-03;
   }
-
+  
   .text02 {
     color: $text-02;
   }
@@ -172,8 +167,8 @@
   display: flex;
   align-items: center;
 
-  :global(.cds--layer-one),
-  :global(.cds--layer-two),
+  :global(.cds--layer-one), 
+  :global(.cds--layer-two), 
   :global(.cds--layer) {
     flex: 1;
   }
@@ -195,7 +190,7 @@
   :global(.cds--btn) {
     background-color: #393939;
   }
-
+  
   .customInput {
     input {
       text-align: center;
@@ -218,5 +213,5 @@
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
   }
-}
 
+}
