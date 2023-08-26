@@ -27,7 +27,14 @@ import styles from './drug-order-form.scss';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DosingUnit, DrugOrderBasketItem, DurationUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from '../types';
+import {
+  DosingUnit,
+  DrugOrderBasketItem,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '../types';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -76,26 +83,26 @@ function MedicationInfoHeader({
   const { t } = useTranslation();
 
   return (
-      <div className={styles.medicationInfo} id="medicationInfo">
-        <strong className={styles.productiveHeading02}>
-          {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
-        </strong>{' '}
-        <span className={styles.bodyLong01}>
-          {routeValue && <>&mdash; {routeValue}</>}{' '}
-          {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
-        </span>
-        {dosage && unitValue ? (
-          <>
-            &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-            <strong>
-              <span className={styles.productiveHeading02}>
-                {dosage} {unitValue.toLowerCase()}
-              </span>
-            </strong>
-          </>
-        ) : null}{' '}
-      </div>
-    )
+    <div className={styles.medicationInfo} id="medicationInfo">
+      <strong className={styles.productiveHeading02}>
+        {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
+      </strong>{' '}
+      <span className={styles.bodyLong01}>
+        {routeValue && <>&mdash; {routeValue}</>}{' '}
+        {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
+      </span>
+      {dosage && unitValue ? (
+        <>
+          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+          <strong>
+            <span className={styles.productiveHeading02}>
+              {dosage} {unitValue.toLowerCase()}
+            </span>
+          </strong>
+        </>
+      ) : null}{' '}
+    </div>
+  );
 }
 
 function InputWrapper({ children }) {
@@ -110,7 +117,6 @@ function InputWrapper({ children }) {
 export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
@@ -149,7 +155,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
 
   const handleFormSubmission = (data: MedicationOrderFormData) => {
     const newBasketItems = {
-      ...orderBasketItem,
+      ...initialOrderBasketItem,
       isFreeTextDosage: data.isFreeTextDosage,
       freeTextDosage: data.freeTextDosage,
       dosage: data.dosage,
@@ -238,7 +244,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
         <div className={styles.stickyMedicationInfo}>
           <MedicationInfoHeader
             dosage={dosage}
-            orderBasketItem={orderBasketItem}
+            orderBasketItem={initialOrderBasketItem}
             routeValue={routeValue}
             unitValue={unitValue}
           />
@@ -282,7 +288,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
         <div ref={medicationInfoHeaderRef}>
           <MedicationInfoHeader
             dosage={dosage}
-            orderBasketItem={orderBasketItem}
+            orderBasketItem={initialOrderBasketItem}
             routeValue={routeValue}
             unitValue={unitValue}
           />
