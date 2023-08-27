@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { ContentSwitcher, Switch } from '@carbon/react';
+import { ContentSwitcher, Switch, Button  } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
@@ -12,6 +12,8 @@ import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
+import { Printer } from '@carbon/react/icons';
+
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -71,6 +73,15 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
+           <Button
+                kind="ghost"
+                size={isTablet ? 'md' : 'sm'}
+                renderIcon={Printer}
+                iconDescription="Print results"
+                // onClick={openPrintModal}
+              >
+                {t('print', 'Print')}
+              </Button>
           <div className={styles.leftHeaderActions}>
             <ContentSwitcher
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
