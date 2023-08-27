@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button  } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
@@ -23,6 +23,8 @@ interface ResultsViewerProps {
   patientUuid?: string;
   loading?: boolean;
 }
+
+
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
@@ -66,6 +68,13 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     });
   }, [patientUuid]);
 
+  const openPrintModal = useCallback(() => {
+    const dispose = showModal('print-modal', {
+      patientUuid,
+      closeDialog: () => dispose(),
+    });
+  }, [patientUuid]);
+
   if (isTablet) {
     return (
       <div className={styles.resultsContainer}>
@@ -78,7 +87,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
                 size={isTablet ? 'md' : 'sm'}
                 renderIcon={Printer}
                 iconDescription="Print results"
-                // onClick={openPrintModal}
+                onClick={openPrintModal}
               >
                 {t('print', 'Print')}
               </Button>
