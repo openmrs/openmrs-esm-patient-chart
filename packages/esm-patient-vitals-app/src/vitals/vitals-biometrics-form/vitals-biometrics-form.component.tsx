@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, Form, Row, Stack, InlineNotification } from '@carbon/react';
 import {
@@ -81,13 +81,13 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
   )?.uuid;
 
-  const midUpperArmCircumference = getValues('midUpperArmCircumference');
-  const systolicBloodPressure = getValues('systolicBloodPressure');
-  const diastolicBloodPressure = getValues('diastolicBloodPressure');
-  const respiratoryRate = getValues('respiratoryRate');
-  const oxygenSaturation = getValues('oxygenSaturation');
-  const temperature = getValues('temperature');
-  const pulse = getValues('pulse');
+  const midUpperArmCircumference = watch('midUpperArmCircumference');
+  const systolicBloodPressure = watch('systolicBloodPressure');
+  const diastolicBloodPressure = watch('diastolicBloodPressure');
+  const respiratoryRate = watch('respiratoryRate');
+  const oxygenSaturation = watch('oxygenSaturation');
+  const temperature = watch('temperature');
+  const pulse = watch('pulse');
   const weight = watch('weight');
   const height = watch('height');
 
@@ -98,19 +98,33 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
 
   useEffect(() => {
     getColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
-  }, [getValues, patient.patient?.birthDate, midUpperArmCircumference]);
+  }, [watch, patient.patient?.birthDate, midUpperArmCircumference]);
 
-  const concepts = {
-    midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
-    diastolicBloodPressureRange: conceptRanges.get(config.concepts.diastolicBloodPressureUuid),
-    systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
-    oxygenSaturationRange: conceptRanges.get(config.concepts.oxygenSaturationUuid),
-    respiratoryRateRange: conceptRanges.get(config.concepts.respiratoryRateUuid),
-    temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
-    weightRange: conceptRanges.get(config.concepts.weightUuid),
-    heightRange: conceptRanges.get(config.concepts.heightUuid),
-    pulseRange: conceptRanges.get(config.concepts.pulseUuid),
-  };
+  const concepts = useMemo(
+    () => ({
+      midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
+      diastolicBloodPressureRange: conceptRanges.get(config.concepts.diastolicBloodPressureUuid),
+      systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
+      oxygenSaturationRange: conceptRanges.get(config.concepts.oxygenSaturationUuid),
+      respiratoryRateRange: conceptRanges.get(config.concepts.respiratoryRateUuid),
+      temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
+      weightRange: conceptRanges.get(config.concepts.weightUuid),
+      heightRange: conceptRanges.get(config.concepts.heightUuid),
+      pulseRange: conceptRanges.get(config.concepts.pulseUuid),
+    }),
+    [
+      conceptRanges,
+      config.concepts.diastolicBloodPressureUuid,
+      config.concepts.heightUuid,
+      config.concepts.midUpperArmCircumferenceUuid,
+      config.concepts.oxygenSaturationUuid,
+      config.concepts.pulseUuid,
+      config.concepts.respiratoryRateUuid,
+      config.concepts.systolicBloodPressureUuid,
+      config.concepts.temperatureUuid,
+      config.concepts.weightUuid,
+    ],
+  );
 
   const savePatientVitalsAndBiometrics = (data: VitalsBiometricsFormData) => {
     data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
@@ -161,7 +175,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           }
         })
         .catch((err) => {
-          setIsSubmitting(false)
+          setIsSubmitting(false);
           createErrorHandler();
           showNotification({
             title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),

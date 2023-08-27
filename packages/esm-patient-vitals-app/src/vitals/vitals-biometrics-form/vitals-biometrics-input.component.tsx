@@ -56,6 +56,15 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const [invalid, setInvalid] = useState(false);
+
+  function checkValidity(value, onChange) {
+    setInvalid(!(Number(value) || value === ''));
+
+    if (!invalid) {
+      onChange(Number(value));
+    }
+  }
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
@@ -84,7 +93,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                         min={val.min}
                         max={val.max}
                         name={val.name}
-                        onChange={(e) => onChange(Number(e.target.value))}
+                        onChange={(e) => checkValidity(e.target.value, onChange)}
                         labelText={''}
                         value={value}
                         onBlur={onBlur}
@@ -125,7 +134,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
-      {!isWithinNormalRange && (
+      {(!isWithinNormalRange || invalid) && (
         <FormLabel className={styles.danger}>
           {t('numericInputError', 'Must be a number with in acceptable ranges')}
         </FormLabel>
