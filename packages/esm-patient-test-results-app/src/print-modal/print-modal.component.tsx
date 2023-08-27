@@ -19,7 +19,7 @@ import {
 import { age, formatDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import { useReactToPrint } from 'react-to-print';
 import styles from './print-modal.scss';
-import usePanelData from '../../panel-view/usePanelData';
+import usePanelData from '../panel-view/usePanelData';
 
 function PrintModal({ patientUuid, closeDialog }) {
   const { t } = useTranslation();
