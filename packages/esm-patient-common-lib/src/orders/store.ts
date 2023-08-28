@@ -16,7 +16,16 @@ export interface OrderBasketStore {
   };
 }
 
-export const orderBasketStore = createGlobalStore<OrderBasketStore>('order-basket', {
+const initialState = {
   items: {},
   postDataPrepFunctions: {},
-});
+};
+
+export const orderBasketStore = createGlobalStore<OrderBasketStore>('order-basket', initialState);
+
+/**
+ * @internal for testing only
+ */
+export function _resetOrderBasketStore() {
+  orderBasketStore.setState(initialState);
+}
