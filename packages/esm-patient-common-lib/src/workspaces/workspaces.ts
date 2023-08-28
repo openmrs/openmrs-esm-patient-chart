@@ -33,7 +33,7 @@ export interface WorkspaceRegistration {
   /** Use `getLifecycle` or `getAsyncLifecycle` to get the value of `load` */
   load(): Promise<any>;
   /** Only one of each "type" of workspace is allowed to be open at a time. The default is "form" */
-  type?: string;
+  type?: 'clinical-form' | 'visit-note' | 'order' | string;
   variant?: 'independent' | 'clinical-form' | 'siderail';
   preferredWindowSize?: WorkspaceWindowState;
 }
