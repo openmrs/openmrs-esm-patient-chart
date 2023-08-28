@@ -31,7 +31,7 @@ const ClinicalFormActionButton: React.FC = () => {
       label={t('clinicalForm', 'Clinical form')}
       iconDescription={t('form', 'Form')}
       handler={launchWorkspace}
-      workspaceMatcher={(name) => name === clinicalFormsWorkspace || name === formEntryWorkspace}
+      type={'clinical-form'}
     />
   );
 };

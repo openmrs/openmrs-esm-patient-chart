@@ -38,7 +38,7 @@ describe('SiderailActionButton', () => {
     const user = userEvent.setup();
 
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'order-basket-workspace' }],
+      workspaces: [{ type: 'order' }],
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -52,7 +52,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 
@@ -69,7 +69,7 @@ describe('SiderailActionButton', () => {
 
   it('should have not active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'order-basket-workspace' }, { name: 'visit-note-form-workspace' }],
+      workspaces: [{ type: 'order' }, { type: 'visit-note' }],
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -83,7 +83,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 
@@ -95,7 +95,7 @@ describe('SiderailActionButton', () => {
 
   it('should have active className if workspace is active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'visit-note-form-workspace' }, { name: 'order-basket-workspace' }],
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -109,7 +109,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 
@@ -123,7 +123,7 @@ describe('SiderailActionButton', () => {
     const user = userEvent.setup();
 
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'order-basket-workspace' }],
+      workspaces: [{ type: 'order' }],
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -137,7 +137,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 
@@ -154,7 +154,7 @@ describe('SiderailActionButton', () => {
 
   it('should display have active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'order-basket-workspace' }, { name: 'visit-note-form-workspace' }],
+      workspaces: [{ type: 'order' }, { type: 'visit-note' }],
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -168,7 +168,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 
@@ -180,7 +180,7 @@ describe('SiderailActionButton', () => {
 
   it('should display have open and active className if workspace is active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'visit-note-form-workspace' }, { name: 'order-basket-workspace' }],
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -194,7 +194,7 @@ describe('SiderailActionButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={/visit-note/i}
+        type={'visit-note'}
       />,
     );
 

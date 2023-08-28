@@ -26,7 +26,7 @@ const OrderBasketActionButton: React.FC = () => {
       label={t('orderBasket', 'Order basket')}
       iconDescription={t('medications', 'Medications')}
       handler={launchOrderBasket}
-      workspaceMatcher={/order/i}
+      type={'order'}
     />
   );
 };

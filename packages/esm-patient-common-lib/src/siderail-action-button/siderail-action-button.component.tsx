@@ -11,7 +11,7 @@ interface SiderailActionButtonProps {
   label: string;
   iconDescription: string;
   handler: () => void;
-  workspaceMatcher: RegExp | string | ((name: string) => boolean);
+  type: 'order' | 'clinical-form' | 'visit-note';
 }
 
 export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
@@ -20,16 +20,13 @@ export const SiderailActionButton: React.FC<SiderailActionButtonProps> = ({
   label,
   iconDescription,
   handler,
-  workspaceMatcher,
+  type,
 }) => {
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
   const { showAlertBadge } = useWorkspaceNavButtons(name);
 
-  const workspaceIndex =
-    workspaces?.findIndex(({ name }) =>
-      typeof workspaceMatcher === 'function' ? workspaceMatcher(name) : name?.match(workspaceMatcher),
-    ) ?? -1;
+  const workspaceIndex = workspaces?.findIndex(({ type: workspaceType }) => workspaceType === type) ?? -1;
   const isWorkspaceActive = workspaceIndex === 0;
 
   if (layout === 'tablet') {

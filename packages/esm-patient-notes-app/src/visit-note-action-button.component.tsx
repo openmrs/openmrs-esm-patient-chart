@@ -15,7 +15,7 @@ const VisitNoteActionButton: React.FC = () => {
       label={t('visitNote', 'Visit note')}
       iconDescription={t('note', 'Note')}
       handler={handleClick}
-      workspaceMatcher={/visit-note/i}
+      type={'visit-note'}
     />
   );
 };

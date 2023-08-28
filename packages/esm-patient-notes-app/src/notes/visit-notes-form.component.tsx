@@ -59,11 +59,12 @@ interface DiagnosisSearchProps {
   control: Control<VisitNotesFormData>;
   handleSearch: (fieldName) => void;
   error?: Object;
+  promptBeforeClosing?: (testFn: () => boolean) => void;
 }
 
 type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
 
-const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, promptBeforeClosing }) => {
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -89,6 +90,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       noteDate: new Date(),
     },
   });
+
+  const clinicalNoteValue = getValues('clinicalNote');
+
+  useEffect(() => {
+    const testFn = () => {
+      return !!clinicalNoteValue;
+    };
+    promptBeforeClosing(testFn);
+  }, [clinicalNoteValue, promptBeforeClosing]);
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const locationUuid = session?.sessionLocation?.uuid;

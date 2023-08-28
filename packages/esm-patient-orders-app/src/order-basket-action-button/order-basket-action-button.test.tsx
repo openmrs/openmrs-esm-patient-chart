@@ -54,7 +54,7 @@ jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () =>
 jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
   useWorkspaces: jest.fn().mockReturnValue({
-    workspaces: [{ name: 'order-basket' }],
+    workspaces: [{ type: 'order' }],
   }),
 }));
 
