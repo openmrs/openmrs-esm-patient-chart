@@ -40,7 +40,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       >
         <div className={styles.elementContainer}>
           {getIcon({ size: 16 })}
-          {tagContent && <Tag className={styles.countTag}>{tagContent}</Tag>}
+          {tagContent && <span className={styles.countTag}>{tagContent}</span>}
         </div>
 
         <span>{label}</span>
@@ -57,7 +57,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           {getIcon({ size: 20, ...props })}
-          {tagContent && <Tag className={styles.countTag}>{tagContent}</Tag>}
+          {tagContent && <span className={styles.countTag}>{tagContent}</span>}
         </div>
       )}
       iconDescription={iconDescription}
