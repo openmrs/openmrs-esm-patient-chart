@@ -32,7 +32,12 @@
       "meta": {
         "columnSpan": 4
       }
+    },
+    {
+      "name": "print-modal",
+      "component": "printModal"
     }
+    
   ],
   "pages": []
 }
