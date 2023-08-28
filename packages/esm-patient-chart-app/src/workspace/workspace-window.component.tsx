@@ -79,7 +79,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
       >
         {layout === 'tablet' && !canHide && (
           <Button
-            iconDescription={t('hide', 'Hide')}
+            iconDescription={t('close', 'Close')}
             hasIconOnly
             onClick={() => closeWorkspace()}
             renderIcon={(props) => <ArrowLeft size={16} {...props} />}
