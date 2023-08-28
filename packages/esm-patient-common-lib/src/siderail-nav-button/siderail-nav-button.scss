@@ -67,3 +67,20 @@
     }
   }
 }
+
+.elementContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .countTag {
+    position: absolute;
+    transform: scale(0.7);
+    min-width: initial;
+    min-height: initial;
+    background-color: $carbon--red-50;
+    color: $ui-02;
+    right: -10px;
+    top: -15px;
+  }
+}
