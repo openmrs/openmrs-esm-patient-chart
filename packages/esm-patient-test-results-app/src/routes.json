@@ -34,6 +34,10 @@
       }
     },
     {
+      "name": "print-modal",
+      "component": "printModal"
+    },
+    {
       "name": "lab-order-panel",
       "component": "labOrderPanel",
       "slot": "order-basket-slot",

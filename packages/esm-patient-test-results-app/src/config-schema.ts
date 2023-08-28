@@ -28,8 +28,14 @@ export const configSchema = {
       },
     ],
   },
+  showPrintButton: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether or not to display the print button in the Test Results dashboard. When set to `true`, a print button is shown alongside the panel and tree view content switcher. When clicked, a modal pops up showing a datatable with the available test results. Once the user selects an appropriate date range, they can click on the print button in the modal to print the data',
+  },
   orders: {
-    // What is this and should it default to null (show all orders)?
+    // TODO: What is this and should it default to null (show all orders)?
     careSettingUuid: {
       _type: Type.UUID,
       _description: 'Only orders corresponding to this care setting will be displayed.',
@@ -49,6 +55,7 @@ export interface ObsTreeEntry {
 }
 export interface ConfigObject {
   concepts: Array<ObsTreeEntry>;
+  showPrintButton: boolean;
   orders: {
     careSettingUuid: string;
     labOrderTypeUUID: string;

@@ -10,6 +10,7 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  FormLabel,
   FormGroup,
   Grid,
   InlineNotification,
@@ -42,30 +43,45 @@ export interface DrugOrderFormProps {
   onCancel: () => void;
 }
 
-const comboSchema = z.object({
+const comboSchema = {
   value: z.string(),
   valueCoded: z.string(),
   default: z.boolean().optional(),
-});
+};
 
-const medicationOrderFormSchema = z.object({
-  isFreeTextDosage: z.boolean(),
-  freeTextDosage: z.string(),
-  dosage: z.number(),
-  unit: comboSchema,
-  route: comboSchema,
+const schemaFields = {
+  freeTextDosage: z.string().refine((value) => value !== '', { message: 'Add free dosage note' }),
+  dosage: z.number({ invalid_type_error: 'A dosage is required' }),
+  unit: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a unit' }),
+  route: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a route' }),
   patientInstructions: z.string().nullable(),
   asNeeded: z.boolean(),
   asNeededCondition: z.string().nullable(),
-  duration: z.number().refine((value) => value >= 1, { message: "Value can't be less than one" }),
-  durationUnit: comboSchema,
-  pillsDispensed: z.number(),
-  quantityUnits: comboSchema,
-  numRefills: z.number(),
+  duration: z.number().nullable(),
+  durationUnit: z.object({ ...comboSchema }).nullable(),
+  pillsDispensed: z.number().nullable(),
+  quantityUnits: z.object({ ...comboSchema }).nullable(),
+  numRefills: z.number().nullable(),
   indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
   startDate: z.date(),
-  frequency: comboSchema,
-});
+  frequency: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a frequency' }),
+};
+
+const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(false),
+    freeTextDosage: z.string().optional(),
+  }),
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(true),
+    dosage: z.number().nullable(),
+    unit: z.object({ ...comboSchema }).nullable(),
+    route: z.object({ ...comboSchema }).nullable(),
+    frequency: z.object({ ...comboSchema }).nullable(),
+  }),
+]);
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
@@ -126,7 +142,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
-  const { handleSubmit, control, watch, setValue, getValues } = useForm<MedicationOrderFormData>({
+  const { handleSubmit, control, watch, setValue } = useForm<MedicationOrderFormData>({
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
     defaultValues: {
@@ -586,7 +602,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                   id="indication"
                   labelText={t('indication', 'Indication')}
                   placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                  // required
                   maxLength={150}
                 />
               </InputWrapper>
@@ -678,6 +693,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
         <NumberInput
           value={!!value ? value : 0}
           onChange={(e, { value }) => onChange(parseFloat(value))}
+          className={fieldState?.error?.message && styles.fieldError}
           onBlur={onBlur}
           ref={ref}
           {...restProps}
@@ -686,12 +702,26 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
 
     if (type === 'textArea')
       return (
-        <TextArea value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} ref={ref} {...restProps} />
+        <TextArea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          ref={ref}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
       );
 
     if (type === 'textInput')
       return (
-        <TextInput value={value} onChange={(e) => onChange(e.target.value)} ref={ref} onBlur={onBlur} {...restProps} />
+        <TextInput
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          ref={ref}
+          onBlur={onBlur}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
       );
 
     if (type === 'comboBox')
@@ -701,12 +731,18 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
           onChange={({ selectedItem }) => onChange(selectedItem)}
           onBlur={onBlur}
           ref={ref}
+          className={fieldState?.error?.message && styles.fieldError}
           {...restProps}
         />
       );
 
     return null;
-  }, [onBlur, onChange, ref, restProps, type, value]);
+  }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
 
-  return component;
+  return (
+    <>
+      {component}
+      <FormLabel className={styles.errorLabel}>{fieldState?.error?.message}</FormLabel>
+    </>
+  );
 };
