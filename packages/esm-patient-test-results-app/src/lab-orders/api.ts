@@ -11,7 +11,7 @@ import { OrderBasketItem, OrderPost, PatientOrderFetchResponse } from '@openmrs/
  * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
-  const { careSettingUuid, labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
+  const { careSettingUuid, labOrderTypeUuid: labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
   const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(

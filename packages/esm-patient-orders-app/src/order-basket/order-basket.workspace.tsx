@@ -16,7 +16,7 @@ import styles from './order-basket.scss';
 const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const config: ConfigObject = useConfig();
+  const config = useConfig<ConfigObject>();
   const session = useSession();
   const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();

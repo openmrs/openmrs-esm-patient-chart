@@ -33,7 +33,7 @@ function filterTreeNode(inputValue, treeNode) {
 
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
   const { roots } = useContext(FilterContext);
-  const config: ConfigObject = useConfig();
+  const config = useConfig<ConfigObject>();
   const tablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { resetTree } = useContext(FilterContext);

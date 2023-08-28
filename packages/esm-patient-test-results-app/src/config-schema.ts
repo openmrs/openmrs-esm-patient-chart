@@ -41,7 +41,7 @@ export const configSchema = {
       _description: 'Only orders corresponding to this care setting will be displayed.',
       _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
     },
-    labOrderTypeUUID: {
+    labOrderTypeUuid: {
       _type: Type.UUID,
       _description: "UUID for the 'Lab' order type",
       _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
@@ -58,6 +58,6 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orders: {
     careSettingUuid: string;
-    labOrderTypeUUID: string;
+    labOrderTypeUuid: string;
   };
 }

@@ -20,7 +20,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const patient = usePatient();
   const activeOrders = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const config: ConfigObject = useConfig();
+  const config = useConfig<ConfigObject>();
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {

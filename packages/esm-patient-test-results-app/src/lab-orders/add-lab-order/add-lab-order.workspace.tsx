@@ -40,7 +40,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   const session = useSession();
   const { patient, isLoading: isLoadingPatient } = usePatient();
   const { orders, setOrders } = useOrderBasket('labs', prepLabOrderPostData);
-  const config: ConfigObject = useConfig();
+  const config = useConfig<ConfigObject>();
   const [inProgressLabOrder, setInProgressLabOrder] = useState((initialOrder ?? emptyLabOrder) as LabOrderBasketItem);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const isTablet = useLayoutType() === 'tablet';
