@@ -10,6 +10,7 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  FormLabel,
   FormGroup,
   Grid,
   InlineNotification,
@@ -21,41 +22,97 @@ import {
 } from '@carbon/react';
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { useOrderConfig } from '../api/order-config';
+import { ConfigObject } from '../config-schema';
+import styles from './drug-order-form.scss';
+import { Controller, useController, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   DosingUnit,
+  DrugOrderBasketItem,
   DurationUnit,
   MedicationFrequency,
   MedicationRoute,
-  OrderBasketItem,
   QuantityUnit,
-} from '@openmrs/esm-patient-common-lib';
-import { useOrderConfig } from '../api/order-config';
-import { ConfigObject } from '../config-schema';
-import styles from './medication-order-form.scss';
+} from '../types';
 
 export interface DrugOrderFormProps {
-  initialOrderBasketItem: OrderBasketItem;
-  onSave: (finalizedOrder: OrderBasketItem) => void;
+  initialOrderBasketItem: DrugOrderBasketItem;
+  onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
 }
 
-function MedicationInfoHeader({ orderBasketItem }: { orderBasketItem: OrderBasketItem }) {
+const comboSchema = {
+  value: z.string(),
+  valueCoded: z.string(),
+  default: z.boolean().optional(),
+};
+
+const schemaFields = {
+  freeTextDosage: z.string().refine((value) => value !== '', { message: 'Add free dosage note' }),
+  dosage: z.number({ invalid_type_error: 'A dosage is required' }),
+  unit: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a unit' }),
+  route: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a route' }),
+  patientInstructions: z.string().nullable(),
+  asNeeded: z.boolean(),
+  asNeededCondition: z.string().nullable(),
+  duration: z.number().nullable(),
+  durationUnit: z.object({ ...comboSchema }).nullable(),
+  pillsDispensed: z.number().nullable(),
+  quantityUnits: z.object({ ...comboSchema }).nullable(),
+  numRefills: z.number().nullable(),
+  indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
+  startDate: z.date(),
+  frequency: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a frequency' }),
+};
+
+const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(false),
+    freeTextDosage: z.string().optional(),
+  }),
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(true),
+    dosage: z.number().nullable(),
+    unit: z.object({ ...comboSchema }).nullable(),
+    route: z.object({ ...comboSchema }).nullable(),
+    frequency: z.object({ ...comboSchema }).nullable(),
+  }),
+]);
+
+type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
+
+function MedicationInfoHeader({
+  orderBasketItem,
+  routeValue,
+  unitValue,
+  dosage,
+}: {
+  orderBasketItem: DrugOrderBasketItem;
+  routeValue: string;
+  unitValue: string;
+  dosage: number;
+}) {
   const { t } = useTranslation();
+
   return (
     <div className={styles.medicationInfo} id="medicationInfo">
       <strong className={styles.productiveHeading02}>
         {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
       </strong>{' '}
       <span className={styles.bodyLong01}>
-        {orderBasketItem?.route?.value && <>&mdash; {orderBasketItem?.route?.value}</>}{' '}
+        {routeValue && <>&mdash; {routeValue}</>}{' '}
         {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
       </span>
-      {orderBasketItem?.dosage && orderBasketItem?.unit?.value ? (
+      {dosage && unitValue ? (
         <>
           &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
           <strong>
             <span className={styles.productiveHeading02}>
-              {orderBasketItem?.dosage} {orderBasketItem?.unit?.value.toLowerCase()}
+              {dosage} {unitValue.toLowerCase()}
             </span>
           </strong>
         </>
@@ -76,13 +133,64 @@ function InputWrapper({ children }) {
 export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
-  const handleFormSubmission = (e) => {
-    e.preventDefault();
-    onSave(orderBasketItem);
+  const defaultStartDate = useMemo(() => {
+    if (typeof initialOrderBasketItem?.startDate === 'string') parseDate(initialOrderBasketItem?.startDate);
+
+    return initialOrderBasketItem?.startDate as Date;
+  }, [initialOrderBasketItem?.startDate]);
+
+  const { handleSubmit, control, watch, setValue } = useForm<MedicationOrderFormData>({
+    mode: 'all',
+    resolver: zodResolver(medicationOrderFormSchema),
+    defaultValues: {
+      isFreeTextDosage: initialOrderBasketItem?.isFreeTextDosage,
+      freeTextDosage: initialOrderBasketItem?.freeTextDosage,
+      dosage: initialOrderBasketItem?.dosage,
+      unit: initialOrderBasketItem?.unit,
+      route: initialOrderBasketItem?.route,
+      patientInstructions: initialOrderBasketItem?.patientInstructions,
+      asNeeded: initialOrderBasketItem?.asNeeded,
+      asNeededCondition: initialOrderBasketItem?.asNeededCondition,
+      duration: initialOrderBasketItem?.duration,
+      durationUnit: initialOrderBasketItem?.durationUnit,
+      pillsDispensed: initialOrderBasketItem?.pillsDispensed,
+      quantityUnits: initialOrderBasketItem?.quantityUnits,
+      numRefills: initialOrderBasketItem?.numRefills,
+      indication: initialOrderBasketItem?.indication,
+      frequency: initialOrderBasketItem?.frequency,
+      startDate: defaultStartDate,
+    },
+  });
+
+  const routeValue = watch('route')?.value;
+  const unitValue = watch('unit')?.value;
+  const dosage = watch('dosage');
+
+  const handleFormSubmission = (data: MedicationOrderFormData) => {
+    const newBasketItems = {
+      ...initialOrderBasketItem,
+      isFreeTextDosage: data.isFreeTextDosage,
+      freeTextDosage: data.freeTextDosage,
+      dosage: data.dosage,
+      unit: data.unit,
+      route: data.route,
+      patientInstructions: data.patientInstructions,
+      asNeeded: data.asNeeded,
+      asNeededCondition: data.asNeededCondition,
+      duration: data.duration,
+      durationUnit: data.durationUnit,
+      pillsDispensed: data.pillsDispensed,
+      quantityUnits: data.quantityUnits,
+      numRefills: data.numRefills,
+      indication: data.indication,
+      frequency: data.frequency,
+      startDate: data.startDate,
+    };
+
+    onSave(newBasketItems as DrugOrderBasketItem);
   };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(
@@ -150,7 +258,12 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     <>
       {showStickyMedicationHeader && (
         <div className={styles.stickyMedicationInfo}>
-          <MedicationInfoHeader orderBasketItem={orderBasketItem} />
+          <MedicationInfoHeader
+            dosage={dosage}
+            orderBasketItem={initialOrderBasketItem}
+            routeValue={routeValue}
+            unitValue={unitValue}
+          />
         </div>
       )}
       {isTablet && !isLoadingPatientDetails && (
@@ -163,7 +276,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
         </div>
       )}
 
-      <Form className={styles.orderForm} onSubmit={handleFormSubmission} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
         {errorFetchingOrderConfig && (
           <InlineNotification
             kind="error"
@@ -189,7 +302,12 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
 
         <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
         <div ref={medicationInfoHeaderRef}>
-          <MedicationInfoHeader orderBasketItem={orderBasketItem} />
+          <MedicationInfoHeader
+            dosage={dosage}
+            orderBasketItem={initialOrderBasketItem}
+            routeValue={routeValue}
+            unitValue={unitValue}
+          />
         </div>
         <section className={styles.formSection}>
           <Grid className={styles.gridRow}>
@@ -197,36 +315,27 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
               <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
             </Column>
             <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
-              <Toggle
+              <ControlledFieldInput
+                name="isFreeTextDosage"
+                type="toggle"
+                control={control}
                 size="sm"
                 id="freeTextDosageToggle"
                 aria-label={t('freeTextDosage', 'Free text dosage')}
                 labelText={t('freeTextDosage', 'Free text dosage')}
-                toggled={orderBasketItem.isFreeTextDosage}
-                onChange={() => {} /* Required by the typings, but we don't need it. */}
-                onToggle={(value) =>
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    isFreeTextDosage: value,
-                  })
-                }
               />
             </Column>
           </Grid>
-          {orderBasketItem.isFreeTextDosage ? (
+          {watch('isFreeTextDosage') ? (
             <Grid className={styles.gridRow}>
               <Column md={8}>
-                <TextArea
+                <ControlledFieldInput
+                  control={control}
+                  name="freeTextDosage"
+                  type="textArea"
                   labelText={t('freeTextDosage', 'Free text dosage')}
                   placeholder={t('freeTextDosage', 'Free text dosage')}
-                  value={orderBasketItem.freeTextDosage}
                   maxLength={65535}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      freeTextDosage: e.target.value,
-                    })
-                  }
                 />
               </Column>
             </Grid>
@@ -236,65 +345,47 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                 <Column lg={4} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     <div className={styles.numberInput}>
-                      <NumberInput
+                      <ControlledFieldInput
+                        control={control}
+                        type="number"
+                        name="dosage"
                         size={isTablet ? 'lg' : 'md'}
                         id="doseSelection"
                         placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                         label={t('editDoseComboBoxTitle', 'Dose')}
-                        value={orderBasketItem?.dosage ?? 0}
-                        onChange={(e, { value }) => {
-                          setOrderBasketItem({
-                            ...orderBasketItem,
-                            dosage: value ? parseFloat(value) : 0,
-                          });
-                        }}
                         min={0}
-                        required
-                        hideSteppers
+                        hideSteppers={true}
                       />
                     </div>
                   </InputWrapper>
                 </Column>
                 <Column lg={4} md={2} sm={4}>
                   <InputWrapper>
-                    <ComboBox
+                    <ControlledFieldInput
+                      control={control}
+                      name="unit"
+                      type="comboBox"
                       size={isTablet ? 'lg' : 'md'}
                       id="dosingUnits"
                       items={drugDosingUnits}
                       placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                       titleText={t('editDosageUnitsTitle', 'Dose unit')}
                       itemToString={(item) => item?.value}
-                      selectedItem={orderBasketItem?.unit}
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          unit: selectedItem,
-                          // Since the default selection for the quantity units
-                          // should be same as dosing units
-                          quantityUnits: orderBasketItem.quantityUnits ?? selectedItem,
-                        });
-                      }}
-                      required
                     />
                   </InputWrapper>
                 </Column>
                 <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
-                    <ComboBox
+                    <ControlledFieldInput
+                      control={control}
+                      name="route"
+                      type="comboBox"
                       size={isTablet ? 'lg' : 'md'}
                       id="editRoute"
                       items={drugRoutes}
-                      selectedItem={orderBasketItem?.route}
                       placeholder={t('editRouteComboBoxTitle', 'Route')}
                       titleText={t('editRouteComboBoxTitle', 'Route')}
                       itemToString={(item) => item?.value}
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          route: selectedItem,
-                        });
-                      }}
-                      required
                     />
                   </InputWrapper>
                 </Column>
@@ -302,21 +393,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
               <Grid className={styles.gridRow}>
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
-                    <ComboBox
+                    <ControlledFieldInput
+                      control={control}
+                      name="frequency"
+                      type="comboBox"
                       size={isTablet ? 'lg' : 'md'}
                       id="editFrequency"
                       items={orderFrequencies}
-                      selectedItem={orderBasketItem?.frequency}
                       placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                       titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                       itemToString={(item) => item?.value}
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          frequency: selectedItem,
-                        });
-                      }}
-                      required
                     />
                   </InputWrapper>
                 </Column>
@@ -325,20 +411,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
               <Grid className={styles.gridRow}>
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
-                    <TextArea
+                    <ControlledFieldInput
+                      control={control}
+                      name="patientInstructions"
+                      type="textArea"
                       labelText={t('patientInstructions', 'Patient instructions')}
                       placeholder={t(
                         'patientInstructionsPlaceholder',
                         'Additional dosing instructions (e.g. "Take after eating")',
                       )}
                       maxLength={65535}
-                      value={orderBasketItem.patientInstructions}
-                      onChange={(e) =>
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          patientInstructions: e.target.value,
-                        })
-                      }
                       rows={isTablet ? 6 : 4}
                     />
                   </InputWrapper>
@@ -348,18 +430,13 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                     <Column lg={6} md={8} sm={4}>
                       <InputWrapper>
                         <FormGroup legendText={t('prn', 'P.R.N.')}>
-                          <Checkbox
+                          <ControlledFieldInput
+                            control={control}
+                            name="asNeeded"
+                            type="checkbox"
                             id="prn"
                             labelText={t('takeAsNeeded', 'Take as needed')}
                             size="lg"
-                            checked={orderBasketItem.asNeeded}
-                            onChange={(e) =>
-                              setOrderBasketItem({
-                                ...orderBasketItem,
-                                asNeeded: e.target.checked,
-                                asNeededCondition: e.target.checked ? orderBasketItem?.asNeededCondition : '',
-                              })
-                            }
                           />
                         </FormGroup>
                       </InputWrapper>
@@ -367,19 +444,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
 
                     <Column lg={10} md={8} sm={4}>
                       <InputWrapper>
-                        <TextArea
+                        <ControlledFieldInput
+                          control={control}
+                          name="asNeededCondition"
+                          type="textArea"
                           labelText={t('prnReason', 'P.R.N. reason')}
                           placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
                           rows={3}
                           maxLength={255}
-                          value={orderBasketItem.asNeededCondition}
-                          onChange={(e) =>
-                            setOrderBasketItem({
-                              ...orderBasketItem,
-                              asNeededCondition: e.target.value,
-                            })
-                          }
-                          disabled={!orderBasketItem?.asNeeded}
+                          disabled={!watch('asNeeded')}
                         />
                       </InputWrapper>
                     </Column>
@@ -396,76 +469,67 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
             <Column lg={16} md={4} sm={4}>
               <div className={styles.fullWidthDatePickerContainer}>
                 <InputWrapper>
-                  <DatePicker
-                    datePickerType="single"
-                    maxDate={new Date()}
-                    value={[orderBasketItem.startDate]}
-                    onChange={([newStartDate]) =>
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        startDate: newStartDate,
-                      })
-                    }
-                  >
-                    <DatePickerInput
-                      id="startDatePicker"
-                      placeholder="mm/dd/yyyy"
-                      labelText={t('startDate', 'Start date')}
-                      size="lg"
-                    />
-                  </DatePicker>
+                  <Controller
+                    name="startDate"
+                    control={control}
+                    render={({ field: { onBlur, value, onChange, ref } }) => (
+                      <DatePicker
+                        datePickerType="single"
+                        maxDate={new Date()}
+                        value={value}
+                        onChange={([newStartDate]) => onChange(newStartDate)}
+                        onBlur={onBlur}
+                        ref={ref}
+                      >
+                        <DatePickerInput
+                          id="startDatePicker"
+                          placeholder="mm/dd/yyyy"
+                          labelText={t('startDate', 'Start date')}
+                          size="lg"
+                        />
+                      </DatePicker>
+                    )}
+                  />
                 </InputWrapper>
               </div>
             </Column>
             <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
               <InputWrapper>
                 {!isTablet ? (
-                  <NumberInput
+                  <ControlledFieldInput
+                    control={control}
+                    name="duration"
+                    type="number"
                     size="lg"
                     id="durationInput"
                     label={t('duration', 'Duration')}
-                    min={1}
-                    value={orderBasketItem.duration ?? ''}
+                    min={0}
                     step={1}
-                    onChange={(e, { value }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        duration: value ? parseFloat(value) : 0,
-                      });
-                    }}
                     max={99}
-                    allowEmpty
+                    allowEmpty={true}
                   />
                 ) : (
                   <CustomNumberInput
+                    control={control}
+                    setValue={setValue}
+                    name="duration"
                     labelText={t('duration', 'Duration')}
-                    value={orderBasketItem.duration}
-                    setValue={(value) =>
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        duration: value,
-                      })
-                    }
                   />
                 )}
               </InputWrapper>
             </Column>
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
-                <ComboBox
+                <ControlledFieldInput
+                  control={control}
+                  name="durationUnit"
+                  type="comboBox"
                   size="lg"
                   id="durationUnitPlaceholder"
                   titleText={t('durationUnit', 'Duration unit')}
-                  selectedItem={orderBasketItem?.durationUnit}
                   items={durationUnits}
                   itemToString={(item) => item?.value}
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  onChange={({ selectedItem }) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      durationUnit: selectedItem,
-                    })
-                  }
                 />
               </InputWrapper>
             </Column>
@@ -476,69 +540,52 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           <Grid className={styles.gridRow}>
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
-                <NumberInput
+                <ControlledFieldInput
+                  control={control}
+                  name="pillsDispensed"
+                  type="number"
                   size="lg"
                   id="quantityDispensed"
-                  value={orderBasketItem.pillsDispensed}
                   label={t('quantityToDispense', 'Quantity to dispense')}
                   min={0}
-                  onChange={(e, { value }) => {
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      pillsDispensed: value ? parseFloat(value) : 0,
-                    });
-                  }}
                   hideSteppers
                 />
               </InputWrapper>
             </Column>
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
-                <ComboBox
+                <ControlledFieldInput
+                  control={control}
+                  name="quantityUnits"
+                  type="comboBox"
                   size="lg"
                   id="dispensingUnits"
                   items={drugDispensingUnits}
                   placeholder={t('editDispensingUnit', 'Quantity unit')}
                   titleText={t('editDispensingUnit', 'Quantity unit')}
                   itemToString={(item) => item?.value}
-                  selectedItem={orderBasketItem?.quantityUnits}
-                  onChange={({ selectedItem }) => {
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      quantityUnits: selectedItem,
-                    });
-                  }}
-                  required
                 />
               </InputWrapper>
             </Column>
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
                 {!isTablet ? (
-                  <NumberInput
+                  <ControlledFieldInput
+                    control={control}
+                    name="numRefills"
+                    type="number"
                     size="lg"
                     id="prescriptionRefills"
                     min={0}
                     label={t('prescriptionRefills', 'Prescription refills')}
-                    value={orderBasketItem.numRefills}
-                    onChange={(e, { value }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        numRefills: value ? parseFloat(value) : 0,
-                      });
-                    }}
                     max={99}
                   />
                 ) : (
                   <CustomNumberInput
+                    control={control}
+                    setValue={setValue}
+                    name="numRefills"
                     labelText={t('prescriptionRefills', 'Prescription refills')}
-                    value={orderBasketItem.numRefills}
-                    setValue={(val) =>
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        numRefills: val,
-                      })
-                    }
                   />
                 )}
               </InputWrapper>
@@ -547,19 +594,14 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           <Grid className={styles.gridRow}>
             <Column lg={16} md={6} sm={4}>
               <InputWrapper>
-                <TextInput
+                <ControlledFieldInput
+                  control={control}
+                  name="indication"
+                  type="textInput"
                   size="lg"
                   id="indication"
                   labelText={t('indication', 'Indication')}
                   placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                  value={orderBasketItem.indication}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      indication: e.target.value,
-                    })
-                  }
-                  required
                   maxLength={150}
                 />
               </InputWrapper>
@@ -586,26 +628,24 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
   );
 }
 
-interface CustomNumberInputProps {
-  setValue: (value: number) => void;
-  value: number;
-  labelText: string;
-  inputProps?: Object;
-}
-
-const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, labelText, inputProps = {} }) => {
+const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }) => {
   const { t } = useTranslation();
+
+  const {
+    field: { onBlur, onChange, value, ref },
+  } = useController<MedicationOrderFormData>({ name: name, control });
+
   const handleChange = (e) => {
     const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
-    setValue(val ? parseInt(val) : 0);
+    onChange(val ? parseInt(val) : 0);
   };
 
   const increment = () => {
-    setValue(Math.min(value + 1, 99));
+    setValue(name, Math.min(Number(value) + 1, 99));
   };
 
   const decrement = () => {
-    setValue(Math.max(value - 1, 0));
+    setValue(name, Math.max(Number(value) - 1, 0));
   };
 
   return (
@@ -615,13 +655,94 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, 
         <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
         <TextInput
           onChange={handleChange}
-          value={value ? value : '--'}
-          {...inputProps}
+          value={!!value ? value : '--'}
           size="lg"
           className={styles.customInput}
+          onBlur={onBlur}
+          ref={ref}
+          {...inputProps}
         />
         <Button hasIconOnly renderIcon={Add} onClick={increment} iconDescription={t('increment', 'Increment')} />
       </div>{' '}
     </div>
+  );
+};
+
+const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
+  const {
+    field: { onBlur, onChange, value, ref },
+    fieldState,
+  } = useController<MedicationOrderFormData>({ name: name, control });
+
+  const component = useMemo(() => {
+    if (type === 'toggle')
+      return (
+        <Toggle
+          toggled={value}
+          onChange={() => {} /* Required by the typings, but we don't need it. */}
+          onToggle={(value) => onChange(value)}
+          {...restProps}
+        />
+      );
+
+    if (type === 'checkbox')
+      return <Checkbox checked={value} onChange={(e, { checked, id }) => onChange(checked)} {...restProps} />;
+
+    if (type === 'number')
+      return (
+        <NumberInput
+          value={!!value ? value : 0}
+          onChange={(e, { value }) => onChange(parseFloat(value))}
+          className={fieldState?.error?.message && styles.fieldError}
+          onBlur={onBlur}
+          ref={ref}
+          {...restProps}
+        />
+      );
+
+    if (type === 'textArea')
+      return (
+        <TextArea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          ref={ref}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
+      );
+
+    if (type === 'textInput')
+      return (
+        <TextInput
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          ref={ref}
+          onBlur={onBlur}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
+      );
+
+    if (type === 'comboBox')
+      return (
+        <ComboBox
+          selectedItem={value}
+          onChange={({ selectedItem }) => onChange(selectedItem)}
+          onBlur={onBlur}
+          ref={ref}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
+      );
+
+    return null;
+  }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
+
+  return (
+    <>
+      {component}
+      <FormLabel className={styles.errorLabel}>{fieldState?.error?.message}</FormLabel>
+    </>
   );
 };
