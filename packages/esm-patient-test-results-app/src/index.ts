@@ -5,7 +5,7 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -41,3 +41,15 @@ export const testResultsDashboardLink =
     }),
     options,
   );
+
+export const labOrderPanel = getAsyncLifecycle(
+  () => import('./lab-orders/lab-order-basket-panel/lab-order-basket-panel.extension'),
+  options,
+);
+
+registerWorkspace({
+  name: 'add-lab-order',
+  type: 'order',
+  title: 'Add lab order',
+  load: getAsyncLifecycle(() => import('./lab-orders/add-lab-order/add-lab-order.workspace'), options),
+});
