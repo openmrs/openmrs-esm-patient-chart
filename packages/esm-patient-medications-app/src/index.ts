@@ -46,5 +46,4 @@ registerWorkspace({
   type: 'order',
   title: 'Add drug order',
   load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order.workspace'), options),
-  type: 'order',
 });
