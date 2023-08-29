@@ -58,7 +58,7 @@ export type VitalsBiometricsFormData = z.infer<typeof vitalsBiometricsFormSchema
 const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const config: ConfigObject = useConfig();
+  const config = useConfig<ConfigObject>();
   const biometricsUnitsSymbols = config.biometrics;
   const useMuacColorStatus = config.vitals.useMuacColors;
 

@@ -16,13 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+import { CardHeader, Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { CardHeader, Order, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
 import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { DrugOrderBasketItem } from '../types';
 import { ConfigObject } from '../config-schema';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
@@ -58,7 +59,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const { orders, setOrders } = useOrderBasket('medications');
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
 
   const tableHeaders = [
     {
@@ -330,8 +331,8 @@ function OrderBasketItemActions({
   showModifyButton: boolean;
   showReorderButton: boolean;
   medication: Order;
-  items: Array<OrderBasketItem>;
-  setItems: (items: Array<OrderBasketItem>) => void;
+  items: Array<DrugOrderBasketItem>;
+  setItems: (items: Array<DrugOrderBasketItem>) => void;
   openOrderBasket: () => void;
   openDrugOrderForm: (additionalProps?: AddDrugOrderWorkspaceAdditionalProps) => void;
 }) {
@@ -343,6 +344,7 @@ function OrderBasketItemActions({
       ...items,
       {
         uuid: medication.uuid,
+        display: medication.drug?.display,
         previousOrder: null,
         action: 'DISCONTINUE',
         drug: medication.drug,
@@ -388,8 +390,9 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
-    const newItem: OrderBasketItem = {
+    const newItem: DrugOrderBasketItem = {
       uuid: medication.uuid,
+      display: medication.drug?.display,
       previousOrder: medication.uuid,
       startDate: new Date(),
       action: 'REVISE',
@@ -439,6 +442,7 @@ function OrderBasketItemActions({
       ...items,
       {
         uuid: medication.uuid,
+        display: medication.drug?.display,
         previousOrder: null,
         startDate: new Date(),
         action: 'RENEW',
