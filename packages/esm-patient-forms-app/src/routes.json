@@ -39,6 +39,7 @@
           "default": "Clinical form"
         },
         "type": "forms-dashboard",
+        "canMaximize": true,
         "width": "wider"
       }
     }
