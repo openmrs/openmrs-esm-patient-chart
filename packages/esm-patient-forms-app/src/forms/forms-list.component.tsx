@@ -18,7 +18,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { formatDatetime, useLayoutType, Visit } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, closeWorkspace } from '@openmrs/esm-patient-common-lib';
 import { HtmlFormEntryForm } from '../config-schema';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import { useForms } from '../hooks/use-forms';
@@ -52,6 +52,7 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
 
   const handleFormOpen = useCallback(
     (formUuid, encounterUuid, formName) => {
+      closeWorkspace('clinical-forms-workspace', true);
       launchFormEntryOrHtmlForms(
         currentVisit,
         formUuid,
