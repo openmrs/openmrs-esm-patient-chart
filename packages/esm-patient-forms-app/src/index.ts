@@ -42,6 +42,7 @@ export function startupApp() {
     canMaximize: true,
     canHide: true,
     width: 'wider',
+    type: 'clinical-form',
   });
 }
 

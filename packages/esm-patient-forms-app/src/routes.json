@@ -38,7 +38,7 @@
           "key": "clinicalForm",
           "default": "Clinical form"
         },
-        "type": "order",
+        "type": "clinical-form",
         "canMaximize": true,
         "canHide": true,
         "width": "wider"

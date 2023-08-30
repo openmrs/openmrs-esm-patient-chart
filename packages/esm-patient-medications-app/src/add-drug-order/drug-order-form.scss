@@ -207,7 +207,7 @@
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: 100%;
+    height: calc(100vh - 10rem);
     background-color: #ededed;
   }
 
