@@ -20,7 +20,7 @@ registerWorkspace({
   title: 'Order Basket',
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
-  variant: 'siderail',
+  canHide: true,
 });
 
 export const orderBasketActionMenu = getAsyncLifecycle(
