@@ -6,6 +6,8 @@ import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import FormsList from './forms-list.component';
 
+jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
+
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUserHasAccess = jest.fn();
@@ -75,7 +77,7 @@ it('renders a list of forms fetched from the server', async () => {
 
   await user.type(searchbox, 'registration');
 
-  expect(screen.getByText(/no matching forms to display/i)).toBeInTheDocument();
+  expect(screen.getByText(/No matching forms to display/i)).toBeInTheDocument();
 
   await user.clear(searchbox);
   await user.type(searchbox, 'lab');

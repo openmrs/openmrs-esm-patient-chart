@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
+import { type OpenWorkspace, useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
-import { ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
+import { ArrowLeft, ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { patientChartWorkspaceHeaderSlot } from '../constants';
 import { isDesktop } from '../utils';
@@ -55,14 +55,18 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   }, [workspaces, patientUuid]);
 
   const workspaceTitle = workspaces[0]?.additionalProps?.['workspaceTitle'] ?? workspaces[0]?.title ?? '';
-  const workspaceVariant = workspaces[0]?.variant;
-  const closeWorkspace = workspaces[0]?.closeWorkspace ?? (() => {});
+  const {
+    canHide = false,
+    canMaximize = false,
+    width = 'narrow',
+    closeWorkspace = () => {},
+  } = useMemo(() => workspaces?.[0] ?? ({} as OpenWorkspace), [workspaces]);
 
   return (
     <aside
-      className={`${styles.container} ${
-        workspaceVariant === 'clinical-form' ? styles.clinicalForm : styles.independent
-      } ${maximized ? `${styles.maximized}` : undefined} ${
+      className={`${styles.container} ${width === 'narrow' ? styles.narrowWorkspace : styles.widerWorkspace} ${
+        maximized ? `${styles.maximized}` : undefined
+      } ${
         isWorkspaceWindowOpen
           ? `${styles.show}`
           : `${styles.hide}
@@ -73,12 +77,22 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
         aria-label="Workspace Title"
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
+        {layout === 'tablet' && !canHide && (
+          <Button
+            iconDescription={t('close', 'Close')}
+            hasIconOnly
+            onClick={() => closeWorkspace()}
+            renderIcon={(props) => <ArrowLeft size={16} {...props} />}
+            tooltipPosition="bottom"
+            tooltipAlignment="end"
+          />
+        )}
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar className={styles.headerGlobalBar}>
           <ExtensionSlot name={patientChartWorkspaceHeaderSlot} />
           {isDesktop(layout) && (
             <>
-              {workspaceVariant === 'clinical-form' && (
+              {canMaximize && (
                 <Button
                   iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
                   hasIconOnly
@@ -90,7 +104,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   tooltipPosition="bottom"
                 />
               )}
-              {workspaceVariant !== 'independent' ? (
+              {canHide ? (
                 <Button
                   iconDescription={t('hide', 'Hide')}
                   hasIconOnly
@@ -105,7 +119,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   iconDescription={t('close', 'Close')}
                   hasIconOnly
                   kind="ghost"
-                  onClick={() => closeWorkspace()}
+                  onClick={() => closeWorkspace?.()}
                   renderIcon={(props) => <Close size={16} {...props} />}
                   tooltipPosition="bottom"
                   tooltipAlignment="end"
@@ -113,11 +127,11 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
               )}
             </>
           )}
-          {layout === 'tablet' && (
+          {layout === 'tablet' && canHide && (
             <Button
               iconDescription={t('close', 'Close')}
               hasIconOnly
-              onClick={() => {}}
+              onClick={() => updateWindowSize('hidden')}
               renderIcon={(props) => <DownToBottom size={16} {...props} />}
               tooltipPosition="bottom"
               tooltipAlignment="end"
