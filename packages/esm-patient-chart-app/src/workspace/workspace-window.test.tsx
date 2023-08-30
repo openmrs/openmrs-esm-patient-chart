@@ -2,11 +2,7 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isDesktop } from '@openmrs/esm-framework';
-import {
-  launchPatientWorkspace,
-  registerWorkspace,
-  WorkspaceWindowSizeProvider,
-} from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../tools/test-helpers';
 import WorkspaceWindow from './workspace-window.component';
 
@@ -91,9 +87,5 @@ xdescribe('WorkspaceWindow', () => {
 });
 
 function renderWorkspaceWindow() {
-  render(
-    <WorkspaceWindowSizeProvider>
-      <WorkspaceWindow patientUuid={mockPatient.id} />
-    </WorkspaceWindowSizeProvider>,
-  );
+  render(<WorkspaceWindow patientUuid={mockPatient.id} />);
 }

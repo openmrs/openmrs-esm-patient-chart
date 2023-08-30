@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OpenWorkspace, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
+import { OpenWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { mountRootParcel, ParcelConfig } from 'single-spa';
 import Parcel from 'single-spa-react/parcel';
 import Loader from '../loader/loader.component';
@@ -15,8 +15,8 @@ interface WorkspaceRendererProps {
 export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceRendererProps) {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { windowSize } = useWorkspaceWindowSize();
-  const maximized = windowSize.size === 'maximized';
+  const { workspaceWindowState } = useWorkspaces();
+  const maximized = workspaceWindowState === 'maximized';
   const [lifecycle, setLifecycle] = useState<ParcelConfig | undefined>();
   useEffect(() => {
     let active = true;

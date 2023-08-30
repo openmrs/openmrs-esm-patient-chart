@@ -1,22 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getWorkspaceStore, OpenWorkspace, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
-import { Prompt, WorkspaceStoreState } from './workspaces';
+import { Prompt, WorkspaceStoreState, updateWorkspaceSizeState } from './workspaces';
 
 export interface WorkspacesInfo {
   active: boolean;
-  windowState: WorkspaceWindowState;
+  workspaceWindowState: WorkspaceWindowState;
   workspaces: Array<OpenWorkspace>;
   prompt: Prompt;
+  updateWorkspaceSizeState: (val: WorkspaceWindowState) => void;
 }
 
 export function useWorkspaces(): WorkspacesInfo {
   const [workspaces, setWorkspaces] = useState<Array<OpenWorkspace>>([]);
   const [prompt, setPrompt] = useState<Prompt>(null);
+  const [workspaceWindowState, setWorkspaceWindowState] = useState<WorkspaceWindowState>('hidden');
 
   useEffect(() => {
     function update(state: WorkspaceStoreState) {
       setWorkspaces(state.openWorkspaces);
       setPrompt(state.prompt);
+      setWorkspaceWindowState(state.workspaceWindowState);
     }
     update(getWorkspaceStore().getState());
     getWorkspaceStore().subscribe(update);
@@ -30,10 +33,27 @@ export function useWorkspaces(): WorkspacesInfo {
     }
   }, [workspaces]);
 
+  // useEffect(() => {
+  //   if (workspaces.length > 0 && windowState === 'maximized') {
+  //     updateContextWorkspaceWindowSize('maximized');
+  //   } else {
+  //     updateContextWorkspaceWindowSize('reopened');
+  //   }
+  // }, [workspaces.length, windowState]);
+
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      updateWorkspaceSizeState('hidden');
+    } else {
+      return updateWorkspaceSizeState(workspaces[0].preferredWindowSize);
+    }
+  }, [workspaces]);
+
   return {
     active: workspaces.length > 0,
-    windowState,
+    workspaceWindowState,
     workspaces,
     prompt,
+    updateWorkspaceSizeState,
   };
 }

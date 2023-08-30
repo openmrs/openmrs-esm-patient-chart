@@ -1,7 +1,6 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
 import { dashboardPath, spaRoot, basePath } from './constants';
 import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './patient-chart/patient-chart.component';
@@ -21,17 +20,15 @@ export default function Root() {
     // do in openmrsComponentDecorator in esm-core.
     <SWRConfig value={swrConfiguration}>
       <BrowserRouter basename={spaRoot}>
-        <WorkspaceWindowSizeProvider>
-          <div className={styles.patientChartWrapper}>
-            <VisitHeader />
-            <SideMenu />
-            <Routes>
-              <Route path={basePath} element={<PatientChart />} />
-              <Route path={dashboardPath} element={<PatientChart />} />
-            </Routes>
-            <WorkspaceWindow />
-          </div>
-        </WorkspaceWindowSizeProvider>
+        <div className={styles.patientChartWrapper}>
+          <VisitHeader />
+          <SideMenu />
+          <Routes>
+            <Route path={basePath} element={<PatientChart />} />
+            <Route path={dashboardPath} element={<PatientChart />} />
+          </Routes>
+          <WorkspaceWindow />
+        </div>
       </BrowserRouter>
     </SWRConfig>
   );
