@@ -64,14 +64,14 @@
     height: 100vh;
   }
 
-  .clinicalForm {
+  .widerWorkspace {
     width: 32.25rem;
     .dynamicWidth {
       width: 32.25rem;
     }
   }
 
-  .independent {
+  .narrowWorkspace {
     width: 26.25rem;
     .dynamicWidth {
       width: 26.25rem;
@@ -97,7 +97,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 8001;
   }
 
   .header {

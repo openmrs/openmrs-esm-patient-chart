@@ -39,7 +39,8 @@
           "default": "Clinical form"
         },
         "type": "clinical-form",
-        "variant": "clinical-form"
+        "canMaximize": true,
+        "width": "wider"
       }
     }
   ]
