@@ -1,5 +1,5 @@
 /* The possible states a workspace window can be opened in. */
-export type WorkspaceWindowState = 'minimized' | 'maximized' | 'hidden' | 'reopened' | 'normal';
+export type WorkspaceWindowState = 'maximized' | 'hidden' | 'normal';
 
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {

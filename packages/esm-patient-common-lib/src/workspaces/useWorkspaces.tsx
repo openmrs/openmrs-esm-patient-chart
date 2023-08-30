@@ -1,44 +1,38 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getWorkspaceStore, OpenWorkspace, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
-import { Prompt, WorkspaceStoreState, updateWorkspaceSizeState } from './workspaces';
+import { Prompt, WorkspaceStoreState } from './workspaces';
+import { useStoreWithActions } from '@openmrs/esm-framework';
 
 export interface WorkspacesInfo {
   active: boolean;
   workspaceWindowState: WorkspaceWindowState;
   workspaces: Array<OpenWorkspace>;
   prompt: Prompt;
-  updateWorkspaceSizeState: (val: WorkspaceWindowState) => void;
+  updateWorkspaceWindowState: (val: WorkspaceWindowState) => void;
 }
 
 export function useWorkspaces(): WorkspacesInfo {
-  const [workspaces, setWorkspaces] = useState<Array<OpenWorkspace>>([]);
-  const [prompt, setPrompt] = useState<Prompt>(null);
-  const [workspaceWindowState, setWorkspaceWindowState] = useState<WorkspaceWindowState>('hidden');
+  const {
+    prompt,
+    openWorkspaces: workspaces,
+    workspaceWindowState,
+    // updateWorkspaceWindowState isn't memoised
+    updateWorkspaceWindowState,
+  } = useStoreWithActions<WorkspaceStoreState>(getWorkspaceStore(), {
+    updateWorkspaceWindowState: (state, value) => ({ ...state, workspaceWindowState: value }),
+  });
 
-  useEffect(() => {
-    function update(state: WorkspaceStoreState) {
-      setWorkspaces(state.openWorkspaces);
-      setPrompt(state.prompt);
-      setWorkspaceWindowState(state.workspaceWindowState);
-    }
-    update(getWorkspaceStore().getState());
-    getWorkspaceStore().subscribe(update);
-  }, []);
-
-  const windowState = useMemo(() => {
-    if (workspaces.length === 0) {
-      return 'hidden';
-    } else {
-      return workspaces[0].preferredWindowSize;
-    }
-  }, [workspaces]);
-
+  // This hook is meant to be triggered only when workspace changes
+  // Accordingly the workspaceWindowState will be updated
   useEffect(() => {
     if (workspaces.length === 0) {
-      updateWorkspaceSizeState('hidden');
+      updateWorkspaceWindowState('hidden');
+    } else if (workspaceWindowState === 'hidden') {
+      updateWorkspaceWindowState('normal');
     } else {
-      updateWorkspaceSizeState(workspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal');
+      updateWorkspaceWindowState(workspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaces]);
 
   const memoisedResults = useMemo(
@@ -47,8 +41,9 @@ export function useWorkspaces(): WorkspacesInfo {
       workspaceWindowState,
       workspaces,
       prompt,
-      updateWorkspaceSizeState,
+      updateWorkspaceWindowState,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [workspaces, workspaceWindowState, prompt],
   );
 

@@ -248,16 +248,10 @@ const initialState: WorkspaceStoreState = {
   patientUuid: null,
   openWorkspaces: [],
   prompt: null,
-  workspaceWindowState: 'hidden',
+  workspaceWindowState: 'normal',
 };
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
-}
-
-export function updateWorkspaceSizeState(value: WorkspaceWindowState) {
-  const store = getWorkspaceStore();
-  const state = store.getState();
-  store.setState({ ...state, workspaceWindowState: value });
 }
 
 /**
