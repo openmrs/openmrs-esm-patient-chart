@@ -60,6 +60,7 @@ jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => 
         type: 'form',
       },
     ],
+    workspaceWindowState: 'normal',
     prompt: null,
   })),
 }));

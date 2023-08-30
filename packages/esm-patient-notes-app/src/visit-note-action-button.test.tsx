@@ -25,6 +25,7 @@ jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => 
   ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
   useWorkspaces: jest.fn().mockReturnValue({
     workspaces: [{ type: 'visit-note' }],
+    workspaceWindowState: 'normal',
   }),
 }));
 

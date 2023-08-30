@@ -39,9 +39,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
     launchPatientWorkspace: (arg) => mockLaunchPatientWorkspace(arg),
     launchStartVisitPrompt: () => mockLaunchStartVisitPrompt(),
-    useWorkspaces: jest.fn(() => {
-      return { workspaces: [{ name: 'order-basket' }] };
-    }),
     useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit(),
     useSystemVisitSetting: jest.fn().mockReturnValue({ data: true }),
   };
@@ -55,6 +52,7 @@ jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => 
   ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
   useWorkspaces: jest.fn().mockReturnValue({
     workspaces: [{ type: 'order' }],
+    workspaceWindowState: 'normal',
   }),
 }));
 
