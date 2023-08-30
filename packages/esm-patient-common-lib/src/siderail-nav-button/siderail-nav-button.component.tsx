@@ -10,7 +10,7 @@ interface SiderailNavButtonProps {
   label: string;
   iconDescription: string;
   handler: () => void;
-  type: 'clinical-form' | 'order' | 'visit-note';
+  type: string;
   tagContent?: string | React.ReactNode;
 }
 
