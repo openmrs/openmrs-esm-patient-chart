@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
-import { calculateBMI } from './biometrics-helpers';
+import { calculateBodyMassIndex } from './biometrics-helpers';
 
 interface BiometricsFetchResponse {
   id: string;
@@ -81,7 +81,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
       return {
         ...biometrics,
         id: index.toString(),
-        bmi: calculateBMI(Number(biometrics.weight), Number(biometrics.height)),
+        bmi: calculateBodyMassIndex(Number(biometrics.weight), Number(biometrics.height)),
         date: date,
       };
     },

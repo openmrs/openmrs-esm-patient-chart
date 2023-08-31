@@ -16,13 +16,12 @@ import styles from './notes-overview.scss';
 
 interface NotesOverviewProps {
   patientUuid: string;
-  showAddNote: boolean;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
 }
 
-const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pageSize, urlLabel, pageUrl }) => {
+const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const displayText = t('visitNotes', 'Visit notes');
@@ -55,16 +54,14 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
     <div className={styles.widgetCard}>
       <CardHeader title={headerTitle}>
         <span>{isValidating ? <InlineLoading /> : null}</span>
-        {showAddNote && (
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add visit note"
-            onClick={launchVisitNoteForm}
-          >
-            {t('add', 'Add')}
-          </Button>
-        )}
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <Add size={16} {...props} />}
+          iconDescription="Add visit note"
+          onClick={launchVisitNoteForm}
+        >
+          {t('add', 'Add')}
+        </Button>
       </CardHeader>
       <PaginatedNotes notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
     </div>

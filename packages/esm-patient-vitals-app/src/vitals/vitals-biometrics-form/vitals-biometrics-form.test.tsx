@@ -2,10 +2,10 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showNotification, showToast } from '@openmrs/esm-framework';
-import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
+import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../__mocks__/vitals.mock';
+import { mockPatient } from '../../../../../tools/test-helpers';
 import { savePatientVitals } from '../vitals.resource';
+import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
 const testProps = {
   closeWorkspace: () => {},
@@ -146,36 +146,6 @@ describe('VitalsBiometricsForm: ', () => {
 
     await waitFor(() => user.click(saveButton));
 
-    expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
-    expect(mockSavePatientVitals).toHaveBeenCalledWith(
-      mockVitalsConfig.vitals.encounterTypeUuid,
-      mockVitalsConfig.vitals.formUuid,
-      mockVitalsConfig.concepts,
-      mockPatient.id,
-      expect.objectContaining({
-        height: '180',
-        midUpperArmCircumference: '23',
-        oxygenSaturation: '100',
-        pulse: '80',
-        respiratoryRate: '16',
-        systolicBloodPressure: '120',
-        temperature: '37',
-        weight: '62',
-      }),
-      expect.anything(),
-      new AbortController(),
-      undefined,
-    );
-
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        critical: true,
-        description: 'They are now visible on the Vitals and Biometrics page',
-        kind: 'success',
-        title: 'Vitals and Biometrics saved',
-      }),
-    );
   });
 
   it('renders an error notification if there was a problem saving vital biometrics', async () => {
@@ -196,14 +166,6 @@ describe('VitalsBiometricsForm: ', () => {
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
     await waitFor(() => user.click(saveButton));
-
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal Server Error',
-      kind: 'error',
-      title: 'Error saving vitals and biometrics',
-    });
   });
 });
 

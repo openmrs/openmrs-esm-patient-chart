@@ -1,5 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
-import { ExtensionSlot, setLeftNav, unsetLeftNav, useConfig, usePatient } from '@openmrs/esm-framework';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ExtensionSlot,
+  setCurrentVisit,
+  setLeftNav,
+  unsetLeftNav,
+  useConfig,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import {
   changeWorkspaceContext,
@@ -12,6 +19,7 @@ import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
 import { spaBasePath } from '../constants';
+import { LayoutMode } from './chart-review/dashboard-view.component';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -20,6 +28,7 @@ const PatientChart: React.FC = () => {
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>();
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
@@ -27,8 +36,16 @@ const PatientChart: React.FC = () => {
   // The following hook takes care of the creation.
   useAutoCreatedOfflineVisit(patientUuid, offlineVisitTypeUuid);
 
+  // Keep state updated with the current patient. Anything used outside the patient
+  // chart (e.g., the current visit is used by the Active Visit Tag used in the
+  // patient search) must be updated in the callback, which is called when the patient
+  // chart unmounts. Workspaces are only used inside the patient chart so we just
+  // need to update those when we enter a new patient chart.
   useEffect(() => {
     changeWorkspaceContext(patientUuid);
+    return () => {
+      setCurrentVisit(null, null);
+    };
   }, [patientUuid]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
@@ -52,11 +69,12 @@ const PatientChart: React.FC = () => {
             <>
               <aside>
                 <ExtensionSlot name="patient-header-slot" state={state} />
+                <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
                 <ExtensionSlot name="patient-info-slot" state={state} />
               </aside>
               <div className={styles.grid}>
-                <div className={styles.chartReview}>
-                  <ChartReview {...state} view={view} />
+                <div className={`${styles.chartReview} ${layoutMode == 'contained' ? styles.widthContained : ''}`}>
+                  <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
                   <WorkspaceNotification />
                 </div>
               </div>

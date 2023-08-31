@@ -22,10 +22,9 @@ import styles from './allergies-detailed-summary.scss';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
-  showAddAllergyButton: boolean;
 }
 
-const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient, showAddAllergyButton }) => {
+const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient }) => {
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
@@ -79,16 +78,14 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          {showAddAllergyButton && (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription="Add allergies"
-              onClick={launchAllergiesForm}
-            >
-              {t('add', 'Add')}
-            </Button>
-          )}
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add allergies"
+            onClick={launchAllergiesForm}
+          >
+            {t('add', 'Add')}
+          </Button>
         </CardHeader>
         <DataTable rows={tableRows} headers={tableHeaders} isSortable useZebraStyles size={isTablet ? 'lg' : 'sm'}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -109,7 +106,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody data-testid="allergy-table">
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (

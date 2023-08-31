@@ -1,14 +1,13 @@
 import React from 'react';
 import StopVisitOverflowMenuItem from './stop-visit.component';
-import { screen, render, waitFor, cleanup } from '@testing-library/react';
+import { screen, render, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal, useConfig, useVisit } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { showModal, useVisit } from '@openmrs/esm-framework';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 
 const mockUseVisit = useVisit as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   useVisit: jest.fn(),
@@ -25,7 +24,6 @@ describe('StopVisitOverflowMenuItem', () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
-    mockUseConfig.mockReturnValue({ endVisitLabel: '' });
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
@@ -41,11 +39,10 @@ describe('StopVisitOverflowMenuItem', () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
-    mockUseConfig.mockReturnValue({ endVisitLabel: 'Checkout' });
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const endVisitButton = screen.getByRole('menuitem', { name: /Checkout/ });
+    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/ });
     expect(endVisitButton).toBeInTheDocument();
 
     // should launch the form

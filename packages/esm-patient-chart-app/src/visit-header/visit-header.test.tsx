@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import {
   useAssignedExtensions,
   useLayoutType,
@@ -9,21 +8,18 @@ import {
   usePatient,
   useVisit,
   navigate,
-  useConfig,
   showModal,
 } from '@openmrs/esm-framework';
-import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import VisitHeader from './visit-header.component';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockExtensionRegistry = {};
-const mockUseConfig = useConfig as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -41,7 +37,6 @@ jest.mock('@openmrs/esm-framework', () => {
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
     translateFrom: (module, key, defaultValue, options) => defaultValue,
     useOnClickOutside: jest.fn(),
-    useConfig: jest.fn(),
     showModal: jest.fn(),
   };
 });
@@ -58,8 +53,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
-    mockUseConfig.mockReturnValue({ startVisitLabel: '' });
-    mockUseConfig.mockReturnValue({ endVisitLabel: '' });
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
@@ -129,7 +122,6 @@ describe('Visit Header', () => {
 
   it('should be able to show configurable stop visit button and modal to stop current visit', async () => {
     const user = userEvent.setup();
-    mockUseConfig.mockReturnValue({ endVisitLabel: 'Checkout' });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatientWithLongName,
@@ -143,7 +135,7 @@ describe('Visit Header', () => {
     renderVisitHeader();
 
     // Should be able to end a visit
-    const endVisitButton = screen.getByRole('button', { name: /Checkout/i });
+    const endVisitButton = screen.getByRole('button', { name: /End visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
     // should launch the form

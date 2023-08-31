@@ -1,3 +1,22 @@
 {
-    "immunizations_link": "ការចាក់ថ្នាំបង្ការរោគ"
+  "add": "Add",
+  "cancel": "Cancel",
+  "emptyStateText": "There are no {{displayText}} to display for this patient",
+  "errorSaving": "Error saving vaccination",
+  "expirationDate": "Expiration Date",
+  "goToSummary": "Go to Summary",
+  "immunizations": "ការចាក់ថ្នាំបង្ការរោគ",
+  "Immunizations": "ការចាក់ថ្នាំបង្ការរោគ",
+  "lotNumber": "Lot Number",
+  "manufacturer": "Manufacturer",
+  "pleaseSelect": "Please select",
+  "recentVaccination": "Recent vaccination",
+  "record": "Record",
+  "save": "Save",
+  "seeAll": "See all",
+  "sequence": "Sequence",
+  "singleDoseOn": "Single Dose on",
+  "vaccinationDate": "Vaccination date",
+  "vaccinationSaved": "Vaccination saved successfully",
+  "vaccine": "Vaccine"
 }

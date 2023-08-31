@@ -1,0 +1,168 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import "../../root";
+
+.orderForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
+  height: calc(100vh - 9rem);
+
+  :global(.cds--css-grid) {
+    max-width: unset;
+  }
+
+  :global(.cds--css-grid-column) {
+    margin: 0 spacing.$spacing-03 !important;
+  }
+
+  :global(.cds--subgrid) {
+    margin: 0 calc(spacing.$spacing-03 * -1) !important;
+  }
+
+  :global(.cds--number--nosteppers.cds--number input[type=number]) {
+    padding-right: spacing.$spacing-05;
+  }
+
+  :global(.cds--list-box) {
+    border: none;
+  }
+
+  :global(.cds--number__control-btn) {
+    border: 0;
+  }
+}
+
+.inlineNotification {
+  width: 100%;
+  max-width: unset;
+  margin-top: calc(spacing.$spacing-03 * -1);
+  margin-left: calc(spacing.$spacing-05 * -1);
+}
+
+.patientHeader {
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
+  background-color: $ui-01;
+  
+  span:first-of-type {
+    margin-right: spacing.$spacing-03;
+  }
+  
+  .text02 {
+    color: $text-02;
+  }
+}
+
+.orderFormHeading {
+  @include type.type-style("heading-03");
+  margin-bottom: 0;
+}
+
+.formSection {
+  margin-bottom: spacing.$spacing-06;
+}
+
+.sectionHeader {
+  @include type.type-style("heading-01");
+  margin-bottom: spacing.$spacing-05;
+}
+
+.pullColumnContentRight > div {
+  float: right;
+}
+
+.fullWidthDatePickerContainer {
+  :global .cds--date-picker {
+    width: 100%;
+
+    :global .cds--date-picker-container {
+      width: 100%;
+
+      :global .cds--date-picker-input__wrapper {
+        width: 100%;
+
+        :global .cds--date-picker__input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  margin: spacing.$spacing-03 0;
+
+  button {
+    display: flex;
+   padding-left: 0 !important;
+    svg {
+      order: 1;
+      margin-right: spacing.$spacing-03;
+      margin-left: 0 !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.gridRow {
+  padding: 0px;
+  margin-left: calc(spacing.$spacing-03 * -1);
+
+  :global(.cds--number) {
+    display: inline-block;
+  }
+}
+
+.field {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.buttonSet {
+  margin-left: calc(spacing.$spacing-05 * -1);
+
+  :global(.cds--btn) {
+    width: 50%;
+    max-width: unset;
+  }
+}
+
+.linkedInput {
+  display: flex;
+  align-items: center;
+
+  :global(.cds--layer-one), 
+  :global(.cds--layer-two), 
+  :global(.cds--layer) {
+    flex: 1;
+  }
+}
+
+.linkedInput::after {
+  content: "";
+  border: 1px solid $text-03;
+  width: spacing.$spacing-05;
+  margin-right: calc(spacing.$spacing-05 * -1);
+  margin-top: spacing.$spacing-05;
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: calc(100vh - 10rem);
+    background-color: #ededed;
+  }
+
+  .buttonSet {
+    padding: spacing.$spacing-06 spacing.$spacing-05;
+    background-color: $ui-02;
+  }
+
+}

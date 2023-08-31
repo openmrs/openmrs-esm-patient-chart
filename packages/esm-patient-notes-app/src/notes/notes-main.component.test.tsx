@@ -1,15 +1,13 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import { usePagination } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, renderWithSwr } from '../../../../tools/test-helpers';
-import NotesMain from './notes-main.component';
+import { mockVisitNotes, formattedVisitNotes } from '../__mocks__/visit-notes.mock';
+import { mockPatient, patientChartBasePath, renderWithSwr } from '../../../../tools/test-helpers';
 import { useVisitNotes } from './visit-notes.resource';
+import NotesMain from './notes-main.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showAddNote: false,
   pageSize: 10,
   urlLabel: window.spaBase + patientChartBasePath + '/summary',
   pageUrl: 'Go to Summary',

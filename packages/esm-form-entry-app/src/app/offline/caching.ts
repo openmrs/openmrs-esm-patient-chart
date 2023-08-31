@@ -6,11 +6,8 @@ import {
   setupDynamicOfflineDataHandler,
   subscribePrecacheStaticDependencies,
 } from '@openmrs/esm-framework';
-import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { FormSchemaService } from '../form-schema/form-schema.service';
-import { FormEncounter, FormSchema } from '../types';
-import { ConceptService } from '../services/concept.service';
+import type { FormSchema } from '../types';
 
 export function setupStaticDataOfflinePrecaching() {
   subscribePrecacheStaticDependencies(async () => {
@@ -69,30 +66,12 @@ export function setupDynamicOfflineFormDataHandler() {
 }
 
 async function getCacheableFormUrls(formUuid: string) {
-  const getFormRes = await openmrsFetch<FormEncounter>(`/ws/rest/v1/form/${formUuid}?v=full`);
+  const getFormRes = await openmrsFetch<FormSchema>(`/ws/rest/v1/o3/form/${formUuid}`);
   const form = getFormRes.data;
-  const getClobdataRes = await openmrsFetch(`/ws/rest/v1/clobdata/${form.resources[0].valueReference}?v=full`);
-  const clobdata = getClobdataRes.data;
 
-  if (!form || !clobdata) {
+  if (!form) {
     throw new Error(`The form data could not be loaded from the server. (Form UUID: ${formUuid})`);
   }
-
-  const formSchemaCompiler = new FormSchemaCompiler();
-  const formSchema = formSchemaCompiler.compileFormSchema(
-    {
-      ...form,
-      pages: clobdata.pages ?? [],
-      referencedForms: clobdata.referencedForms ?? [],
-      processor: clobdata.processor,
-    },
-    [],
-  ) as FormSchema;
-
-  const requiredConceptIdentifiers = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(formSchema);
-  const conceptUrls = ConceptService.getConceptReferenceUrls(requiredConceptIdentifiers).map(
-    (relativeUrl) => `/ws/rest/v1/${relativeUrl}`,
-  );
 
   return [
     // Required by:
@@ -104,10 +83,6 @@ async function getCacheableFormUrls(formUuid: string) {
     // Required by:
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/openmrs-api/form-resource.service.ts#L10
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/form-schema/form-schema.service.ts#L167
-    `/ws/rest/v1/clobdata/${form.resources[0].valueReference}?v=full`,
-
-    // Required by:
-    // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/cb020d4083f564fcda8864dff2897bc3fb9cc8a5/packages/esm-form-entry-app/src/app/services/concept.service.ts#L23
-    ...conceptUrls,
+    `/ws/rest/v1/o3/forms/${formUuid}`,
   ].filter(Boolean);
 }

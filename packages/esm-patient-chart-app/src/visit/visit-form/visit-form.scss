@@ -12,7 +12,7 @@
 
 .heading {
   @include type.type-style("heading-03");
-  
+
   margin: spacing.$spacing-05;
 }
 
@@ -39,7 +39,6 @@
   display: grid;
   grid-template-columns: 50% 10% 1fr;
   margin: 0.5rem 1rem;
-  width: 100%;
 }
 
 .form {
@@ -81,3 +80,23 @@
 .queueSection {
   margin-top: spacing.$spacing-04;
 }
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    & section {
+      display: flex;
+      gap: 4rem;
+
+      .sectionTitle {
+        flex-basis: 30%;
+        min-width: 8rem;
+        text-align: left;
+      }
+
+      .sectionField {
+        flex-basis: 70%;
+      }
+    }
+  }
+}
+

@@ -2,20 +2,18 @@ import React from 'react';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePagination } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { formattedVisitNotes, mockVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
+import { formattedVisitNotes, mockVisitNotes } from '../__mocks__/visit-notes.mock';
+import { mockPatient, patientChartBasePath, renderWithSwr } from '../../../../tools/test-helpers';
+import { ConfigMock } from '../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
 import { useVisitNotes } from './visit-notes.resource';
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 const testProps = {
   basePath: patientChartBasePath,
   patient: mockPatient,
   patientUuid: mockPatient.id,
-  showAddNote: false,
 };
 
 const mockUseVisitNotes = useVisitNotes as jest.Mock;

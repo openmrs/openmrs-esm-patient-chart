@@ -3,72 +3,40 @@ import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patien
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+const moduleName = '@openmrs/esm-patient-immunizations-app';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
-  fhir2: '^1.2.0',
+const options = {
+  featureName: 'patient-immunizations',
+  moduleName,
 };
 
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-immunizations-app';
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-  const options = {
-    featureName: 'patient-immunizations',
-    moduleName,
-  };
-
+export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-
-  return {
-    extensions: [
-      {
-        name: 'immunization-overview-widget',
-        order: getPatientSummaryOrder('Immunizations'),
-        load: getAsyncLifecycle(() => import('./immunizations/immunizations-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-      },
-      {
-        name: 'immunization-details-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./immunizations/immunizations-detailed-summary.component'), options),
-        meta: {
-          columnSpan: 1,
-        },
-      },
-      {
-        name: 'immunization-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 8,
-        // t('immunizations_link', 'Immunizations')
-        load: getSyncLifecycle(
-          createDashboardLink({
-            ...dashboardMeta,
-            title: () =>
-              Promise.resolve(
-                window.i18next?.t('immunizations_link', { defaultValue: 'Immunizations', ns: moduleName }) ??
-                  'Immunizations',
-              ),
-          }),
-          options,
-        ),
-        meta: dashboardMeta,
-      },
-      {
-        name: 'immunization-form-workspace',
-        load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
-        meta: {
-          title: 'Immunization Form',
-        },
-      },
-    ],
-  };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS, version };
+export const immunizationsOverview = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-overview.component'),
+  options,
+);
+
+export const immunizationsDetailedSummary = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-detailed-summary.component'),
+  options,
+);
+
+export const immunizationsDashboardLink =
+  // t('Immunizations', 'Immunizations')
+  getSyncLifecycle(
+    createDashboardLink({
+      ...dashboardMeta,
+      moduleName,
+    }),
+    options,
+  );
+
+export const immunizationsForm = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-form.component'),
+  options,
+);

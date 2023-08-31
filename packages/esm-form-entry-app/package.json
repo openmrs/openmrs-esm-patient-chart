@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-entry-app",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "license": "MPL-2.0",
   "description": "Form engine entry capabilities for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-entry-app.js",
@@ -11,7 +11,7 @@
     "serve": "ng serve --port 4200 --live-reload true",
     "debug": "yarn run serve",
     "build": "ng build --configuration production",
-    "lint": "eslint src --ext ts --fix --max-warnings=0"
+    "lint": "cross-env eslint src --ext ts --fix --max-warnings=0"
   },
   "openmrs:develop": {
     "command": "yarn run serve",
@@ -65,7 +65,7 @@
     "zone.js": "~0.11.8"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "4.x",
+    "@openmrs/esm-framework": "5.x",
     "rxjs": "6.x",
     "single-spa": "5.x"
   },
@@ -81,6 +81,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/webpack-env": "^1.17.0",
     "codelyzer": "^6.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.3.4",
@@ -88,7 +89,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "openmrs": "next",
+    "openmrs": "^5.1.0",
     "protractor": "~7.0.0",
     "rxjs": "6",
     "style-loader": "2.x",

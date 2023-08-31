@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0",
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "conditions-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "component": "conditionsOverview",
+      "order": 3,
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "conditions-details-widget",
+      "slot": "patient-chart-conditions-dashboard-slot",
+      "component": "conditionsDetailedSummary",
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "conditions-summary-dashboard",
+      "component": "conditionsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 7,
+      "meta": {
+        "slot": "patient-chart-conditions-dashboard-slot",
+        "columns": 1,
+        "path": "Conditions"
+      }
+    },
+    {
+      "name": "conditions-widget",
+      "component": "conditionsWidget"
+    },
+    {
+      "name": "conditions-form-workspace",
+      "component": "conditionsFormWorkspace"
+    },
+    {
+      "name": "condition-delete-confirmation-dialog",
+      "component": "conditionDeleteConfirmationDialog"
+    }
+  ]
+}

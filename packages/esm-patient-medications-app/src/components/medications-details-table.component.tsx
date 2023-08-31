@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import {
@@ -16,23 +16,23 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useStore } from 'zustand';
-import { Add, User } from '@carbon/react/icons';
-import { formatDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { Add, User, Printer } from '@carbon/react/icons';
+import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { compare } from '../utils/compare';
-import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
-import { Order } from '../types/order';
-import { OrderBasketItem } from '../types/order-basket-item';
-import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import styles from './medications-details-table.scss';
+import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { DrugOrderBasketItem } from '../types';
+import { ConfigObject } from '../config-schema';
+import { useReactToPrint } from 'react-to-print';
+import PrintComponent from '../print/print.component';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
-  showAddNewButton: boolean;
+  showAddButton?: boolean;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
@@ -43,18 +43,23 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   isValidating,
   title,
   medications,
+  showAddButton,
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
-  showAddNewButton,
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const config = useConfig() as ConfigObject;
+  const showPrintButton = config.showPrintButton;
+  const contentToPrintRef = useRef(null);
+  const patient = usePatient(patientUuid);
+  const { excludePatientIdentifierCodeTypes } = useConfig();
+  const [isPrinting, setIsPrinting] = useState(false);
 
-  const store = useStore(orderBasketStore);
-  const setItems = useCallback((items) => orderBasketStoreActions.setOrderBasketItems(items), []);
-  const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
 
   const tableHeaders = [
     {
@@ -134,8 +139,8 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       sortKey: dayjs(medication.dateActivated).toDate(),
       content: (
         <div className={styles.startDateColumn}>
-          <p>{formatDate(new Date(medication.dateActivated))}</p>
-          <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
+          <span>{formatDate(new Date(medication.dateActivated))}</span>
+          {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),
     },
@@ -147,6 +152,60 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       : compare(cellA.sortKey, cellB.sortKey);
   };
 
+  const patientDetails = useMemo(() => {
+    const getGender = (gender: string): string => {
+      switch (gender) {
+        case 'male':
+          return t('male', 'Male');
+        case 'female':
+          return t('female', 'Female');
+        case 'other':
+          return t('other', 'Other');
+        case 'unknown':
+          return t('unknown', 'Unknown');
+        default:
+          return gender;
+      }
+    };
+
+    const identifiers =
+      patient?.patient?.identifier?.filter(
+        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+      ) ?? [];
+
+    return {
+      name: `${patient?.patient?.name?.[0]?.given?.join(' ')} ${patient?.patient?.name?.[0].family}`,
+      age: age(patient?.patient?.birthDate),
+      gender: getGender(patient?.patient?.gender),
+      location: patient?.patient?.address?.[0].city,
+      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+    };
+  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
+
+  const onBeforeGetContentResolve = useRef(null);
+
+  useEffect(() => {
+    if (isPrinting && onBeforeGetContentResolve.current) {
+      onBeforeGetContentResolve.current();
+    }
+  }, [isPrinting]);
+
+  const handlePrint = useReactToPrint({
+    content: () => contentToPrintRef.current,
+    documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
+    onBeforeGetContent: () =>
+      new Promise((resolve) => {
+        if (patient && patient.patient && title) {
+          onBeforeGetContentResolve.current = resolve;
+          setIsPrinting(true);
+        }
+      }),
+    onAfterPrint: () => {
+      onBeforeGetContentResolve.current = null;
+      setIsPrinting(false);
+    },
+  });
+
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={title}>
@@ -155,76 +214,95 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             <InlineLoading />
           </span>
         ) : null}
-        {showAddNewButton && (
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Launch order basket"
-            onClick={launchOrderBasket}
-          >
-            {t('add', 'Add')}
-          </Button>
-        )}
+        <div className={styles.buttons}>
+          {showPrintButton && (
+            <Button
+              kind="ghost"
+              renderIcon={Printer}
+              iconDescription="Add vitals"
+              className={styles.printButton}
+              onClick={handlePrint}
+            >
+              {t('print', 'Print')}
+            </Button>
+          )}
+          {showAddButton ?? true ? (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Launch order basket"
+              onClick={launchAddDrugOrder}
+            >
+              {t('add', 'Add')}
+            </Button>
+          ) : null}
+        </div>
       </CardHeader>
-      <DataTable
-        data-floating-menu-container
-        size="sm"
-        headers={tableHeaders}
-        rows={tableRows}
-        isSortable
-        sortRow={sortRow}
-        overflowMenuOnHover={false}
-        useZebraStyles
-      >
-        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}
-                    >
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                  <TableHeader />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, rowIndex) => (
-                  <TableRow className={styles.row} {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell className={styles.tableCell} key={cell.id}>
-                        {cell.value?.content ?? cell.value}
-                      </TableCell>
+      <div ref={contentToPrintRef}>
+        <PrintComponent subheader={title} patientDetails={patientDetails} />
+        <DataTable
+          data-floating-menu-container
+          size="sm"
+          headers={tableHeaders}
+          rows={tableRows}
+          isSortable
+          sortRow={sortRow}
+          overflowMenuOnHover={false}
+          useZebraStyles
+        >
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                      >
+                        {header.header}
+                      </TableHeader>
                     ))}
-                    <TableCell className="cds--table-column-menu">
-                      <OrderBasketItemActions
-                        showDiscontinueButton={showDiscontinueButton}
-                        showModifyButton={showModifyButton}
-                        showReorderButton={showReorderButton}
-                        medication={medications[rowIndex]}
-                        items={patientOrderItems}
-                        setItems={setItems}
-                        openOrderBasket={launchOrderBasket}
-                      />
-                    </TableCell>
+                    <TableHeader />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
+                      ))}
+                      {!isPrinting && (
+                        <TableCell className="cds--table-column-menu">
+                          <OrderBasketItemActions
+                            showDiscontinueButton={showDiscontinueButton}
+                            showModifyButton={showModifyButton}
+                            showReorderButton={showReorderButton}
+                            medication={medications[rowIndex]}
+                            items={orders}
+                            setItems={setOrders}
+                            openOrderBasket={launchOrderBasket}
+                            openDrugOrderForm={launchAddDrugOrder}
+                          />
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+      </div>
     </div>
   );
 };
 
-function InfoTooltip({ orderer }) {
+function InfoTooltip({ orderer }: { orderer: string }) {
   return (
     <IconButton
       className={styles.tooltip}
@@ -247,14 +325,16 @@ function OrderBasketItemActions({
   items,
   setItems,
   openOrderBasket,
+  openDrugOrderForm,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
   medication: Order;
-  items: Array<OrderBasketItem>;
-  setItems: (items: Array<OrderBasketItem>) => void;
+  items: Array<DrugOrderBasketItem>;
+  setItems: (items: Array<DrugOrderBasketItem>) => void;
   openOrderBasket: () => void;
+  openDrugOrderForm: (additionalProps?: AddDrugOrderWorkspaceAdditionalProps) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -264,6 +344,7 @@ function OrderBasketItemActions({
       ...items,
       {
         uuid: medication.uuid,
+        display: medication.drug?.display,
         previousOrder: null,
         action: 'DISCONTINUE',
         drug: medication.drug,
@@ -274,7 +355,7 @@ function OrderBasketItemActions({
         },
         frequency: {
           valueCoded: medication.frequency?.uuid,
-          value: medication.frequency.display,
+          value: medication.frequency?.display,
         },
         route: {
           valueCoded: medication.route?.uuid,
@@ -300,55 +381,6 @@ function OrderBasketItemActions({
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
         quantityUnits: {
-          value: medication.quantityUnits.display,
-          valueCoded: medication.quantityUnits.uuid,
-        },
-      },
-    ]);
-    openOrderBasket();
-  }, [items, setItems, medication, openOrderBasket]);
-
-  const handleModifyClick = useCallback(() => {
-    setItems([
-      ...items,
-      {
-        uuid: medication.uuid,
-        previousOrder: medication.uuid,
-        startDate: new Date(),
-        action: 'REVISE',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        asNeeded: medication.asNeeded,
-        asNeededCondition: medication.asNeededCondition,
-        duration: medication.duration,
-        durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
-          value: medication.durationUnits?.display,
-        },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer?.uuid,
-        careSetting: medication.careSetting?.uuid,
-        quantityUnits: {
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
         },
@@ -357,14 +389,63 @@ function OrderBasketItemActions({
     openOrderBasket();
   }, [items, setItems, medication, openOrderBasket]);
 
+  const handleModifyClick = useCallback(() => {
+    const newItem: DrugOrderBasketItem = {
+      uuid: medication.uuid,
+      display: medication.drug?.display,
+      previousOrder: medication.uuid,
+      startDate: new Date(),
+      action: 'REVISE',
+      drug: medication.drug,
+      dosage: medication.dose,
+      unit: {
+        value: medication.doseUnits?.display,
+        valueCoded: medication.doseUnits?.uuid,
+      },
+      frequency: {
+        valueCoded: medication.frequency?.uuid,
+        value: medication.frequency?.display,
+      },
+      route: {
+        valueCoded: medication.route?.uuid,
+        value: medication.route?.display,
+      },
+      commonMedicationName: medication.drug?.display,
+      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+      freeTextDosage:
+        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      patientInstructions:
+        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      asNeeded: medication.asNeeded,
+      asNeededCondition: medication.asNeededCondition,
+      duration: medication.duration,
+      durationUnit: {
+        valueCoded: medication.durationUnits?.uuid,
+        value: medication.durationUnits?.display,
+      },
+      pillsDispensed: medication.quantity,
+      numRefills: medication.numRefills,
+      indication: medication.orderReasonNonCoded,
+      orderer: medication.orderer?.uuid,
+      careSetting: medication.careSetting?.uuid,
+      quantityUnits: {
+        value: medication.quantityUnits?.display,
+        valueCoded: medication.quantityUnits?.uuid,
+      },
+    };
+    setItems([...items, newItem]);
+    openDrugOrderForm({ order: newItem });
+  }, [items, setItems, medication, openDrugOrderForm]);
+
   const handleReorderClick = useCallback(() => {
     setItems([
       ...items,
       {
         uuid: medication.uuid,
+        display: medication.drug?.display,
         previousOrder: null,
         startDate: new Date(),
-        action: 'RENEWED',
+        action: 'RENEW',
         drug: medication.drug,
         dosage: medication.dose,
         unit: {
@@ -439,6 +520,26 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
+}
+
+/**
+ * Enables a comparison of arbitrary values with support for undefined/null.
+ * Requires the `<` and `>` operators to return something reasonable for the provided values.
+ */
+function compare<T>(x?: T, y?: T) {
+  if (x == undefined && y == undefined) {
+    return 0;
+  } else if (x == undefined) {
+    return -1;
+  } else if (y == undefined) {
+    return 1;
+  } else if (x < y) {
+    return -1;
+  } else if (x > y) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 export default MedicationsDetailsTable;

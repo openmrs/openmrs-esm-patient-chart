@@ -1,14 +1,12 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockFhirAllergyIntoleranceResponse } from '../__mocks__/allergies.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
 const testProps = {
   patient: mockPatient,
-  showAddAllergyButton: false,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

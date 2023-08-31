@@ -7,21 +7,18 @@ import {
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import { patientAllergiesFormWorkspace } from './constants';
 import { dashboardMeta } from './dashboard.meta';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+const moduleName = '@openmrs/esm-patient-allergies-app';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
-  fhir2: '^1.2.0',
+const options = {
+  featureName: 'patient-allergies',
+  moduleName,
 };
 
-function setupOpenMRS() {
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
     pattern: '.+/ws/rest/v1/concept.+',
@@ -37,82 +34,36 @@ function setupOpenMRS() {
     pattern: `.+${fhirBaseUrl}/AllergyIntolerance.+`,
   });
 
-  const moduleName = '@openmrs/esm-patient-allergies-app';
-
-  const options = {
-    featureName: 'patient-allergies',
-    moduleName,
-  };
-
   defineConfigSchema(moduleName, configSchema);
-
-  return {
-    extensions: [
-      {
-        name: 'allergies-details-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./allergies/allergies-detailed-summary.component'), options),
-        meta: {
-          columnSpan: 1,
-        },
-        online: { showAddAllergyButton: true },
-        offline: { showAddAllergyButton: false },
-      },
-      {
-        name: 'allergies-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 6,
-        // t('allergies_link', 'Allergies')
-        load: getSyncLifecycle(
-          createDashboardLink({
-            ...dashboardMeta,
-            title: () =>
-              Promise.resolve(
-                window.i18next?.t('allergies_link', { defaultValue: 'Allergies', ns: moduleName }) ?? 'Allergies',
-              ),
-          }),
-          options,
-        ),
-        meta: dashboardMeta,
-        online: { showAddAllergyButton: true },
-        offline: { showAddAllergyButton: true },
-      },
-      {
-        id: patientAllergiesFormWorkspace,
-        load: getAsyncLifecycle(() => import('./allergies/allergies-form/allergy-form.component'), options),
-        meta: {
-          title: {
-            key: 'recordNewAllergy',
-            default: 'Record a new allergy',
-          },
-        },
-      },
-      {
-        name: 'patient-details-tile',
-        slot: 'patient-details-header-slot',
-        order: 1,
-        load: getAsyncLifecycle(
-          () => import('../../esm-patient-chart-app/src/patient-details-tile/patient-details-tile.component'),
-          options,
-        ),
-      },
-      {
-        name: 'weight-tile',
-        slot: 'patient-details-header-slot',
-        order: 2,
-        load: getAsyncLifecycle(
-          () => import('../../esm-patient-biometrics-app/src/biometrics/weight-tile.component'),
-          options,
-        ),
-      },
-      {
-        name: 'allergy-tile',
-        slot: 'patient-details-header-slot',
-        order: 3,
-        load: getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options),
-      },
-    ],
-  };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS, version };
+export const allergiesDetailedSummary = getAsyncLifecycle(
+  () => import('./allergies/allergies-detailed-summary.component'),
+  options,
+);
+
+// t('Allergies', 'Allergies')
+export const allergiesDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...dashboardMeta,
+    moduleName,
+  }),
+  options,
+);
+
+export const allergiesForm = getAsyncLifecycle(
+  () => import('./allergies/allergies-form/allergy-form.component'),
+  options,
+);
+
+export const allergyTile = getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options);
+
+export const patientDetailsTile = getAsyncLifecycle(
+  () => import('../../esm-patient-chart-app/src/patient-details-tile/patient-details-tile.component'),
+  options,
+);
+
+export const weightTile = getAsyncLifecycle(
+  () => import('../../esm-patient-biometrics-app/src/biometrics/weight-tile.component'),
+  options,
+);

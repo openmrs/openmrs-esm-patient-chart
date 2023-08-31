@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "visit-tag",
+      "slot": "patient-banner-tags-slot",
+      "component": "visitTag",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "deceased-patient-tag",
+      "slot": "patient-banner-tags-slot",
+      "component": "deceasedPatientTag",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "patient-banner",
+      "slot": "patient-header-slot",
+      "component": "patientBanner",
+      "online": true,
+      "offline": true
+    }
+  ]
+}

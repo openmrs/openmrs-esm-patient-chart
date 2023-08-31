@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "medications-details-widget",
+      "component": "medicationsSummary",
+      "slot": "patient-chart-orders-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "active-medications-widget",
+      "component": "activeMedications",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 4 
+    },
+    {
+      "name": "medications-summary-dashboard",
+      "component": "medicationsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 3,
+      "meta": {
+        "slot": "patient-chart-orders-dashboard-slot",
+        "columns": 1,
+        "path": "Medications"
+      }
+    },
+    {
+      "name": "drug-order-panel",
+      "component": "drugOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 1
+    }
+  ]
+}

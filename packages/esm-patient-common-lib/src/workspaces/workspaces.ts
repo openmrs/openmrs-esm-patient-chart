@@ -34,6 +34,9 @@ export interface WorkspaceRegistration {
   load(): Promise<any>;
   /** Only one of each "type" of workspace is allowed to be open at a time. The default is "form" */
   type?: string;
+  canHide?: boolean;
+  canMaximize?: boolean;
+  width?: 'narrow' | 'wider';
   preferredWindowSize?: WorkspaceWindowState;
 }
 
@@ -48,6 +51,9 @@ export function registerWorkspace(workspace: WorkspaceRegistration) {
     ...workspace,
     preferredWindowSize: workspace.preferredWindowSize ?? 'normal',
     type: workspace.type ?? 'form',
+    canHide: workspace.canHide ?? false,
+    canMaximize: workspace.canMaximize ?? false,
+    width: workspace.width ?? 'narrow',
   };
 }
 
@@ -69,6 +75,9 @@ function getWorkspaceRegistration(name: string): WorkspaceRegistration {
         preferredWindowSize: workspaceExtension.meta?.screenSize ?? 'normal',
         load: workspaceExtension.load,
         type: workspaceExtension.meta?.type ?? 'form',
+        canHide: workspaceExtension.meta?.canHide ?? false,
+        canMaximize: workspaceExtension.meta?.canMaximize ?? false,
+        width: workspaceExtension.meta?.width ?? 'narrow',
       };
     } else {
       throw new Error(`No workspace named '${name}' has been registered.`);

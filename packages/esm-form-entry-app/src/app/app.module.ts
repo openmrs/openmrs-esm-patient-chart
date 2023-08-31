@@ -21,6 +21,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
 import { JsonLoader } from './loaders/json-loader';
+import { ProgramResourceService } from './openmrs-api/program-resource.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -54,6 +55,7 @@ import { JsonLoader } from './loaders/json-loader';
       provide: LOCALE_ID,
       useValue: (window as any).i18next.language.toLowerCase() ? (window as any).i18next.language.toLowerCase() : 'en',
     },
+    ProgramResourceService,
   ],
   bootstrap: [AppComponent],
 })

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "offline-tools-dashboard-forms-card",
+      "component": "offlineFormOverviewCard",
+      "slot": "offline-tools-dashboard-cards",
+      "order": 1
+    },
+    {
+      "name": "offline-tools-page-forms-link",
+      "component": "offlineFormsNavLink",
+      "slot": "offline-tools-page-slot",
+      "meta": {
+        "name": "forms",
+        "slot": "offline-tools-page-forms-slot"
+      }
+    },
+    {
+      "name": "offline-tools-page-forms",
+      "component": "offlineForms",
+      "slot": "offline-tools-page-forms-slot"
+    },
+    {
+      "name": "clinical-form-action-menu",
+      "component": "clinicalFormActionMenu",
+      "slot": "action-menu-chart-items-slot",
+      "order": 2
+    },
+    {
+      "name": "clinical-forms-workspace",
+      "component": "clinicalFormsWorkspace",
+      "meta": {
+        "title": {
+          "key": "clinicalForm",
+          "default": "Clinical form"
+        },
+        "type": "clinical-form",
+        "canMaximize": true,
+        "width": "wider"
+      }
+    }
+  ]
+}

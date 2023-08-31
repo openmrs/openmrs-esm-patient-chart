@@ -1,8 +1,9 @@
-import useSWR from 'swr';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
+import { useCallback, useMemo } from 'react';
+import useSwrInfinite from 'swr/infinite';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FetchResponse } from '@openmrs/esm-framework';
 import { ObsMetaInfo, ConceptMetadata, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
-import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
+import { VitalsBiometricsFormData } from './vitals-biometrics-form/vitals-biometrics-form.component';
+import { calculateBodyMassIndex } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
 
 interface ObsRecord {
@@ -42,6 +43,10 @@ interface VitalsFetchResponse {
   meta: {
     lastUpdated: string;
   };
+  link: Array<{
+    relation: string;
+    url: string;
+  }>;
   resourceType: string;
   total: number;
   type: string;
@@ -60,15 +65,31 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
         .filter((uuid) => !biometricsConcepts.includes(uuid))
         .join(',');
 
-  const apiUrl =
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-    conceptUuids +
-    '&_summary=data&_sort=-date' +
-    `&_count=${pageSize}
-        `;
+  const getUrl = useCallback(
+    (page, prevPageData) => {
+      if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
+        return null;
+      }
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: VitalsFetchResponse }, Error>(
-    apiUrl,
+      let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&`;
+      let urlSearchParams = new URLSearchParams();
+
+      urlSearchParams.append('code', conceptUuids);
+      urlSearchParams.append('_summary', 'data');
+      urlSearchParams.append('_sort', '-date');
+      urlSearchParams.append('_count', pageSize.toString());
+
+      if (page) {
+        urlSearchParams.append('_getpagesoffset', (page * pageSize).toString());
+      }
+
+      return url + urlSearchParams.toString();
+    },
+    [conceptUuids, patientUuid],
+  );
+
+  const { data, isValidating, setSize, error, size, mutate } = useSwrInfinite<{ data: VitalsFetchResponse }, Error>(
+    getUrl,
     openmrsFetch,
   );
 
@@ -106,7 +127,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
   });
 
   const vitalsHashTable = new Map<string, Partial<PatientVitals>>();
-  const vitalsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapVitalsProperties);
+  const vitalsResponse = data?.[0]?.data?.entry?.map((entry) => entry.resource ?? []).map(mapVitalsProperties);
 
   vitalsResponse?.map((vitalSign) => {
     const recordedDate = new Date(new Date(vitalSign.recordedDate)).toISOString();
@@ -130,7 +151,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     return {
       ...vitalSigns,
       id: index.toString(),
-      bmi: calculateBMI(Number(vitalSigns.weight), Number(vitalSigns.height)),
+      bmi: calculateBodyMassIndex(Number(vitalSigns.weight), Number(vitalSigns.height)),
       date: date,
       bloodPressureInterpretation: interpretBloodPressure(
         vitalSigns.systolic,
@@ -141,13 +162,22 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     };
   });
 
-  return {
-    vitals: formattedVitals,
-    isError: error,
-    isLoading,
-    isValidating,
-    mutate,
-  };
+  const results = useMemo(
+    () => ({
+      vitals: data ? [].concat(formattedVitals) : null,
+      isLoading: !data && !error,
+      isError: error,
+      hasMore: data?.length ? !!data?.[data?.length - 1].data?.link?.some((link) => link.relation === 'next') : false,
+      isValidating,
+      loadingNewData: isValidating,
+      setPage: setSize,
+      currentPage: size,
+      totalResults: data?.[0]?.data?.total ?? null,
+      mutate,
+    }),
+    [data, isValidating, error, setSize, size, formattedVitals, mutate],
+  );
+  return results;
 }
 
 export function savePatientVitals(
@@ -155,7 +185,7 @@ export function savePatientVitals(
   formUuid: string,
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalsAndBiometrics,
+  vitals: VitalsBiometricsFormData,
   encounterDatetime: Date,
   abortController: AbortController,
   location: string,
@@ -177,7 +207,7 @@ export function savePatientVitals(
   });
 }
 
-function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObject['concepts']): Array<ObsRecord> {
+function createObsObject(vitals: VitalsBiometricsFormData, concepts: ConfigObject['concepts']): Array<ObsRecord> {
   return Object.entries(vitals)
     .filter(([_, result]) => Boolean(result))
     .map(([name, result]) => {
@@ -191,7 +221,7 @@ function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObj
 export function editPatientVitals(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalsAndBiometrics,
+  vitals: VitalsBiometricsFormData,
   encounterDatetime: Date,
   abortController: AbortController,
   encounterUuid: string,

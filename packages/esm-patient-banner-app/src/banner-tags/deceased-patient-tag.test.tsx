@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { mockPatient } from '../../../../tools/test-helpers';
+import { mockDeceasedPatient } from '../__mocks__/mockDeceasedPatient';
 import DeceasedPatientBannerTag from './deceased-patient-tag.component';
-import { mockDeceasedPatient } from '../../../../__mocks__/mockDeceasedPatient';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 
 describe('DeceasedPatientTag', () => {
   it('does not render Deceased tag for patients who are still alive', () => {

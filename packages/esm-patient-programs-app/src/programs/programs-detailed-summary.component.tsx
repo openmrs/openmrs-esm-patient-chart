@@ -139,7 +139,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                     <TableHeader />
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody data-testid="program-table">
                   {rows.map((row, i) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
@@ -184,6 +184,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
       hasIconOnly
       tooltipPosition="left"
       size={isTablet ? 'lg' : 'sm'}
+      data-testid="edit-program-button"
     />
   );
 }
