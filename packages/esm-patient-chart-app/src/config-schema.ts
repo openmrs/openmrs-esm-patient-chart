@@ -103,6 +103,14 @@ export const esmPatientChartSchema = {
       _description: 'The organization name displayed when image is absent',
     },
   },
+  hideFieldsByConceptUuid: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.ConceptUuid,
+    },
+    _description: 'An array of concept UUIDs that will be hidden in the observations output when viewing an encounter',
+    _default: [],
+  },
 };
 
 export interface ChartConfig {
