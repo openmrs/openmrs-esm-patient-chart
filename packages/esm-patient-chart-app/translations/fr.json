@@ -130,6 +130,7 @@
   "Test Results dashboard": "Tableau de bord des résultats des tests",
   "tests": "Tests",
   "time": "Heure",
+  "timeFormat ": "Time Format",
   "type": "Type",
   "unknown": "Inconnu",
   "updateError": "Error updating upcoming appointment",
