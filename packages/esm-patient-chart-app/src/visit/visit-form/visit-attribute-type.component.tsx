@@ -17,15 +17,15 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
 import dayjs from 'dayjs';
+import { useFormContext } from 'react-hook-form';
+import { VisitFormData } from './visit-form.component';
 
 interface VisitAttributes {
   [uuid: string]: string;
 }
 
 interface VisitAttributeTypeFieldsProps {
-  setVisitAttributes: React.Dispatch<React.SetStateAction<VisitAttributes>>;
   isMissingRequiredAttributes: boolean;
-  visitAttributes: VisitAttributes;
   setErrorFetchingResources: React.Dispatch<
     React.SetStateAction<{
       blockSavingForm: boolean;
@@ -34,21 +34,20 @@ interface VisitAttributeTypeFieldsProps {
 }
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
-  setVisitAttributes,
   isMissingRequiredAttributes,
-  visitAttributes,
   setErrorFetchingResources,
 }) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
+  const { getValues, setValue } = useFormContext<VisitFormData>();
+  const visitAttributes = getValues('visitAttributes');
 
   const setAttributeValue = useCallback(
     (uuid: string, value: string) => {
-      setVisitAttributes((prevState) => ({
-        ...prevState,
+      setValue('visitAttributes', {
         [uuid]: value,
-      }));
+      });
     },
-    [setVisitAttributes],
+    [setValue],
   );
 
   if (visitAttributeTypes?.length) {
