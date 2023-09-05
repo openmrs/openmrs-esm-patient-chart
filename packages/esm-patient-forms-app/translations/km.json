@@ -4,7 +4,6 @@
   "clinicalForm": "ទម្រង់គ្លីនិក",
   "completed": "Completed",
   "editForm": "Edit form",
-  "emptyStateText": "There are no {{displayText}} to display for this patient",
   "form": "ទម្រង់",
   "formName": "ឈ្មោះទម្រង់ (A-Z)",
   "forms": "ទម្រង់ទាំងអស់",
@@ -26,7 +25,6 @@
   "offlinePatientsTableSearchPlaceholder": "ស្វែងរកបញ្ជីនេះ។",
   "offlineToggle": "បិទបើកក្រៅបណ្តាញ",
   "recommended": "Recommended",
-  "record": "Record",
   "searchForAForm": "Search for a form",
   "searchThisList": "Search this list",
   "seeAll": "មើលឃើញទាំងអស់"

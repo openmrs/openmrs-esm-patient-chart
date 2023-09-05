@@ -4,7 +4,6 @@
   "clinicalForm": "טופס קליני",
   "completed": "הושלם",
   "editForm": "Edit form",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "form": "טופס",
   "formName": "שם הטופס (א-ת)",
   "forms": "טפסים",
@@ -26,7 +25,6 @@
   "offlinePatientsTableSearchPlaceholder": "חפש ברשימה זו",
   "offlineToggle": "מצב לא מקוון",
   "recommended": "מומלץ",
-  "record": "רשומה",
   "searchForAForm": "Search for a form",
   "searchThisList": "חפש ברשימה זו",
   "seeAll": "הצג הכל"

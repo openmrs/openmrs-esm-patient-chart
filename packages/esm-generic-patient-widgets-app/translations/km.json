@@ -1,7 +1,5 @@
 {
   "chartView": "មើលគំនូសតាង",
   "displaying": "ការបង្ហាញ",
-  "emptyStateText": "There are no {{displayText}} to display for this patient",
-  "record": "Record",
   "tableView": "មើលតារាង"
 }
