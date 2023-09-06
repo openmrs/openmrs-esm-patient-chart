@@ -6,14 +6,10 @@ import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import { useTranslation } from 'react-i18next';
 import { useLocations } from '../hooks/useLocations';
 import isEmpty from 'lodash/isEmpty';
+import { useFormContext, Controller } from 'react-hook-form';
+import { VisitFormData } from './visit-form.component';
 
-interface LocationSelectorProps {
-  selectedLocation: string;
-  setSelectedLocation: (x: string) => void;
-}
-
-const LocationSelector: React.FC<LocationSelectorProps> = ({ selectedLocation, setSelectedLocation }) => {
-  const isTablet = useLayoutType();
+const LocationSelector = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
@@ -28,6 +24,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ selectedLocation, s
       ? [selectedSessionLocation]
       : [];
 
+  const { control } = useFormContext<VisitFormData>();
+
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
   };
@@ -36,16 +34,23 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ selectedLocation, s
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
       <div className={`${styles.selectContainer} ${styles.sectionField}`}>
-        <ComboBox
-          titleText={t('selectLocation', 'Select a location')}
-          aria-label={t('selectLocation', 'Select a location')}
-          id="location"
-          invalidText="Required"
-          items={locationsToShow}
-          selectedItem={locationsToShow?.find((location) => location?.uuid === selectedLocation)}
-          onChange={({ selectedItem }) => setSelectedLocation(selectedItem?.uuid)}
-          itemToString={(loc: Location) => loc?.display}
-          onInputChange={(loc) => handleSearch(loc)}
+        <Controller
+          name="visitLocation"
+          control={control}
+          render={({ field: { onBlur, onChange, value } }) => (
+            <ComboBox
+              titleText={t('selectLocation', 'Select a location')}
+              aria-label={t('selectLocation', 'Select a location')}
+              id="location"
+              invalidText="Required"
+              items={locationsToShow}
+              selectedItem={value}
+              onChange={({ selectedItem }) => onChange(selectedItem)}
+              onBlur={onBlur}
+              itemToString={(loc: Location) => loc?.display}
+              onInputChange={(loc) => handleSearch(loc)}
+            />
+          )}
         />
       </div>
     </section>
