@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { type OpenWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
 import { ArrowLeft, ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   const { patientUuid } = usePatient();
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { active, workspaces, workspaceWindowState, updateWorkspaceWindowState } = useWorkspaces();
+  const { active, workspaces, workspaceWindowState } = useWorkspaces();
   const hidden = workspaceWindowState === 'hidden';
   const maximized = workspaceWindowState === 'maximized';
 

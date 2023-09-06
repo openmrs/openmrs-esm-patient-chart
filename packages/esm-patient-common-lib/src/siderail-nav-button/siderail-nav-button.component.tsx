@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Tag } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
 import styles from './siderail-nav-button.scss';

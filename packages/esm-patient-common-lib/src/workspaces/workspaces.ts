@@ -254,6 +254,12 @@ export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
 }
 
+export function updateWorkspaceWindowState(value: WorkspaceWindowState) {
+  const store = getWorkspaceStore();
+  const state = store.getState();
+  store.setState({ ...state, workspaceWindowState: value });
+}
+
 /**
  * @internal
  * Just for testing.
