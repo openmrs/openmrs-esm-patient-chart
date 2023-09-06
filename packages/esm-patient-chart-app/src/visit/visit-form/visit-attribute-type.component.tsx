@@ -107,9 +107,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     if (errorFetchingVisitAttributeType) {
       return null;
     }
-    // if (!!errors.visitAttributes?.[uuid]) {
-    //   console.log({ labelText, invalid: !!errors.visitAttributes?.[uuid] });
-    // }
 
     switch (data?.datatypeClassname) {
       case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
@@ -129,7 +126,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           >
-            <SelectItem text={t('selectAnOption', 'Select an option')} value={null} />
+            <SelectItem text={t('selectAnOption', 'Select an option')} value={''} />
             {answers.map((ans, indx) => (
               <SelectItem key={indx} text={ans.display} value={ans.uuid} />
             ))}
