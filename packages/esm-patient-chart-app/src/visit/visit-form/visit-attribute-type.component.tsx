@@ -16,8 +16,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
-import dayjs from 'dayjs';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { VisitFormData } from './visit-form.component';
 
 interface VisitAttributes {
@@ -25,7 +24,6 @@ interface VisitAttributes {
 }
 
 interface VisitAttributeTypeFieldsProps {
-  isMissingRequiredAttributes: boolean;
   setErrorFetchingResources: React.Dispatch<
     React.SetStateAction<{
       blockSavingForm: boolean;
@@ -33,34 +31,25 @@ interface VisitAttributeTypeFieldsProps {
   >;
 }
 
-const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
-  isMissingRequiredAttributes,
-  setErrorFetchingResources,
-}) => {
+const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setErrorFetchingResources }) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
-  const { getValues, setValue } = useFormContext<VisitFormData>();
-  const visitAttributes = getValues('visitAttributes');
-
-  const setAttributeValue = useCallback(
-    (uuid: string, value: string) => {
-      setValue('visitAttributes', {
-        [uuid]: value,
-      });
-    },
-    [setValue],
-  );
+  const { control } = useFormContext();
 
   if (visitAttributeTypes?.length) {
     return (
       <>
         {visitAttributeTypes.map((attributeType, indx) => (
-          <AttributeTypeField
-            key={indx}
-            attributeType={attributeType}
-            setVisitAttribute={(val: string) => setAttributeValue(attributeType.uuid, val)}
-            isMissingRequiredAttributes={isMissingRequiredAttributes}
-            visitAttributes={visitAttributes}
-            setErrorFetchingResources={setErrorFetchingResources}
+          <Controller
+            name={`visitAttributes.${attributeType.uuid}`}
+            control={control}
+            render={({ field }) => (
+              <AttributeTypeField
+                key={indx}
+                attributeType={attributeType}
+                setErrorFetchingResources={setErrorFetchingResources}
+                fieldProps={field}
+              />
+            )}
           />
         ))}
       </>
@@ -71,13 +60,11 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
 };
 
 interface AttributeTypeFieldProps {
+  fieldProps: any;
   attributeType: {
     uuid: string;
     required: boolean;
   };
-  setVisitAttribute: (val: string) => void;
-  isMissingRequiredAttributes: boolean;
-  visitAttributes: VisitAttributes;
   setErrorFetchingResources: React.Dispatch<
     React.SetStateAction<{
       blockSavingForm: boolean;
@@ -87,10 +74,8 @@ interface AttributeTypeFieldProps {
 
 const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   attributeType,
-  setVisitAttribute,
-  isMissingRequiredAttributes,
-  visitAttributes,
   setErrorFetchingResources,
+  fieldProps,
 }) => {
   const { uuid, required } = attributeType;
   const { data, isLoading, error: errorFetchingVisitAttributeType } = useVisitAttributeType(uuid);
@@ -102,6 +87,10 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   const { t } = useTranslation();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
+  const {
+    formState: { errors },
+  } = useFormContext<VisitFormData>();
+
   useEffect(() => {
     if (errorFetchingVisitAttributeType || errorFetchingVisitAttributeAnswers) {
       setErrorFetchingResources((prev) => ({
@@ -110,7 +99,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     }
   }, [errorFetchingVisitAttributeAnswers, errorFetchingVisitAttributeType, required, setErrorFetchingResources]);
 
-  const field = useMemo(() => {
+  const fieldToRender = useMemo(() => {
     if (isLoading) {
       return <></>;
     }
@@ -118,6 +107,9 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     if (errorFetchingVisitAttributeType) {
       return null;
     }
+    // if (!!errors.visitAttributes?.[uuid]) {
+    //   console.log({ labelText, invalid: !!errors.visitAttributes?.[uuid] });
+    // }
 
     switch (data?.datatypeClassname) {
       case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
@@ -131,10 +123,10 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
 
         return (
           <Select
+            {...fieldProps}
             labelText={labelText}
-            onChange={(e) => setVisitAttribute(e.target.value)}
             required={required}
-            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           >
             <SelectItem text={t('selectAnOption', 'Select an option')} value={null} />
@@ -146,81 +138,73 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
       case 'org.openmrs.customdatatype.datatype.FloatDatatype':
         return (
           <NumberInput
+            {...fieldProps}
             label={labelText}
             required={required}
             hideSteppers
-            onChange={(e) => setVisitAttribute(e.target.value?.toString())}
-            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
         );
       case 'org.openmrs.customdatatype.datatype.FreeTextDatatype':
         return (
           <TextInput
+            {...fieldProps}
             labelText={labelText}
             required={required}
-            onChange={(e) => setVisitAttribute(e.target.value)}
-            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
         );
       case 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype':
         return (
           <TextArea
+            {...fieldProps}
             labelText={labelText}
             required={required}
-            onChange={(e) => setVisitAttribute(e.target.value)}
-            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
         );
       case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
         return (
           <Checkbox
+            {...fieldProps}
             labelText={labelText}
             required={required}
-            onChange={(e, { checked }) => setVisitAttribute(checked.toString())}
-            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
         );
       case 'org.openmrs.customdatatype.datatype.DateDatatype':
         return (
-          <DatePicker
-            dateFormat="d/m/Y"
-            datePickerType="single"
-            onChange={([date]) => setVisitAttribute(dayjs(date).format('YYYY-MM-DD'))}
-            required={required}
-          >
+          <DatePicker {...fieldProps} dateFormat="d/m/Y" datePickerType="single" required={required}>
             <DatePickerInput
               id="date-picker-default-id"
               placeholder="dd/mm/yyyy"
               labelText={labelText}
               type="text"
-              invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+              invalid={!!errors.visitAttributes?.[uuid]}
               invalidText={t('fieldRequired', 'This field is required')}
             />
           </DatePicker>
         );
       default:
-        return (
-          <TextInput labelText={labelText} required={required} onChange={(e) => setVisitAttribute(e.target.value)} />
-        );
+        return <TextInput {...fieldProps} labelText={labelText} required={required} />;
     }
   }, [
+    uuid,
+    required,
     answers,
     data,
     isLoading,
     isLoadingAnswers,
-    isMissingRequiredAttributes,
     labelText,
-    required,
-    setVisitAttribute,
     t,
-    uuid,
-    visitAttributes,
     errorFetchingVisitAttributeType,
     errorFetchingVisitAttributeAnswers,
+    fieldProps,
+    errors.visitAttributes,
   ]);
 
   if (isLoading) {
@@ -235,6 +219,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     return null;
   }
 
-  return <div className={styles.visitAttributeField}>{field}</div>;
+  return <div className={styles.visitAttributeField}>{fieldToRender}</div>;
 };
 export default VisitAttributeTypeFields;
