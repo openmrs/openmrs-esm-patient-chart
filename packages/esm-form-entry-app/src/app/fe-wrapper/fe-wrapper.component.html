@@ -1,12 +1,12 @@
 <div *ngIf="loadingError" class="form-container">
   <div class="cds--tile error-tile">
-    <h4 class="heading">There was an error with this form</h4>
+    <h4 class="heading">{{'errorWithForm' | translate}}</h4>
     <p class="helperText">
-      Try opening another form
+      {{'tryOpeningAnotherForm' | translate}}
     </p>
     <p class="separator">or</p>
     <button class="cds--btn cds--btn--sm cds--btn--ghost" (click)="closeForm()">
-      Close this panel
+      {{'closeThisPanel' | translate}}
     </button>
   </div>
 </div>
@@ -15,19 +15,19 @@
     <div *ngIf="formState === 'ready' || formState === 'readyWithValidationErrors' || formState === 'submitting' || formState === 'submissionError'" class="form-container">
       <div>
         <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
-          <ofe-form-renderer [labelMap]="labelMap" [node]="form.rootNode"></ofe-form-renderer>
+          <ofe-form-renderer [labelMap]="labelMap" [node]="form.rootNode"></ofe-form-renderer>          
         </form>
       </div>
       <div *ngIf="showDiscardSubmitButtons" class="cds-btn--set button-set">
-        <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">Discard</button>
+        <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">{{ 'discardButton' | translate}}</button>
         <button [disabled]="formState === 'submitting'" class="cds--btn cds--btn--primary" (click)="onSubmit()" type="submit">
-          <span *ngIf="formState !== 'submitting'">Save and close</span>
-          <loader *ngIf="formState === 'submitting'" loadingMessage="Submitting"></loader>
+          <span *ngIf="formState !== 'submitting'">{{'saveAndCloseButton' | translate}}</span>
+          <loader *ngIf="formState === 'submitting'" loadingMessage={{submitting | translate}}></loader>
         </button>
     </div>
   </div>
 </div>
 
 <div *ngIf="formState === 'loading'" class="loader-container">
-  <loader class="loader" loadingMessage="Loading..."></loader>
+  <loader class="loader" loadingMessage={{loading | translate=""></loader>
 </div>
