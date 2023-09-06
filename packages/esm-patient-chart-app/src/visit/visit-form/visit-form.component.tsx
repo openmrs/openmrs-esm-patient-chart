@@ -55,18 +55,40 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-const visitFormSchema = z.object({
-  visitDate: z.date(),
-  visitTime: z.string(),
-  timeFormat: z.enum(['PM', 'AM']),
-  programType: z.string().optional(),
-  visitType: z.string().refine((value) => value != '', 'Visit type is required'),
-  visitLocation: z.object({
-    display: z.string(),
-    uuid: z.string(),
-  }),
-  visitAttributes: z.record(z.string()).optional(),
-});
+const visitAttributeTypeSchema = z.record(z.object({ required: z.boolean() }));
+
+const visitFormSchema = z
+  .object({
+    visitDate: z.date(),
+    visitTime: z.string(),
+    timeFormat: z.enum(['PM', 'AM']),
+    programType: z.string().optional(),
+    visitType: z.string().refine((value) => value != '', 'Visit type is required'),
+    visitLocation: z.object({
+      display: z.string(),
+      uuid: z.string(),
+    }),
+    visitAttributeTypes: visitAttributeTypeSchema,
+    visitAttributes: z.record(z.union([z.string().optional(), z.string()])),
+  })
+  .refine(
+    (fields) => {
+      const errors = new z.ZodError([]);
+      for (const key in fields.visitAttributeTypes) {
+        if (fields.visitAttributeTypes[key]?.required && !fields.visitAttributes[key]) {
+          errors.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'This field is required',
+            path: ['visitAttributes', key],
+          });
+          return false;
+        }
+      }
+
+      return true;
+    },
+    { message: 'This field is required', path: [] },
+  );
 
 export type VisitFormData = z.infer<typeof visitFormSchema>;
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
@@ -84,6 +106,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
+  const [attributeFieldError, setAttributeFieldError] = useState();
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
@@ -100,6 +123,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
       visitLocation: sessionLocation ? sessionLocation : {},
       visitAttributes: {},
+      // visitAttributeTypes: [],
     },
   });
 
@@ -107,6 +131,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
+      // eslint-disable-next-line no-console
+      console.log(data);
       const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
       if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
         setIsMissingRequiredAttributes(true);
@@ -242,15 +268,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
     [
       closeWorkspace,
-      config.visitAttributeTypes,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
-      visitQueueNumberAttributeUuid,
+      config.visitAttributeTypes,
       mutate,
       patientUuid,
-      upcomingAppointment,
       t,
-      setIsMissingRequiredAttributes,
+      upcomingAppointment,
+      visitQueueNumberAttributeUuid,
     ],
   );
 
@@ -267,9 +292,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     }
   }, [errorFetchingLocations]);
 
+  const onError = (error) => console.error(error);
+
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit, onError)}>
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -282,7 +309,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <div>
           {isTablet && (
             <Row className={styles.headerGridRow}>
-              <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={visitHeaderSlotState} />
+              <ExtensionSlot
+                name="visit-form-header-slot"
+                className={styles.dataGridRow}
+                state={visitHeaderSlotState}
+              />
             </Row>
           )}
           <Stack gap={1} className={styles.container}>
