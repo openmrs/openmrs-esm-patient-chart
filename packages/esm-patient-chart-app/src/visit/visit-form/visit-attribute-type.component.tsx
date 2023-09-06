@@ -122,7 +122,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <Select
             {...fieldProps}
             labelText={labelText}
-            required={required}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           >
@@ -137,7 +136,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <NumberInput
             {...fieldProps}
             label={labelText}
-            required={required}
             hideSteppers
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
@@ -148,7 +146,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <TextInput
             {...fieldProps}
             labelText={labelText}
-            required={required}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
@@ -158,7 +155,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <TextArea
             {...fieldProps}
             labelText={labelText}
-            required={required}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
@@ -168,14 +164,13 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <Checkbox
             {...fieldProps}
             labelText={labelText}
-            required={required}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           />
         );
       case 'org.openmrs.customdatatype.datatype.DateDatatype':
         return (
-          <DatePicker {...fieldProps} dateFormat="d/m/Y" datePickerType="single" required={required}>
+          <DatePicker {...fieldProps} dateFormat="d/m/Y" datePickerType="single">
             <DatePickerInput
               id="date-picker-default-id"
               placeholder="dd/mm/yyyy"
@@ -187,11 +182,17 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           </DatePicker>
         );
       default:
-        return <TextInput {...fieldProps} labelText={labelText} required={required} />;
+        return (
+          <TextInput
+            {...fieldProps}
+            labelText={labelText}
+            invalid={!!errors.visitAttributes?.[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
+          />
+        );
     }
   }, [
     uuid,
-    required,
     answers,
     data,
     isLoading,

@@ -145,7 +145,6 @@ describe('VitalsBiometricsForm: ', () => {
     expect(muac).toHaveValue(23);
 
     await waitFor(() => user.click(saveButton));
-
   });
 
   it('renders an error notification if there was a problem saving vital biometrics', async () => {
