@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
 import { Controller, ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { VisitFormData } from './visit-form.component';
+import dayjs from 'dayjs';
 
 interface VisitAttributes {
   [uuid: string]: string;
@@ -100,6 +101,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   }, [errorFetchingVisitAttributeAnswers, errorFetchingVisitAttributeType, required, setErrorFetchingResources]);
 
   const fieldToRender = useMemo(() => {
+    const { onChange } = fieldProps;
     if (isLoading) {
       return <></>;
     }
@@ -170,7 +172,12 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         );
       case 'org.openmrs.customdatatype.datatype.DateDatatype':
         return (
-          <DatePicker {...fieldProps} dateFormat="d/m/Y" datePickerType="single">
+          <DatePicker
+            {...fieldProps}
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            onChange={([date]) => onChange(dayjs(date).format('YYYY-MM-DD'))}
+          >
             <DatePickerInput
               id="date-picker-default-id"
               placeholder="dd/mm/yyyy"
