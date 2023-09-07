@@ -148,9 +148,7 @@ const VisitHeader: React.FC = () => {
   const hasActiveVisit = !isLoading && !visitNotLoaded;
 
   const onClosePatientChart = useCallback(() => {
-    const originPage = localStorage.getItem('fromPage');
-    localStorage.removeItem('fromPage');
-    navigate({ to: `${window.spaBase}/${originPage || 'home'}` });
+    document.referrer === '' ? navigate({ to: `${window.spaBase}/home` }) : window.history.back();
   }, []);
 
   const openModal = useCallback((patientUuid) => {
