@@ -13,3 +13,17 @@ export interface DefaultWorkspaceProps {
   patientUuid: string;
   handlePostResponse?(): void;
 }
+
+export interface WorkspaceWindowSize {
+  size: WorkspaceWindowState;
+}
+
+export interface WorkspaceWindowSizeProviderProps {
+  children?: React.ReactNode;
+}
+
+export interface WorkspaceWindowSizeContext {
+  windowSize: WorkspaceWindowSize;
+  updateWindowSize?(value: WorkspaceWindowState): any;
+  active: boolean;
+}

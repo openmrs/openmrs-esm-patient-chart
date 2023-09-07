@@ -40,7 +40,6 @@
         },
         "type": "clinical-form",
         "canMaximize": true,
-        "canHide": true,
         "width": "wider"
       }
     }
