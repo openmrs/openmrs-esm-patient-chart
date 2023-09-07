@@ -16,6 +16,7 @@ services:
 
   backend:
     image: openmrs/openmrs-reference-application-3-backend:nightly-with-data
+    container_name: 'backend'
     depends_on:
       - db
 
