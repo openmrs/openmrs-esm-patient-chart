@@ -234,3 +234,9 @@
 .errorLabel {
   color: colors.$red-60;
 }
+
+.combobox {
+  :global(.cds--list-box--expanded .cds--list-box__menu) {
+    width: fit-content;
+  }
+}

@@ -731,7 +731,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
           onChange={({ selectedItem }) => onChange(selectedItem)}
           onBlur={onBlur}
           ref={ref}
-          className={fieldState?.error?.message && styles.fieldError}
+          className={`${fieldState?.error?.message && styles.fieldError} ${styles.combobox}`}
           {...restProps}
         />
       );
