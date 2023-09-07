@@ -21,6 +21,7 @@ const mockUseVisit = useVisit as jest.Mock;
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockExtensionRegistry = {};
 const mockShowModal = showModal as jest.Mock;
+const mockNavigateBack = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -51,6 +52,10 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 describe('Visit Header', () => {
+  beforeEach(() => {
+    window.history.back = mockNavigateBack;
+  });
+
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
@@ -100,6 +105,12 @@ describe('Visit Header', () => {
     // Should close the visit-header
     await user.click(closeButton);
     expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
+    expect(window.history.back).not.toHaveBeenCalled();
+
+    Object.defineProperty(document, 'referrer', { value: 'some-uuid', configurable: true });
+    await user.click(closeButton);
+    expect(window.history.back).toHaveBeenCalled();
+    expect(mockNavigateBack).toHaveBeenCalled();
   });
 
   test('should display a truncated name when the patient name is very long', async () => {
