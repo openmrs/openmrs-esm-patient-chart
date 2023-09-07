@@ -14,11 +14,6 @@ export const configSchema = {
       _default: 'Days',
     },
   },
-  careSettingUuid: {
-    _type: Type.UUID,
-    _description: 'Only orders corresponding to this care setting will be displayed.',
-    _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
-  },
   drugOrderTypeUUID: {
     _type: Type.UUID,
     _description: "UUID for the 'Drug' order type to fetch medications",
@@ -37,7 +32,6 @@ export interface ConfigObject {
     uuid: string;
     display: string;
   };
-  careSettingUuid: string;
   drugOrderTypeUUID: string;
   showPrintButton: boolean;
 }
