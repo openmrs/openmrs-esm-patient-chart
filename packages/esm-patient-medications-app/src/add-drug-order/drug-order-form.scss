@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
@@ -206,7 +207,7 @@
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: 100%;
+    height: calc(100vh - 10rem);
     background-color: #ededed;
   }
 
@@ -220,3 +221,16 @@
   }
 }
 
+.fieldError {
+  :global(.cds--number input[type=number]):focus {
+    outline: 2.5px solid colors.$red-60;
+  }
+
+  input:focus, textarea:focus {
+    outline: 2.5px solid colors.$red-60;
+  }
+}
+
+.errorLabel {
+  color: colors.$red-60;
+}

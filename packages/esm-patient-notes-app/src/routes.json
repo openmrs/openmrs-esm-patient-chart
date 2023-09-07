@@ -28,7 +28,7 @@
           "default": "Visit Note"
         },
         "type": "visit-note",
-        "variant": "siderail"
+        "canHide": true
       }
     }
   ]

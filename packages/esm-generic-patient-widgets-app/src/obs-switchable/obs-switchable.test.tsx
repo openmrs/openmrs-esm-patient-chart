@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockWeightAndViralLoadResult } from '../__mocks__/generic-widgets.mock';
 import { ConfigObject } from '../config-schema';
 import ObsSwitchable from './obs-switchable.component';
