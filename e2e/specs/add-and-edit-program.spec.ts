@@ -10,6 +10,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
+// TODO: https://issues.openmrs.org/browse/O3-2405
 test.fixme('Should add a program and edit program', async ({ page, api }) => {
   const programPage = new ProgramPage(page);
   const row = programPage.table().locator('tr');

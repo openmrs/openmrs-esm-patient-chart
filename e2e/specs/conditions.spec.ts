@@ -9,6 +9,7 @@ test.beforeEach(async ({ api }) => {
     patient = await generateRandomPatient(api);
 });
 
+// TODO: https://issues.openmrs.org/browse/O3-2405
 test.fixme('Should add, delete and edit a condition', async ({page, api}) => {
     const conditionsPage = new ConditionsPage(page);
     const row = conditionsPage.conditionsTable().locator('tr');
