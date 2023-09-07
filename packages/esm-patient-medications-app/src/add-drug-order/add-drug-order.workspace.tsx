@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import OrderBasketSearch from './drug-search/drug-search.component';
 import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
-import { showToast, usePatient, useSession } from '@openmrs/esm-framework';
-import { careSettingUuid, prepMedicationOrderPostData, usePatientOrders } from '../api/api';
+import { showToast, useConfig, usePatient, useSession } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
+import { prepMedicationOrderPostData, usePatientOrders } from '../api/api';
 import { useTranslation } from 'react-i18next';
 import { DrugOrderBasketItem } from '../types';
 
@@ -19,6 +20,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const patient = usePatient();
   const activeOrders = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  const config = useConfig<ConfigObject>();
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
@@ -52,7 +54,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
 
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
-      finalizedOrder.careSetting = careSettingUuid;
+      finalizedOrder.careSetting = config.careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -61,7 +63,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, config.careSettingUuid, session.currentProvider.uuid],
   );
 
   if (!currentOrder) {
