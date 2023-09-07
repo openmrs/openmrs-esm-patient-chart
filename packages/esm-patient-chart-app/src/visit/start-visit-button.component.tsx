@@ -2,15 +2,10 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig } from '@openmrs/esm-framework';
-
-interface StartVisitButtonProps {
-  patientUuid: string;
-}
+import { navigate } from '@openmrs/esm-framework';
 
 const StartVisitButton = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { startVisitLabel } = useConfig();
 
   const handleStartVisit = useCallback(() => {
     launchPatientChartWithWorkspaceOpen({
@@ -24,7 +19,7 @@ const StartVisitButton = ({ patientUuid }) => {
 
   return (
     <Button kind="primary" onClick={handleStartVisit}>
-      {!startVisitLabel ? <>{t('startVisit', 'Start visit')}</> : startVisitLabel}
+      {t('startVisit', 'Start visit')}
     </Button>
   );
 };
