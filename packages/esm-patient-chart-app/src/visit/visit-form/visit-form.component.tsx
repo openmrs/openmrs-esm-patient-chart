@@ -482,10 +482,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             <section>
               <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
               <div className={styles.sectionField}>
-                <VisitAttributeTypeFields
-                  // isMissingRequiredAttributes={isMissingRequiredAttributes}
-                  setErrorFetchingResources={setErrorFetchingResources}
-                />
+                <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
               </div>
             </section>
 
