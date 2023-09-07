@@ -148,6 +148,7 @@
   "visitSummaries": "Résumés de la visite",
   "visitType": "Type de visite",
   "visitType_title": "Visit Type",
+  "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Tableau de bord Vitals et biométrie",
   "workspaceModalText": "Le lancement d'un nouveau formulaire dans l'espace de travail pourrait vous faire perdre du travail non sauvegardé sur le formulaire {FormName}.",
   "yes": "Oui"
