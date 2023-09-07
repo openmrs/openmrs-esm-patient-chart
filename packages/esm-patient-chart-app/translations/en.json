@@ -130,6 +130,7 @@
   "Test Results dashboard": "Test Results dashboard",
   "tests": "Tests",
   "time": "Time",
+  "timeFormat ": "Time Format",
   "type": "Type",
   "unknown": "Unknown",
   "updateError": "Error updating upcoming appointment",
@@ -147,6 +148,7 @@
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
   "visitType_title": "Visit Type",
+  "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
   "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
   "yes": "Yes"
