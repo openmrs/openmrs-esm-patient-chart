@@ -130,6 +130,7 @@
   "Test Results dashboard": "ផ្ទាំងគ្រប់គ្រងលទ្ធផលតេស្ត",
   "tests": "ការធ្វើតេស្ត",
   "time": "ពេលវេលា",
+  "timeFormat ": "Time Format",
   "type": "ប្រភេទ",
   "unknown": "មិនដឹង",
   "updateError": "Error updating upcoming appointment",
