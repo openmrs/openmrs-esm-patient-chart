@@ -148,6 +148,7 @@
   "visitSummaries": "סיכומי ביקורים",
   "visitType": "סוג הביקור",
   "visitType_title": "Visit Type",
+  "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
   "workspaceModalText": "הפעלת טופס חדש בסביבת העבודה עשויה לגרום לאובדן עבודה שלא נשמרה בטופס {formName}.",
   "yes": "כן"

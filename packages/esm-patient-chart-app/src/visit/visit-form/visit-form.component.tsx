@@ -55,20 +55,21 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-const visitFormSchema = z.object({
-  visitDate: z.date(),
-  visitTime: z.string(),
-  timeFormat: z.enum(['PM', 'AM']),
-  programType: z.string().optional(),
-  visitType: z.string().refine((value) => value != '', 'Visit type is required'),
-  visitLocation: z.object({
-    display: z.string(),
-    uuid: z.string(),
-  }),
-  visitAttributes: z.record(z.string()).optional(),
-});
+export type VisitFormData = {
+  visitDate: Date;
+  visitTime: string;
+  timeFormat: 'PM' | 'AM';
+  programType: string;
+  visitType: string;
+  visitLocation: {
+    display: string;
+    uuid: string;
+  };
+  visitAttributes: {
+    [x: string]: string;
+  };
+};
 
-export type VisitFormData = z.infer<typeof visitFormSchema>;
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -83,13 +84,43 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const allVisitTypes = useVisitTypes();
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
-  const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
   const [upcomingAppointment, setUpcomingAppointment] = useState(null);
   const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
+
+  const visitFormSchema = useMemo(() => {
+    const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
+      (acc, { uuid, required }) => ({
+        ...acc,
+        [uuid]: required
+          ? z
+              .string({
+                required_error: t('fieldRequired', 'This field is required'),
+              })
+              .refine((value) => !!value, t('fieldRequired', 'This field is required'))
+          : z.string().optional(),
+      }),
+      {},
+    );
+
+    return z.object({
+      visitDate: z.date(),
+      visitTime: z.string(),
+      timeFormat: z.enum(['PM', 'AM']),
+      programType: z.string().optional(),
+      visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
+      visitLocation: z.object({
+        display: z.string(),
+        uuid: z.string(),
+      }),
+      visitAttributes: z.object(visitAttributes),
+    });
+  }, [t, config]);
+
+  type VisitFormData = z.infer<typeof visitFormSchema>;
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -103,15 +134,16 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
   });
 
-  const { handleSubmit, control, getValues, formState } = methods;
+  const {
+    handleSubmit,
+    control,
+    getValues,
+    formState: { errors },
+  } = methods;
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
       const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
-      if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
-        setIsMissingRequiredAttributes(true);
-        return;
-      }
 
       setIsSubmitting(true);
 
@@ -130,7 +162,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           .filter(([key, value]) => !!value)
           .map(([key, value]) => ({
             attributeType: key,
-            value,
+            value: value as string,
           })),
       };
 
@@ -242,7 +274,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
     [
       closeWorkspace,
-      config.visitAttributeTypes,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
@@ -250,7 +281,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       patientUuid,
       upcomingAppointment,
       t,
-      setIsMissingRequiredAttributes,
     ],
   );
 
@@ -432,7 +462,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               </div>
             </section>
 
-            {formState.errors?.visitType && (
+            {errors?.visitType && (
               <section>
                 <div className={styles.sectionTitle}></div>
                 <div className={styles.sectionField}>
@@ -452,10 +482,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             <section>
               <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
               <div className={styles.sectionField}>
-                <VisitAttributeTypeFields
-                  isMissingRequiredAttributes={isMissingRequiredAttributes}
-                  setErrorFetchingResources={setErrorFetchingResources}
-                />
+                <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
               </div>
             </section>
 
