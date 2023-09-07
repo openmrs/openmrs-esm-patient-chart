@@ -92,21 +92,26 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
   const visitFormSchema = useMemo(() => {
-    const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce((acc, { uuid, required }) => {
-      return {
+    const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
+      (acc, { uuid, required }) => ({
         ...acc,
         [uuid]: required
-          ? z.string().refine((value) => !!value, t('fieldRequired', 'This field is required'))
+          ? z
+              .string({
+                required_error: t('fieldRequired', 'This field is required'),
+              })
+              .refine((value) => !!value, t('fieldRequired', 'This field is required'))
           : z.string().optional(),
-      };
-    }, {});
+      }),
+      {},
+    );
 
     return z.object({
       visitDate: z.date(),
       visitTime: z.string(),
       timeFormat: z.enum(['PM', 'AM']),
       programType: z.string().optional(),
-      visitType: z.string().refine((value) => !!value, 'Visit type is required'),
+      visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
       visitLocation: z.object({
         display: z.string(),
         uuid: z.string(),

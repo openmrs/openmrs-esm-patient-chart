@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { VisitFormData } from './visit-form.component';
 
 interface VisitAttributes {
@@ -33,7 +33,7 @@ interface VisitAttributeTypeFieldsProps {
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setErrorFetchingResources }) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
-  const { control } = useFormContext();
+  const { control } = useFormContext<VisitFormData>();
 
   if (visitAttributeTypes?.length) {
     return (
@@ -60,7 +60,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ set
 };
 
 interface AttributeTypeFieldProps {
-  fieldProps: any;
+  fieldProps: ControllerRenderProps<VisitFormData, `visitAttributes.${string}`>;
   attributeType: {
     uuid: string;
     required: boolean;
@@ -123,7 +123,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           >
             <SelectItem text={t('selectAnOption', 'Select an option')} value={''} />
             {answers.map((ans, indx) => (
@@ -138,7 +138,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             label={labelText}
             hideSteppers
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           />
         );
       case 'org.openmrs.customdatatype.datatype.FreeTextDatatype':
@@ -147,7 +147,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           />
         );
       case 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype':
@@ -156,7 +156,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           />
         );
       case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
@@ -165,7 +165,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           />
         );
       case 'org.openmrs.customdatatype.datatype.DateDatatype':
@@ -177,7 +177,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
               labelText={labelText}
               type="text"
               invalid={!!errors.visitAttributes?.[uuid]}
-              invalidText={t('fieldRequired', 'This field is required')}
+              invalidText={errors.visitAttributes?.[uuid]?.message}
             />
           </DatePicker>
         );
@@ -187,7 +187,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
-            invalidText={t('fieldRequired', 'This field is required')}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
           />
         );
     }
