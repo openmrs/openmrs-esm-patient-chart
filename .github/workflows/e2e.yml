@@ -54,18 +54,17 @@ jobs:
         if: "!cancelled()"
         run: docker stop $(docker ps -a -q)
 
-      - name: Capture Backend Logs
+      - name: Capture Server Logs
         if: "!cancelled()"
-        run: |
-          docker-compose logs backend > backend-logs.txt
+        run: docker-compose logs > backend-logs.txt
         working-directory: e2e/support/github/
 
       - name: Upload Logs as Artifact
         uses: actions/upload-artifact@v2
         if: "!cancelled()"
         with:
-          name: backend-logs
-          path: e2e/support/github/backend-logs.txt
+          name: server-logs
+          path: e2e/support/github/server-logs.txt
 
       - name: Upload report
         uses: actions/upload-artifact@v3
