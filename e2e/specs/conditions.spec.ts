@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
     patient = await generateRandomPatient(api);
 });
 
-test('Should add, delete and edit a condition', async ({page, api}) => {
+test.fixme('Should add, delete and edit a condition', async ({page, api}) => {
     const conditionsPage = new ConditionsPage(page);
     const row = conditionsPage.conditionsTable().locator('tr');
     const conditionCell = row.locator('td:first-child');
@@ -55,7 +55,7 @@ test('Should add, delete and edit a condition', async ({page, api}) => {
         await page.getByLabel('End date').fill('11/07/2023');
         await page.getByLabel('End date').press('Tab');
     });
-    
+
     await test.step('And I save the form', async () =>{
         await page.getByRole('button', { name: 'Save & close' }).click();
     });

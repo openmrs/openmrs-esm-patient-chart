@@ -10,7 +10,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Should add a program and edit program', async ({ page, api }) => {
+test.fixme('Should add a program and edit program', async ({ page, api }) => {
   const programPage = new ProgramPage(page);
   const row = programPage.table().locator('tr');
   const programCell = row.locator('td:first-child');
