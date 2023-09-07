@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfig, usePatient, useVisit } from '@openmrs/esm-framework';
+import { usePatient, useVisit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface StartVisitOverflowMenuItemProps {
@@ -12,7 +12,6 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   const { currentVisit } = useVisit(patientUuid);
   const { patient } = usePatient(patientUuid);
   const handleClick = useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
-  const { startVisitLabel } = useConfig();
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
@@ -29,9 +28,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
             maxWidth: '100vw',
           }}
         >
-          <span className="cds--overflow-menu-options__option-content">
-            {!startVisitLabel ? <>{t('startVisit', 'Start visit')}</> : startVisitLabel}
-          </span>
+          <span className="cds--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
         </button>
       </li>
     )
