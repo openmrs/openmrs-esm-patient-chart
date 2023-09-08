@@ -150,6 +150,7 @@
 .gridRow {
   padding: 0px;
   margin-left: calc(spacing.$spacing-03 * -1);
+  align-items: baseline;
 
   :global(.cds--number) {
     display: inline-block;
@@ -235,8 +236,3 @@
   color: colors.$red-60;
 }
 
-.combobox {
-  :global(.cds--list-box--expanded .cds--list-box__menu) {
-    width: fit-content;
-  }
-}
