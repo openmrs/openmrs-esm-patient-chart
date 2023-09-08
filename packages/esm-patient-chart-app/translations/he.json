@@ -133,6 +133,7 @@
   "Test Results dashboard": "Test Results dashboard",
   "tests": "בדיקות",
   "time": "זמן",
+  "timeFormat ": "Time Format",
   "type": "סוג",
   "unknown": "לא ידוע",
   "updateError": "Error updating upcoming appointment",
@@ -150,6 +151,7 @@
   "visitSummaries": "סיכומי ביקורים",
   "visitType": "סוג הביקור",
   "visitType_title": "Visit Type",
+  "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
   "workspaceModalText": "הפעלת טופס חדש בסביבת העבודה עשויה לגרום לאובדן עבודה שלא נשמרה בטופס {formName}.",
   "yes": "כן"
