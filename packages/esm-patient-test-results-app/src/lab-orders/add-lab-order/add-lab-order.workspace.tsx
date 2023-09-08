@@ -3,15 +3,14 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, TextInput, InlineNotification } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import { age, formatDate, parseDate, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import {
   DefaultWorkspaceProps,
   launchPatientWorkspace,
   OrderBasketItem,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { ConfigObject } from '../../config-schema';
-import { LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import { LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
 import styles from './add-lab-order.scss';
 import { TestType, useTestTypes } from './useTestTypes';
 
@@ -40,7 +39,6 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   const session = useSession();
   const { patient, isLoading: isLoadingPatient } = usePatient();
   const { orders, setOrders } = useOrderBasket('labs', prepLabOrderPostData);
-  const config = useConfig<ConfigObject>();
   const [inProgressLabOrder, setInProgressLabOrder] = useState((initialOrder ?? emptyLabOrder) as LabOrderBasketItem);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const isTablet = useLayoutType() === 'tablet';
@@ -55,7 +53,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   const handleFormSubmission = useCallback(
     (e: Event) => {
       e.preventDefault();
-      inProgressLabOrder.careSetting = config.orders.careSettingUuid;
+      inProgressLabOrder.careSetting = careSettingUuid;
       inProgressLabOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, inProgressLabOrder));
@@ -65,14 +63,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [
-      orders,
-      setOrders,
-      closeWorkspace,
-      config.orders.careSettingUuid,
-      session.currentProvider.uuid,
-      inProgressLabOrder,
-    ],
+    [orders, setOrders, closeWorkspace, session.currentProvider.uuid, inProgressLabOrder],
   );
 
   return (

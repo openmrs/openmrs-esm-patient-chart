@@ -3,6 +3,8 @@
 @use '@carbon/styles/scss/type';
 
 td {
+  white-space: nowrap;
+
   &.criticallyLow, &.criticallyHigh, &.low, &.high {
     td:nth-child(2) {
       @include type.type-style("heading-compact-01");
@@ -23,7 +25,7 @@ td {
       content: " ↓↓";
     }
   }
-  
+
   &.criticallyHigh {
     td:nth-child(2)::after {
       content: " ↑↑";

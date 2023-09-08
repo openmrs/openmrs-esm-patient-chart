@@ -1,6 +1,6 @@
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { OpenMRSResource } from '../../types';
+import type { OpenMRSResource } from '../../types';
 
 interface ConceptFetchResponse {
   results: Array<{
@@ -8,11 +8,11 @@ interface ConceptFetchResponse {
   }>;
 }
 
-export interface Allergens {
-  allergicReactions: Array<Record<string, string>>;
-  drugAllergens: Array<Record<string, string>>;
-  environmentalAllergens: Array<Record<string, string>>;
-  foodAllergens: Array<Record<string, string>>;
+export interface AllergensAndAllergicReactions {
+  allergicReactions: Array<{ uuid: string; display: string }>;
+  drugAllergens: Array<{ uuid: string; display: string }>;
+  environmentalAllergens: Array<{ uuid: string; display: string }>;
+  foodAllergens: Array<{ uuid: string; display: string }>;
 }
 
 export interface NewAllergy {
@@ -66,14 +66,16 @@ export function useAllergensAndAllergicReactions() {
   const foodAllergens = extractData(foodAllergenData);
   const allergicReactions = extractData(allergicReactionsData);
 
+  const allergensAndAllergicReactions: AllergensAndAllergicReactions = {
+    allergicReactions,
+    drugAllergens,
+    environmentalAllergens,
+    foodAllergens,
+  };
+
   return {
     isLoading: !drugAllergenData || !environmentalAllergenData || !foodAllergenData || !allergicReactionsData,
-    allergensAndAllergicReactions: {
-      drugAllergens,
-      foodAllergens,
-      environmentalAllergens,
-      allergicReactions,
-    },
+    allergensAndAllergicReactions: allergensAndAllergicReactions,
   };
 }
 

@@ -5,6 +5,8 @@ import { useCallback, useMemo } from 'react';
 import { OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderBasketItem } from '../types';
 
+export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
+
 /**
  * SWR-based data fetcher for patient orders.
  *
@@ -12,7 +14,7 @@ import { DrugOrderBasketItem } from '../types';
  * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
-  const { careSettingUuid, drugOrderTypeUUID } = useConfig() as ConfigObject;
+  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
