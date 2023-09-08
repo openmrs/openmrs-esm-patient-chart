@@ -12,13 +12,16 @@ import {
   RadioButtonGroup,
   Row,
   Tab,
-  Tabs,
   TabList,
   TabPanel,
   TabPanels,
+  Tabs,
   TextArea,
   TextInput,
 } from '@carbon/react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, Controller, Control, UseFormSetValue } from 'react-hook-form';
 import {
   ExtensionSlot,
   FetchResponse,
@@ -28,13 +31,29 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { saveAllergy, NewAllergy, useAllergensAndAllergicReactions } from './allergy-form.resource';
-import styles from './allergy-form.scss';
+import {
+  type AllergensAndAllergicReactions,
+  NewAllergy,
+  saveAllergy,
+  useAllergensAndAllergicReactions,
+} from './allergy-form.resource';
 import { useAllergies } from '../allergy-intolerance.resource';
+import styles from './allergy-form.scss';
 
 type AllergenType = 'FOOD' | 'DRUG' | 'ENVIRONMENT';
 
-function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: DefaultWorkspaceProps) {
+const allergyFormSchema = z.object({
+  selectedAllergen: z.string(),
+  nonCodedAllergenType: z.string().optional(),
+  allergicReactions: z.array(z.string().optional()),
+  nonCodedAllergicReaction: z.string().optional(),
+  severityOfWorstReaction: z.string(),
+  comment: z.string().optional(),
+});
+
+type AllergyFormData = z.infer<typeof allergyFormSchema>;
+
+function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -46,32 +65,31 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
     [concepts],
   );
   const { allergensAndAllergicReactions, isLoading } = useAllergensAndAllergicReactions();
-  const [allergicReactions, setAllergicReactions] = useState<Array<string>>([]);
-  const [comment, setComment] = useState('');
   const [error, setError] = useState<Error | null>(null);
-  const [nonCodedAllergenType, setNonCodedAllergenType] = useState('');
-  const [nonCodedAllergicReaction, setNonCodedAllergicReaction] = useState('');
-  const [onsetDate, setOnsetDate] = useState<Date | null>(null);
-  const [selectedAllergen, setSelectedAllergen] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
   const [selectedAllergenType, setSelectedAllergenType] = useState<AllergenType>('DRUG');
-  const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
   const { mutate } = useAllergies(patientUuid);
 
+  const { control, handleSubmit, watch, getValues, setValue } = useForm<AllergyFormData>({
+    mode: 'all',
+    resolver: zodResolver(allergyFormSchema),
+    defaultValues: {
+      allergicReactions: [],
+    },
+  });
+
+  const allergicReactionsWatcher = watch('allergicReactions');
+  const selectedAllergen = watch('selectedAllergen');
+  const allergicReactions = watch('allergicReactions');
+  const severityOfWorstReaction = watch('severityOfWorstReaction');
+  const nonCodedAllergenType = watch('nonCodedAllergenType');
+  const nonCodedAllergicReaction = watch('nonCodedAllergicReaction');
+
   useEffect(() => {
-    promptBeforeClosing(() => {
-      return Boolean(
-        nonCodedAllergenType || nonCodedAllergicReaction || onsetDate || selectedAllergen || severityOfWorstReaction,
-      );
-    });
-  }, [
-    promptBeforeClosing,
-    nonCodedAllergenType,
-    nonCodedAllergicReaction,
-    onsetDate,
-    selectedAllergen,
-    selectedAllergenType,
-    severityOfWorstReaction,
-  ]);
+    const reactionsValidation = allergicReactions?.some((item) => item !== '');
+    if (!!selectedAllergen && reactionsValidation && !!severityOfWorstReaction) setIsDisabled(false);
+    else setIsDisabled(true);
+  }, [allergicReactions, watch, selectedAllergen, severityOfWorstReaction, otherConceptUuid, nonCodedAllergenType]);
 
   const handleTabChange = (index: number) => {
     switch (index) {
@@ -87,15 +105,18 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
     }
   };
 
-  const handleAllergicReactionChange = useCallback((event, { checked, id }) => {
-    checked
-      ? setAllergicReactions((prevState) => [...prevState, id])
-      : setAllergicReactions((prevState) => prevState.filter((reaction) => reaction !== id));
-  }, []);
+  const onSubmit = useCallback(
+    (data: AllergyFormData) => {
+      const {
+        comment,
+        selectedAllergen,
+        nonCodedAllergenType,
+        nonCodedAllergicReaction,
+        allergicReactions,
+        severityOfWorstReaction,
+      } = data;
 
-  const handleSubmit = useCallback(
-    (event: React.SyntheticEvent) => {
-      event.preventDefault();
+      const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
 
       let payload: NewAllergy = {
         allergen:
@@ -117,7 +138,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
           uuid: severityOfWorstReaction,
         },
         comment,
-        reactions: allergicReactions?.map((reaction) => {
+        reactions: selectedAllergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
             : { reaction: { uuid: reaction } };
@@ -141,6 +162,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
             }
           },
           (err) => {
+            setError(err);
             showNotification({
               title: t('allergySaveError', 'Error saving allergy'),
               kind: 'error',
@@ -151,20 +173,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
         )
         .finally(() => abortController.abort());
     },
-    [
-      selectedAllergen,
-      otherConceptUuid,
-      selectedAllergenType,
-      nonCodedAllergenType,
-      severityOfWorstReaction,
-      comment,
-      allergicReactions,
-      patientUuid,
-      nonCodedAllergicReaction,
-      closeWorkspace,
-      t,
-      mutate,
-    ],
+    [selectedAllergenType, otherConceptUuid, patientUuid, closeWorkspace, t, mutate],
   );
 
   return (
@@ -209,23 +218,30 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                       return (
                         <TabPanel key={`allergen-tab-panel-${index}`}>
                           <div className={isTablet ? styles.wrapperContainer : undefined}>
-                            <RadioButtonGroup
-                              name={`allergen-type-${index + 1}`}
-                              key={allergenCategory}
-                              orientation="vertical"
-                              onChange={(event) => setSelectedAllergen(event.toString())}
-                              valueSelected={selectedAllergen}
-                            >
-                              {allergensAndAllergicReactions?.[allergenCategory]?.map((allergen, index) => (
-                                <RadioButton
-                                  key={`allergen-${index}`}
-                                  className={styles.radio}
-                                  id={allergen.display}
-                                  labelText={allergen.display}
-                                  value={allergen.uuid}
-                                />
-                              ))}
-                            </RadioButtonGroup>
+                            <Controller
+                              name="selectedAllergen"
+                              control={control}
+                              render={({ field: { onBlur, onChange, value } }) => (
+                                <RadioButtonGroup
+                                  name={`allergen-type-${index + 1}`}
+                                  key={allergenCategory}
+                                  orientation="vertical"
+                                  onChange={(event) => onChange(event.toString())}
+                                  valueSelected={value}
+                                  onBlur={onBlur}
+                                >
+                                  {allergensAndAllergicReactions?.[allergenCategory]?.map((allergen, index) => (
+                                    <RadioButton
+                                      key={`allergen-${index}`}
+                                      className={styles.radio}
+                                      id={allergen.display}
+                                      labelText={allergen.display}
+                                      value={allergen.uuid}
+                                    />
+                                  ))}
+                                </RadioButtonGroup>
+                              )}
+                            />
                           </div>
                         </TabPanel>
                       );
@@ -236,11 +252,21 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               {selectedAllergen === otherConceptUuid ? (
                 <div className={styles.input}>
                   <ResponsiveWrapper isTablet={isTablet}>
-                    <TextInput
-                      id="nonCodedAllergenType"
-                      labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
-                      onChange={(event) => setNonCodedAllergenType(event.target.value)}
-                      placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
+                    <Controller
+                      name="nonCodedAllergenType"
+                      control={control}
+                      rules={{ required: watch('selectedAllergen') === otherConceptUuid }}
+                      render={({ field: { onBlur, onChange, value, ref } }) => (
+                        <TextInput
+                          id="nonCodedAllergenType"
+                          labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
+                          value={value}
+                          ref={ref}
+                        />
+                      )}
                     />
                   </ResponsiveWrapper>
                 </div>
@@ -252,26 +278,31 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                 {isLoading ? (
                   <InlineLoading description={`${t('loading', 'Loading')} ...`} />
                 ) : (
-                  allergensAndAllergicReactions?.allergicReactions?.map((reaction, index) => (
-                    <Checkbox
-                      className={styles.checkbox}
-                      key={index}
-                      labelText={reaction.display}
-                      id={reaction.uuid}
-                      onChange={handleAllergicReactionChange}
-                      value={reaction.display}
-                    />
-                  ))
+                  <AllergicReactionsField
+                    allergensAndAllergicReactions={allergensAndAllergicReactions}
+                    methods={{ setValue, control }}
+                  />
                 )}
               </div>
-              {allergicReactions.includes(otherConceptUuid) ? (
+              {allergicReactionsWatcher?.includes(otherConceptUuid) ? (
                 <div className={styles.input}>
                   <ResponsiveWrapper isTablet={isTablet}>
-                    <TextInput
-                      id="nonCodedAllergicReaction"
-                      labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
-                      onChange={(event) => setNonCodedAllergicReaction(event.target.value)}
-                      placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
+                    <Controller
+                      name="nonCodedAllergicReaction"
+                      control={control}
+                      render={({ field: { onBlur, onChange, value } }) => (
+                        <TextInput
+                          id="nonCodedAllergicReaction"
+                          labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                          placeholder={t(
+                            'typeAllergicReactionName',
+                            'Please type in the name of the allergic reaction',
+                          )}
+                        />
+                      )}
                     />
                   </ResponsiveWrapper>
                 </div>
@@ -283,46 +314,60 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>{t('severityOfWorstReaction', 'Severity of worst reaction')}</h2>
               <div className={styles.wrapper}>
-                <RadioButtonGroup
-                  name="severity-of-worst-reaction"
-                  onChange={(event) => setSeverityOfWorstReaction(event.toString())}
-                  valueSelected={severityOfWorstReaction}
-                >
-                  {severityLevels.map((severity, index) => (
-                    <RadioButton
-                      id={severity.toLowerCase() + 'Severity'}
-                      key={`severity-${index}`}
-                      labelText={severity}
-                      value={(() => {
-                        switch (severity.toLowerCase()) {
-                          case 'mild':
-                            return mildReactionUuid;
-                          case 'moderate':
-                            return moderateReactionUuid;
-                          case 'severe':
-                            return severeReactionUuid;
-                          default:
-                            return '';
-                        }
-                      })()}
-                    />
-                  ))}
-                </RadioButtonGroup>
+                <Controller
+                  name="severityOfWorstReaction"
+                  control={control}
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <RadioButtonGroup
+                      name="severity-of-worst-reaction"
+                      onChange={(event) => onChange(event.toString())}
+                      valueSelected={value}
+                      onBlur={onBlur}
+                    >
+                      {severityLevels.map((severity, index) => (
+                        <RadioButton
+                          id={severity.toLowerCase() + 'Severity'}
+                          key={`severity-${index}`}
+                          labelText={severity}
+                          value={(() => {
+                            switch (severity.toLowerCase()) {
+                              case 'mild':
+                                return mildReactionUuid;
+                              case 'moderate':
+                                return moderateReactionUuid;
+                              case 'severe':
+                                return severeReactionUuid;
+                              default:
+                                return '';
+                            }
+                          })()}
+                        />
+                      ))}
+                    </RadioButtonGroup>
+                  )}
+                />
               </div>
             </section>
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
               <div className={styles.wrapper}>
                 <ResponsiveWrapper isTablet={isTablet}>
-                  <TextArea
-                    className={styles.textbox}
-                    cols={20}
-                    id="comments"
-                    invalidText={t('invalidComment', 'Invalid comment, try again')}
-                    labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
-                    onChange={(event) => setComment(event.target.value)}
-                    placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
-                    rows={4}
+                  <Controller
+                    name="comment"
+                    control={control}
+                    render={({ field: { onBlur, onChange, value } }) => (
+                      <TextArea
+                        cols={20}
+                        id="comments"
+                        invalidText={t('invalidComment', 'Invalid comment, try again')}
+                        labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
+                        onChange={onChange}
+                        placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
+                        onBlur={onBlur}
+                        value={value}
+                        rows={4}
+                      />
+                    )}
                   />
                 </ResponsiveWrapper>
               </div>
@@ -335,8 +380,12 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
           </Button>
           <Button
             className={styles.button}
-            disabled={!selectedAllergen || (selectedAllergen === otherConceptUuid && !nonCodedAllergenType)}
-            onClick={handleSubmit}
+            disabled={
+              isDisabled ||
+              (selectedAllergen === otherConceptUuid && !nonCodedAllergenType) ||
+              (allergicReactions?.includes(otherConceptUuid) && !nonCodedAllergicReaction)
+            }
+            onClick={handleSubmit(onSubmit)}
             kind="primary"
           >
             {t('saveAndClose', 'Save and close')}
@@ -349,6 +398,47 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
 
 function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
   return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
+
+function AllergicReactionsField({
+  allergensAndAllergicReactions,
+  methods: { control, setValue },
+}: {
+  allergensAndAllergicReactions: AllergensAndAllergicReactions;
+  methods: { control: Control<AllergyFormData>; setValue: UseFormSetValue<AllergyFormData> };
+}) {
+  const handleAllergicReactionChange = useCallback(
+    (onChange, checked, id, index) => {
+      onChange(id);
+      setValue(`allergicReactions.${index}`, checked ? id : '', {
+        shouldValidate: true,
+      });
+    },
+    [setValue],
+  );
+
+  const controlledFields = allergensAndAllergicReactions.allergicReactions.map((reaction, index) => (
+    <Controller
+      key={reaction.uuid}
+      name={`allergicReactions.${index}`}
+      control={control}
+      defaultValue=""
+      render={({ field: { onBlur, onChange, value } }) => (
+        <Checkbox
+          className={styles.checkbox}
+          labelText={reaction.display}
+          id={reaction.uuid}
+          onChange={(event, { checked, id }) => {
+            handleAllergicReactionChange(onChange, checked, id, index);
+          }}
+          checked={Boolean(value)}
+          onBlur={onBlur}
+        />
+      )}
+    />
+  ));
+
+  return <React.Fragment>{controlledFields}</React.Fragment>;
 }
 
 export default AllergyForm;
