@@ -24,7 +24,7 @@ import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useController, useForm } from 'react-hook-form';
-import { age, formatDate, isDesktop, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
 import {
@@ -342,7 +342,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           ) : (
             <>
               <Grid className={styles.gridRow}>
-                <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
+                <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     <div className={styles.numberInput}>
                       <ControlledFieldInput
@@ -359,7 +359,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                     </div>
                   </InputWrapper>
                 </Column>
-                <Column lg={8} md={2} sm={4}>
+                <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
                       control={control}
