@@ -1,7 +1,6 @@
 {
   "add": "הוסף",
   "cancel": "ביטול",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "errorSaving": "שגיאה בשמירת החיסון",
   "expirationDate": "תאריך תפוגה",
   "goToSummary": "עבור לסיכום",
@@ -11,7 +10,6 @@
   "manufacturer": "יצרן",
   "pleaseSelect": "בחר בבקשה",
   "recentVaccination": "חיסון אחרון",
-  "record": "רשומה",
   "save": "שמור",
   "seeAll": "ראה הכל",
   "sequence": "סדר",
