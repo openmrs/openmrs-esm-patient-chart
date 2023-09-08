@@ -4,7 +4,6 @@
   "clinicalForm": "Formulaire clinique",
   "completed": "Complété",
   "editForm": "Edit form",
-  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "form": "Formulaire",
   "formName": "Nom du formulaire (A-Z)",
   "forms": "Formulaires",
@@ -26,7 +25,6 @@
   "offlinePatientsTableSearchPlaceholder": "Chercher dans cette liste",
   "offlineToggle": "Basculer en mode sans connexion internet",
   "recommended": "Recommandé",
-  "record": "Record",
   "searchForAForm": "Search for a form",
   "searchThisList": "Chercher dans cette liste",
   "seeAll": "Voir tout"

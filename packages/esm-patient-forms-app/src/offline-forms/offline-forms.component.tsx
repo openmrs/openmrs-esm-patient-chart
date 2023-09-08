@@ -57,8 +57,6 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
       })) ?? [];
 
   if (forms?.data?.length === 0) {
-    // Ensure we have emptyStateText and record translation keys
-    // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
     return (
       <div className={styles.contentContainer}>
         <EmptyState
