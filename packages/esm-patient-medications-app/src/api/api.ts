@@ -2,7 +2,8 @@ import useSWR, { mutate } from 'swr';
 import { FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { OrderBasketItem, OrderPost, PatientMedicationFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { DrugOrderBasketItem } from '../types';
 
 /**
  * SWR-based data fetcher for patient orders.
@@ -21,7 +22,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
   const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
     openmrsFetch,
   );
@@ -51,7 +52,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
 }
 
 export function prepMedicationOrderPostData(
-  order: OrderBasketItem,
+  order: DrugOrderBasketItem,
   patientUuid: string,
   encounterUuid: string,
 ): OrderPost {

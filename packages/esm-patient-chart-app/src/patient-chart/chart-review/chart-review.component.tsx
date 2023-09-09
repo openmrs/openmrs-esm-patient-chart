@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
-import { DashboardView, DashboardConfig } from './dashboard-view.component';
+import { DashboardView, DashboardConfig, LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
@@ -27,15 +27,12 @@ interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
   view: string;
+  setDashboardLayoutMode?: (layoutMode: LayoutMode) => void;
 }
 
-const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view }) => {
+const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setDashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
-
-  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
-    return null;
-  }
 
   const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
     getDashboardDefinition(e.meta, e.config),
@@ -48,7 +45,20 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards.filter((dashboard) => dashboard.path)[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.path === view);
+  const dashboard = useMemo(() => {
+    return dashboards.find((dashboard) => dashboard.path === view);
+  }, [dashboards, view]);
+
+  useEffect(() => {
+    const activeDashboard = dashboard ?? defaultDashboard;
+    if (setDashboardLayoutMode) {
+      setDashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
+    }
+  }, [dashboard, defaultDashboard, setDashboardLayoutMode]);
+
+  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
+    return null;
+  }
 
   if (!defaultDashboard) {
     return null;

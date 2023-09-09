@@ -27,7 +27,8 @@
           "key": "visitNote",
           "default": "Visit Note"
         },
-        "type": "visit-note"
+        "type": "visit-note",
+        "canHide": true
       }
     }
   ]

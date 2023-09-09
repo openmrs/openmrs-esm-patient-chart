@@ -16,12 +16,22 @@ function getColumnsLayoutStyle(dashboard: DashboardConfig) {
   return '1fr '.repeat(numberOfColumns).trimEnd();
 }
 
+/**
+ * The layout mode dictates the width occuppied by the chart dashboard widgets.
+ * - In 'contained' mode, the dashboard widgets are displayed in a centered
+ * container with a fixed width (max-width: 60rem).
+ * - In 'anchored' mode, the dashboard widgets expand to occupy the entire width
+ * of the chart dashboard
+ */
+export type LayoutMode = 'contained' | 'anchored';
+
 export interface DashboardConfig {
   slot: string;
   title: string | (() => string | Promise<string>);
   path: string;
   columns: number;
   hideDashboardTitle?: boolean;
+  layoutMode?: LayoutMode;
 }
 
 interface DashboardViewProps {

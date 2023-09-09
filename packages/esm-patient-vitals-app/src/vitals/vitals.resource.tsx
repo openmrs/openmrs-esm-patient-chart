@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import useSwrInfinite from 'swr/infinite';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FetchResponse } from '@openmrs/esm-framework';
 import { ObsMetaInfo, ConceptMetadata, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
+import { VitalsBiometricsFormData } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { calculateBodyMassIndex } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
 
@@ -185,7 +185,7 @@ export function savePatientVitals(
   formUuid: string,
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalsAndBiometrics,
+  vitals: VitalsBiometricsFormData,
   encounterDatetime: Date,
   abortController: AbortController,
   location: string,
@@ -207,7 +207,7 @@ export function savePatientVitals(
   });
 }
 
-function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObject['concepts']): Array<ObsRecord> {
+function createObsObject(vitals: VitalsBiometricsFormData, concepts: ConfigObject['concepts']): Array<ObsRecord> {
   return Object.entries(vitals)
     .filter(([_, result]) => Boolean(result))
     .map(([name, result]) => {
@@ -221,7 +221,7 @@ function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObj
 export function editPatientVitals(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalsAndBiometrics,
+  vitals: VitalsBiometricsFormData,
   encounterDatetime: Date,
   abortController: AbortController,
   encounterUuid: string,

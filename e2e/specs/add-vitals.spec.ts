@@ -42,12 +42,18 @@ test('Record Vitals of the patient', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the vitals record', async () => {
+    const row = vitalsPage.vitalsTable().locator('tr');
+    const temperatureCell = row.locator('td:nth-child(2)');
+    const bloodPressureCell = row.locator('td:nth-child(3)');
+    const pulseCell = row.locator('td:nth-child(4)');
+    const respirationRateCell = row.locator('td:nth-child(5)');
+    const oxygenSaturationCell = row.locator('td:nth-child(6)');
     await vitalsPage.page.reload();
-    await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '37' })).toBeVisible();
-    await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '80', exact: true })).toBeVisible();
-    await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '120 / 80' })).toBeVisible();
-    await expect(vitalsPage.vitalsTable().getByText('98')).toBeVisible();
-    await expect(vitalsPage.vitalsTable().getByRole('cell', { name: '20 ↑' })).toBeVisible();
+    await expect(temperatureCell).toHaveText('37');
+    await expect(pulseCell).toHaveText('80');
+    await expect(bloodPressureCell).toHaveText('120 / 80');
+    await expect(oxygenSaturationCell).toHaveText('98');
+    await expect(respirationRateCell).toHaveText('20');
   });
 });
 

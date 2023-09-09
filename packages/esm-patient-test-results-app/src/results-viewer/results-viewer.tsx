@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { ContentSwitcher, Switch } from '@carbon/react';
+import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
@@ -12,6 +12,8 @@ import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
+import { Printer } from '@carbon/react/icons';
+import { ConfigObject } from '../config-schema';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -24,8 +26,8 @@ interface ResultsViewerProps {
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
-  const conceptUuids = config?.concepts?.map((concept) => concept.conceptUuid) ?? [];
+  const config = useConfig<ConfigObject>();
+  const conceptUuids = config.concepts.map((concept) => concept.conceptUuid) ?? [];
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
 
   if (error) {
@@ -52,15 +54,24 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
+  const config = useConfig() as ConfigObject;
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
   const { totalResultsCount } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
+  const showPrintButton = config.showPrintButton;
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
       to: testResultsBasePath(`/patient/${patientUuid}/chart`),
+    });
+  }, [patientUuid]);
+
+  const openPrintModal = useCallback(() => {
+    const dispose = showModal('print-modal', {
+      patientUuid,
+      closeDialog: () => dispose(),
     });
   }, [patientUuid]);
 
@@ -119,6 +130,17 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
+            {showPrintButton && (
+              <Button
+                kind="ghost"
+                size={isTablet ? 'md' : 'sm'}
+                renderIcon={Printer}
+                iconDescription="Print results"
+                onClick={openPrintModal}
+              >
+                {t('print', 'Print')}
+              </Button>
+            )}
             <ContentSwitcher
               size={isTablet ? 'lg' : 'md'}
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}

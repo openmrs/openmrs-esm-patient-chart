@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import styles from './drug-order-basket-panel.scss';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
+import { DrugOrderBasketItem } from '../types';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
@@ -15,7 +16,7 @@ import RxIcon from './rx-icon.component';
 export default function DrugOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket('medications', prepMedicationOrderPostData);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const newOrderBasketItems = orders.filter((x) => x.action === 'NEW');
   const renewedOrderBasketItems = orders.filter((x) => x.action === 'RENEW');
@@ -26,12 +27,12 @@ export default function DrugOrderBasketPanelExtension() {
     launchPatientWorkspace('add-drug-order');
   };
 
-  const openDrugForm = (order: OrderBasketItem) => {
+  const openDrugForm = (order: DrugOrderBasketItem) => {
     launchPatientWorkspace('add-drug-order', { order });
   };
 
   const removeMedication = useCallback(
-    (order: OrderBasketItem) => {
+    (order: DrugOrderBasketItem) => {
       const newOrders = [...orders];
       newOrders.splice(orders.indexOf(order), 1);
       setOrders(newOrders);

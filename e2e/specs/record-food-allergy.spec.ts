@@ -42,10 +42,10 @@ test('Add Food allergy to patient', async ({ page, api }) => {
     const severityCell = rows.locator('td:nth-child(2)');
     const reactionCell = rows.locator('td:nth-child(3)');
     const commentCell = rows.locator('td:nth-child(4)');
-    await expect(allergenCell.getByText('Eggs')).toBeVisible();
-    await expect(reactionCell.getByText('Mental status change')).toBeVisible();
-    await expect(severityCell.getByText('LOW')).toBeVisible();
-    await expect(commentCell.getByText('Test comment')).toBeVisible();
+    await expect(allergenCell).toHaveText('Eggs');
+    await expect(reactionCell).toHaveText('Mental status change');
+    await expect(severityCell).toHaveText('low');
+    await expect(commentCell).toHaveText('Test comment');
   });
 });
 

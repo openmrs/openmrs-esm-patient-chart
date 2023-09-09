@@ -4,6 +4,8 @@
 @import "../root.scss";
 
 .header {
+  box-sizing: content-box;
+  border-bottom: 1px solid $text-03;
   background-color: $ui-03;
   top: 3rem;
   z-index: 100;
@@ -45,9 +47,6 @@
   width: calc(100% - 3rem);
 }
 
-.dynamicWidth {
-  width: calc(50% - 9.625rem);
-}
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
@@ -61,26 +60,32 @@
   }
 
   .container {
-    margin-right: 2.825rem;
-    flex: 1;
+    margin-right: 3rem;
     height: 100vh;
   }
 
-  .headerGlobalBar {
-    &>button {
-      min-height: spacing.$spacing-08;
-      background-color: $ui-02;
-      border-color: $color-gray-30;
-      border-style: solid;
-      border-width: 0 1px 0 0;
+  .widerWorkspace {
+    width: 32.25rem;
+    .dynamicWidth {
+      width: 32.25rem;
     }
   }
-}
 
-/* Small desktop */
-:global(.omrs-breakpoint-lt-large-desktop){
-  .dynamicWidth {
-    width: calc(50% - 1.625rem);
+  .narrowWorkspace {
+    width: 26.25rem;
+    .dynamicWidth {
+      width: 26.25rem;
+    }
+  }
+
+  .headerGlobalBar {
+    button {
+      background-color: $ui-02;
+      border-right: 1px solid $ui-03;
+    }
+    button:last-child {
+      border-right: none;
+    }
   }
 }
 
@@ -92,7 +97,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 8001;
   }
 
   .header {
@@ -128,7 +133,7 @@
 html[dir='rtl'] {
   :global(.omrs-breakpoint-gt-tablet) {
     .container {
-      margin-left: 2.825rem;
+      margin-left: 3rem;
       margin-right: unset;
     }
   }

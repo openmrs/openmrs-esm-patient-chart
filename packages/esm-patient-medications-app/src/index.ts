@@ -43,6 +43,7 @@ export const medicationsDashboardLink =
 
 registerWorkspace({
   name: 'add-drug-order',
+  type: 'order',
   title: 'Add drug order',
   load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order.workspace'), options),
 });

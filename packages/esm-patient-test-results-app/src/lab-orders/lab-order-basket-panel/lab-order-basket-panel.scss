@@ -1,0 +1,73 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import "../../root";
+
+.actionText {
+  @include type.type-style("body-compact-01");
+  color: $text-02;
+  margin-bottom: 1rem;
+}
+
+.content {
+  @include type.type-style("heading-compact-01");
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.desktopHeading {
+  background-color: white;
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading, .tabletHeading {
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.headingIcon {
+   margin: 0.3rem;
+   margin-right: 0.8rem;
+}
+
+.desktopTile, .tabletTile {
+  padding: 0;
+  border-top: 1px solid #e8daff;
+  border-right: none;
+  border-left: 4px solid #6929c4;
+}
+
+.collapsedTile {
+  border-bottom: none;
+  min-height: 0;
+  .orderBasketHeader {
+    margin-bottom: 0;
+  }
+}
+
+.orderBasketContainerDesktop {
+  margin-bottom: 1rem;
+}
+
+.orderBasketContainerTablet {
+  margin-bottom: 1rem;
+  border: 1px solid $ui-03;
+}

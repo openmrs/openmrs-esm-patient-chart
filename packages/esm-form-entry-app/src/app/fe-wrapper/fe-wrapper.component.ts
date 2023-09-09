@@ -1,4 +1,5 @@
 import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
@@ -116,12 +117,19 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
     const identifiers = this.formDataSourceService.getPatientObject(patient)?.identifiers ?? [];
-    const language = window.i18next?.language?.substring(0, 2) ?? '';
-    this.translateService.addLangs([language]);
-    this.translateService.use(language);
+    const locale = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([locale]);
+    this.translateService.use(locale);
+
+    import(
+      /* webpackInclude: /\.js$/ */
+      `@angular/common/locales/${locale}.js`
+    ).then((module) => {
+      registerLocaleData(module.default);
+    });
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(this.formUuid, language).pipe(take(1)),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),
       session: this.openmrsApi.getCurrentSession().pipe(take(1)),
       encounter: encounterOrSyncItemId
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))

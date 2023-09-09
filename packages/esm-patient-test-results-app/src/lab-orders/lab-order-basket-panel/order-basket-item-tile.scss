@@ -1,0 +1,53 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import "../../root";
+
+.clickableTileDesktop {
+  margin-bottom: 0.5rem;
+}
+
+.clickableTileTablet {
+  &:not(:last-of-type) {
+    border-bottom: 0.0625rem solid $ui-03;
+  }
+
+  &:nth-child(even) {
+    background-color: $ui-02;
+  }
+
+  &:nth-child(odd) {
+    background-color: $ui-01;
+  }
+}
+
+.orderBasketItemTile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orderActionNewLabel {
+  margin-bottom: 0.5625rem;
+  @extend .label01;
+  color: $support-02; 
+}
+
+.orderErrorText {
+  color: $danger;
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  @include type.type-style("heading-compact-01");
+  color: $text-02;
+}
+
+.removeButton {
+  flex: 0 0 auto; 
+}
+
+.removeButton svg {
+  fill: $danger !important;
+}

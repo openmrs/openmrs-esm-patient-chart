@@ -1,15 +1,19 @@
 import React from 'react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { mockPatientDrugOrdersApiData } from '../__mocks__/medication.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
+import { mockSessionDataResponse } from '../__mocks__/session.mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
+const mockUseSession = useSession as jest.Mock;
 
 function renderActiveMedications() {
+  mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
   renderWithSwr(<ActiveMedications {...testProps} />);
 }
 
@@ -76,7 +80,11 @@ describe('ActiveMedications: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /active medications/i })).toBeInTheDocument();
+    const headingElements = screen.getAllByText(/Active Medications/i);
+
+    headingElements.forEach((headingElement) => {
+      expect(headingElement).toBeInTheDocument();
+    });
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');

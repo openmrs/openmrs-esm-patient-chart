@@ -27,6 +27,30 @@
   }
 }
 
+.elementContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .countTag {
+    position: absolute;
+     font-family: IBMPlexSans;
+    font-size: 11px;
+    font-weight: 600;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.27;
+    letter-spacing: 0.13px;
+    text-align: center;
+    color: $ui-01;
+    background-color: $danger;
+    padding: 0 3px 0 4px;
+    border-radius: 4px;
+    top: -6px;
+    right: -6px;
+  }
+}
+
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .active {
@@ -67,3 +91,5 @@
     }
   }
 }
+
+

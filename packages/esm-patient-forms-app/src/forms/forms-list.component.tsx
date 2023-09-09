@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -18,11 +18,12 @@ import {
   Tile,
 } from '@carbon/react';
 import { formatDatetime, useLayoutType, Visit } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, closeWorkspace } from '@openmrs/esm-patient-common-lib';
 import { HtmlFormEntryForm } from '../config-schema';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import { useForms } from '../hooks/use-forms';
 import styles from './forms-list.scss';
+import debounce from 'lodash-es/debounce';
 
 export type FormsListProps = {
   currentVisit: Visit;
@@ -34,11 +35,24 @@ export type FormsListProps = {
 const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms, patient, patientUuid }) => {
   const { t } = useTranslation();
   const { data, error, mutateForms } = useForms(patientUuid);
-
+  const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
+
+  const filteredForms = useMemo(() => {
+    if (!searchTerm) {
+      return data;
+    }
+    return data.filter((form) => {
+      const formName = form.form.display ?? form.form.name;
+      return formName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [data, searchTerm]);
+
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const handleFormOpen = useCallback(
     (formUuid, encounterUuid, formName) => {
+      closeWorkspace('clinical-forms-workspace', true);
       launchFormEntryOrHtmlForms(
         currentVisit,
         formUuid,
@@ -65,7 +79,7 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
 
   const tableRows = useMemo(
     () =>
-      data?.map((formData) => {
+      filteredForms?.map((formData) => {
         return {
           id: formData.form.uuid,
           lastCompleted: formData.lastCompleted ? formatDatetime(formData.lastCompleted) : undefined,
@@ -74,7 +88,7 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
           encounterUuid: formData?.associatedEncounters[0]?.uuid,
         };
       }),
-    [data],
+    [filteredForms],
   );
 
   if (!data && !error) {
@@ -106,7 +120,7 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
                   <TableToolbarSearch
                     className={styles.search}
                     expanded
-                    onChange={onInputChange}
+                    onChange={(event) => handleSearch(event.target.value)}
                     placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
                   />

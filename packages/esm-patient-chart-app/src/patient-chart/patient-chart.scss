@@ -19,9 +19,12 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   align-self: start;
   height: 90%;
   width: 100%;
-  max-width: 60rem;
   margin: 0 auto;
   padding-bottom: spacing.$spacing-10;
+}
+
+.widthContained {
+  max-width: 60rem;
 }
 
 .chartContainer {

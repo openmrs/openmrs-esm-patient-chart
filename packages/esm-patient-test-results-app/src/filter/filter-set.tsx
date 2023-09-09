@@ -7,6 +7,7 @@ import type { FilterNodeProps, FilterLeafProps } from './filter-types';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
 import FilterContext from './filter-context';
 import styles from './filter-set.styles.scss';
+import { ConfigObject } from '../config-schema';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
@@ -32,7 +33,7 @@ function filterTreeNode(inputValue, treeNode) {
 
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
   const { roots } = useContext(FilterContext);
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
   const tablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { resetTree } = useContext(FilterContext);

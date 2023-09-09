@@ -48,14 +48,19 @@ const useGetObstreeData = (conceptUuid) => {
   return result;
 };
 
-const useGetManyObstreeData = (uuidArray) => {
+const useGetManyObstreeData = (uuidArray: Array<string>) => {
   const { patientUuid } = usePatient();
-  const getObstreeUrl = (index) => {
+  const getObstreeUrl = (index: number) => {
     if (index < uuidArray.length && patientUuid) {
       return `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
     } else return null;
   };
-  const { data, error, isLoading } = useSWRInfinite(getObstreeUrl, openmrsFetch, { initialSize: uuidArray.length });
+  const { data, error, isLoading } = useSWRInfinite(getObstreeUrl, openmrsFetch, {
+    initialSize: uuidArray.length,
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   const result = useMemo(() => {
     return (
