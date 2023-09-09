@@ -3,9 +3,8 @@
   "biometricDisplayed": "Biometric displayed",
   "biometrics": "Biometrics",
   "biometrics_lower": "biometrics",
-  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "goToSummary": "Go to Summary",
-  "record": "Record",
+  "loading": "Loading",
   "seeAll": "See all",
   "Vitals & Biometrics": "Vitals & Biometrics"
 }

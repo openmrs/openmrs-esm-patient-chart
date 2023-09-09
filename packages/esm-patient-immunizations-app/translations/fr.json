@@ -1,7 +1,6 @@
 {
   "add": "Add",
   "cancel": "Cancel",
-  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
   "goToSummary": "Go to Summary",
@@ -11,7 +10,6 @@
   "manufacturer": "Manufacturer",
   "pleaseSelect": "Please select",
   "recentVaccination": "Recent vaccination",
-  "record": "Record",
   "save": "Save",
   "seeAll": "See all",
   "sequence": "Sequence",

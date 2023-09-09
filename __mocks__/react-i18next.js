@@ -29,8 +29,16 @@ const renderNodes = (reactNodes) => {
   });
 };
 
-const useMock = [(k) => k, {}];
-useMock.t = (k, o) => (o && o.defaultValue) || (typeof o === 'string' ? o : k);
+const useMock = [(key) => key, {}];
+useMock.t = (key, defaultValue, options = {}) => {
+  let translatedString = defaultValue;
+  Object.keys(options).forEach((key) => {
+    translatedString = defaultValue.replace(`{${key}}`, `${options[key]}`);
+  });
+
+  return translatedString;
+};
+
 useMock.i18n = { language: 'en_US' };
 
 module.exports = {

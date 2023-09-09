@@ -158,8 +158,6 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       </div>
     );
   }
-  // Ensure we have emptyStateText and record translation keys
-  // t('emptyStateText', 'There are no {{displayText}} to display for this patient'); t('record', 'Record');
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 

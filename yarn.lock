@@ -6397,8 +6397,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 3.2.1-pre.232
-  resolution: "@openmrs/ngx-formentry@npm:3.2.1-pre.232"
+  version: 3.2.1-pre.245
+  resolution: "@openmrs/ngx-formentry@npm:3.2.1-pre.245"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -6421,13 +6421,13 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 9c3e01206c00ee4f7291cc6db31bda48fae2ac63a372361c2dd0c443c68f2b4797b6f6e94cf18e33e4567bcf2a83b134e202ab3c4bc58df230a029de435a1009
+  checksum: e86a2ee323964092b7535303bfbe25853c1e0cd21142de492b23c4a5dba1ef1112b5fa1b7b135bf3f56e5d489f610f8ec91d367afa9c502e5a8a7318448e4812
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.302
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.302"
+  version: 1.0.0-pre.333
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.333"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -6449,7 +6449,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 21a4cbad12085fe45266dea334e10bf721d18fc41b69651265b4d034766a4ee6042384d44541a2f810bd8077dd097d1e56a6d9f6c88462d78f31c6b1b10a7ff8
+  checksum: ead5b37d4765741db8f867919d9e6b5d1bc1defc7bf87e9238335db97b27df68453089a68d85d4b4f2608d14baa5920c68ad4fae5d1e62f24a5d8ebeca4d4785
   languageName: node
   linkType: hard
 

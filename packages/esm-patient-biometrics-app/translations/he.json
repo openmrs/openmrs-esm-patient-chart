@@ -3,9 +3,8 @@
   "biometricDisplayed": "תצוגת מדדים ביומטריים",
   "biometrics": "מדדים ביומטריים",
   "biometrics_lower": "מדדים ביומטריים",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "goToSummary": "עבור לסיכום",
-  "record": "רשומה",
+  "loading": "טוען",
   "seeAll": "ראה הכל",
   "Vitals & Biometrics": "מדדים וביומטריה"
 }
