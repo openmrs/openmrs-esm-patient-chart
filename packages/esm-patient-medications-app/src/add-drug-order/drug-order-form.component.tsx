@@ -21,21 +21,21 @@ import {
   Toggle,
 } from '@carbon/react';
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useController, useForm } from 'react-hook-form';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
-import styles from './drug-order-form.scss';
-import { Controller, useController, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  DosingUnit,
-  DrugOrderBasketItem,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  QuantityUnit,
+  type DosingUnit,
+  type DrugOrderBasketItem,
+  type DurationUnit,
+  type MedicationFrequency,
+  type MedicationRoute,
+  type QuantityUnit,
 } from '../types';
+import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -342,7 +342,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           ) : (
             <>
               <Grid className={styles.gridRow}>
-                <Column lg={4} md={2} sm={4} className={styles.linkedInput}>
+                <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     <div className={styles.numberInput}>
                       <ControlledFieldInput
@@ -359,7 +359,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                     </div>
                   </InputWrapper>
                 </Column>
-                <Column lg={4} md={2} sm={4}>
+                <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
                       control={control}
@@ -374,6 +374,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                     />
                   </InputWrapper>
                 </Column>
+              </Grid>
+              <Grid className={styles.gridRow}>
                 <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
@@ -389,9 +391,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                     />
                   </InputWrapper>
                 </Column>
-              </Grid>
-              <Grid className={styles.gridRow}>
-                <Column lg={16} md={4} sm={4}>
+                <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
                       control={control}
