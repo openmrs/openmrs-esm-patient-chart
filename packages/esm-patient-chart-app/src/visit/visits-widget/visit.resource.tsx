@@ -78,7 +78,7 @@ export function mapEncounters(visit: Visit): MappedEncounter[] {
     form: encounter?.form,
     obs: encounter?.obs,
     visitUuid: visit?.uuid,
-    visitType: visit?.visitType?.name,
+    visitType: visit?.visitType?.display,
     visitTypeUuid: visit?.visitType?.uuid,
     visitStartDatetime: visit?.startDatetime,
     visitStopDatetime: visit?.stopDatetime,

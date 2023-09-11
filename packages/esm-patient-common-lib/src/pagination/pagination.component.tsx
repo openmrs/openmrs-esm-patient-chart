@@ -24,7 +24,7 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
   currentItems,
   dashboardLinkLabel: urlLabel,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
   const isTablet = useLayoutType() === 'tablet';
 

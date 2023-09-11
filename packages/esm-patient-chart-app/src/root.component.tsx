@@ -33,3 +33,14 @@ export default function Root() {
     </SWRConfig>
   );
 }
+
+/**
+ * DO NOT REMOVE THIS COMMENT
+ * THE TRANSLATION KEYS AND VALUES USED IN THE COMMON LIB IS WRITTEN HERE
+ * t("emptyStateText", 'There are no {displayText} to display for this patient', {displayText: "sample text"})
+ * t('record', 'Record')
+ * t('errorCopy','Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.')
+ * t('error', 'Error')
+ * t('seeAll', 'See all')
+ * t('items', ' items')
+ */

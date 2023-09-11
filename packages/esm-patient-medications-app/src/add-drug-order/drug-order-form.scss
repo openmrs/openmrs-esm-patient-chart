@@ -1,18 +1,16 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
-@import "../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .orderForm {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
-  height: calc(100vh - spacing.$spacing-12);
+  padding: layout.$spacing-03 0 0 layout.$spacing-05;
+  height: calc(100vh - layout.$spacing-12);
 
   input[data-invalid]:focus {
-    outline: 2px solid  #da1e28;
+    outline: 2px solid  colors.$red-60;
      outline-offset: -2px;
   }
 
@@ -21,15 +19,15 @@
   }
 
   :global(.cds--css-grid-column) {
-    margin: 0 spacing.$spacing-03 !important;
+    margin: 0 layout.$spacing-03 !important;
   }
 
   :global(.cds--subgrid) {
-    margin: 0 calc(spacing.$spacing-03 * -1) !important;
+    margin: 0 calc(layout.$spacing-03 * -1) !important;
   }
 
   :global(.cds--number--nosteppers.cds--number input[type=number]) {
-    padding-right: spacing.$spacing-05;
+    padding-right: layout.$spacing-05;
   }
 
   :global(.cds--list-box) {
@@ -43,23 +41,23 @@
 
 .medicationInfo {
   border: 0;
-  padding: spacing.$spacing-05;
-  margin-left: calc(spacing.$spacing-05 * -1);
+  padding: layout.$spacing-05;
+  margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
 }
 
 .inlineNotification {
   width: 100%;
   max-width: unset;
-  margin-top: calc(spacing.$spacing-03 * -1);
-  margin-left: calc(spacing.$spacing-05 * -1);
+  margin-top: calc(layout.$spacing-03 * -1);
+  margin-left: calc(layout.$spacing-05 * -1);
 }
 
 .stickyMedicationInfo {
   position: fixed;
-  background-color: #0072c3;
-  color: #ffffff;
-  top: spacing.$spacing-12;
+  background-color: colors.$cyan-60;
+  color: colors.$white-0;
+  top: layout.$spacing-12;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -71,15 +69,15 @@
 }
 
 .patientHeader {
-  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
-  background-color: $ui-01;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
+  background-color: colors.$gray-10;
 
   span:first-of-type {
-    margin-right: spacing.$spacing-03;
+    margin-right: layout.$spacing-03;
   }
 
   .text02 {
-    color: $text-02;
+    color: colors.$gray-70;
   }
 }
 
@@ -89,12 +87,12 @@
 }
 
 .formSection {
-  margin-bottom: spacing.$spacing-06;
+  margin-bottom: layout.$spacing-06;
 }
 
 .sectionHeader {
   @include type.type-style("heading-01");
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .pullColumnContentRight > div {
@@ -122,7 +120,7 @@
 .numberInput {
   :global(.cds--number__input-wrapper) input {
   min-width: unset !important;
-  padding-right: spacing.$spacing-05;
+  padding-right: layout.$spacing-05;
   }
 }
 
@@ -130,14 +128,14 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
 
   button {
     display: flex;
    padding-left: 0 !important;
     svg {
       order: 1;
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
       margin-left: 0 !important;
     }
 
@@ -149,19 +147,20 @@
 
 .gridRow {
   padding: 0px;
-  margin-left: calc(spacing.$spacing-03 * -1);
+  margin-left: calc(layout.$spacing-03 * -1);
+}
 
-  :global(.cds--number) {
-    display: inline-block;
-  }
+/* Desktop */
+:global(.omrs-breakpoint-lt-desktop) .gridRow {
+  align-items: baseline;
 }
 
 .field {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .buttonSet {
-  margin-left: calc(spacing.$spacing-05 * -1);
+  margin-left: calc(layout.$spacing-05 * -1);
 
   :global(.cds--btn) {
     width: 50%;
@@ -182,10 +181,9 @@
 
 .linkedInput::after {
   content: "";
-  border: 1px solid $text-03;
-  width: spacing.$spacing-05;
-  margin-right: calc(spacing.$spacing-05 * -1);
-  margin-top: spacing.$spacing-05;
+  border: 1px solid colors.$gray-40;
+  width: layout.$spacing-05;
+  margin-right: calc(layout.$spacing-05 * -1);
 }
 
 .customNumberInput {
@@ -194,7 +192,7 @@
   align-items: flex-end;
 
   :global(.cds--btn) {
-    background-color: #393939;
+    background-color: colors.$gray-80;
   }
 
   .customInput {
@@ -207,17 +205,17 @@
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: calc(100vh - 10rem);
+    height: 100%;
     background-color: #ededed;
   }
 
   .stickyMedicationInfo {
-    top: spacing.$spacing-09;
+    top: layout.$spacing-09;
   }
 
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
+    padding: layout.$spacing-06 layout.$spacing-05;
+    background-color: colors.$white-0;
   }
 }
 
@@ -234,3 +232,4 @@
 .errorLabel {
   color: colors.$red-60;
 }
+
