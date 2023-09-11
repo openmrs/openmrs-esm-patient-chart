@@ -11,7 +11,7 @@ interface EncounterObservationsProps {
 
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
   const { t } = useTranslation();
-  const { hideObsByConceptUuid = [] } = useConfig();
+  const { obsConceptUuidsToHide = [] } = useConfig();
 
   function getAnswerFromDisplay(display: string): string {
     const colonIndex = display.indexOf(':');
@@ -27,9 +27,9 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   }
 
   if (observations) {
-    const filteredObservations = !!hideObsByConceptUuid.length
+    const filteredObservations = !!obsConceptUuidsToHide.length
       ? observations?.filter((obs) => {
-          return !hideObsByConceptUuid.includes(obs?.concept?.uuid);
+          return !obsConceptUuidsToHide.includes(obs?.concept?.uuid);
         })
       : observations;
     return (

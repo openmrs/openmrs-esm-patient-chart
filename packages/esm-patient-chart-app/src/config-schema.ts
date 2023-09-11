@@ -103,7 +103,7 @@ export const esmPatientChartSchema = {
       _description: 'The organization name displayed when image is absent',
     },
   },
-  hideObsByConceptUuid: {
+  obsConceptUuidsToHide: {
     _type: Type.Array,
     _elements: {
       _type: Type.ConceptUuid,
