@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
@@ -11,7 +11,7 @@ interface EncounterObservationsProps {
 
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
   const { t } = useTranslation();
-  const { hideFieldsByConceptUuid = [] } = useConfig();
+  const { hideObsByConceptUuid = [] } = useConfig();
 
   function getAnswerFromDisplay(display: string): string {
     const colonIndex = display.indexOf(':');
@@ -27,9 +27,9 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   }
 
   if (observations) {
-    const filteredObservations = !!hideFieldsByConceptUuid.length
-      ? observations?.filter((it) => {
-          return !hideFieldsByConceptUuid.includes(it?.concept?.uuid);
+    const filteredObservations = !!hideObsByConceptUuid.length
+      ? observations?.filter((obs) => {
+          return !hideObsByConceptUuid.includes(obs?.concept?.uuid);
         })
       : observations;
     return (

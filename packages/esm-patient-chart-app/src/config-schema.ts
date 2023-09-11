@@ -103,13 +103,13 @@ export const esmPatientChartSchema = {
       _description: 'The organization name displayed when image is absent',
     },
   },
-  hideFieldsByConceptUuid: {
+  hideObsByConceptUuid: {
     _type: Type.Array,
     _elements: {
       _type: Type.ConceptUuid,
     },
     _description:
-      'An array of concept UUIDs. When this array is not empty, any observations in the observations list view that match any of the UUIDs in this array will be hidden.',
+      'An array of concept UUIDs. If an observation has a concept UUID that matches any of the ones in this array, it will be hidden from the observations list in the Encounters summary table.',
     _default: [],
   },
 };
