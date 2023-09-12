@@ -2,7 +2,7 @@ import { ExtensionRegistration, getGlobalStore, navigate, translateFrom } from '
 // FIXME We should not rely on internals here
 import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
-import { WorkspaceWindowState } from '..';
+import { WorkspaceWindowState } from '../types/workspace';
 
 export interface Prompt {
   title: string;
@@ -18,6 +18,7 @@ export interface WorkspaceStoreState {
   patientUuid: string | null;
   openWorkspaces: Array<OpenWorkspace>;
   prompt: Prompt | null;
+  workspaceWindowState: WorkspaceWindowState;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
@@ -243,9 +244,20 @@ export function changeWorkspaceContext(patientUuid) {
   }
 }
 
-const initialState = { patientUuid: null, openWorkspaces: [], prompt: null };
+const initialState: WorkspaceStoreState = {
+  patientUuid: null,
+  openWorkspaces: [],
+  prompt: null,
+  workspaceWindowState: 'normal',
+};
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
+}
+
+export function updateWorkspaceWindowState(value: WorkspaceWindowState) {
+  const store = getWorkspaceStore();
+  const state = store.getState();
+  store.setState({ ...state, workspaceWindowState: value });
 }
 
 /**
