@@ -79,6 +79,13 @@ jest.mock('../hooks/useLocations', () => {
 });
 
 describe('Visit Form', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+    mockSaveVisit.mockClear();
+  });
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
@@ -107,12 +114,26 @@ describe('Visit Form', () => {
     renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /start visit/i });
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await waitFor(() => userEvent.click(locationPicker));
+    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
 
     await waitFor(() => user.click(saveButton));
 
-    expect(screen.queryAllByText(/Please select a visit type/i)).not.toBe([]);
+    let errorAlert;
+
+    await waitFor(() => {
+      errorAlert = screen.getByRole('alert');
+      expect(errorAlert).toBeInTheDocument();
+    });
+    await waitFor(() => expect(screen.getByText(/Missing visit type/i)).toBeInTheDocument());
+    expect(screen.getByText(/Please select a visit type/i)).toBeInTheDocument();
 
     await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+
+    await waitFor(() => {
+      expect(errorAlert).not.toBeInTheDocument();
+    });
   });
 
   it('starts a new visit upon successful submission of the form', async () => {
@@ -130,7 +151,7 @@ describe('Visit Form', () => {
     await waitFor(() => userEvent.click(locationPicker));
     await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
 
-    mockSaveVisit.mockReturnValueOnce(
+    mockSaveVisit.mockReturnValue(
       of({
         status: 201,
         data: {
@@ -142,11 +163,27 @@ describe('Visit Form', () => {
     );
 
     await waitFor(() => user.click(saveButton));
+
+    expect(mockSaveVisit).toHaveBeenCalledTimes(1);
+    expect(mockSaveVisit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        location: mockLocations[1].uuid,
+        patient: mockPatient.id,
+        visitType: 'some-uuid1',
+      }),
+      new AbortController(),
+    );
+
+    expect(showToast).toHaveBeenCalledTimes(1);
+    expect(showToast).toHaveBeenCalledWith({
+      critical: true,
+      description: expect.stringContaining('started successfully'),
+      kind: 'success',
+      title: 'Visit started',
+    });
   });
 
   it('renders an error message if there was a problem starting a new visit', async () => {
-    mockSaveVisit.mockReturnValueOnce(throwError({ status: 500, statusText: 'Internal server error' }));
-
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -154,8 +191,20 @@ describe('Visit Form', () => {
     await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
     const saveButton = screen.getByRole('button', { name: /Start Visit/i });
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await waitFor(() => userEvent.click(locationPicker));
+    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
+    mockSaveVisit.mockReturnValue(throwError({ status: 500, statusText: 'Internal server error' }));
 
     await waitFor(() => user.click(saveButton));
+
+    expect(showNotification).toHaveBeenCalledTimes(1);
+    expect(showNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error starting visit',
+      }),
+    );
   });
 
   it('displays the `Unsaved changes` modal when a form has unsaved changes', async () => {
