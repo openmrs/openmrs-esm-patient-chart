@@ -67,19 +67,9 @@ export const configSchema = {
     _default: true,
     _description: 'Whether HTML Form Entry forms should be included in lists of forms.',
   },
-  showRecommendedFormsTab: {
-    _type: Type.Boolean,
-    _description: 'Whether to display recommended forms tab. Requires AMPATH ETL.',
-    _default: false,
-  },
-  showConfigurableForms: {
-    _type: Type.Boolean,
-    _description: 'Whether to use customURL to fetch forms, works with `customFormsUrl`',
-    _default: false,
-  },
   customFormsUrl: {
     _type: Type.String,
-    _description: 'Custom forms endpoint to fetch forms using a custom url need `showConfigurableForms`',
+    _description: 'Custom forms endpoint to fetch forms using a custom url.',
     _default: '',
   },
   orderFormsByName: {
@@ -98,9 +88,7 @@ export interface HtmlFormEntryForm {
 
 export interface ConfigObject {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
-  showRecommendedFormsTab: boolean;
   customFormsUrl: string;
   orderFormsByName: boolean;
-  showConfigurableForms: boolean;
   showHtmlFormEntryForms: boolean;
 }
