@@ -13,9 +13,9 @@ import { ConfigObject } from '../config-schema';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
-  const { customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
-  const isCustomUrl = Boolean(customFormsUrl);
-  const url = isCustomUrl
+  const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
+  const hasCustomFormsUrl = Boolean(customFormsUrl);
+  const url = hasCustomFormsUrl
     ? customFormsUrl.concat(`?patientUuid=${patientUuid}`)
     : showHtmlFormEntryForms
     ? formEncounterUrl
@@ -24,7 +24,7 @@ export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: s
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
     // show published forms and hide component forms
-    const forms = isCustomUrl
+    const forms = hasCustomFormsUrl
       ? res?.data.results
       : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 
