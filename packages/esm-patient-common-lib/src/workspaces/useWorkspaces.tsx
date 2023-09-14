@@ -24,18 +24,6 @@ export function useWorkspaces(): WorkspacesInfo {
     getWorkspaceStore().subscribe(update);
   }, []);
 
-  // This hook is meant to be triggered only when workspace changes
-  // Accordingly the workspaceWindowState will be updated
-  useEffect(() => {
-    if (workspaces.length === 0) {
-      updateWorkspaceWindowState('hidden');
-    } else if (workspaceWindowState === 'hidden') {
-      updateWorkspaceWindowState('normal');
-    } else {
-      updateWorkspaceWindowState(workspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal');
-    }
-  }, [workspaces, workspaceWindowState]);
-
   const memoisedResults = useMemo(
     () => ({
       active: workspaces.length > 0,
