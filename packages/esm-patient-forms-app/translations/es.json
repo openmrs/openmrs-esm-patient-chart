@@ -1,8 +1,6 @@
 {
-  "all": "All",
   "checkFilters": "Check the filters above",
   "clinicalForm": "Clinical form",
-  "completed": "Completed",
   "editForm": "Edit form",
   "form": "Form",
   "formName": "Form name (A-Z)",
@@ -11,7 +9,6 @@
   "homeOverviewCardView": "View",
   "lastCompleted": "Last completed",
   "never": "Never",
-  "noFormsAvailable": "There are no forms to display for this patient",
   "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "There are no {formCategory} forms to display",
   "noMatchingFormsToDisplay": "No matching forms to display",
@@ -24,8 +21,6 @@
   "offlinePatientsTableSearchLabel": "Search this list",
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
-  "recommended": "Recommended",
   "searchForAForm": "Search for a form",
-  "searchThisList": "Search this list",
-  "seeAll": "See all"
+  "searchThisList": "Search this list"
 }
