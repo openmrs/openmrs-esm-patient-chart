@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { type OpenWorkspace, useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
+import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
 import { ArrowLeft, ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -17,35 +17,16 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   const { patientUuid } = usePatient();
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { active, workspaces } = useWorkspaces();
-  const { windowSize, updateWindowSize } = useWorkspaceWindowSize();
-  const hidden = windowSize.size === 'hidden';
-  const maximized = windowSize.size === 'maximized';
-  const normal = windowSize.size === 'normal';
+  const { active, workspaces, workspaceWindowState } = useWorkspaces();
+  const hidden = workspaceWindowState === 'hidden';
+  const maximized = workspaceWindowState === 'maximized';
 
-  const [isWorkspaceWindowOpen, setIsWorkspaceWindowOpen] = useState(false);
-
-  useEffect(() => {
-    if (active && (maximized || normal)) {
-      setIsWorkspaceWindowOpen(true);
-    } else if (workspaces.length && hidden) {
-      setIsWorkspaceWindowOpen(false);
-    } else {
-      setIsWorkspaceWindowOpen(false);
-    }
-  }, [workspaces.length, active, hidden, maximized, normal]);
-
-  useEffect(() => {
-    if (active && hidden) {
-      updateWindowSize('normal');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaces, active]);
+  const isWorkspaceWindowOpen = active && !hidden;
 
   useBodyScrollLock(active && !isDesktop(layout));
 
   const toggleWindowState = () => {
-    maximized ? updateWindowSize('minimized') : updateWindowSize('maximized');
+    maximized ? updateWorkspaceWindowState('normal') : updateWorkspaceWindowState('maximized');
   };
 
   const workspacesToRender = useMemo(() => {
@@ -109,7 +90,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   iconDescription={t('hide', 'Hide')}
                   hasIconOnly
                   kind="ghost"
-                  onClick={() => updateWindowSize('hidden')}
+                  onClick={() => updateWorkspaceWindowState('hidden')}
                   renderIcon={(props) => <ArrowRight size={16} {...props} />}
                   tooltipPosition="bottom"
                   tooltipAlignment="end"
@@ -131,7 +112,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
             <Button
               iconDescription={t('close', 'Close')}
               hasIconOnly
-              onClick={() => updateWindowSize('hidden')}
+              onClick={() => updateWorkspaceWindowState('hidden')}
               renderIcon={(props) => <DownToBottom size={16} {...props} />}
               tooltipPosition="bottom"
               tooltipAlignment="end"

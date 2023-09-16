@@ -39,6 +39,7 @@ describe('SiderailNavButton', () => {
 
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ type: 'order' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -52,7 +53,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -69,7 +70,8 @@ describe('SiderailNavButton', () => {
 
   it('should have not active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ type: 'order' }, { name: 'visit-note' }],
+      workspaces: [{ type: 'order' }, { type: 'visit-note' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -83,7 +85,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -95,7 +97,8 @@ describe('SiderailNavButton', () => {
 
   it('should have active className if workspace is active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'visit-note' }, { type: 'order' }],
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('tablet');
@@ -109,7 +112,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -119,11 +122,39 @@ describe('SiderailNavButton', () => {
     expect(button).toHaveClass('active');
   });
 
+  it('should not display active className if workspace is active but workspace window is hidden', async () => {
+    (useWorkspaces as jest.Mock).mockReturnValue({
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
+      workspaceWindowState: 'hidden',
+    });
+
+    mockedUseLayoutType.mockReturnValue('tablet');
+
+    const handler = jest.fn();
+
+    render(
+      <SiderailNavButton
+        name={'visit-note-nav-button'}
+        getIcon={(props) => <Pen {...props} />}
+        label={'Visit note'}
+        iconDescription={'Note'}
+        handler={handler}
+        type={'visit-note'}
+      />,
+    );
+
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+
+    expect(button).not.toHaveClass('active');
+  });
+
   it('should display desktop view', async () => {
     const user = userEvent.setup();
 
     (useWorkspaces as jest.Mock).mockReturnValue({
       workspaces: [{ type: 'order' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -137,7 +168,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -154,7 +185,8 @@ describe('SiderailNavButton', () => {
 
   it('should display have active className if workspace is not active', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ type: 'order' }, { name: 'visit-note' }],
+      workspaces: [{ type: 'order' }, { type: 'visit-note' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -168,7 +200,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -178,9 +210,10 @@ describe('SiderailNavButton', () => {
     expect(button).not.toHaveClass('active');
   });
 
-  it('should display have open and active className if workspace is active', async () => {
+  it('should display active className if workspace is active and workspace window is normal', async () => {
     (useWorkspaces as jest.Mock).mockReturnValue({
-      workspaces: [{ name: 'visit-note' }, { type: 'order' }],
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
+      workspaceWindowState: 'normal',
     });
 
     mockedUseLayoutType.mockReturnValue('small-desktop');
@@ -194,7 +227,7 @@ describe('SiderailNavButton', () => {
         label={'Visit note'}
         iconDescription={'Note'}
         handler={handler}
-        workspaceMatcher={'visit-note'}
+        type={'visit-note'}
       />,
     );
 
@@ -202,5 +235,32 @@ describe('SiderailNavButton', () => {
     expect(button).toBeInTheDocument();
 
     expect(button).toHaveClass('active');
+  });
+
+  it('should not display active className if workspace is active but workspace window is hidden', async () => {
+    (useWorkspaces as jest.Mock).mockReturnValue({
+      workspaces: [{ type: 'visit-note' }, { type: 'order' }],
+      workspaceWindowState: 'hidden',
+    });
+
+    mockedUseLayoutType.mockReturnValue('small-desktop');
+
+    const handler = jest.fn();
+
+    render(
+      <SiderailNavButton
+        name={'visit-note-nav-button'}
+        getIcon={(props) => <Pen {...props} />}
+        label={'Visit note'}
+        iconDescription={'Note'}
+        handler={handler}
+        type={'visit-note'}
+      />,
+    );
+
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+
+    expect(button).not.toHaveClass('active');
   });
 });

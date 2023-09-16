@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Tag } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
 import styles from './siderail-nav-button.scss';
@@ -24,10 +24,11 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   tagContent,
 }) => {
   const layout = useLayoutType();
-  const { workspaces } = useWorkspaces();
+  const { workspaces, workspaceWindowState } = useWorkspaces();
 
   const workspaceIndex = workspaces?.findIndex(({ type: workspaceType }) => workspaceType === type) ?? -1;
-  const isWorkspaceActive = workspaceIndex === 0;
+  const isWorkspaceActive =
+    (workspaceWindowState === 'normal' || workspaceWindowState === 'maximized') && workspaceIndex === 0;
 
   if (layout === 'tablet') {
     return (
