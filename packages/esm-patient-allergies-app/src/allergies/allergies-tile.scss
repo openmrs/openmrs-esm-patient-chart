@@ -17,18 +17,3 @@
 
 }
 
-.tile {
-  @include type.type-style('body-compact-01');
-  background-color: #ffc9a3;
-  font-size: 12px;
-  color: #943d00;
-  text-align: center;
-  min-height: unset;
-  min-width: unset;
-  height: 1.5rem;
-  padding: 0 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-}

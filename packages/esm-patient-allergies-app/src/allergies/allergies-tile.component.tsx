@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile } from '@carbon/react';
+import { Tag } from '@carbon/react';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-tile.scss';
 
@@ -16,7 +16,7 @@ const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
     return (
       <div className={styles.content}>
         {allergies?.map((allergy) => (
-          <Tile className={styles.tile}>{allergy?.display}</Tile>
+          <Tag type="red">{allergy?.display}</Tag>
         ))}
       </div>
     );
