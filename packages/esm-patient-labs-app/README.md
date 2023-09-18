@@ -1,6 +1,6 @@
 # esm-patient-labs-app
 
-Funcitonality for viewing test results and ordering labs.
+Functionality for viewing test results and ordering labs.
 
 ## Test Results
 
