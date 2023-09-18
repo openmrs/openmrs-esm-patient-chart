@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { OBSERVATION_INTERPRETATION, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
-import { ObsRecord } from '../panel-view/types';
+import { ObsRecord } from '../../types';
 import styles from './timeline.scss';
 import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { ParsedTimeType } from '../filter/filter-types';

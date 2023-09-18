@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
-import { ObsRecord } from './types';
+import { ObsRecord } from '../../types';
 import { testResultsBasePath } from '../helpers';
 import LabSetPanel from './panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';

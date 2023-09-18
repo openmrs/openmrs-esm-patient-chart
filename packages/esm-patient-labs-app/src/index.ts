@@ -7,12 +7,12 @@ import {
 } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
+import { dashboardMeta } from './test-results/dashboard.meta';
 
-const moduleName = '@openmrs/esm-patient-test-results-app';
+const moduleName = '@openmrs/esm-patient-labs-app';
 
 const options = {
-  featureName: 'patient-test-results',
+  featureName: 'patient-labs',
   moduleName,
 };
 
@@ -27,10 +27,9 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const externalOverview = getAsyncLifecycle(() => import('./overview/external-overview.component'), options);
-
-export const resultsViewer = getAsyncLifecycle(() => import('./results-viewer'), options);
-export const printModal = getAsyncLifecycle(() => import('./print-modal/print-modal.component'), options);
+export const externalOverview = getAsyncLifecycle(() => import('./test-results/overview/external-overview.extension'), options);
+export const resultsViewer = getAsyncLifecycle(() => import('./test-results/results-viewer'), options);
+export const printModal = getAsyncLifecycle(() => import('./test-results/print-modal/print-modal.extension'), options);
 
 export const testResultsDashboardLink =
   // t('Test Results', 'Test Results')

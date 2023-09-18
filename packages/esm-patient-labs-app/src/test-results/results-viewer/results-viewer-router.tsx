@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import RoutedResultsViewer from './results-viewer';
+import RoutedResultsViewer from './results-viewer.extension';
 
 const ResultsView = ({ basePath, patientUuid }) => {
   return (

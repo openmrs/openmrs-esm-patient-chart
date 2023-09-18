@@ -13,7 +13,7 @@ import {
   Layer,
 } from '@carbon/react';
 import { getClass } from './helper';
-import { ObsRecord } from './types';
+import { ObsRecord } from '../../types';
 import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 
 interface LabSetPanelProps {

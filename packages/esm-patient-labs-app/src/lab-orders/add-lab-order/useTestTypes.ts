@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable';
-import { Concept } from '../../panel-view/types';
+import { Concept } from '../../types';
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 

@@ -1,6 +1,10 @@
-# esm-patient-test-results-app
+# esm-patient-labs-app
 
-The test results widget. It provides tabular and chart-based overviews of the test results available for a patient. 
+Funcitonality for viewing test results and ordering labs.
+
+## Test Results
+
+It provides tabular and chart-based overviews of the test results available for a patient. 
 
 IMPORTANT NOTE: To have data show up in this view, your concepts just need to have "Type: Test" or "Type: LabSet". 
 If you are seeing strange things showing up, like Temperature, in the Test Results viewer, then you probably just need to change the Type for your Temperature concept to something other than "Test", like finding. 
@@ -58,4 +62,4 @@ Review your concepts to see that the hierarchy all looks right in the Dictionary
 
 ### 5. Update the config-schema file with your ConvSet codes
 Go here to add the UUIDs for each of your ConvSet concepts which you want to show up in the Lab Results filters: 
-https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-test-results-app/src/config-schema.ts#L3
+https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-labs-app/src/config-schema.ts#L3

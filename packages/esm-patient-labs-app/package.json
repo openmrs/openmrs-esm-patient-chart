@@ -1,9 +1,9 @@
 {
-  "name": "@openmrs/esm-patient-test-results-app",
+  "name": "@openmrs/esm-patient-labs-app",
   "version": "5.0.0",
   "license": "MPL-2.0",
-  "description": "Patient test results microfrontend for the OpenMRS SPA",
-  "browser": "dist/openmrs-esm-patient-test-results-app.js",
+  "description": "Patient lab order and test results microfrontend for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-patient-labs-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {

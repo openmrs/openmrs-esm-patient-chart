@@ -4,7 +4,7 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';
 import { ParsedTimeType } from '../filter/filter-types';
-import { ObsRecord } from '../panel-view/types';
+import { ObsRecord } from '../../types';
 
 const RecentResultsGrid = (props) => {
   return <div {...props} className={styles['recent-results-grid']} />;

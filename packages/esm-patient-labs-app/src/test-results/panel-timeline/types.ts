@@ -1,5 +1,5 @@
 import { ParsedTimeType } from '../filter/filter-types';
-import { ObsRecord } from '../panel-view/types';
+import { ObsRecord } from '../../types';
 
 export interface TimelineData {
   parsedTimes: ParsedTimeType;

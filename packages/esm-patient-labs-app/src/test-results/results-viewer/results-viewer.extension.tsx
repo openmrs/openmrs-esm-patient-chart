@@ -13,7 +13,7 @@ import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
 import { Printer } from '@carbon/react/icons';
-import { ConfigObject } from '../config-schema';
+import { ConfigObject } from '../../config-schema';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';

@@ -7,7 +7,7 @@ import type { FilterNodeProps, FilterLeafProps } from './filter-types';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
 import FilterContext from './filter-context';
 import styles from './filter-set.styles.scss';
-import { ConfigObject } from '../config-schema';
+import { ConfigObject } from '../../config-schema';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);

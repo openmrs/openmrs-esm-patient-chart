@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseTime } from './helpers';
-import { ObsRecord } from '../panel-view/types';
+import { ObsRecord } from '../../types';
 import Timeline from './timeline.component';
 
 interface PanelTimelineComponentProps {
