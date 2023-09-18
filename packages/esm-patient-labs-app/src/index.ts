@@ -27,7 +27,10 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const externalOverview = getAsyncLifecycle(() => import('./test-results/overview/external-overview.extension'), options);
+export const externalOverview = getAsyncLifecycle(
+  () => import('./test-results/overview/external-overview.extension'),
+  options,
+);
 export const resultsViewer = getAsyncLifecycle(() => import('./test-results/results-viewer'), options);
 export const printModal = getAsyncLifecycle(() => import('./test-results/print-modal/print-modal.extension'), options);
 
