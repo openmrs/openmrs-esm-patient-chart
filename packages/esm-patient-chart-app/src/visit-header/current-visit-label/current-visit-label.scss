@@ -1,0 +1,53 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.currentVisitLabelContainer {
+    display: flex;
+    min-width: 18rem;
+    align-items: center;
+    height: spacing.$spacing-09;
+    justify-content: space-between;
+    color: #ccd9d9;
+    @include type.type-style("body-compact-01");
+    padding: 0 spacing.$spacing-05;
+    width: 100%;
+    & button {
+        visibility: hidden;
+        background-color: transparent;
+    }
+
+    &:hover {
+        background-color: colors.$teal-90;
+        cursor: pointer;
+
+        & button {
+            visibility: visible;
+            background-color: transparent;
+        }
+    }
+
+    &> div{
+        display: flex;
+        align-items: center;
+    }
+}
+
+.tag{
+    margin-left: spacing.$spacing-05;
+}
+
+.priorityTag {
+    background-color:#ffc9a3;
+    color:#943d00
+}
+
+.visitName {
+    margin-right: spacing.$spacing-05;
+}
+
+
+.container {
+    display: flex;
+    align-items:center;
+}

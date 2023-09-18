@@ -1,0 +1,69 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.container {
+    display: flex;
+    align-items:center;
+    width: 100%;
+    &:hover {
+        background-color: colors.$teal-90;
+    }
+}
+
+.toolTip {
+    text-transform: capitalize;
+    min-height: spacing.$spacing-09;
+    display: flex;
+    cursor: pointer;
+    min-width: 16rem;
+
+   
+}
+
+.toolTipContainer {
+
+    @extend .toolTip;
+    display: flex;
+    align-items: center;
+    padding-left: spacing.$spacing-05;
+
+    &>button {
+        height: spacing.$spacing-09;
+        background-color: transparent;
+        outline: none;
+        border: none;
+        @include type.type-style("heading-compact-01");
+        color: colors.$white-0;
+        cursor: pointer;
+    }
+}
+
+.tooltipPatientName {
+    @include type.type-style("heading-01");
+    color: colors.$white-0;
+}
+
+.tooltipPatientInfo {
+    @include type.type-style("body-compact-01");
+    color: colors.$gray-30;
+    margin-top: spacing.$spacing-03;
+}
+
+.patientInfoContainer {
+    display: flex;
+    align-items: center;
+    @extend .toolTip;
+    padding-left: spacing.$spacing-05;
+
+    .patientName {
+        @include type.type-style("heading-compact-01");
+        color: colors.$white-0;
+    }
+
+    .patientInfo {
+        padding-left: spacing.$spacing-05;
+        @include type.type-style("body-compact-01");
+        color: colors.$gray-30;
+    }
+}

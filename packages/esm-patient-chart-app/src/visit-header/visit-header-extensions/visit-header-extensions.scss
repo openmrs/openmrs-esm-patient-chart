@@ -1,0 +1,100 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.topNavHeader {
+  top: var(--omrs-offline-banner-height);
+  @include brand-02(background-color);
+}
+
+.headerGlobalBarCloseButton {
+  @include brand-02(background-color);
+}
+
+.headerName {
+  display: flex;
+}
+
+.navLogo {
+  margin-right: spacing.$spacing-06;
+  margin-left: spacing.$spacing-04;
+}
+
+.startVisitButton {
+  @include brand-03(background-color);
+
+  &:hover {
+    background-color: colors.$teal-90;
+  }
+}
+
+.patientDetails {
+  display: flex;
+  align-items: center;
+  color: $ui-02;
+  padding: spacing.$spacing-04 spacing.$spacing-05;
+
+  &:hover {
+    background-color: colors.$teal-90;
+  }
+
+  :global(.cds--popover--bottom .cds--popover-content) {
+    text-align: center
+  }
+
+  .patientName {
+    @include type.type-style('heading-compact-01');
+    color: $ui-02;
+  }
+
+  .longPatientNameBtn {
+    @extend .patientName;
+    margin-right: spacing.$spacing-05;
+    padding-right: 0.5rem;
+  }
+
+  .tooltipPatientName {
+    @include type.type-style('productive-heading-01');
+    color:$ui-02;
+  }
+
+  .longPatientNameBtn {
+    background-color: transparent;
+    border: none;
+    outline: none;
+  }
+
+  .patientInfo {
+    color: $color-gray-30;
+    @include type.type-style('body-compact-01');
+    margin: 0 spacing.$spacing-03 0;
+  }
+}
+
+.tooltipPatientInfo {
+  @include type.type-style('body-short-01');
+  color:$color-gray-30;
+  margin-top:spacing.$spacing-03;
+}
+
+.tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
+  border-bottom: none;
+}
+
+.navDivider {
+  background-color: colors.$teal-20;
+  width: 0.05rem;
+  height: 2.25rem;
+}
+
+.tag {
+  margin: 0.25rem 0;
+}
+
+.priorityTag {
+  @extend .tag;
+  @include type.type-style('label-01');
+  color: #943d00;
+  background-color: #ffc9a3;
+}

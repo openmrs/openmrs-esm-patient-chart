@@ -1,0 +1,34 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.queueEntryContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: spacing.$spacing-09;
+    color: #ccd9d9;
+    @include type.type-style("body-compact-01");
+    padding: 0 spacing.$spacing-05;
+    width: 100%;
+    min-width: 16rem;
+    & button {
+        visibility: hidden;
+        background-color: transparent;
+    }
+
+    &:hover {
+        background-color: colors.$teal-90;
+        cursor: pointer;
+
+        & button {
+            visibility: visible;
+            background-color: transparent;
+        }
+    }
+
+}
+.container {
+    display: flex;
+    align-items:center;
+}
