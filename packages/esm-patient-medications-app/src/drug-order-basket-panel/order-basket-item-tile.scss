@@ -10,6 +10,7 @@
 .clickableTileTablet {
   &:not(:last-of-type) {
     border-bottom: 0.0625rem solid $ui-03;
+    padding: 15px;
   }
 
   &:nth-child(even) {
@@ -17,7 +18,7 @@
   }
 
   &:nth-child(odd) {
-    background-color: $ui-01;
+    background-color: $ui-02;
   }
 }
 
