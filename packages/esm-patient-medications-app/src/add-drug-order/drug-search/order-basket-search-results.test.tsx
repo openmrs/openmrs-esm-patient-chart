@@ -58,7 +58,7 @@ describe('OrderBasketSearchResults', () => {
     expect(asprin162).toBeInTheDocument();
     expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
 
-    expect(screen.getAllByRole('button', { name: /Immediately add to basket/i }).length).toEqual(3);
+    expect(screen.getAllByRole('button', { name: /Add to basket/i }).length).toEqual(3);
 
     await waitFor(() => user.click(screen.getAllByRole('listitem')[0]));
 

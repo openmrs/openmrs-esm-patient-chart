@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import { ShoppingCart } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
+import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
+import { ArrowRight, ShoppingCart } from '@carbon/react/icons';
+import { Trans, useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
 import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
@@ -118,50 +118,50 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
   return (
     <>
       {orderItems.map((orderItem, indx) => (
-        <ClickableTile
+        <Tile
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"
-          className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-          onClick={() => onSearchResultClicked(orderItem, false)}
+          className={`${styles.searchResultTile} ${isTablet && styles.tabletSearchResultTile}`}
         >
-          <div className={styles.searchResultTile}>
-            <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
-              <p>
-                <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
-                {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
-                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
-              </p>
-              <UserHasAccess privilege="Manage OrderTemplates">
-                {fetchingDrugOrderTemplatesError ? (
-                  <p>
-                    <span className={styles.errorLabel}>
-                      {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
-                    </span>
-                  </p>
-                ) : (
-                  <p>
-                    {orderItem?.frequency?.value && (
-                      <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
-                    )}
-                    {orderItem?.route?.value && (
-                      <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
-                    )}
-                  </p>
-                )}
-              </UserHasAccess>
-            </div>
-            <Button
-              className={styles.addToBasketButton}
-              kind="ghost"
-              hasIconOnly={true}
-              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
-              iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
-              onClick={() => onSearchResultClicked(orderItem, true)}
-              tooltipPosition="left"
-              tooltipAlignment="end"
-            />
+          <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
+            <p>
+              <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
+              {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+              {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+            </p>
+            <UserHasAccess privilege="Manage OrderTemplates">
+              {fetchingDrugOrderTemplatesError ? (
+                <p>
+                  <span className={styles.errorLabel}>
+                    {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
+                  </span>
+                </p>
+              ) : (
+                <p>
+                  {orderItem?.frequency?.value && (
+                    <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
+                  )}
+                  {orderItem?.route?.value && (
+                    <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
+                  )}
+                </p>
+              )}
+            </UserHasAccess>
           </div>
-        </ClickableTile>
+          <div className={styles.searchResultActions}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
+              onClick={() => onSearchResultClicked(orderItem, true)}
+            >{t('directlyAddToBasket', 'Add to basket')}</Button>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <ArrowRight size={16} {...props} />}
+              onClick={() => onSearchResultClicked(orderItem, false)}
+            >{t('goToDrugOrderForm', 'Order form')}
+            </Button>
+          </div>
+        </Tile>
       ))}
     </>
   );
