@@ -103,8 +103,11 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
  *   it will be opened and focused.
  * - If a workspace with the same name is already open, it will be displayed/focused,
  *   if it was not already.
- * - If another workspace with the same type is open, a confirmation modal will pop up a
- *   warning about closing the currently open workspace.
+ * - If a workspace is launched and a workspace which cannot be hidden is already open,
+ *  a confirmation modal will pop up warning about closing the currently open workspace.
+ * - If another workspace with the same type is open, the workspace will be brought to
+ *   the front and then a confirmation modal will pop up warning about closing the opened
+ *   workspace
  *
  * Note that this function just manipulates the workspace store. The UI logic based on
  * the workspace store is contained in esm-patient-chart-app.
@@ -114,7 +117,6 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
  */
 export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const store = getWorkspaceStore();
-  const state = store.getState();
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
@@ -122,21 +124,26 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
-  const existingWorkspaces = state.openWorkspaces.filter((w) => w.type == newWorkspace.type);
 
-  if (existingWorkspaces.length == 0) {
-    store.setState({ ...state, openWorkspaces: [newWorkspace, ...state.openWorkspaces] });
-  } else {
-    const existingIdx = state.openWorkspaces.findIndex((w) => w.name == name);
-    const promptCheckFcn = getPromptBeforeClosingFcn(existingWorkspaces[0].name);
-    if (existingIdx >= 0) {
-      const restOfWorkspaces = [...state.openWorkspaces];
-      restOfWorkspaces.splice(existingIdx, 1);
-      state.openWorkspaces[existingIdx].additionalProps = newWorkspace.additionalProps;
-      const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
-      store.setState({ ...state, openWorkspaces });
-    } else if (!promptCheckFcn || promptCheckFcn()) {
-      const currentName = existingWorkspaces[0].title ?? existingWorkspaces[0].name;
+  const updateStoreWithNewWorkspace = (workspaceToBeAdded: OpenWorkspace, restWorkspaces = null) => {
+    if (!restWorkspaces) {
+      restWorkspaces = store.getState().openWorkspaces;
+    }
+    store.setState({ ...store.getState(), openWorkspaces: [workspaceToBeAdded, ...restWorkspaces] });
+  };
+
+  function promptBeforeLaunchingWorkspace(workspace: OpenWorkspace) {
+    const promptCheckFcn = getPromptBeforeClosingFcn(workspace.name);
+
+    const proceed = () => {
+      workspace.closeWorkspace();
+      // Calling the launchPatientWorkspace again, since one of the `if` case
+      // might resolve, but we need to check all the cases before launching the form.
+      launchPatientWorkspace(name, additionalProps);
+    };
+
+    if (!promptCheckFcn || promptCheckFcn()) {
+      const currentName = workspace.title ?? workspace.name;
       const prompt: Prompt = {
         title: translateFrom(
           '@openmrs/esm-patient-chart-app',
@@ -150,22 +157,38 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
           { formName: currentName },
         ),
         onConfirm: () => {
-          const state = store.getState();
           store.setState({
-            openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
             prompt: null,
           });
+          proceed();
         },
         confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
       };
-      store.setState({ ...state, prompt });
+      store.setState({ ...store.getState(), prompt });
     } else {
-      const state = store.getState();
-      store.setState({
-        ...state,
-        openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
-      });
+      proceed();
     }
+  }
+
+  const openWorkspaces = store.getState().openWorkspaces;
+  const workspaceIndexInOpenWorkspaces = openWorkspaces.findIndex((w) => w.name === name);
+  const isWorkspaceAlreadyOpen = workspaceIndexInOpenWorkspaces >= 0;
+  const openedWorkspaceWithSameType = openWorkspaces.find((w) => w.type == newWorkspace.type);
+
+  if (openWorkspaces.length === 0) {
+    updateStoreWithNewWorkspace(newWorkspace);
+  } else if (!openWorkspaces[0].canHide && workspaceIndexInOpenWorkspaces !== 0) {
+    promptBeforeLaunchingWorkspace(openWorkspaces[0]);
+  } else if (isWorkspaceAlreadyOpen) {
+    openWorkspaces[workspaceIndexInOpenWorkspaces].additionalProps = newWorkspace.additionalProps;
+    const restOfWorkspaces = openWorkspaces.filter((w) => w.name != name);
+    updateStoreWithNewWorkspace(openWorkspaces[workspaceIndexInOpenWorkspaces], restOfWorkspaces);
+  } else if (!!openedWorkspaceWithSameType) {
+    const restOfWorkspaces = store.getState().openWorkspaces.filter((w) => w.type != newWorkspace.type);
+    updateStoreWithNewWorkspace(openedWorkspaceWithSameType, restOfWorkspaces);
+    promptBeforeLaunchingWorkspace(openedWorkspaceWithSameType);
+  } else {
+    updateStoreWithNewWorkspace(newWorkspace);
   }
 }
 
