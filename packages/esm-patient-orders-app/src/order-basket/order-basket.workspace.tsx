@@ -98,8 +98,10 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     <>
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
-          <ExtensionSlot name="order-basket-slot"
-            className={`${styles.orderBasketSlot} ${isTablet ? styles.orderBasketSlotTablet : ''}`} />
+          <ExtensionSlot
+            name="order-basket-slot"
+            className={`${styles.orderBasketSlot} ${isTablet ? styles.orderBasketSlotTablet : ''}`}
+          />
         </div>
 
         <div>
