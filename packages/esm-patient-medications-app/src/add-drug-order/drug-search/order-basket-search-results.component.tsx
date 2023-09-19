@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import { ArrowRight, ShoppingCart } from '@carbon/react/icons';
+import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
@@ -105,14 +105,14 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const patient = usePatient();
-  const { data: activeOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const drugAlreadyInBasket = useMemo(
-    () => orders.some(order => ordersEqual(order, getTemplateOrderBasketItem(drug)))
-    , [orders, drug]
+    () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
+    [orders, drug],
   );
   const drugAlreadyPrescribed = useMemo(
-    () => activeOrders.some(order => ordersEqual(order, getTemplateOrderBasketItem(drug)))
-    , [activeOrders, drug]
+    () => activeOrders?.some((order) => order.drug.uuid == drug.uuid),
+    [activeOrders, drug],
   );
 
   const {
@@ -132,10 +132,17 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
 
   const addToBasket = useCallback(
     (searchResult: DrugOrderBasketItem) => {
-      setOrders([...orders, searchResult]);      
+      setOrders([...orders, searchResult]);
     },
-    []
-  )
+    [orders, setOrders],
+  );
+
+  const removeFromBasket = useCallback(
+    (searchResult: DrugOrderBasketItem) => {
+      setOrders(orders.filter((order) => !ordersEqual(order, searchResult)));
+    },
+    [orders, setOrders],
+  );
 
   return (
     <>
@@ -170,19 +177,40 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
               )}
             </UserHasAccess>
           </div>
-          <div className={styles.searchResultActions}>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
-              onClick={() => addToBasket(orderItem)}
-            >{t('directlyAddToBasket', 'Add to basket')}</Button>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowRight size={16} {...props} />}
-              onClick={() => openOrderForm(orderItem)}
-            >{t('goToDrugOrderForm', 'Order form')}
-            </Button>
-          </div>
+          {!isLoadingActiveOrders ? (
+            drugAlreadyPrescribed ? (
+              <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
+            ) : (
+              <div className={styles.searchResultActions}>
+                {drugAlreadyInBasket ? (
+                  <Button
+                    kind="danger--ghost"
+                    renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+                    onClick={() => removeFromBasket(orderItem)}
+                  >
+                    {t('removeFromBasket', 'Remove from basket')}
+                  </Button>
+                ) : (
+                  <Button
+                    kind="ghost"
+                    renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
+                    onClick={() => addToBasket(orderItem)}
+                    disabled={drugAlreadyPrescribed}
+                  >
+                    {t('directlyAddToBasket', 'Add to basket')}
+                  </Button>
+                )}
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={() => openOrderForm(orderItem)}
+                  disabled={drugAlreadyPrescribed}
+                >
+                  {t('goToDrugOrderForm', 'Order form')}
+                </Button>
+              </div>
+            )
+          ) : null}
         </Tile>
       ))}
     </>

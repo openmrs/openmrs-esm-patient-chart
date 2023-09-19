@@ -72,6 +72,7 @@
   "dispensingInformation": "3. Dispensing instructions",
   "dosageInstructions": "1. Dosage instructions",
   "dose": "Dose",
+  "drugAlreadyPrescribed": "Already prescribed",
   "duration": "Duration",
   "durationUnit": "Duration unit",
   "durationUnitPlaceholder": "Duration Unit",

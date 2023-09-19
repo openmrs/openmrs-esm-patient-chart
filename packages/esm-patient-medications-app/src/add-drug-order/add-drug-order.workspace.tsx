@@ -24,11 +24,15 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, currentOrder, orders, setOrders]);
 
-
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
-      setOrders([...orders, searchResult]);
-      setCurrentOrder(searchResult);
+      const existingOrder = orders.find((order) => ordersEqual(order, searchResult));
+      if (existingOrder) {
+        setCurrentOrder(existingOrder);
+      } else {
+        setOrders([...orders, searchResult]);
+        setCurrentOrder(searchResult);
+      }
     },
     [setOrders, orders],
   );
