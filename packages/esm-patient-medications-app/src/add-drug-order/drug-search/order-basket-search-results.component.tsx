@@ -10,7 +10,7 @@ import { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
@@ -95,7 +95,7 @@ export default function OrderBasketSearchResults({
 
 interface DrugSearchResultItemProps {
   drug: DrugSearchResult;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem) => void;
 }
 
 const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
@@ -122,7 +122,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"
           className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-          onClick={() => onSearchResultClicked(orderItem, false)}
+          onClick={() => onSearchResultClicked(orderItem)}
         >
           <div className={styles.searchResultTile}>
             <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
@@ -156,7 +156,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
               hasIconOnly={true}
               renderIcon={(props) => <ShoppingCart size={16} {...props} />}
               iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
-              onClick={() => onSearchResultClicked(orderItem, true)}
+              onClick={() => onSearchResultClicked(orderItem)}
               tooltipPosition="left"
               tooltipAlignment="end"
             />

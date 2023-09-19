@@ -28,7 +28,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   }, [closeWorkspace, currentOrder, orders, setOrders]);
 
   const chooseDrug = useCallback(
-    (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => {
+    (searchResult: DrugOrderBasketItem) => {
       if (activeOrders.data?.find((existing) => existing.drug?.concept.uuid === searchResult.drug?.concept.uuid)) {
         showToast({
           kind: 'warning',
@@ -41,11 +41,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
         return;
       }
       setOrders([...orders, searchResult]);
-      if (directlyAddToBasket) {
-        closeWorkspace();
-      } else {
-        setCurrentOrder(searchResult);
-      }
+      setCurrentOrder(searchResult);
     },
     [setOrders, orders, closeWorkspace, activeOrders.data, t],
   );

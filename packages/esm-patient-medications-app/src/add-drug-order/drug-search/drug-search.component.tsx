@@ -8,7 +8,7 @@ import { useDebounce } from './drug-search.resource';
 import { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchProps {
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem) => void;
 }
 
 export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasketSearchProps) {
