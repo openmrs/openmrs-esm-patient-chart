@@ -12,7 +12,12 @@ jest.mock('@openmrs/esm-framework', () => {
       mockExtensionRegistry[ext.name] = ext;
     },
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
-    translateFrom: (module, key, defaultValue, options) => defaultValue,
+    translateFrom: (module, key, defaultValue, options = {}) => {
+      Object.keys(options).forEach((key) => {
+        defaultValue = defaultValue.replace(`{${key}}`, options[key]);
+      });
+      return defaultValue;
+    },
   };
 });
 
@@ -74,9 +79,9 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions', { foo: true });
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
-      expect(prompt.title).toMatch('There is an active form open in the workspace');
+      expect(prompt.title).toMatch('You have unsaved changes');
       expect(prompt.body).toMatch(
-        'Launching a new form in the workspace could cause you to lose unsaved work on the Allergies form.',
+        'There are unsaved changes in Allergies. Please save them before opening another form.',
       );
       expect(prompt.confirmText).toMatch('Open anyway');
       prompt.onConfirm();
@@ -138,9 +143,9 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces[1].name).toBe('conditions');
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
-      expect(prompt.title).toMatch('There is an active form open in the workspace');
+      expect(prompt.title).toMatch('You have unsaved changes');
       expect(prompt.body).toMatch(
-        'Launching a new form in the workspace could cause you to lose unsaved work on the Allergies form.',
+        'There are unsaved changes in Allergies. Please save them before opening another form.',
       );
       expect(prompt.confirmText).toMatch('Open anyway');
       prompt.onConfirm();
@@ -224,7 +229,7 @@ describe('workspace system', () => {
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
       expect(prompt.body).toMatch(
-        'Launching a new form in the workspace could cause you to lose unsaved work on the Conditions form.',
+        'There are unsaved changes in Conditions. Please save them before opening another form.',
       );
       // Closing the conditions workspace because it cannot be hidden
       prompt.onConfirm();
@@ -234,7 +239,7 @@ describe('workspace system', () => {
       const prompt2 = store.getState().prompt;
       expect(prompt2).toBeTruthy();
       expect(prompt2.body).toMatch(
-        'Launching a new form in the workspace could cause you to lose unsaved work on the Allergies form.',
+        'There are unsaved changes in Allergies. Please save them before opening another form.',
       );
       prompt2.onConfirm();
       expect(store.getState().openWorkspaces.length).toEqual(2);
@@ -264,7 +269,7 @@ describe('workspace system', () => {
     launchPatientWorkspace('form-entry', { foo: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
-    expect(store.getState().prompt.title).toMatch(/active form open/);
+    expect(store.getState().prompt.title).toMatch('You have unsaved changes');
     store.getState().prompt.onConfirm();
     expect(store.getState().prompt).toBeNull();
     expect(store.getState().openWorkspaces.length).toEqual(1);
@@ -281,7 +286,7 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('form-entry');
     expect(store.getState().openWorkspaces[1].name).toBe('order-meds');
-    expect(store.getState().prompt.title).toMatch(/active form open/);
+    expect(store.getState().prompt.title).toMatch('You have unsaved changes');
     cancelPrompt(); // should leave same workspaces intact
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('form-entry');
@@ -309,7 +314,7 @@ describe('workspace system', () => {
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
     launchPatientWorkspace('hiv');
     expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
-    expect(store.getState().prompt.title).toMatch(/active form open/);
+    expect(store.getState().prompt.title).toBe('You have unsaved changes');
     store.getState().prompt.onConfirm();
     expect(store.getState().openWorkspaces[0].name).toBe('hiv');
   });
