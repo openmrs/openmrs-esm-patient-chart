@@ -3,52 +3,16 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
-.actionText {
-  @include type.type-style("body-compact-01");
-  color: $text-02;
-  margin-bottom: 1rem;
-}
-
-.content {
-  @include type.type-style("heading-compact-01");
-  color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
-}
-
-.heading {
-  display: flex;
-  justify-content: space-between;
-  text-align: left;
-  text-transform: capitalize;
-  h4 {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
-}
-
-.title {
-  display: flex;
-  align-items: center;
-}
-
-.headingIcon {
-   margin: 0.3rem;
-   margin-right: 0.8rem;
-}
-
 .desktopTile {
+  background-color: $ui-02;
   padding: 0;
   border-top: 1px solid #bae6ff;
   border-right: none;
-  border-left: 4px solid #0072c3;
 }
 
 .tabletTile {
-  padding: spacing.$spacing-03;
-  background-color: white;
-  border: 1px solid $grey-2;
-  border-bottom: none;
+  background-color: $ui-02;
+  padding: 0;
 }
 
 .collapsedTile {
@@ -63,11 +27,35 @@
   border-bottom: 1px solid $grey-2;
 }
 
-.orderBasketContainerDesktop {
-  margin-bottom: 1rem;
+.heading {
+  background-color: $ui-02;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  text-transform: capitalize;
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
 }
 
-.orderBasketContainerTablet {
-  margin-bottom: 1rem;
-  border: 1px solid $ui-03;
+.desktopTile .heading {
+  border-left: 4px solid #0072c3;
+}
+
+.tabletTile .heading {
+  padding: spacing.$spacing-03;
+  border-top: 1px solid $grey-2;
+  border-right: 1px solid $grey-2;
+  border-left: 1px solid $grey-2;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.headingIcon {
+   margin: 0.3rem 0.8rem 0 0.3rem;
 }
