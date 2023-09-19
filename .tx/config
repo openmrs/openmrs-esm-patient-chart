@@ -92,8 +92,8 @@ source_file = packages/esm-patient-immunizations-app/translations/en.json
 source_lang = en
 type = KEYVALUEJSON
 
-[openmrs-esm-patient-chart.esm-patient-test-results-app]
-file_filter = packages/esm-patient-test-results-app/translations/<lang>.json
-source_file = packages/esm-patient-test-results-app/translations/en.json
+[openmrs-esm-patient-chart.esm-patient-labs-app]
+file_filter = packages/esm-patient-labs-app/translations/<lang>.json
+source_file = packages/esm-patient-labs-app/translations/en.json
 source_lang = en
 type = KEYVALUEJSON
