@@ -68,7 +68,6 @@ describe('OrderBasketSearchResults', () => {
         undefined,
         mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
       ),
-      false,
     );
   });
 });
