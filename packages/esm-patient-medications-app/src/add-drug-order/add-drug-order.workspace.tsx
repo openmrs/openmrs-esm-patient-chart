@@ -43,6 +43,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       setOrders([...orders, searchResult]);
       if (directlyAddToBasket) {
         closeWorkspace();
+        launchPatientWorkspace('order-basket');
       } else {
         setCurrentOrder(searchResult);
       }
