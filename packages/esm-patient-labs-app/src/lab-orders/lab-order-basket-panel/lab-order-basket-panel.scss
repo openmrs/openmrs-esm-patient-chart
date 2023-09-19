@@ -16,17 +16,10 @@
   margin-bottom: spacing.$spacing-03;
 }
 
-.desktopHeading {
+.desktopHeading, .tabletHeading {
   background-color: white;
   h4 {
     @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
-}
-
-.tabletHeading {
-  h4 {
-    @include type.type-style('heading-03');
     color: $text-02;
   }
 }
@@ -53,6 +46,12 @@
   border-top: 1px solid #e8daff;
   border-right: none;
   border-left: 4px solid #6929c4;
+}
+
+.tabletTile {
+  padding: 0;
+  border-top: 1px solid #e8daff;
+  border-right: none;
 }
 
 .collapsedTile {
