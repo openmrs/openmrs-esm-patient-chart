@@ -1,8 +1,6 @@
 {
-  "all": "All",
   "checkFilters": "Check the filters above",
   "clinicalForm": "ទម្រង់គ្លីនិក",
-  "completed": "Completed",
   "editForm": "Edit form",
   "form": "ទម្រង់",
   "formName": "ឈ្មោះទម្រង់ (A-Z)",
@@ -11,7 +9,6 @@
   "homeOverviewCardView": "ពិនិត្យមើល",
   "lastCompleted": "បញ្ចប់ចុងក្រោយ",
   "never": "មិនដែលសោះ",
-  "noFormsAvailable": "មិនមានទម្រង់ដើម្បីបង្ហាញសម្រាប់អ្នកជំងឺនេះទេ",
   "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "There are no {formCategory} forms to display",
   "noMatchingFormsToDisplay": "No matching forms to display",
@@ -24,8 +21,6 @@
   "offlinePatientsTableSearchLabel": "ស្វែងរកបញ្ជីនេះ។",
   "offlinePatientsTableSearchPlaceholder": "ស្វែងរកបញ្ជីនេះ។",
   "offlineToggle": "បិទបើកក្រៅបណ្តាញ",
-  "recommended": "Recommended",
   "searchForAForm": "Search for a form",
-  "searchThisList": "Search this list",
-  "seeAll": "មើលឃើញទាំងអស់"
+  "searchThisList": "Search this list"
 }

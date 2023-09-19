@@ -1,8 +1,6 @@
 {
-  "all": "Tout",
   "checkFilters": "Check the filters above",
   "clinicalForm": "Formulaire clinique",
-  "completed": "Complété",
   "editForm": "Edit form",
   "form": "Formulaire",
   "formName": "Nom du formulaire (A-Z)",
@@ -11,7 +9,6 @@
   "homeOverviewCardView": "Voir",
   "lastCompleted": "Dernière mise à jour",
   "never": "Jamais",
-  "noFormsAvailable": "Il n'y a pas de formulaires à afficher pour ce patient",
   "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "Il n'y a pas de formulaires {FormCategory} à afficher",
   "noMatchingFormsToDisplay": "Pas de formulaires correspondants à afficher",
@@ -24,8 +21,6 @@
   "offlinePatientsTableSearchLabel": "Chercher dans cette liste",
   "offlinePatientsTableSearchPlaceholder": "Chercher dans cette liste",
   "offlineToggle": "Basculer en mode sans connexion internet",
-  "recommended": "Recommandé",
   "searchForAForm": "Search for a form",
-  "searchThisList": "Chercher dans cette liste",
-  "seeAll": "Voir tout"
+  "searchThisList": "Chercher dans cette liste"
 }
