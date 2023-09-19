@@ -1,5 +1,5 @@
 {
-  "activeFormWarning": "יש טופס פעיל פתוח במרחב העבודה",
+  "activeFormWarning": "יש לך שינויים שלא נשמרו",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "הוסף ביקור עבר",
   "addPastVisitText": "ניתן להוסיף ביקור עבר חדש או לעדכן ביקור ישן. בחר אחת מהאפשרויות להמשך.",
@@ -153,6 +153,6 @@
   "visitType_title": "Visit Type",
   "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
-  "workspaceModalText": "הפעלת טופס חדש בסביבת העבודה עשויה לגרום לאובדן עבודה שלא נשמרה בטופס {formName}.",
+  "workspaceModalText": "ישנם שינויים שלא נשמרו ב-{formName}. נא לשמור אותם לפני פתיחת טופס נוסף.",
   "yes": "כן"
 }
