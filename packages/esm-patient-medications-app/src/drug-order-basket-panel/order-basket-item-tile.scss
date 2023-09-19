@@ -8,17 +8,9 @@
 }
 
 .clickableTileTablet {
+  background-color: $ui-02;
   &:not(:last-of-type) {
-    border-bottom: 0.0625rem solid $ui-03;
     padding: 15px;
-  }
-
-  &:nth-child(even) {
-    background-color: $ui-02;
-  }
-
-  &:nth-child(odd) {
-    background-color: $ui-02;
   }
 }
 

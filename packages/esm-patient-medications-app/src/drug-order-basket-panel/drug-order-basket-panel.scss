@@ -16,19 +16,15 @@
   margin-bottom: spacing.$spacing-03;
 }
 
-.desktopHeading, .tabletHeading{
-  background-color: white;
-  h4 {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
-}
-
-.desktopHeading, .tabletHeading {
+.heading {
   display: flex;
   justify-content: space-between;
   text-align: left;
   text-transform: capitalize;
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
 }
 
 .title {
@@ -49,9 +45,10 @@
 }
 
 .tabletTile {
-  padding: 0;
-  border-top: 1px solid #bae6ff;
-  border-right: none;
+  padding: spacing.$spacing-03;
+  background-color: white;
+  border: 1px solid $grey-2;
+  border-bottom: none;
 }
 
 .collapsedTile {
@@ -60,6 +57,10 @@
   .orderBasketHeader {
     margin-bottom: 0;
   }
+}
+
+.tabletTile.collapsedTile {
+  border-bottom: 1px solid $grey-2;
 }
 
 .orderBasketContainerDesktop {
