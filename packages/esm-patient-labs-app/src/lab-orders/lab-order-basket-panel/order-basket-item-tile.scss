@@ -5,21 +5,16 @@
 
 .clickableTileDesktop {
   margin-bottom: 0.5rem;
+  border-left: 4px solid #6929c4;
 }
 
 .clickableTileTablet {
+  background-color: $ui-02;
   &:not(:last-of-type) {
-    border-bottom: 0.0625rem solid $ui-03;
-  }
-
-  &:nth-child(even) {
-    background-color: $ui-02;
-  }
-
-  &:nth-child(odd) {
-    background-color: $ui-01;
+    padding: 15px;
   }
 }
+
 
 .orderBasketItemTile {
   display: flex;
