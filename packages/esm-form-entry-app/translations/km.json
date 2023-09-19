@@ -1,5 +1,4 @@
 {
-  "ADD_SECaddSecondOND": "Add a second",
   "aDayAgo": "a day ago",
   "aFewSecondsAgo": "a few seconds ago",
   "aMinuteAgo": "a minute ago",
@@ -8,6 +7,7 @@
   "add": "Add",
   "addHour": "Add a hour",
   "addMinute": "Add a minute",
+  "addSecond": "Add a second",
   "anHourAgo": "an hour ago",
   "cancel": "Cancel",
   "changeToMonthView": "Change to month view",
@@ -29,7 +29,7 @@
   "futureDateRestriction": "Future date is not allowed!",
   "hoursAgo": " hours ago",
   "invalidDate": "Provided date is invalid!",
-  "loading": "កំពុង​ផ្ទុក...",
+  "loading": "Loading...",
   "loadingComponent": "Loading Component...",
   "max": "Max value should be {max}",
   "maxDate": "Max Date should be {maxDate}",

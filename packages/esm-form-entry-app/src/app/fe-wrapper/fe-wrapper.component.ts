@@ -238,7 +238,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               critical: true,
               kind: 'success',
               description: this.translateService.instant('formSubmittedSuccessfully'),
-              title: this.form.schema.display,
+              title: this.form.schema.display ?? this.form.schema.name,
             });
 
             this.closeForm();
@@ -252,7 +252,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
                 .instant('formSubmissionFailed')
                 .replace('{error}', this.extractErrorMessagesFromResponse(error)),
 
-              title: this.form.schema.display,
+              title: this.form.schema.display ?? this.form.schema.name,
               millis: 5000,
             });
           },
