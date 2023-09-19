@@ -8,10 +8,10 @@ import { useDebounce } from './drug-search.resource';
 import { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchProps {
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
-export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasketSearchProps) {
+export default function OrderBasketSearch({ openOrderForm }: OrderBasketSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,7 +41,7 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
       </ResponsiveWrapper>
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
-        onSearchResultClicked={onSearchResultClicked}
+        openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
       />
     </div>

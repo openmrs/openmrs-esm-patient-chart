@@ -1,22 +1,25 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ArrowRight, ShoppingCart } from '@carbon/react/icons';
-import { Trans, useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
 import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';
 import { DrugOrderBasketItem } from '../../types';
+import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
+import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { ordersEqual } from './helpers';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  onSearchResultClicked,
+  openOrderForm,
   focusAndClearSearchInput,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
@@ -66,7 +69,7 @@ export default function OrderBasketSearchResults({
           </div>
           <div className={styles.resultsContainer}>
             {drugs.map((drug) => (
-              <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
+              <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
             ))}
           </div>
         </div>
@@ -95,11 +98,23 @@ export default function OrderBasketSearchResults({
 
 interface DrugSearchResultItemProps {
   drug: DrugSearchResult;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
+const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
+  const patient = usePatient();
+  const { data: activeOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const drugAlreadyInBasket = useMemo(
+    () => orders.some(order => ordersEqual(order, getTemplateOrderBasketItem(drug)))
+    , [orders, drug]
+  );
+  const drugAlreadyPrescribed = useMemo(
+    () => activeOrders.some(order => ordersEqual(order, getTemplateOrderBasketItem(drug)))
+    , [activeOrders, drug]
+  );
+
   const {
     templates,
     isLoading: isLoadingTemplates,
@@ -114,6 +129,13 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
         : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
     [templates, drug, config?.daysDurationUnit],
   );
+
+  const addToBasket = useCallback(
+    (searchResult: DrugOrderBasketItem) => {
+      setOrders([...orders, searchResult]);      
+    },
+    []
+  )
 
   return (
     <>
@@ -152,12 +174,12 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
             <Button
               kind="ghost"
               renderIcon={(props) => <ShoppingCart size={16} {...props} />}
-              onClick={() => onSearchResultClicked(orderItem, true)}
+              onClick={() => addToBasket(orderItem)}
             >{t('directlyAddToBasket', 'Add to basket')}</Button>
             <Button
               kind="ghost"
               renderIcon={(props) => <ArrowRight size={16} {...props} />}
-              onClick={() => onSearchResultClicked(orderItem, false)}
+              onClick={() => openOrderForm(orderItem)}
             >{t('goToDrugOrderForm', 'Order form')}
             </Button>
           </div>
