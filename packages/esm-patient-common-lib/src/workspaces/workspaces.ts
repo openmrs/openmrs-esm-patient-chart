@@ -165,15 +165,18 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   };
 
   const updateStoreWithNewWorkspace = (workspaceToBeAdded: OpenWorkspace, restWorkspaces = null) => {
-    if (!restWorkspaces) {
-      restWorkspaces = store.getState().openWorkspaces;
-    }
-    store.setState((state) => ({ ...state, openWorkspaces: [workspaceToBeAdded, ...restWorkspaces] }));
-    if (store.getState().workspaceWindowState === 'hidden') {
-      updateWorkspaceWindowState(
-        store.getState().openWorkspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal',
-      );
-    }
+    store.setState((state) => {
+      const openWorkspaces = [workspaceToBeAdded, ...(restWorkspaces ?? state.openWorkspaces)];
+      let workspaceWindowState = state.workspaceWindowState;
+      if (workspaceWindowState === 'hidden') {
+        workspaceWindowState = workspaceToBeAdded.preferredWindowSize === 'maximized' ? 'maximized' : 'normal';
+      }
+      return {
+        ...state,
+        openWorkspaces,
+        workspaceWindowState,
+      };
+    });
   };
 
   const openWorkspaces = store.getState().openWorkspaces;
