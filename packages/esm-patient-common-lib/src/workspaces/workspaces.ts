@@ -96,6 +96,45 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
   return ext.name;
 }
 
+function promptBeforeLaunchingWorkspace(
+  workspace: OpenWorkspace,
+  newWorkspaceDetails: { name: string; additionalProps?: object },
+) {
+  const store = getWorkspaceStore();
+  const { name, additionalProps } = newWorkspaceDetails;
+  const promptCheckFcn = getPromptBeforeClosingFcn(workspace.name);
+
+  const proceed = () => {
+    workspace.closeWorkspace();
+    // Calling the launchPatientWorkspace again, since one of the `if` case
+    // might resolve, but we need to check all the cases before launching the form.
+    launchPatientWorkspace(name, additionalProps);
+  };
+
+  if (!promptCheckFcn || promptCheckFcn()) {
+    const currentName = workspace.title ?? workspace.name;
+    const prompt: Prompt = {
+      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+      body: translateFrom(
+        '@openmrs/esm-patient-chart-app',
+        'unsavedChangesInForm',
+        'There are unsaved changes in {formName}. Please save them before opening another form.',
+        { formName: currentName },
+      ),
+      onConfirm: () => {
+        store.setState({
+          prompt: null,
+        });
+        proceed();
+      },
+      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
+    };
+    store.setState((state) => ({ ...state, prompt }));
+  } else {
+    proceed();
+  }
+}
+
 /**
  * Given a workspace specified by its name:
  *
@@ -129,47 +168,13 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     if (!restWorkspaces) {
       restWorkspaces = store.getState().openWorkspaces;
     }
-    store.setState({ ...store.getState(), openWorkspaces: [workspaceToBeAdded, ...restWorkspaces] });
+    store.setState((state) => ({ ...state, openWorkspaces: [workspaceToBeAdded, ...restWorkspaces] }));
     if (store.getState().workspaceWindowState === 'hidden') {
       updateWorkspaceWindowState(
         store.getState().openWorkspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal',
       );
     }
   };
-
-  function promptBeforeLaunchingWorkspace(workspace: OpenWorkspace) {
-    const promptCheckFcn = getPromptBeforeClosingFcn(workspace.name);
-
-    const proceed = () => {
-      workspace.closeWorkspace();
-      // Calling the launchPatientWorkspace again, since one of the `if` case
-      // might resolve, but we need to check all the cases before launching the form.
-      launchPatientWorkspace(name, additionalProps);
-    };
-
-    if (!promptCheckFcn || promptCheckFcn()) {
-      const currentName = workspace.title ?? workspace.name;
-      const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
-        body: translateFrom(
-          '@openmrs/esm-patient-chart-app',
-          'unsavedChangesInForm',
-          'There are unsaved changes in {formName}. Please save them before opening another form.',
-          { formName: currentName },
-        ),
-        onConfirm: () => {
-          store.setState({
-            prompt: null,
-          });
-          proceed();
-        },
-        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
-      };
-      store.setState({ ...store.getState(), prompt });
-    } else {
-      proceed();
-    }
-  }
 
   const openWorkspaces = store.getState().openWorkspaces;
   const workspaceIndexInOpenWorkspaces = openWorkspaces.findIndex((w) => w.name === name);
@@ -179,7 +184,10 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   if (openWorkspaces.length === 0) {
     updateStoreWithNewWorkspace(newWorkspace);
   } else if (!openWorkspaces[0].canHide && workspaceIndexInOpenWorkspaces !== 0) {
-    promptBeforeLaunchingWorkspace(openWorkspaces[0]);
+    promptBeforeLaunchingWorkspace(openWorkspaces[0], {
+      name,
+      additionalProps,
+    });
   } else if (isWorkspaceAlreadyOpen) {
     openWorkspaces[workspaceIndexInOpenWorkspaces].additionalProps = newWorkspace.additionalProps;
     const restOfWorkspaces = openWorkspaces.filter((w) => w.name != name);
@@ -187,7 +195,10 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   } else if (!!openedWorkspaceWithSameType) {
     const restOfWorkspaces = store.getState().openWorkspaces.filter((w) => w.type != newWorkspace.type);
     updateStoreWithNewWorkspace(openedWorkspaceWithSameType, restOfWorkspaces);
-    promptBeforeLaunchingWorkspace(openedWorkspaceWithSameType);
+    promptBeforeLaunchingWorkspace(openedWorkspaceWithSameType, {
+      name,
+      additionalProps,
+    });
   } else {
     updateStoreWithNewWorkspace(newWorkspace);
   }

@@ -27,7 +27,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   const { workspaces, workspaceWindowState } = useWorkspaces();
   const workspaceIndex = workspaces?.findIndex(({ type: workspaceType }) => workspaceType === type) ?? -1;
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
-  const formOpenInTheBackground = workspaceIndex > 0;
+  const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
   if (layout === 'tablet') {
     return (
