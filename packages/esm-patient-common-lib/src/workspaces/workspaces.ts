@@ -130,6 +130,11 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       restWorkspaces = store.getState().openWorkspaces;
     }
     store.setState({ ...store.getState(), openWorkspaces: [workspaceToBeAdded, ...restWorkspaces] });
+    if (store.getState().workspaceWindowState === 'hidden') {
+      updateWorkspaceWindowState(
+        store.getState().openWorkspaces[0].preferredWindowSize === 'maximized' ? 'maximized' : 'normal',
+      );
+    }
   };
 
   function promptBeforeLaunchingWorkspace(workspace: OpenWorkspace) {

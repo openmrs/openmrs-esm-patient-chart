@@ -1,12 +1,12 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import "../root";
+@import "../../root";
 
 .desktopTile {
   background-color: $ui-02;
   padding: 0;
-  border-top: 1px solid #bae6ff;
+  border-top: 1px solid #e8daff;
   border-right: none;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .desktopTile .heading {
-  border-left: 4px solid #0072c3;
+  border-left: 4px solid #6929c4;
 }
 
 .tabletTile .heading {
