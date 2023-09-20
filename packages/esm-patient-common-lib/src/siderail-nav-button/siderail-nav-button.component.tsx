@@ -25,10 +25,9 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
 }) => {
   const layout = useLayoutType();
   const { workspaces, workspaceWindowState } = useWorkspaces();
-
   const workspaceIndex = workspaces?.findIndex(({ type: workspaceType }) => workspaceType === type) ?? -1;
-  const isWorkspaceActive =
-    (workspaceWindowState === 'normal' || workspaceWindowState === 'maximized') && workspaceIndex === 0;
+  const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
+  const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
   if (layout === 'tablet') {
     return (
@@ -41,7 +40,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       >
         <div className={styles.elementContainer}>
           {getIcon({ size: 16 })}
-          {tagContent && <span className={styles.countTag}>{tagContent}</span>}
+          <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
         </div>
 
         <span>{label}</span>
@@ -58,7 +57,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           {getIcon({ size: 20, ...props })}
-          {tagContent && <span className={styles.countTag}>{tagContent}</span>}
+          <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
         </div>
       )}
       iconDescription={iconDescription}

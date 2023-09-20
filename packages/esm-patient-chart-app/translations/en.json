@@ -1,5 +1,4 @@
 {
-  "activeFormWarning": "There is an active form open in the workspace",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
@@ -136,6 +135,8 @@
   "timeFormat ": "Time Format",
   "type": "Type",
   "unknown": "Unknown",
+  "unsavedChanges": "You have unsaved changes",
+  "unsavedChangesInForm": "There are unsaved changes in {formName}. Please save them before opening another form.",
   "updateError": "Error updating upcoming appointment",
   "visit": "Visit",
   "visitAttributes": "Visit Attributes",
@@ -153,6 +154,5 @@
   "visitType_title": "Visit Type",
   "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
-  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
   "yes": "Yes"
 }

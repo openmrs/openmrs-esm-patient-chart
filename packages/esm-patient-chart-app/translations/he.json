@@ -1,5 +1,4 @@
 {
-  "activeFormWarning": "יש טופס פעיל פתוח במרחב העבודה",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "הוסף ביקור עבר",
   "addPastVisitText": "ניתן להוסיף ביקור עבר חדש או לעדכן ביקור ישן. בחר אחת מהאפשרויות להמשך.",
@@ -136,6 +135,8 @@
   "timeFormat ": "Time Format",
   "type": "סוג",
   "unknown": "לא ידוע",
+  "unsavedChanges": "יש לך שינויים שלא נשמרו",
+  "unsavedChangesInForm": "ישנם שינויים שלא נשמרו ב {formName}. נא לשמור אותם לפני פתיחת טופס נוסף.",
   "updateError": "Error updating upcoming appointment",
   "visit": "ביקור",
   "visitAttributes": "Visit attributes",
@@ -153,6 +154,5 @@
   "visitType_title": "Visit Type",
   "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
-  "workspaceModalText": "הפעלת טופס חדש בסביבת העבודה עשויה לגרום לאובדן עבודה שלא נשמרה בטופס {formName}.",
   "yes": "כן"
 }
