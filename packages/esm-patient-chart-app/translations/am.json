@@ -1,5 +1,4 @@
 {
-  "activeFormWarning": "You have unsaved changes",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
@@ -136,6 +135,8 @@
   "timeFormat ": "Time Format",
   "type": "Type",
   "unknown": "Unknown",
+  "unsavedChanges": "You have unsaved changes",
+  "unsavedChangesInForm": "There are unsaved changes in {formName}. Please save them before opening another form.",
   "updateError": "Error updating upcoming appointment",
   "visit": "Visit",
   "visitAttributes": "Visit attributes",
@@ -153,6 +154,5 @@
   "visitType_title": "Visit Type",
   "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Vitals & Biometrics dashboard",
-  "workspaceModalText": "There are unsaved changes in {formName}. Please save them before opening another form.",
   "yes": "Yes"
 }

@@ -4,8 +4,8 @@ import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@car
 import { useTranslation } from 'react-i18next';
 import styles from './workspace-notification.scss';
 
-// t('activeFormWarning', 'You have unsaved changes')
-// t('workspaceModalText', 'There are unsaved changes in {formName}. Please save them before opening another form.')
+// t('unsavedChanges', 'You have unsaved changes')
+// t('unsavedChangesInForm', 'There are unsaved changes in {formName}. Please save them before opening another form.')
 // t('openAnyway', 'Open anyway')
 
 const WorkspaceNotification: React.FC = () => {

@@ -150,10 +150,10 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     if (!promptCheckFcn || promptCheckFcn()) {
       const currentName = workspace.title ?? workspace.name;
       const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'activeFormWarning', 'You have unsaved changes'),
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'workspaceModalText',
+          'unsavedChangesInForm',
           'There are unsaved changes in {formName}. Please save them before opening another form.',
           { formName: currentName },
         ),
