@@ -22,7 +22,7 @@ export class FormSchemaService {
         };
 
         if (combinedFormMetadata.translations) {
-          this.translateService.setTranslation(language, combinedFormMetadata.translations);
+          this.translateService.setTranslation(language, combinedFormMetadata.translations, true);
         }
 
         return combinedFormMetadata;

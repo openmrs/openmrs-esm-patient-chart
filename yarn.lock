@@ -6153,6 +6153,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-patient-labs-app@workspace:packages/esm-patient-labs-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-labs-app@workspace:packages/esm-patient-labs-app"
+  dependencies:
+    "@carbon/charts": ^1.5.2
+    "@carbon/charts-react": ^1.5.2
+    "@carbon/react": ^1.12.0
+    "@openmrs/esm-patient-common-lib": ^5.0.0
+    d3: ^7.6.1
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 5.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app"
@@ -6221,27 +6242,6 @@ __metadata:
     "@openmrs/esm-framework": 5.x
     "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
-    react: 18.x
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    rxjs: 6.x
-  languageName: unknown
-  linkType: soft
-
-"@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app"
-  dependencies:
-    "@carbon/charts": ^1.5.2
-    "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.12.0
-    "@openmrs/esm-patient-common-lib": ^5.0.0
-    d3: ^7.6.1
-    lodash-es: ^4.17.15
-    webpack: ^5.74.0
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 5.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -6426,8 +6426,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.333
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.333"
+  version: 1.0.0-pre.362
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.362"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -6449,7 +6449,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: ead5b37d4765741db8f867919d9e6b5d1bc1defc7bf87e9238335db97b27df68453089a68d85d4b4f2608d14baa5920c68ad4fae5d1e62f24a5d8ebeca4d4785
+  checksum: 45e40844583e6a3765397d5b5c372515df9068b1c2b98a84016eb4a719068c48a680da6581f7be0571f14efd4590a3c181d4ad6c53c26d506ea99697375c5e95
   languageName: node
   linkType: hard
 

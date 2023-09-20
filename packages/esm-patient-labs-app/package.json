@@ -1,0 +1,58 @@
+{
+  "name": "@openmrs/esm-patient-labs-app",
+  "version": "5.0.0",
+  "license": "MPL-2.0",
+  "description": "Patient lab order and test results microfrontend for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-patient-labs-app.js",
+  "main": "src/index.ts",
+  "source": true,
+  "scripts": {
+    "start": "openmrs develop",
+    "serve": "webpack serve --mode=development",
+    "debug": "npm run serve",
+    "build": "webpack --mode production",
+    "analyze": "webpack --mode=production --env analyze=true",
+    "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
+    "coverage": "yarn test --coverage",
+    "typescript": "tsc",
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "keywords": [
+    "openmrs"
+  ],
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-chart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
+  },
+  "dependencies": {
+    "@carbon/charts": "^1.5.2",
+    "@carbon/charts-react": "^1.5.2",
+    "@carbon/react": "^1.12.0",
+    "@openmrs/esm-patient-common-lib": "^5.0.0",
+    "d3": "^7.6.1",
+    "lodash-es": "^4.17.15"
+  },
+  "peerDependencies": {
+    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-patient-common-lib": "5.x",
+    "react": "18.x",
+    "react-i18next": "11.x",
+    "react-router-dom": "6.x",
+    "rxjs": "6.x"
+  },
+  "devDependencies": {
+    "webpack": "^5.74.0"
+  }
+}
