@@ -1,5 +1,4 @@
 {
-  "activeFormWarning": "Il y a un formulaire actif ouvert dans l'espace de travail",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Ajouter une visite passée",
   "addPastVisitText": "Vous pouvez ajouter une nouvelle visite passée ou mettre à jour une ancienne. Choisissez parmi l'une des options ci-dessous pour continuer.",
@@ -136,6 +135,8 @@
   "timeFormat ": "Time Format",
   "type": "Type",
   "unknown": "Inconnu",
+  "unsavedChanges": "Vous avez des changements non enregistrés",
+  "unsavedChangesInForm": "Il existe des modifications non enregistrées dans {formName}. Veuillez les enregistrer avant d'ouvrir un autre formulaire.",
   "updateError": "Error updating upcoming appointment",
   "visit": "Visite",
   "visitAttributes": "Visit attributes",
@@ -153,6 +154,5 @@
   "visitType_title": "Visit Type",
   "visitTypeRequired": "Visit type is required",
   "Vitals & Biometrics dashboard": "Tableau de bord Vitals et biométrie",
-  "workspaceModalText": "Le lancement d'un nouveau formulaire dans l'espace de travail pourrait vous faire perdre du travail non sauvegardé sur le formulaire {FormName}.",
   "yes": "Oui"
 }
