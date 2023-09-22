@@ -13,6 +13,15 @@ const testProps = {
   promptBeforeClosing: () => {},
 };
 
+const heightValue = 180;
+const muacValue = 23;
+const oxygenSaturationValue = 100;
+const pulseValue = 80;
+const respiratoryRateValue = 16;
+const weightValue = 62;
+const systolicBloodPressureValue = 120;
+const temperatureValue = 37;
+
 const mockShowToast = showToast as jest.Mock;
 const mockSavePatientVitals = savePatientVitals as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
@@ -134,14 +143,14 @@ describe('VitalsBiometricsForm: ', () => {
     const muac = screen.getByRole('spinbutton', { name: /muac/i });
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
-    await waitFor(() => user.type(heightInput, '180'));
-    await waitFor(() => user.type(weightInput, '62'));
-    await waitFor(() => user.type(systolic, '120'));
-    await waitFor(() => user.type(pulse, '80'));
-    await waitFor(() => user.type(oxygenSaturation, '100'));
-    await waitFor(() => user.type(respirationRate, '16'));
-    await waitFor(() => user.type(temperature, '37'));
-    await waitFor(() => user.type(muac, '23'));
+    await waitFor(() => user.type(heightInput, String(heightValue)));
+    await waitFor(() => user.type(weightInput, String(weightValue)));
+    await waitFor(() => user.type(systolic, String(systolicBloodPressureValue)));
+    await waitFor(() => user.type(pulse, String(pulseValue)));
+    await waitFor(() => user.type(oxygenSaturation, String(oxygenSaturationValue)));
+    await waitFor(() => user.type(respirationRate, String(respiratoryRateValue)));
+    await waitFor(() => user.type(temperature, String(temperatureValue)));
+    await waitFor(() => user.type(muac, String(muacValue)));
 
     expect(bmiInput).toHaveValue(19.1);
     expect(systolic).toHaveValue(120);
@@ -160,14 +169,14 @@ describe('VitalsBiometricsForm: ', () => {
       mockVitalsConfig.concepts,
       mockPatient.id,
       expect.objectContaining({
-        height: '180',
-        midUpperArmCircumference: '23',
-        oxygenSaturation: '100',
-        pulse: '80',
-        respiratoryRate: '16',
-        systolicBloodPressure: '120',
-        temperature: '37',
-        weight: '62',
+        height: heightValue,
+        midUpperArmCircumference: muacValue,
+        oxygenSaturation: oxygenSaturationValue,
+        pulse: pulseValue,
+        respiratoryRate: respiratoryRateValue,
+        systolicBloodPressure: systolicBloodPressureValue,
+        temperature: temperatureValue,
+        weight: weightValue,
       }),
       expect.anything(),
       new AbortController(),
@@ -199,6 +208,24 @@ describe('VitalsBiometricsForm: ', () => {
     mockSavePatientVitals.mockRejectedValueOnce(error);
 
     renderForm();
+    const heightInput = screen.getByRole('spinbutton', { name: /height/i });
+    const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
+    const bmiInput = screen.getByRole('spinbutton', { name: /bmi/i });
+    const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
+    const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
+    const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
+    const respirationRate = screen.getByRole('spinbutton', { name: /respiration rate/i });
+    const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
+    const muac = screen.getByRole('spinbutton', { name: /muac/i });
+
+    await waitFor(() => user.type(heightInput, String(heightValue)));
+    await waitFor(() => user.type(weightInput, String(weightValue)));
+    await waitFor(() => user.type(systolic, String(systolicBloodPressureValue)));
+    await waitFor(() => user.type(pulse, String(pulseValue)));
+    await waitFor(() => user.type(oxygenSaturation, String(oxygenSaturationValue)));
+    await waitFor(() => user.type(respirationRate, String(respiratoryRateValue)));
+    await waitFor(() => user.type(temperature, String(temperatureValue)));
+    await waitFor(() => user.type(muac, String(muacValue)));
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
