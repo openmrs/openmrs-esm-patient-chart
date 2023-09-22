@@ -1,0 +1,11 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
+
+
+.container{
+    background-color: colors.$white-0;
+}
+
+.visitSummaryCard{
+    margin: 0 spacing.$spacing-05;
+}

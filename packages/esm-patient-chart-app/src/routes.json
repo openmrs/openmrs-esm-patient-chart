@@ -149,6 +149,13 @@
     {
       "name": "delete-encounter-modal",
       "component": "deleteEncounterModal"
+    },
+    {
+      "name": "current-visit-summary",
+      "component": "currentVisitSummary",
+      "meta": {
+        "columnSpan": 4
+      }
     }
   ],
   "pages": [
