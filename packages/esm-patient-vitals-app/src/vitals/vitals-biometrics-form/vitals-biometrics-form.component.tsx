@@ -215,7 +215,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     );
   }
 
-  const onError = (err: { oneFieldRequired: any }) => {
+  const onError = (err) => {
     if (err?.oneFieldRequired) {
       setShowErrorNotification(true);
     }
