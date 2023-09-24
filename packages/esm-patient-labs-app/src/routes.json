@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": "^1.2.0",
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "test-results-summary-dashboard",
+      "component": "testResultsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "slot": "patient-chart-test-results-dashboard-slot",
+        "columns": 1,
+        "path": "Test Results",
+        "hideDashboardTitle": true
+      },
+      "order": 4
+    },
+    {
+      "name": "test-results-filtered-overview",
+      "slot": "test-results-filtered-overview-slot",
+      "component": "externalOverview",
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "results-viewer",
+      "slots": ["patient-chart-results-viewer-slot", "patient-chart-test-results-dashboard-slot"],
+      "component": "resultsViewer",
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "print-modal",
+      "component": "printModal"
+    },
+    {
+      "name": "lab-order-panel",
+      "component": "labOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 1
+    }
+  ],
+  "pages": []
+}

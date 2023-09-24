@@ -2,13 +2,13 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
 import { useDebounce } from './drug-search.resource';
+import { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchProps {
-  onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasketSearchProps) {

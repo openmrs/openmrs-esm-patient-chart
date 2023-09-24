@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -13,10 +13,10 @@ import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 
-const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const session = useSession();
   const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
@@ -29,6 +29,10 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
   } = useOrderEncounter(patientUuid);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+
+  useEffect(() => {
+    promptBeforeClosing(() => false);
+  }, [promptBeforeClosing]);
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -60,7 +64,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     }
 
     const erroredItems = await postOrders(orderEncounterUuid, abortController);
-    clearOrders({ exceptThoseMatching: (item) => erroredItems.includes(item) });
+    clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
     mutateOrders();
     if (erroredItems.length == 0) {
       closeWorkspace();
@@ -94,7 +98,10 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     <>
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
-          <ExtensionSlot name="order-basket-slot" />
+          <ExtensionSlot
+            name="order-basket-slot"
+            className={`${styles.orderBasketSlot} ${isTablet ? styles.orderBasketSlotTablet : ''}`}
+          />
         </div>
 
         <div>
@@ -108,7 +115,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
               inline
             />
           )}
-          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <ButtonSet className={styles.buttonSet}>
             <Button className={styles.bottomButton} kind="secondary" onClick={handleCancel}>
               {t('cancel', 'Cancel')}
             </Button>
@@ -143,21 +150,21 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
 function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[]) {
   const orderedString = patientOrderItems
     .filter((item) => ['NEW', 'RENEW'].includes(item.action))
-    .map((item) => item.drug?.display)
+    .map((item) => item.display)
     .join(', ');
   const updatedString = patientOrderItems
     .filter((item) => item.action === 'REVISE')
-    .map((item) => item.drug?.display)
+    .map((item) => item.display)
     .join(', ');
   const discontinuedString = patientOrderItems
     .filter((item) => item.action === 'DISCONTINUE')
-    .map((item) => item.drug?.display)
+    .map((item) => item.display)
     .join(', ');
 
   showToast({
     critical: true,
     kind: 'success',
-    title: t('orderCompleted', 'Medications updated'),
+    title: t('orderCompleted', 'Placed orders'),
     description:
       (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
       (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +

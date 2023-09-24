@@ -1,7 +1,5 @@
 {
   "chartView": "תצוגת תרשים",
   "displaying": "מציג",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
-  "record": "רשומה",
   "tableView": "תצוגת טבלה"
 }

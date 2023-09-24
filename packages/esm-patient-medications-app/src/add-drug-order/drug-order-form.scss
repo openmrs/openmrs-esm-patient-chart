@@ -1,0 +1,235 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.orderForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: layout.$spacing-03 0 0 layout.$spacing-05;
+  height: calc(100vh - layout.$spacing-12);
+
+  input[data-invalid]:focus {
+    outline: 2px solid  colors.$red-60;
+     outline-offset: -2px;
+  }
+
+  :global(.cds--css-grid) {
+    max-width: unset;
+  }
+
+  :global(.cds--css-grid-column) {
+    margin: 0 layout.$spacing-03 !important;
+  }
+
+  :global(.cds--subgrid) {
+    margin: 0 calc(layout.$spacing-03 * -1) !important;
+  }
+
+  :global(.cds--number--nosteppers.cds--number input[type=number]) {
+    padding-right: layout.$spacing-05;
+  }
+
+  :global(.cds--list-box) {
+    border: none;
+  }
+
+  :global(.cds--number__control-btn) {
+    border: 0;
+  }
+}
+
+.medicationInfo {
+  border: 0;
+  padding: layout.$spacing-05;
+  margin-left: calc(layout.$spacing-05 * -1);
+  box-sizing: border-box;
+}
+
+.inlineNotification {
+  width: 100%;
+  max-width: unset;
+  margin-top: calc(layout.$spacing-03 * -1);
+  margin-left: calc(layout.$spacing-05 * -1);
+}
+
+.stickyMedicationInfo {
+  position: fixed;
+  background-color: colors.$cyan-60;
+  color: colors.$white-0;
+  top: layout.$spacing-12;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .medicationInfo {
+    margin: 0;
+  }
+}
+
+.patientHeader {
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
+  background-color: colors.$gray-10;
+
+  span:first-of-type {
+    margin-right: layout.$spacing-03;
+  }
+
+  .text02 {
+    color: colors.$gray-70;
+  }
+}
+
+.orderFormHeading {
+  @include type.type-style("heading-03");
+  margin-bottom: 0;
+}
+
+.formSection {
+  margin-bottom: layout.$spacing-06;
+}
+
+.sectionHeader {
+  @include type.type-style("heading-01");
+  margin-bottom: layout.$spacing-05;
+}
+
+.pullColumnContentRight > div {
+  float: right;
+}
+
+.fullWidthDatePickerContainer {
+  :global .cds--date-picker {
+    width: 100%;
+
+    :global .cds--date-picker-container {
+      width: 100%;
+
+      :global .cds--date-picker-input__wrapper {
+        width: 100%;
+
+        :global .cds--date-picker__input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.numberInput {
+  :global(.cds--number__input-wrapper) input {
+  min-width: unset !important;
+  padding-right: layout.$spacing-05;
+  }
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  margin: layout.$spacing-03 0;
+
+  button {
+    display: flex;
+   padding-left: 0 !important;
+    svg {
+      order: 1;
+      margin-right: layout.$spacing-03;
+      margin-left: 0 !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.gridRow {
+  padding: 0px;
+  margin-left: calc(layout.$spacing-03 * -1);
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-lt-desktop) .gridRow {
+  align-items: baseline;
+}
+
+.field {
+  margin-bottom: layout.$spacing-05;
+}
+
+.buttonSet {
+  margin-left: calc(layout.$spacing-05 * -1);
+
+  :global(.cds--btn) {
+    width: 50%;
+    max-width: unset;
+  }
+}
+
+.linkedInput {
+  display: flex;
+  align-items: center;
+
+  :global(.cds--layer-one),
+  :global(.cds--layer-two),
+  :global(.cds--layer) {
+    flex: 1;
+  }
+}
+
+.linkedInput::after {
+  content: "";
+  border: 1px solid colors.$gray-40;
+  width: layout.$spacing-05;
+  margin-right: calc(layout.$spacing-05 * -1);
+}
+
+.customNumberInput {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+
+  :global(.cds--btn) {
+    background-color: colors.$gray-80;
+  }
+
+  .customInput {
+    input {
+      text-align: center;
+    }
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: 100%;
+    background-color: #ededed;
+  }
+
+  .stickyMedicationInfo {
+    top: layout.$spacing-09;
+  }
+
+  .buttonSet {
+    padding: layout.$spacing-06 layout.$spacing-05;
+    background-color: colors.$white-0;
+  }
+}
+
+.fieldError {
+  :global(.cds--number input[type=number]):focus {
+    outline: 2.5px solid colors.$red-60;
+  }
+
+  input:focus, textarea:focus {
+    outline: 2.5px solid colors.$red-60;
+  }
+}
+
+.errorLabel {
+  color: colors.$red-60;
+}
+

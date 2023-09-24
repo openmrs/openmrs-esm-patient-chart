@@ -1,4 +1,5 @@
 import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
@@ -76,6 +77,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   }
 
   public launchForm() {
+    const language = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([language]);
+    this.translateService.use(language);
+
     this.changeState('loading');
     this.showDiscardSubmitButtons = this.singleSpaPropsService.getProp('showDiscardSubmitButtons') ?? true;
     this.launchFormSubscription?.unsubscribe();
@@ -104,7 +109,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         },
         (err) => {
           // TODO: Improve error handling.
-          this.loadingError = 'Error loading form';
+          this.loadingError = this.translateService.instant('errorLoadingForm');
           console.error('Error rendering form', err);
           this.changeState('loadingError');
         },
@@ -114,14 +119,22 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
     const identifiers = this.formDataSourceService.getPatientObject(patient)?.identifiers ?? [];
-    const language = window.i18next?.language?.substring(0, 2) ?? '';
-    this.translateService.addLangs([language]);
-    this.translateService.use(language);
+    const locale = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([locale]);
+    this.translateService.use(locale);
+
+    import(
+      /* webpackInclude: /\.js$/ */
+      `@angular/common/locales/${locale}.js`
+    ).then((module) => {
+      registerLocaleData(module.default);
+    });
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(this.formUuid, language).pipe(take(1)),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),
       session: this.openmrsApi.getCurrentSession().pipe(take(1)),
       encounter: encounterOrSyncItemId
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
@@ -134,7 +147,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         ),
       ),
       catchError((err) =>
-        throwError(new Error('There was an error fetching form data. Details: ' + JSON.stringify(err))),
+        throwError(
+          new Error(this.translateService.instant('errorFetchingFormData').replace('{detail}', JSON.stringify(err))),
+        ),
       ),
     );
   }
@@ -189,9 +204,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       if (resp.length > 0) {
         this.changeState('readyWithValidationErrors');
         showNotification({
-          title: 'Patient identifier duplication',
-          description:
-            'The identifier provided is already associated with an existing patient. Please check the identifier and try again.',
+          title: this.translateService.instant('patientIdentifierDuplication'),
+          description: this.translateService.instant('patientIdentifierDuplicationDescription'),
           kind: 'error',
           critical: true,
         });
@@ -223,8 +237,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             showToast({
               critical: true,
               kind: 'success',
-              description: `The form has been submitted successfully.`,
-              title: this.form.schema.name,
+              description: this.translateService.instant('formSubmittedSuccessfully'),
+              title: this.form.schema.display ?? this.form.schema.name,
             });
 
             this.closeForm();
@@ -234,10 +248,11 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             showNotification({
               critical: true,
               kind: 'error',
-              description: `An error has occurred while submitting the form. Error: ${this.extractErrorMessagesFromResponse(
-                error,
-              )}.`,
-              title: this.form.schema.name,
+              description: this.translateService
+                .instant('formSubmissionFailed')
+                .replace('{error}', this.extractErrorMessagesFromResponse(error)),
+
+              title: this.form.schema.display ?? this.form.schema.name,
               millis: 5000,
             });
           },

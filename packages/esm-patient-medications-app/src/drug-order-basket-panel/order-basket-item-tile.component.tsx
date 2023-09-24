@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket-item-tile.scss';
+import { DrugOrderBasketItem } from '../types';
 
 export interface OrderBasketItemTileProps {
-  orderBasketItem: OrderBasketItem;
+  orderBasketItem: DrugOrderBasketItem;
   onItemClick: () => void;
   onRemoveClick: () => void;
 }
@@ -105,7 +105,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
   );
 }
 
-function OrderActionLabel({ orderBasketItem }: { orderBasketItem: OrderBasketItem }) {
+function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBasketItem }) {
   const { t } = useTranslation();
 
   switch (orderBasketItem.action) {

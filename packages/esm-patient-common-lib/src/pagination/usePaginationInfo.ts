@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function usePaginationInfo(pageSize: number, totalItems: number, pageNumber: number, currentItems: number) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('@openmrs/esm-patient-chart-app');
 
   const pageSizes = useMemo(() => {
     let numberOfPages = Math.ceil(totalItems / pageSize);

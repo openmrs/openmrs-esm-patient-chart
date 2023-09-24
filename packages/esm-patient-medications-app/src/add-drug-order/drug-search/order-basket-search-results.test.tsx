@@ -16,6 +16,7 @@ const testProps = {
   searchTerm: 'aspirin',
   onSearchTermClear: jest.fn(),
   onSearchResultClicked: jest.fn(),
+  focusAndClearSearchInput: jest.fn(),
 };
 
 function renderOrderBasketSearchResults() {

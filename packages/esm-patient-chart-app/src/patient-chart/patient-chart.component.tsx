@@ -8,11 +8,7 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import {
-  changeWorkspaceContext,
-  useAutoCreatedOfflineVisit,
-  useWorkspaceWindowSize,
-} from '@openmrs/esm-patient-common-lib';
+import { changeWorkspaceContext, useAutoCreatedOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
@@ -25,7 +21,7 @@ const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
-  const { windowSize, active } = useWorkspaceWindowSize();
+  const { workspaceWindowState, active } = useWorkspaces();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
@@ -59,7 +55,7 @@ const PatientChart: React.FC = () => {
       <>
         <div
           className={`${styles.innerChartContainer} ${
-            windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
+            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
           }`}
         >
           <ExtensionSlot name="breadcrumbs-slot" />

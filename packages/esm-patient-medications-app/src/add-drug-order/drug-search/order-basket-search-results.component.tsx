@@ -3,14 +3,14 @@ import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carb
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
-import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';
+import { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
   focusAndClearSearchInput: () => void;
 }
 
@@ -95,7 +95,7 @@ export default function OrderBasketSearchResults({
 
 interface DrugSearchResultItemProps {
   drug: DrugSearchResult;
-  onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
@@ -107,7 +107,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
   } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const orderItems: Array<OrderBasketItem> = useMemo(
+  const orderItems: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length
         ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))

@@ -1,7 +1,8 @@
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import type { Drug, DrugOrderTemplate, OrderTemplate, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { Drug } from '@openmrs/esm-patient-common-lib';
+import { DrugOrderBasketItem, DrugOrderTemplate, OrderTemplate } from '../../types';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -100,10 +101,11 @@ export function getTemplateOrderBasketItem(
     display: string;
   },
   template?: DrugOrderTemplate,
-): OrderBasketItem {
+): DrugOrderBasketItem {
   return template
     ? {
         action: 'NEW',
+        display: drug.display,
         drug,
         unit:
           getDefault(template.template, 'unit') ?? drug?.dosageForm
@@ -145,6 +147,7 @@ export function getTemplateOrderBasketItem(
       }
     : {
         action: 'NEW',
+        display: drug.display,
         drug,
         unit: drug?.dosageForm
           ? {

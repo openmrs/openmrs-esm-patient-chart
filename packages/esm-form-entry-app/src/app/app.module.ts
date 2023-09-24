@@ -1,12 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LOCALE_ID, NgModule } from '@angular/core';
+import { TranslateLoader, TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
+import { HttpClient } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
 import { FormEntryModule } from '@openmrs/ngx-formentry';
 
-import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { FormSchemaService } from './form-schema/form-schema.service';
 import { LocalStorageService } from './local-storage/local-storage.service';
@@ -17,7 +20,7 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
-import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
+import { JsonLoader } from './loaders/json-loader';
 import { ProgramResourceService } from './openmrs-api/program-resource.service';
 
 @NgModule({
@@ -26,6 +29,11 @@ import { ProgramResourceService } from './openmrs-api/program-resource.service';
     BrowserModule,
     TranslateModule.forRoot({
       isolate: false,
+      loader: {
+        provide: TranslateLoader,
+        useClass: JsonLoader,
+        deps: [HttpClient],
+      },
     }),
     FormEntryModule,
     ReactiveFormsModule,

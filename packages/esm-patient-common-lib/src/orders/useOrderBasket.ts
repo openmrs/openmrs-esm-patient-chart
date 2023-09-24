@@ -18,6 +18,7 @@ const orderBasketStoreActions = {
       items: {
         ...state?.items,
         [patientUuid]: {
+          ...state?.items?.[patientUuid],
           [grouping]: typeof value === 'function' ? value() : value,
         },
       },
@@ -59,12 +60,12 @@ function clearOrders(options?: ClearOrdersOptions) {
   }));
 }
 
-type UseOrderBasketReturn<T> = {
-  orders: Array<OrderBasketItem>;
+type UseOrderBasketReturn<T, U> = {
+  orders: Array<T>;
   clearOrders: (options?: ClearOrdersOptions) => void;
-  setOrders: T extends string
-    ? (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => void
-    : (groupingKey: string, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => void;
+  setOrders: U extends string
+    ? (value: Array<T> | (() => Array<T>)) => void
+    : (groupingKey: string, value: Array<T> | (() => Array<T>)) => void;
 };
 
 /**
@@ -76,16 +77,16 @@ type UseOrderBasketReturn<T> = {
  *  A PostDataPrepFunction must be provided for each grouping, but does not necessarily have to be provided
  *  in every usage of useOrderBasket with a grouping key.
  */
-export function useOrderBasket(): UseOrderBasketReturn<void>;
-export function useOrderBasket(grouping: string): UseOrderBasketReturn<string>;
-export function useOrderBasket(
+export function useOrderBasket<T extends OrderBasketItem>(): UseOrderBasketReturn<T, void>;
+export function useOrderBasket<T extends OrderBasketItem>(grouping: string): UseOrderBasketReturn<T, string>;
+export function useOrderBasket<T extends OrderBasketItem>(
   grouping: string,
   postDataPrepFunction: PostDataPrepFunction,
-): UseOrderBasketReturn<string>;
-export function useOrderBasket(
+): UseOrderBasketReturn<T, string>;
+export function useOrderBasket<T extends OrderBasketItem>(
   grouping?: string | null,
   postDataPrepFunction?: PostDataPrepFunction,
-): UseOrderBasketReturn<string | void> {
+): UseOrderBasketReturn<T, string | void> {
   const { items, postDataPrepFunctions, setOrderBasketItems, setPostDataPrepFunctionForGrouping } = useStoreWithActions(
     orderBasketStore,
     orderBasketStoreActions,
@@ -99,14 +100,14 @@ export function useOrderBasket(
   }, [postDataPrepFunction, grouping, postDataPrepFunctions, setPostDataPrepFunctionForGrouping]);
 
   if (typeof grouping === 'string') {
-    const setOrders = (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => {
+    const setOrders = (value: Array<T> | (() => Array<T>)) => {
       return setOrderBasketItems(grouping, value);
     };
-    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<string>;
+    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<T, string>;
   } else {
-    const setOrders = (groupingKey: string, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => {
+    const setOrders = (groupingKey: string, value: Array<T> | (() => Array<T>)) => {
       setOrderBasketItems(groupingKey, value);
     };
-    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<void>;
+    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<T, void>;
   }
 }

@@ -20,3 +20,4 @@ export * from './useLaunchWorkspaceRequiringVisit';
 export * from './useSystemVisitSetting';
 export * from './useVitalsConceptMetadata';
 export * from './workspaces';
+export * from './siderail-nav-button';

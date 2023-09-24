@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layer, Link, Tile } from '@carbon/react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
@@ -12,7 +12,7 @@ export interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = (props) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const isTablet = useLayoutType() === 'tablet';
 
   return (
@@ -23,9 +23,9 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
-          <Trans i18nKey="emptyStateText" values={{ displayText: props.displayText.toLowerCase() }}>
-            There are no {props.displayText.toLowerCase()} to display for this patient
-          </Trans>
+          {t('emptyStateText', 'There are no {displayText} to display for this patient', {
+            displayText: props.displayText.toLowerCase(),
+          })}
         </p>
         <p className={styles.action}>
           {props.launchForm && (

@@ -1,5 +1,5 @@
 /* The possible states a workspace window can be opened in. */
-export type WorkspaceWindowState = 'minimized' | 'maximized' | 'hidden' | 'reopened' | 'normal';
+export type WorkspaceWindowState = 'maximized' | 'hidden' | 'normal';
 
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {
@@ -12,4 +12,18 @@ export interface DefaultWorkspaceProps {
   promptBeforeClosing(testFcn: () => boolean): void;
   patientUuid: string;
   handlePostResponse?(): void;
+}
+
+export interface WorkspaceWindowSize {
+  size: WorkspaceWindowState;
+}
+
+export interface WorkspaceWindowSizeProviderProps {
+  children?: React.ReactNode;
+}
+
+export interface WorkspaceWindowSizeContext {
+  windowSize: WorkspaceWindowSize;
+  updateWindowSize?(value: WorkspaceWindowState): any;
+  active: boolean;
 }

@@ -6153,6 +6153,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-patient-labs-app@workspace:packages/esm-patient-labs-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-labs-app@workspace:packages/esm-patient-labs-app"
+  dependencies:
+    "@carbon/charts": ^1.5.2
+    "@carbon/charts-react": ^1.5.2
+    "@carbon/react": ^1.12.0
+    "@openmrs/esm-patient-common-lib": ^5.0.0
+    d3: ^7.6.1
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 5.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app"
@@ -6221,27 +6242,6 @@ __metadata:
     "@openmrs/esm-framework": 5.x
     "@openmrs/esm-patient-common-lib": 5.x
     dayjs: 1.x
-    react: 18.x
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    rxjs: 6.x
-  languageName: unknown
-  linkType: soft
-
-"@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app"
-  dependencies:
-    "@carbon/charts": ^1.5.2
-    "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.12.0
-    "@openmrs/esm-patient-common-lib": ^5.0.0
-    d3: ^7.6.1
-    lodash-es: ^4.17.15
-    webpack: ^5.74.0
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 5.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -6397,8 +6397,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 3.1.2-pre.200
-  resolution: "@openmrs/ngx-formentry@npm:3.1.2-pre.200"
+  version: 3.2.1-pre.245
+  resolution: "@openmrs/ngx-formentry@npm:3.2.1-pre.245"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -6421,13 +6421,13 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: cb27ce70b8c4fe3744126fab0ff8afc80ad3215a09c618bd1fec221b244e4f3280198b0c1427e6b603fac95cac037501a4ccf838e645cb429194ba68bf485a38
+  checksum: e86a2ee323964092b7535303bfbe25853c1e0cd21142de492b23c4a5dba1ef1112b5fa1b7b135bf3f56e5d489f610f8ec91d367afa9c502e5a8a7318448e4812
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.302
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.302"
+  version: 1.0.0-pre.362
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.362"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -6449,7 +6449,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 21a4cbad12085fe45266dea334e10bf721d18fc41b69651265b4d034766a4ee6042384d44541a2f810bd8077dd097d1e56a6d9f6c88462d78f31c6b1b10a7ff8
+  checksum: 45e40844583e6a3765397d5b5c372515df9068b1c2b98a84016eb4a719068c48a680da6581f7be0571f14efd4590a3c181d4ad6c53c26d506ea99697375c5e95
   languageName: node
   linkType: hard
 

@@ -1,0 +1,61 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import "../../root";
+
+.desktopTile {
+  background-color: $ui-02;
+  padding: 0;
+  border-top: 1px solid #e8daff;
+  border-right: none;
+}
+
+.tabletTile {
+  background-color: $ui-02;
+  padding: 0;
+}
+
+.collapsedTile {
+  border-bottom: none;
+  min-height: 0;
+  .orderBasketHeader {
+    margin-bottom: 0;
+  }
+}
+
+.tabletTile.collapsedTile {
+  border-bottom: 1px solid $grey-2;
+}
+
+.heading {
+  background-color: $ui-02;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  text-transform: capitalize;
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.desktopTile .heading {
+  border-left: 4px solid #6929c4;
+}
+
+.tabletTile .heading {
+  padding: spacing.$spacing-03;
+  border-top: 1px solid $grey-2;
+  border-right: 1px solid $grey-2;
+  border-left: 1px solid $grey-2;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.headingIcon {
+   margin: 0.3rem 0.8rem 0 0.3rem;
+}

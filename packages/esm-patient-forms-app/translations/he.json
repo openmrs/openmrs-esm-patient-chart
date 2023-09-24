@@ -1,10 +1,7 @@
 {
-  "all": "הכל",
   "checkFilters": "Check the filters above",
   "clinicalForm": "טופס קליני",
-  "completed": "הושלם",
   "editForm": "Edit form",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "form": "טופס",
   "formName": "שם הטופס (א-ת)",
   "forms": "טפסים",
@@ -12,7 +9,6 @@
   "homeOverviewCardView": "תצוגה",
   "lastCompleted": "הושלם לאחרונה",
   "never": "אף פעם",
-  "noFormsAvailable": "אין טפסים לתצוגה עבור מטופל זה",
   "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "אין טפסים {formCategory} לתצוגה",
   "noMatchingFormsToDisplay": "אין טפסים מתאימים לתצוגה",
@@ -25,9 +21,6 @@
   "offlinePatientsTableSearchLabel": "חפש ברשימה זו",
   "offlinePatientsTableSearchPlaceholder": "חפש ברשימה זו",
   "offlineToggle": "מצב לא מקוון",
-  "recommended": "מומלץ",
-  "record": "רשומה",
   "searchForAForm": "Search for a form",
-  "searchThisList": "חפש ברשימה זו",
-  "seeAll": "הצג הכל"
+  "searchThisList": "חפש ברשימה זו"
 }

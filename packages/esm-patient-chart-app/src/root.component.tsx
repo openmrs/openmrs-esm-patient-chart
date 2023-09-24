@@ -1,7 +1,6 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
 import { dashboardPath, spaRoot, basePath } from './constants';
 import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './patient-chart/patient-chart.component';
@@ -21,18 +20,27 @@ export default function Root() {
     // do in openmrsComponentDecorator in esm-core.
     <SWRConfig value={swrConfiguration}>
       <BrowserRouter basename={spaRoot}>
-        <WorkspaceWindowSizeProvider>
-          <div className={styles.patientChartWrapper}>
-            <VisitHeader />
-            <SideMenu />
-            <Routes>
-              <Route path={basePath} element={<PatientChart />} />
-              <Route path={dashboardPath} element={<PatientChart />} />
-            </Routes>
-            <WorkspaceWindow />
-          </div>
-        </WorkspaceWindowSizeProvider>
+        <div className={styles.patientChartWrapper}>
+          <VisitHeader />
+          <SideMenu />
+          <Routes>
+            <Route path={basePath} element={<PatientChart />} />
+            <Route path={dashboardPath} element={<PatientChart />} />
+          </Routes>
+          <WorkspaceWindow />
+        </div>
       </BrowserRouter>
     </SWRConfig>
   );
 }
+
+/**
+ * DO NOT REMOVE THIS COMMENT
+ * THE TRANSLATION KEYS AND VALUES USED IN THE COMMON LIB IS WRITTEN HERE
+ * t("emptyStateText", 'There are no {displayText} to display for this patient', {displayText: "sample text"})
+ * t('record', 'Record')
+ * t('errorCopy','Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.')
+ * t('error', 'Error')
+ * t('seeAll', 'See all')
+ * t('items', ' items')
+ */

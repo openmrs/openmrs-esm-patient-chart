@@ -1,30 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import OrderBasketSearch from './drug-search/drug-search.component';
-import {
-  DefaultWorkspaceProps,
-  OrderBasketItem,
-  launchPatientWorkspace,
-  useOrderBasket,
-} from '@openmrs/esm-patient-common-lib';
+import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
-import { showToast, useConfig, usePatient, useSession } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
-import { prepMedicationOrderPostData, usePatientOrders } from '../api/api';
+import { showToast, usePatient, useSession } from '@openmrs/esm-framework';
+import { careSettingUuid, prepMedicationOrderPostData, usePatientOrders } from '../api/api';
 import { useTranslation } from 'react-i18next';
+import { DrugOrderBasketItem } from '../types';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
-  order: OrderBasketItem;
+  order: DrugOrderBasketItem;
 }
 
 export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
 
 export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorkspace }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket('medications', prepMedicationOrderPostData);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const patient = usePatient();
   const activeOrders = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const config: ConfigObject = useConfig();
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
@@ -34,7 +28,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   }, [closeWorkspace, currentOrder, orders, setOrders]);
 
   const chooseDrug = useCallback(
-    (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
+    (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => {
       if (activeOrders.data?.find((existing) => existing.drug?.concept.uuid === searchResult.drug?.concept.uuid)) {
         showToast({
           kind: 'warning',
@@ -49,6 +43,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       setOrders([...orders, searchResult]);
       if (directlyAddToBasket) {
         closeWorkspace();
+        launchPatientWorkspace('order-basket');
       } else {
         setCurrentOrder(searchResult);
       }
@@ -57,8 +52,8 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   );
 
   const saveDrugOrder = useCallback(
-    (finalizedOrder: OrderBasketItem) => {
-      finalizedOrder.careSetting = config.careSettingUuid;
+    (finalizedOrder: DrugOrderBasketItem) => {
+      finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -67,7 +62,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, config.careSettingUuid, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
   );
 
   if (!currentOrder) {
@@ -77,6 +72,6 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   }
 }
 
-function ordersEqual(order1: OrderBasketItem, order2: OrderBasketItem) {
+function ordersEqual(order1: DrugOrderBasketItem, order2: DrugOrderBasketItem) {
   return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
 }

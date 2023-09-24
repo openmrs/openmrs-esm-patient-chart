@@ -1,15 +1,19 @@
 import React from 'react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { mockPatientDrugOrdersApiData } from '../__mocks__/medication.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
+import { mockSessionDataResponse } from '../__mocks__/session.mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
+const mockUseSession = useSession as jest.Mock;
 
 function renderActiveMedications() {
+  mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
   renderWithSwr(<ActiveMedications {...testProps} />);
 }
 
@@ -76,7 +80,11 @@ describe('ActiveMedications: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /active medications/i })).toBeInTheDocument();
+    const headingElements = screen.getAllByText(/Active Medications/i);
+
+    headingElements.forEach((headingElement) => {
+      expect(headingElement).toBeInTheDocument();
+    });
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');
@@ -90,8 +98,8 @@ describe('ActiveMedications: ', () => {
     const expectedTableRows = [
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good — END DATE 14-Aug-2023/,
-      /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {duration} {durationUnit} — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
-      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {duration} {durationUnit} INDICATION Heart — QUANTITY 30 Tablet/,
+      /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {duration} weeks — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
+      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {duration} days INDICATION Heart — QUANTITY 30 Tablet/,
     ];
 
     expectedTableRows.map((row) =>
