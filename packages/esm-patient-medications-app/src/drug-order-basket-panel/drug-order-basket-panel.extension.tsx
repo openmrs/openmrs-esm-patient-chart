@@ -46,7 +46,7 @@ export default function DrugOrderBasketPanelExtension() {
 
   return (
     <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
-      <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+      <div className={styles.heading}>
         <div className={styles.title}>
           <div className={styles.headingIcon}>
             <RxIcon />
