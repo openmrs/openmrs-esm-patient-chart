@@ -13,7 +13,12 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  flex-wrap: wrap
+  flex-wrap: wrap;
 
+  :global(.cds--tag) {
+   background-color: #ffc9a3;
+   color: #943d00;
+  }
 }
+
 
