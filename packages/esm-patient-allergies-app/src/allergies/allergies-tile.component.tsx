@@ -16,7 +16,7 @@ const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
     return (
       <div className={styles.content}>
         {allergies?.map((allergy) => (
-          <Tag type="red">{allergy?.display}</Tag>
+          <Tag>{allergy?.display}</Tag>
         ))}
       </div>
     );
