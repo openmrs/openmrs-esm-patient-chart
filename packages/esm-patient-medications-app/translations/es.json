@@ -67,6 +67,7 @@
   "saveOrder": "Save order",
   "searchAgain": "search again",
   "searchFieldPlaceholder": "Search for a drug or orderset (e.g. \"Aspirin\")",
+  "searchResultsMatchesForTermfalsemany": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseone": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseother": "{count} result{plural} for \"{searchTerm}\"",
   "startDate": "Start date",
