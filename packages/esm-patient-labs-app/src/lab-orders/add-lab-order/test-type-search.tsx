@@ -63,11 +63,7 @@ interface TestTypeSearchResultsProps {
 function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchInput }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { testTypes, isLoading, error } = useTestTypes();
-
-  if (!searchTerm) {
-    return null;
-  }
+  const { testTypes, isLoading, error } = useTestTypes(searchTerm);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -94,18 +90,20 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
     <>
       {testTypes?.length ? (
         <div className={styles.container}>
-          <div className={styles.orderBasketSearchResultsHeader}>
-            <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
-                count: testTypes?.length,
-                searchTerm,
-                plural: testTypes?.length === 0 || testTypes?.length > 1 ? 's' : '',
-              })}
-            </span>
-            <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
-              {t('clearSearchResults', 'Clear Results')}
-            </Button>
-          </div>
+          {searchTerm && (
+            <div className={styles.orderBasketSearchResultsHeader}>
+              <span className={styles.searchResultsCount}>
+                {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
+                  count: testTypes?.length,
+                  searchTerm,
+                  plural: testTypes?.length === 0 || testTypes?.length > 1 ? 's' : '',
+                })}
+              </span>
+              <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
+                {t('clearSearchResults', 'Clear Results')}
+              </Button>
+            </div>
+          )}
           <div className={styles.resultsContainer}>
             {testTypes.map((testType) => (
               <TestTypeSearchResultItem key={testType.conceptUuid} testType={testType} openOrderForm={openOrderForm} />
