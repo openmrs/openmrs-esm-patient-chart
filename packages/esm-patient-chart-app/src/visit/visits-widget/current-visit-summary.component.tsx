@@ -1,21 +1,18 @@
 import React from 'react';
-import VisitSummary from './past-visits-components/visit-summary.component';
-import { ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { CardHeader, EmptyState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import styles from './current-visit-summary.scss';
-import { useVisits } from './visit.resource';
 
+import VisitSummary from './past-visits-components/visit-summary.component';
+import styles from './current-visit-summary.scss';
 interface CurrentVisitSummaryProps {
   patientUuid: string;
 }
 
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { visits, isLoading, isValidating, isError } = useVisits(patientUuid);
-
-  const [currentVisit] = visits?.filter((visit) => visit.stopDatetime === null) ?? [];
+  const { isLoading, currentVisit, error, isValidating } = useVisit(patientUuid);
 
   if (isLoading) {
     return (
@@ -27,11 +24,11 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
     );
   }
 
-  if (isError) {
-    return <ErrorState headerTitle={t('failedToLoadCurrentVisit', 'Failed loading current visit')} error={isError} />;
+  if (!!error) {
+    return <ErrorState headerTitle={t('failedToLoadCurrentVisit', 'Failed loading current visit')} error={error} />;
   }
 
-  if (!Boolean(currentVisit)) {
+  if (!currentVisit) {
     return (
       <EmptyState
         headerTitle={t('currentVisit', 'currentVisit')}

@@ -55,17 +55,19 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     const notes: Array<Note> = [];
 
     // Iterating through every Encounter
-    visit?.encounters.forEach((enc: Encounter) => {
+    visit?.encounters?.forEach((enc: Encounter) => {
       // Orders of every encounter put in a single array.
-      medications.push(
-        ...enc.orders.map((order: Order) => ({
-          order,
-          provider: {
-            name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-            role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-          },
-        })),
-      );
+      if (enc.hasOwnProperty('orders')) {
+        medications.push(
+          ...enc.orders.map((order: Order) => ({
+            order,
+            provider: {
+              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+            },
+          })),
+        );
+      }
 
       //Check if there is a diagnosis associated with this encounter
       if (enc.hasOwnProperty('diagnoses')) {
@@ -81,20 +83,22 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
 
       // Check for Visit Diagnoses and Notes
-      enc.obs.forEach((obs: Observation) => {
-        if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
-          // Putting all notes in a single array.
-          notes.push({
-            note: obs.value,
-            provider: {
-              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-            },
-            time: enc.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
-            concept: obs.concept,
-          });
-        }
-      });
+      if (enc.hasOwnProperty('obs')) {
+        enc.obs.forEach((obs: Observation) => {
+          if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
+            // Putting all notes in a single array.
+            notes.push({
+              note: obs.value,
+              provider: {
+                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+              },
+              time: enc.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
+              concept: obs.concept,
+            });
+          }
+        });
+      }
     });
 
     return [diagnoses, notes, medications];
