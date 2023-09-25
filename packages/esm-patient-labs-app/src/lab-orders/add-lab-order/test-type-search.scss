@@ -1,0 +1,116 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import "../../root";
+
+/** For TestTypeSearchResults */
+
+.container {
+  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid $color-gray-30;
+  width: 66%;
+}
+
+.desktopDivider {
+  margin: spacing.$spacing-07 auto spacing.$spacing-05;
+}
+
+.tabletDivider {
+  margin: spacing.$spacing-08 auto spacing.$spacing-06;
+}
+
+.searchResultsCount {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.orderBasketSearchResultsHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: spacing.$spacing-03;
+  align-items: center;
+}
+
+/** For TestTypeSearchResultItem */
+
+.searchResultTile {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid $grey-2;
+  &:not(:last-of-type) {
+    margin-bottom: spacing.$spacing-03;
+  }
+}
+
+.tabletSearchResultTile {
+  margin-top: 5px;
+  background-color: $ui-02;
+}
+
+.searchResultTileContent {
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+}
+
+.searchResultActions {
+  border-top: 1px solid $grey-2;
+  padding: 0 spacing.$spacing-05;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.searchResultSkeletonWrapper {
+  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
+  
+  :global(.cds--skeleton__text) {
+    margin: 0;
+  }
+
+  .searchResultCntSkeleton {
+    margin-right: spacing.$spacing-07;
+  }
+
+  .skeletonTile {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.emptyState {
+  margin: spacing.$spacing-05;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-07;
+  border: 1px solid $ui-03;
+  text-align: center;
+  background-color: $ui-01;
+}
+
+:global(.omrs-breakpoint-lt-small-desktop) .emptyState {
+  background-color: $ui-02;
+}
+
+.link {
+  color: $interactive-01;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.resultsContainer {
+  max-height: 27.5rem;
+  overflow-y: scroll;
+}
+
+.resultsContainer::-webkit-scrollbar {
+  width: spacing.$spacing-03;
+}
+
+.resultsContainer::-webkit-scrollbar-thumb {
+  background: $ui-04;
+  border-radius: spacing.$spacing-02;
+}
