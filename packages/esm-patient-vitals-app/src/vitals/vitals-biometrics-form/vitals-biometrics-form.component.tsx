@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Column, Form, Row, Stack, InlineNotification } from '@carbon/react';
+import { Button, ButtonSet, Column, Form, InlineNotification, Row, Stack } from '@carbon/react';
 import {
   age,
   createErrorHandler,
@@ -225,11 +225,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     <Form className={styles.form}>
       <div className={styles.grid}>
         <Stack>
-          <Column className={styles.column}>
-            <p className={styles.vitalsTitle}>{t('recordVitals', 'Record vitals')}</p>
+          <Column>
+            <p className={styles.title}>{t('recordVitals', 'Record vitals')}</p>
           </Column>
           <Row className={styles.row}>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('bloodPressure', 'Blood Pressure')}
                 control={control}
@@ -265,7 +265,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 }
               />
             </Column>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('pulse', 'Pulse')}
                 control={control}
@@ -282,10 +282,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 isWithinNormalRange={isValueWithinReferenceRange(conceptMetadata, config.concepts['pulseUuid'], pulse)}
               />
             </Column>
-          </Row>
 
-          <Row className={styles.row}>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('respirationRate', 'Respiration Rate')}
                 control={control}
@@ -306,7 +304,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 )}
               />
             </Column>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('spo2', 'SpO2')}
                 control={control}
@@ -327,10 +325,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 )}
               />
             </Column>
-          </Row>
 
-          <Row className={styles.row}>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('temp', 'Temp')}
                 control={control}
@@ -354,8 +350,9 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           </Row>
 
           <Row className={styles.row}>
-            <Column className={styles.column}>
+            <Column className={styles.noteInput}>
               <VitalsBiometricInput
+                textFieldWidth={isTablet ? '70%' : '100%'}
                 title={t('notes', 'Notes')}
                 control={control}
                 textFields={[
@@ -365,18 +362,17 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'generalPatientNote',
                   },
                 ]}
-                textFieldWidth="26.375rem"
                 placeholder={t('additionalNoteText', 'Type any additional notes here')}
               />
             </Column>
           </Row>
         </Stack>
         <Stack className={styles.spacer}>
-          <Column className={styles.column}>
-            <p className={styles.vitalsTitle}>{t('recordBiometrics', 'Record biometrics')}</p>
+          <Column>
+            <p className={styles.title}>{t('recordBiometrics', 'Record biometrics')}</p>
           </Column>
           <Row className={styles.row}>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('weight', 'Weight')}
                 control={control}
@@ -397,7 +393,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 )}
               />
             </Column>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('height', 'Height')}
                 control={control}
@@ -418,7 +414,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 )}
               />
             </Column>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('calculatedBmi', 'BMI (calc.)')}
                 control={control}
@@ -433,7 +429,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 disabled
               />
             </Column>
-            <Column className={styles.column}>
+            <Column>
               <VitalsBiometricInput
                 title={t('muac', 'MUAC')}
                 control={control}
@@ -461,8 +457,9 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             {showErroNotification && (
               <Column>
                 <InlineNotification
-                  title="ERROR"
-                  subtitle="Atleast one field is required"
+                  lowContrast
+                  title={t('error', 'Error')}
+                  subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
                   onClose={() => setShowErrorNotification(false)}
                 />
               </Column>

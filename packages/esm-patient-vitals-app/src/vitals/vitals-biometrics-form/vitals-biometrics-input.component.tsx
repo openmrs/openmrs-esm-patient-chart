@@ -1,10 +1,10 @@
 import React, { Fragment, useState } from 'react';
-import { FormLabel, Layer, TextArea, TextInput } from '@carbon/react';
+import { Control, Controller } from 'react-hook-form';
+import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './vitals-biometrics-input.scss';
 import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
-import { Control, Controller } from 'react-hook-form';
+import styles from './vitals-biometrics-input.scss';
 
 type Id =
   | 'systolicBloodPressure'
@@ -18,6 +18,7 @@ type Id =
   | 'height'
   | 'midUpperArmCircumference'
   | 'computedBodyMassIndex';
+
 interface VitalsBiometricInputProps {
   title: string;
   control: Control<VitalsBiometricsFormData>;
@@ -65,11 +66,12 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       onChange(Number(value));
     }
   }
+
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
-        className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${
+        className={`${styles.textInputContainer} ${disabled && styles.disabledInput} ${
           !isWithinNormalRange && styles.danger
         } ${useMuacColors ? muacColorCode : undefined}`}
         style={{ ...textFieldStyles }}
@@ -83,22 +85,27 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     name={val.id}
                     control={control}
                     render={({ field: { onBlur, onChange, value, ref } }) => (
-                      <TextInput
-                        style={{ ...textFieldStyles }}
-                        className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
+                      <NumberInput
+                        allowEmpty
+                        className={`${styles.textInput} ${disabled && styles.disabledInput} ${val.className} ${
                           !isWithinNormalRange && styles.danger
                         }`}
-                        id={val.name}
-                        type={val.type}
-                        min={val.min}
+                        defaultValue="--"
+                        disabled={disabled}
+                        disableWheel
+                        hideSteppers
+                        id={val.name + 'input'}
+                        label={''}
                         max={val.max}
+                        min={val.min}
                         name={val.name}
-                        onChange={(e) => checkValidity(e.target.value, onChange)}
-                        labelText={''}
-                        value={value}
                         onBlur={onBlur}
+                        onChange={(e) => checkValidity(e.target.value, onChange)}
+                        style={{ ...textFieldStyles }}
                         ref={ref}
                         title={val.name}
+                        type={val.type}
+                        value={value}
                       />
                     )}
                   />
@@ -144,7 +151,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
 };
 
 function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <>{children}</>;
 }
 
 export default VitalsBiometricInput;
