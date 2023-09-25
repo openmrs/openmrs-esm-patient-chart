@@ -2,7 +2,7 @@ import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } 
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate, useConfig, useConnectedExtensions } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -27,6 +27,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
   const { excludePatientIdentifierCodeTypes } = useConfig();
+  const patientActions = useConnectedExtensions('patient-actions-slot');
 
   useEffect(() => {
     const currentRef = patientBannerRef.current;
@@ -78,6 +79,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     setShowDropdown((value) => !value);
   }, []);
 
+  const showActionsMenu = useMemo(
+    () => !hideActionsOverflow && patientActions.length > 0,
+    [patientActions.length, hideActionsOverflow],
+  );
+
   const getGender = (gender: string): string => {
     switch (gender) {
       case 'male':
@@ -121,7 +127,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 className={styles.flexRow}
               />
             </div>
-            {!hideActionsOverflow && (
+            {showActionsMenu && (
               <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
                 <CustomOverflowMenuComponent
                   deceased={isDeceased}
