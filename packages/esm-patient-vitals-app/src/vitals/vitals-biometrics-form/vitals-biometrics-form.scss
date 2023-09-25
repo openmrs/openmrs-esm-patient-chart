@@ -7,9 +7,9 @@
   @include type.type-style("heading-03");
 }
 
-.vitalsTitle {
+.title {
   @extend .productiveHeading03;
-  margin: 0 spacing.$spacing-03 spacing.$spacing-05 0;
+  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
 }
 
 .danger {
@@ -40,6 +40,14 @@
   height: calc(100vh - 6rem);
 }
 
+:global(.omrs-breakpoint-lt-desktop) .form {
+  background-color: #ededed;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .form {
+  background-color: $ui-02;
+}
+
 .grid {
   margin: 1rem;
 }
@@ -48,13 +56,13 @@
   margin: 0.5rem 0rem 0rem;
   display: flex;
   flex-flow: row wrap;
-}
-
-.column {
-  flex-grow: 1;
-  flex-basis: 0;
+  gap: 1rem;
 }
 
 .spacer {
-  margin-top: 3rem;
+  margin-top: 1rem;
+}
+
+.noteInput {
+  width: 100%;
 }
