@@ -24,7 +24,7 @@ test('Add environmental allergy to patient', async ({ page, api }) => {
     await allergiesPage.page.getByText('Environmental').click();
     await allergiesPage.page.getByText('Dust').click();
     await allergiesPage.page.getByText('Mental status change').click();
-    await allergiesPage.page.getByText('Mild').click()
+    await allergiesPage.page.getByText('Mild').click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 

@@ -43,7 +43,7 @@ test('Record biometrics of the patient', async ({ page, api }) => {
     const weightCell = row.locator('td:nth-child(2)');
     const heightCell = row.locator('td:nth-child(3)');
     const BMICell = row.locator('td:nth-child(4)');
-    const MUACCell = row.locator('td:nth-child(5)')
+    const MUACCell = row.locator('td:nth-child(5)');
     await biometricsPage.page.reload();
     await expect(heightCell).toHaveText('170');
     await expect(weightCell).toHaveText('65');
