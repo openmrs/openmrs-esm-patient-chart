@@ -1,7 +1,7 @@
 import { navigate, Visit } from '@openmrs/esm-framework';
 import { HtmlFormEntryForm } from './config-schema';
 import isEmpty from 'lodash-es/isEmpty';
-import { formEntrySub, launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,
@@ -34,12 +34,9 @@ export function launchFormEntry(
   mutateForm?: () => void,
   currentVisit?: Visit,
 ) {
-  formEntrySub.next({ formUuid, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
     mutateForm,
-    formUuid,
-    encounterUuid,
-    visit: currentVisit,
+    formInfo: { encounterUuid, formUuid, visit: currentVisit },
   });
 }

@@ -77,10 +77,12 @@ describe('FormView', () => {
 
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       workspaceTitle: 'POC COVID 19 Assessment Form v1.1',
-      formUuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
-      mutateForm: undefined,
-      encounterUuid: '',
-      visit: mockCurrentVisit,
+      formInfo: {
+        formUuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
+        mutateForm: undefined,
+        encounterUuid: '',
+        visit: mockCurrentVisit,
+      },
     });
   });
 });

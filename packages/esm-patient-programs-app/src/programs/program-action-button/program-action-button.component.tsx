@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { TaskAdd } from '@carbon/react/icons';
-import { formEntrySub, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableProgram } from '../../types';
 import { useLayoutType } from '@openmrs/esm-framework';
 
@@ -16,9 +16,10 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
   const formUuid =
     enrollment.enrollmentStatus === 'eligible' ? enrollment.enrollmentFormUuid : enrollment.discontinuationFormUuid;
   const launchEnrollmentForm = (enrollmentStatus: string) => {
-    formEntrySub.next({ formUuid, encounterUuid: '' });
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: `${enrollment?.display} ${enrollmentStatus} Form`,
+      formUuid,
+      encounterUuid: '',
     });
   };
 

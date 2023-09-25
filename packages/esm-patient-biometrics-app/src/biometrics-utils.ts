@@ -1,11 +1,13 @@
 import { Visit } from '@openmrs/esm-framework';
-import { formEntrySub, launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 
 export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  formEntrySub.next({ formUuid, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+  launchPatientWorkspace('patient-form-entry-workspace', {
+    workspaceTitle: formName,
+    formInfo: { formUuid, encounterUuid },
+  });
 }
 
 export function launchVitalsAndBiometricsForm(currentVisit: Visit, config: ConfigObject) {

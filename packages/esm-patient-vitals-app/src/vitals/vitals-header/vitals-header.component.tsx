@@ -7,7 +7,6 @@ import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
-  formEntrySub,
   launchPatientWorkspace,
   useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
@@ -24,8 +23,7 @@ interface VitalsHeaderProps {
 }
 
 export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  formEntrySub.next({ formUuid, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
 }
 
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
