@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../tools/test-helpers';
 import PatientBanner from './patient-banner.component';
+import { useConnectedExtensions } from '@openmrs/esm-framework';
 
 class ResizeObserverMock {
   callback: any;
@@ -30,11 +31,13 @@ jest.mock('@openmrs/esm-framework', () => ({
   useVisit: jest.fn(),
   age: jest.fn(),
   Breakpoint: { TABLET_MAX: 1023 },
+  useConnectedExtensions: jest.fn(() => [{}, {}]),
 }));
 
 describe('PatientBanner: ', () => {
   it('renders information about a patient in a banner above the patient chart', () => {
     window.ResizeObserver = ResizeObserverMock;
+
     renderPatientBanner();
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
@@ -47,6 +50,14 @@ describe('PatientBanner: ', () => {
     expect(screen.getByText(/OpenMRS ID/i)).toBeInTheDocument();
     expect(screen.getByText(/Old Identification Number/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Show details$/i })).toBeInTheDocument();
+  });
+
+  it('shoulld not render actions menu if no actions connected', () => {
+    window.ResizeObserver = ResizeObserverMock;
+    useConnectedExtensions.mockReturnValue([]); // override the default mock to one that returns an empty array
+
+    renderPatientBanner();
+    expect(screen.queryByRole('button', { name: /^Actions$/i })).not.toBeInTheDocument();
   });
 
   it("can toggle between showing or hiding the patient's contact details", async () => {

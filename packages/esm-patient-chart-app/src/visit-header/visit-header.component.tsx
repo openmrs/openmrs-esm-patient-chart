@@ -133,7 +133,7 @@ function launchStartVisitForm() {
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
-  const { currentVisit, currentVisitIsRetrospective, isValidating } = useVisit(patient?.id);
+  const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(patient?.id);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { logo } = useConfig();
@@ -141,11 +141,7 @@ const VisitHeader: React.FC = () => {
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
-  const isLoading = isValidating && currentVisit === null;
-  const visitNotLoaded = !isValidating && currentVisit === null;
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
-
-  const hasActiveVisit = !isLoading && !visitNotLoaded;
 
   const onClosePatientChart = useCallback(() => {
     document.referrer === '' ? navigate({ to: `${window.spaBase}/home` }) : window.history.back();
@@ -194,23 +190,15 @@ const VisitHeader: React.FC = () => {
         {systemVisitEnabled && (
           <>
             <ExtensionSlot name="visit-header-right-slot" />
-            {!hasActiveVisit && !isDeceased && (
+            {!isLoading && !currentVisit && !isDeceased && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {t('startAVisit', 'Start a visit')}
               </Button>
             )}
-            {currentVisit !== null && (
-              <>
-                <HeaderGlobalAction
-                  className={styles.headerGlobalBarButton}
-                  aria-label={t('endVisit', 'End visit')}
-                  onClick={() => openModal(patient?.id)}
-                >
-                  <Button as="div" className={styles.startVisitButton}>
-                    {t('endVisit', 'End visit')}
-                  </Button>
-                </HeaderGlobalAction>
-              </>
+            {!isLoading && !!currentVisit && (
+              <Button onClick={() => openModal(patient?.id)} className={styles.startVisitButton}>
+                {t('endVisit', 'End visit')}
+              </Button>
             )}
           </>
         )}
