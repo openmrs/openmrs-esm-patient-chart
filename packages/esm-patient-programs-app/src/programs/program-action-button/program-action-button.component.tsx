@@ -18,8 +18,7 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
   const launchEnrollmentForm = (enrollmentStatus: string) => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: `${enrollment?.display} ${enrollmentStatus} Form`,
-      formUuid,
-      encounterUuid: '',
+      formInfo: { formUuid, encounterUuid: '' },
     });
   };
 
