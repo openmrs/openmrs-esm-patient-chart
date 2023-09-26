@@ -37,9 +37,7 @@ const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) 
           (attribute) =>
             visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
         )
-        .map((attribute) => (
-          <Tag type="gray">{getAttributeValue(attribute?.attributeType, attribute?.value)}</Tag>
-        ))}
+        .map((attribute) => <Tag type="gray">{getAttributeValue(attribute?.attributeType, attribute?.value)}</Tag>)}
     </>
   );
 };

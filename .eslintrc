@@ -1,14 +1,28 @@
 {
+  "env": {
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
-  ],
-  "extends": ["ts-react-important-stuff", "plugin:prettier/recommended"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
+    // Disabling these rules for now just to keep the diff small. I'll enable them in a future PR that fixes lint issues.
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-types": "off",
+    "prefer-const": "off",
+    "no-unsafe-optional-chaining": "off",
+    "no-explicit-any": "off",
+    "no-extra-boolean-cast": "off",
+    "no-prototype-builtins": "off",
+    "no-useless-escape": "off",
     "no-restricted-imports": [
       "error",
       {
         "paths": [
+          // These two rules ensure that we're importing lodash and lodash-es correctly. Not doing so can bloat our bundle size significantly.
           {
             "name": "lodash",
             "message": "Import specific methods from `lodash`. e.g. `import map from 'lodash/map'`"
@@ -18,6 +32,7 @@
             "importNames": ["default"],
             "message": "Import specific methods from `lodash-es`. e.g. `import { map } from 'lodash-es'`"
           },
+          // These two rules ensure that we're importing Carbon components and icons from the correct packages (after v10). May be removed in the future.
           {
             "name": "carbon-components-react",
             "message": "Import from `@carbon/react` directly. e.g. `import { Toggle } from '@carbon/react'`"

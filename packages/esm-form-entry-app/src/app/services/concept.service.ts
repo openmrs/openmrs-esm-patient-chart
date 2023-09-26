@@ -22,7 +22,10 @@ export class ConceptService {
     accept: 'application/json',
   });
 
-  constructor(private http: HttpClient, private windowRef: WindowRef) {}
+  constructor(
+    private http: HttpClient,
+    private windowRef: WindowRef,
+  ) {}
 
   public searchConceptsByIdentifiers(conceptIdentifiers: Array<string>) {
     return of(ConceptService.getConceptReferenceUrls(conceptIdentifiers))

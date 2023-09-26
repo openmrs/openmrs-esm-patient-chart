@@ -9,7 +9,10 @@ import { Visit } from '../types';
 export class VisitResourceService {
   public v = 'full';
 
-  constructor(protected http: HttpClient, private windowRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    private windowRef: WindowRef,
+  ) {}
 
   public getUrl(): string {
     return this.windowRef.openmrsRestBase + 'visit';

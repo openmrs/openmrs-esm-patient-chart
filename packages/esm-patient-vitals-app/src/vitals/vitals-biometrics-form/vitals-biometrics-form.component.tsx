@@ -1,6 +1,9 @@
-import React, { SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Column, Form, InlineNotification, Row, Stack } from '@carbon/react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, ButtonSet, Column, Form, Row, Stack, InlineNotification } from '@carbon/react';
 import {
   age,
   createErrorHandler,
@@ -14,6 +17,7 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import type { ConfigObject } from '../../config-schema';
 import {
   calculateBodyMassIndex,
   isValueWithinReferenceRange,
@@ -21,12 +25,8 @@ import {
   getColorCode,
 } from './vitals-biometrics-form.utils';
 import { savePatientVitals, useVitals } from '../vitals.resource';
-import type { ConfigObject } from '../../config-schema';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
-import { useForm } from 'react-hook-form';
 
 const vitalsBiometricsFormSchema = z
   .object({
@@ -77,9 +77,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     resolver: zodResolver(vitalsBiometricsFormSchema),
   });
 
-  const encounterUuid = currentVisit?.encounters?.find(
-    (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
-  )?.uuid;
+  const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
+    ?.uuid;
 
   const midUpperArmCircumference = watch('midUpperArmCircumference');
   const systolicBloodPressure = watch('systolicBloodPressure');
@@ -131,7 +130,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     const patientVitalAndBiometrics = data;
 
     let isFieldValid = true;
-    for (let key in patientVitalAndBiometrics) {
+    for (const key in patientVitalAndBiometrics) {
       if (
         isValueWithinReferenceRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) ==
         false

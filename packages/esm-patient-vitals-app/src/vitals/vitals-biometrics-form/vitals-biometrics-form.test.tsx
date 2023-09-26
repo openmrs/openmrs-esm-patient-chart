@@ -105,11 +105,6 @@ describe('VitalsBiometricsForm: ', () => {
   });
 
   it('renders a success toast notification upon clicking the save button', async () => {
-    // @ts-ignore
-    jest.useFakeTimers('modern');
-    // @ts-ignore
-    jest.setSystemTime(1638682781000); // 5 Dec 2021 05:39:41 GMT
-
     const user = userEvent.setup();
 
     mockSavePatientVitals.mockResolvedValueOnce({ status: 201, statusText: 'Ok' });

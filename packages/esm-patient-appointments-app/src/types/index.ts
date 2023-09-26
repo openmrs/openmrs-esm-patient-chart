@@ -15,7 +15,7 @@ export interface Appointment {
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: number | any;
+  startDateTime: string;
   status: string;
   dateHonored: Date | number;
   uuid: string;

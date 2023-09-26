@@ -2,3 +2,4 @@ src/**/*.test.tsx
 src/**/*.spec.tsx
 **/*.d.ts
 **/node_modules/**/*
+__mocks__/*

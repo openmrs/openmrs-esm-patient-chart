@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -21,8 +21,11 @@ import {
   TimePicker,
   Toggle,
 } from '@carbon/react';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
-import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
   saveRecurringAppointments,
@@ -32,9 +35,6 @@ import {
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../../constants';
 import styles from './appointments-form.scss';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
@@ -403,35 +403,36 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     name="appointmentDateTime"
                     control={control}
                     render={({ field: { onChange, value, ref } }) => (
-                      <DatePicker
-                        datePickerType="range"
-                        light={isTablet}
-                        dateFormat={datePickerFormat}
-                        value={[value.startDate, value.recurringPatternEndDate]}
-                        ref={ref}
-                        onChange={([startDate, endDate]) => {
-                          onChange({
-                            startDate: new Date(startDate),
-                            recurringPatternEndDate: new Date(endDate),
-                            recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
-                            startDateText: dayjs(new Date(startDate)).format(dateFormat),
-                          });
-                        }}
-                      >
-                        <DatePickerInput
-                          id="startDatePickerInput"
-                          labelText={t('startDate', 'Start date')}
-                          style={{ width: '100%' }}
-                          value={watch('appointmentDateTime').startDateText}
-                        />
-                        <DatePickerInput
-                          id="endDatePickerInput"
-                          labelText={t('endDate', 'End date')}
-                          style={{ width: '100%' }}
-                          placeholder={datePickerPlaceHolder}
-                          value={watch('appointmentDateTime').recurringPatternEndDateText}
-                        />
-                      </DatePicker>
+                      <ResponsiveWrapper isTablet={isTablet}>
+                        <DatePicker
+                          datePickerType="range"
+                          dateFormat={datePickerFormat}
+                          value={[value.startDate, value.recurringPatternEndDate]}
+                          ref={ref}
+                          onChange={([startDate, endDate]) => {
+                            onChange({
+                              startDate: new Date(startDate),
+                              recurringPatternEndDate: new Date(endDate),
+                              recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
+                              startDateText: dayjs(new Date(startDate)).format(dateFormat),
+                            });
+                          }}
+                        >
+                          <DatePickerInput
+                            id="startDatePickerInput"
+                            labelText={t('startDate', 'Start date')}
+                            style={{ width: '100%' }}
+                            value={watch('appointmentDateTime').startDateText}
+                          />
+                          <DatePickerInput
+                            id="endDatePickerInput"
+                            labelText={t('endDate', 'End date')}
+                            style={{ width: '100%' }}
+                            placeholder={datePickerPlaceHolder}
+                            value={watch('appointmentDateTime').recurringPatternEndDateText}
+                          />
+                        </DatePicker>
+                      </ResponsiveWrapper>
                     )}
                   />
                 </ResponsiveWrapper>
@@ -564,16 +565,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="appointmentNote"
             control={control}
             render={({ field: { onChange, onBlur, value, ref } }) => (
-              <TextArea
-                id="appointmentNote"
-                light={isTablet}
-                value={value}
-                labelText={t('appointmentNoteLabel', 'Write an additional note')}
-                placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-                onChange={onChange}
-                onBlur={onBlur}
-                ref={ref}
-              />
+              <ResponsiveWrapper isTablet={isTablet}>
+                <TextArea
+                  id="appointmentNote"
+                  value={value}
+                  labelText={t('appointmentNoteLabel', 'Write an additional note')}
+                  placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  ref={ref}
+                />
+              </ResponsiveWrapper>
             )}
           />
         </section>

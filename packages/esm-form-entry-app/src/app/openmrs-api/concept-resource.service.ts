@@ -8,7 +8,10 @@ import { WindowRef } from '../window-ref';
 export class ConceptResourceService {
   public v = 'custom:(uuid,name,conceptClass,setMembers)';
 
-  constructor(protected http: HttpClient, protected windowRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    protected windowRef: WindowRef,
+  ) {}
 
   public getUrl(): string {
     return this.windowRef.openmrsRestBase + 'concept';
