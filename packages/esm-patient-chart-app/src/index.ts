@@ -238,3 +238,11 @@ export const deleteEncounterModal = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const currentVisitSummary = getAsyncLifecycle(
+  () => import('./visit/visits-widget/current-visit-summary.component'),
+  {
+    featureName: 'current-visit-summary',
+    moduleName,
+  },
+);
