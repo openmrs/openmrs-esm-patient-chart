@@ -70,7 +70,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [bodyMassIndex, setBodyMassIndex] = useState<number>();
   const [muacColorCode, setMuacColorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [showErroNotification, setShowErrorNotification] = useState(false);
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
 
   const { control, handleSubmit, getValues, watch, setValue } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
@@ -454,7 +454,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             </Column>
           </Row>
           <Row>
-            {showErroNotification && (
+            {showErrorNotification && (
               <Column>
                 <InlineNotification
                   lowContrast
