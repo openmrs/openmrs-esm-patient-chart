@@ -12,14 +12,15 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
   const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
+
   const state = useMemo(
     () => ({
       view: 'form',
       formUuid: formUuid ?? null,
-      visitUuid: visitUuid ?? currentVisit?.uuid ?? null,
-      visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
-      visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? null,
-      visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
+      visitUuid: visitUuid ?? currentVisit?.uuid ?? '',
+      visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? '',
+      visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? '',
+      visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? '',
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? null,
