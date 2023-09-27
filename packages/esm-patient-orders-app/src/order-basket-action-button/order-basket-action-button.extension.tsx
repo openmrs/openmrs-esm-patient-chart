@@ -1,9 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useLaunchWorkspaceRequiringVisit, useOrderBasket, SiderailNavButton } from '@openmrs/esm-patient-common-lib';
-import styles from './order-basket-action-button.scss';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@carbon/react';
+import { Button, IconButton } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
 import styles from './siderail-nav-button.scss';
@@ -49,22 +49,18 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   }
 
   return (
-    <Button
+    <IconButton
+      align="left"
       className={`${styles.container} ${isWorkspaceActive && styles.active}`}
-      onClick={handler}
-      hasIconOnly
-      kind="ghost"
-      renderIcon={(props) => (
-        <div className={styles.elementContainer}>
-          {getIcon({ size: 20, ...props })}
-          <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
-        </div>
-      )}
-      iconDescription={iconDescription}
       enterDelayMs={1000}
-      tooltipAlignment="center"
-      tooltipPosition="left"
-      size="sm"
-    />
+      kind="ghost"
+      label={iconDescription}
+      onClick={handler}
+    >
+      <div className={styles.elementContainer}>
+        {getIcon({ size: 20 })}
+        <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
+      </div>
+    </IconButton>
   );
 };
