@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../__mocks__/vitals.mock';
@@ -160,7 +160,9 @@ describe('VitalsBiometricsForm: ', () => {
     expect(temperature).toHaveValue(37);
     expect(muac).toHaveValue(23);
 
-    await waitFor(() => user.click(saveButton));
+    await act(async () => {
+      await waitFor(() => user.click(saveButton));
+    });
 
     expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
     expect(mockSavePatientVitals).toHaveBeenCalledWith(
@@ -210,7 +212,6 @@ describe('VitalsBiometricsForm: ', () => {
     renderForm();
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
-    const bmiInput = screen.getByRole('spinbutton', { name: /bmi/i });
     const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
     const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
     const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
@@ -229,7 +230,9 @@ describe('VitalsBiometricsForm: ', () => {
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
-    await waitFor(() => user.click(saveButton));
+    await act(async () => {
+      await waitFor(() => user.click(saveButton));
+    });
 
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
     expect(mockShowNotification).toHaveBeenCalledWith({
