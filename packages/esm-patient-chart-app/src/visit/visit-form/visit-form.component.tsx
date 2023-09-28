@@ -20,7 +20,10 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { first } from 'rxjs/operators';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   saveVisit,
   showNotification,
@@ -40,20 +43,16 @@ import {
   convertTime12to24,
   DefaultWorkspaceProps,
   useActivePatientEnrollment,
-  PatientProgram,
 } from '@openmrs/esm-patient-common-lib';
-import BaseVisitType from './base-visit-type.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import styles from './visit-form.scss';
-import LocationSelector from './location-selection.component';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selection.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import styles from './visit-form.scss';
 
 export type VisitFormData = {
   visitDate: Date;
@@ -198,11 +197,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                       showToast({
                         kind: 'success',
                         title: t('visitStarted', 'Visit started'),
-                        description: t(
-                          'queueAddedSuccessfully',
-                          `Patient has been added to the queue successfully.`,
-                          `${hours} : ${minutes}`,
-                        ),
+                        description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
                       });
                     }
                   },
@@ -328,23 +323,24 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   name="visitDate"
                   control={control}
                   render={({ field: { onBlur, onChange, value } }) => (
-                    <DatePicker
-                      dateFormat="d/m/Y"
-                      datePickerType="single"
-                      id="visitDate"
-                      light={isTablet}
-                      style={{ paddingBottom: '1rem' }}
-                      maxDate={new Date().toISOString()}
-                      onChange={([date]) => onChange(date)}
-                      value={value}
-                    >
-                      <DatePickerInput
-                        id="visitStartDateInput"
-                        labelText={t('date', 'Date')}
-                        placeholder="dd/mm/yyyy"
-                        style={{ width: '100%' }}
-                      />
-                    </DatePicker>
+                    <ResponsiveWrapper isTablet={isTablet}>
+                      <DatePicker
+                        dateFormat="d/m/Y"
+                        datePickerType="single"
+                        id="visitDate"
+                        style={{ paddingBottom: '1rem' }}
+                        maxDate={new Date().toISOString()}
+                        onChange={([date]) => onChange(date)}
+                        value={value}
+                      >
+                        <DatePickerInput
+                          id="visitStartDateInput"
+                          labelText={t('date', 'Date')}
+                          placeholder="dd/mm/yyyy"
+                          style={{ width: '100%' }}
+                        />
+                      </DatePicker>
+                    </ResponsiveWrapper>
                   )}
                 />
                 <ResponsiveWrapper isTablet={isTablet}>

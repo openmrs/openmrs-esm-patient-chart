@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { TFunction, useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {

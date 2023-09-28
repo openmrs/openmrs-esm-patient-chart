@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "module": "esnext",
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "jsx": "react",
-    "skipLibCheck": true,
-    "moduleResolution": "node",
     "lib": [
       "dom",
       "es5",
@@ -16,12 +13,15 @@
       "es2018",
       "es2020"
     ],
-    "resolveJsonModule": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "noEmit": true,
-    "target": "esnext",
-    "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@openmrs/*": ["./node_modules/@openmrs/*"]
-    }
-  }
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "esnext",
+    "typeRoots": ["./node_modules/@types"],
+  },
 }

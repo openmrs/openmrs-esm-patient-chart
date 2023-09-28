@@ -10,7 +10,10 @@ import { Person, PersonUpdate } from '../types';
 export class PersonResourceService {
   public v = 'full';
 
-  constructor(protected http: HttpClient, private windowRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    private windowRef: WindowRef,
+  ) {}
 
   public getUrl(): string {
     return this.windowRef.openmrsRestBase + 'person';
