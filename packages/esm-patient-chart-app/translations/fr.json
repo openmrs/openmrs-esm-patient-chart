@@ -37,7 +37,7 @@
   "editPastVisit": "Editer une visite passée",
   "editThisEncounter": "Editer cette rencontre",
   "editThisVisit": "Edit this visit",
-  "emptyStateText": "Il n'y a pas de {{displayText}} à afficher pour ce patient.",
+  "emptyStateText": "Il n'y a pas de {displayText} à afficher pour ce patient.",
   "encounterDeleted": "Encounter deleted",
   "encounters": "Rencontres",
   "encounters_title": "Encounters",

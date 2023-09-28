@@ -1,11 +1,11 @@
 {
-  "add": "Add",
-  "biometricDisplayed": "Biometric displayed",
-  "biometrics": "Biometrics",
-  "biometrics_lower": "biometrics",
-  "goToSummary": "Go to Summary",
-  "loading": "Loading",
-  "seeAll": "See all",
-  "Vitals & Biometrics": "Vitals & Biometrics",
-  "weight": "Weight"
+  "add": "Añadir",
+  "biometricDisplayed": "Biometría mostrada",
+  "biometrics": "Biometría",
+  "biometrics_lower": "biometría",
+  "goToSummary": "Ir al Resumen",
+  "loading": "Cargando",
+  "seeAll": "Ver todo",
+  "Vitals & Biometrics": "Signos vitales y biometría",
+  "weight": "Peso"
 }
