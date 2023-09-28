@@ -1,10 +1,20 @@
-import useSWR from 'swr';
+import useSwrInfinite from 'swr/infinite';
 import { fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBodyMassIndex } from './biometrics-helpers';
+import { useCallback, useMemo } from 'react';
 
 interface BiometricsFetchResponse {
   id: string;
-  entry: Array<FHIRResource>;
+  entry: Array<{
+    resource: FHIRResource['resource'];
+  }>;
+  meta: {
+    lastUpdated: string;
+  };
+  link: Array<{
+    relation: string;
+    url: string;
+  }>;
   resourceType: string;
   total: number;
   type: string;
@@ -28,15 +38,31 @@ type MappedBiometrics = {
 export const pageSize = 100;
 
 export function useBiometrics(patientUuid: string, concepts: Record<string, string>) {
-  const apiUrl =
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-    Object.values(concepts).join(',') +
-    '&_summary=data&_sort=-date' +
-    `&_count=${pageSize}
-  `;
+  const getUrl = useCallback(
+    (page, prevPageData) => {
+      if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
+        return null;
+      }
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
-    apiUrl,
+      let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&`;
+      let urlSearchParams = new URLSearchParams();
+
+      urlSearchParams.append('code', Object.values(concepts).join(','));
+      urlSearchParams.append('_summary', 'data');
+      urlSearchParams.append('_sort', '-date');
+      urlSearchParams.append('_count', pageSize.toString());
+
+      if (page) {
+        urlSearchParams.append('_getpagesoffset', (page * pageSize).toString());
+      }
+
+      return url + urlSearchParams.toString();
+    },
+    [concepts, patientUuid],
+  );
+
+  const { data, isValidating, setSize, error, size, mutate } = useSwrInfinite<{ data: BiometricsFetchResponse }, Error>(
+    getUrl,
     openmrsFetch,
   );
 
@@ -58,7 +84,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
   });
 
   const biometricsHashTable = new Map<string, Partial<PatientBiometrics>>([]);
-  const biometricsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapBiometricsProperties);
+  const biometricsResponse = data?.[0]?.data?.entry?.map((entry) => entry.resource ?? []).map(mapBiometricsProperties);
 
   biometricsResponse?.map((biometrics) => {
     const recordedDate = new Date(new Date(biometrics.recordedDate)).toISOString();
@@ -87,10 +113,21 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
     },
   );
 
-  return {
-    biometrics: formattedBiometrics,
-    isError: error,
-    isLoading,
-    isValidating,
-  };
+  const results = useMemo(
+    () => ({
+      biometrics: data ? [].concat(formattedBiometrics) : null,
+      isLoading: !data && !error,
+      isError: error,
+      hasMore: data?.length ? !!data?.[data?.length - 1].data?.link?.some((link) => link.relation === 'next') : false,
+      isValidating,
+      loadingNewData: isValidating,
+      setPage: setSize,
+      currentPage: size,
+      totalResults: data?.[0]?.data?.total ?? null,
+      mutate,
+    }),
+    [data, isValidating, error, setSize, size, formattedBiometrics, mutate],
+  );
+
+  return results;
 }

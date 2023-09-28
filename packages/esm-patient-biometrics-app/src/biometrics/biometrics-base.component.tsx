@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
@@ -29,7 +29,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { t } = useTranslation();
   const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
-  const [chartView, setChartView] = React.useState(false);
+  const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
 
   const config = useConfig() as ConfigObject;
@@ -38,7 +38,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchBiometricsForm = React.useCallback(
+  const launchBiometricsForm = useCallback(
     () => launchVitalsAndBiometricsForm(currentVisit, config),
     [config, currentVisit],
   );
@@ -51,7 +51,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
     { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.muacUuid) ?? '') },
   ];
 
-  const tableRows = React.useMemo(
+  const tableRows = useMemo(
     () =>
       biometrics?.map((biometricsData, index) => {
         return {

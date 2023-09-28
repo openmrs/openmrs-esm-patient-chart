@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   DataTableRow,
@@ -13,13 +13,14 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './biometrics-overview.scss';
+import orderBy from 'lodash-es/orderBy';
 
 interface PaginatedBiometricsProps {
-  tableRows: Array<DataTableRow>;
+  tableRows: Array<Record<string, string>>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<{ key: string; header: string }>;
+  tableHeaders: Array<Record<string, string | boolean>>;
 }
 
 const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
@@ -29,13 +30,34 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   urlLabel,
   tableHeaders,
 }) => {
-  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+
+  const sortDate = (myArray, order) =>
+    order === 'ASC'
+      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
+      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+
+  const { key, order } = sortParams;
+
+  const sortedData =
+    key === 'encounterDate'
+      ? sortDate(tableRows, order)
+      : order === 'DESC'
+      ? orderBy(tableRows, [key], ['desc'])
+      : orderBy(tableRows, [key], ['asc']);
+
+  function customSortRow(biometricA, biometricB, { sortDirection, sortStates, ...props }) {
+    const { key } = props;
+    setSortParams({ key, order: sortDirection });
+  }
+  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
   const isTablet = useLayoutType() === 'tablet';
 
   return (
     <div>
       <DataTable
         rows={paginatedBiometrics}
+        sortRow={customSortRow}
         headers={tableHeaders}
         isSortable
         size={isTablet ? 'lg' : 'sm'}
