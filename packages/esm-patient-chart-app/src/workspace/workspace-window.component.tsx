@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
-import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
-import { ArrowLeft, ArrowRight, DownToBottom, Maximize, Minimize, Close } from '@carbon/react/icons';
+import { Header, HeaderGlobalBar, HeaderName, IconButton } from '@carbon/react';
+import { ArrowLeft, ArrowRight, Close, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { patientChartWorkspaceHeaderSlot } from '../constants';
 import { isDesktop } from '../utils';
@@ -59,14 +59,9 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         {layout === 'tablet' && !canHide && (
-          <Button
-            iconDescription={t('close', 'Close')}
-            hasIconOnly
-            onClick={() => closeWorkspace()}
-            renderIcon={(props) => <ArrowLeft size={16} {...props} />}
-            tooltipPosition="bottom"
-            tooltipAlignment="end"
-          />
+          <IconButton align="bottom-right" onClick={closeWorkspace}>
+            <ArrowLeft />
+          </IconButton>
         )}
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar className={styles.headerGlobalBar}>
@@ -74,49 +69,48 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
           {isDesktop(layout) && (
             <>
               {canMaximize && (
-                <Button
-                  iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
-                  hasIconOnly
+                <IconButton
+                  align="bottom"
                   kind="ghost"
+                  label={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
                   onClick={toggleWindowState}
-                  renderIcon={(props) =>
-                    maximized ? <Minimize size={16} {...props} /> : <Maximize size={16} {...props} />
-                  }
-                  tooltipPosition="bottom"
-                />
+                  size="lg"
+                >
+                  {maximized ? <Maximize /> : <Minimize />}
+                </IconButton>
               )}
               {canHide ? (
-                <Button
-                  iconDescription={t('hide', 'Hide')}
-                  hasIconOnly
+                <IconButton
+                  align="bottom-right"
                   kind="ghost"
+                  label={t('hide', 'Hide')}
                   onClick={() => updateWorkspaceWindowState('hidden')}
-                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
-                  tooltipPosition="bottom"
-                  tooltipAlignment="end"
-                />
+                  size="lg"
+                >
+                  <ArrowRight />
+                </IconButton>
               ) : (
-                <Button
-                  iconDescription={t('close', 'Close')}
-                  hasIconOnly
+                <IconButton
+                  align="bottom-right"
+                  label={t('close', 'Close')}
                   kind="ghost"
                   onClick={() => closeWorkspace?.()}
-                  renderIcon={(props) => <Close size={16} {...props} />}
-                  tooltipPosition="bottom"
-                  tooltipAlignment="end"
-                />
+                  size="lg"
+                >
+                  <Close />
+                </IconButton>
               )}
             </>
           )}
           {layout === 'tablet' && canHide && (
-            <Button
-              iconDescription={t('close', 'Close')}
-              hasIconOnly
-              onClick={() => updateWorkspaceWindowState('hidden')}
-              renderIcon={(props) => <DownToBottom size={16} {...props} />}
-              tooltipPosition="bottom"
-              tooltipAlignment="end"
-            />
+            <IconButton
+              align="bottom-right"
+              label={t('close', 'Close')}
+              kind="ghost"
+              onClick={() => closeWorkspace?.()}
+            >
+              <DownToBottom />
+            </IconButton>
           )}
         </HeaderGlobalBar>
       </Header>
