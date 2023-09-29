@@ -12,7 +12,7 @@ import { OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 const useFormSchema = (formUuid: string) => {
   const url = formUuid ? `/ws/rest/v1/o3/forms/${formUuid}` : null;
 
-  const { data, error, isLoading } = useSWR<{ data: OHRIFormSchema }>(formUuid ? url : null, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: OHRIFormSchema }>(url, openmrsFetch);
 
   return { schema: data?.data, error, isLoading };
 };
