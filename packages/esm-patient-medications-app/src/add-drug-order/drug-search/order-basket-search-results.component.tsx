@@ -8,7 +8,7 @@ import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTem
 import styles from './order-basket-search-results.scss';
 import { DrugOrderBasketItem } from '../../types';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
-import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { ordersEqual } from './helpers';
 
 export interface OrderBasketSearchResultsProps {
@@ -27,7 +27,7 @@ export default function OrderBasketSearchResults({
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
 
   if (!searchTerm) {
-    return null;
+    return <div className={styles.container}></div>;
   }
 
   if (isLoading) {
@@ -71,6 +71,7 @@ export default function OrderBasketSearchResults({
             {drugs.map((drug) => (
               <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
             ))}
+            <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
           </div>
         </div>
       ) : (
@@ -91,7 +92,6 @@ export default function OrderBasketSearchResults({
           </div>
         </Tile>
       )}
-      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
     </>
   );
 }
@@ -133,6 +133,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   const addToBasket = useCallback(
     (searchResult: DrugOrderBasketItem) => {
       setOrders([...orders, searchResult]);
+      closeWorkspace('add-drug-order', true);
+      launchPatientWorkspace('order-basket');
     },
     [orders, setOrders],
   );

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import OrderBasketSearch from './drug-search/drug-search.component';
+import DrugSearch from './drug-search/drug-search.component';
 import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
 import { useSession } from '@openmrs/esm-framework';
@@ -52,7 +52,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   );
 
   if (!currentOrder) {
-    return <OrderBasketSearch openOrderForm={openOrderForm} />;
+    return <DrugSearch openOrderForm={openOrderForm} />;
   } else {
     return <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />;
   }

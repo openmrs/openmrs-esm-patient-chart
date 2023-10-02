@@ -7,11 +7,11 @@ import styles from './order-basket-search.scss';
 import { useDebounce } from './drug-search.resource';
 import { DrugOrderBasketItem } from '../../types';
 
-export interface OrderBasketSearchProps {
+export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
-export default function OrderBasketSearch({ openOrderForm }: OrderBasketSearchProps) {
+export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,23 +28,25 @@ export default function OrderBasketSearch({ openOrderForm }: OrderBasketSearchPr
   };
 
   return (
-    <div className={styles.searchPopupContainer}>
-      <ResponsiveWrapper isTablet={isTablet}>
-        <Search
-          size="lg"
-          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-          labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-          onChange={handleSearchTermChange}
-          ref={searchInputRef}
-          value={searchTerm}
+    <>
+      <div className={styles.searchPopupContainer}>
+        <ResponsiveWrapper isTablet={isTablet}>
+          <Search
+            size="lg"
+            placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+            labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+            onChange={handleSearchTermChange}
+            ref={searchInputRef}
+            value={searchTerm}
+          />
+        </ResponsiveWrapper>
+        <OrderBasketSearchResults
+          searchTerm={debouncedSearchTerm}
+          openOrderForm={openOrderForm}
+          focusAndClearSearchInput={focusAndClearSearchInput}
         />
-      </ResponsiveWrapper>
-      <OrderBasketSearchResults
-        searchTerm={debouncedSearchTerm}
-        openOrderForm={openOrderForm}
-        focusAndClearSearchInput={focusAndClearSearchInput}
-      />
-    </div>
+      </div>
+    </>
   );
 }
 

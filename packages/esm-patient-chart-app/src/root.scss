@@ -2,7 +2,14 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+<<<<<<< HEAD
 $bottom-nav-height: 4rem;
+=======
+:root {
+  --tablet-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - 62px);
+  --desktop-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - 3rem);
+}
+>>>>>>> fcc32141 (Fix styling)
 
 .patientChartWrapper {
   display: flex;
@@ -90,3 +97,4 @@ html[dir='rtl'] {
       }
   }
 }
+

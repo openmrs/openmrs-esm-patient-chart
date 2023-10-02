@@ -5,7 +5,7 @@
 /** For OrderBasketSearchResults */
 
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
+  margin: spacing.$spacing-03 spacing.$spacing-05 0;
 }
 
 .divider {
@@ -16,10 +16,12 @@
 
 .desktopDivider {
   margin: spacing.$spacing-07 auto spacing.$spacing-05;
+  padding-bottom: 8rem;
 }
 
 .tabletDivider {
-  margin: spacing.$spacing-08 auto spacing.$spacing-06;
+  margin: spacing.$spacing-08 auto 0;
+  padding-bottom: spacing.$spacing-08;
 }
 
 .searchResultsCount {
@@ -48,8 +50,9 @@
 }
 
 .tabletSearchResultTile {
-  margin-top: 5px;
-  background-color: $ui-02;
+  &:not(:last-of-type) {
+    margin-bottom: spacing.$spacing-04;
+  }
 }
 
 .searchResultTileContent {
@@ -112,8 +115,6 @@
 }
 
 .resultsContainer {
-  max-height: 27.5rem;
-  overflow-y: scroll;
 }
 
 .resultsContainer::-webkit-scrollbar {
@@ -121,7 +122,7 @@
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
-  background: $ui-04;
+  // background: $ui-04;
   border-radius: spacing.$spacing-02;
 }
 

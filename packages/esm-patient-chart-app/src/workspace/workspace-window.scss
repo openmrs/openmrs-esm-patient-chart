@@ -34,12 +34,13 @@
 }
 
 .fixed {
+  background-color: $ui-02;
   position: fixed !important;
   top: 6rem;
   right: auto;
   left: auto;
   overflow-y: auto;
-  background-color: $ui-02;
+  max-height: var(--desktop-workspace-window-height);
 }
 
 .fullWidth {
@@ -93,11 +94,11 @@
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
-    background-color: $ui-01;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     z-index: 8001;
   }
 
@@ -120,9 +121,9 @@
   }
 
   .fixed {
-    top: 3rem;
-    bottom: spacing.$spacing-10;
     background-color: $ui-01;
+    top: 3rem;
+    max-height: var(--tablet-workspace-window-height);
   }
 
   .dynamicWidth {
