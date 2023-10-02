@@ -2,14 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-<<<<<<< HEAD
-$bottom-nav-height: 4rem;
-=======
 :root {
-  --tablet-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - 62px);
-  --desktop-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - 3rem);
+  --bottom-nav-height: 4rem;
+  --workspace-header-height: 3rem;
+  --tablet-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - var(--bottom-nav-height));
+  --desktop-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - var(--workspace-header-height));
 }
->>>>>>> fcc32141 (Fix styling)
 
 .patientChartWrapper {
   display: flex;
@@ -36,7 +34,7 @@ $bottom-nav-height: 4rem;
 :global(.omrs-breakpoint-lt-desktop) {
   .patientChartWrapper {
     :global(.cds--side-nav) {
-      height: calc(100vh - 3rem - $bottom-nav-height);
+      height: calc(100vh - 3rem - var(--bottom-nav-height));
     }
   }
 }
