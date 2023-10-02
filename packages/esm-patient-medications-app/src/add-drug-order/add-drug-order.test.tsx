@@ -1,7 +1,7 @@
 import React from 'react';
-import { screen, render, waitFor, within, renderHook } from '@testing-library/react';
+import { screen, render, within, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getByTextWithMarkup, mockPatient } from '../../../../tools/test-helpers';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 import {
@@ -11,7 +11,7 @@ import {
 } from '../__mocks__/medication.mock';
 import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useSession } from '@openmrs/esm-framework';
-import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 
 const mockUseSession = useSession as jest.Mock;
 mockUseSession.mockReturnValue({
@@ -19,6 +19,12 @@ mockUseSession.mockReturnValue({
     uuid: 'mock-provider-uuid',
   },
 });
+
+const mockLaunchPatientWorkspace = jest.fn();
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
+}));
 
 /** This is needed to render the order form */
 global.IntersectionObserver = jest.fn(function (callback, options) {
@@ -45,7 +51,7 @@ jest.mock('../api/api', () => ({
 function renderDrugSearch() {
   render(
     <AddDrugOrderWorkspace
-      order={undefined}
+      order={undefined as any}
       closeWorkspace={jest.fn()}
       promptBeforeClosing={() => false}
       patientUuid={'mock-patient-uuid'}
@@ -107,7 +113,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
   });
 
-  test('can add items directly to the basket and then open one in the form', async () => {
+  test('can add items directly to the basket', async () => {
     const user = userEvent.setup();
     renderDrugSearch();
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
@@ -117,17 +123,30 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
     const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('div').parentElement;
     const aspirin325AddButton = within(aspirin325Div).getByText(/Add to basket/i);
-    user.click(aspirin325AddButton);
-
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
-    const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
-    await user.click(aspirin81OpenFormButton);
+    await user.click(aspirin325AddButton);
 
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
         startDate: expect.any(Date),
       }),
+    ]);
+
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+  });
+
+  test('can open the drug form ', async () => {
+    const user = userEvent.setup();
+    renderDrugSearch();
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
+    await user.click(aspirin81OpenFormButton);
+
+    expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
         ...getTemplateOrderBasketItem(
           mockDrugSearchResultApiData[0],
