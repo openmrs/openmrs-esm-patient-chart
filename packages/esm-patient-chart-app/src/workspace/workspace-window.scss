@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
@@ -84,10 +85,15 @@
     button {
       background-color: $ui-02;
       border-right: 1px solid $ui-03;
+
+      &>svg{
+        fill:colors.$cool-gray-100 !important; // force svg to be visible
+      }
     }
     button:last-child {
       border-right: none;
     }
+    
   }
 }
 

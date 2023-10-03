@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
-import { Header, HeaderGlobalBar, HeaderName, IconButton } from '@carbon/react';
+import { Header, HeaderGlobalBar, HeaderName, HeaderMenuButton, HeaderGlobalAction, IconButton } from '@carbon/react';
 import { ArrowLeft, ArrowRight, Close, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { patientChartWorkspaceHeaderSlot } from '../constants';
@@ -59,9 +59,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         {layout === 'tablet' && !canHide && (
-          <IconButton align="bottom-right" onClick={closeWorkspace}>
-            <ArrowLeft />
-          </IconButton>
+          <HeaderMenuButton renderMenuIcon={<ArrowLeft />} onClick={closeWorkspace} />
         )}
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar className={styles.headerGlobalBar}>
@@ -69,48 +67,40 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
           {isDesktop(layout) && (
             <>
               {canMaximize && (
-                <IconButton
+                <HeaderGlobalAction
                   align="bottom"
-                  kind="ghost"
                   label={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
                   onClick={toggleWindowState}
                   size="lg"
                 >
                   {maximized ? <Maximize /> : <Minimize />}
-                </IconButton>
+                </HeaderGlobalAction>
               )}
               {canHide ? (
-                <IconButton
+                <HeaderGlobalAction
                   align="bottom-right"
-                  kind="ghost"
                   label={t('hide', 'Hide')}
                   onClick={() => updateWorkspaceWindowState('hidden')}
                   size="lg"
                 >
                   <ArrowRight />
-                </IconButton>
+                </HeaderGlobalAction>
               ) : (
-                <IconButton
+                <HeaderGlobalAction
                   align="bottom-right"
                   label={t('close', 'Close')}
-                  kind="ghost"
                   onClick={() => closeWorkspace?.()}
                   size="lg"
                 >
                   <Close />
-                </IconButton>
+                </HeaderGlobalAction>
               )}
             </>
           )}
           {layout === 'tablet' && canHide && (
-            <IconButton
-              align="bottom-right"
-              label={t('close', 'Close')}
-              kind="ghost"
-              onClick={() => closeWorkspace?.()}
-            >
+            <HeaderGlobalAction align="bottom-right" label={t('close', 'Close')} onClick={() => closeWorkspace?.()}>
               <DownToBottom />
-            </IconButton>
+            </HeaderGlobalAction>
           )}
         </HeaderGlobalBar>
       </Header>
