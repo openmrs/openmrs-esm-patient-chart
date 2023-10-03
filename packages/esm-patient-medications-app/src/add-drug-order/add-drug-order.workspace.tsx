@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import OrderBasketSearch from './drug-search/drug-search.component';
+import React, { useCallback, useState } from 'react';
+import DrugSearch from './drug-search/drug-search.component';
 import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
-import { showToast, usePatient, useSession } from '@openmrs/esm-framework';
-import { careSettingUuid, prepMedicationOrderPostData, usePatientOrders } from '../api/api';
-import { useTranslation } from 'react-i18next';
+import { useSession } from '@openmrs/esm-framework';
+import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { DrugOrderBasketItem } from '../types';
+import { ordersEqual } from './drug-search/helpers';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
@@ -14,10 +14,7 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
 export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
 
 export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorkspace }: AddDrugOrderWorkspace) {
-  const { t } = useTranslation();
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
-  const patient = usePatient();
-  const activeOrders = usePatientOrders(patient.patientUuid, 'ACTIVE');
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
 
@@ -27,28 +24,17 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, currentOrder, orders, setOrders]);
 
-  const chooseDrug = useCallback(
-    (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => {
-      if (activeOrders.data?.find((existing) => existing.drug?.concept.uuid === searchResult.drug?.concept.uuid)) {
-        showToast({
-          kind: 'warning',
-          title: t('drugAlreadyOrdered', 'Drug already ordered'),
-          description: t(
-            'drugAlreadyOrderedDescription',
-            `${searchResult.drug.concept.display} is already ordered for this patient.`,
-          ),
-        });
-        return;
-      }
-      setOrders([...orders, searchResult]);
-      if (directlyAddToBasket) {
-        closeWorkspace();
-        launchPatientWorkspace('order-basket');
+  const openOrderForm = useCallback(
+    (searchResult: DrugOrderBasketItem) => {
+      const existingOrder = orders.find((order) => ordersEqual(order, searchResult));
+      if (existingOrder) {
+        setCurrentOrder(existingOrder);
       } else {
+        setOrders([...orders, searchResult]);
         setCurrentOrder(searchResult);
       }
     },
-    [setOrders, orders, closeWorkspace, activeOrders.data, t],
+    [setOrders, orders],
   );
 
   const saveDrugOrder = useCallback(
@@ -66,12 +52,8 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   );
 
   if (!currentOrder) {
-    return <OrderBasketSearch onSearchResultClicked={chooseDrug} />;
+    return <DrugSearch openOrderForm={openOrderForm} />;
   } else {
     return <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />;
   }
-}
-
-function ordersEqual(order1: DrugOrderBasketItem, order2: DrugOrderBasketItem) {
-  return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
 }
