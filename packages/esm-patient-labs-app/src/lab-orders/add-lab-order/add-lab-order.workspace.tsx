@@ -67,7 +67,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   );
 
   return (
-    <>
+    <div className={styles.container}>
       {isTablet && !isLoadingPatient && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
@@ -202,7 +202,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
           </Button>
         </ButtonSet>
       </Form>
-    </>
+    </div>
   );
 }
 
