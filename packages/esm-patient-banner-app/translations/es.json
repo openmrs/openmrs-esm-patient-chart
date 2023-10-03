@@ -21,5 +21,8 @@
   "relationships": "Relaciones",
   "seeMoreLists": "Ver {listCount} listas más",
   "showDetails": "Mostrar Detalles",
-  "started": "Iniciado"
+  "started": "Iniciado",
+  "state": "State",
+  "stateProvince": "State",
+  "unknown": "Unknown"
 }
