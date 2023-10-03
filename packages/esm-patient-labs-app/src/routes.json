@@ -41,7 +41,7 @@
       "name": "lab-order-panel",
       "component": "labOrderPanel",
       "slot": "order-basket-slot",
-      "order": 1
+      "order": 2
     }
   ],
   "pages": []
