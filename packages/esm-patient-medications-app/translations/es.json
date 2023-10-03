@@ -69,7 +69,6 @@
   "saveOrder": "Guardar pedido",
   "searchAgain": "buscar de nuevo",
   "searchFieldPlaceholder": "Buscar un medicamento o un conjunto de órdenes (por ejemplo, \"Aspirina\")",
-  "searchResultsMatchesForTermfalsemany": "{count} result{plural} for \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseone": "{count} resultado {plural} para \"{searchTerm}\"",
   "searchResultsMatchesForTermfalseother": "{count} resultado {plural} para \"{searchTerm}\"",
   "startDate": "Fecha de inicio",
