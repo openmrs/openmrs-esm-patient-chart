@@ -37,7 +37,7 @@
   "editPastVisit": "ערוך ביקור עבר",
   "editThisEncounter": "ערוך ביקור זה",
   "editThisVisit": "Edit this visit",
-  "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
+  "emptyStateText": "אין {displayText} להצגה עבור מטופל זה",
   "encounterDeleted": "Encounter deleted",
   "encounters": "ביקורים",
   "encounters_title": "Encounters",

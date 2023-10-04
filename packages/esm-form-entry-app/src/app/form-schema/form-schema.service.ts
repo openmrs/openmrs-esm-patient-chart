@@ -8,7 +8,10 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class FormSchemaService {
-  constructor(private formsResourceService: FormResourceService, private translateService: TranslateService) {}
+  constructor(
+    private formsResourceService: FormResourceService,
+    private translateService: TranslateService,
+  ) {}
 
   public getFormSchemaByUuid(formUuid: string, language = 'en'): Observable<FormSchema> {
     return forkJoin({

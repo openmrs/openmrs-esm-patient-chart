@@ -1,3 +1,10 @@
 .container {
-  height: 100vh;
+  height: var(--desktop-workspace-window-height);
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    height: var(--tablet-workspace-window-height);
+  }
 }

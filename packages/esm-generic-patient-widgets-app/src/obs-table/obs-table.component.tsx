@@ -42,16 +42,15 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
         };
 
-        for (let obs of obss) {
+        for (const obs of obss) {
           switch (obs.dataType) {
             case 'Text':
               rowData[obs.conceptUuid] = obs.valueString;
               break;
 
-            case 'Number':
-              let decimalPlaces: number | undefined = config.data.find(
-                (ele: any) => ele.concept === obs.conceptUuid,
-              )?.decimalPlaces;
+            case 'Number': {
+              const decimalPlaces: number | undefined = config.data.find((ele: any) => ele.concept === obs.conceptUuid)
+                ?.decimalPlaces;
 
               if (obs.valueQuantity?.value % 1 !== 0) {
                 if (decimalPlaces > 0) {
@@ -63,6 +62,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 rowData[obs.conceptUuid] = obs.valueQuantity?.value;
               }
               break;
+            }
 
             case 'Coded':
               rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;

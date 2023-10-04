@@ -54,7 +54,7 @@ const computeParents = (
 
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
-    case ReducerActionType.INITIALIZE:
+    case ReducerActionType.INITIALIZE: {
       let parents: TreeParents = {},
         leaves: Array<string> = [],
         tests: Array<[string, TreeNode]> = [],
@@ -72,7 +72,9 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         tests = [...tests, ...newTests];
         lowestParents = [...lowestParents, ...newLP];
       });
+
       const flatTests = Object.fromEntries(tests);
+
       return {
         checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, false])) || {},
         parents: parents,
@@ -80,7 +82,8 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         tests: flatTests,
         lowestParents: lowestParents,
       };
-    case ReducerActionType.TOGGLEVAL:
+    }
+    case ReducerActionType.TOGGLEVAL: {
       return {
         ...state,
         checkboxes: {
@@ -88,7 +91,9 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
           [action.name]: !state.checkboxes[action.name],
         },
       };
-    case ReducerActionType.UDPATEPARENT:
+    }
+
+    case ReducerActionType.UDPATEPARENT: {
       const affectedLeaves = state.parents[action.name];
       const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
@@ -97,11 +102,14 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         ...state,
         checkboxes: checkboxes,
       };
+    }
+
     case ReducerActionType.RESET_TREE:
       return {
         ...state,
         checkboxes: Object.fromEntries(Object.keys(state?.checkboxes)?.map((leaf) => [leaf, false])),
       };
+
     default:
       return state;
   }

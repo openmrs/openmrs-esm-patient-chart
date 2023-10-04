@@ -217,7 +217,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         getToolbarProps,
         onInputChange,
       }: {
-        rows: Array<typeof tableRows[0] & { isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
+        rows: Array<(typeof tableRows)[0] & { isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
         headers: typeof tableHeaders;
         [key: string]: any;
       }) => (

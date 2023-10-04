@@ -15,7 +15,10 @@ export class EncounterResourceService {
     ',visitType:(uuid,name)),' +
     'location:ref,encounterType:ref,encounterProviders:(uuid,display,provider:(uuid,display)))';
 
-  constructor(protected http: HttpClient, protected windoRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    protected windoRef: WindowRef,
+  ) {}
 
   public getUrl(): string {
     return this.windoRef.openmrsRestBase;

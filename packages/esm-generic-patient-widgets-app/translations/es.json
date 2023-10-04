@@ -1,6 +1,6 @@
 {
-  "chartView": "Chart View",
   "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "tableView": "Table View"
+  "chartView": "Vista de gráfico",
+  "displaying": "Visualización",
+  "tableView": "Vista de tabla"
 }

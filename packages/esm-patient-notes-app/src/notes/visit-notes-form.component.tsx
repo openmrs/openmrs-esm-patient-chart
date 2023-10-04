@@ -456,12 +456,14 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                       </ul>
                     );
                   return (
-                    <Tile light={isTablet} className={styles.emptyResults}>
-                      <span>
-                        {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
-                        <strong>"{watch('secondaryDiagnosisSearch')}"</strong>
-                      </span>
-                    </Tile>
+                    <ResponsiveWrapper isTablet={isTablet}>
+                      <Tile className={styles.emptyResults}>
+                        <span>
+                          {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
+                          <strong>"{watch('secondaryDiagnosisSearch')}"</strong>
+                        </span>
+                      </Tile>
+                    </ResponsiveWrapper>
                   );
                 })()}
               </div>

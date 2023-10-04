@@ -37,7 +37,7 @@ const RangeSelector: React.FC<{ setLowerRange: (lowerRange: Date) => void; upper
   ];
 
   return (
-    <Tabs light selected={6} className={styles['range-tabs']}>
+    <Tabs selected={6} className={styles['range-tabs']}>
       <TabList aria-label="Trendline range tabs">
         {ranges.map(([label, onClick], index) => (
           <Tab onClick={onClick} key={index}>
