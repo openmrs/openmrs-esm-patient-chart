@@ -87,7 +87,7 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
           formUuid: formData.form.uuid,
           encounterUuid: formData?.associatedEncounters[0]?.uuid,
         };
-      }),
+      }) ?? [],
     [filteredForms],
   );
 
