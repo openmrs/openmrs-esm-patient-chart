@@ -66,7 +66,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               <Switch name={'today'} text={t('today', 'Today')} />
               <Switch name={'past'} text={t('past', 'Past')} />
             </ContentSwitcher>
-            <div className={styles.divider}></div>
+            <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
