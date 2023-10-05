@@ -2,7 +2,8 @@
 
 .searchPopupContainer {
   position: relative;
-  height: 100vh;
+  min-height: var(--desktop-workspace-window-height);
+  background-color: white;
 }
 
 .searchPopup {
@@ -15,4 +16,10 @@
   width: 100%;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.3);
   z-index: 1;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .searchPopupContainer {
+    min-height: var(--tablet-workspace-window-height);
+  }
 }

@@ -34,8 +34,8 @@ export const usePatientAttributes = (patientUuid: string) => {
 export const usePatientContactAttributes = (patientUuid: string) => {
   const { contactAttributeType } = useConfig() as ConfigObject;
   const { attributes, isLoading } = usePatientAttributes(patientUuid);
-  const contactAttributes = attributes?.filter(({ attributeType }) =>
-    contactAttributeType?.some((uuid) => attributeType?.uuid === uuid),
+  const contactAttributes = attributes?.filter(
+    ({ attributeType }) => contactAttributeType?.some((uuid) => attributeType?.uuid === uuid),
   );
   return {
     contactAttributes: contactAttributes ?? [],

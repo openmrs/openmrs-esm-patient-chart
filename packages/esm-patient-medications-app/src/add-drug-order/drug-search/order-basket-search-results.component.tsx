@@ -1,22 +1,25 @@
-import React, { useMemo } from 'react';
-import { Button, ClickableTile, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import { ShoppingCart } from '@carbon/react/icons';
+import React, { useCallback, useMemo } from 'react';
+import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
+import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
 import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';
 import { DrugOrderBasketItem } from '../../types';
+import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { ordersEqual } from './helpers';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  onSearchResultClicked,
+  openOrderForm,
   focusAndClearSearchInput,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
@@ -24,7 +27,7 @@ export default function OrderBasketSearchResults({
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
 
   if (!searchTerm) {
-    return null;
+    return <div className={styles.container}></div>;
   }
 
   if (isLoading) {
@@ -66,8 +69,9 @@ export default function OrderBasketSearchResults({
           </div>
           <div className={styles.resultsContainer}>
             {drugs.map((drug) => (
-              <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
+              <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
             ))}
+            <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
           </div>
         </div>
       ) : (
@@ -88,18 +92,29 @@ export default function OrderBasketSearchResults({
           </div>
         </Tile>
       )}
-      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
     </>
   );
 }
 
 interface DrugSearchResultItemProps {
   drug: DrugSearchResult;
-  onSearchResultClicked: (searchResult: DrugOrderBasketItem, directlyAddToBasket: boolean) => void;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
+const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
+  const patient = usePatient();
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const drugAlreadyInBasket = useMemo(
+    () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
+    [orders, drug],
+  );
+  const drugAlreadyPrescribed = useMemo(
+    () => activeOrders?.some((order) => order.drug.uuid == drug.uuid),
+    [activeOrders, drug],
+  );
+
   const {
     templates,
     isLoading: isLoadingTemplates,
@@ -115,53 +130,90 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
     [templates, drug, config?.daysDurationUnit],
   );
 
+  const addToBasket = useCallback(
+    (searchResult: DrugOrderBasketItem) => {
+      setOrders([...orders, searchResult]);
+      closeWorkspace('add-drug-order', true);
+      launchPatientWorkspace('order-basket');
+    },
+    [orders, setOrders],
+  );
+
+  const removeFromBasket = useCallback(
+    (searchResult: DrugOrderBasketItem) => {
+      setOrders(orders.filter((order) => !ordersEqual(order, searchResult)));
+    },
+    [orders, setOrders],
+  );
+
   return (
     <>
       {orderItems.map((orderItem, indx) => (
-        <ClickableTile
+        <Tile
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"
-          className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-          onClick={() => onSearchResultClicked(orderItem, false)}
+          className={`${styles.searchResultTile} ${isTablet && styles.tabletSearchResultTile}`}
         >
-          <div className={styles.searchResultTile}>
-            <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
-              <p>
-                <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
-                {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
-                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
-              </p>
-              <UserHasAccess privilege="Manage OrderTemplates">
-                {fetchingDrugOrderTemplatesError ? (
-                  <p>
-                    <span className={styles.errorLabel}>
-                      {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
-                    </span>
-                  </p>
-                ) : (
-                  <p>
-                    {orderItem?.frequency?.value && (
-                      <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
-                    )}
-                    {orderItem?.route?.value && (
-                      <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
-                    )}
-                  </p>
-                )}
-              </UserHasAccess>
-            </div>
-            <Button
-              className={styles.addToBasketButton}
-              kind="ghost"
-              hasIconOnly={true}
-              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
-              iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
-              onClick={() => onSearchResultClicked(orderItem, true)}
-              tooltipPosition="left"
-              tooltipAlignment="end"
-            />
+          <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
+            <p>
+              <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
+              {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+              {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+            </p>
+            <UserHasAccess privilege="Manage OrderTemplates">
+              {fetchingDrugOrderTemplatesError ? (
+                <p>
+                  <span className={styles.errorLabel}>
+                    {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
+                  </span>
+                </p>
+              ) : (
+                <p>
+                  {orderItem?.frequency?.value && (
+                    <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
+                  )}
+                  {orderItem?.route?.value && (
+                    <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
+                  )}
+                </p>
+              )}
+            </UserHasAccess>
           </div>
-        </ClickableTile>
+          {!isLoadingActiveOrders ? (
+            drugAlreadyPrescribed ? (
+              <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
+            ) : (
+              <div className={styles.searchResultActions}>
+                {drugAlreadyInBasket ? (
+                  <Button
+                    kind="danger--ghost"
+                    renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+                    onClick={() => removeFromBasket(orderItem)}
+                  >
+                    {t('removeFromBasket', 'Remove from basket')}
+                  </Button>
+                ) : (
+                  <Button
+                    kind="ghost"
+                    renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
+                    onClick={() => addToBasket(orderItem)}
+                    disabled={drugAlreadyPrescribed}
+                  >
+                    {t('directlyAddToBasket', 'Add to basket')}
+                  </Button>
+                )}
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={() => openOrderForm(orderItem)}
+                  disabled={drugAlreadyPrescribed}
+                >
+                  {t('goToDrugOrderForm', 'Order form')}
+                </Button>
+              </div>
+            )
+          ) : null}
+        </Tile>
       ))}
     </>
   );

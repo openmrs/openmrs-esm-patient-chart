@@ -19,7 +19,10 @@ interface ProgramEnrollmentPayload {
 
 @Injectable()
 export class ProgramResourceService {
-  constructor(private httpClient: HttpClient, protected windowRef: WindowRef) {}
+  constructor(
+    private httpClient: HttpClient,
+    protected windowRef: WindowRef,
+  ) {}
 
   private getBaseProgramsUrl(): string {
     return `${this.windowRef.nativeWindow.openmrsBase}/ws/rest/v1/programenrollment`;

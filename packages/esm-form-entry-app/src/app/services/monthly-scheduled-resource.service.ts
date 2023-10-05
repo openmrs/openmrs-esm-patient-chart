@@ -7,7 +7,11 @@ import { ConfigResourceService } from './config-resource.service';
 
 @Injectable()
 export class MonthlyScheduleResourceService {
-  constructor(private http: HttpClient, private windowRef: WindowRef, private configResource: ConfigResourceService) {}
+  constructor(
+    private http: HttpClient,
+    private windowRef: WindowRef,
+    private configResource: ConfigResourceService,
+  ) {}
 
   public getMonthlySchedule(params: MonthlyScheduleParams) {
     const url = `${this.configResource.getConfig().appointmentsResourceUrl}?startDate=${params.startDate}&endDate=${

@@ -2,28 +2,10 @@
 @use '@carbon/styles/scss/type';
 @import "../../root";
 
+/** For OrderBasketSearchResults */
+
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
-}
-
-.desktopSearchResultTile {
-  padding: spacing.$spacing-03 spacing.$spacing-05;
-  border-left: 4px solid var(--brand-03);
-
-  &:not(:last-of-type) {
-    margin-bottom: spacing.$spacing-03;
-  }
-}
-
-.tabletSearchResultTile {
-  padding: spacing.$spacing-03 spacing.$spacing-05;
-  margin-top: 5px;
-  border-left: 2px solid var(--brand-03);
-  background-color: $ui-02;
-
-  &:not(:last-of-type) {
-    margin-bottom: 1rem;
-  }
+  margin: spacing.$spacing-03 spacing.$spacing-05 0;
 }
 
 .divider {
@@ -34,10 +16,12 @@
 
 .desktopDivider {
   margin: spacing.$spacing-07 auto spacing.$spacing-05;
+  padding-bottom: 8rem;
 }
 
 .tabletDivider {
-  margin: spacing.$spacing-08 auto spacing.$spacing-06;
+  margin: spacing.$spacing-08 auto 0;
+  padding-bottom: spacing.$spacing-08;
 }
 
 .searchResultsCount {
@@ -52,14 +36,34 @@
   align-items: center;
 }
 
+/** For DrugSearchResultItem */
+
 .searchResultTile {
+  padding: 0;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  border: 1px solid $grey-2;
+  &:not(:last-of-type) {
+    margin-bottom: spacing.$spacing-03;
+  }
+}
+
+.tabletSearchResultTile {
+  &:not(:last-of-type) {
+    margin-bottom: spacing.$spacing-04;
+  }
 }
 
 .searchResultTileContent {
-  flex: 1 1 auto;
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+}
+
+.searchResultActions {
+  border-top: 1px solid $grey-2;
+  padding: 0 spacing.$spacing-05;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .addToBasketButton {
@@ -111,8 +115,6 @@
 }
 
 .resultsContainer {
-  max-height: 27.5rem;
-  overflow-y: scroll;
 }
 
 .resultsContainer::-webkit-scrollbar {
@@ -120,6 +122,13 @@
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
-  background: $ui-04;
+  // background: $ui-04;
   border-radius: spacing.$spacing-02;
+}
+
+.drugAlreadyPrescribed {
+  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
+  text-align: right;
+  @include type.type-style('label-01');
+  color: $text-02;
 }

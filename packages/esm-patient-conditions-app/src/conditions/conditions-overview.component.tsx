@@ -122,7 +122,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                 size={isTablet ? 'lg' : 'sm'}
               />
             </div>
-            <div className={styles.divider}></div>
+            <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}

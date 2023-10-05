@@ -13,7 +13,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     <aside className={styles.sideRail}>
       <div className={styles.container}>
         <ExtensionSlot className={styles.chartExtensions} name={'action-menu-chart-items-slot'} />
-        {layout === 'small-desktop' || layout === 'large-desktop' ? <div className={styles.divider}></div> : null}
+        {layout === 'small-desktop' || layout === 'large-desktop' ? <div className={styles.divider}>|</div> : null}
         <ExtensionSlot className={styles.nonChartExtensions} name={'action-menu-non-chart-items-slot'} />
       </div>
     </aside>

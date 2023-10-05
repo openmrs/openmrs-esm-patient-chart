@@ -3,5 +3,4 @@
 
 set -e  # die on error
 
-yarn pretty-quick --staged
 yarn verify

@@ -11,7 +11,10 @@ import { Location, ListResult } from '../types';
 export class LocationResourceService {
   private static readonly v = 'custom:(uuid,display)';
 
-  constructor(protected http: HttpClient, protected windowRef: WindowRef) {}
+  constructor(
+    protected http: HttpClient,
+    protected windowRef: WindowRef,
+  ) {}
 
   public getLocationByUuid(uuid: string): Observable<Location | undefined> {
     const url = this.getUrl(uuid);

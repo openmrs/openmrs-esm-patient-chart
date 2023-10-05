@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @import "../root.scss";
 
@@ -17,13 +18,13 @@
       height: spacing.$spacing-05;
     }
   }
-
 }
 
 .divider {
-  border-left: 1px solid $ui-03;
+  width: 1px;
   height: spacing.$spacing-05;
-  margin: 0 spacing.$spacing-03 0 spacing.$spacing-05;
+  color: colors.$gray-20;
+  margin: 0 spacing.$spacing-05;
 }
 
 .validatingDataIcon {

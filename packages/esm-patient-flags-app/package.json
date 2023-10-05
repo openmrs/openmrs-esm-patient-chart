@@ -9,7 +9,7 @@
   "scripts": {
     "start": "openmrs develop",
     "serve": "webpack serve --mode=development",
-    "build": "webpack --mode production",
+    "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
     "lint": "TIMING=1 eslint src --ext js,jsx,ts,tsx",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
@@ -50,7 +50,7 @@
     "rxjs": "6.x"
   },
   "devDependencies": {
-    "webpack": "^5.75.0"
+    "webpack": "^5.88.2"
   },
   "packageManager": "yarn@3.6.1"
 }
