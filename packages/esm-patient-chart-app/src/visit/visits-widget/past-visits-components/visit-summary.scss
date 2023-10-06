@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../../../root.scss";
 
@@ -23,7 +24,7 @@
   padding: 1rem 0rem;
 
   :global(.cds--tabs) {
-    max-height: 10rem;
+    min-height: 8rem;
   }
 }
 
@@ -50,7 +51,7 @@
   outline-offset: 0;
 
   &:active, &:focus {
-    outline: 2px solid var(--brand-03) !important;
+    outline: spacing.$spacing-01 solid var(--brand-03) !important;
   }
 
   &[aria-selected="true"] {
@@ -62,7 +63,7 @@
 
   &[aria-selected="false"] {
     border-bottom: none;
-    border-left: 2px solid $ui-03;
+    border-left: spacing.$spacing-01 solid $ui-03;
     margin-left: 0rem !important;
   }
 }
