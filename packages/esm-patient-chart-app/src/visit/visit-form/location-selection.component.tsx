@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './visit-form.scss';
-import { Location, OpenmrsResource, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { Location, OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
 import { ComboBox, InlineNotification } from '@carbon/react';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { useLocations } from '../hooks/useLocations';
 import isEmpty from 'lodash/isEmpty';
 import { useFormContext, Controller } from 'react-hook-form';
 import { VisitFormData } from './visit-form.component';
+import { ChartConfig } from '../../config-schema';
 
 const LocationSelector = () => {
   const { t } = useTranslation();
@@ -15,6 +16,8 @@ const LocationSelector = () => {
   const selectedSessionLocation = useSession().sessionLocation;
   const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
+  const config = useConfig() as ChartConfig;
+  const viewOnlyVisitLocationField = config?.viewOnlyVisitLocationField;
   const locationsToShow: Array<OpenmrsResource> =
     !loadingDefaultFacility && !isEmpty(defaultFacility)
       ? [defaultFacility]
@@ -49,6 +52,7 @@ const LocationSelector = () => {
               onBlur={onBlur}
               itemToString={(loc: Location) => loc?.display}
               onInputChange={(loc) => handleSearch(loc)}
+              disabled={viewOnlyVisitLocationField}
             />
           )}
         />
