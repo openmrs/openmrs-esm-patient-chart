@@ -96,6 +96,7 @@
   "orderDurationAndUnit": "for {duration} {durationUnit}",
   "orderIndefiniteDuration": "Indefinite duration",
   "other": "Other",
+  "paginationPageText": "of {total} pages",
   "partOfFormDidntLoad": "Part of the form did not load",
   "pastVisitErrorText": "Past Visit Error",
   "pastVisits": "Past Visits",
