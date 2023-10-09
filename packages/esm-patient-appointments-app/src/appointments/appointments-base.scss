@@ -1,8 +1,9 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-// TO DO Move this styles to style - guide 
+// TO DO Move this styles to style - guide
 // https://github.com/openmrs/openmrs-esm-core/blob/master/packages/framework/esm-styleguide/src/_vars.scss
 $color-blue-30 : #a6c8ff;
 $color-blue-10: #edf5ff;
@@ -43,7 +44,7 @@ $color-blue-10: #edf5ff;
   border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
 }
 
-.contentSwitcherWrapper > div > button[aria-selected=true], 
+.contentSwitcherWrapper > div > button[aria-selected=true],
 .contentSwitcherWrapper > div > button[aria-selected=true]:first-child {
   background-color: $color-blue-10;
   color: $color-blue-60-2;
@@ -51,7 +52,7 @@ $color-blue-10: #edf5ff;
   border-right: 1px solid $color-blue-60-2;
 }
 
-.contentSwitcherWrapper > div > button[aria-selected=true], 
+.contentSwitcherWrapper > div > button[aria-selected=true],
 .contentSwitcherWrapper > div > button[aria-selected=true]:last-child {
   background-color: $color-blue-10;
   color: $color-blue-60-2;
@@ -64,9 +65,10 @@ $color-blue-10: #edf5ff;
 }
 
 .divider {
-  border-left: 1px solid $ui-03;
+  width: 1px;
   height: spacing.$spacing-05;
-  margin: 0 spacing.$spacing-05 0 spacing.$spacing-06;
+  color: colors.$gray-20;
+  margin: 0 spacing.$spacing-05;
 }
 
 .content {

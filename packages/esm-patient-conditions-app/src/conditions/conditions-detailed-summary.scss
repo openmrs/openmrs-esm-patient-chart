@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import "~@openmrs/esm-styleguide/src/vars";
@@ -7,9 +8,10 @@
 }
 
 .divider {
-  border-left: 1px solid $ui-03;
+  width: 1px;
   height: spacing.$spacing-05;
-  margin: 0 spacing.$spacing-03;
+  color: colors.$gray-20;
+  margin: 0 spacing.$spacing-05;
 }
 
 .rightMostFlexContainer {
