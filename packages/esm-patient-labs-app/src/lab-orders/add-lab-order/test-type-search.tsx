@@ -30,7 +30,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
   };
 
   return (
-    <div className={styles.searchPopupContainer}>
+    <>
       <ResponsiveWrapper isTablet={isTablet}>
         <Search
           size="lg"
@@ -46,7 +46,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
         openOrderForm={openLabForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
       />
-    </div>
+    </>
   );
 }
 

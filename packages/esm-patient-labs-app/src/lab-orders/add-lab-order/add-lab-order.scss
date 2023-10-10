@@ -3,6 +3,12 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../../root";
 
+.container {
+  position: relative;
+  min-height: var(--desktop-workspace-window-height);
+  background-color: white;
+}
+
 .patientHeader {
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-01;
@@ -20,7 +26,7 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
+  padding: spacing.$spacing-03 0;
 
   button {
     display: flex;
@@ -36,65 +42,3 @@
     }
   }
 }
-<<<<<<< HEAD
-
-.gridRow {
-  padding: 0px;
-  margin-left: calc(spacing.$spacing-03 * -1);
-
-  :global(.cds--number) {
-    display: inline-block;
-  }
-}
-
-.field {
-  margin-bottom: spacing.$spacing-05;
-}
-
-.buttonSet {
-  margin-left: calc(spacing.$spacing-05 * -1);
-
-  :global(.cds--btn) {
-    width: 50%;
-    max-width: unset;
-  }
-}
-
-.linkedInput {
-  display: flex;
-  align-items: center;
-
-  :global(.cds--layer-one), 
-  :global(.cds--layer-two), 
-  :global(.cds--layer) {
-    flex: 1;
-  }
-}
-
-.linkedInput::after {
-  content: "";
-  border: 1px solid $text-03;
-  width: spacing.$spacing-05;
-  margin-right: calc(spacing.$spacing-05 * -1);
-  margin-top: spacing.$spacing-05;
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) {
-
-  .container {
-    height: var(--tablet-workspace-window-height);
-  }
-
-  .orderForm {
-    background-color: #ededed;
-  }
-
-  .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-  }
-
-}
-=======
->>>>>>> b48d5508 (First pass at creating test type search page. Need to fix the test type resource and create the page for an empty search box.)

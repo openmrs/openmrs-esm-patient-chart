@@ -109,15 +109,11 @@
   cursor: pointer;
 }
 
-.resultsContainer {
-}
-
 .resultsContainer::-webkit-scrollbar {
   width: spacing.$spacing-03;
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
-  // background: $ui-04;
   border-radius: spacing.$spacing-02;
 }
 

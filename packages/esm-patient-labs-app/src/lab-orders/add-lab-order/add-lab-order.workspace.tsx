@@ -61,6 +61,6 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       ) : (
         <LabOrderForm initialOrder={currentLabOrder} closeWorkspace={closeWorkspace} />
       )}
-    </>
+    </div>
   );
 }

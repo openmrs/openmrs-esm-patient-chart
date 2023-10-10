@@ -2,10 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import "../../root";
 
+/** For TestTypeSearch */
+
 /** For TestTypeSearchResults */
 
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
+  margin: spacing.$spacing-03 spacing.$spacing-05;
 }
 
 .divider {
@@ -102,7 +104,6 @@
 }
 
 .resultsContainer {
-  max-height: 27.5rem;
   overflow-y: scroll;
 }
 
