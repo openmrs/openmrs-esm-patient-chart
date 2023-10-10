@@ -62,8 +62,8 @@ export interface Privilege {
 export interface EncounterType {
   uuid: string;
   name: string;
-  viewPrivilege: Privilege;
-  editPrivilege: Privilege;
+  viewPrivilege: Privilege | null;
+  editPrivilege: Privilege | null;
 }
 
 export interface ListResponse<T> {
