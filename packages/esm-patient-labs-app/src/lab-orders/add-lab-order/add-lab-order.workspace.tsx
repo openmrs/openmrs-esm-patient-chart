@@ -11,12 +11,12 @@ import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
-  order: OrderBasketItem;
+  order?: OrderBasketItem;
 }
 
 export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
 
-// Design: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bf3e8e5a4119570c1bae
+// Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspace }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
 

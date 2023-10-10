@@ -7,6 +7,8 @@
   position: relative;
   min-height: var(--desktop-workspace-window-height);
   background-color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .patientHeader {

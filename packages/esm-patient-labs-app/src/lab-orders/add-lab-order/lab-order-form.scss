@@ -4,11 +4,11 @@
 @import "../../root";
 
 .orderForm {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
-  height: calc(100vh - 9rem);
 
   :global(.cds--css-grid) {
     max-width: unset;
