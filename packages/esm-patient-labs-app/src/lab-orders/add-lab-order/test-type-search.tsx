@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Layer, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItem, prepLabOrderPostData } from '../api';
 import styles from './test-type-search.scss';
 import { TestType, useTestTypes } from './useTestTypes';
@@ -159,6 +159,8 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
   const addToBasket = useCallback(() => {
     const labOrder = createLabOrder(testType);
     setOrders([...orders, labOrder]);
+    closeWorkspace('add-lab-order', true);
+    launchPatientWorkspace('order-basket');
   }, [orders, setOrders, createLabOrder, testType]);
 
   const removeFromBasket = useCallback(() => {
