@@ -20,7 +20,6 @@ import {
   formatDate,
   formatDatetime,
   useConfig,
-  usePagination,
   ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
@@ -38,20 +37,12 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const config = useConfig() as ConfigObject;
-  const programsCount = 5;
-  const isConfigurable = config.customUrl ? true : false;
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
 
   const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms, configurablePrograms } =
     usePrograms(patientUuid);
-
-  const {
-    results: paginatedEnrollments,
-    goTo,
-    currentPage,
-  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
 
   const tableHeaders: Array<typeof DataTableHeader> = React.useMemo(
     () => [
