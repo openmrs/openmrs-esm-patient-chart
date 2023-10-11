@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './visit-form.scss';
 import { Location, OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
-import { ComboBox, InlineNotification } from '@carbon/react';
+import { ComboBox } from '@carbon/react';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import { useTranslation } from 'react-i18next';
 import { useLocations } from '../hooks/useLocations';
@@ -12,6 +12,9 @@ import { ChartConfig } from '../../config-schema';
 
 const LocationSelector = () => {
   const { t } = useTranslation();
+  const {
+    sessionLocation: { display: sessionLocationDisplay },
+  } = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
   const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
@@ -27,7 +30,7 @@ const LocationSelector = () => {
       ? [selectedSessionLocation]
       : [];
 
-  const { control } = useFormContext<VisitFormData>();
+  const { control, getValues } = useFormContext<VisitFormData>();
 
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
@@ -37,25 +40,29 @@ const LocationSelector = () => {
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
       <div className={`${styles.selectContainer} ${styles.sectionField}`}>
-        <Controller
-          name="visitLocation"
-          control={control}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <ComboBox
-              titleText={t('selectLocation', 'Select a location')}
-              aria-label={t('selectLocation', 'Select a location')}
-              id="location"
-              invalidText="Required"
-              items={locationsToShow}
-              selectedItem={value}
-              onChange={({ selectedItem }) => onChange(selectedItem)}
-              onBlur={onBlur}
-              itemToString={(loc: Location) => loc?.display}
-              onInputChange={(loc) => handleSearch(loc)}
-              disabled={viewOnlyVisitLocationField}
-            />
-          )}
-        />
+        {!viewOnlyVisitLocationField ? (
+          <Controller
+            name="visitLocation"
+            control={control}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <ComboBox
+                titleText={t('selectLocation', 'Select a location')}
+                aria-label={t('selectLocation', 'Select a location')}
+                id="location"
+                invalidText="Required"
+                items={locationsToShow}
+                selectedItem={value}
+                onChange={({ selectedItem }) => onChange(selectedItem)}
+                onBlur={onBlur}
+                itemToString={(loc: Location) => loc?.display}
+                onInputChange={(loc) => handleSearch(loc)}
+                disabled={viewOnlyVisitLocationField}
+              />
+            )}
+          />
+        ) : (
+          <p className={styles.bodyShort02}>{sessionLocationDisplay}</p>
+        )}
       </div>
     </section>
   );
