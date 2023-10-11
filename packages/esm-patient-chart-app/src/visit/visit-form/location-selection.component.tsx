@@ -12,9 +12,7 @@ import { ChartConfig } from '../../config-schema';
 
 const LocationSelector = () => {
   const { t } = useTranslation();
-  const {
-    sessionLocation: { display: sessionLocationDisplay },
-  } = useSession();
+  const session = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
   const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
@@ -30,7 +28,7 @@ const LocationSelector = () => {
       ? [selectedSessionLocation]
       : [];
 
-  const { control, getValues } = useFormContext<VisitFormData>();
+  const { control } = useFormContext<VisitFormData>();
 
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
@@ -61,7 +59,7 @@ const LocationSelector = () => {
             )}
           />
         ) : (
-          <p className={styles.bodyShort02}>{sessionLocationDisplay}</p>
+          <p className={styles.bodyShort02}>{session?.sessionLocation?.display}</p>
         )}
       </div>
     </section>
