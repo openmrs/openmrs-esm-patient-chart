@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './visit-form.scss';
 import { Location, OpenmrsResource, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { ComboBox, InlineNotification } from '@carbon/react';
@@ -11,9 +11,8 @@ import { VisitFormData } from './visit-form.component';
 
 const LocationSelector = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
-  const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
+  const { locations } = useLocations('');
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
   const locationsToShow: Array<OpenmrsResource> =
     !loadingDefaultFacility && !isEmpty(defaultFacility)
@@ -26,10 +25,6 @@ const LocationSelector = () => {
 
   const { control } = useFormContext<VisitFormData>();
 
-  const handleSearch = (searchString) => {
-    setSearchTerm(searchString);
-  };
-
   return (
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
@@ -37,18 +32,15 @@ const LocationSelector = () => {
         <Controller
           name="visitLocation"
           control={control}
-          render={({ field: { onBlur, onChange, value } }) => (
+          render={({ field: { value } }) => (
             <ComboBox
               titleText={t('selectLocation', 'Select a location')}
               aria-label={t('selectLocation', 'Select a location')}
               id="location"
-              invalidText="Required"
               items={locationsToShow}
               selectedItem={value}
-              onChange={({ selectedItem }) => onChange(selectedItem)}
-              onBlur={onBlur}
               itemToString={(loc: Location) => loc?.display}
-              onInputChange={(loc) => handleSearch(loc)}
+              disabled={true}
             />
           )}
         />
