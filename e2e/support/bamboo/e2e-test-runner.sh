@@ -8,4 +8,6 @@ while [ "$(curl -s -o /dev/null -w ''%{http_code}'' http://gateway/openmrs/login
   sleep 10
 done
 
+cp example.env .env
+
 yarn test-e2e
