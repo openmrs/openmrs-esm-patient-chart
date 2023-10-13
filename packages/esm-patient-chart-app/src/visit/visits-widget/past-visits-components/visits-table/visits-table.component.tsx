@@ -54,7 +54,7 @@ interface VisitTableProps {
 
 type FilterProps = {
   rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
+  headers: Array<typeof DataTableHeader>;
   cellsById: Record<string, Record<string, boolean | string | null | Record<string, unknown>>>;
   inputValue: string;
   getCellId: (row, key) => string;
