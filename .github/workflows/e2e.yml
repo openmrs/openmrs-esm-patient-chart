@@ -56,8 +56,22 @@ jobs:
 
       - name: Upload report
         uses: actions/upload-artifact@v3
-        if: always()
+        if: "!cancelled()"
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+      - name: Capture Server Logs
+        if: "!cancelled()"
+        uses: jwalton/gh-docker-logs@v2
+        with:
+          dest: './logs'
+
+      - name: Upload Logs as Artifact
+        uses: actions/upload-artifact@v2
+        if: "!cancelled()"
+        with:
+          name: server-logs
+          path: './logs'
+          retention-days: 2
