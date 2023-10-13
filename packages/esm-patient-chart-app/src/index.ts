@@ -246,3 +246,8 @@ export const currentVisitSummary = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const retrospectiveDialog = getAsyncLifecycle(
+  () => import('./visit/visit-prompt/retrospective-dialog.component'),
+  { featureName: 'retrospective-dialog', moduleName },
+);

@@ -37,6 +37,7 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
+  showModal,
 } from '@openmrs/esm-framework';
 import {
   amPm,
@@ -140,30 +141,51 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     formState: { errors },
   } = methods;
 
+  const createPayload = (data: VisitFormData) => {
+    const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
+    const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
+
+    return {
+      patient: patientUuid,
+      startDatetime: toDateObjectStrict(
+        toOmrsIsoString(
+          new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
+        ),
+      ),
+      visitType: visitType,
+      location: visitLocation?.uuid,
+      attributes: Object.entries(visitAttributes)
+        .filter(([key, value]) => !!value)
+        .map(([key, value]) => ({
+          attributeType: key,
+          value: value as string,
+        })),
+    };
+  };
+
+  const handleRetrospectiveVisit = useCallback((data: VisitFormData, event) => {
+    const { visitDate } = data;
+    const payload = createPayload(data);
+
+    const dispose = showModal('retrospective-modal', {
+      closeModal: () => {
+        dispose();
+        closeWorkspace();
+      },
+      onCancel: () => dispose(),
+      patientUuid,
+      visitDate,
+      payload,
+    });
+  }, []);
+
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
-      const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
+      const { visitDate, visitLocation } = data;
+
+      const payload = createPayload(data);
 
       setIsSubmitting(true);
-
-      const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
-
-      const payload: NewVisitPayload = {
-        patient: patientUuid,
-        startDatetime: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
-          ),
-        ),
-        visitType: visitType,
-        location: visitLocation?.uuid,
-        attributes: Object.entries(visitAttributes)
-          .filter(([key, value]) => !!value)
-          .map(([key, value]) => ({
-            attributeType: key,
-            value: value as string,
-          })),
-      };
 
       const abortController = new AbortController();
       saveVisit(payload, abortController)
@@ -279,6 +301,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     ],
   );
 
+  const handleFormSubmit = (data: VisitFormData, event) =>
+    dayjs(data.visitDate).isBefore(new Date(), 'day') ? handleRetrospectiveVisit(data, event) : onSubmit(data, event);
+
   const handleOnChange = () => {
     setIgnoreChanges((prevState) => !prevState);
     promptBeforeClosing(() => true);
@@ -294,7 +319,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(handleFormSubmit)}>
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}

@@ -1,12 +1,10 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { BehaviorSubject } from 'rxjs';
 import { usePatient } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../tools/test-helpers';
 import FormEntry from './form-entry.component';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
-const mockFormEntrySub = jest.fn();
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
 
@@ -40,10 +38,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 describe('FormEntry', () => {
   it('renders an extension where the form entry widget plugs in', () => {
     mockUsePatient.mockReturnValue({ patient: mockPatient });
-    mockUseVisitOrOfflineVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
-    mockFormEntrySub.mockReturnValue(
-      new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
-    );
+    mockUseVisitOrOfflineVisit.mockReturnValue({ currentVisit: mockCurrentVisit, currentVisitIsRetrospective: false });
 
     renderFormEntry();
 
@@ -54,10 +49,18 @@ describe('FormEntry', () => {
 
 function renderFormEntry() {
   const testProps = {
+    patientUuid: 'some-patient-uuid',
     closeWorkspace: jest.fn(),
-    promptBeforeClosing: jest.fn(),
-    patientUuid: mockPatient.id,
     mutateForm: jest.fn(),
+    formInfo: {
+      encounterUuid: 'some-encounter-uuid',
+      formUuid: 'some-form-uuid',
+      visitStartDatetime: new Date().toISOString(),
+      visitStopDatetime: new Date().toDateString(),
+      visitTypeUuid: 'some-visit-type-uuid',
+      visitUuid: 'some-visit-uuid',
+    },
+    promptBeforeClosing: jest.fn(),
   };
 
   render(<FormEntry {...testProps} />);

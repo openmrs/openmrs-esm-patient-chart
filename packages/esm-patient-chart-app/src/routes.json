@@ -156,6 +156,10 @@
       "meta": {
         "columnSpan": 4
       }
+    },
+    {
+      "name": "retrospective-modal",
+      "component": "retrospectiveDialog"
     }
   ],
   "pages": [

@@ -10,7 +10,7 @@ interface FormEntryComponentProps extends DefaultWorkspaceProps {
 const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm, formInfo }) => {
   const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid } = formInfo || {};
   const { patient } = usePatient(patientUuid);
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit, currentVisitIsRetrospective } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
   const state = useMemo(
     () => ({
@@ -27,6 +27,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
         typeof mutateForm === 'function' && mutateForm();
         closeWorkspace();
       },
+      currentVisitIsRetrospective,
     }),
     [
       formUuid,

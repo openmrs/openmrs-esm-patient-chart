@@ -243,9 +243,10 @@ export class FormCreationService {
 
   private setDefaultValues(form: Form, createFormParams: CreateFormParams) {
     const { session } = createFormParams;
-
+    const currentVisitIsRetrospective = this.singleSpaPropsService.getPropOrThrow('currentVisitIsRetrospective');
+    const visitStartDatetime = this.singleSpaPropsService.getPropOrThrow('visitStartDatetime');
     // Encounter date and time.
-    const currentDate = moment().format();
+    const currentDate = currentVisitIsRetrospective ? visitStartDatetime : moment().format();
     const encounterDate = form.searchNodeByQuestionId('encDate');
     if (encounterDate.length > 0) {
       encounterDate[0].control.setValue(currentDate);

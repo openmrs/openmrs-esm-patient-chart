@@ -1,0 +1,16 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+
+
+.header {
+  @include type.type-style("heading-03");
+}
+
+.body {
+  @include type.type-style("body-01");
+  margin-bottom: spacing.$spacing-05;
+}
+
+.datePicker {
+  padding: spacing.$spacing-05 0;
+}
