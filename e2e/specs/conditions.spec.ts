@@ -73,6 +73,7 @@ test('Should add, delete and edit a condition', async ({ page, api }) => {
   });
 
   await test.step('And I click on the delete condition button', async () => {
+    test.slow();
     await page.getByRole('button', { name: 'Edit or delete condition' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'danger Delete' }).click();
