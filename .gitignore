@@ -95,4 +95,4 @@ moduleName/
 e2e/storageState.json
 
 # misc
-/.angular/cache
+.angular

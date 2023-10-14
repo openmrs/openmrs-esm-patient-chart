@@ -39,7 +39,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
   });
 
   await test.step('And I should see the success message', async () => {
-    await expect(programPage.page.getByText('saved')).toBeVisible();
+    await expect(programPage.page.getByText('Program enrollment saved')).toBeVisible();
   });
 
   await test.step('Then I should see the program in the patient chart', async () => {
@@ -65,7 +65,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
   });
 
   await test.step('And I should see the success message', async () => {
-    await expect(programPage.page.getByText('updated')).toBeVisible();
+    await expect(programPage.page.getByText('Program enrollment updated')).toBeVisible();
   });
 
   await test.step('Then I should see the updated program in the patient chart', async () => {
