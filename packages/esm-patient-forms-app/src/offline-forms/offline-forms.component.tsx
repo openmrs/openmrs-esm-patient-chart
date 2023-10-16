@@ -42,12 +42,12 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
   const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
-  const headers: Array<DataTableHeader> = [
+  const headers: Array<typeof DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
   ];
 
-  const rows: Array<DataTableRow & Record<string, unknown>> =
+  const rows: Array<typeof DataTableRow & Record<string, unknown>> =
     forms.data
       ?.filter((formInfo) => userHasAccess(formInfo?.encounterType?.editPrivilege?.display, session?.user))
       .map((form) => ({
@@ -82,7 +82,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
             getRowProps,
             getTableContainerProps,
             onInputChange,
-          }: DataTableCustomRenderProps) => (
+          }: typeof DataTableCustomRenderProps) => (
             <TableContainer {...getTableContainerProps()}>
               <div className={styles.tableHeaderContainer}>
                 <Layer>

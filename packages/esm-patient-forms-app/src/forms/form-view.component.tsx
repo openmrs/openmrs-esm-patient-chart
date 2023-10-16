@@ -83,7 +83,7 @@ const FormView: React.FC<FormViewProps> = ({
     pageSize,
   );
 
-  const tableHeaders: Array<DataTableHeader> = useMemo(
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
       { key: 'formName', header: t('formName', 'Form name (A-Z)') },
       {
@@ -94,7 +94,7 @@ const FormView: React.FC<FormViewProps> = ({
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = useMemo(
+  const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
       results?.map((formInfo) => {
         return {

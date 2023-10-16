@@ -37,7 +37,7 @@ interface EncountersTableProps {
 
 type FilterProps = {
   rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
+  headers: Array<typeof DataTableHeader>;
   cellsById: any;
   inputValue: string;
   getCellId: (row, key) => string;
