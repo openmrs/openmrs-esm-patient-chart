@@ -53,7 +53,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     currentPage,
   } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
 
-  const tableHeaders: Array<DataTableHeader> = React.useMemo(
+  const tableHeaders: Array<typeof DataTableHeader> = React.useMemo(
     () => [
       {
         key: 'display',

@@ -1,8 +1,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-
+@import '@openmrs/esm-styleguide/src/vars';
 
 .error-tile {
   width: 60%;

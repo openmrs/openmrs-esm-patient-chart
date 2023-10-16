@@ -17,6 +17,9 @@ import {
   SelectItem,
   Stack,
 } from '@carbon/react';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createErrorHandler,
   showNotification,
@@ -34,9 +37,6 @@ import {
   updateProgramEnrollment,
 } from './programs.resource';
 import styles from './programs-form.scss';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 interface ProgramsFormProps extends DefaultWorkspaceProps {
   programEnrollmentId?: string;

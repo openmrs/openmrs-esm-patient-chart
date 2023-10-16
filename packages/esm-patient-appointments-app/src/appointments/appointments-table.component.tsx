@@ -5,6 +5,7 @@ dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  DataTableHeader,
   Table,
   TableCell,
   TableContainer,
@@ -12,7 +13,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
 } from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
@@ -45,7 +45,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({
     }
   }, [switchedView, goTo, currentPage]);
 
-  const tableHeaders: Array<DataTableHeader> = useMemo(
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
       { key: 'date', header: t('date', 'Date') },
       { key: 'location', header: t('location', 'Location') },
