@@ -96,6 +96,7 @@
   "orderDurationAndUnit": "لمدة {duration} {durationUnit}",
   "orderIndefiniteDuration": "مدة غير محددة",
   "other": "أخرى",
+  "paginationPageText": "of {total} pages",
   "partOfFormDidntLoad": "جزء من النموذج لم يتم تحميله",
   "pastVisitErrorText": "خطأ في الزيارات السابقة",
   "pastVisits": "الزيارات السابقة",
