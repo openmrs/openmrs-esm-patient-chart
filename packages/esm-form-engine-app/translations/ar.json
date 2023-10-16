@@ -1,8 +1,8 @@
 {
-  "closeThisPanel": "Close this panel",
-  "errorTitle": "There was an error with this form",
-  "loading": "Loading",
-  "or": "or",
-  "thisList": "this list",
-  "tryAgainMessage": "Try opening another form from"
+  "closeThisPanel": "أغلق هذه اللوحة",
+  "errorTitle": "كان هناك خطأ في هذا النموذج",
+  "loading": "جار التحميل",
+  "or": "أو",
+  "thisList": "هذه القائمة",
+  "tryAgainMessage": "حاول فتح نموذج آخر من"
 }
