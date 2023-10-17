@@ -89,7 +89,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "^2.1.0",
     "ngx-build-plus": "^14.0.0",
-    "openmrs": "^5.1.0",
+    "openmrs": "next",
     "protractor": "~7.0.0",
     "rxjs": "~6.6.7",
     "style-loader": "2.x",

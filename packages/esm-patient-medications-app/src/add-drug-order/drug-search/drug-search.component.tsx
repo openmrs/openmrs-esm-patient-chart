@@ -1,10 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
-import { useDebounce } from './drug-search.resource';
 import { DrugOrderBasketItem } from '../../types';
 
 export interface DrugSearchProps {

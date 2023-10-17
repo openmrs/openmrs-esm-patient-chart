@@ -5,10 +5,10 @@ import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
-import styles from './drug-order-basket-panel.scss';
+import type { DrugOrderBasketItem } from '../types';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
-import { DrugOrderBasketItem } from '../types';
+import styles from './drug-order-basket-panel.scss';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
@@ -48,21 +48,23 @@ export default function DrugOrderBasketPanelExtension() {
     <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
       <div className={styles.heading}>
         <div className={styles.title}>
-          <div className={styles.headingIcon}>
-            <RxIcon />
+          <div className={`${isTablet ? styles.tabletIcon : styles.desktopIcon}`}>
+            <RxIcon isTablet={isTablet} />
           </div>
           <h4>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
         </div>
-        <div>
+        <div className={styles.buttonContainer}>
           <Button
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add medication"
             onClick={openDrugSearch}
+            size={isTablet ? 'lg' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>
           <Button
+            className={styles.chevron}
             hasIconOnly
             kind="ghost"
             renderIcon={(props) =>
