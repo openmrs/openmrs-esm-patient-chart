@@ -14,25 +14,23 @@
 .patientHeader {
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-01;
-  
+
   span:first-of-type {
     margin-right: spacing.$spacing-03;
   }
-  
+
   .text02 {
     color: $text-02;
   }
 }
 
 .backButton {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  padding: spacing.$spacing-03 0;
+  padding: spacing.$spacing-03;
 
   button {
     display: flex;
-   padding-left: 0 !important;
+    padding-left: 0 !important;
+
     svg {
       order: 1;
       margin-right: spacing.$spacing-03;

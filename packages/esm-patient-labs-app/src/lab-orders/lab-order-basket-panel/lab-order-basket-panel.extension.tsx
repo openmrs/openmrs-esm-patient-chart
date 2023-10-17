@@ -59,6 +59,7 @@ export default function LabOrderBasketPanelExtension() {
             {t('add', 'Add')}
           </Button>
           <Button
+            className={styles.chevron}
             hasIconOnly
             kind="ghost"
             renderIcon={(props) =>

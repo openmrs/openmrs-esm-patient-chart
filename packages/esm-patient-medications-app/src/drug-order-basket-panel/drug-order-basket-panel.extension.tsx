@@ -64,6 +64,7 @@ export default function DrugOrderBasketPanelExtension() {
             {t('add', 'Add')}
           </Button>
           <Button
+            className={styles.chevron}
             hasIconOnly
             kind="ghost"
             renderIcon={(props) =>
