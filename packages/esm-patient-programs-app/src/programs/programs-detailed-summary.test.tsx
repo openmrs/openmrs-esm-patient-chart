@@ -10,7 +10,6 @@ import ProgramsDetailedSummary from './programs-detailed-summary.component';
 jest.setTimeout(20000);
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -18,11 +17,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
   };
 });
 
@@ -75,11 +69,6 @@ describe('ProgramsDetailedSummary ', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
-    mockUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockEnrolledProgramsResponse.slice(0, 5),
-    }));
 
     renderProgramsOverview();
 

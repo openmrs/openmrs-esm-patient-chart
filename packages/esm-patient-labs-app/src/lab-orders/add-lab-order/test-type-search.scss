@@ -2,10 +2,10 @@
 @use '@carbon/styles/scss/type';
 @import "../../root";
 
-/** For OrderBasketSearchResults */
+/** For TestTypeSearchResults */
 
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05 0;
+  margin: spacing.$spacing-03 spacing.$spacing-05;
 }
 
 .divider {
@@ -16,12 +16,10 @@
 
 .desktopDivider {
   margin: spacing.$spacing-07 auto spacing.$spacing-05;
-  padding-bottom: 8rem;
 }
 
 .tabletDivider {
-  margin: spacing.$spacing-08 auto 0;
-  padding-bottom: spacing.$spacing-08;
+  margin: spacing.$spacing-08 auto spacing.$spacing-06;
 }
 
 .searchResultsCount {
@@ -36,7 +34,7 @@
   align-items: center;
 }
 
-/** For DrugSearchResultItem */
+/** For TestTypeSearchResultItem */
 
 .searchResultTile {
   padding: 0;
@@ -50,9 +48,8 @@
 }
 
 .tabletSearchResultTile {
-  &:not(:last-of-type) {
-    margin-bottom: spacing.$spacing-04;
-  }
+  margin-top: 5px;
+  background-color: $ui-02;
 }
 
 .searchResultTileContent {
@@ -64,11 +61,6 @@
   padding: 0 spacing.$spacing-05;
   display: flex;
   justify-content: flex-end;
-}
-
-.errorLabel {
-  @extend .label01;
-  color: $danger;
 }
 
 .searchResultSkeletonWrapper {
@@ -109,17 +101,15 @@
   cursor: pointer;
 }
 
+.resultsContainer {
+  overflow-y: scroll;
+}
+
 .resultsContainer::-webkit-scrollbar {
   width: spacing.$spacing-03;
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
+  background: $ui-04;
   border-radius: spacing.$spacing-02;
-}
-
-.drugAlreadyPrescribed {
-  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
-  text-align: right;
-  @include type.type-style('label-01');
-  color: $text-02;
 }

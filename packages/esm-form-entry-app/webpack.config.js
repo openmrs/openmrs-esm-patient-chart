@@ -3,6 +3,7 @@ const { ModuleFederationPlugin } = container;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const { existsSync, statSync } = require('fs');
+const { inc } = require('semver');
 
 function getFrameworkVersion() {
   try {
@@ -23,7 +24,7 @@ function fileExistsSync(name) {
 
 const path = require('path');
 const { basename, dirname, resolve } = path;
-const { name, version, browser, main, peerDependencies } = require('./package.json');
+const { name, version, browser, main, peerDependencies, types } = require('./package.json');
 const filename = basename(browser || main);
 const root = process.cwd();
 const outDir = dirname(browser || main);
@@ -48,7 +49,7 @@ module.exports = {
   target: 'web',
   devtool: mode === production ? 'hidden-nosources-source-map' : 'eval-source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    static: path.join(__dirname, 'dist'),
     compress: true,
     port: 4200,
   },
@@ -56,6 +57,7 @@ module.exports = {
     publicPath: 'auto',
     path: resolve(root, outDir),
     uniqueName: '_openmrs_esm_form_entry_app',
+    scriptType: 'text/javascript',
   },
   optimization: {
     runtimeChunk: false,

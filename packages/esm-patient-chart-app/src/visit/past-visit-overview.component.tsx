@@ -14,10 +14,10 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { DefaultWorkspaceProps, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { setCurrentVisit } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
-import { setCurrentVisit } from '@openmrs/esm-framework';
 
 const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t, i18n } = useTranslation();
@@ -25,7 +25,7 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
 
   const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
 
-  const headerData: Array<DataTableHeader> = useMemo(
+  const headerData: Array<typeof DataTableHeader> = useMemo(
     () => [
       { key: 'startDate', header: t('startDate', 'Start Date') },
       { key: 'visitType', header: t('type', 'Type') },

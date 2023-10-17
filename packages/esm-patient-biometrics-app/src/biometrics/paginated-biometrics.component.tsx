@@ -15,7 +15,7 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './biometrics-overview.scss';
 
 interface PaginatedBiometricsProps {
-  tableRows: Array<DataTableRow>;
+  tableRows: Array<typeof DataTableRow>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
