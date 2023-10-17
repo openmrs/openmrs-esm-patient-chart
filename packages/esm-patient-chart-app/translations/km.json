@@ -96,7 +96,7 @@
   "orderDurationAndUnit": "សម្រាប់ {រយៈពេល} {ឯកតារយៈពេលt}",
   "orderIndefiniteDuration": "រយៈពេលមិនកំណត់",
   "other": "ផ្សេងទៀត",
-  "paginationPageText": "នៃ {total} ទំព័រ",
+  "paginationPageText_other": "of {count} pages",
   "partOfFormDidntLoad": "ទម្រង់មួយផ្នែកមិនមានទិន្នន័យទេ",
   "pastVisitErrorText": "កំហុសក្នុងការមកពិនិត្យជំងឺកន្លងមក",
   "pastVisits": "ការមកពិនិត្យជំងឺកន្លងមក",
