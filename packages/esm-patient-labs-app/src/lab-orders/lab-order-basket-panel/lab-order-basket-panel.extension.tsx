@@ -4,10 +4,10 @@ import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import styles from './lab-order-basket-panel.scss';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
-import { LabIcon } from './lab-icon.component';
 import { prepLabOrderPostData } from '../api';
+import LabIcon from './lab-icon.component';
+import styles from './lab-order-basket-panel.scss';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
@@ -43,17 +43,18 @@ export default function LabOrderBasketPanelExtension() {
     <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
       <div className={styles.heading}>
         <div className={styles.title}>
-          <div className={styles.headingIcon}>
-            <LabIcon />
+          <div className={`${isTablet ? styles.tabletIcon : styles.desktopIcon}`}>
+            <LabIcon isTablet={isTablet} />
           </div>
           <h4>{`${t('labOrders', 'Lab orders')} (${orders.length})`}</h4>
         </div>
-        <div>
+        <div className={styles.buttonContainer}>
           <Button
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add lab order"
             onClick={openNewLabForm}
+            size={isTablet ? 'lg' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>
