@@ -32,6 +32,10 @@ interface ProgramsDetailedSummaryProps {
   patientUuid: string;
 }
 
+interface ProgramEditButtonProps {
+  programEnrollmentId: string;
+}
+
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const displayText = t('programEnrollments', 'Program enrollments');
@@ -41,7 +45,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms, configurablePrograms } =
+  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms } =
     usePrograms(patientUuid);
 
   const tableHeaders: Array<typeof DataTableHeader> = React.useMemo(
@@ -151,10 +155,6 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
-
-interface ProgramEditButtonProps {
-  programEnrollmentId: string;
-}
 
 function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   const isTablet = useLayoutType() === 'tablet';
