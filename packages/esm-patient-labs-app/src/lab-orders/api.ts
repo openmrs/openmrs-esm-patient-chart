@@ -57,7 +57,7 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
     action: 'NEW',
     patient: patientUuid,
     type: 'testorder',
-    careSetting: order.careSetting,
+    careSetting: careSettingUuid,
     orderer: order.orderer,
     encounter: encounterUuid,
     concept: order.testType.conceptUuid,
