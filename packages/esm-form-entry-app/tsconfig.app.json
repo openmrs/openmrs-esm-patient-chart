@@ -7,6 +7,7 @@
       "node",
       "webpack-env",
     ],
+    "target": "es2020",
     "paths": {
       "@openmrs/esm-framework": [
         "../../node_modules/@openmrs/esm-framework/src/internal"

@@ -33,22 +33,27 @@
   justify-content: space-between;
   align-items: center;
   text-align: left;
-  text-transform: capitalize;
+
+}
+
+.desktopTile .heading {
+  border-left: 4px solid #0072c3;
+
   h4 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 }
 
-.desktopTile .heading {
-  border-left: 4px solid #0072c3;
-}
-
 .tabletTile .heading {
   padding: spacing.$spacing-03;
-  border-top: 1px solid $grey-2;
-  border-right: 1px solid $grey-2;
-  border-left: 1px solid $grey-2;
+  border: 1px solid $grey-2;
+  border-bottom: none;
+
+  h4 {
+    @include type.type-style('heading-03');
+    color: $ui-05;
+  }
 }
 
 .title {
@@ -56,6 +61,21 @@
   align-items: center;
 }
 
-.headingIcon {
-   margin: 0.3rem 0.8rem 0 0.3rem;
+.desktopIcon {
+  margin: 0.25rem 0.5rem 0.25rem 0.25rem;
+}
+
+.tabletIcon {
+  margin: 1rem 0.5rem 1rem 1rem;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: baseline;
+}
+
+.chevron {
+  svg {
+    fill: black;
+  }
 }
