@@ -121,9 +121,8 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
               {searchResults.length > 0 ? (
                 <>
                   <span className={styles.resultsCount}>
-                    {t('matchesForSearchTerm', '{count} flag{plural}', {
+                    {t('matchesForSearchTerm', '{count} flags', {
                       count: searchResults.length,
-                      plural: searchResults.length > 1 ? 's' : '',
                     })}
                   </span>
                   <Dropdown
