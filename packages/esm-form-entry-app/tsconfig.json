@@ -21,7 +21,8 @@
       "es2015",
       "dom"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true,

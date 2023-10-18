@@ -130,7 +130,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       /* webpackInclude: /\.mjs$/ */
       /* webpackChunkName: "./assets/l10n/locales/[request]"*/
       `@/../../../node_modules/@angular/common/locales/${locale}.mjs`
-    ).then((module) => registerLocaleData(module.default));
+    )
+      .then((module) => registerLocaleData(module.default))
+      .catch((e) => console.error(`An error occurred while loading default locale data for '${locale}'`, e));
 
     return forkJoin({
       formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),
