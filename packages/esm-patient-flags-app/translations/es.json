@@ -11,7 +11,7 @@
   "enabledFlag": "Bandera activada",
   "enablingFlag": "Activando bandera...",
   "flagCount_one": "{count} bandera de riesgo",
-  "flagCount_many": "{count} bandera de riesgo",
+  "flagCount_many": "{count} banderas de riesgo",
   "flagCount_other": "{count} banderas de riesgo",
   "flagDisabled": "Bandera desactivada",
   "flagDisabledSuccessfully": "Bandera desactivada con éxito",
