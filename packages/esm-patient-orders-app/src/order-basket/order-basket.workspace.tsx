@@ -177,7 +177,7 @@ function showOrderFailureToast(t: TFunction) {
     critical: true,
     kind: 'error',
     title: t('error', 'Error'),
-    description: t('errorSavingMedicationOrder', 'There were errors saving some medication orders.'),
+    description: t('errorSavingOrder', 'There were errors saving some orders.'),
   });
 }
 

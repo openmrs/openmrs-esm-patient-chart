@@ -19,22 +19,6 @@ export interface DrugSearchResult {
   };
 }
 
-export function useDebounce(value: string, delay = 300) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
 export function useDrugSearch(query: string): {
   isLoading: boolean;
   drugs: Array<DrugSearchResult>;

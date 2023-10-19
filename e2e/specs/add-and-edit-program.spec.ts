@@ -2,7 +2,6 @@ import { test } from '../core';
 import { ProgramPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
-import { getByTestId, getByText } from '@testing-library/dom';
 
 let patient: Patient;
 
@@ -26,7 +25,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
     await programPage.page.getByText('Record program enrollment').click();
   });
 
-  await test.step('And I Fill the form', async () => {
+  await test.step('And I fill the form', async () => {
     await programPage.page.locator('#program').selectOption('64f950e6-1b07-4ac0-8e7e-f3e148f3463f');
     await programPage.page.locator('#enrollmentDateInput').fill('04/07/2023');
     await programPage.page.locator('#completionDateInput').fill('05/07/2023');
@@ -39,7 +38,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
   });
 
   await test.step('And I should see the success message', async () => {
-    await expect(programPage.page.getByText('saved')).toBeVisible();
+    await expect(programPage.page.getByText('Program enrollment saved')).toBeVisible();
   });
 
   await test.step('Then I should see the program in the patient chart', async () => {
@@ -65,7 +64,7 @@ test('Should add a program and edit program', async ({ page, api }) => {
   });
 
   await test.step('And I should see the success message', async () => {
-    await expect(programPage.page.getByText('updated')).toBeVisible();
+    await expect(programPage.page.getByText('Program enrollment updated')).toBeVisible();
   });
 
   await test.step('Then I should see the updated program in the patient chart', async () => {

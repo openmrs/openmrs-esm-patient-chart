@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   DataTable,
@@ -33,7 +32,6 @@ import {
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { usePrograms } from './programs.resource';
-import ProgramActionButton from './program-action-button/program-action-button.component';
 import { ConfigurableProgram } from '../types';
 import styles from './programs-overview.scss';
 
@@ -50,27 +48,14 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
-  const isConfigurable = config.customUrl ? true : false;
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
 
-  const {
-    activeEnrollments,
-    availablePrograms,
-    configurablePrograms,
-    eligiblePrograms,
-    enrollments,
-    isError,
-    isLoading,
-    isValidating,
-  } = usePrograms(patientUuid);
+  const { activeEnrollments, availablePrograms, eligiblePrograms, enrollments, isError, isLoading, isValidating } =
+    usePrograms(patientUuid);
 
-  const {
-    results: paginatedEnrollments,
-    goTo,
-    currentPage,
-  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
+  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -103,18 +88,15 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       display: enrollment.display,
       location: enrollment.location?.display ?? '--',
       dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
-      status: isConfigurable
-        ? capitalize(enrollment.enrollmentStatus)
-        : enrollment.dateCompleted
+      status: enrollment.dateCompleted
         ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
         : t('active', 'Active'),
-      actions: <ProgramActionButton enrollment={enrollment} />,
     }));
-  }, [isConfigurable, paginatedEnrollments, t]);
+  }, [paginatedEnrollments, t]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-  if (isConfigurable ? configurablePrograms.length : activeEnrollments?.length) {
+  if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -177,7 +159,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={programsCount}
-          totalItems={isConfigurable ? configurablePrograms.length : enrollments?.length}
+          totalItems={enrollments?.length}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}
         />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -20,7 +20,6 @@ import {
   formatDate,
   formatDatetime,
   useConfig,
-  usePagination,
   ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
@@ -33,27 +32,23 @@ interface ProgramsDetailedSummaryProps {
   patientUuid: string;
 }
 
+interface ProgramEditButtonProps {
+  programEnrollmentId: string;
+}
+
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const displayText = t('programEnrollments', 'Program enrollments');
-  const headerTitle = t('carePrograms', 'Care Programs');
-  const config = useConfig() as ConfigObject;
-  const programsCount = 5;
-  const isConfigurable = config.customUrl ? true : false;
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
+  const { hideAddProgramButton } = useConfig<ConfigObject>();
+  const displayText = t('programEnrollments', 'Program enrollments');
+  const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms, configurablePrograms } =
+  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms } =
     usePrograms(patientUuid);
 
-  const {
-    results: paginatedEnrollments,
-    goTo,
-    currentPage,
-  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
-
-  const tableHeaders: Array<DataTableHeader> = React.useMemo(
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
       {
         key: 'display',
@@ -75,7 +70,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return enrollments?.map((program) => {
       return {
         id: program.uuid,
@@ -89,7 +84,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     });
   }, [enrollments, t]);
 
-  const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -98,7 +93,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          {config.hideAddProgramButton ? null : (
+          {hideAddProgramButton ? null : (
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
@@ -160,10 +155,6 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
-
-interface ProgramEditButtonProps {
-  programEnrollmentId: string;
-}
 
 function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   const isTablet = useLayoutType() === 'tablet';

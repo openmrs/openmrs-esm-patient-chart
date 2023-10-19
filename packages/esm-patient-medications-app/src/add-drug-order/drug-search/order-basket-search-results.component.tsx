@@ -57,10 +57,9 @@ export default function OrderBasketSearchResults({
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
+              {t('searchResultsMatchesForTerm', '{count} results for "{searchTerm}"', {
                 count: drugs?.length,
                 searchTerm,
-                plural: drugs?.length === 0 || drugs?.length > 1 ? 's' : '',
               })}
             </span>
             <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
@@ -122,7 +121,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const orderItems: Array<DrugOrderBasketItem> = useMemo(
+  const drugItemTemplateOptions: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length
         ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
@@ -148,7 +147,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
 
   return (
     <>
-      {orderItems.map((orderItem, indx) => (
+      {drugItemTemplateOptions.map((orderItem, indx) => (
         <Tile
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"

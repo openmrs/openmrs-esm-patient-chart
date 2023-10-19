@@ -127,11 +127,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.translateService.use(locale);
 
     import(
-      /* webpackInclude: /\.js$/ */
-      `@angular/common/locales/${locale}.js`
-    ).then((module) => {
-      registerLocaleData(module.default);
-    });
+      /* webpackInclude: /\.mjs$/ */
+      /* webpackChunkName: "./assets/l10n/locales/[request]"*/
+      `@/../../../node_modules/@angular/common/locales/${locale}.mjs`
+    ).then((module) => registerLocaleData(module.default));
 
     return forkJoin({
       formSchema: this.fetchCompiledFormSchema(this.formUuid, locale).pipe(take(1)),

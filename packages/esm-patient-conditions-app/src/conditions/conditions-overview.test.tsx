@@ -8,6 +8,8 @@ import { mockConditions, mockFhirConditionsResponse } from '../__mocks__/conditi
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
+jest.setTimeout(10000);
+
 const testProps = {
   patientUuid: mockPatient.id,
 };
@@ -74,7 +76,7 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByText(/Sorry, there was a problem displaying this information./i)).toBeInTheDocument();
   });
 
-  xit("renders an overview of the patient's conditions when present", async () => {
+  it("renders an overview of the patient's conditions when present", async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });

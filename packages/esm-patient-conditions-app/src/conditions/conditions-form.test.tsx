@@ -71,7 +71,7 @@ describe('Conditions Form', () => {
     expect(screen.getByRole('group', { name: /Condition/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Onset date/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Current status/i })).toBeInTheDocument();
-    expect(screen.getByRole('search', { name: /Enter condition/i })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: /Enter condition/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Clear search input/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Active' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Active' })).toBeChecked();

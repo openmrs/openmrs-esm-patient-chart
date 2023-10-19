@@ -69,7 +69,7 @@
   "saveOrder": "រក្សាទុកវេជ្ជបញ្ជា",
   "searchAgain": "search again",
   "searchFieldPlaceholder": "ស្វែងរកវេជ្ជបញ្ជា (ឧ. \"Aspirin\")",
-  "searchResultsMatchesForTermfalseother": "{count} result{plural} for \"{searchTerm}\"",
+  "searchResultsMatchesForTerm_other": "{count} results for \"{searchTerm}\"",
   "startDate": "ថ្ងៃចាប់ផ្តើម",
   "takeAsNeeded": "យកតាមតម្រូវការ",
   "tryReopeningTheForm": "Please try launching the form again",
