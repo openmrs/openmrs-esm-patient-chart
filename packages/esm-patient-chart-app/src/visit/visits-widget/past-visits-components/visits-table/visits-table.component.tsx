@@ -54,7 +54,7 @@ interface VisitTableProps {
 
 type FilterProps = {
   rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
+  headers: Array<typeof DataTableHeader>;
   cellsById: Record<string, Record<string, boolean | string | null | Record<string, unknown>>>;
   inputValue: string;
   getCellId: (row, key) => string;
@@ -228,11 +228,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                 <div className={styles.filterContainer}>
                   <Dropdown
                     id="serviceFilter"
-                    initialSelectedItem={'All'}
+                    initialSelectedItem={t('all', 'All')}
                     label=""
                     titleText={t('filterByEncounterType', 'Filter by encounter type') + ':'}
                     type="inline"
-                    items={['All', ...encounterTypes]}
+                    items={[t('all', 'All'), ...encounterTypes]}
                     onChange={handleEncounterTypeChange}
                     size={desktopLayout ? 'sm' : 'lg'}
                   />

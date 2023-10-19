@@ -64,8 +64,8 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
-  expect(screen.getByRole('search', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
-  expect(screen.getByRole('search', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
@@ -86,12 +86,10 @@ test.only('typing in the diagnosis search input triggers a search', async () => 
   // clicking on a search result displays the selected diagnosis as a tag
   await userEvent.click(targetSearchResult);
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
-  const diabetesMellitusTag = screen.getByLabelText('Clear filter Diabetes Mellitus');
-  expect(diabetesMellitusTag).toHaveAttribute('class', expect.stringContaining('cds--tag--red')); // primary diagnosis tags have a red background
+  const diabetesMellitusTag = screen.getByTitle(/^Diabetes Mellitus$/i);
+  expect(diabetesMellitusTag).toBeInTheDocument();
 
-  const closeTagButton = screen.getByRole('button', {
-    name: 'Clear filter Diabetes Mellitus',
-  });
+  const closeTagButton = screen.getByRole('button', { name: /clear filter/i });
   // Clicking the close button on the tag removes the selected diagnosis
   await userEvent.click(closeTagButton);
   // no selected diagnoses left

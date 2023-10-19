@@ -1,7 +1,8 @@
-import useSWRImmutable from 'swr/immutable';
-import { Concept } from '../../types';
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
+import fuzzy from 'fuzzy';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { Concept } from '../../types';
 
 export interface TestType {
   label: string;
@@ -14,7 +15,7 @@ export interface UseTestType {
   error: Error;
 }
 
-export function useTestTypes(): UseTestType {
+export function useTestTypes(searchTerm: string = ''): UseTestType {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<Concept> }>>(
     () => `/ws/rest/v1/concept?class=Test`,
     openmrsFetch,
@@ -33,8 +34,14 @@ export function useTestTypes(): UseTestType {
     }));
   }, [data]);
 
+  const filteredTestTypes = useMemo(() => {
+    return searchTerm
+      ? fuzzy.filter(searchTerm, testTypes, { extract: (testType) => testType.label }).map((result) => result.original)
+      : testTypes;
+  }, [testTypes, searchTerm]);
+
   return {
-    testTypes: testTypes,
+    testTypes: filteredTestTypes,
     isLoading: isLoading,
     error: error,
   };

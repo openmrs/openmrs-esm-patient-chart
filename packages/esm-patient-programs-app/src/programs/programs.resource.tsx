@@ -91,22 +91,7 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   });
 }
 
-export const useConfigurableProgram = (patientUuid: string) => {
-  const { customUrl } = useConfig() as ConfigObject;
-  const { data, error, isLoading } = useSWR<{ data: Array<ConfigurableProgram> }>(
-    customUrl ? `${customUrl}${patientUuid}` : null,
-    openmrsFetch,
-  );
-  const configurablePrograms = data?.data ?? [];
-  return {
-    configurablePrograms,
-    isLoading,
-    error: error,
-  };
-};
-
 export const usePrograms = (patientUuid: string) => {
-  const { customUrl } = useConfig() as ConfigObject;
   const {
     data: enrollments,
     isError: enrollError,
@@ -115,11 +100,8 @@ export const usePrograms = (patientUuid: string) => {
     activeEnrollments,
   } = useEnrollments(patientUuid);
   const { data: availablePrograms, eligiblePrograms } = useAvailablePrograms(enrollments);
-  const { configurablePrograms, isLoading: configLoading, error: configError } = useConfigurableProgram(patientUuid);
 
-  const status = customUrl
-    ? { isLoading: configLoading, isError: configError }
-    : { isLoading: enrolLoading, isError: enrollError };
+  const status = { isLoading: enrolLoading, isError: enrollError };
   return {
     enrollments,
     ...status,
@@ -127,6 +109,5 @@ export const usePrograms = (patientUuid: string) => {
     activeEnrollments,
     availablePrograms,
     eligiblePrograms,
-    configurablePrograms,
   };
 };

@@ -58,6 +58,7 @@ export interface Order {
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
+  concept: OpenmrsResource;
   dateActivated: string;
   dateStopped?: string | null;
   dispenseAsWritten: boolean;

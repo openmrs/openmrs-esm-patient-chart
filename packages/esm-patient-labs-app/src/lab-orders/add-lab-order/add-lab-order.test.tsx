@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, renderHook, screen, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
-import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { LabOrderBasketItem } from '../api';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { createEmptyLabOrder } from './lab-order';
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -13,17 +15,18 @@ const mockUseLayoutType = useLayoutType as jest.Mock;
 
 const ptUuid = 'test-patient-uuid';
 
+const mockTestTypes = [
+  {
+    conceptUuid: 'test-lab-uuid-1',
+    label: 'HIV VIRAL LOAD',
+  },
+  {
+    conceptUuid: 'test-lab-uuid-2',
+    label: 'CD4 COUNT',
+  },
+];
 const mockUseTestTypes = jest.fn().mockReturnValue({
-  testTypes: [
-    {
-      conceptUuid: 'test-lab-uuid-1',
-      label: 'HIV VIRAL LOAD',
-    },
-    {
-      conceptUuid: 'test-lab-uuid-2',
-      label: 'CD4 COUNT',
-    },
-  ],
+  testTypes: mockTestTypes,
   isLoading: false,
   error: null,
 });
@@ -32,9 +35,11 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
+const mockCloseWorkspace = jest.fn();
 const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  closeWorkspace: (...args) => mockCloseWorkspace(...args),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
 }));
 
@@ -47,7 +52,6 @@ function renderAddLabOrderWorkspace() {
   const mockPromptBeforeClosing = jest.fn();
   const renderResult = render(
     <AddLabOrderWorkspace
-      order={null}
       closeWorkspace={mockCloseWorkspace}
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
@@ -79,13 +83,23 @@ describe('AddLabOrder', () => {
     });
   });
 
+  beforeEach(() => {
+    _resetOrderBasketStore();
+  });
+
   test('happy path fill and submit form', async () => {
     jest.setTimeout(10000);
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    const cd4 = screen.getByText('CD4 COUNT');
+    expect(cd4).toBeInTheDocument();
+    const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Order form');
+    await userEvent.click(cd4OrderButton);
+
     const testType = screen.getByRole('combobox', { name: 'Test type' });
     expect(testType).toBeInTheDocument();
-    await userEvent.click(testType);
-    await userEvent.click(screen.getByText('CD4 COUNT'));
+    expect(testType).toHaveValue('CD4 COUNT');
+
     const priority = screen.getByRole('combobox', { name: 'Priority' });
     expect(priority).toBeInTheDocument();
     await userEvent.click(priority);
@@ -101,6 +115,21 @@ describe('AddLabOrder', () => {
     expect(labsOrderBasket[0].testType.conceptUuid).toBe('test-lab-uuid-2');
     expect(labsOrderBasket[0].urgency).toBe('STAT');
     expect(labsOrderBasket[0].instructions).toBe('plz do it thx');
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+  });
+
+  test('from lab search, click add directly to order basket', async () => {
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+    renderAddLabOrderWorkspace();
+    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    const cd4 = screen.getByText('CD4 COUNT');
+    expect(cd4).toBeInTheDocument();
+    const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Add to basket');
+    await userEvent.click(cd4OrderButton);
+    expect(hookResult.current.orders).toEqual([createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid')]);
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });

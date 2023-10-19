@@ -20,6 +20,11 @@
 				"build": {
 					"builder": "ngx-build-plus:browser",
 					"options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "moment",
+              "zone.js"
+            ],
 						"preserveSymlinks": true,
 						"outputPath": "dist",
 						"index": "",
@@ -74,6 +79,7 @@
 				"serve": {
 					"builder": "ngx-build-plus:dev-server",
 					"options": {
+            "publicHost": "http://localhost:4200",
 						"browserTarget": "openmrs-esm-form-entry-app:build",
 						"extraWebpackConfig": "webpack.config.js"
 					},
@@ -122,6 +128,5 @@
 				}
 			}
 		}
-	},
-	"defaultProject": "openmrs-esm-form-entry-app"
+  }
 }
