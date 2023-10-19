@@ -1,81 +1,69 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  DataTable,
-  DataTableSkeleton,
-  Layer,
-  Link,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
-  Tile,
-} from '@carbon/react';
-import { formatDatetime, useLayoutType, Visit } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, closeWorkspace } from '@openmrs/esm-patient-common-lib';
-import { HtmlFormEntryForm } from '../config-schema';
-import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
-import { useForms } from '../hooks/use-forms';
-import styles from './forms-list.scss';
 import debounce from 'lodash-es/debounce';
+import fuzzy from 'fuzzy';
+import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
+import { formatDatetime, useLayoutType } from '@openmrs/esm-framework';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import FormsTable from './forms-table.component';
+import styles from './forms-list.scss';
+import type { CompletedFormInfo } from '../types';
 
 export type FormsListProps = {
-  currentVisit: Visit;
-  htmlFormEntryForms: Array<HtmlFormEntryForm>;
-  patient: fhir.Patient;
-  patientUuid: string;
+  completedForms?: Array<CompletedFormInfo>;
+  error?: any;
+  sectionName?: string;
+  handleFormOpen: (formUuid: string, encounterUuid: string, formName: string) => void;
 };
 
-const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms, patient, patientUuid }) => {
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
+
+/*
+ * For the benefit of our automated translations:
+ * t('forms', 'Forms')
+ */
+
+const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionName = 'forms', handleFormOpen }) => {
   const { t } = useTranslation();
-  const { data, error, mutateForms } = useForms(patientUuid);
   const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
+  const [locale, setLocale] = useState(window.i18next.language ?? navigator.language);
+
+  useEffect(() => {
+    if (window.i18next?.on) {
+      const languageChanged = (lng: string) => setLocale(lng);
+      window.i18next.on('languageChanged', languageChanged);
+      return () => window.i18next.off('languageChanged', languageChanged);
+    }
+  }, []);
+
+  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
-      return data;
+      return completedForms;
     }
-    return data.filter((form) => {
-      const formName = form.form.display ?? form.form.name;
-      return formName.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  }, [data, searchTerm]);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+    return fuzzy
+      .filter(searchTerm, completedForms, { extract: (formInfo) => formInfo.form.display ?? formInfo.form.name })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
+  }, [completedForms, searchTerm, locale]);
 
-  const handleFormOpen = useCallback(
-    (formUuid, encounterUuid, formName) => {
-      closeWorkspace('clinical-forms-workspace', true);
-      launchFormEntryOrHtmlForms(
-        currentVisit,
-        formUuid,
-        patient,
-        htmlFormEntryForms,
-        encounterUuid,
-        formName,
-        mutateForms,
-      );
-    },
-    [currentVisit, htmlFormEntryForms, mutateForms, patient],
-  );
-
-  const tableHeaders = [
-    {
-      header: t('formName', 'Form name (A-Z)'),
-      key: 'formName',
-    },
-    {
-      header: t('lastCompleted', 'Last completed'),
-      key: 'lastCompleted',
-    },
-  ];
+  const tableHeaders = useMemo(() => {
+    return [
+      {
+        header: t('formName', 'Form name (A-Z)'),
+        key: 'formName',
+      },
+      {
+        header: t('lastCompleted', 'Last completed'),
+        key: 'lastCompleted',
+      },
+    ];
+  }, [t]);
 
   const tableRows = useMemo(
     () =>
@@ -91,87 +79,49 @@ const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms,
     [filteredForms],
   );
 
-  if (!data && !error) {
+  if (!completedForms && !error) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (data?.length === 0) {
+  if (completedForms?.length === 0) {
     return (
-      <Layer>
+      <ResponsiveWrapper isTablet>
         <Tile className={styles.emptyState}>
-          <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('forms', 'Forms')}</h4>
-          </div>
           <EmptyDataIllustration />
           <p className={styles.emptyStateContent}>{t('noFormsToDisplay', 'There are no forms to display.')}</p>
         </Tile>
-      </Layer>
+      </ResponsiveWrapper>
     );
   }
 
-  return (
-    <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, onInputChange }) => (
-        <>
-          <TableContainer className={styles.tableContainer}>
-            <div className={styles.toolbarWrapper}>
-              <TableToolbar className={styles.tableToolbar}>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    className={styles.search}
-                    expanded
-                    onChange={(event) => handleSearch(event.target.value)}
-                    placeholder={t('searchThisList', 'Search this list')}
-                    size="sm"
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
-            </div>
-            <Table {...getTableProps()} className={styles.table}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, i) => (
-                  <TableRow {...getRowProps({ row })}>
-                    <TableCell key={row.cells[0].id}>
-                      <Link
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          handleFormOpen(row.id, '', tableRows[i].formName);
-                        }}
-                        role="presentation"
-                        className={styles.formName}
-                      >
-                        {tableRows[i]?.formName}
-                      </Link>
-                    </TableCell>
-                    <TableCell className={styles.editCell}>
-                      <label>{row.cells[1].value ?? t('never', 'Never')}</label>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {rows?.length === 0 ? (
-            <div className={styles.tileContainer}>
-              <Tile className={styles.tile}>
-                <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noMatchingFormsToDisplay', 'No matching forms to display')}</p>
-                  <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                </div>
-              </Tile>
-            </div>
-          ) : null}
-        </>
-      )}
-    </DataTable>
-  );
+  if (sectionName === 'forms') {
+    return (
+      <ResponsiveWrapper isTablet>
+        <FormsTable
+          tableHeaders={tableHeaders}
+          tableRows={tableRows}
+          isTablet={isTablet}
+          handleSearch={handleSearch}
+          handleFormOpen={handleFormOpen}
+        />
+      </ResponsiveWrapper>
+    );
+  } else {
+    return (
+      <ResponsiveWrapper isTablet>
+        <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+          <h4>{t(sectionName)}</h4>
+        </div>
+        <FormsTable
+          tableHeaders={tableHeaders}
+          tableRows={tableRows}
+          isTablet={isTablet}
+          handleSearch={handleSearch}
+          handleFormOpen={handleFormOpen}
+        />
+      </ResponsiveWrapper>
+    );
+  }
 };
 
 export default FormsList;

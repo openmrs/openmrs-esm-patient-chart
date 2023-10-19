@@ -1,58 +1,35 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event/';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import FormsList from './forms-list.component';
+import userEvent from '@testing-library/user-event';
+import { renderWithSwr } from '../../../../tools/test-helpers';
+import FormsList, { FormsListProps } from './forms-list.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
-const mockedUserHasAccess = jest.fn();
+const testProps: FormsListProps & { reset: () => void } = {
+  completedForms: [],
+  handleFormOpen: jest.fn(),
+  reset() {
+    this.completedForms = [];
+  },
+};
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    userHasAccess: () => mockedUserHasAccess,
-  };
+beforeEach(async () => {
+  testProps.reset();
 });
 
 it('renders an empty state if there are no forms persisted on the server', async () => {
-  mockedOpenmrsFetch.mockReturnValue({
-    data: { results: [] },
-  });
-
   renderFormsList();
 
-  await waitForLoadingToFinish();
-
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /forms/i })).toBeInTheDocument();
   expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
 });
 
 it('renders a list of forms fetched from the server', async () => {
   const user = userEvent.setup();
-
-  mockedOpenmrsFetch.mockReturnValue({
-    data: { results: forms },
-  });
-
-  mockedUseConfig.mockImplementation(() => ({
-    showHtmlFormEntryForms: true,
-    showConfigurableForms: false,
-  }));
-
-  mockedUserHasAccess.mockImplementation((privilege) => {
-    return privilege === 'edit' ? false : true;
-  });
+  testProps.completedForms = forms.map((form) => ({ form, associatedEncounters: [] }));
 
   renderFormsList();
-
-  await waitForLoadingToFinish();
 
   const searchbox = screen.getByRole('searchbox');
   expect(searchbox).toBeInTheDocument();
@@ -86,13 +63,6 @@ it('renders a list of forms fetched from the server', async () => {
 });
 
 function renderFormsList() {
-  const testProps = {
-    currentVisit: mockCurrentVisit,
-    htmlFormEntryForms: [],
-    patient: mockPatient,
-    patientUuid: mockPatient.id,
-  };
-
   renderWithSwr(<FormsList {...testProps} />);
 }
 
@@ -105,7 +75,7 @@ const forms = [
       uuid: '0e8230ce-bd1d-43f5-a863-cf44344fa4b0',
       name: 'Adult Visit',
       viewPrivilege: null,
-      editPrivilege: 'edit',
+      editPrivilege: { uuid: 'd7a611f3-3c88-406e-8f7c-ecf13d0891dc', name: 'Edit Form' },
     },
     version: '1.0.2',
     published: false,
@@ -127,7 +97,7 @@ const forms = [
       uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
       name: 'Consultation',
       viewPrivilege: null,
-      editPrivilege: 'edit',
+      editPrivilege: { uuid: 'd7a611f3-3c88-406e-8f7c-ecf13d0891dc', name: 'Edit Form' },
     },
     version: '1',
     published: false,
@@ -149,7 +119,7 @@ const forms = [
       uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
       name: 'Consultation',
       viewPrivilege: null,
-      editPrivilege: 'edit',
+      editPrivilege: { uuid: 'd7a611f3-3c88-406e-8f7c-ecf13d0891dc', name: 'Edit Form' },
     },
     version: '2',
     published: true,
@@ -160,28 +130,6 @@ const forms = [
         name: 'JSON schema',
         dataType: 'AmpathJsonSchema',
         valueReference: 'e8525f5e-98e8-4599-8f53-8cd80679a225',
-      },
-    ],
-  },
-  {
-    uuid: '13c459d1-6768-4eaf-a865-4230987796ff',
-    name: 'PiusRocks',
-    display: 'PiusRocks',
-    encounterType: {
-      uuid: 'e22e39fd-7db2-45e7-80f1-60fa0d5a4378',
-      name: 'Admission',
-      viewPrivilege: null,
-      editPrivilege: null,
-    },
-    version: '1.1.1',
-    published: false,
-    retired: false,
-    resources: [
-      {
-        uuid: '783a949a-706d-4c1a-94c5-c2ee204e1b0f',
-        name: 'JSON schema',
-        dataType: 'AmpathJsonSchema',
-        valueReference: '77978fe1-8f41-4e3b-bec3-aa38b1ade6bc',
       },
     ],
   },

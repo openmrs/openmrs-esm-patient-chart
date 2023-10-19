@@ -1,130 +1,6 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-
-.container {
-  padding: 2rem;
-  background-color: $ui-01;
-}
-
-.backgroundDataFetchingIndicator {
-  flex: 1;
-}
-
-.flexContainer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.toolbarWrapper {
-  position: relative;
-  display: flex;
-  height: spacing.$spacing-09;
-  justify-content: flex-end;
-}
-
-.tableToolbar {
-  width: 20%;
-  min-width: 12.5rem;
-}
-
-.search {
-  input {
-    padding: 0 4rem !important;
-  }
-
-  :global(.cds--search-close:focus) {
-    outline: none;
-    outline-offset: 0;
-  }
-
-  :global(.cds--search-close:focus:before) {
-    background-color: none;
-  }
-}
-
-.table tr:last-of-type {
-  td {
-    border-bottom: none;
-  }
-}
-
-.heading {
-  margin-bottom: 1.5rem;
-}
-
-.toolbar {
-  position: relative;
-  display: flex;
-  width: 100%;
-  min-height: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-.emptyContainer {
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 1rem;
-}
-
-.tableContainer {
-  padding: 0;
-
-  :global(.cds--data-table-content) {
-    border: 1px solid $ui-03;
-    border-bottom: none;
-    overflow: visible;
-  }
-
-  :global(.cds--table-toolbar) {
-    position: relative;
-    height: 2rem;
-    min-height: 0rem;
-    overflow: visible;
-    top: 0;
-  }
-
-  &:global(.cds--data-table-container) {
-    padding-top: 0rem;
-  }
-}
-
-.filterContainer {
-  flex: 1;
-
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: 1rem;
-  }
-}
-
-.tileContainer {
-  background-color: $ui-02;
-  border-top: 1px solid $ui-03;
-  padding: 5rem 0;
-}
-
-.tile {
-  margin: auto;
-  width: fit-content;
-}
-
-.content {
-  @include type.type-style('heading-compact-02');
-  color: $text-02;
-  margin-bottom: 0.5rem;
-}
-
-.tileContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .emptyState {
   text-align: center;
@@ -155,6 +31,8 @@
 .desktopHeading, .tabletHeading {
   text-align: left;
   text-transform: capitalize;
+  margin-top: spacing.$spacing-05;
+  margin-left: spacing.$spacing-03;
   margin-bottom: spacing.$spacing-05;
   
   h4:after {
@@ -166,10 +44,11 @@
   }
 }
 
-.heading:after {
-  content: "";
-  display: block;
-  width: 2rem;
-  padding-top: 0.188rem;
-  border-bottom: 0.375rem solid var(--brand-03);
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .desktopHeading, .tabletHeading {
+    text-align: right;
+    margin-left: unset;
+    margin-right: spacing.$spacing-03;
+  }
 }
