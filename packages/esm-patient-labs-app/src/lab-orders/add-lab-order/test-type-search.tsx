@@ -93,10 +93,9 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
           {searchTerm && (
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
-                {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
+                {t('searchResultsMatchesForTerm', '{count} results for "{searchTerm}"', {
                   count: testTypes?.length,
                   searchTerm,
-                  plural: testTypes?.length === 0 || testTypes?.length > 1 ? 's' : '',
                 })}
               </span>
               <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>

@@ -13,19 +13,21 @@ import { usePagination, useConfig, formatDatetime, formatDate, formatTime } from
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
+import { useTranslation } from 'react-i18next';
 
 interface ObsTableProps {
   patientUuid: string;
 }
 
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const config = useConfig();
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
   const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
   const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
 
   const tableHeaders = [
-    { key: 'date', header: 'Date and time', isSortable: true },
+    { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
     ...config.data.map(({ concept, label }) => ({
       key: concept,
       header: label,

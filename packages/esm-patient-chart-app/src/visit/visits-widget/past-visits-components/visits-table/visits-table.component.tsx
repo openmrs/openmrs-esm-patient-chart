@@ -228,11 +228,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                 <div className={styles.filterContainer}>
                   <Dropdown
                     id="serviceFilter"
-                    initialSelectedItem={'All'}
+                    initialSelectedItem={t('all', 'All')}
                     label=""
                     titleText={t('filterByEncounterType', 'Filter by encounter type') + ':'}
                     type="inline"
-                    items={['All', ...encounterTypes]}
+                    items={[t('all', 'All'), ...encounterTypes]}
                     onChange={handleEncounterTypeChange}
                     size={desktopLayout ? 'sm' : 'lg'}
                   />

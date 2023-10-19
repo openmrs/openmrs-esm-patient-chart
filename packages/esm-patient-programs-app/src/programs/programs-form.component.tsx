@@ -256,7 +256,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
 
   const formGroups = [
     {
-      style: { maxWidth: '50%' },
+      style: { maxWidth: isTablet ? '50%' : 'fit-content' },
       legendText: t('programName', 'Program name'),
       value: programSelect,
     },
