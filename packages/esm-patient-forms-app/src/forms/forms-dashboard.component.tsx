@@ -41,7 +41,7 @@ const FormsDashboard = () => {
 
   return (
     <div className={styles.container}>
-      {sections.length === 0) ? (
+      {sections.length === 0 ? (
         <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
       ) : (
         sections.map((section) => {
