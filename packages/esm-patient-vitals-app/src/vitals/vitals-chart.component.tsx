@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
@@ -9,11 +9,11 @@ import { PatientVitals } from './vitals.resource';
 import styles from './vitals-chart.scss';
 
 enum ScaleTypes {
-  TIME = 'time',
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels_ratio',
   LINEAR = 'linear',
   LOG = 'log',
-  LABELS = 'labels',
-  LABELS_RATIO = 'labels-ratio',
+  TIME = 'time',
 }
 
 interface VitalsChartProps {
@@ -136,14 +136,12 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
         <Tabs className={styles.verticalTabs}>
-          <TabList className={styles.tablist} aria-label="Vitals signs">
+          <TabList className={styles.tablist} aria-label="Vitals tabs">
             {vitalSigns.map(({ id, title, value }) => {
               return (
                 <Tab
                   key={id}
-                  className={`${styles.tab} ${styles.bodyLong01} ${
-                    selectedVitalSign.title === title && styles.selectedTab
-                  }`}
+                  className={`${styles.tab} ${selectedVitalSign.title === title && styles.selectedTab}`}
                   onClick={() =>
                     setSelectedVitalsSign({
                       title: title,
