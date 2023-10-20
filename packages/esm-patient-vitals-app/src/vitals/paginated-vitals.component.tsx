@@ -20,7 +20,9 @@ interface PaginatedVitalsProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
+  // @ts-ignore
   tableRows: Array<typeof DataTableRow>;
+  // @ts-ignore
   tableHeaders: Array<typeof DataTableHeader>;
   isPrinting?: boolean;
 }
