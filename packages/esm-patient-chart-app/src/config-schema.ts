@@ -112,6 +112,12 @@ export const esmPatientChartSchema = {
       'An array of concept UUIDs. If an observation has a concept UUID that matches any of the ones in this array, it will be hidden from the observations list in the Encounters summary table.',
     _default: [],
   },
+  disableChangingVisitLocation: {
+    _type: Type.Boolean,
+    _description:
+      "Whether the visit location field in the Start Visit form should be view-only. If so, the visit location will always be set to the user's login location.",
+    _default: false,
+  },
 };
 
 export interface ChartConfig {
@@ -133,6 +139,7 @@ export interface ChartConfig {
     alt: string;
     name: string;
   };
+  viewOnlyVisitLocationField: boolean;
 }
 
 export const configSchema = {
