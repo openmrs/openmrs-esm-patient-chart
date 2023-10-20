@@ -212,8 +212,8 @@
     {
       "component": "root",
       "routeRegex": "^patient\/.+\/chart",
-      "offline": true,
-      "online": true
+      "online": true,
+      "offline": true
     }
   ]
 }
