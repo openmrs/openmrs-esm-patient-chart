@@ -9,7 +9,7 @@ import {
 } from '@openmrs/esm-framework';
 import { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
@@ -46,8 +46,17 @@ export function useEncountersWithFormRef(
   return useSWR(url, (url) => openmrsFetch<ListResponse<EncounterWithFormRef>>(url));
 }
 
-export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, cachedOfflineFormsOnly = false) {
-  const { htmlFormEntryForms } = useConfig() as ConfigObject;
+// December 31, 1969; hopefully we don't have encounters before that
+const MINIMUM_DATE = new Date(0);
+
+export function useForms(
+  patientUuid: string,
+  startDate?: Date,
+  endDate?: Date,
+  cachedOfflineFormsOnly = false,
+  orderBy: 'name' | 'most-recent' = 'name',
+) {
+  const { htmlFormEntryForms } = useConfig<ConfigObject>();
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
@@ -75,6 +84,17 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
     );
   }
 
+  if (orderBy === 'name') {
+    formsToDisplay?.sort((formInfo1, formInfo2) =>
+      (formInfo1.form.display ?? formInfo1.form.name).localeCompare(formInfo2.form.display ?? formInfo2.form.name),
+    );
+  } else {
+    formsToDisplay?.sort(
+      (formInfo1, formInfo2) =>
+        (formInfo1.lastCompleted ?? MINIMUM_DATE).getDate() - (formInfo2.lastCompleted ?? MINIMUM_DATE).getDate(),
+    );
+  }
+
   return {
     data: formsToDisplay,
     error: allFormsRes.error,
@@ -89,9 +109,7 @@ function mapToFormCompletedInfo(
   encounters: Array<EncounterWithFormRef>,
 ): Array<CompletedFormInfo> {
   return allForms.map((form) => {
-    const associatedEncounters = encounters
-      .filter((encounter) => encounter.form?.uuid === form?.uuid)
-      .sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1));
+    const associatedEncounters = encounters.filter((encounter) => encounter.form?.uuid === form?.uuid);
     const lastCompleted =
       associatedEncounters.length > 0 ? new Date(associatedEncounters?.[0].encounterDatetime) : undefined;
 
