@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
+  DataTableHeader,
+  DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -13,12 +15,15 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
+
 interface PaginatedVitalsProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableRows: Array<Record<string, string>>;
-  tableHeaders: Array<Record<string, string | boolean>>;
+  // @ts-ignore
+  tableRows: Array<typeof DataTableRow>;
+  // @ts-ignore
+  tableHeaders: Array<typeof DataTableHeader>;
   isPrinting?: boolean;
 }
 
@@ -31,6 +36,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   isPrinting,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
+
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
@@ -62,40 +68,20 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       ? orderBy(tableRows, [key], ['desc'])
       : orderBy(tableRows, [key], ['asc']);
 
-  function customSortRow(vitalA, vitalB, { sortDirection, sortStates, ...props }) {
-    const { key } = props;
-    setSortParams({ key, order: sortDirection });
-  }
-
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   const rows = isPrinting ? sortedData : paginatedVitals;
 
   return (
     <div>
-      <DataTable
-        rows={rows}
-        sortRow={customSortRow}
-        headers={tableHeaders}
-        isSortable
-        size={isTablet ? 'lg' : 'sm'}
-        useZebraStyles
-      >
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+        {({ rows, headers, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}
-                    >
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
+                    <TableHeader>{header.header?.content ?? header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
