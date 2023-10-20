@@ -139,7 +139,7 @@ export interface ChartConfig {
     alt: string;
     name: string;
   };
-  viewOnlyVisitLocationField: boolean;
+  disableChangingVisitLocation: boolean;
 }
 
 export const configSchema = {
