@@ -54,7 +54,7 @@ const LocationSelector = () => {
                 onBlur={onBlur}
                 itemToString={(loc: Location) => loc?.display}
                 onInputChange={(loc) => handleSearch(loc)}
-                disabled={viewOnlyVisitLocationField}
+                readOnly={viewOnlyVisitLocationField}
               />
             )}
           />
