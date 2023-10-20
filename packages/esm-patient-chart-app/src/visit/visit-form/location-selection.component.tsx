@@ -18,7 +18,7 @@ const LocationSelector = () => {
   const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
   const config = useConfig() as ChartConfig;
-  const viewOnlyVisitLocationField = config?.viewOnlyVisitLocationField;
+  const disableChangingVisitLocation = config?.disableChangingVisitLocation;
   const locationsToShow: Array<OpenmrsResource> =
     !loadingDefaultFacility && !isEmpty(defaultFacility)
       ? [defaultFacility]
@@ -38,7 +38,7 @@ const LocationSelector = () => {
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
       <div className={`${styles.selectContainer} ${styles.sectionField}`}>
-        {!viewOnlyVisitLocationField ? (
+        {!disableChangingVisitLocation ? (
           <Controller
             name="visitLocation"
             control={control}
@@ -54,7 +54,7 @@ const LocationSelector = () => {
                 onBlur={onBlur}
                 itemToString={(loc: Location) => loc?.display}
                 onInputChange={(loc) => handleSearch(loc)}
-                readOnly={viewOnlyVisitLocationField}
+                readOnly={disableChangingVisitLocation}
               />
             )}
           />
