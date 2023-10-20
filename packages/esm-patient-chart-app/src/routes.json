@@ -5,6 +5,8 @@
       "name": "charts-summary-dashboard",
       "component": "patientSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
+      "online": true,
+      "offline": true,
       "order": 0,
       "meta": {
         "slot": "patient-chart-summary-dashboard-slot",
@@ -15,54 +17,74 @@
     {
       "name": "start-visit-button",
       "component": "startVisitActionButton",
+      "online": true,
+      "offline": true,
       "slot": "patient-actions-slot"
     },
     {
       "name": "stop-visit-button",
       "component": "stopVisitActionButton",
+      "online": true,
+      "offline": true,
       "slot": "patient-actions-slot"
     },
     {
       "name": "mark-alive-button",
       "component": "markPatientAliveActionButton",
+      "online": true,
+      "offline": true,
       "slot": "patient-actions-slot"
     },
     {
       "name": "stop-visit-button-patient-search",
       "slot": "patient-search-actions-slot",
-      "component": "stopVisitPatientSearchActionButton"
+      "component": "stopVisitPatientSearchActionButton",
+      "online": true,
+      "offline": true
     },
     {
       "name": "cancel-visit-button",
       "slot": "patient-actions-slot",
-      "component": "cancelVisitActionButton"
+      "component": "cancelVisitActionButton",
+      "online": true,
+      "offline": true
     },
     {
       "name": "cancel-visit-button",
       "slot": "patient-search-actions-slot",
-      "component": "cancelVisitPatientSearchActionButton"
+      "component": "cancelVisitPatientSearchActionButton",
+      "online": true,
+      "offline": true
     },
     {
       "name": "mark-patient-deceased-button",
       "slot": "patient-actions-slot",
-      "component": "markPatientDeceasedActionButton"
+      "component": "markPatientDeceasedActionButton",
+      "online": true,
+      "offline": true
     },
     {
       "name": "add-past-visit-button",
       "slot": "patient-actions-slot",
       "component": "addPastVisitActionButton",
+      "online": true,
+      "offline": true,
       "featureFlag": "rde"
     },
     {
       "name": "add-past-visit-button",
       "slot": "patient-search-actions-slot",
       "component": "addPastVisitPatientSearchActionButton",
+      "online": true,
+      "offline": true,
       "featureFlag": "rde"
     },
     {
       "name": "encounters-summary-dashboard",
       "slot": "patient-chart-dashboard-slot",
       "component": "encountersSummaryDashboardLink",
+      "online": true,
+      "offline": true,
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
         "columns": 1,
@@ -74,6 +96,8 @@
       "name": "past-visits-detail-overview",
       "slot": "patient-chart-encounters-dashboard-slot",
       "component": "pastVisitsDetailOverview",
+      "online": true,
+      "offline": true,
       "order": 1,
       "meta": {
         "title": "Visits",
@@ -91,6 +115,8 @@
     {
       "name": "start-visit-workspace-form",
       "component": "startVisitForm",
+      "online": true,
+      "offline": true,
       "meta": {
         "title": "Start a visit"
       }
@@ -106,52 +132,76 @@
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
+      "online": true,
+      "offline": true,
       "order": 1
     },
     {
       "name": "nav-group",
+      "online": true,
+      "offline": true,
       "component": "genericNavGroup"
     },
     {
       "name": "dashboard",
+      "online": true,
+      "offline": true,
       "component": "genericDashboard"
     },
     {
       "name": "cancel-visit-dialog",
+      "online": true,
+      "offline": true,
       "component": "cancelVisitDialog"
     },
     {
       "name": "start-visit-dialog",
+      "online": true,
+      "offline": true,
       "component": "startVisitDialog"
     },
     {
       "name": "end-visit-dialog",
+      "online": true,
+      "offline": true,
       "component": "endVisitDialog"
     },
     {
       "name": "confirm-deceased-dialog",
+      "online": true,
+      "offline": true,
       "component": "confirmDeceasedDialog"
     },
     {
       "name": "confirm-alive-modal",
+      "online": true,
+      "offline": true,
       "component": "confirmAliveDialog"
     },
     {
       "name": "start-visit-button-patient-search",
       "slot": "start-visit-button-slot",
+      "online": true,
+      "offline": true,
       "component": "startVisitButtonPatientSearch"
     },
     {
       "name": "visit-attribute-tags",
       "slot": "patient-banner-tags-slot",
+      "online": true,
+      "offline": true,
       "component": "visitAttributeTags"
     },
     {
       "name": "delete-encounter-modal",
+      "online": true,
+      "offline": true,
       "component": "deleteEncounterModal"
     },
     {
       "name": "current-visit-summary",
+      "online": true,
+      "offline": true,
       "component": "currentVisitSummary",
       "meta": {
         "columnSpan": 4
@@ -161,7 +211,9 @@
   "pages": [
     {
       "component": "root",
-      "routeRegex": "^patient\/.+\/chart"
+      "routeRegex": "^patient\/.+\/chart",
+      "offline": true,
+      "online": true
     }
   ]
 }
