@@ -8,12 +8,16 @@
       "name": "offline-tools-dashboard-forms-card",
       "component": "offlineFormOverviewCard",
       "slot": "offline-tools-dashboard-cards",
+      "offline": true,
+      "online": true,
       "order": 1
     },
     {
       "name": "offline-tools-page-forms-link",
       "component": "offlineFormsNavLink",
       "slot": "offline-tools-page-slot",
+      "offline": true,
+      "online": true,
       "meta": {
         "name": "forms",
         "slot": "offline-tools-page-forms-slot"
@@ -22,12 +26,16 @@
     {
       "name": "offline-tools-page-forms",
       "component": "offlineForms",
-      "slot": "offline-tools-page-forms-slot"
+      "slot": "offline-tools-page-forms-slot",
+      "offline": true,
+      "online": true
     },
     {
       "name": "clinical-form-action-menu",
       "component": "clinicalFormActionMenu",
       "slot": "action-menu-chart-items-slot",
+      "offline": true,
+      "online": true,
       "order": 2
     },
     {
@@ -41,7 +49,9 @@
         "type": "clinical-form",
         "canMaximize": true,
         "width": "wider"
-      }
+      },
+      "offline": true,
+      "online": true
     }
   ]
 }

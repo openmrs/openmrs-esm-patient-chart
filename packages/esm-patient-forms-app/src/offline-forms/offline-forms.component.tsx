@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -22,6 +22,7 @@ import {
   putDynamicOfflineData,
   removeDynamicOfflineData,
   syncDynamicOfflineData,
+  useConnectivity,
   useLayoutType,
   userHasAccess,
   useSession,
@@ -32,31 +33,37 @@ import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.styles.scss';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
-export interface OfflineFormsProps {
-  canMarkFormsAsOffline: boolean;
-}
+export interface OfflineFormsProps {}
 
-const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) => {
+const OfflineForms: React.FC<OfflineFormsProps> = () => {
   const { t } = useTranslation();
   const session = useSession();
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
+  const canMarkFormsAsOffline = useConnectivity();
   const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
   const headers: Array<typeof DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
   ];
 
-  const rows: Array<typeof DataTableRow & Record<string, unknown>> =
-    forms.data
-      ?.filter((formInfo) => userHasAccess(formInfo?.encounterType?.editPrivilege?.display, session?.user))
-      .map((form) => ({
-        id: form.uuid,
-        formName: form.name,
-        availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
-      })) ?? [];
+  const rows: Array<typeof DataTableRow & Record<string, unknown>> = useMemo(() => {
+    const filteredForms = forms?.data?.filter((formInfo) =>
+      userHasAccess(formInfo?.encounterType?.editPrivilege?.display, session?.user),
+    );
 
-  if (forms?.data?.length === 0) {
+    const sortedForms = filteredForms
+      ?.map((form) => ({
+        id: form.uuid,
+        formName: form.display,
+        availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
+      }))
+      ?.sort((a, b) => a.formName.localeCompare(b.formName));
+
+    return sortedForms ?? [];
+  }, [forms.data, session.user, canMarkFormsAsOffline]);
+
+  if (rows.length === 0) {
     return (
       <div className={styles.contentContainer}>
         <EmptyState
