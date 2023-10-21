@@ -12,7 +12,6 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './biometrics-overview.scss';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<typeof DataTableRow>;
