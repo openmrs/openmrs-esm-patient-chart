@@ -34,13 +34,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 
   return (
     <div>
-      <DataTable
-        rows={paginatedBiometrics}
-        headers={tableHeaders}
-        isSortable
-        size={isTablet ? 'lg' : 'sm'}
-        useZebraStyles
-      >
+      <DataTable rows={paginatedBiometrics} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
@@ -48,10 +42,8 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}
                     >
                       {header.header?.content ?? header.header}
