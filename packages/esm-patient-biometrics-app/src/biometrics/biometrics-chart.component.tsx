@@ -8,11 +8,11 @@ import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-chart.scss';
 
 enum ScaleTypes {
-  TIME = 'time',
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels_ratio',
   LINEAR = 'linear',
   LOG = 'log',
-  LABELS = 'labels',
-  LABELS_RATIO = 'labels-ratio',
+  TIME = 'time',
 }
 
 interface BiometricsChartProps {
@@ -84,7 +84,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
             parseDate(date),
             { year: true },
-          )} - 
+          )} -
           <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
       },
       height: '400px',

@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars'; 
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .label01 {
   @include type.type-style("label-01");
@@ -30,7 +30,7 @@
   :global(.cds--cc--layout-row) {
     height: 0;
   }
-  
+
   :global(.layout-child) {
     margin-top: spacing.$spacing-03;
   }
@@ -45,15 +45,15 @@
 .verticalTabs {
   margin: 1rem 0;
   scroll-behavior: smooth;
-  
+
   > ul {
     flex-direction: column !important;
   }
-  
+
   :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
     margin-left: 0rem;
   }
-  
+
   :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
     border-bottom: 0 !important;
     border-left: 2px solid $color-gray-30;
@@ -63,6 +63,7 @@
 .tab {
   outline: 0;
   outline-offset: 0;
+  min-height: spacing.$spacing-07;
 
   &:active, &:focus {
     outline: 2px solid var(--brand-03) !important;
@@ -88,7 +89,7 @@
     max-height: fit-content;
     overflow-x: visible;
   }
-  
+
   > button :global(.cds--tabs .cds--tabs__nav-link) {
     border-bottom: none;
   }
