@@ -61,6 +61,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
 jest.mock('../vitals.resource', () => ({
   savePatientVitals: jest.fn(),
+  assessValue: jest.fn(),
+  getReferenceRangesForConcept: jest.fn(),
   useVitals: jest.fn().mockImplementation(() => ({
     mutate: jest.fn,
   })),
