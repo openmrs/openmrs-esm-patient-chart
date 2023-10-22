@@ -26,6 +26,8 @@ import {
 } from './vitals-biometrics-form.utils';
 import { savePatientVitals, useVitals } from '../vitals.resource';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
+import { assessValue, getReferenceRangesForConcept } from '../vitals.resource';
+
 import styles from './vitals-biometrics-form.scss';
 
 const vitalsBiometricsFormSchema = z
@@ -232,6 +234,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('bloodPressure', 'Blood Pressure')}
                 control={control}
+                interpretation={assessValue(
+                  diastolicBloodPressure,
+                  getReferenceRangesForConcept(config.concepts.systolicBloodPressureUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('systolic', 'systolic'),
@@ -268,6 +274,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('pulse', 'Pulse')}
                 control={control}
+                interpretation={assessValue(
+                  pulse,
+                  getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('pulse', 'Pulse'),
@@ -286,6 +296,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('respirationRate', 'Respiration Rate')}
                 control={control}
+                interpretation={assessValue(
+                  respiratoryRate,
+                  getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('respirationRate', 'Respiration Rate'),
@@ -307,6 +321,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('spo2', 'SpO2')}
                 control={control}
+                interpretation={assessValue(
+                  oxygenSaturation,
+                  getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('oxygenSaturation', 'Oxygen Saturation'),
@@ -329,6 +347,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('temp', 'Temp')}
                 control={control}
+                interpretation={assessValue(
+                  temperature,
+                  getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('temperature', 'Temperature'),
@@ -375,6 +397,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('weight', 'Weight')}
                 control={control}
+                interpretation={assessValue(
+                  weight,
+                  getReferenceRangesForConcept(config.concepts.weightUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('weight', 'Weight'),
@@ -396,6 +422,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('height', 'Height')}
                 control={control}
+                interpretation={assessValue(
+                  height,
+                  getReferenceRangesForConcept(config.concepts.heightUuid, conceptMetadata),
+                )}
                 textFields={[
                   {
                     name: t('height', 'Height'),

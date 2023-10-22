@@ -40,6 +40,7 @@ interface VitalsBiometricInputProps {
   placeholder?: string;
   disabled?: boolean;
   isWithinNormalRange?: boolean;
+  interpretation?: string;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
@@ -54,10 +55,24 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   muacColorCode,
   useMuacColors,
   isWithinNormalRange = true,
+  interpretation,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [invalid, setInvalid] = useState(false);
+  const [isFocused, setFocused] = useState(false);
+
+  const handleFocus = () => {
+    setFocused(true);
+  };
+
+  const handleBlur = () => {
+    setFocused(false);
+  };
+
+  const flaggedCritical =
+    interpretation && ['critically_low', 'critically_high', 'high', 'low'].includes(interpretation);
+  const flaggedAbnormal = interpretation && interpretation !== 'normal';
 
   function checkValidity(value, onChange) {
     setInvalid(!(Number(value) || value === ''));
@@ -68,12 +83,29 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   }
 
   return (
-    <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
-      <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
+    <div
+      className={`${styles.inputContainer} ${isTablet ? styles.inputInTabletView : ''} ${
+        flaggedCritical ? styles.isCriticalInput : ''
+      }`}
+      style={{ width: textFieldWidth }}
+    >
+      <div className={styles.labelAndIcons}>
+        <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
+        {flaggedAbnormal ? (
+          <div title="abnormal value">
+            {interpretation === 'high' ? <span className={styles.high}></span> : null}
+            {interpretation === 'critically_high' ? <span className={styles['critically-high']}></span> : null}
+            {interpretation === 'low' ? <span className={styles.low}></span> : null}
+            {interpretation === 'critically_low' ? <span className={styles['critically-low']}></span> : null}
+          </div>
+        ) : null}
+      </div>
       <div
-        className={`${styles.textInputContainer} ${disabled && styles.disabledInput} ${
-          !isWithinNormalRange && styles.danger
-        } ${useMuacColors ? muacColorCode : undefined}`}
+        className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
+          flaggedCritical && styles['critical-value']
+        } ${flaggedAbnormal && styles['abnormal-value']} ${disabled && styles.disabledInput} ${
+          useMuacColors ? muacColorCode : undefined
+        }`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
@@ -87,9 +119,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     render={({ field: { onBlur, onChange, value, ref } }) => (
                       <NumberInput
                         allowEmpty
-                        className={`${styles.textInput} ${disabled && styles.disabledInput} ${val.className} ${
-                          !isWithinNormalRange && styles.danger
-                        }`}
+                        className={`${styles.textInput} ${disabled && styles.disabledInput} ${val.className}`}
                         defaultValue="--"
                         disabled={disabled}
                         disableWheel
@@ -99,7 +129,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                         max={val.max}
                         min={val.min}
                         name={val.name}
-                        onBlur={onBlur}
+                        onBlur={handleBlur}
+                        onFocus={handleFocus}
                         onChange={(e) => checkValidity(e.target.value, onChange)}
                         style={{ ...textFieldStyles }}
                         ref={ref}
