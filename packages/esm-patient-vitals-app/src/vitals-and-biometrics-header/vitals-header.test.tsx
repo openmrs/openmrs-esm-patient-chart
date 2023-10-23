@@ -8,15 +8,15 @@ import {
   getByTextWithMarkup,
   renderWithSwr,
   waitForLoadingToFinish,
-} from '../../../../../tools/test-helpers';
+} from '../../../../tools/test-helpers';
 import {
   mockConceptMetadata,
   mockFhirVitalsResponse,
   mockVitalsConfig,
   mockVitalsSignsConcept,
-} from '../../__mocks__/vitals.mock';
-import { patientVitalsBiometricsFormWorkspace } from '../../constants';
-import { mockCurrentVisit } from '../../__mocks__/visits.mock';
+} from '../__mocks__/vitals.mock';
+import { patientVitalsBiometricsFormWorkspace } from '../constants';
+import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {

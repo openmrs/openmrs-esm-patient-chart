@@ -1,6 +1,9 @@
 {
   "add": "הוסף",
   "additionalNoteText": "הקלד הערות נוספות כאן",
+  "biometricDisplayed": "תצוגת מדדים ביומטריים",
+  "biometrics": "מדדים ביומטריים",
+  "biometrics_lower": "מדדים ביומטריים",
   "bloodPressure": "לחץ דם",
   "bmi": "BMI",
   "bp": "ל.דם",
@@ -39,6 +42,7 @@
   "temperatureAbbreviated": "טמפ'",
   "unknown": "Unknown",
   "vitals": "מדדים חיוניים",
+  "Vitals & Biometrics": "מדדים וביומטריה",
   "vitalsAndBiometrics": "מדדים חיוניים וביומטרים",
   "vitalsAndBiometricsNowAvailable": "הם כעת זמינים בדף מדדים חיוניים וביומטרים",
   "vitalsAndBiometricsRecorded": "מדדים חיוניים וביומטרים נשמרו",

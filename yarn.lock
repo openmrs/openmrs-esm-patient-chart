@@ -6864,28 +6864,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-biometrics-app@workspace:packages/esm-patient-biometrics-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-biometrics-app@workspace:packages/esm-patient-biometrics-app"
-  dependencies:
-    "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.12.0
-    "@openmrs/esm-patient-common-lib": ^5.1.0
-    d3: ^7.6.1
-    lodash-es: ^4.17.21
-    webpack: ^5.88.2
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 5.x
-    dayjs: 1.x
-    react: ^18.x
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    rxjs: 6.x
-    swr: 2.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-patient-chart-app@workspace:packages/esm-patient-chart-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart-app@workspace:packages/esm-patient-chart-app"

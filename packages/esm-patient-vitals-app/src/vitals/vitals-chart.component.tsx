@@ -5,7 +5,7 @@ import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
-import { PatientVitals } from './vitals.resource';
+import { type PatientVitals } from '../common';
 import styles from './vitals-chart.scss';
 
 enum ScaleTypes {

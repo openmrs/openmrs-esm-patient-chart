@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
@@ -12,11 +12,11 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
-import { launchVitalsAndBiometricsForm } from '../biometrics-utils';
-import { useBiometrics } from './biometrics.resource';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
+import { launchVitalsAndBiometricsForm } from '../utils';
+import { useVitalsAndBiometrics } from '../common';
 
 interface BiometricsBaseProps {
   patientUuid: string;
@@ -29,12 +29,12 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { t } = useTranslation();
   const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
-  const [chartView, setChartView] = React.useState(false);
+  const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
 
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
-  const { biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid, config.concepts);
+  const { data: biometrics, isLoading, isError, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
@@ -48,10 +48,10 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
     { key: 'weight', header: withUnit('Weight', conceptUnits.get(config.concepts.weightUuid) ?? '') },
     { key: 'height', header: withUnit('Height', conceptUnits.get(config.concepts.heightUuid) ?? '') },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.muacUuid) ?? '') },
+    { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? '') },
   ];
 
-  const tableRows = React.useMemo(
+  const tableRows = useMemo(
     () =>
       biometrics?.map((biometricsData, index) => {
         return {

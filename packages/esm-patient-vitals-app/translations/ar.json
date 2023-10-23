@@ -1,6 +1,9 @@
 {
   "add": "أضف",
   "additionalNoteText": "اكتب أي ملاحظات إضافية هنا",
+  "biometricDisplayed": "تم عرض البيانات البيومترية",
+  "biometrics": "البيانات البيومترية",
+  "biometrics_lower": "البيانات البيومترية",
   "bloodPressure": "ضغط الدم",
   "bmi": "مؤشر كتلة الجسم",
   "bp": "ضغط الدم",
@@ -39,6 +42,7 @@
   "temperatureAbbreviated": "درجة الحرارة",
   "unknown": "غير معروف",
   "vitals": "العلامات الحيوية",
+  "Vitals & Biometrics": "العلامات الحيوية والبيانات البيومترية",
   "vitalsAndBiometrics": "العلامات الحيوية والقياسات البيومترية",
   "vitalsAndBiometricsNowAvailable": "هم الآن مرئيون على صفحة العلامات الحيوية والقياسات البيومترية",
   "vitalsAndBiometricsRecorded": "تم حفظ العلامات الحيوية والقياسات البيومترية",

@@ -2,9 +2,9 @@ import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
-import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../__mocks__/vitals.mock';
-import { mockPatient } from '../../../../../tools/test-helpers';
-import { savePatientVitals } from '../vitals.resource';
+import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
+import { saveVitalsAndBiometrics } from '../common';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
 const testProps = {
@@ -23,7 +23,7 @@ const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
 const mockShowToast = jest.mocked(showToast);
-const mockSavePatientVitals = jest.mocked(savePatientVitals);
+const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
 const mockShowNotification = jest.mocked(showNotification);
 
 const mockConceptUnits = new Map<string, string>(
@@ -59,11 +59,9 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('../vitals.resource', () => ({
-  savePatientVitals: jest.fn(),
-  useVitals: jest.fn().mockImplementation(() => ({
-    mutate: jest.fn,
-  })),
+jest.mock('../common', () => ({
+  invalidateCachedVitalsAndBiometrics: jest.fn(),
+  saveVitalsAndBiometrics: jest.fn(),
 }));
 
 describe('VitalsBiometricsForm', () => {
@@ -116,13 +114,13 @@ describe('VitalsBiometricsForm', () => {
   it('renders a success toast notification upon clicking the save button', async () => {
     const user = userEvent.setup();
 
-    const response: Partial<Promise<FetchResponse>> = {
+    const response: Partial<FetchResponse> = {
       statusText: 'created',
       status: 201,
       data: [],
-    } as unknown;
+    };
 
-    mockSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof savePatientVitals>);
+    mockSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
 
     renderForm();
 

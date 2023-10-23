@@ -1,6 +1,9 @@
 {
   "add": "Add",
   "additionalNoteText": "Type any additional notes here",
+  "biometricDisplayed": "Biometric displayed",
+  "biometrics": "Biometrics",
+  "biometrics_lower": "biometrics",
   "bloodPressure": "Blood Pressure",
   "bmi": "BMI",
   "bp": "BP",
@@ -39,6 +42,7 @@
   "temperatureAbbreviated": "Temp",
   "unknown": "Unknown",
   "vitals": "Vitals",
+  "Vitals & Biometrics": "Vitals & Biometrics",
   "vitalsAndBiometrics": "Vitals and biometrics",
   "vitalsAndBiometricsNowAvailable": "They are now visible on the Vitals and Biometrics page",
   "vitalsAndBiometricsRecorded": "Vitals and Biometrics saved",

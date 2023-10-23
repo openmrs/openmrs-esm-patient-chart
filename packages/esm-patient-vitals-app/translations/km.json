@@ -1,6 +1,9 @@
 {
   "add": "បន្ថែម",
   "additionalNoteText": "វាយបញ្ចូលកំណត់ចំណាំបន្ថែមនៅទីនេះ",
+  "biometricDisplayed": "ជីវមាត្របានបង្ហាញ",
+  "biometrics": "ជីវមាត្រ",
+  "biometrics_lower": "ជីវមាត្រ",
   "bloodPressure": "សម្ពាធឈាម",
   "bmi": "សន្ទស្សន៍ទម្ងន់ខ្លួន",
   "bp": "សម្ពាធឈាម",
@@ -39,6 +42,7 @@
   "temperatureAbbreviated": "សីតុណ្ហភាព",
   "unknown": "Unknown",
   "vitals": "សញ្ញាជីវិត",
+  "Vitals & Biometrics": "សញ្ញាជីវិត និងជីវមាត្រ",
   "vitalsAndBiometrics": "សញ្ញាជីវិត និងជីវមាត្រ",
   "vitalsAndBiometricsNowAvailable": "ឥឡូវនេះពួកវាអាចមើលឃើញនៅលើទំព័រ សញ្ញាជីវិត និងជីវមាត្រ",
   "vitalsAndBiometricsRecorded": "សញ្ញាជីវិត និងជីវមាត្រត្រូវបានរក្សាទុក",

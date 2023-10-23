@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -17,16 +17,16 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../../config-schema';
+import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
   isValueWithinReferenceRange,
   extractNumbers,
   getColorCode,
 } from './vitals-biometrics-form.utils';
-import { savePatientVitals, useVitals } from '../vitals.resource';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
+import { invalidateCachedVitalsAndBiometrics, saveVitalsAndBiometrics } from '../common';
 
 const vitalsBiometricsFormSchema = z
   .object({
@@ -65,9 +65,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { mutate } = useVitals(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
-  const [bodyMassIndex, setBodyMassIndex] = useState<number>();
   const [muacColorCode, setMuacColorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -89,11 +87,6 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const pulse = watch('pulse');
   const weight = watch('weight');
   const height = watch('height');
-
-  const isBodyMassIndexValueAbnormal = (bmi: number) => {
-    if (!bmi) return false;
-    return bmi < 18.5 || bmi > 24.9;
-  };
 
   useEffect(() => {
     getColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
@@ -125,69 +118,72 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     ],
   );
 
-  const savePatientVitalsAndBiometrics = (data: VitalsBiometricsFormData) => {
-    data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
-    const patientVitalAndBiometrics = data;
+  const savePatientVitalsAndBiometrics = useCallback(
+    (data: VitalsBiometricsFormData) => {
+      data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
+      const patientVitalAndBiometrics = data;
 
-    let isFieldValid = true;
-    for (const key in patientVitalAndBiometrics) {
-      if (
-        isValueWithinReferenceRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) ==
-        false
-      ) {
-        isFieldValid = false;
-        showNotification({
-          title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
-          kind: 'error',
-          critical: true,
-          description: t('checkForValidity', 'Some of the values entered are invalid'),
-        });
-        break;
-      }
-    }
-    if (isFieldValid) {
-      setIsSubmitting(true);
-      const ac = new AbortController();
-      savePatientVitals(
-        config.vitals.encounterTypeUuid,
-        config.vitals.formUuid,
-        config.concepts,
-        patientUuid,
-        patientVitalAndBiometrics,
-        new Date(),
-        ac,
-        session?.sessionLocation?.uuid,
-      )
-        .then((response) => {
-          if (response.status === 201) {
-            mutate();
-            closeWorkspace();
-            showToast({
-              critical: true,
-              kind: 'success',
-              title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-              description: t(
-                'vitalsAndBiometricsNowAvailable',
-                'They are now visible on the Vitals and Biometrics page',
-              ),
-            });
-          }
-        })
-        .catch((err) => {
-          setIsSubmitting(false);
-          createErrorHandler();
+      let isFieldValid = true;
+      for (const key in patientVitalAndBiometrics) {
+        if (
+          isValueWithinReferenceRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) ==
+          false
+        ) {
+          isFieldValid = false;
           showNotification({
             title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
             kind: 'error',
             critical: true,
-            description: err?.message,
+            description: t('checkForValidity', 'Some of the values entered are invalid'),
           });
-        })
-        .finally(() => {
-          ac.abort();
-        });
-    }
-  };
+          break;
+        }
+      }
+      if (isFieldValid) {
+        setIsSubmitting(true);
+        const ac = new AbortController();
+        saveVitalsAndBiometrics(
+          config.vitals.encounterTypeUuid,
+          config.vitals.formUuid,
+          config.concepts,
+          patientUuid,
+          patientVitalAndBiometrics,
+          new Date(),
+          ac,
+          session?.sessionLocation?.uuid,
+        )
+          .then((response) => {
+            if (response.status === 201) {
+              invalidateCachedVitalsAndBiometrics();
+              closeWorkspace();
+              showToast({
+                critical: true,
+                kind: 'success',
+                title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+                description: t(
+                  'vitalsAndBiometricsNowAvailable',
+                  'They are now visible on the Vitals and Biometrics page',
+                ),
+              });
+            }
+          })
+          .catch((err) => {
+            setIsSubmitting(false);
+            createErrorHandler();
+            showNotification({
+              title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+              kind: 'error',
+              critical: true,
+              description: err?.message,
+            });
+          })
+          .finally(() => {
+            ac.abort();
+          });
+      }
+    },
+    [conceptMetadata, config, session],
+  );
 
   useEffect(() => {
     if (height && weight) {

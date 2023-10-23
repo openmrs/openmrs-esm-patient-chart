@@ -1,6 +1,9 @@
 {
   "add": "Añadir",
   "additionalNoteText": "Escriba aquí cualquier nota adicional",
+  "biometricDisplayed": "Biometría mostrada",
+  "biometrics": "Biometría",
+  "biometrics_lower": "biometría",
   "bloodPressure": "Presión arterial",
   "bmi": "IMC",
   "bp": "PA",
@@ -39,6 +42,7 @@
   "temperatureAbbreviated": "Temp",
   "unknown": "Desconocido",
   "vitals": "Signos vitales",
+  "Vitals & Biometrics": "Signos vitales y biometría",
   "vitalsAndBiometrics": "Signos vitales y biométricos",
   "vitalsAndBiometricsNowAvailable": "Ahora son visibles en la página de Signos vitales y biométricos",
   "vitalsAndBiometricsRecorded": "Signos vitales y biométricos guardados",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ObservationInterpretation } from '../vitals.resource';
+import { ObservationInterpretation } from '../common';
 import styles from './vitals-header-item.scss';
 
 interface VitalsHeaderItemProps {
