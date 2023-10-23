@@ -57,13 +57,3 @@ export const allergiesForm = getAsyncLifecycle(
 );
 
 export const allergyTile = getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options);
-
-export const patientDetailsTile = getAsyncLifecycle(
-  () => import('../../esm-patient-chart-app/src/patient-details-tile/patient-details-tile.component'),
-  options,
-);
-
-export const weightTile = getAsyncLifecycle(
-  () => import('../../esm-patient-biometrics-app/src/biometrics/weight-tile.component'),
-  options,
-);
