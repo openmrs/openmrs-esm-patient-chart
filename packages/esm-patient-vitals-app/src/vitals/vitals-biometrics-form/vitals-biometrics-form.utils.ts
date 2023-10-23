@@ -19,6 +19,10 @@ export function isValueWithinReferenceRange(
   }
 
   const concept = conceptMetadata.find((c) => c.uuid === conceptUuid);
+  // Don't validate inputs if the value is empty or the concept is not found
+  if (value === undefined || value === '' || concept === undefined) {
+    return true;
+  }
   return isNumber(concept?.lowAbsolute) && isNumber(concept?.hiAbsolute)
     ? Number(value) >= Number(concept.lowAbsolute) && Number(value) <= Number(concept.hiAbsolute)
     : true;

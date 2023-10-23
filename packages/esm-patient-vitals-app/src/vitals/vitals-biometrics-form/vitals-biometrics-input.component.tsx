@@ -4,6 +4,7 @@ import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
+import { generatePlaceholder } from '../vitals.resource';
 import styles from './vitals-biometrics-input.scss';
 
 type Id =
@@ -119,6 +120,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     render={({ field: { onBlur, onChange, value, ref } }) => (
                       <NumberInput
                         allowEmpty
+                        placeholder={generatePlaceholder(val.name)}
                         className={`${styles.textInput} ${disabled && styles.disabledInput} ${val.className}`}
                         defaultValue="--"
                         disabled={disabled}
