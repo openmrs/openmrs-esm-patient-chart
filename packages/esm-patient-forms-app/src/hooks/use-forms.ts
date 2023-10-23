@@ -42,8 +42,10 @@ export function useEncountersWithFormRef(
   startDate: Date = dayjs(new Date()).startOf('day').subtract(500, 'day').toDate(),
   endDate: Date = dayjs(new Date()).endOf('day').toDate(),
 ) {
-  const url = `/ws/rest/v1/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`;
-  return useSWR(url, (url) => openmrsFetch<ListResponse<EncounterWithFormRef>>(url));
+  const url = patientUuid
+    ? `/ws/rest/v1/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`
+    : null;
+  return useSWR(url, openmrsFetch<ListResponse<EncounterWithFormRef>>);
 }
 
 // December 31, 1969; hopefully we don't have encounters before that
