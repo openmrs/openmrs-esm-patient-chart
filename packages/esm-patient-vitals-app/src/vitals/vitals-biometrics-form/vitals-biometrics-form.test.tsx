@@ -63,6 +63,7 @@ jest.mock('../vitals.resource', () => ({
   savePatientVitals: jest.fn(),
   assessValue: jest.fn(),
   getReferenceRangesForConcept: jest.fn(),
+  generatePlaceholder: jest.fn(),
   useVitals: jest.fn().mockImplementation(() => ({
     mutate: jest.fn,
   })),
