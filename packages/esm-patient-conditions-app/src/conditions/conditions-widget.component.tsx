@@ -16,6 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
+import { useFormContext, Controller } from 'react-hook-form';
 import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   CodedCondition,
@@ -26,9 +27,9 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import styles from './conditions-form.scss';
-import { useFormContext, Controller } from 'react-hook-form';
 import { ConditionFormData } from './conditions-form.component';
+import styles from './conditions-form.scss';
+
 interface ConditionsWidgetProps {
   closeWorkspace?: () => void;
   conditionToEdit?: ConditionDataTableRow;
@@ -287,6 +288,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
+                className={styles.radioGroup}
                 valueSelected={value.toLowerCase()}
                 name="clinicalStatus"
                 orientation="vertical"
