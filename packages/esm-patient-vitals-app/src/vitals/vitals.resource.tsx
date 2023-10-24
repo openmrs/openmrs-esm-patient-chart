@@ -244,7 +244,7 @@ export function editPatientVitals(
 }
 
 export function assessValue(value: number, range: ObsMetaInfo): ObservationInterpretation {
-  if ((range?.hiCritical && value >= range.hiCritical) || (range?.hiAbsolute && value >= range.hiAbsolute)) {
+  if (range?.hiCritical && value >= range.hiCritical) {
     return 'critically_high';
   }
 
@@ -252,7 +252,7 @@ export function assessValue(value: number, range: ObsMetaInfo): ObservationInter
     return 'high';
   }
 
-  if ((range?.lowCritical && value <= range.lowCritical) || (range?.lowAbsolute && value <= range.lowAbsolute)) {
+  if (range?.lowCritical && value <= range.lowCritical) {
     return 'critically_low';
   }
 

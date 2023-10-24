@@ -94,10 +94,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
         {flaggedAbnormal ? (
           <div title="abnormal value">
-            {interpretation === 'high' ? <span className={styles.high}></span> : null}
-            {interpretation === 'critically_high' ? <span className={styles['critically-high']}></span> : null}
-            {interpretation === 'low' ? <span className={styles.low}></span> : null}
-            {interpretation === 'critically_low' ? <span className={styles['critically-low']}></span> : null}
+            <span className={styles[interpretation.replace('_', '-')]} />
           </div>
         ) : null}
       </div>
