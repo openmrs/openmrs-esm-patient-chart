@@ -19,7 +19,7 @@
   "muac": "MUAC",
   "noDataRecorded": "No data has been recorded for this patient",
   "notes": "Notes",
-  "numericInputError": "Must be a number within acceptable ranges",
+  "numericInputError": "Only numbers \"{min}\" - \"{max}\" permitted",
   "other": "Other",
   "overdue": "Overdue",
   "oxygenSaturation": "Oxygen Saturation",

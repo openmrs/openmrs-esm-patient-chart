@@ -181,7 +181,10 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       </div>
       {showInvalidInputError ? (
         <FormLabel className={styles.danger}>
-          {t('numericInputError', `Only numbers ${textFields[0].min} - ${textFields[0].max} permitted`)}
+          {t('numericInputError', `Only numbers "{min}" - "{max}" permitted`, {
+            min: textFields[0].min,
+            max: textFields[0].max,
+          })}
         </FormLabel>
       ) : null}
     </div>
