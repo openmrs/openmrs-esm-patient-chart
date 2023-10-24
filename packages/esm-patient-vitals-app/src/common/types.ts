@@ -1,6 +1,11 @@
-import { type FHIRResource } from '@openmrs/esm-framework';
+import type { FetchResponse, FHIRResource } from '@openmrs/esm-framework';
 
 type ReferenceRangeValue = number | null | undefined;
+
+export type FHIRSearchBundleResponse = FetchResponse<{
+  entry: Array<FHIRResource>;
+  link: Array<{ relation: string; url: string }>;
+}>;
 
 export interface ObsReferenceRanges {
   hiAbsolute: ReferenceRangeValue;
