@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
+import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
@@ -42,6 +43,7 @@ interface VitalsBiometricInputProps {
   disabled?: boolean;
   isWithinNormalRange?: boolean;
   interpretation?: string;
+  showErrorMessage?: boolean;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
@@ -57,6 +59,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   useMuacColors,
   isWithinNormalRange = true,
   interpretation,
+  showErrorMessage,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -82,6 +85,10 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     }
   }
 
+  const isInvalidInput = !isWithinNormalRange || invalid;
+  const showInvalidInputError = showErrorMessage && isInvalidInput;
+  const errorMessageClass = showInvalidInputError ? styles.invalidInput : '';
+
   return (
     <div
       className={`${styles.inputContainer} ${isTablet ? styles.inputInTabletView : ''} ${
@@ -95,12 +102,16 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
           <div title="abnormal value">
             <span className={styles[interpretation.replace('_', '-')]} />
           </div>
+        ) : showInvalidInputError ? (
+          <div className={styles.invalidInputIcon}>
+            <Warning />
+          </div>
         ) : null}
       </div>
       <div
         className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
           flaggedCritical && styles['critical-value']
-        } ${disabled && styles.disabledInput} ${useMuacColors ? muacColorCode : undefined}`}
+        } ${disabled ? styles.disabledInput : ''} ${useMuacColors ? muacColorCode : undefined} ${errorMessageClass}`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
@@ -168,11 +179,11 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
-      {(!isWithinNormalRange || invalid) && (
+      {showInvalidInputError ? (
         <FormLabel className={styles.danger}>
-          {t('numericInputError', 'Must be a number with in acceptable ranges')}
+          {t('numericInputError', `Only numbers ${textFields[0].min} - ${textFields[0].max} permitted`)}
         </FormLabel>
-      )}
+      ) : null}
     </div>
   );
 };

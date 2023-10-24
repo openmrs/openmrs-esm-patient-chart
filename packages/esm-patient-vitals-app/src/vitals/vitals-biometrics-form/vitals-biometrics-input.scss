@@ -64,6 +64,14 @@
     input {
       outline: none !important;
     }
+
+    input[data-invalid]:not(:focus) {
+      outline: none;
+    }
+
+    svg {
+      display: none;
+    }
   }
 }
 
@@ -94,6 +102,15 @@
   }
 }
 
+.textInput {
+  svg {
+    display: none;
+  }
+
+  input[data-invalid]:not(:focus) {
+    outline: none !important;
+  }
+}
 .textarea {
   border: none;
   @extend .bodyLong01;
@@ -139,6 +156,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.invalidInput {
+  border: 2px solid $danger;
+}
+
+.invalidInputIcon {
+  svg {
+    color: $danger;
+  }
 }
 
 .critical-value {

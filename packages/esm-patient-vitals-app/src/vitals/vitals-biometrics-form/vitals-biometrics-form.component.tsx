@@ -73,6 +73,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [muacColorCode, setMuacColorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const { control, handleSubmit, getValues, watch, setValue } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
@@ -128,6 +129,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   );
 
   const savePatientVitalsAndBiometrics = (data: VitalsBiometricsFormData) => {
+    setShowErrorMessage(true);
     data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
     const patientVitalAndBiometrics = data;
 
@@ -149,6 +151,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     }
     if (isFieldValid) {
       setIsSubmitting(true);
+      setShowErrorMessage(false);
       const ac = new AbortController();
       savePatientVitals(
         config.vitals.encounterTypeUuid,
@@ -315,6 +318,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['respiratoryRateUuid'],
                   respiratoryRate,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
             <Column>
@@ -340,6 +344,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['oxygenSaturationUuid'],
                   oxygenSaturation,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
 
@@ -366,6 +371,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['temperatureUuid'],
                   temperature,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
           </Row>
@@ -416,6 +422,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['weightUuid'],
                   weight,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
             <Column>
@@ -441,6 +448,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['heightUuid'],
                   height,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
             <Column>
@@ -479,6 +487,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   config.concepts['midUpperArmCircumferenceUuid'],
                   midUpperArmCircumference,
                 )}
+                showErrorMessage={showErrorMessage}
               />
             </Column>
           </Row>
