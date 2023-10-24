@@ -73,7 +73,6 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
 
   const flaggedCritical =
     interpretation && ['critically_low', 'critically_high', 'high', 'low'].includes(interpretation);
-  const flaggedAbnormal = interpretation && interpretation !== 'normal';
 
   function checkValidity(value, onChange) {
     setInvalid(!(Number(value) || value === ''));
@@ -92,7 +91,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     >
       <div className={styles.labelAndIcons}>
         <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
-        {flaggedAbnormal ? (
+        {flaggedCritical ? (
           <div title="abnormal value">
             <span className={styles[interpretation.replace('_', '-')]} />
           </div>
@@ -101,9 +100,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       <div
         className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
           flaggedCritical && styles['critical-value']
-        } ${flaggedAbnormal && styles['abnormal-value']} ${disabled && styles.disabledInput} ${
-          useMuacColors ? muacColorCode : undefined
-        }`}
+        } ${disabled && styles.disabledInput} ${useMuacColors ? muacColorCode : undefined}`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
@@ -118,7 +115,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                       <NumberInput
                         allowEmpty
                         placeholder={generatePlaceholder(val.name)}
-                        className={`${styles.textInput} ${disabled && styles.disabledInput} ${val.className}`}
+                        className={`${styles.textInput} ${disabled ? styles.disabledInput : ''} ${val.className}`}
                         defaultValue="--"
                         disabled={disabled}
                         disableWheel
