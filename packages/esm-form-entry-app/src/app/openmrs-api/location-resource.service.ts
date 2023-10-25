@@ -17,7 +17,7 @@ export class LocationResourceService {
   ) {}
 
   public getLocationByUuid(uuid: string): Observable<Location | undefined> {
-    const url = this.getLcationByUuidUrl(uuid);
+    const url = this.getLocationByUuidUrl(uuid);
     return this.http.get<Location>(url).pipe(catchError(() => this.getLocationByUuidFallback(uuid)));
   }
 
@@ -35,8 +35,10 @@ export class LocationResourceService {
     return this.http.get<ListResult<Location>>(url).pipe(map((r) => r.results));
   }
 
-  public getLcationByUuidUrl(uuid?: string) {
-    if (uuid) return this.windowRef.openmrsRestBase + 'location/' + uuid + '?v=' + LocationResourceService.v;
+  public getLocationByUuidUrl(uuid?: string) {
+    if (uuid) {
+      return this.windowRef.openmrsRestBase + 'location/' + uuid + '?v=' + LocationResourceService.v;
+    }
   }
 
   public getUrl(searchText?: string) {
