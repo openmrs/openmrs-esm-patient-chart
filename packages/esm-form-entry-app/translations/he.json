@@ -19,7 +19,7 @@
   "deleteEntry": "האם אתה בטוח שברצונך למחוק פריט זה?",
   "discardButton": "בטל",
   "enterMoreCharacters": "אנא הזן 2 או יותר תווים",
-  "errorFetchingFormData": "אירעה שגיאה באחזור נתוני הטופס. פרטים: {detail}"
+  "errorFetchingFormData": "אירעה שגיאה באחזור נתוני הטופס. פרטים: {detail}",
   "errorLoadingForm": "שגיאה בטעינת הטופס",
   "errorWithForm": "אירעה שגיאה בטופס ",
   "fix": "תיקון",
