@@ -104,8 +104,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         return 'weight';
       case concepts.midUpperArmCircumferenceUuid:
         return 'muac';
-      default:
-        throw { message: `Unrecognised concept ${conceptUuid}` };
     }
   };
 
