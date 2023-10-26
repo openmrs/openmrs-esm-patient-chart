@@ -54,47 +54,39 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                 </TableToolbarContent>
               </TableToolbar>
             </div>
-            <Table {...getTableProps()} className={styles.table}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, i) => (
-                  <TableRow {...getRowProps({ row })}>
-                    <TableCell key={row.cells[0].id}>
-                      <Link
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          handleFormOpen(row.id, '', tableRows[i].formName);
-                        }}
-                        role="presentation"
-                        className={styles.formName}
-                      >
-                        {tableRows[i]?.formName}
-                      </Link>
-                    </TableCell>
-                    <TableCell className={styles.editCell}>
-                      <label>{row.cells[1].value ?? t('never', 'Never')}</label>
-                    </TableCell>
+            {rows.length > 0 && (
+              <Table {...getTableProps()} className={styles.table}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, i) => (
+                    <TableRow {...getRowProps({ row })}>
+                      <TableCell key={row.cells[0].id}>
+                        <Link
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            handleFormOpen(row.id, '', tableRows[i].formName);
+                          }}
+                          role="presentation"
+                          className={styles.formName}
+                        >
+                          {tableRows[i]?.formName}
+                        </Link>
+                      </TableCell>
+                      <TableCell className={styles.editCell}>
+                        <label>{row.cells[1].value ?? t('never', 'Never')}</label>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </TableContainer>
-          {rows?.length === 0 ? (
-            <div className={styles.tileContainer}>
-              <Tile className={styles.tile}>
-                <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noMatchingFormsToDisplay', 'No matching forms to display')}</p>
-                  <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                </div>
-              </Tile>
-            </div>
-          ) : null}
         </>
       )}
     </DataTable>
