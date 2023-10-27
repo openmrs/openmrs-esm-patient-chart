@@ -14,6 +14,5 @@ export const useOfflineVisitType = () => {
     ]);
   }, []);
 
-  console.warn('visitTypes', visitTypes);
   return visitTypes;
 };
