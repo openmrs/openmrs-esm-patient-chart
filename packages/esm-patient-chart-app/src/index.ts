@@ -17,7 +17,7 @@ import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.compon
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
-window["_openmrs_esm_patient_common_lib"] = PatientCommonLib;
+window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 

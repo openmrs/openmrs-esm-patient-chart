@@ -5,4 +5,5 @@ export interface FormEntryProps {
   visitTypeUuid?: string;
   visitStartDatetime?: string;
   visitStopDatetime?: string;
+  additionalProps?: Record<string, any>;
 }
