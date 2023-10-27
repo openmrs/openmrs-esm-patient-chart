@@ -14,7 +14,7 @@
   "closePreview": "Close preview",
   "dateUploaded": "Date uploaded",
   "delete": "Delete",
-  "deleteAttachmentConfirmationText": "Are you sure you want to delete this {attachmentType}? This action can't be undone.",
+  "deleteAttachmentConfirmationText": "Are you sure you want to delete this {{attachmentType}}? This action can't be undone.",
   "deleteImage": "Delete image",
   "error": "Error",
   "errorUploading": "Error uploading a file",

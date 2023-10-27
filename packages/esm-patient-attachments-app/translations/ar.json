@@ -14,7 +14,7 @@
   "closePreview": "إغلاق المعاينة",
   "dateUploaded": "تاريخ التحميل",
   "delete": "حذف",
-  "deleteAttachmentConfirmationText": "هل أنت متأكد أنك تريد حذف هذا {attachmentType}؟ لا يمكن التراجع عن هذا الإجراء.",
+  "deleteAttachmentConfirmationText": "هل أنت متأكد أنك تريد حذف هذا {{attachmentType}}؟ لا يمكن التراجع عن هذا الإجراء.",
   "deleteImage": "حذف الصورة",
   "error": "خطأ",
   "errorUploading": "خطأ أثناء تحميل الملف",

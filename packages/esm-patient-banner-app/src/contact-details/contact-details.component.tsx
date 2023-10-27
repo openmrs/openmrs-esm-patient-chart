@@ -48,8 +48,8 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
           <li style={{ marginTop: '1rem' }}>
             <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
               {cohorts.length > 3
-                ? t('seeMoreLists', 'See {listCount} more lists', {
-                    listCount: cohorts?.length - 3,
+                ? t('seeMoreLists', 'See {{count}} more lists', {
+                    count: cohorts?.length - 3,
                   })
                 : ''}
             </ConfigurableLink>

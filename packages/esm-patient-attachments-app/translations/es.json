@@ -14,7 +14,7 @@
   "closePreview": "Cerrar vista previa",
   "dateUploaded": "Fecha de carga",
   "delete": "Borrar",
-  "deleteAttachmentConfirmationText": "¿Está seguro de que desea eliminar este {attachmentType}? Esta acción no se puede deshacer.",
+  "deleteAttachmentConfirmationText": "¿Está seguro de que desea eliminar este {{attachmentType}}? Esta acción no se puede deshacer.",
   "deleteImage": "Borrar imagen",
   "error": "Error",
   "errorUploading": "Error al cargar un archivo",

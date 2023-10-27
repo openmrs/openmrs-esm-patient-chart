@@ -15,18 +15,21 @@ export function usePaginationInfo(pageSize: number, totalItems: number, pageNumb
     });
   }, [pageSize, totalItems]);
 
-  const numberOfItemsDisplayed = useMemo(() => {
+  const itemsDisplayed = useMemo(() => {
+    let pageItemsCount = 0;
     if (pageSize > totalItems) {
-      return `${totalItems} / ${totalItems}`;
+      pageItemsCount = totalItems;
     } else if (pageSize * pageNumber > totalItems) {
-      return `${pageSize * (pageNumber - 1) + currentItems} / ${totalItems}`;
+      pageItemsCount = pageSize * (pageNumber - 1) + currentItems;
     } else {
-      return `${pageSize * pageNumber} / ${totalItems}`;
+      pageItemsCount = pageSize * pageNumber;
     }
+
+    return t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
   }, [pageSize, totalItems, pageNumber, currentItems]);
 
   return {
     pageSizes,
-    itemsDisplayed: `${numberOfItemsDisplayed} ${t('items', ' items')}`,
+    itemsDisplayed,
   };
 }
