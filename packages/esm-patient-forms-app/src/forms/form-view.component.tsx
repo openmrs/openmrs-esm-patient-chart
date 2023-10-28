@@ -114,7 +114,7 @@ const FormView: React.FC<FormViewProps> = ({
         <Tile className={styles.tile}>
           <EmptyDataIllustration />
           <p className={styles.content}>
-            {t('noMatchingFormsAvailable', 'There are no {formCategory} forms to display', {
+            {t('noMatchingFormsAvailable', 'There are no {{formCategory}} forms to display', {
               formCategory: category?.toLowerCase(),
             })}
           </p>

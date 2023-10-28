@@ -33,7 +33,7 @@ const useMock = [(key) => key, {}];
 useMock.t = (key, defaultValue, options = {}) => {
   let translatedString = defaultValue;
   Object.keys(options).forEach((key) => {
-    translatedString = defaultValue.replace(`{${key}}`, `${options[key]}`);
+    translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
   });
 
   return translatedString;

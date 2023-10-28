@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './workspace-notification.scss';
 
 // t('unsavedChanges', 'You have unsaved changes')
-// t('unsavedChangesInForm', 'There are unsaved changes in {formName}. Please save them before opening another form.')
+// t('unsavedChangesInForm', 'There are unsaved changes in {{formName}}. Please save them before opening another form.')
 // t('openAnyway', 'Open anyway')
 
 const WorkspaceNotification: React.FC = () => {

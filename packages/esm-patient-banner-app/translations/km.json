@@ -19,7 +19,7 @@
   "patientLists": "Patient Lists",
   "postalCode": "Postal code",
   "relationships": "ទំនាក់ទំនង",
-  "seeMoreLists": "See {listCount} more lists",
+  "seeMoreLists_other": "See {{count}} more lists",
   "showDetails": "បង្ហាញលម្អិត",
   "started": "បានចាប់ផ្តើម",
   "state": "State",
