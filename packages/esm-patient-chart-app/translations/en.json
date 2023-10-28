@@ -95,7 +95,7 @@
   "orderDurationAndUnit": "for {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Indefinite duration",
   "other": "Other",
-  "paginationItemsCount_one": "{{pageItemsCount}} / {{count}} items",
+  "paginationItemsCount_one": "{{pageItemsCount}} / {{count}} item",
   "paginationItemsCount_other": "{{pageItemsCount}} / {{count}} items",
   "paginationPageText_one": "of {{count}} page",
   "paginationPageText_other": "of {{count}} pages",

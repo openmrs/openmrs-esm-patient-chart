@@ -19,7 +19,7 @@
   "patientLists": "Patient Lists",
   "postalCode": "מיקוד",
   "relationships": "יחסים",
-  "seeMoreLists_one": "See {{count}} more lists",
+  "seeMoreLists_one": "See {{count}} more list",
   "seeMoreLists_two": "See {{count}} more lists",
   "seeMoreLists_many": "See {{count}} more lists",
   "seeMoreLists_other": "See {{count}} more lists",

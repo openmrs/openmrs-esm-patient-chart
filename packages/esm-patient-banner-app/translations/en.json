@@ -19,7 +19,7 @@
   "patientLists": "Patient Lists",
   "postalCode": "Postal code",
   "relationships": "Relationships",
-  "seeMoreLists_one": "See {{count}} more lists",
+  "seeMoreLists_one": "See {{count}} more list",
   "seeMoreLists_other": "See {{count}} more lists",
   "showDetails": "Show details",
   "started": "Started",

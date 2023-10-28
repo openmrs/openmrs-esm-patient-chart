@@ -95,7 +95,7 @@
   "orderDurationAndUnit": "למשך {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "למשך זמן בלתי מוגבל",
   "other": "אחר",
-  "paginationItemsCount_one": "{{pageItemsCount}} / {{count}} items",
+  "paginationItemsCount_one": "{{pageItemsCount}} / {{count}} item",
   "paginationItemsCount_two": "{{pageItemsCount}} / {{count}} items",
   "paginationItemsCount_many": "{{pageItemsCount}} / {{count}} items",
   "paginationItemsCount_other": "{{pageItemsCount}} / {{count}} items",
