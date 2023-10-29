@@ -166,3 +166,21 @@
   border-bottom: 1px solid var(--brand-03);
   padding: 0.625rem;
 }
+
+.saveAndCloseButtons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 0.625rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  margin-left: 0.625rem;
+  @include type.type-style("body-short-01");
+  
+  border-top: 1px solid #a8a8a8;
+
+  & button {
+    width: 100%;
+    padding-inline-end:0;
+  }
+}
