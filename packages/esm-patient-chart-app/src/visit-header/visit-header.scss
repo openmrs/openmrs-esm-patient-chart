@@ -21,6 +21,11 @@
   margin-left: spacing.$spacing-04;
 }
 
+.navLogoTablet {
+  margin-right: spacing.$spacing-04;
+  margin-left: spacing.$spacing-02;
+}
+
 .startVisitButton {
   @include brand-03(background-color);
 
@@ -90,6 +95,7 @@
 
 .tag {
   margin: 0.25rem 0;
+  min-width: 4rem;
 }
 
 .priorityTag {
@@ -97,4 +103,5 @@
   @include type.type-style('label-01');
   color: #943d00;
   background-color: #ffc9a3;
+  min-width: 4rem;
 }
