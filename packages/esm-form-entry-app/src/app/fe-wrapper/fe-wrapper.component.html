@@ -34,14 +34,14 @@
         <div *ngIf="showDiscardSubmitButtons" class="saveAndCloseButtons">
           <button
             [disabled]="formState === 'submitting'"
-            class="cds--btn cds--btn--primary cds--layout--size-sm"
+            class="cds--btn cds--btn--primary"
             (click)="onSubmit()"
             type="submit"
           >
             <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}</span>
             <loader *ngIf="formState === 'submitting'" loadingMessage="{{submitting" | translate}}></loader>
           </button>
-          <button class="cds--btn cds--btn--danger--tertiary cds--layout--size-sm" (click)="closeForm()" type="button">
+          <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">
             {{ 'discardButton' | translate }}
           </button>
         </div>
