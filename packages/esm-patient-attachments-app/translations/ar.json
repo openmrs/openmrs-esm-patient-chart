@@ -7,6 +7,8 @@
   "attachmentCaptionInstruction": "أدخل الوصف",
   "attachments": "المرفقات",
   "Attachments": "المرفقات",
+  "attachmentsInLowerCase": "attachments",
+  "attachmentsInProperFormat": "Attachments",
   "cameraError": "خطأ في الكاميرا",
   "cancel": "إلغاء",
   "changeImage": "غير الصورة",

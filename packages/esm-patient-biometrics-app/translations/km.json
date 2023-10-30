@@ -3,9 +3,14 @@
   "biometricDisplayed": "ជីវមាត្របានបង្ហាញ",
   "biometrics": "ជីវមាត្រ",
   "biometrics_lower": "ជីវមាត្រ",
+  "bmi": "BMI",
+  "date": "Date",
+  "dateAndTime": "Date and time",
   "goToSummary": "ចូលទៅកាន់តារាងសង្ខេប",
+  "height": "Height",
   "loading": "កំពុងទាញទិន្ន័យ",
+  "muac": "MUAC",
   "seeAll": "បង្ហាញទាំងអស់",
-  "Vitals & Biometrics": "សញ្ញាជីវិត​ និងជីវមាត្រ",
+  "Vitals & Biometrics": "សញ្ញាជីវិត\u200b និងជីវមាត្រ",
   "weight": "ទម្ងន់"
 }
