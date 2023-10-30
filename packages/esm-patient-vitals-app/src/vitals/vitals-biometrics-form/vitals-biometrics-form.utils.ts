@@ -35,7 +35,7 @@ export function extractNumbers(str: string) {
   return parseInt(match[0], 10);
 }
 
-export function getColorCode(age: number, muac: number, setColorCode: (color) => void) {
+export function getMuacColorCode(age: number, muac: number, setColorCode: (color) => void) {
   switch (true) {
     // children 5 years and below with a muac equal to 14
     case age <= 5 && muac <= 11.5 && muac > 0:

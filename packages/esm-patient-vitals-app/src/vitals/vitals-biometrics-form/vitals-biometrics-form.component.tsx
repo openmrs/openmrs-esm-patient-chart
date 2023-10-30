@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, ButtonSet, Column, Form, Row, Stack, InlineNotification } from '@carbon/react';
+import { Button, ButtonSet, Column, Form, InlineNotification, Row, Stack } from '@carbon/react';
 import {
   age,
   createErrorHandler,
@@ -20,14 +20,18 @@ import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-pa
 import type { ConfigObject } from '../../config-schema';
 import {
   calculateBodyMassIndex,
-  isValueWithinReferenceRange,
   extractNumbers,
-  getColorCode,
+  getMuacColorCode,
+  isValueWithinReferenceRange,
 } from './vitals-biometrics-form.utils';
-import { savePatientVitals, useVitals } from '../vitals.resource';
+import {
+  assessValue,
+  getReferenceRangesForConcept,
+  interpretBloodPressure,
+  savePatientVitals,
+  useVitals,
+} from '../vitals.resource';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
-import { assessValue, getReferenceRangesForConcept } from '../vitals.resource';
-
 import styles from './vitals-biometrics-form.scss';
 
 const vitalsBiometricsFormSchema = z
@@ -69,7 +73,6 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { currentVisit } = useVisit(patientUuid);
   const { mutate } = useVitals(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
-  const [bodyMassIndex, setBodyMassIndex] = useState<number>();
   const [muacColorCode, setMuacColorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -93,13 +96,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const weight = watch('weight');
   const height = watch('height');
 
-  const isBodyMassIndexValueAbnormal = (bmi: number) => {
-    if (!bmi) return false;
-    return bmi < 18.5 || bmi > 24.9;
-  };
-
   useEffect(() => {
-    getColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
+    getMuacColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
   }, [watch, patient.patient?.birthDate, midUpperArmCircumference]);
 
   const concepts = useMemo(
@@ -237,9 +235,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
               <VitalsBiometricInput
                 title={t('bloodPressure', 'Blood Pressure')}
                 control={control}
-                interpretation={assessValue(
+                interpretation={interpretBloodPressure(
+                  systolicBloodPressure,
                   diastolicBloodPressure,
-                  getReferenceRangesForConcept(config.concepts.systolicBloodPressureUuid, conceptMetadata),
+                  config.concepts,
+                  conceptMetadata,
                 )}
                 textFields={[
                   {
