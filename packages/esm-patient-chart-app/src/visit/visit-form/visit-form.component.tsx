@@ -229,7 +229,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 saveAppointment(appointmentPayload, abortController).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutate();
+                      mutateVisit();
                       showToast({
                         critical: true,
                         kind: 'success',
@@ -276,7 +276,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
-      mutate,
+      mutateVisit,
       patientUuid,
       upcomingAppointment,
       t,
