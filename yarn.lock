@@ -7280,37 +7280,36 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 4.0.1-pre.287
-  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.287"
+  version: 4.0.1-pre.321
+  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.321"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
-    "@angular-extensions/elements": ^12.6.0
-    "@angular/animations": ">=11.2.14 <=12.0.4"
-    "@angular/cdk": ">=11.2.13 <=12.0.4"
-    "@angular/common": ">=11.2.14 <=12.0.4"
-    "@angular/compiler": ">=11.2.14 <=12.0.4"
-    "@angular/core": ">=11.2.14 <=12.0.4"
-    "@angular/forms": ">=11.2.14 <=12.0.4"
+    "@angular/animations": ^14.3.0
+    "@angular/cdk": ^14.2.7
+    "@angular/common": ^14.3.0
+    "@angular/compiler": ^14.3.0
+    "@angular/compiler-cli": ^14.3.0
+    "@angular/core": ^14.3.0
+    "@angular/forms": ^14.3.0
     "@carbon/styles": ^1.11.0
-    "@ng-select/ng-select": ^6.1.0
-    "@ngx-translate/core": ^13.0.0
-    hammerjs: ^2.0.8
-    lodash: ^4.17.4
-    moment: ^2.17.1
-    ngx-file-uploader: ^0.0.18
-    ngx-webcam: ^0.2.2
-    reflect-metadata: ^0.1.9
-    shelljs: ^0.7.0
+    "@ng-select/ng-select": ^9.1.0
+    "@ngx-translate/core": ^14.0.0
+    "@openmrs/ngx-file-uploader": "*"
+    lodash: "*"
+    moment: ^2.29.4
+    ngx-webcam: ^0.4.1
+    reflect-metadata: ^0.1.13
+    shelljs: ^0.7.8
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 8f3a07a3fc38b8dea5c4a1027a401e81f154a4860801fb8566b24c700498a1522fcda8b9c8703ab00fe9a42690e21a1596413779bf8dc7cc7311a92a394f78b1
+  checksum: c5492992602b293e8712176ae51292ef7c9c687eb91b781e5c33f120a32223839f39a9aa01df431d4fd5268c402c1d332e380186c97e1b52ce0c501970225ff8
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.402
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.402"
+  version: 1.0.0-pre.412
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.412"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -7332,7 +7331,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: b59bdf7274795b2cb0dadc6791e903152eed7518aca51934522d079f33635452768a8563214ddc940e9a16843730c1234f24db824d4b9d713f8afec58c10f1fc
+  checksum: 03bb6790c76ab61fb0bc081ce47df40fc307d142567232e459392b3695a49cf8ddd7c93f8f68404224eb05197273cdb16163bf322a968da0450ae3b742ffb051
   languageName: node
   linkType: hard
 
