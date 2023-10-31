@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import classNames from 'classnames';
 import { Control, Controller } from 'react-hook-form';
 import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
 import { Warning } from '@carbon/react/icons';
@@ -21,12 +22,21 @@ type Id =
   | 'midUpperArmCircumference'
   | 'computedBodyMassIndex';
 
+interface ResponsiveWrapperProps {
+  children: React.ReactNode;
+  isTablet: boolean;
+}
 interface VitalsBiometricInputProps {
-  title: string;
   control: Control<VitalsBiometricsFormData>;
   muacColorCode?: string;
-  useMuacColors?: boolean;
-  textFields: Array<{
+  interpretation?: string;
+  isWithinNormalRange?: boolean;
+  placeholder?: string;
+  readOnly?: boolean;
+  showErrorMessage?: boolean;
+  fieldStyles?: React.CSSProperties;
+  fieldWidth?: string;
+  fields: Array<{
     id: Id;
     name: string;
     separator?: string;
@@ -36,30 +46,25 @@ interface VitalsBiometricInputProps {
     min?: number | null;
     max?: number | null;
   }>;
+  title: string;
+  useMuacColors?: boolean;
   unitSymbol?: string;
-  textFieldWidth?: string;
-  textFieldStyles?: React.CSSProperties;
-  placeholder?: string;
-  disabled?: boolean;
-  isWithinNormalRange?: boolean;
-  interpretation?: string;
-  showErrorMessage?: boolean;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
-  title,
   control,
-  textFields,
-  unitSymbol,
-  textFieldStyles,
-  textFieldWidth,
-  placeholder,
-  disabled,
-  muacColorCode,
-  useMuacColors,
-  isWithinNormalRange = true,
   interpretation,
+  isWithinNormalRange = true,
+  muacColorCode,
+  placeholder,
+  readOnly,
   showErrorMessage,
+  fields,
+  fieldStyles,
+  fieldWidth,
+  title,
+  unitSymbol,
+  useMuacColors,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -74,7 +79,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     setFocused(false);
   };
 
-  const flaggedCritical =
+  const isFlaggedCritical =
     interpretation && ['critically_low', 'critically_high', 'high', 'low'].includes(interpretation);
 
   function checkValidity(value, onChange) {
@@ -89,17 +94,24 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   const showInvalidInputError = showErrorMessage && isInvalidInput;
   const errorMessageClass = showInvalidInputError ? styles.invalidInput : '';
 
+  const containerClasses = classNames(styles.inputContainer, {
+    [styles.inputInTabletView]: isTablet,
+    [styles.isCriticalInput]: !isFocused && isFlaggedCritical,
+  });
+
+  const textInputClasses = classNames(styles.textInputContainer, {
+    [styles.focused]: isFocused,
+    [styles['critical-value']]: !isFocused && isFlaggedCritical,
+    [muacColorCode]: useMuacColors,
+    [errorMessageClass]: true,
+  });
+
   return (
     <>
-      <div
-        className={`${styles.inputContainer} ${isTablet ? styles.inputInTabletView : ''} ${
-          flaggedCritical ? styles.isCriticalInput : ''
-        }`}
-        style={{ width: textFieldWidth }}
-      >
+      <div className={containerClasses} style={{ width: fieldWidth }}>
         <div className={styles.labelAndIcons}>
           <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
-          {flaggedCritical ? (
+          {!isFocused && isFlaggedCritical ? (
             <div title="abnormal value">
               <span className={styles[interpretation.replace('_', '-')]} />
             </div>
@@ -109,27 +121,20 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
             </div>
           ) : null}
         </div>
-        <div
-          className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
-            flaggedCritical && styles['critical-value']
-          } ${disabled ? styles.disabledInput : ''} ${useMuacColors ? muacColorCode : undefined} ${errorMessageClass}`}
-          style={{ ...textFieldStyles }}
-        >
+        <div className={textInputClasses} style={{ ...fieldStyles }}>
           <div className={styles.centerDiv}>
-            {textFields.map((val, i) => {
+            {fields.map((val, i) => {
               return val.type === 'number' ? (
-                <Fragment key={`vitals-text-input-${val.name}-${i}`}>
+                <Fragment key={`${val.name}-${i}-number-input`}>
                   <ResponsiveWrapper isTablet={isTablet}>
                     <Controller
                       name={val.id}
                       control={control}
-                      render={({ field: { onBlur, onChange, value, ref } }) => (
+                      render={({ field: { onChange, value, ref } }) => (
                         <NumberInput
                           allowEmpty
-                          placeholder={generatePlaceholder(val.name)}
-                          className={`${styles.textInput} ${disabled ? styles.disabledInput : ''} ${val.className}`}
+                          className={`${styles.textInput} ${val.className}`}
                           defaultValue="--"
-                          disabled={disabled}
                           disableWheel
                           hideSteppers
                           id={val.name + 'input'}
@@ -138,10 +143,12 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                           min={val.min}
                           name={val.name}
                           onBlur={handleBlur}
-                          onFocus={handleFocus}
                           onChange={(e) => checkValidity(e.target.value, onChange)}
-                          style={{ ...textFieldStyles }}
+                          onFocus={handleFocus}
+                          placeholder={generatePlaceholder(val.name)}
+                          readOnly={readOnly}
                           ref={ref}
+                          style={{ ...fieldStyles }}
                           title={val.name}
                           type={val.type}
                           value={value}
@@ -152,25 +159,25 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                   {val?.separator}
                 </Fragment>
               ) : (
-                <ResponsiveWrapper key={`vitals-text-area-${val.name}-${i}`} isTablet={isTablet}>
+                <ResponsiveWrapper key={`${val.name}-${i}-textarea`} isTablet={isTablet}>
                   <Controller
                     name={val.id}
                     control={control}
                     render={({ field: { onBlur, onChange, value, ref } }) => (
                       <TextArea
-                        key={val.name}
-                        style={{ ...textFieldStyles }}
                         className={styles.textarea}
                         id={val.name}
-                        name={val.name}
+                        key={val.name + 'textarea'}
                         labelText={''}
-                        onChange={(e) => onChange(e.target.value)}
+                        name={val.name}
                         onBlur={onBlur}
-                        rows={2}
+                        onChange={(e) => onChange(e.target.value)}
                         placeholder={placeholder}
-                        value={value}
-                        title={val.name}
                         ref={ref}
+                        rows={2}
+                        style={{ ...fieldStyles }}
+                        title={val.name}
+                        value={value}
                       />
                     )}
                   />
@@ -184,8 +191,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       {showInvalidInputError ? (
         <FormLabel className={styles.invalidInputError}>
           {t('validationInputError', `Value must be between {{min}} and {{max}} {{unitSymbol}}`, {
-            min: textFields[0].min,
-            max: textFields[0].max,
+            min: fields[0].min,
+            max: fields[0].max,
             unitSymbol: unitSymbol,
           })}
         </FormLabel>
@@ -194,8 +201,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   );
 };
 
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+const ResponsiveWrapper: React.FC<ResponsiveWrapperProps> = ({ children, isTablet }) => {
   return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <>{children}</>;
-}
+};
 
 export default VitalsBiometricInput;
