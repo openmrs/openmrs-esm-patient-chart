@@ -21,7 +21,6 @@ registerWorkspace({
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
   canHide: true,
-  preferredWindowSize: 'maximized',
 });
 
 export const orderBasketActionMenu = getAsyncLifecycle(
