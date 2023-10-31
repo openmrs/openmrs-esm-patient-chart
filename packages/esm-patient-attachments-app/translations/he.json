@@ -7,6 +7,8 @@
   "attachmentCaptionInstruction": "הכנס תיאור לתמונה",
   "attachments": "קבצים מצורפים",
   "Attachments": "קבצים מצורפים",
+  "attachmentsInLowerCase": "attachments",
+  "attachmentsInProperFormat": "Attachments",
   "cameraError": "שגיאת מצלמה",
   "cancel": "ביטול",
   "changeImage": "שנה תמונה",

@@ -254,7 +254,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               showToast({
                 critical: true,
                 kind: 'success',
-                description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                description: t('visitStartedSuccessfully', '{{visit}} started successfully', {
                   visit: response?.data?.visitType?.display ?? `Visit`,
                 }),
                 title: t('visitStarted', 'Visit started'),

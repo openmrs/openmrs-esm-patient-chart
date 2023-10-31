@@ -47,7 +47,7 @@ const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) =>
             <Tag type="high-contrast" onClick={handleClick} className={styles.flagsHighlightTag}>
               <span className={styles.flagIcon}>&#128681;</span>
               <span className={styles.flagText}>
-                {t('flagCount', '{count} risk flags', {
+                {t('flagCount', '{{count}} risk flags', {
                   count: riskFlags.length,
                 })}
               </span>

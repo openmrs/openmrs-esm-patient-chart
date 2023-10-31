@@ -39,7 +39,7 @@ export default function OrderBasketSearchResults({
       <Tile className={styles.emptyState}>
         <div>
           <h4 className={styles.productiveHeading01}>
-            {t('errorFetchingDrugResults', 'Error fetching results for "{searchTerm}"', {
+            {t('errorFetchingDrugResults', 'Error fetching results for "{{searchTerm}}"', {
               searchTerm,
             })}
           </h4>
@@ -57,7 +57,7 @@ export default function OrderBasketSearchResults({
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{count} results for "{searchTerm}"', {
+              {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
                 count: drugs?.length,
                 searchTerm,
               })}
@@ -77,7 +77,7 @@ export default function OrderBasketSearchResults({
         <Tile className={styles.emptyState}>
           <div>
             <h4 className={styles.productiveHeading01}>
-              {t('noResultsForDrugSearch', 'No results to display for "{searchTerm}"', {
+              {t('noResultsForDrugSearch', 'No results to display for "{{searchTerm}}"', {
                 searchTerm,
               })}
             </h4>

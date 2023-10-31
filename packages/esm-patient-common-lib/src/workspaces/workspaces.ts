@@ -118,7 +118,7 @@ function promptBeforeLaunchingWorkspace(
       body: translateFrom(
         '@openmrs/esm-patient-chart-app',
         'unsavedChangesInForm',
-        'There are unsaved changes in {formName}. Please save them before opening another form.',
+        'There are unsaved changes in {{formName}}. Please save them before opening another form.',
         { formName: currentName },
       ),
       onConfirm: () => {

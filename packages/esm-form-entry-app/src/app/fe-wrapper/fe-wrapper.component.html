@@ -1,33 +1,55 @@
 <div *ngIf="loadingError" class="form-container">
   <div class="cds--tile error-tile">
-    <h4 class="heading">{{'errorWithForm' | translate}}</h4>
+    <h4 class="heading">{{ 'errorWithForm' | translate }}</h4>
     <p class="helperText">
-      {{'tryOpeningAnotherForm' | translate}}
+      {{ 'tryOpeningAnotherForm' | translate }}
     </p>
     <p class="separator">or</p>
     <button class="cds--btn cds--btn--sm cds--btn--ghost" (click)="closeForm()">
-      {{'closeThisPanel' | translate}}
+      {{ 'closeThisPanel' | translate }}
     </button>
   </div>
 </div>
-<div *ngIf="formState !== 'submitted'" [ngClass]="{'error': formState === 'readyWithValidationErrors'}">
+<div *ngIf="formState !== 'submitted'" [ngClass]="{ error: formState === 'readyWithValidationErrors' }">
   <div class="content">
-    <div *ngIf="formState === 'ready' || formState === 'readyWithValidationErrors' || formState === 'submitting' || formState === 'submissionError'" class="form-container">
+    <div
+      *ngIf="
+        formState === 'ready' ||
+        formState === 'readyWithValidationErrors' ||
+        formState === 'submitting' ||
+        formState === 'submissionError'
+      "
+      class="form-container"
+    >
       <div>
         <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
-          <ofe-form-renderer [labelMap]="labelMap" [node]="form.rootNode"></ofe-form-renderer>          
+          <ofe-form-renderer
+            [formSubmissionTemplate]="buttonsTemplate"
+            [labelMap]="labelMap"
+            [node]="form.rootNode"
+          ></ofe-form-renderer>
         </form>
       </div>
-      <div *ngIf="showDiscardSubmitButtons" class="cds-btn--set button-set">
-        <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">{{ 'discardButton' | translate}}</button>
-        <button [disabled]="formState === 'submitting'" class="cds--btn cds--btn--primary" (click)="onSubmit()" type="submit">
-          <span *ngIf="formState !== 'submitting'">{{'saveAndCloseButton' | translate}}</span>
-          <loader *ngIf="formState === 'submitting'" loadingMessage={{submitting | translate}}></loader>
-        </button>
+      <ng-template #buttonsTemplate>
+        <div *ngIf="showDiscardSubmitButtons" class="saveAndCloseButtons">
+          <button
+            [disabled]="formState === 'submitting'"
+            class="cds--btn cds--btn--primary"
+            (click)="onSubmit()"
+            type="submit"
+          >
+            <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}</span>
+            <loader *ngIf="formState === 'submitting'" [loadingMessage]="'submitting' | translate"></loader>
+          </button>
+          <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">
+            {{ 'discardButton' | translate }}
+          </button>
+        </div>
+      </ng-template>
     </div>
   </div>
-</div>
 
-<div *ngIf="formState === 'loading'" class="loader-container">
-  <loader class="loader" loadingMessage={{loading | translate=""></loader>
+  <div *ngIf="formState === 'loading'" class="loader-container">
+    <loader class="loader" [loadingMessage]="'loading' | translate"></loader>
+  </div>
 </div>
