@@ -190,7 +190,10 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
             <h4 className={styles.productiveHeading02}>
               {!searchTerm
                 ? t('panel', 'Panel')
-                : `${totalSearchResults} ${t('searchResultsTextFor', 'search results for')} "${searchTerm}"`}
+                : t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
+                    searchTerm,
+                    count: totalSearchResults,
+                  })}
             </h4>
             {searchTerm ? (
               <Button kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>

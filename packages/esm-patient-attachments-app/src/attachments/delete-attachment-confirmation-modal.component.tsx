@@ -26,7 +26,7 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
         <p className={styles.bodyLong01}>
           {t(
             'deleteAttachmentConfirmationText',
-            `Are you sure you want to delete this {attachmentType}? This action can't be undone.`,
+            `Are you sure you want to delete this {{attachmentType}}? This action can't be undone.`,
             {
               attachmentType: attachment.bytesContentFamily.toLowerCase(),
             },

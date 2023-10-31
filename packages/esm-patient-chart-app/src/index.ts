@@ -7,12 +7,17 @@ import {
   registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
+
+// This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
+// using webpack. This is used for ngx-formentry.
+window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
