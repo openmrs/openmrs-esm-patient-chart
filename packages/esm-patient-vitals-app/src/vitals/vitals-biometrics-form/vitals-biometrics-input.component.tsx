@@ -90,104 +90,107 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   const errorMessageClass = showInvalidInputError ? styles.invalidInput : '';
 
   return (
-    <div
-      className={`${styles.inputContainer} ${isTablet ? styles.inputInTabletView : ''} ${
-        flaggedCritical ? styles.isCriticalInput : ''
-      }`}
-      style={{ width: textFieldWidth }}
-    >
-      <div className={styles.labelAndIcons}>
-        <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
-        {flaggedCritical ? (
-          <div title="abnormal value">
-            <span className={styles[interpretation.replace('_', '-')]} />
-          </div>
-        ) : showInvalidInputError ? (
-          <div className={styles.invalidInputIcon}>
-            <Warning />
-          </div>
-        ) : null}
-      </div>
+    <>
       <div
-        className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
-          flaggedCritical && styles['critical-value']
-        } ${disabled ? styles.disabledInput : ''} ${useMuacColors ? muacColorCode : undefined} ${errorMessageClass}`}
-        style={{ ...textFieldStyles }}
+        className={`${styles.inputContainer} ${isTablet ? styles.inputInTabletView : ''} ${
+          flaggedCritical ? styles.isCriticalInput : ''
+        }`}
+        style={{ width: textFieldWidth }}
       >
-        <div className={styles.centerDiv}>
-          {textFields.map((val, i) => {
-            return val.type === 'number' ? (
-              <Fragment key={`vitals-text-input-${val.name}-${i}`}>
-                <ResponsiveWrapper isTablet={isTablet}>
+        <div className={styles.labelAndIcons}>
+          <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
+          {flaggedCritical ? (
+            <div title="abnormal value">
+              <span className={styles[interpretation.replace('_', '-')]} />
+            </div>
+          ) : showInvalidInputError ? (
+            <div className={styles.invalidInputIcon}>
+              <Warning />
+            </div>
+          ) : null}
+        </div>
+        <div
+          className={`${styles.textInputContainer} ${isFocused ? styles.focused : ''} ${
+            flaggedCritical && styles['critical-value']
+          } ${disabled ? styles.disabledInput : ''} ${useMuacColors ? muacColorCode : undefined} ${errorMessageClass}`}
+          style={{ ...textFieldStyles }}
+        >
+          <div className={styles.centerDiv}>
+            {textFields.map((val, i) => {
+              return val.type === 'number' ? (
+                <Fragment key={`vitals-text-input-${val.name}-${i}`}>
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <Controller
+                      name={val.id}
+                      control={control}
+                      render={({ field: { onBlur, onChange, value, ref } }) => (
+                        <NumberInput
+                          allowEmpty
+                          placeholder={generatePlaceholder(val.name)}
+                          className={`${styles.textInput} ${disabled ? styles.disabledInput : ''} ${val.className}`}
+                          defaultValue="--"
+                          disabled={disabled}
+                          disableWheel
+                          hideSteppers
+                          id={val.name + 'input'}
+                          label={''}
+                          max={val.max}
+                          min={val.min}
+                          name={val.name}
+                          onBlur={handleBlur}
+                          onFocus={handleFocus}
+                          onChange={(e) => checkValidity(e.target.value, onChange)}
+                          style={{ ...textFieldStyles }}
+                          ref={ref}
+                          title={val.name}
+                          type={val.type}
+                          value={value}
+                        />
+                      )}
+                    />
+                  </ResponsiveWrapper>
+                  {val?.separator}
+                </Fragment>
+              ) : (
+                <ResponsiveWrapper key={`vitals-text-area-${val.name}-${i}`} isTablet={isTablet}>
                   <Controller
                     name={val.id}
                     control={control}
                     render={({ field: { onBlur, onChange, value, ref } }) => (
-                      <NumberInput
-                        allowEmpty
-                        placeholder={generatePlaceholder(val.name)}
-                        className={`${styles.textInput} ${disabled ? styles.disabledInput : ''} ${val.className}`}
-                        defaultValue="--"
-                        disabled={disabled}
-                        disableWheel
-                        hideSteppers
-                        id={val.name + 'input'}
-                        label={''}
-                        max={val.max}
-                        min={val.min}
-                        name={val.name}
-                        onBlur={handleBlur}
-                        onFocus={handleFocus}
-                        onChange={(e) => checkValidity(e.target.value, onChange)}
+                      <TextArea
+                        key={val.name}
                         style={{ ...textFieldStyles }}
-                        ref={ref}
-                        title={val.name}
-                        type={val.type}
+                        className={styles.textarea}
+                        id={val.name}
+                        name={val.name}
+                        labelText={''}
+                        onChange={(e) => onChange(e.target.value)}
+                        onBlur={onBlur}
+                        rows={2}
+                        placeholder={placeholder}
                         value={value}
+                        title={val.name}
+                        ref={ref}
                       />
                     )}
                   />
                 </ResponsiveWrapper>
-                {val?.separator}
-              </Fragment>
-            ) : (
-              <ResponsiveWrapper key={`vitals-text-area-${val.name}-${i}`} isTablet={isTablet}>
-                <Controller
-                  name={val.id}
-                  control={control}
-                  render={({ field: { onBlur, onChange, value, ref } }) => (
-                    <TextArea
-                      key={val.name}
-                      style={{ ...textFieldStyles }}
-                      className={styles.textarea}
-                      id={val.name}
-                      name={val.name}
-                      labelText={''}
-                      onChange={(e) => onChange(e.target.value)}
-                      onBlur={onBlur}
-                      rows={2}
-                      placeholder={placeholder}
-                      value={value}
-                      title={val.name}
-                      ref={ref}
-                    />
-                  )}
-                />
-              </ResponsiveWrapper>
-            );
-          })}
+              );
+            })}
+          </div>
+          <p className={styles.unitName}>{unitSymbol}</p>
         </div>
-        <p className={styles.unitName}>{unitSymbol}</p>
       </div>
       {showInvalidInputError ? (
-        <FormLabel className={styles.danger}>
-          {t('numericInputError', `Only numbers "{min}" - "{max}" permitted`, {
+        <FormLabel className={styles.invalidInputError}>
+          {t('validationInputError', `Value must be between {{min}} and {{max}} {{unitSymbol}}`, {
             min: textFields[0].min,
             max: textFields[0].max,
+            unitSymbol: unitSymbol,
           })}
         </FormLabel>
       ) : null}
-    </div>
+    </>
   );
 };
 

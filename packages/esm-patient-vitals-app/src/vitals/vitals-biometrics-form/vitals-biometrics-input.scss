@@ -18,7 +18,7 @@
 .inputContainer {
   width: 11.625rem;
   border-bottom: 1px solid $ui-04;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .vitalsBiometricInputLabel01 {
@@ -44,6 +44,10 @@
 
   :global(.cds--number--nosteppers input[type="number"]) {
     padding-right: 1rem !important;
+  }
+
+  ::placeholder {
+    color: $text-03;
   }
 }
 
@@ -144,8 +148,9 @@
   }
 }
 
-.danger {
+.invalidInputError {
   color: $danger;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .layer {
@@ -157,8 +162,13 @@
   justify-content: space-between;
   align-items: center;
 }
+
 .invalidInput {
-  border: 2px solid $danger;
+  outline: 2px solid $danger;
+
+  &.focused {
+    border: none;
+  }
 }
 
 .invalidInputIcon {

@@ -54,7 +54,7 @@ const vitalsBiometricsFormSchema = z
       return Object.values(fields).some((value) => Boolean(value));
     },
     {
-      message: 'Atleast one fields is required',
+      message: 'Please fill at least one field',
       path: ['oneFieldRequired'],
     },
   );
@@ -77,6 +77,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
 
   const { control, handleSubmit, getValues, watch, setValue } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
@@ -137,13 +138,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
         isValueWithinReferenceRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) ==
         false
       ) {
+        setHasInvalidVitals(true);
         isFieldValid = false;
-        showNotification({
-          title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
-          kind: 'error',
-          critical: true,
-          description: t('checkForValidity', 'Some of the values entered are invalid'),
-        });
         break;
       }
     }
@@ -499,6 +495,16 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   title={t('error', 'Error')}
                   subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
                   onClose={() => setShowErrorNotification(false)}
+                />
+              </Column>
+            )}
+            {hasInvalidVitals && (
+              <Column>
+                <InlineNotification
+                  className={styles.errorNotification}
+                  lowContrast={false}
+                  title={t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics')}
+                  subtitle={t('checkForValidity', 'Some of the values entered are invalid')}
                 />
               </Column>
             )}
