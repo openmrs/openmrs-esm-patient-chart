@@ -9,7 +9,7 @@ import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
 import { generatePlaceholder } from '../vitals.resource';
 import styles from './vitals-biometrics-input.scss';
 
-type Id =
+type fieldId =
   | 'systolicBloodPressure'
   | 'diastolicBloodPressure'
   | 'respiratoryRate'
@@ -37,7 +37,7 @@ interface VitalsBiometricInputProps {
   fieldStyles?: React.CSSProperties;
   fieldWidth?: string;
   fields: Array<{
-    id: Id;
+    id: fieldId;
     name: string;
     separator?: string;
     type?: string | 'text';
