@@ -7,6 +7,8 @@
   "attachmentCaptionInstruction": "Ajouter une légende pour l'image",
   "attachments": "Pièces jointes",
   "Attachments": "Pièces jointes",
+  "attachmentsInLowerCase": "attachments",
+  "attachmentsInProperFormat": "Attachments",
   "cameraError": "Erreur avec l'appareil photo",
   "cancel": "Annuller",
   "changeImage": "Changer l'image",

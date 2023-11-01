@@ -100,7 +100,13 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   );
 
   if (!attachments.length) {
-    return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
+    return (
+      <EmptyState
+        displayText={t('attachmentsInLowerCase', 'attachments')}
+        headerTitle={t('attachmentsInProperFormat', 'Attachments')}
+        launchForm={showCam}
+      />
+    );
   }
 
   return (

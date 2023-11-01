@@ -138,6 +138,7 @@ const VisitHeader: React.FC = () => {
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { logo } = useConfig();
   const { systemVisitEnabled } = useSystemVisitSetting();
+  const isTablet = useLayoutType() === 'tablet';
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
@@ -170,7 +171,7 @@ const VisitHeader: React.FC = () => {
           isActive={isSideMenuExpanded}
         />
       )}
-      <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
+      <ConfigurableLink className={isTablet ? styles.navLogoTablet : styles.navLogo} to="${openmrsSpaBase}/home">
         <div className={styles.divider}>
           {logo?.src ? (
             <img className={styles.logo} src={interpolateUrl(logo.src)} alt={logo.alt} width={110} height={40} />

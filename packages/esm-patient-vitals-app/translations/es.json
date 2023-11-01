@@ -6,6 +6,7 @@
   "bp": "PA",
   "calculatedBmi": "IMC (calc.)",
   "checkForValidity": "Algunos de los valores introducidos no son válidos",
+  "date": "Date",
   "diastolic": "diastólica",
   "discard": "Descartar",
   "error": "Error",

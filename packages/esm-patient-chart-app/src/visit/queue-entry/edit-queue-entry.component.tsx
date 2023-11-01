@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import styles from './edit-queue-entry.scss';
 import { MappedVisitQueueEntry } from './queue.resource';
 import { Edit } from '@carbon/react/icons';
@@ -12,6 +12,7 @@ interface EditQueueEntryProps {
 
 export const EditQueueEntry: React.FC<EditQueueEntryProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const launchEditPriorityModal = useCallback(() => {
     const dispose = showModal('edit-queue-entry-status-modal', {
       closeModal: () => dispose(),
@@ -23,10 +24,11 @@ export const EditQueueEntry: React.FC<EditQueueEntryProps> = ({ queueEntry }) =>
     <Button
       className={styles.editStatusBtn}
       onClick={launchEditPriorityModal}
+      size={isTablet ? 'sm' : 'md'}
       iconDescription={t('movePatientToNextService', 'Move patient to next service')}
       renderIcon={(props) => <Edit className={styles.editStatusIcon} size={16} {...props} />}
     >
-      {t('movePatientToNextService', 'Move patient to next service')}
+      {isTablet ? t('movePatient', 'Move patient') : t('movePatientToNextService', 'Move patient to next service')}
     </Button>
   );
 };

@@ -7,6 +7,8 @@
   "attachmentCaptionInstruction": "Enter caption",
   "attachments": "Attachments",
   "Attachments": "Attachments",
+  "attachmentsInLowerCase": "attachments",
+  "attachmentsInProperFormat": "Attachments",
   "cameraError": "Camera Error",
   "cancel": "Cancel",
   "changeImage": "Change image",

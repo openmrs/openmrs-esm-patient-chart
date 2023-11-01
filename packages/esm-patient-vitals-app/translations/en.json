@@ -6,6 +6,7 @@
   "bp": "BP",
   "calculatedBmi": "BMI (calc.)",
   "checkForValidity": "Some of the values entered are invalid",
+  "date": "Date",
   "diastolic": "diastolic",
   "discard": "Discard",
   "error": "Error",
