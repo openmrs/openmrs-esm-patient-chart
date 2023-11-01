@@ -26,6 +26,7 @@ interface ResponsiveWrapperProps {
   children: React.ReactNode;
   isTablet: boolean;
 }
+
 interface VitalsBiometricInputProps {
   control: Control<VitalsBiometricsFormData>;
   muacColorCode?: string;
@@ -69,14 +70,14 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [invalid, setInvalid] = useState(false);
-  const [isFocused, setFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleFocus = () => {
-    setFocused(true);
+    setIsFocused(true);
   };
 
   const handleBlur = () => {
-    setFocused(false);
+    setIsFocused(false);
   };
 
   const isFlaggedCritical =
@@ -100,8 +101,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   });
 
   const textInputClasses = classNames(styles.textInputContainer, {
-    [styles.focused]: isFocused,
     [styles['critical-value']]: !isFocused && isFlaggedCritical,
+    [styles.focused]: isFocused,
+    [styles.readonly]: readOnly,
     [muacColorCode]: useMuacColors,
     [errorMessageClass]: true,
   });
@@ -134,7 +136,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                         <NumberInput
                           allowEmpty
                           className={`${styles.textInput} ${val.className}`}
-                          defaultValue="--"
+                          defaultValue={''}
                           disableWheel
                           hideSteppers
                           id={val.name + 'input'}

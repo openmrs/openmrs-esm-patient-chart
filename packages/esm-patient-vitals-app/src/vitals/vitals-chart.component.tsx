@@ -42,7 +42,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
     {
       id: 'oxygenSaturation',
-      title: withUnit(t('spo2', 'SPO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
+      title: withUnit(t('spo2', 'SpO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
       value: 'spo2',
     },
     {
@@ -52,7 +52,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
     {
       id: 'respiratoryRate',
-      title: withUnit(t('respiratoryRate', 'R. Rate'), conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
+      title: withUnit(t('respiratoryRate', 'R. rate'), conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
       value: 'respiratoryRate',
     },
     {

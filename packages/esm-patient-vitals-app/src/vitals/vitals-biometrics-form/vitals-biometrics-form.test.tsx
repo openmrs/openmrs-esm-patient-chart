@@ -192,7 +192,7 @@ describe('VitalsBiometricsForm', () => {
     );
   });
 
-  it('renders an error notification if there was a problem saving vital biometrics', async () => {
+  it('renders an error notification if there was a problem saving vitals and biometrics', async () => {
     const user = userEvent.setup();
 
     const error = {

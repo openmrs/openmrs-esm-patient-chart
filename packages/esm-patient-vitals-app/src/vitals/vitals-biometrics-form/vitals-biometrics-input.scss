@@ -225,3 +225,15 @@
     }
   }
 }
+
+.readonly {
+  cursor: default;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .readonly {
+  background-color: colors.$gray-10;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .readonly {
+  background-color: colors.$white-0;
+}

@@ -1,7 +1,8 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
+import { assessValue, getReferenceRangesForConcept } from '../vitals.resource';
 import VitalsBiometricsInput from './vitals-biometrics-input.component';
-import userEvent from '@testing-library/user-event';
 
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
@@ -55,44 +56,347 @@ jest.mock('react-hook-form', () => ({
   }),
 }));
 
+const mockConceptMetadata = [
+  {
+    uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Systolic blood pressure',
+    hiNormal: 140,
+    hiAbsolute: 250,
+    hiCritical: 180,
+    lowNormal: 100,
+    lowAbsolute: 0,
+    lowCritical: 85,
+    units: 'mmHg',
+  },
+  {
+    uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Diastolic blood pressure',
+    hiNormal: 90,
+    hiAbsolute: 150,
+    hiCritical: 120,
+    lowNormal: 55,
+    lowAbsolute: 0,
+    lowCritical: 40,
+    units: 'mmHg',
+  },
+  {
+    uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Temperature (c)',
+    hiNormal: null,
+    hiAbsolute: 43,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: 25,
+    lowCritical: null,
+    units: 'DEG C',
+  },
+  {
+    uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Height (cm)',
+    hiNormal: null,
+    hiAbsolute: 272,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: 10,
+    lowCritical: null,
+    units: 'cm',
+  },
+  {
+    uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Weight (kg)',
+    hiNormal: null,
+    hiAbsolute: 250,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: 0,
+    lowCritical: null,
+    units: 'kg',
+  },
+  {
+    uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Pulse',
+    hiNormal: 100,
+    hiAbsolute: 230,
+    hiCritical: 130,
+    lowNormal: 55,
+    lowAbsolute: 0,
+    lowCritical: 49,
+    units: 'beats/min',
+  },
+  {
+    uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Arterial blood oxygen saturation (pulse oximeter)',
+    hiNormal: null,
+    hiAbsolute: 100,
+    hiCritical: null,
+    lowNormal: 95,
+    lowAbsolute: 0,
+    lowCritical: 90,
+    units: '%',
+  },
+  {
+    uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Mid-upper arm circumference',
+    hiNormal: null,
+    hiAbsolute: null,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: null,
+    lowCritical: null,
+    units: 'cm',
+  },
+  {
+    uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Respiratory rate',
+    hiNormal: 18,
+    hiAbsolute: 999,
+    hiCritical: 26,
+    lowNormal: 12,
+    lowAbsolute: 0,
+    lowCritical: 8,
+    units: 'breaths/min',
+  },
+  {
+    uuid: '5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Karnofsky performance score',
+    hiNormal: null,
+    hiAbsolute: null,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: null,
+    lowCritical: null,
+    units: '%',
+  },
+];
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
+      data: new Map([
+        ['5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'mmHg'],
+        ['5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'mmHg'],
+        ['5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'DEG C'],
+        ['5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'cm'],
+        ['5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'kg'],
+        ['5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'beats/min'],
+        ['5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '%'],
+        ['1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'cm'],
+        ['5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'breaths/min'],
+        ['5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '%'],
+      ]),
+      conceptMetadata: [
+        {
+          uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Systolic blood pressure',
+          hiNormal: 140,
+          hiAbsolute: 250,
+          hiCritical: 180,
+          lowNormal: 100,
+          lowAbsolute: 0,
+          lowCritical: 85,
+          units: 'mmHg',
+        },
+        {
+          uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Diastolic blood pressure',
+          hiNormal: 90,
+          hiAbsolute: 150,
+          hiCritical: 120,
+          lowNormal: 55,
+          lowAbsolute: 0,
+          lowCritical: 40,
+          units: 'mmHg',
+        },
+        {
+          uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Temperature (c)',
+          hiNormal: null,
+          hiAbsolute: 43,
+          hiCritical: null,
+          lowNormal: null,
+          lowAbsolute: 25,
+          lowCritical: null,
+          units: 'DEG C',
+        },
+        {
+          uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Height (cm)',
+          hiNormal: null,
+          hiAbsolute: 272,
+          hiCritical: null,
+          lowNormal: null,
+          lowAbsolute: 10,
+          lowCritical: null,
+          units: 'cm',
+        },
+        {
+          uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Weight (kg)',
+          hiNormal: null,
+          hiAbsolute: 250,
+          hiCritical: null,
+          lowNormal: null,
+          lowAbsolute: 0,
+          lowCritical: null,
+          units: 'kg',
+        },
+        {
+          uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Pulse',
+          hiNormal: 100,
+          hiAbsolute: 230,
+          hiCritical: 130,
+          lowNormal: 55,
+          lowAbsolute: 0,
+          lowCritical: 49,
+          units: 'beats/min',
+        },
+        {
+          uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Arterial blood oxygen saturation (pulse oximeter)',
+          hiNormal: null,
+          hiAbsolute: 100,
+          hiCritical: null,
+          lowNormal: 95,
+          lowAbsolute: 0,
+          lowCritical: 90,
+          units: '%',
+        },
+        {
+          uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Mid-upper arm circumference',
+          hiNormal: null,
+          hiAbsolute: null,
+          hiCritical: null,
+          lowNormal: null,
+          lowAbsolute: null,
+          lowCritical: null,
+          units: 'cm',
+        },
+        {
+          uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Respiratory rate',
+          hiNormal: 18,
+          hiAbsolute: 999,
+          hiCritical: 26,
+          lowNormal: 12,
+          lowAbsolute: 0,
+          lowCritical: 8,
+          units: 'breaths/min',
+        },
+        {
+          uuid: '5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Karnofsky performance score',
+          hiNormal: null,
+          hiAbsolute: null,
+          hiCritical: null,
+          lowNormal: null,
+          lowAbsolute: null,
+          lowCritical: null,
+          units: '%',
+        },
+      ],
+    })),
+  };
+});
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    useConfig: jest.fn().mockReturnValue({
+      concepts: {
+        pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+    }),
+  };
+});
+
+const testProps = {
+  control: undefined,
+  isWithinNormalRange: true,
+  fields: [],
+  interpretation: undefined,
+  placeholder: '',
+  title: '',
+  unitSymbol: '',
+};
+
 describe('VitalsBiometricsInput', () => {
-  it('should display the correct text input with correct value', async () => {
-    const user = userEvent.setup();
+  it('renders number inputs based correctly on the props provided', () => {
+    testProps.fields = [
+      {
+        id: 'pulse',
+        name: 'Heart rate',
+        type: 'number',
+      },
+    ];
+    testProps.title = 'Heart rate';
+    testProps.unitSymbol = 'bpm';
 
-    render(
-      <VitalsBiometricsInput
-        control={undefined}
-        isWithinNormalRange
-        fields={[
-          {
-            id: 'pulse',
-            name: 'heartRate',
-            type: 'number',
-          },
-        ]}
-        title="Heart Rate"
-        unitSymbol="bpm"
-      />,
-    );
+    renderVitalsBiometricsInput();
 
-    expect(screen.getByText(/Heart Rate/i)).toBeInTheDocument();
+    const heartRateInput = screen.getByRole('spinbutton', { name: /heart rate/i });
+    expect(heartRateInput).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('--')).toBeInTheDocument();
+    expect(screen.getByTitle(/heart rate/i)).toBeInTheDocument();
     expect(screen.getByText(/bpm/i)).toBeInTheDocument();
-    expect(screen.getByRole('spinbutton')).toBeInTheDocument();
-
-    const inputTextBox = await screen.findByRole('spinbutton');
-    await user.type(inputTextBox, '75');
   });
 
-  it('should display the correct text area with correct value', async () => {
-    render(
-      <VitalsBiometricsInput
-        control={undefined}
-        isWithinNormalRange
-        fields={[{ id: 'generalPatientNote', name: 'Notes', type: 'textArea' }]}
-        title="Notes"
-      />,
-    );
+  it('renders textarea inputs correctly based on the props provided', () => {
+    testProps.fields = [
+      {
+        id: 'generalPatientNote',
+        name: 'Notes',
+        type: 'textArea',
+      },
+    ];
+    testProps.placeholder = 'Type any additional notes here';
+    testProps.title = 'Notes';
 
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    renderVitalsBiometricsInput();
+
+    const noteInput = screen.getByRole('textbox', { name: /notes/i });
+    expect(noteInput).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/type any additional notes here/i)).toBeInTheDocument();
+    expect(screen.getByTitle(/notes/i)).toBeInTheDocument();
+  });
+
+  it('should validate the input based on the provided interpretation and reference range values', () => {
+    const config = useConfig();
+
+    testProps.fields = [
+      {
+        id: 'pulse',
+        name: 'Heart rate',
+        min: 0,
+        max: 230,
+        type: 'number',
+      },
+    ];
+    testProps.interpretation = assessValue(
+      300,
+      getReferenceRangesForConcept(config.concepts.pulseUuid, mockConceptMetadata),
+    );
+    testProps.title = 'Heart rate';
+    testProps.unitSymbol = 'bpm';
+
+    renderVitalsBiometricsInput();
+
+    screen.findByRole('spinbutton');
+
+    expect(screen.getByRole('spinbutton', { name: /heart rate/i })).toBeInTheDocument();
+    const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
+    expect(abnormalValueFlag).toBeInTheDocument();
+    const criticallyHighFlag = abnormalValueFlag.querySelector('span.critically-high');
+    expect(criticallyHighFlag).toBeInTheDocument();
   });
 });
+
+function renderVitalsBiometricsInput() {
+  render(<VitalsBiometricsInput {...testProps} />);
+}
