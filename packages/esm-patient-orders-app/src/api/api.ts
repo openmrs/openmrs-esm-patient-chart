@@ -135,3 +135,15 @@ export function useOrderEncounter(patientUuid: string): {
   }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
   return results;
 }
+
+export function useOrderTypes() {
+  const orderTypesUrl = `/ws/rest/v1/ordertype`;
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse, Error>(orderTypesUrl, openmrsFetch);
+
+  return {
+    data: data?.data?.results,
+    error,
+    isLoading,
+    isValidating,
+  };
+}

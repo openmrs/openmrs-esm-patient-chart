@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "start": "openmrs develop --sources packages/esm-patient-orders-app/",
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",

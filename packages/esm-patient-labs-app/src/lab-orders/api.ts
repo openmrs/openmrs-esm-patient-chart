@@ -13,7 +13,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  */
 export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
   const { labOrderTypeUuid: labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
-  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
+  const ordersUrl = `/ws/rest/v1/order?v=full&patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -32,6 +32,8 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
         : null,
     [data],
   );
+
+  console.log('labOrders', labOrders);
 
   return {
     data: data ? labOrders : null,
