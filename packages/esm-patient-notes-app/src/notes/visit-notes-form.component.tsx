@@ -45,9 +45,7 @@ import styles from './visit-notes-form.scss';
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
-  primaryDiagnosisSearch: z.string({
-    required_error: 'Choose at least one primary diagnosis',
-  }),
+  primaryDiagnosisSearch: z.string().optional(),
   secondaryDiagnosisSearch: z.string().optional(),
   clinicalNote: z.string().optional(),
 });
@@ -178,11 +176,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     (data: VisitNotesFormData, event: SyntheticEvent) => {
       const { noteDate, clinicalNote } = data;
       setIsHandlingSubmit(true);
-
-      if (!selectedPrimaryDiagnoses.length) {
-        setIsHandlingSubmit(false);
-        return;
-      }
 
       let visitNotePayload: VisitNotePayload = {
         encounterDatetime: dayjs(noteDate).format(),
