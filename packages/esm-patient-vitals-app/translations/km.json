@@ -1,4 +1,5 @@
 {
+  "abnormalValue": "Abnormal value",
   "add": "បន្ថែម",
   "additionalNoteText": "វាយបញ្ចូលកំណត់ចំណាំបន្ថែមនៅទីនេះ",
   "bloodPressure": "សម្ពាធឈាម",
@@ -19,7 +20,6 @@
   "muac": "រង្វង់ដើមដៃពាក់ផ្នែកខាងលើ(MUAC)",
   "noDataRecorded": "មិនមានទិន្នន័យត្រូវបានកត់ត្រាសម្រាប់អ្នកជំងឺនេះទេ",
   "notes": "កំណត់សម្គាល់",
-  "numericInputError": "ត្រូវតែជាលេខ",
   "other": "ផ្សេងៗ",
   "overdue": "ហួសពេលកំណត់",
   "oxygenSaturation": "ការឆ្អែតអុកស៊ីសែន",
@@ -32,7 +32,7 @@
   "respirationRate": "ចង្វាក់ដង្ហើម",
   "respiratoryRate": "ចង្វាក់ដង្ហើម",
   "saveAndClose": "រក្សាទុក និងបិទ",
-  "seeAll": "ឃើញ​ទាំងអស់",
+  "seeAll": "ឃើញទាំងអស់",
   "spo2": "កំហាប់អុកស៊ីសែន",
   "systolic": "ស៊ីស្តូលិក",
   "temp": "សីតុណ្ហភាព",

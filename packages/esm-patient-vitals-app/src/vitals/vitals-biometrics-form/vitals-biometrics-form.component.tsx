@@ -31,10 +31,10 @@ import {
   savePatientVitals,
   useVitals,
 } from '../vitals.resource';
-import VitalsBiometricInput from './vitals-biometrics-input.component';
+import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
 
-const vitalsBiometricsFormSchema = z
+const VitalsAndBiometricFormSchema = z
   .object({
     systolicBloodPressure: z.number(),
     diastolicBloodPressure: z.number(),
@@ -59,9 +59,9 @@ const vitalsBiometricsFormSchema = z
     },
   );
 
-export type VitalsBiometricsFormData = z.infer<typeof vitalsBiometricsFormSchema>;
+export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
 
-const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -73,15 +73,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { currentVisit } = useVisit(patientUuid);
   const { mutate } = useVitals(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
+  const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
 
   const { control, handleSubmit, watch, setValue } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
-    resolver: zodResolver(vitalsBiometricsFormSchema),
+    resolver: zodResolver(VitalsAndBiometricFormSchema),
   });
 
   const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
@@ -100,6 +100,19 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   useEffect(() => {
     getMuacColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
   }, [watch, patient.patient?.birthDate, midUpperArmCircumference]);
+
+  useEffect(() => {
+    if (height && weight) {
+      const computedBodyMassIndex = calculateBodyMassIndex(weight, height);
+      setValue('computedBodyMassIndex', computedBodyMassIndex);
+    }
+  }, [weight, height, setValue]);
+
+  function onError(err) {
+    if (err?.oneFieldRequired) {
+      setShowErrorNotification(true);
+    }
+  }
 
   const concepts = useMemo(
     () => ({
@@ -128,33 +141,31 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   );
 
   const savePatientVitalsAndBiometrics = (data: VitalsBiometricsFormData) => {
+    const formData = data;
     setShowErrorMessage(true);
-    data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
-    const patientVitalAndBiometrics = data;
+    setShowErrorNotification(false);
 
-    let isFieldValid = true;
-    for (const key in patientVitalAndBiometrics) {
-      if (
-        isValueWithinReferenceRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) ==
-        false
-      ) {
-        setHasInvalidVitals(true);
-        isFieldValid = false;
-        break;
-      }
-    }
-    if (isFieldValid) {
+    data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
+
+    let allFieldsAreValid = false;
+
+    allFieldsAreValid = Object.entries(formData)
+      .filter(([, value]) => Boolean(value))
+      .every(([key, value]) => isValueWithinReferenceRange(conceptMetadata, config.concepts[`${key}Uuid`], value));
+
+    if (allFieldsAreValid) {
       setIsSubmitting(true);
       setShowErrorMessage(false);
-      const ac = new AbortController();
+      const abortController = new AbortController();
+
       savePatientVitals(
         config.vitals.encounterTypeUuid,
         config.vitals.formUuid,
         config.concepts,
         patientUuid,
-        patientVitalAndBiometrics,
+        formData,
         new Date(),
-        ac,
+        abortController,
         session?.sessionLocation?.uuid,
       )
         .then((response) => {
@@ -183,17 +194,10 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           });
         })
         .finally(() => {
-          ac.abort();
+          abortController.abort();
         });
     }
   };
-
-  useEffect(() => {
-    if (height && weight) {
-      const computedBodyMassIndex = calculateBodyMassIndex(weight, height);
-      setValue('computedBodyMassIndex', computedBodyMassIndex);
-    }
-  }, [weight, height, setValue]);
 
   if (config.vitals.useFormEngine) {
     return (
@@ -213,12 +217,6 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     );
   }
 
-  const onError = (err) => {
-    if (err?.oneFieldRequired) {
-      setShowErrorNotification(true);
-    }
-  };
-
   return (
     <Form className={styles.form}>
       <div className={styles.grid}>
@@ -228,9 +226,9 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           </Column>
           <Row className={styles.row}>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     id: 'temperature',
                     max: concepts.temperatureRange.highAbsolute,
@@ -239,24 +237,27 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     type: 'number',
                   },
                 ]}
-                interpretation={assessValue(
-                  temperature,
-                  getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['temperatureUuid'],
-                  temperature,
-                )}
+                interpretation={
+                  temperature &&
+                  assessValue(
+                    temperature,
+                    getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
+                  )
+                }
+                isValueWithinReferenceRange={
+                  temperature
+                    ? isValueWithinReferenceRange(conceptMetadata, config.concepts['temperatureUuid'], temperature)
+                    : true
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('temperature', 'Temperature')}
+                label={t('temperature', 'Temperature')}
                 unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('systolic', 'systolic'),
                     separator: '/',
@@ -273,13 +274,19 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'diastolicBloodPressure',
                   },
                 ]}
-                interpretation={interpretBloodPressure(
-                  systolicBloodPressure,
-                  diastolicBloodPressure,
-                  config.concepts,
-                  conceptMetadata,
-                )}
-                isWithinNormalRange={
+                interpretation={
+                  systolicBloodPressure &&
+                  diastolicBloodPressure &&
+                  interpretBloodPressure(
+                    systolicBloodPressure,
+                    diastolicBloodPressure,
+                    config.concepts,
+                    conceptMetadata,
+                  )
+                }
+                isValueWithinReferenceRange={
+                  systolicBloodPressure &&
+                  diastolicBloodPressure &&
                   isValueWithinReferenceRange(
                     conceptMetadata,
                     config.concepts.systolicBloodPressureUuid,
@@ -291,14 +298,14 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     diastolicBloodPressure,
                   )
                 }
-                title={t('bloodPressure', 'Blood pressure')}
+                label={t('bloodPressure', 'Blood pressure')}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('pulse', 'Pulse'),
                     type: 'number',
@@ -307,19 +314,20 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'pulse',
                   },
                 ]}
-                interpretation={assessValue(
-                  pulse,
-                  getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(conceptMetadata, config.concepts['pulseUuid'], pulse)}
-                title={t('heartRate', 'Heart rate')}
+                interpretation={
+                  pulse && assessValue(pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata))
+                }
+                isValueWithinReferenceRange={
+                  pulse && isValueWithinReferenceRange(conceptMetadata, config.concepts['pulseUuid'], pulse)
+                }
+                label={t('heartRate', 'Heart rate')}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('respirationRate', 'Respiration rate'),
                     type: 'number',
@@ -328,24 +336,26 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'respiratoryRate',
                   },
                 ]}
-                interpretation={assessValue(
-                  respiratoryRate,
-                  getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['respiratoryRateUuid'],
-                  respiratoryRate,
-                )}
+                interpretation={
+                  respiratoryRate &&
+                  assessValue(
+                    respiratoryRate,
+                    getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptMetadata),
+                  )
+                }
+                isValueWithinReferenceRange={
+                  respiratoryRate &&
+                  isValueWithinReferenceRange(conceptMetadata, config.concepts['respiratoryRateUuid'], respiratoryRate)
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('respirationRate', 'Respiration rate')}
+                label={t('respirationRate', 'Respiration rate')}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('oxygenSaturation', 'Oxygen saturation'),
                     type: 'number',
@@ -354,17 +364,23 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'oxygenSaturation',
                   },
                 ]}
-                interpretation={assessValue(
-                  oxygenSaturation,
-                  getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['oxygenSaturationUuid'],
-                  oxygenSaturation,
-                )}
+                interpretation={
+                  oxygenSaturation &&
+                  assessValue(
+                    oxygenSaturation,
+                    getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptMetadata),
+                  )
+                }
+                isValueWithinReferenceRange={
+                  oxygenSaturation &&
+                  isValueWithinReferenceRange(
+                    conceptMetadata,
+                    config.concepts['oxygenSaturationUuid'],
+                    oxygenSaturation,
+                  )
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('spo2', 'SpO2')}
+                label={t('spo2', 'SpO2')}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
               />
             </Column>
@@ -372,18 +388,18 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
 
           <Row className={styles.row}>
             <Column className={styles.noteInput}>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
                 fieldWidth={isTablet ? '70%' : '100%'}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('notes', 'Notes'),
-                    type: 'textArea',
+                    type: 'textarea',
                     id: 'generalPatientNote',
                   },
                 ]}
                 placeholder={t('additionalNoteText', 'Type any additional notes here')}
-                title={t('notes', 'Notes')}
+                label={t('notes', 'Notes')}
               />
             </Column>
           </Row>
@@ -394,9 +410,9 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           </Column>
           <Row className={styles.row}>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('weight', 'Weight'),
                     type: 'number',
@@ -405,24 +421,22 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'weight',
                   },
                 ]}
-                interpretation={assessValue(
-                  weight,
-                  getReferenceRangesForConcept(config.concepts.weightUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['weightUuid'],
-                  weight,
-                )}
+                interpretation={
+                  weight &&
+                  assessValue(weight, getReferenceRangesForConcept(config.concepts.weightUuid, conceptMetadata))
+                }
+                isValueWithinReferenceRange={
+                  height && isValueWithinReferenceRange(conceptMetadata, config.concepts['weightUuid'], weight)
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('weight', 'Weight')}
+                label={t('weight', 'Weight')}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('height', 'Height'),
                     type: 'number',
@@ -431,24 +445,22 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     id: 'height',
                   },
                 ]}
-                interpretation={assessValue(
-                  height,
-                  getReferenceRangesForConcept(config.concepts.heightUuid, conceptMetadata),
-                )}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['heightUuid'],
-                  height,
-                )}
+                interpretation={
+                  height &&
+                  assessValue(height, getReferenceRangesForConcept(config.concepts.heightUuid, conceptMetadata))
+                }
+                isValueWithinReferenceRange={
+                  weight && isValueWithinReferenceRange(conceptMetadata, config.concepts['heightUuid'], height)
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('height', 'Height')}
+                label={t('height', 'Height')}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('bmi', 'BMI'),
                     type: 'number',
@@ -456,14 +468,14 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 readOnly
-                title={t('calculatedBmi', 'BMI (calc.)')}
+                label={t('calculatedBmi', 'BMI (calc.)')}
                 unitSymbol={biometricsUnitsSymbols['bmiUnit']}
               />
             </Column>
             <Column>
-              <VitalsBiometricInput
+              <VitalsAndBiometricsInput
                 control={control}
-                fields={[
+                fieldProperties={[
                   {
                     name: t('muac', 'MUAC'),
                     type: 'number',
@@ -473,42 +485,47 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 muacColorCode={muacColorCode}
-                isWithinNormalRange={isValueWithinReferenceRange(
-                  conceptMetadata,
-                  config.concepts['midUpperArmCircumferenceUuid'],
-                  midUpperArmCircumference,
-                )}
+                isValueWithinReferenceRange={
+                  height &&
+                  weight &&
+                  isValueWithinReferenceRange(
+                    conceptMetadata,
+                    config.concepts['midUpperArmCircumferenceUuid'],
+                    midUpperArmCircumference,
+                  )
+                }
                 showErrorMessage={showErrorMessage}
-                title={t('muac', 'MUAC')}
+                label={t('muac', 'MUAC')}
                 unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
                 useMuacColors={useMuacColorStatus}
               />
             </Column>
           </Row>
-          <Row>
-            {showErrorNotification && (
-              <Column>
-                <InlineNotification
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
-                  onClose={() => setShowErrorNotification(false)}
-                />
-              </Column>
-            )}
-            {hasInvalidVitals && (
-              <Column>
-                <InlineNotification
-                  className={styles.errorNotification}
-                  lowContrast={false}
-                  title={t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics')}
-                  subtitle={t('checkForValidity', 'Some of the values entered are invalid')}
-                />
-              </Column>
-            )}
-          </Row>
         </Stack>
       </div>
+
+      {showErrorNotification && (
+        <Column className={styles.errorContainer}>
+          <InlineNotification
+            lowContrast
+            title={t('error', 'Error')}
+            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+            onClose={() => setShowErrorNotification(false)}
+          />
+        </Column>
+      )}
+
+      {hasInvalidVitals && (
+        <Column className={styles.errorContainer}>
+          <InlineNotification
+            className={styles.errorNotification}
+            lowContrast={false}
+            title={t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics')}
+            subtitle={t('checkForValidity', 'Some of the values entered are invalid')}
+          />
+        </Column>
+      )}
+
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
@@ -527,4 +544,4 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   );
 };
 
-export default VitalsAndBiometricForms;
+export default VitalsAndBiometricsForm;

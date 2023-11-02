@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { assessValue, getReferenceRangesForConcept } from '../vitals.resource';
-import VitalsBiometricsInput from './vitals-biometrics-input.component';
+import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
@@ -319,23 +319,23 @@ jest.mock('@openmrs/esm-framework', () => {
 const testProps = {
   control: undefined,
   isWithinNormalRange: true,
-  fields: [],
+  fieldProperties: [],
   interpretation: undefined,
   placeholder: '',
-  title: '',
+  label: '',
   unitSymbol: '',
 };
 
-describe('VitalsBiometricsInput', () => {
+describe('VitalsAndBiometricsInput', () => {
   it('renders number inputs based correctly on the props provided', () => {
-    testProps.fields = [
+    testProps.fieldProperties = [
       {
         id: 'pulse',
         name: 'Heart rate',
         type: 'number',
       },
     ];
-    testProps.title = 'Heart rate';
+    testProps.label = 'Heart rate';
     testProps.unitSymbol = 'bpm';
 
     renderVitalsBiometricsInput();
@@ -348,15 +348,15 @@ describe('VitalsBiometricsInput', () => {
   });
 
   it('renders textarea inputs correctly based on the props provided', () => {
-    testProps.fields = [
+    testProps.fieldProperties = [
       {
         id: 'generalPatientNote',
         name: 'Notes',
-        type: 'textArea',
+        type: 'textarea',
       },
     ];
     testProps.placeholder = 'Type any additional notes here';
-    testProps.title = 'Notes';
+    testProps.label = 'Notes';
 
     renderVitalsBiometricsInput();
 
@@ -369,7 +369,7 @@ describe('VitalsBiometricsInput', () => {
   it('should validate the input based on the provided interpretation and reference range values', () => {
     const config = useConfig();
 
-    testProps.fields = [
+    testProps.fieldProperties = [
       {
         id: 'pulse',
         name: 'Heart rate',
@@ -382,7 +382,7 @@ describe('VitalsBiometricsInput', () => {
       300,
       getReferenceRangesForConcept(config.concepts.pulseUuid, mockConceptMetadata),
     );
-    testProps.title = 'Heart rate';
+    testProps.label = 'Heart rate';
     testProps.unitSymbol = 'bpm';
 
     renderVitalsBiometricsInput();
@@ -392,11 +392,10 @@ describe('VitalsBiometricsInput', () => {
     expect(screen.getByRole('spinbutton', { name: /heart rate/i })).toBeInTheDocument();
     const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
     expect(abnormalValueFlag).toBeInTheDocument();
-    const criticallyHighFlag = abnormalValueFlag.querySelector('span.critically-high');
-    expect(criticallyHighFlag).toBeInTheDocument();
+    expect(abnormalValueFlag).toHaveClass('critically-high');
   });
 });
 
 function renderVitalsBiometricsInput() {
-  render(<VitalsBiometricsInput {...testProps} />);
+  render(<VitalsAndBiometricsInput {...testProps} />);
 }

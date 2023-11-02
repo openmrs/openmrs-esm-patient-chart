@@ -1,107 +1,108 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useId, useState } from 'react';
 import classNames from 'classnames';
-import { Control, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
 import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
 import { generatePlaceholder } from '../vitals.resource';
+import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
 import styles from './vitals-biometrics-input.scss';
 
 type fieldId =
-  | 'systolicBloodPressure'
+  | 'computedBodyMassIndex'
   | 'diastolicBloodPressure'
-  | 'respiratoryRate'
-  | 'oxygenSaturation'
-  | 'pulse'
-  | 'temperature'
   | 'generalPatientNote'
-  | 'weight'
   | 'height'
   | 'midUpperArmCircumference'
-  | 'computedBodyMassIndex';
+  | 'oxygenSaturation'
+  | 'pulse'
+  | 'respiratoryRate'
+  | 'systolicBloodPressure'
+  | 'temperature'
+  | 'weight';
+
+type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';
+type FieldTypes = 'number' | 'textarea';
 
 interface ResponsiveWrapperProps {
   children: React.ReactNode;
   isTablet: boolean;
 }
 
-interface VitalsBiometricInputProps {
+interface VitalsAndBiometricsInputProps {
   control: Control<VitalsBiometricsFormData>;
-  muacColorCode?: string;
+  fieldStyles?: React.CSSProperties;
+  fieldWidth?: string;
+  fieldProperties: Array<{
+    className?: string;
+    id: fieldId;
+    invalid?: boolean;
+    max?: number | null;
+    min?: number | null;
+    name: string;
+    separator?: string;
+    type?: FieldTypes;
+  }>;
   interpretation?: string;
-  isWithinNormalRange?: boolean;
+  isValueWithinReferenceRange?: boolean;
+  label: string;
+  muacColorCode?: string;
   placeholder?: string;
   readOnly?: boolean;
   showErrorMessage?: boolean;
-  fieldStyles?: React.CSSProperties;
-  fieldWidth?: string;
-  fields: Array<{
-    id: fieldId;
-    name: string;
-    separator?: string;
-    type?: string | 'text';
-    className?: string;
-    invalid?: boolean;
-    min?: number | null;
-    max?: number | null;
-  }>;
-  title: string;
-  useMuacColors?: boolean;
   unitSymbol?: string;
+  useMuacColors?: boolean;
 }
 
-const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
+const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   control,
+  fieldProperties,
+  fieldStyles,
+  fieldWidth,
   interpretation,
-  isWithinNormalRange = true,
+  isValueWithinReferenceRange = true,
+  label,
   muacColorCode,
   placeholder,
   readOnly,
   showErrorMessage,
-  fields,
-  fieldStyles,
-  fieldWidth,
-  title,
   unitSymbol,
   useMuacColors,
 }) => {
   const { t } = useTranslation();
+  const fieldId = useId();
   const isTablet = useLayoutType() === 'tablet';
   const [invalid, setInvalid] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
+  const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
 
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
-  const isFlaggedCritical =
-    interpretation && ['critically_low', 'critically_high', 'high', 'low'].includes(interpretation);
+  const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
   function checkValidity(value, onChange) {
     setInvalid(!(Number(value) || value === ''));
 
     if (!invalid) {
-      onChange(Number(value));
+      onChange(value === '' ? undefined : Number(value));
     }
   }
 
-  const isInvalidInput = !isWithinNormalRange || invalid;
-  const showInvalidInputError = showErrorMessage && isInvalidInput;
+  function handleFocusChange(isFocused: boolean) {
+    setIsFocused(isFocused);
+  }
+
+  const isInvalidInput = !isValueWithinReferenceRange || invalid;
+  const showInvalidInputError = Boolean(showErrorMessage && isInvalidInput);
   const errorMessageClass = showInvalidInputError ? styles.invalidInput : '';
 
-  const containerClasses = classNames(styles.inputContainer, {
+  const containerClasses = classNames(styles.container, {
     [styles.inputInTabletView]: isTablet,
-    [styles.isCriticalInput]: !isFocused && isFlaggedCritical,
+    [styles.inputWithAbnormalValue]: hasAbnormalValue,
   });
 
-  const textInputClasses = classNames(styles.textInputContainer, {
-    [styles['critical-value']]: !isFocused && isFlaggedCritical,
+  const inputClasses = classNames(styles.inputContainer, {
+    [styles['critical-value']]: hasAbnormalValue,
     [styles.focused]: isFocused,
     [styles.readonly]: readOnly,
     [muacColorCode]: useMuacColors,
@@ -111,100 +112,114 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   return (
     <>
       <div className={containerClasses} style={{ width: fieldWidth }}>
-        <div className={styles.labelAndIcons}>
-          <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
-          {!isFocused && isFlaggedCritical ? (
-            <div title="abnormal value">
-              <span className={styles[interpretation.replace('_', '-')]} />
-            </div>
-          ) : showInvalidInputError ? (
-            <div className={styles.invalidInputIcon}>
-              <Warning />
-            </div>
+        <section className={styles.labelContainer}>
+          <span className={styles.label}>{label}</span>
+
+          {Boolean(hasAbnormalValue) ? (
+            <span className={styles[interpretation.replace('_', '-')]} title={t('abnormalValue', 'Abnormal value')} />
           ) : null}
-        </div>
-        <div className={textInputClasses} style={{ ...fieldStyles }}>
-          <div className={styles.centerDiv}>
-            {fields.map((val, i) => {
-              return val.type === 'number' ? (
-                <Fragment key={`${val.name}-${i}-number-input`}>
-                  <ResponsiveWrapper isTablet={isTablet}>
+
+          {showInvalidInputError ? (
+            <span className={styles.invalidInputIcon}>
+              <Warning />
+            </span>
+          ) : null}
+        </section>
+        <section className={inputClasses} style={{ ...fieldStyles }}>
+          <div className={styles.centered}>
+            {fieldProperties.map((fieldProperty) => {
+              if (fieldProperty.type === 'number') {
+                const numberInputClasses = classNames(styles.numberInput, fieldProperty.className);
+
+                return (
+                  <Fragment key={fieldProperty.id}>
+                    <ResponsiveWrapper isTablet={isTablet}>
+                      <Controller
+                        name={fieldProperty.id}
+                        control={control}
+                        render={({ field: { onChange, ref, value } }) => {
+                          return (
+                            <NumberInput
+                              allowEmpty
+                              className={numberInputClasses}
+                              defaultValue={''}
+                              disableWheel
+                              hideSteppers
+                              id={`${fieldId}-${fieldProperty.id}`}
+                              max={fieldProperty.max}
+                              min={fieldProperty.min}
+                              name={fieldProperty.name}
+                              onBlur={() => handleFocusChange(false)}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                checkValidity(event.target.value, onChange)
+                              }
+                              onFocus={() => handleFocusChange(true)}
+                              placeholder={generatePlaceholder(fieldProperty.name)}
+                              readOnly={readOnly}
+                              ref={ref}
+                              style={{ ...fieldStyles }}
+                              title={fieldProperty.name}
+                              type={fieldProperty.type}
+                              value={value}
+                            />
+                          );
+                        }}
+                      />
+                    </ResponsiveWrapper>
+                    {fieldProperty?.separator}
+                  </Fragment>
+                );
+              }
+
+              if (fieldProperty.type === 'textarea') {
+                return (
+                  <ResponsiveWrapper key={fieldProperty.id} isTablet={isTablet}>
                     <Controller
-                      name={val.id}
+                      name={fieldProperty.id}
                       control={control}
-                      render={({ field: { onChange, value, ref } }) => (
-                        <NumberInput
-                          allowEmpty
-                          className={`${styles.textInput} ${val.className}`}
-                          defaultValue={''}
-                          disableWheel
-                          hideSteppers
-                          id={val.name + 'input'}
-                          label={''}
-                          max={val.max}
-                          min={val.min}
-                          name={val.name}
-                          onBlur={handleBlur}
-                          onChange={(e) => checkValidity(e.target.value, onChange)}
-                          onFocus={handleFocus}
-                          placeholder={generatePlaceholder(val.name)}
-                          readOnly={readOnly}
+                      render={({ field: { onChange, ref, value } }) => (
+                        <TextArea
+                          className={styles.textarea}
+                          id={`${fieldId}-${fieldProperty.id}`}
+                          labelText={''}
+                          maxCount={100}
+                          name={fieldProperty.name}
+                          onBlur={() => handleFocusChange(false)}
+                          onChange={onChange}
+                          onFocus={() => handleFocusChange(true)}
+                          placeholder={placeholder}
                           ref={ref}
+                          rows={2}
                           style={{ ...fieldStyles }}
-                          title={val.name}
-                          type={val.type}
+                          title={fieldProperty.name}
                           value={value}
                         />
                       )}
                     />
                   </ResponsiveWrapper>
-                  {val?.separator}
-                </Fragment>
-              ) : (
-                <ResponsiveWrapper key={`${val.name}-${i}-textarea`} isTablet={isTablet}>
-                  <Controller
-                    name={val.id}
-                    control={control}
-                    render={({ field: { onBlur, onChange, value, ref } }) => (
-                      <TextArea
-                        className={styles.textarea}
-                        id={val.name}
-                        key={val.name + 'textarea'}
-                        labelText={''}
-                        name={val.name}
-                        onBlur={onBlur}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                        ref={ref}
-                        rows={2}
-                        style={{ ...fieldStyles }}
-                        title={val.name}
-                        value={value}
-                      />
-                    )}
-                  />
-                </ResponsiveWrapper>
-              );
+                );
+              }
             })}
           </div>
-          <p className={styles.unitName}>{unitSymbol}</p>
-        </div>
+          {Boolean(unitSymbol) && <p className={styles.unitName}>{unitSymbol}</p>}
+        </section>
       </div>
-      {showInvalidInputError ? (
+
+      {showInvalidInputError && (
         <FormLabel className={styles.invalidInputError}>
           {t('validationInputError', `Value must be between {{min}} and {{max}} {{unitSymbol}}`, {
-            min: fields[0].min,
-            max: fields[0].max,
+            min: fieldProperties[0].min,
+            max: fieldProperties[0].max,
             unitSymbol: unitSymbol,
           })}
         </FormLabel>
-      ) : null}
+      )}
     </>
   );
 };
 
-const ResponsiveWrapper: React.FC<ResponsiveWrapperProps> = ({ children, isTablet }) => {
-  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <>{children}</>;
-};
+function ResponsiveWrapper({ children, isTablet }: ResponsiveWrapperProps) {
+  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <Fragment>{children}</Fragment>;
+}
 
-export default VitalsBiometricInput;
+export default VitalsAndBiometricsInput;

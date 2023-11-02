@@ -15,19 +15,19 @@
   @include type.type-style("heading-04");
 }
 
-.inputContainer {
+.container {
   width: 11.625rem;
   border-bottom: 1px solid $ui-04;
   margin-bottom: spacing.$spacing-03;
 }
 
-.vitalsBiometricInputLabel01 {
+.label {
   @extend .label01;
   color: $text-02;
   margin-bottom: spacing.$spacing-03;
 }
 
-.textInput {
+.numberInput {
   border: none;
   @extend .productiveHeading04;
   text-align: center;
@@ -51,19 +51,18 @@
   }
 }
 
-.textInputContainer {
+.inputContainer {
   @extend .productiveHeading04;
   height: 4.875rem;
   display: flex;
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  padding: spacing.$spacing-03;
   color: $text-02;
   background-color: $ui-01;
 
   &.focused {
-    border: 2px solid colors.$blue-60;
+    outline: 2px solid colors.$blue-60;
 
     input {
       outline: none !important;
@@ -79,11 +78,11 @@
   }
 }
 
-:global(.omrs-breakpoint-lt-desktop) .textInputContainer {
+:global(.omrs-breakpoint-lt-desktop) .inputContainer {
   background-color: $ui-02;
 }
 
-.textInputContainer {
+.inputContainer {
   &:global(.red) {
     background-color: colors.$red-20;
 
@@ -91,6 +90,7 @@
       background-color: colors.$red-20;
     }
   }
+
   &:global(.green) {
     background-color: colors.$green-20;
 
@@ -98,6 +98,7 @@
       background-color: colors.$green-20;
     }
   }
+
   &:global(.yellow) {
     background-color: colors.$yellow-10;
      input {
@@ -106,7 +107,7 @@
   }
 }
 
-.textInput {
+.numberInput {
   svg {
     display: none;
   }
@@ -115,6 +116,7 @@
     outline: none !important;
   }
 }
+
 .textarea {
   border: none;
   @extend .bodyLong01;
@@ -122,10 +124,14 @@
 
   textarea {
     border-bottom: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 
-.centerDiv {
+.centered {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -141,6 +147,7 @@
 }
 
 .invalidInputError {
+  max-width: 11rem;
   color: $danger;
   margin-bottom: spacing.$spacing-03;
 }
@@ -149,7 +156,7 @@
   width: 100%;
 }
 
-.labelAndIcons {
+.labelContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -171,7 +178,7 @@
 
 .critical-value {
   background-color: colors.$red-10;
-  .textInput {
+  .numberInput {
     svg {
       display: none;
     }
@@ -212,11 +219,11 @@
 
 
 .inputInTabletView {
-  &.isCriticalInput {
-    .textInputContainer {
+  &.inputWithAbnormalValue {
+    .inputContainer {
       background-color: colors.$red-20;
 
-      .textInput {
+      .numberInput {
         input {
           background-color: colors.$red-20;
           outline: none;
