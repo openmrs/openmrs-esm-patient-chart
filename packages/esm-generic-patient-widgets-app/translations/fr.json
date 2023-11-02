@@ -1,6 +1,7 @@
 {
   "chartView": "Vue graphique",
-  "dateAndTime": "Date and time",
+  "dateAndTime": "Date et heure",
   "displaying": "En cours d'affichage",
+  "encounterType": "Type de rencontre",
   "tableView": "Vue tabulaire"
 }

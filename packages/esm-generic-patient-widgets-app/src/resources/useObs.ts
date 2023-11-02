@@ -18,35 +18,42 @@ export function useObs(patientUuid: string): UseObsResult {
       data.map((d) => d.concept).join(',') +
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}` +
-      urlEncounterTypes,
+      urlEncounterTypes +
+      '&_include=Observation:encounter',
     openmrsFetch,
   );
 
+  const encounters = getEncountersByResources(result?.data?.entry);
+
   const observations =
-    result?.data?.entry?.map((entry) => {
-      const observation: ObsResult = {
-        ...entry.resource,
-        conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
-      };
+    result?.data?.entry
+      ?.filter((entry) => entry.resource.resourceType === 'Observation')
+      ?.map((entry) => {
+        const observation: ObsResult = {
+          ...entry.resource,
+          conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
+        };
+        observation.encounter.name = encounters.find((e) => e.reference === entry.resource.encounter.reference)
+          ?.display;
 
-      if (entry.resource.hasOwnProperty('valueDateTime')) {
-        observation.dataType = 'DateTime';
-      }
+        if (entry.resource.hasOwnProperty('valueDateTime')) {
+          observation.dataType = 'DateTime';
+        }
 
-      if (entry.resource.hasOwnProperty('valueString')) {
-        observation.dataType = 'Text';
-      }
+        if (entry.resource.hasOwnProperty('valueString')) {
+          observation.dataType = 'Text';
+        }
 
-      if (entry.resource.hasOwnProperty('valueQuantity')) {
-        observation.dataType = 'Number';
-      }
+        if (entry.resource.hasOwnProperty('valueQuantity')) {
+          observation.dataType = 'Number';
+        }
 
-      if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
-        observation.dataType = 'Coded';
-      }
+        if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
+          observation.dataType = 'Coded';
+        }
 
-      return observation;
-    }) ?? [];
+        return observation;
+      }) ?? [];
 
   return {
     data: observations,
@@ -84,4 +91,13 @@ type ObsResult = FHIRResource['resource'] & {
 
 function isUuid(input: string) {
   return input.length === 36;
+}
+
+function getEncountersByResources(resources) {
+  return resources
+    ?.filter((entry) => entry?.resource?.resourceType === 'Encounter')
+    .map((entry) => ({
+      reference: `Encounter/${entry.resource.id}`,
+      display: entry.resource.type?.[0]?.coding?.[0]?.display || '--',
+    }));
 }
