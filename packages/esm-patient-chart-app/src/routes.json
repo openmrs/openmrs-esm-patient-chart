@@ -206,6 +206,13 @@
       },
       "online": true,
       "offline": true
+    },
+    {
+      "name": "visit-overflow-menu",
+      "slot": "visit-detail-overview-actions",
+      "component": "visitOverflowMenu",
+      "online": true,
+      "offline": true
     }
   ],
   "pages": [

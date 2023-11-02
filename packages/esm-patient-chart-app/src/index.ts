@@ -251,3 +251,11 @@ export const currentVisitSummary = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const visitOverflowMenu = getAsyncLifecycle(
+  () => import('./visit/visit-action-items/visit-overflow-menu.component'),
+  {
+    featureName: 'visit-action-items',
+    moduleName,
+  },
+);
