@@ -74,7 +74,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
       <Tile className={styles.emptyState}>
         <div>
           <h4 className={styles.productiveHeading01}>
-            {t('errorFetchingTestTypes', 'Error fetching results for "{searchTerm}"', {
+            {t('errorFetchingTestTypes', 'Error fetching results for "{{searchTerm}}"', {
               searchTerm,
             })}
           </h4>
@@ -93,7 +93,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
           {searchTerm && (
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
-                {t('searchResultsMatchesForTerm', '{count} results for "{searchTerm}"', {
+                {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
                   count: testTypes?.length,
                   searchTerm,
                 })}
@@ -113,7 +113,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
         <Tile className={styles.emptyState}>
           <div>
             <h4 className={styles.productiveHeading01}>
-              {t('noResultsForTestTypeSearch', 'No results to display for "{searchTerm}"', {
+              {t('noResultsForTestTypeSearch', 'No results to display for "{{searchTerm}}"', {
                 searchTerm,
               })}
             </h4>

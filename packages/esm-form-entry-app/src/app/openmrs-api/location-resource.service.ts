@@ -17,7 +17,7 @@ export class LocationResourceService {
   ) {}
 
   public getLocationByUuid(uuid: string): Observable<Location | undefined> {
-    const url = this.getUrl(uuid);
+    const url = this.getLocationByUuidUrl(uuid);
     return this.http.get<Location>(url).pipe(catchError(() => this.getLocationByUuidFallback(uuid)));
   }
 
@@ -26,21 +26,24 @@ export class LocationResourceService {
   }
 
   public searchLocation(searchText: string): Observable<Array<Location>> {
-    return this.getAllLocations().pipe(
-      map((locations) =>
-        locations.filter((location) => location.display.toLowerCase().includes(searchText.toLowerCase())),
-      ),
-    );
+    return this.getAllLocations(searchText);
   }
 
-  private getAllLocations(): Observable<Array<Location>> {
-    const url = this.getUrl();
+  public getAllLocations(searchText?: string): Observable<Array<Location>> {
+    let url = '';
+    searchText ? (url = this.getUrl(searchText)) : (url = this.getUrl());
     return this.http.get<ListResult<Location>>(url).pipe(map((r) => r.results));
   }
 
-  public getUrl(uuid?: string) {
-    return uuid
-      ? this.windowRef.openmrsRestBase + 'location/' + uuid + '?v=' + LocationResourceService.v
-      : this.windowRef.openmrsRestBase + 'location?q=&v=' + LocationResourceService.v;
+  public getLocationByUuidUrl(uuid?: string) {
+    if (uuid) {
+      return this.windowRef.openmrsRestBase + 'location/' + uuid + '?v=' + LocationResourceService.v;
+    }
+  }
+
+  public getUrl(searchText?: string) {
+    return searchText
+      ? this.windowRef.openmrsRestBase + `location?q=${searchText}&v=${LocationResourceService.v}`
+      : this.windowRef.openmrsRestBase + 'location?v=' + LocationResourceService.v;
   }
 }

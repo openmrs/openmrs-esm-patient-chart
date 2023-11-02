@@ -44,11 +44,11 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   );
 
   const tableHeaders = [
-    { key: 'date', header: 'Date and time' },
-    { key: 'weight', header: withUnit('Weight', conceptUnits.get(config.concepts.weightUuid) ?? '') },
-    { key: 'height', header: withUnit('Height', conceptUnits.get(config.concepts.heightUuid) ?? '') },
-    { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.muacUuid) ?? '') },
+    { key: 'date', header: t('dateAndTime', 'Date and time') },
+    { key: 'weight', header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? '') },
+    { key: 'height', header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? '') },
+    { key: 'bmi', header: `${t('bmi', 'BMI')} (${bmiUnit})` },
+    { key: 'muac', header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.muacUuid) ?? '') },
   ];
 
   const tableRows = React.useMemo(

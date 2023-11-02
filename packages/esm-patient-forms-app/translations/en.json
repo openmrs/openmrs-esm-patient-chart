@@ -10,7 +10,7 @@
   "lastCompleted": "Last completed",
   "never": "Never",
   "noFormsToDisplay": "There are no forms to display.",
-  "noMatchingFormsAvailable": "There are no {formCategory} forms to display",
+  "noMatchingFormsAvailable": "There are no {{formCategory}} forms to display",
   "noMatchingFormsToDisplay": "No matching forms to display",
   "offlineForms": "Offline forms",
   "offlineForms__lower": "offline forms",
