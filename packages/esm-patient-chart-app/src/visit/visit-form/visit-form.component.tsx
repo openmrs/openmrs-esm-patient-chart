@@ -37,6 +37,8 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
+  Visit,
+  updateVisit,
 } from '@openmrs/esm-framework';
 import {
   amPm,
@@ -55,6 +57,11 @@ import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 
+interface StartVisitFormProps extends DefaultWorkspaceProps {
+  visitDetails: Visit;
+  showVisitEndDateTimeFields: boolean;
+}
+
 export type VisitFormData = {
   visitDate: Date;
   visitTime: string;
@@ -70,7 +77,13 @@ export type VisitFormData = {
   };
 };
 
-const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const StartVisitForm: React.FC<StartVisitFormProps> = ({
+  patientUuid,
+  closeWorkspace,
+  promptBeforeClosing,
+  visitDetails,
+  showVisitEndDateTimeFields,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
@@ -93,6 +106,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
 
+  const inEditForm = useMemo(() => !!visitDetails?.uuid, [visitDetails]);
+  const displayVisitEndDateTimeFields = useMemo(
+    () => showVisitEndDateTimeFields || visitDetails?.stopDatetime,
+    [showVisitEndDateTimeFields, visitDetails?.stopDatetime],
+  );
   const visitFormSchema = useMemo(() => {
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
       (acc, { uuid, required }) => ({
@@ -112,6 +130,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       visitDate: z.date(),
       visitTime: z.string(),
       timeFormat: z.enum(['PM', 'AM']),
+      visitEndDate: z.date().optional(),
+      visitEndTime: z.string().optional(),
+      visitEndTimeFormat: z.enum(['PM', 'AM']).optional(),
       programType: z.string().optional(),
       visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
       visitLocation: z.object({
@@ -124,16 +145,39 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   type VisitFormData = z.infer<typeof visitFormSchema>;
 
+  const visitFormDefaultValues: VisitFormData = useMemo(() => {
+    const visitStartDateTime = visitDetails?.startDatetime ? new Date(visitDetails?.startDatetime) : new Date();
+    let defaultValues: VisitFormData = {
+      visitDate: visitStartDateTime,
+      visitTime: dayjs(visitStartDateTime).format('hh:mm'),
+      timeFormat: (visitStartDateTime.getHours() >= 12 ? 'PM' : 'AM') as amPm,
+      visitType: visitDetails?.visitType?.uuid,
+      visitLocation: visitDetails?.location ?? sessionLocation ?? {},
+      visitAttributes: visitDetails?.attributes?.reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr?.attributeType?.uuid]: typeof curr.value === 'object' ? curr?.value?.uuid : `${curr.value ?? ''}`,
+        }),
+        {},
+      ),
+    };
+
+    const visitEndDateTime = visitDetails?.stopDatetime ? new Date(visitDetails?.stopDatetime) : null;
+    if (visitEndDateTime) {
+      defaultValues = {
+        ...defaultValues,
+        visitEndDate: visitEndDateTime,
+        visitEndTime: dayjs(visitEndDateTime).format('hh:mm'),
+        visitEndTimeFormat: (visitEndDateTime.getHours() >= 12 ? 'PM' : 'AM') as amPm,
+      };
+    }
+    return defaultValues;
+  }, [visitDetails, sessionLocation]);
+
   const methods = useForm<VisitFormData>({
     mode: 'all',
     resolver: zodResolver(visitFormSchema),
-    defaultValues: {
-      visitDate: new Date(),
-      visitTime: dayjs(new Date()).format('hh:mm'),
-      timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
-      visitLocation: sessionLocation ? sessionLocation : {},
-      visitAttributes: {},
-    },
+    defaultValues: visitFormDefaultValues,
   });
 
   const {
@@ -145,7 +189,17 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
-      const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
+      const {
+        timeFormat,
+        visitDate,
+        visitLocation,
+        visitTime,
+        visitType,
+        visitAttributes,
+        visitEndDate,
+        visitEndTime,
+        visitEndTimeFormat,
+      } = data;
 
       setIsSubmitting(true);
 
@@ -168,8 +222,31 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           })),
       };
 
+      if (inEditForm) {
+        // The request throws 400 (Bad request)error when patient is passed in the update payload
+        delete payload.patient;
+        if (displayVisitEndDateTimeFields) {
+          const [visitEndHours, visitEndMinutes] = convertTime12to24(visitEndTime, visitEndTimeFormat);
+
+          payload.stopDatetime = toDateObjectStrict(
+            toOmrsIsoString(
+              new Date(
+                dayjs(visitEndDate).year(),
+                dayjs(visitEndDate).month(),
+                dayjs(visitEndDate).date(),
+                visitEndHours,
+                visitEndMinutes,
+              ),
+            ),
+          );
+        }
+      }
+
       const abortController = new AbortController();
-      saveVisit(payload, abortController)
+      (visitDetails?.uuid
+        ? updateVisit(visitDetails?.uuid, payload, abortController)
+        : saveVisit(payload, abortController)
+      )
         .pipe(first())
         .subscribe(
           (response) => {
@@ -248,22 +325,30 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   },
                 );
               }
-              mutateVisit();
-              closeWorkspace();
-
-              showToast({
-                critical: true,
-                kind: 'success',
-                description: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                  visit: response?.data?.visitType?.display ?? `Visit`,
-                }),
-                title: t('visitStarted', 'Visit started'),
-              });
             }
+            mutateVisit();
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: !inEditForm
+                ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                  })
+                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                  }),
+              title: !inEditForm
+                ? t('visitStarted', 'Visit started')
+                : t('visitDetailsUpdated', 'Visit details updated'),
+            });
           },
           (error) => {
             showNotification({
-              title: t('startVisitError', 'Error starting visit'),
+              title: !inEditForm
+                ? t('startVisitError', 'Error starting visit')
+                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
               kind: 'error',
               critical: true,
               description: error?.message,
@@ -280,6 +365,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       patientUuid,
       upcomingAppointment,
       t,
+      inEditForm,
+      displayVisitEndDateTimeFields,
     ],
   );
 
@@ -339,7 +426,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                       >
                         <DatePickerInput
                           id="visitStartDateInput"
-                          labelText={t('date', 'Date')}
+                          labelText={
+                            !displayVisitEndDateTimeFields ? t('date', 'Date') : t('visitStartDate', 'Visit start date')
+                          }
                           placeholder="dd/mm/yyyy"
                           style={{ width: '100%' }}
                         />
@@ -354,7 +443,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                     render={({ field: { onBlur, onChange, value } }) => (
                       <TimePicker
                         id="visitStartTime"
-                        labelText={t('time', 'Time')}
+                        labelText={
+                          !displayVisitEndDateTimeFields ? t('time', 'Time') : t('visitStartTime', 'Visit start time')
+                        }
                         onChange={(event) => onChange(event.target.value as amPm)}
                         pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
                         style={{ marginLeft: '0.125rem', flex: 'none' }}
@@ -381,6 +472,67 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   />
                 </ResponsiveWrapper>
               </div>
+              {displayVisitEndDateTimeFields && (
+                <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
+                  <Controller
+                    name="visitEndDate"
+                    control={control}
+                    render={({ field: { onBlur, onChange, value } }) => (
+                      <ResponsiveWrapper isTablet={isTablet}>
+                        <DatePicker
+                          dateFormat="d/m/Y"
+                          datePickerType="single"
+                          id="visitEndDate"
+                          style={{ paddingBottom: '1rem' }}
+                          maxDate={new Date().toISOString()}
+                          onChange={([date]) => onChange(date)}
+                          value={value}
+                        >
+                          <DatePickerInput
+                            id="visitEndDateInput"
+                            labelText={t('visitEndDate', 'Visit end date')}
+                            placeholder="dd/mm/yyyy"
+                            style={{ width: '100%' }}
+                          />
+                        </DatePicker>
+                      </ResponsiveWrapper>
+                    )}
+                  />
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <Controller
+                      name="visitEndTime"
+                      control={control}
+                      render={({ field: { onBlur, onChange, value } }) => (
+                        <TimePicker
+                          id="visitEndTime"
+                          labelText={t('visitEndTime', 'Visit end time')}
+                          onChange={(event) => onChange(event.target.value as amPm)}
+                          pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                          style={{ marginLeft: '0.125rem', flex: 'none' }}
+                          value={value}
+                          onBlur={onBlur}
+                        >
+                          <Controller
+                            name="visitEndTimeFormat"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                              <TimePickerSelect
+                                id="visitEndTimeSelect"
+                                onChange={(event) => onChange(event.target.value as amPm)}
+                                value={value}
+                                aria-label={t('visitEndTimeFormat ', 'Visit end time format')}
+                              >
+                                <SelectItem value="AM" text="AM" />
+                                <SelectItem value="PM" text="PM" />
+                              </TimePickerSelect>
+                            )}
+                          />
+                        </TimePicker>
+                      )}
+                    />
+                  </ResponsiveWrapper>
+                </div>
+              )}
             </section>
 
             {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
@@ -507,7 +659,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             kind="primary"
             type="submit"
           >
-            {t('startVisit', 'Start visit')}
+            {!inEditForm ? t('startVisit', 'Start visit') : t('updateVisitDetails', 'Update visit details')}
           </Button>
         </ButtonSet>
       </Form>
