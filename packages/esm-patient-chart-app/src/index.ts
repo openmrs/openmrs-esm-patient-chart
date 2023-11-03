@@ -208,6 +208,11 @@ export const startVisitDialog = getAsyncLifecycle(() => import('./visit/visit-pr
   moduleName,
 });
 
+export const deleteVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/delete-visit-dialog.component'), {
+  featureName: 'delete visit',
+  moduleName,
+});
+
 export const endVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
   featureName: 'end visit',
   moduleName,
@@ -252,10 +257,12 @@ export const currentVisitSummary = getAsyncLifecycle(
   },
 );
 
-export const visitOverflowMenu = getAsyncLifecycle(
-  () => import('./visit/visit-action-items/visit-overflow-menu.component'),
-  {
-    featureName: 'visit-action-items',
-    moduleName,
-  },
+export const editVisitDetailsActionButton = getAsyncLifecycle(
+  () => import('./visit/visit-action-items/edit-visit-details.component'),
+  { featureName: 'edit-visit-details', moduleName },
+);
+
+export const deleteVisitActionButton = getAsyncLifecycle(
+  () => import('./visit/visit-action-items/delete-visit-action-item.component'),
+  { featureName: 'delete-visit', moduleName },
 );

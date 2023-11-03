@@ -69,6 +69,12 @@ export function usePastVisits(patientUuid: string) {
   };
 }
 
+export function deleteVisit(visitUuid: string) {
+  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+    method: 'DELETE',
+  });
+}
+
 export function mapEncounters(visit: Visit): MappedEncounter[] {
   return visit?.encounters?.map((encounter) => ({
     id: encounter?.uuid,

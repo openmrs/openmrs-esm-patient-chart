@@ -161,6 +161,12 @@
       "offline": true
     },
     {
+      "name": "delete-visit-dialog",
+      "component": "deleteVisitDialog",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "end-visit-dialog",
       "component": "endVisitDialog",
       "online": true,
@@ -208,9 +214,16 @@
       "offline": true
     },
     {
-      "name": "visit-overflow-menu",
+      "name": "edit-visit-action-button",
       "slot": "visit-detail-overview-actions",
-      "component": "visitOverflowMenu",
+      "component": "editVisitDetailsActionButton",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "delete-visit-action-button",
+      "slot": "visit-detail-overview-actions",
+      "component": "deleteVisitActionButton",
       "online": true,
       "offline": true
     }
