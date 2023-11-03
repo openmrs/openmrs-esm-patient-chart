@@ -39,7 +39,7 @@
   "temperature": "درجة الحرارة",
   "temperatureAbbreviated": "درجة الحرارة",
   "unknown": "غير معروف",
-  "validationInputError": "Value must be between {{min}} and {{max}} {{unitSymbol}}",
+  "validationInputError": "Value must be between {{min}} and {{max}}",
   "vitals": "العلامات الحيوية",
   "vitalsAndBiometrics": "العلامات الحيوية والقياسات البيومترية",
   "vitalsAndBiometricsNowAvailable": "هم الآن مرئيون على صفحة العلامات الحيوية والقياسات البيومترية",

@@ -39,7 +39,7 @@
   "temperature": "Temperatura",
   "temperatureAbbreviated": "Temp",
   "unknown": "Desconocido",
-  "validationInputError": "Value must be between {{min}} and {{max}} {{unitSymbol}}",
+  "validationInputError": "Value must be between {{min}} and {{max}}",
   "vitals": "Signos vitales",
   "vitalsAndBiometrics": "Signos vitales y biométricos",
   "vitalsAndBiometricsNowAvailable": "Ahora son visibles en la página de Signos vitales y biométricos",

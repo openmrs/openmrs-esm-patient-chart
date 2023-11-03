@@ -39,7 +39,7 @@
   "temperature": "טמפרטורה",
   "temperatureAbbreviated": "טמפ'",
   "unknown": "Unknown",
-  "validationInputError": "Value must be between {{min}} and {{max}} {{unitSymbol}}",
+  "validationInputError": "Value must be between {{min}} and {{max}}",
   "vitals": "מדדים חיוניים",
   "vitalsAndBiometrics": "מדדים חיוניים וביומטרים",
   "vitalsAndBiometricsNowAvailable": "הם כעת זמינים בדף מדדים חיוניים וביומטרים",
