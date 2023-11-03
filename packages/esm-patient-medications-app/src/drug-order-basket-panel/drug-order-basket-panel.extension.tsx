@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import type { DrugOrderBasketItem } from '../types';
 import OrderBasketItemTile from './order-basket-item-tile.component';
@@ -23,8 +23,15 @@ export default function DrugOrderBasketPanelExtension() {
   const revisedOrderBasketItems = orders.filter((x) => x.action === 'REVISE');
   const discontinuedOrderBasketItems = orders.filter((x) => x.action === 'DISCONTINUE');
 
+  const onClose = useCallback(() => {
+    closeWorkspace('add-drug-order', true);
+    launchPatientWorkspace('order-basket');
+  }, []);
+
   const openDrugSearch = () => {
-    launchPatientWorkspace('add-drug-order');
+    launchPatientWorkspace('add-drug-order', {
+      onCloseWorkspace: onClose,
+    });
   };
 
   const openDrugForm = (order: DrugOrderBasketItem) => {
