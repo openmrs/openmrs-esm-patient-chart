@@ -15,19 +15,19 @@
   @include type.type-style("heading-04");
 }
 
-.inputContainer {
+.container {
   width: 11.625rem;
   border-bottom: 1px solid $ui-04;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
-.vitalsBiometricInputLabel01 {
+.label {
   @extend .label01;
   color: $text-02;
   margin-bottom: spacing.$spacing-03;
 }
 
-.textInput {
+.numberInput {
   border: none;
   @extend .productiveHeading04;
   text-align: center;
@@ -45,25 +45,44 @@
   :global(.cds--number--nosteppers input[type="number"]) {
     padding-right: 1rem !important;
   }
+
+  ::placeholder {
+    color: $text-03;
+  }
 }
 
-.textInputContainer {
+.inputContainer {
   @extend .productiveHeading04;
   height: 4.875rem;
   display: flex;
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  padding: spacing.$spacing-03;
   color: $text-02;
   background-color: $ui-01;
+
+  &.focused {
+    outline: 2px solid colors.$blue-60;
+
+    input {
+      outline: none !important;
+    }
+
+    input[data-invalid]:not(:focus) {
+      outline: none;
+    }
+
+    svg {
+      display: none;
+    }
+  }
 }
 
-:global(.omrs-breakpoint-lt-desktop) .textInputContainer {
+:global(.omrs-breakpoint-lt-desktop) .inputContainer {
   background-color: $ui-02;
 }
 
-.textInputContainer {
+.inputContainer {
   &:global(.red) {
     background-color: colors.$red-20;
 
@@ -71,6 +90,7 @@
       background-color: colors.$red-20;
     }
   }
+
   &:global(.green) {
     background-color: colors.$green-20;
 
@@ -78,11 +98,22 @@
       background-color: colors.$green-20;
     }
   }
+
   &:global(.yellow) {
     background-color: colors.$yellow-10;
      input {
       background-color: colors.$yellow-10;
      }
+  }
+}
+
+.numberInput {
+  svg {
+    display: none;
+  }
+
+  input[data-invalid]:not(:focus) {
+    outline: none !important;
   }
 }
 
@@ -93,10 +124,14 @@
 
   textarea {
     border-bottom: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 
-.centerDiv {
+.centered {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -111,18 +146,100 @@
   margin-top: spacing.$spacing-03;
 }
 
-.disabledInput {
-  background-color: $ui-01 !important;
-
-  :global(.cds--number input[type="number"]) {
-    background-color: $ui-01 !important;
-  }
-}
-
-.danger {
+.invalidInputError {
+  max-width: 11rem;
   color: $danger;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .layer {
   width: 100%;
+}
+
+.labelContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invalidInput {
+  outline: 2px solid $danger;
+
+  &.focused {
+    border: none;
+  }
+}
+
+.invalidInputIcon {
+  svg {
+    color: $danger;
+  }
+}
+
+.critical-value {
+  background-color: colors.$red-10;
+  .numberInput {
+    svg {
+      display: none;
+    }
+
+    input {
+      background-color: colors.$red-10;
+    }
+
+    input[data-invalid]:not(:focus) {
+      outline: none;
+    }
+
+  }
+}
+
+.critically-low, .critically-high, .low, .high {
+  &::after {
+    @include type.type-style('heading-compact-01');
+    color: $text-02;
+  }
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.critically-low::after {
+  content: " ↓↓";
+}
+
+.high::after {
+  content: " ↑";
+}
+
+.critically-high::after {
+  content: " ↑↑";
+}
+
+.inputInTabletView {
+  &.inputWithAbnormalValue {
+    .inputContainer {
+      background-color: colors.$red-20;
+
+      .numberInput {
+        input {
+          background-color: colors.$red-20;
+          outline: none;
+        }
+      }
+    }
+  }
+}
+
+.readonly {
+  cursor: default;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .readonly {
+  background-color: colors.$gray-10;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .readonly {
+  background-color: colors.$white-0;
 }

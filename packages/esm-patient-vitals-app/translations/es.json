@@ -1,4 +1,5 @@
 {
+  "abnormalValue": "Abnormal value",
   "add": "Añadir",
   "additionalNoteText": "Escriba aquí cualquier nota adicional",
   "bloodPressure": "Presión arterial",
@@ -19,7 +20,6 @@
   "muac": "PB/MUAC",
   "noDataRecorded": "No se han registrado datos para este paciente",
   "notes": "Notas",
-  "numericInputError": "Debe ser un número dentro de los rangos aceptables",
   "other": "Otro",
   "overdue": "Atrasado",
   "oxygenSaturation": "Saturación de oxígeno",
@@ -39,6 +39,7 @@
   "temperature": "Temperatura",
   "temperatureAbbreviated": "Temp",
   "unknown": "Desconocido",
+  "validationInputError": "Value must be between {{min}} and {{max}}",
   "vitals": "Signos vitales",
   "vitalsAndBiometrics": "Signos vitales y biométricos",
   "vitalsAndBiometricsNowAvailable": "Ahora son visibles en la página de Signos vitales y biométricos",
