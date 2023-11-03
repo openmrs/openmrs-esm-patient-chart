@@ -279,7 +279,7 @@ export interface Diagnosis {
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { mutateVisits } = useVisits(patientUuid);
-  const { currentVisit, mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
   const { t } = useTranslation();
 
@@ -308,9 +308,9 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
       });
   };
 
-  const initiateDeletingVisit = useCallback(() => {
+  const initiateDeletingVisit = () => {
     setIsDeletingVisit(true);
-    const isCurrentVisitDeleted = currentVisit ? currentVisit?.uuid === visit?.uuid : false;
+    const isCurrentVisitDeleted = !visit?.stopDatetime;
 
     deleteVisit(visit?.uuid)
       .then(() => {
@@ -346,15 +346,10 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
       .finally(() => {
         setIsDeletingVisit(false);
       });
-  }, []);
+  };
 
-  const results = useMemo(
-    () => ({
-      initiateDeletingVisit,
-      isDeletingVisit,
-    }),
-    [initiateDeletingVisit, isDeletingVisit],
-  );
-
-  return results;
+  return {
+    initiateDeletingVisit,
+    isDeletingVisit,
+  };
 }
