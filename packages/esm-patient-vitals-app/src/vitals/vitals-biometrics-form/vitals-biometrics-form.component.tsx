@@ -196,6 +196,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
         .finally(() => {
           abortController.abort();
         });
+    } else {
+      setHasInvalidVitals(true);
     }
   };
 
