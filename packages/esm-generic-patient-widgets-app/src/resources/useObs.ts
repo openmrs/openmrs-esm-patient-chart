@@ -3,39 +3,40 @@ import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@o
 
 export const pageSize = 100;
 
-export function useObs(patientUuid: string): UseObsResult {
+export function useObs(patientUuid: string, includeEncounters: boolean = false): UseObsResult {
   const { encounterTypes, data } = useConfig();
-
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
-  const {
-    data: result,
-    error,
+  let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
+    .map((d) => d.concept)
+    .join(',')}&_summary=data&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
+
+  if (includeEncounters) {
+    url += '&_include=Observation:encounter';
+  }
+
+  const { data: result, error, isLoading, isValidating } = useSWR<{ data: ObsFetchResponse }, Error>(url, openmrsFetch);
+
+  const encounters = includeEncounters ? getEncountersByResources(result?.data?.entry) : [];
+  const observations = filterAndMapObservations(result?.data?.entry, encounters);
+
+  return {
+    data: observations,
+    error: error,
     isLoading,
     isValidating,
-  } = useSWR<{ data: ObsFetchResponse }, Error>(
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      data.map((d) => d.concept).join(',') +
-      '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}` +
-      urlEncounterTypes +
-      '&_include=Observation:encounter',
-    openmrsFetch,
-  );
+  };
+}
 
-  const encounters = getEncountersByResources(result?.data?.entry);
-
-  const observations =
-    result?.data?.entry
-      ?.filter((entry) => entry.resource.resourceType === 'Observation')
+function filterAndMapObservations(entries, encounters): ObsResult[] {
+  return (
+    entries
+      ?.filter((entry) => entry?.resource?.resourceType === 'Observation')
       ?.map((entry) => {
         const observation: ObsResult = {
           ...entry.resource,
-          conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
+          conceptUuid: entry.resource.code.coding.find((c) => isUuid(c.code))?.code,
         };
-        observation.encounter.name = encounters.find((e) => e.reference === entry.resource.encounter.reference)
-          ?.display;
-
         if (entry.resource.hasOwnProperty('valueDateTime')) {
           observation.dataType = 'DateTime';
         }
@@ -51,16 +52,12 @@ export function useObs(patientUuid: string): UseObsResult {
         if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
           observation.dataType = 'Coded';
         }
+        observation.encounter.name = encounters.find((e) => e.reference === entry.resource.encounter.reference)
+          ?.display;
 
         return observation;
-      }) ?? [];
-
-  return {
-    data: observations,
-    error: error,
-    isLoading,
-    isValidating,
-  };
+      }) || []
+  );
 }
 
 interface ObsFetchResponse {

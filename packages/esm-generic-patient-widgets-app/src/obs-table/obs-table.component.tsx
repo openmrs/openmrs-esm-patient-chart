@@ -22,7 +22,7 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
+  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid, config.showEncounterType);
   const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
   const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
 
@@ -34,8 +34,9 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     })),
   ];
 
-  if (config.showEncounterType)
+  if (config.showEncounterType) {
     tableHeaders.splice(1, 0, { key: 'encounter', header: t('encounterType', 'Encounter type'), isSortable: true });
+  }
 
   const tableRows = React.useMemo(
     () =>
