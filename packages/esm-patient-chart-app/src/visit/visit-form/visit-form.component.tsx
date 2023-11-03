@@ -56,6 +56,7 @@ import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { useVisits } from '../visits-widget/visit.resource';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitDetails: Visit;
@@ -95,7 +96,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const allVisitTypes = useVisitTypes();
-  const { mutate: mutateVisit } = useVisit(patientUuid);
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutateVisits } = useVisits(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -273,7 +275,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutateVisit();
+                      mutateCurrentVisit();
                       mutateQueueEntry();
                       showToast({
                         kind: 'success',
@@ -306,7 +308,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 saveAppointment(appointmentPayload, abortController).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutateVisit();
+                      mutateCurrentVisit();
                       showToast({
                         critical: true,
                         kind: 'success',
@@ -326,7 +328,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 );
               }
             }
-            mutateVisit();
+            mutateCurrentVisit();
+            mutateVisits();
             closeWorkspace();
 
             showToast({
@@ -361,7 +364,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
-      mutateVisit,
+      mutateCurrentVisit,
+      mutateVisits,
       patientUuid,
       upcomingAppointment,
       t,

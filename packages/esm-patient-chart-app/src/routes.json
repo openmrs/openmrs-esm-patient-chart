@@ -218,14 +218,16 @@
       "slot": "visit-detail-overview-actions",
       "component": "editVisitDetailsActionButton",
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 0
     },
     {
       "name": "delete-visit-action-button",
       "slot": "visit-detail-overview-actions",
       "component": "deleteVisitActionButton",
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 1
     }
   ],
   "pages": [

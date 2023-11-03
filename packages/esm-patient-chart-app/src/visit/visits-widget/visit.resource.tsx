@@ -1,5 +1,16 @@
 import useSWR from 'swr';
-import { openmrsFetch, OpenmrsResource, Privilege, Visit } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  OpenmrsResource,
+  Privilege,
+  showActionableNotification,
+  showNotification,
+  showToast,
+  useVisit,
+  Visit,
+} from '@openmrs/esm-framework';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
@@ -71,7 +82,21 @@ export function usePastVisits(patientUuid: string) {
 
 export function deleteVisit(visitUuid: string) {
   return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
-    method: 'DELETE',
+    headers: {
+      'content-type': 'application/json',
+    },
+    method: 'POST',
+    body: { voided: true },
+  });
+}
+
+export function restoreVisit(visitUuid: string) {
+  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+    headers: {
+      'content-type': 'application/json',
+    },
+    method: 'POST',
+    body: { voided: false },
   });
 }
 
@@ -250,4 +275,86 @@ export interface Diagnosis {
       links: Array<any>;
     };
   };
+}
+
+export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
+  const { mutateVisits } = useVisits(patientUuid);
+  const { currentVisit, mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const [isDeletingVisit, setIsDeletingVisit] = useState(false);
+  const { t } = useTranslation();
+
+  const restoreDeletedVisit = () => {
+    restoreVisit(visit?.uuid)
+      .then(() => {
+        showNotification({
+          title: t('visitRestored', 'Visit restored'),
+          description: t('visitRestoredSuccessfully', '{{visit}} restored successfully', {
+            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+          }),
+          kind: 'success',
+        });
+        mutateVisits();
+        mutateCurrentVisit();
+        onVisitRestore?.();
+      })
+      .catch(() => {
+        showNotification({
+          title: t('visitNotRestored', "Visit couldn't be restored"),
+          description: t('errorWhenRestoringVisit', 'Error occured when restoring {{visit}}', {
+            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+          }),
+          kind: 'error',
+        });
+      });
+  };
+
+  const initiateDeletingVisit = useCallback(() => {
+    setIsDeletingVisit(true);
+    const isCurrentVisitDeleted = currentVisit ? currentVisit?.uuid === visit?.uuid : false;
+
+    deleteVisit(visit?.uuid)
+      .then(() => {
+        mutateVisits();
+        mutateCurrentVisit();
+        // TODO: Needs to be replaced with Actionable Snackbar when Actionable
+        showActionableNotification({
+          title: !isCurrentVisitDeleted
+            ? t('visitDeleted', '{{visit}} deleted', {
+                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+              })
+            : t('cancelVisit', 'Cancel visit'),
+          kind: 'success',
+          subtitle: !isCurrentVisitDeleted
+            ? t('visitDeletedSuccessfully', '{{visit}} is deleted successfully', {
+                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+              })
+            : t('visitCanceled', 'Canceled active visit successfully'),
+          actionButtonLabel: t('undo', 'Undo'),
+          onActionButtonClick: restoreDeletedVisit,
+        });
+        onVisitDelete?.();
+      })
+      .catch(() => {
+        showNotification({
+          title: isCurrentVisitDeleted
+            ? t('errorDeletingVisit', 'Error deleting visit')
+            : t('cancelVisitError', 'Error cancelling active visit'),
+          kind: 'error',
+          description: t('errorOccuredDeletingVisit', 'An error occured when deleting visit'),
+        });
+      })
+      .finally(() => {
+        setIsDeletingVisit(false);
+      });
+  }, []);
+
+  const results = useMemo(
+    () => ({
+      initiateDeletingVisit,
+      isDeletingVisit,
+    }),
+    [initiateDeletingVisit, isDeletingVisit],
+  );
+
+  return results;
 }
