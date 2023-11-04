@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
@@ -53,7 +53,6 @@ export type ProgramsFormData = z.infer<typeof programsFormSchema>;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
   const { t } = useTranslation();
-  const id = useId();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const availableLocations = useLocations();
@@ -171,7 +170,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       render={({ fieldState, field: { onChange, value } }) => (
         <>
           <Select
-            id={`{id}-program-select`}
+            id="program"
             invalidText={t('required', 'Required')}
             labelText=""
             onChange={(event) => onChange(event.target.value)}
@@ -197,7 +196,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <DatePicker
-          id={`${id}-enrollmentDate`}
+          id="enrollmentDate"
           datePickerType="single"
           dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
@@ -205,7 +204,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
           onChange={([date]) => onChange(date)}
           value={value}
         >
-          <DatePickerInput id={`${id}-enrollmentDateInput`} labelText="" />
+          <DatePickerInput id="enrollmentDateInput" labelText="" />
         </DatePicker>
       )}
     />
@@ -217,7 +216,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <DatePicker
-          id={`${id}-completionDate`}
+          id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
           minDate={new Date(watch('enrollmentDate')).toISOString()}
@@ -226,7 +225,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
           onChange={([date]) => onChange(date)}
           value={value}
         >
-          <DatePickerInput id={`${id}-completionDateInput`} labelText="" />
+          <DatePickerInput id="completionDateInput" labelText="" />
         </DatePicker>
       )}
     />
@@ -238,7 +237,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <Select
-          id={`${id}-location-select`}
+          id="location"
           invalidText="Required"
           labelText=""
           onChange={(event) => onChange(event.target.value)}
