@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -31,10 +32,10 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
+import type { ConfigObject } from '../config-schema';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
-import { ConfigObject } from '../config-schema';
 
 interface ConditionsOverviewProps {
   patientUuid: string;
@@ -149,7 +150,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                     <TableRow>
                       {headers.map((header) => (
                         <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,

@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -122,7 +123,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                   <TableRow>
                     {headers.map((header) => (
                       <TableHeader
-                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,

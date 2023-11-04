@@ -1,4 +1,5 @@
 import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -106,19 +107,22 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   return (
     <div
-      className={`${styles.container} ${isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer}`}
+      className={classNames(
+        styles.container,
+        isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer,
+      )}
       role="banner"
       ref={patientBannerRef}
     >
       <div
+        className={classNames(styles.patientBanner, { [styles.patientAvatarButton]: onClick })}
         onClick={handleNavigateToPatientChart}
-        tabIndex={0}
         role="button"
-        className={`${styles.patientBanner} ${onClick && styles.patientAvatarButton}`}
+        tabIndex={0}
       >
         {patientAvatar}
         <div className={styles.patientInfo}>
-          <div className={`${styles.row} ${styles.patientNameRow}`}>
+          <div className={classNames(styles.row, styles.patientNameRow)}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot

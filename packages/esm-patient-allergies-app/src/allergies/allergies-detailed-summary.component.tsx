@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -59,7 +60,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                 <use xlinkHref="#omrs-icon-important-notification" />
               </svg>
             )}
-            <span className={`${allergy.criticality === 'high' && styles.allergySeverityHigh}`}>
+            <span className={classNames({ [styles.allergySeverityHigh]: allergy.criticality === 'high' })}>
               {allergy.criticality}
             </span>
           </span>
@@ -95,7 +96,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                   <TableRow>
                     {headers.map((header) => (
                       <TableHeader
-                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,

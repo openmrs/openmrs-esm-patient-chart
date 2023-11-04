@@ -101,7 +101,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.tableHeader}`}
+                      className={styles.tableHeader}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,

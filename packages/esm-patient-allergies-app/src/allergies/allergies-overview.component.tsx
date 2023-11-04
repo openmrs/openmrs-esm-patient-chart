@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import {
   DataTableSkeleton,
   DataTable,
@@ -90,7 +91,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                   <TableRow>
                     {headers.map((header) => (
                       <TableHeader
-                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,

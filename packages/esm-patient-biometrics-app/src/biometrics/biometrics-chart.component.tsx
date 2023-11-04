@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
@@ -108,10 +109,10 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
               { id: 'bmi', label: `${t('bmi', 'BMI')} (${bmiUnit})` },
             ].map(({ id, label }) => (
               <Tab
+                className={classNames(styles.tab, styles.bodyLong01, {
+                  [styles.selectedTab]: selectedBiometrics.title === label,
+                })}
                 key={id}
-                className={`${styles.tab} ${styles.bodyLong01} ${
-                  selectedBiometrics.title === label && styles.selectedTab
-                }`}
                 onClick={() =>
                   setSelectedBiometrics({
                     title: label,

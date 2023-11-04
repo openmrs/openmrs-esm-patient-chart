@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -74,7 +75,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({ showAllEncounters, en
   ];
 
   if (!encounters?.length) {
-    return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncountersFound', 'No encounters found')}</p>;
+    return (
+      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
+    );
   }
 
   const tableRows = transformEncounters(encounters);
