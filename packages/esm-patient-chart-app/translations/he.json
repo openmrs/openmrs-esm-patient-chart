@@ -72,6 +72,8 @@
   "goToThisEncounter": "עבור לביקור זה",
   "hide": "הסתר",
   "indication": "רמז",
+  "invalidVisitEndDatetime": "End date needs to be on or after {{firstEncounterDatetime}}",
+  "invalidVisitStartDate": "Start date needs to be on or before {{firstEncounterDatetime}}",
   "loading": "טוען",
   "loadingVisit": "Loading current visit...",
   "location": "מיקום",

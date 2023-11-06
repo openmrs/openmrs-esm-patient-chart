@@ -72,6 +72,8 @@
   "goToThisEncounter": "اذهب إلى هذا اللقاء",
   "hide": "إخفاء",
   "indication": "دلالة",
+  "invalidVisitEndDatetime": "End date needs to be on or after {{firstEncounterDatetime}}",
+  "invalidVisitStartDate": "Start date needs to be on or before {{firstEncounterDatetime}}",
   "loading": "جار التحميل",
   "loadingVisit": "جار تحميل الزيارة الحالية...",
   "location": "الموقع",

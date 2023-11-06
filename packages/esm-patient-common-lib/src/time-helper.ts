@@ -11,5 +11,5 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
     hours = hours === '12' ? hours : parseInt(hours, 10) + 12;
   }
 
-  return [hours, minutes];
+  return [hours, minutes] as [number, number];
 };

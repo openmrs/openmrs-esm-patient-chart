@@ -72,6 +72,8 @@
   "goToThisEncounter": "ទៅរកការជួបពិនិត្យជំងឺលើកនេះ",
   "hide": "លាក់មិនឱ្យមើលឃើញ",
   "indication": "ការចង្អុលបង្ហាញ",
+  "invalidVisitEndDatetime": "End date needs to be on or after {{firstEncounterDatetime}}",
+  "invalidVisitStartDate": "Start date needs to be on or before {{firstEncounterDatetime}}",
   "loading": "កំពុងផ្ទុក",
   "loadingVisit": "ការទាញទិន្នន័យពិនិត្យជំងឺបច្ចុប្បន្ន...",
   "location": "ទីតាំង",

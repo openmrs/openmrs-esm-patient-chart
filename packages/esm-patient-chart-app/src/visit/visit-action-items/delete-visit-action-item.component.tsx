@@ -28,20 +28,21 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
     });
   };
 
-  if (!visit?.stopDatetime) {
-    return (
-      <UserHasAccess privilege="Delete Visits">
-        <Button onClick={cancelVisit} kind="danger--ghost" renderIcon={TrashCan} size={isTablet ? 'lg' : 'sm'}>
-          {t('cancelVisit', 'Cancel visit')}
-        </Button>
-      </UserHasAccess>
-    );
+  const isActiveVisit = !visit?.stopDatetime;
+
+  if (visit?.encounters?.length) {
+    return null;
   }
 
   return (
     <UserHasAccess privilege="Delete Visits">
-      <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCan} size={isTablet ? 'lg' : 'sm'}>
-        {t('deleteVisit', 'Delete')}
+      <Button
+        onClick={isActiveVisit ? cancelVisit : deleteVisit}
+        kind="danger--ghost"
+        renderIcon={TrashCan}
+        size={isTablet ? 'lg' : 'sm'}
+      >
+        {isActiveVisit ? t('cancelVisit', 'Cancel visit') : t('deleteVisit', 'Delete')}
       </Button>
     </UserHasAccess>
   );

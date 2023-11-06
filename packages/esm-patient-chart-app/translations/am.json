@@ -72,6 +72,8 @@
   "goToThisEncounter": "Go to this encounter",
   "hide": "Hide",
   "indication": "Indication",
+  "invalidVisitEndDatetime": "End date needs to be on or after {{firstEncounterDatetime}}",
+  "invalidVisitStartDate": "Start date needs to be on or before {{firstEncounterDatetime}}",
   "loading": "Loading",
   "loadingVisit": "Loading current visit...",
   "location": "Location",

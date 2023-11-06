@@ -72,6 +72,8 @@
   "goToThisEncounter": "Aller à cette rencontre",
   "hide": "Cacher",
   "indication": "Indication",
+  "invalidVisitEndDatetime": "End date needs to be on or after {{firstEncounterDatetime}}",
+  "invalidVisitStartDate": "Start date needs to be on or before {{firstEncounterDatetime}}",
   "loading": "En cours de chargement",
   "loadingVisit": "Loading current visit...",
   "location": "Emplacement",

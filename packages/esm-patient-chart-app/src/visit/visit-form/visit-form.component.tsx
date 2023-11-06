@@ -113,6 +113,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     () => showVisitEndDateTimeFields || visitDetails?.stopDatetime,
     [showVisitEndDateTimeFields, visitDetails?.stopDatetime],
   );
+
+  const [maxVisitStartDatetime, minVisitEndDatetime]: [Date, Date] = useMemo(() => {
+    if (!inEditForm || !visitDetails?.encounters?.length) {
+      return [new Date(), new Date(null)];
+    }
+
+    const allEncounterDates = visitDetails?.encounters?.map(({ encounterDatetime }) => Date.parse(encounterDatetime));
+    const maxVisitStartDatetime = new Date(Math.min(...allEncounterDates));
+    const minVisitEndDatetime = new Date(Math.max(...allEncounterDates));
+
+    return [maxVisitStartDatetime, minVisitEndDatetime];
+  }, [visitDetails, inEditForm]);
+
   const visitFormSchema = useMemo(() => {
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
       (acc, { uuid, required }) => ({
@@ -128,21 +141,69 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       {},
     );
 
-    return z.object({
-      visitDate: z.date(),
-      visitTime: z.string(),
-      timeFormat: z.enum(['PM', 'AM']),
-      visitEndDate: z.date().optional(),
-      visitEndTime: z.string().optional(),
-      visitEndTimeFormat: z.enum(['PM', 'AM']).optional(),
-      programType: z.string().optional(),
-      visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
-      visitLocation: z.object({
-        display: z.string(),
-        uuid: z.string(),
-      }),
-      visitAttributes: z.object(visitAttributes),
-    });
+    return z
+      .object({
+        visitDate: z.date(),
+        visitTime: z.string(),
+        timeFormat: z.enum(['PM', 'AM']),
+        visitEndDate: z.date().optional(),
+        visitEndTime: z.string().optional(),
+        visitEndTimeFormat: z.enum(['PM', 'AM']).optional(),
+        programType: z.string().optional(),
+        visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
+        visitLocation: z.object({
+          display: z.string(),
+          uuid: z.string(),
+        }),
+        visitAttributes: z.object(visitAttributes),
+      })
+      .superRefine(({ visitDate, visitEndDate, visitEndTime, visitTime, visitEndTimeFormat, timeFormat }, ctx) => {
+        const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
+        const visitStartDatetime = visitDate.setHours(hours, minutes);
+
+        if (visitStartDatetime > Date.parse(maxVisitStartDatetime.toISOString())) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_date,
+            message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
+              firstEncounterDatetime: maxVisitStartDatetime.toLocaleString(),
+              interpolation: {
+                escapeValue: false,
+              },
+            }),
+          });
+        }
+
+        if (!visitEndDate) {
+          return;
+        }
+
+        const [endHours, endMinutes] = convertTime12to24(visitEndTime, visitEndTimeFormat);
+        const visitEndDatetime = visitEndDate.setHours(endHours, endMinutes);
+
+        if (visitStartDatetime >= visitEndDatetime) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_date,
+            message: t('invalidVisitEndDatetime', 'End date needs to be on or after {{visitStartDatetime}}', {
+              visitStartDatetime: new Date(visitStartDatetime).toLocaleString(),
+              interpolation: {
+                escapeValue: false,
+              },
+            }),
+          });
+        }
+
+        if (visitEndDatetime < Date.parse(minVisitEndDatetime.toISOString())) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_date,
+            message: t('invalidVisitEndDatetime', 'End date needs to be on or after {{firstEncounterDatetime}}', {
+              firstEncounterDatetime: minVisitEndDatetime.toLocaleString(),
+              interpolation: {
+                escapeValue: false,
+              },
+            }),
+          });
+        }
+      });
   }, [t, config]);
 
   type VisitFormData = z.infer<typeof visitFormSchema>;
@@ -424,7 +485,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                         datePickerType="single"
                         id="visitDate"
                         style={{ paddingBottom: '1rem' }}
-                        maxDate={new Date().toISOString()}
+                        maxDate={maxVisitStartDatetime}
                         onChange={([date]) => onChange(date)}
                         value={value}
                       >
@@ -488,7 +549,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                           datePickerType="single"
                           id="visitEndDate"
                           style={{ paddingBottom: '1rem' }}
-                          maxDate={new Date().toISOString()}
+                          minDate={minVisitEndDatetime}
                           onChange={([date]) => onChange(date)}
                           value={value}
                         >
@@ -651,6 +712,18 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 </div>
               </section>
             )}
+            <section>
+              {Object.entries(errors)
+                .filter(([key]) => !key)
+                .map(([_, value]) => (
+                  <InlineNotification
+                    kind={'error'}
+                    className={styles.inlineNotification}
+                    title={t('error', 'Error')}
+                    subtitle={value.message}
+                  />
+                ))}
+            </section>
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
