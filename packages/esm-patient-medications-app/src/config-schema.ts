@@ -39,5 +39,5 @@ export interface ConfigObject {
   };
   drugOrderTypeUUID: string;
   showPrintButton: boolean;
-  maxDispenseDurationInDays: Number;
+  maxDispenseDurationInDays: number;
 }
