@@ -14,30 +14,6 @@
   margin: 0.5rem 1rem;
 }
 
-.container {
-  border: solid 1px $ui-03;
-  margin: 0rem 1rem 1rem;
-
-  &:first-of-type {
-    margin-bottom: 2rem;
-  }
-
-  &:last-of-type {
-    margin-top: 2.5rem;
-  }
-}
-
-.heading {
-  @include type.type-style("heading-03");
-  margin: 1rem 1rem 0.5rem;
-}
-
-.section {
-  &:not(:first-of-type) {
-    margin-bottom: 2rem;
-  }
-}
-
 .wrapperContainer fieldset {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -46,27 +22,6 @@
 
 .wrapperContainer :global(.cds--radio-button__label) {
   justify-content: flex-start;
-}
-
-.tablist {
-  :global(.cds--tab--list) {
-    justify-content: center;
-    width: 100%;
-  }
-}
-
-.tab {
-  flex-grow: 1;
-}
-
-.sectionHeading {
-  @include type.type-style('heading-compact-02');
-  margin: 1rem 1rem 0.5rem;
-}
-
-.midSectionHeading {
-  @include type.type-style('heading-compact-02');
-  margin: 0rem 1rem 0.5rem;
 }
 
 .radio {
@@ -92,24 +47,12 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.wrapper {
-  margin: 1rem;
-
-  &:last-of-type {
-    margin-top: 1.5rem;
-  }
-}
-
 .button {
   height: 4rem;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
-}
-
-.tablet {
-  padding: 0rem;
 }
 
 .desktopButtons {
@@ -122,34 +65,31 @@
   background-color: $ui-02;
 }
 
-.desktop {
-  padding: 0rem;
-}
-
 .form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  margin: 1rem;
 }
 
-.desktopContainer {
-  background-color: $ui-01;
-}
 
-.tabletContainer {
-  background-color: white;
+.allergenSearchResults {
+  background-color: $ui-02;
+  max-height: 14rem;
+  overflow-y: auto;
+  border: 1px solid $ui-03;
+
+  li {
+    padding: 1rem 0.75rem;
+    cursor: pointer;
+  }
+
+  li:hover {
+    background-color: $ui-03;
+  }
 }
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .form {
     height: calc(100vh - 6rem);
-  }
-
-  .section {
-    &:last-of-type {
-      margin-top: 2rem;
-    }
   }
 }
 
@@ -159,9 +99,4 @@
     height: calc(100vh - 9rem);
   }
 
-  .section {
-    &:last-of-type {
-      margin-top: 0rem;
-    }
-  }
 }

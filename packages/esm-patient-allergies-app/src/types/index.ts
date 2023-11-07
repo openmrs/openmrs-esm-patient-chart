@@ -82,3 +82,10 @@ export interface OpenMRSResource {
   uuid: string;
   display: string;
 }
+
+export enum AllergenType {
+  DRUG = 'DRUG',
+  FOOD = 'FOOD',
+  ENVIRONMENT = 'ENVIRONMENT',
+  OTHER = 'OTHER',
+}
