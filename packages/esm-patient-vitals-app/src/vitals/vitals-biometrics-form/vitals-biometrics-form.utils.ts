@@ -14,11 +14,12 @@ export function isValueWithinReferenceRange(
   conceptUuid: string,
   value: string | number,
 ) {
-  if (value === undefined || value === '') {
+  const concept = conceptMetadata.find((c) => c.uuid === conceptUuid);
+
+  if (value === undefined || value === '' || concept === undefined) {
     return true;
   }
 
-  const concept = conceptMetadata.find((c) => c.uuid === conceptUuid);
   return isNumber(concept?.lowAbsolute) && isNumber(concept?.hiAbsolute)
     ? Number(value) >= Number(concept.lowAbsolute) && Number(value) <= Number(concept.hiAbsolute)
     : true;
@@ -34,7 +35,7 @@ export function extractNumbers(str: string) {
   return parseInt(match[0], 10);
 }
 
-export function getColorCode(age: number, muac: number, setColorCode: (color) => void) {
+export function getMuacColorCode(age: number, muac: number, setColorCode: (color) => void) {
   switch (true) {
     // children 5 years and below with a muac equal to 14
     case age <= 5 && muac <= 11.5 && muac > 0:

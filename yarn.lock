@@ -6932,6 +6932,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^6.7.3
     "@typescript-eslint/parser": ^6.7.3
     babel-preset-minify: ^0.5.2
+    classnames: ^2.3.2
     concurrently: ^8.2.1
     cross-env: ^7.0.3
     css-loader: ^6.6.0
@@ -7280,8 +7281,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 4.0.1-pre.323
-  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.323"
+  version: 4.0.1-pre.330
+  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.330"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -7303,13 +7304,13 @@ __metadata:
     shelljs: ^0.7.8
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 081135cf83056cdc3e1e834d3ff8f9af4fc14ff5830335ff5e9f556dfe32986ab69752239d6c3a6f64362dd9d7881930ac733e3f026223dc0f066f12dc261327
+  checksum: a881cd3d65b0f77cf1c845c4c9358f45fd6653e70fc70f0ad71798dd14c972907a3e58860d977924c6b69bbface198eacf8aadd828fd22d8ff6e677da5e3c0c3
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.412
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.412"
+  version: 1.0.0-pre.426
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.426"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -7323,6 +7324,7 @@ __metadata:
     react-scroll: ^1.8.2
     react-test-renderer: ^16.9.0
     react-waypoint: ^10.3.0
+    react-webcam: ^7.1.1
     semver: ^7.3.5
     yup: ^0.29.1
   peerDependencies:
@@ -7331,7 +7333,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 03bb6790c76ab61fb0bc081ce47df40fc307d142567232e459392b3695a49cf8ddd7c93f8f68404224eb05197273cdb16163bf322a968da0450ae3b742ffb051
+  checksum: db5f378fd4617ff7f1d240c5c44ed7df10a1f96a3b46d4c77bb1dfbf08fa946f1bc83d1003a38877c9c72637b6138e09c548b5e3ad550918ef0d5818dc0fe050
   languageName: node
   linkType: hard
 
@@ -12234,7 +12236,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:2.3.2":
+"classnames@npm:2.3.2, classnames@npm:^2.3.2":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
@@ -25233,6 +25235,16 @@ __metadata:
   peerDependencies:
     react: ^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
   checksum: 5a476432cd4a55ae022b33f82610a1addae92912ec88111cf33c17ef473bbbfc2c695714cb3bd60911259c92c5b6349f80033b022bf1e59e1a4be9b198a70a7a
+  languageName: node
+  linkType: hard
+
+"react-webcam@npm:^7.1.1":
+  version: 7.2.0
+  resolution: "react-webcam@npm:7.2.0"
+  peerDependencies:
+    react: ">=16.2.0"
+    react-dom: ">=16.2.0"
+  checksum: 55aecc9e33ea711525f9b68a7c14c9cf4089777b9edd6d9c93813568d701a101f3da09ffd7df04b64eca8c9783a37830522376049589699c6015555ec8d7ccd8
   languageName: node
   linkType: hard
 

@@ -309,3 +309,23 @@ export function interpretBloodPressure(systolic, diastolic, concepts, conceptMet
 
   return 'normal';
 }
+
+export function generatePlaceholder(value: string) {
+  switch (value) {
+    case 'BMI':
+      return '';
+
+    case 'Temperature':
+    case 'Weight':
+      return '--.-';
+
+    case 'Height':
+    case 'diastolic':
+    case 'systolic':
+    case 'Pulse':
+      return '---';
+
+    default:
+      return '--';
+  }
+}
