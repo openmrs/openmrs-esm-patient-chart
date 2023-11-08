@@ -40,7 +40,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
       finalizedOrder.careSetting = careSettingUuid;
-      finalizedOrder.orderer = session.currentProvider.uuid;
+      finalizedOrder.orderer = session?.currentProvider?.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       newOrders[orders.indexOf(existingOrder)] = finalizedOrder;
@@ -48,7 +48,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid],
   );
 
   if (!currentOrder) {
