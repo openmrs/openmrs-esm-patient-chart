@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
 import { Search as SearchIcon, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
-import { ObsRecord } from '../../types';
+import type { ObsRecord } from '../../types';
 import { testResultsBasePath } from '../helpers';
 import LabSetPanel from './panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';
@@ -135,7 +136,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
         </div>
       ) : null}
       <div
-        className={`${styles.headerMargin} ${styles.rightSection}  ${expanded ? styles.fullView : styles.splitView}`}
+        className={classNames(styles.headerMargin, styles.rightSection, expanded ? styles.fullView : styles.splitView)}
       >
         <div className={styles.stickySection}>
           {isLoading ? (
@@ -231,7 +232,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
       ) : (
         <>
           <Overlay close={handleToggleSearchFields} headerText={t('search', 'Search')}>
-            <Form onSubmit={handleSearchTerm} className={`${styles.flex} ${styles.tabletSearch}`}>
+            <Form onSubmit={handleSearchTerm} className={classNames(styles.flex, styles.tabletSearch)}>
               <Search
                 value={localSearchTerm}
                 onChange={(e) => setLocalSearchTerm(e.target.value)}

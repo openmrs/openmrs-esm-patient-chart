@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';

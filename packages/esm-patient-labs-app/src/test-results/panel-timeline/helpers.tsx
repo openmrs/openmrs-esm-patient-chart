@@ -1,10 +1,11 @@
 import * as React from 'react';
+import classNames from 'classnames';
+import { ConfigurableLink, formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import { OBSERVATION_INTERPRETATION, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
-import { ObsRecord } from '../../types';
-import styles from './timeline.scss';
-import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { ParsedTimeType } from '../filter/filter-types';
 import { testResultsBasePath } from '../helpers';
+import type { ObsRecord } from '../../types';
+import styles from './timeline.scss';
 
 export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -102,7 +103,11 @@ export const TimelineCell: React.FC<{
 
   return (
     <div
-      className={`${styles['timeline-data-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}
+      className={classNames(
+        styles['timeline-data-cell'],
+        { [styles['timeline-cell-zebra']]: zebra },
+        additionalClassname,
+      )}
     >
       <p>{text}</p>
     </div>
