@@ -50,6 +50,7 @@ export interface LabOrderBasketItem extends OrderBasketItem {
   labReferenceNumber?: string;
   urgency?: string;
   instructions?: string;
+  orderReason?: string;
 }
 
 export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
@@ -62,6 +63,7 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
     encounter: encounterUuid,
     concept: order.testType.conceptUuid,
     instructions: order.instructions,
+    orderReason: order.orderReason,
   };
 }
 

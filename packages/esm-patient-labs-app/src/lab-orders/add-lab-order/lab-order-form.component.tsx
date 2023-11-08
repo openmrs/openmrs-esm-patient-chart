@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
 import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData } from '../api';
 import {
   Button,
@@ -22,6 +22,7 @@ import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
+import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
@@ -70,6 +71,8 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       ...initialOrder,
     },
   });
+  const config = useConfig<ConfigObject>();
+  const selectedLabTest = config.labTests.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid);
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
@@ -187,6 +190,22 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
               </InputWrapper>
             </Column>
           </Grid>
+          {selectedLabTest && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <ComboBox
+                    size="lg"
+                    id="orderReasonInput"
+                    titleText={t('orderReason', 'Order reason')}
+                    selectedItem={''}
+                    items={selectedLabTest.labTestOrderReasons}
+                    itemToString={(item) => item?.label}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
