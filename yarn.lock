@@ -7281,8 +7281,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 4.0.1-pre.323
-  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.323"
+  version: 4.0.1-pre.330
+  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.330"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -7304,7 +7304,7 @@ __metadata:
     shelljs: ^0.7.8
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 081135cf83056cdc3e1e834d3ff8f9af4fc14ff5830335ff5e9f556dfe32986ab69752239d6c3a6f64362dd9d7881930ac733e3f026223dc0f066f12dc261327
+  checksum: a881cd3d65b0f77cf1c845c4c9358f45fd6653e70fc70f0ad71798dd14c972907a3e58860d977924c6b69bbface198eacf8aadd828fd22d8ff6e677da5e3c0c3
   languageName: node
   linkType: hard
 
