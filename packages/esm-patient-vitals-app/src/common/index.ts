@@ -4,5 +4,11 @@ export {
   updateVitalsAndBiometrics,
   saveVitalsAndBiometrics,
 } from './data.resource';
-export { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
+export {
+  assessValue,
+  calculateBodyMassIndex,
+  getReferenceRangesForConcept,
+  generatePlaceholder,
+  interpretBloodPressure,
+} from './helpers';
 export type { ObservationInterpretation, PatientVitals } from './types';

@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
@@ -33,7 +34,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
   const { t } = useTranslation();
   const { bmiUnit } = config.biometrics;
   const [selectedBiometrics, setSelectedBiometrics] = React.useState<BiometricChartData>({
-    title: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
+    title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
     value: 'weight',
     groupName: 'weight',
   });
@@ -62,7 +63,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       title: selectedBiometrics.title,
       axes: {
         bottom: {
-          title: 'Date',
+          title: t('date', 'Date'),
           mapsTo: 'key',
           scaleType: ScaleTypes.LABELS,
         },
@@ -100,15 +101,18 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         <Tabs className={styles.verticalTabs}>
           <TabList className={styles.tablist} aria-label="Biometrics tabs">
             {[
-              { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
-              { id: 'height', label: `Height (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
-              { id: 'bmi', label: `BMI (${bmiUnit})` },
+              {
+                id: 'weight',
+                label: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
+              },
+              { id: 'height', label: `{t('height',"Height")} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
+              { id: 'bmi', label: `${t('bmi', 'BMI')} (${bmiUnit})` },
             ].map(({ id, label }) => (
               <Tab
+                className={classNames(styles.tab, styles.bodyLong01, {
+                  [styles.selectedTab]: selectedBiometrics.title === label,
+                })}
                 key={id}
-                className={`${styles.tab} ${styles.bodyLong01} ${
-                  selectedBiometrics.title === label && styles.selectedTab
-                }`}
                 onClick={() =>
                   setSelectedBiometrics({
                     title: label,

@@ -68,6 +68,26 @@ export function interpretBloodPressure(
   return 'normal';
 }
 
+export function generatePlaceholder(value: string) {
+  switch (value) {
+    case 'BMI':
+      return '';
+
+    case 'Temperature':
+    case 'Weight':
+      return '--.-';
+
+    case 'Height':
+    case 'diastolic':
+    case 'systolic':
+    case 'Pulse':
+      return '---';
+
+    default:
+      return '--';
+  }
+}
+
 export function getReferenceRangesForConcept(
   conceptUuid: string | undefined | null,
   conceptMetadata: Array<ConceptMetadata> | undefined,

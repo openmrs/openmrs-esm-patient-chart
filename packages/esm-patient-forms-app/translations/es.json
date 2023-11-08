@@ -10,7 +10,7 @@
   "lastCompleted": "Último completado",
   "never": "Nunca",
   "noFormsToDisplay": "No hay formularios para mostrar.",
-  "noMatchingFormsAvailable": "No hay formularios {formCategory} para mostrar",
+  "noMatchingFormsAvailable": "No hay formularios {{formCategory}} para mostrar",
   "noMatchingFormsToDisplay": "No hay formularios coincidentes para mostrar",
   "offlineForms": "Formularios sin conexión",
   "offlineForms__lower": "formularios sin conexión",

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './overflow-menu.scss';
 
@@ -47,11 +48,16 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   }, [wrapperRef]);
 
   return (
-    <div data-overflow-menu className={`cds--overflow-menu ${styles.container}`} ref={wrapperRef}>
+    <div data-overflow-menu className={classNames('cds--overflow-menu', styles.container)} ref={wrapperRef}>
       <button
-        className={`cds--btn cds--btn--ghost cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
-          deceased && styles.deceased
-        } ${styles.overflowMenuButton}`}
+        className={classNames(
+          'cds--btn',
+          'cds--btn--ghost',
+          'cds--overflow-menu__trigger',
+          { 'cds--overflow-menu--open': showMenu },
+          { [styles.deceased]: deceased },
+          styles.overflowMenuButton,
+        )}
         aria-haspopup="true"
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
@@ -61,14 +67,18 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         {menuTitle}
       </button>
       <div
-        className={`cds--overflow-menu-options cds--overflow-menu--flip ${styles.menu} ${showMenu && styles.show}`}
+        className={classNames('cds--overflow-menu-options', 'cds--overflow-menu--flip', styles.menu, {
+          [styles.show]: showMenu,
+        })}
         tabIndex={0}
         data-floating-menu-direction="bottom"
         role="menu"
         aria-labelledby="custom-actions-overflow-menu-trigger"
         id="custom-actions-overflow-menu"
       >
-        <ul className={`cds--overflow-menu-options__content ${isTablet && 'cds--overflow-menu-options--lg'}`}>
+        <ul
+          className={classNames('cds--overflow-menu-options__content', { 'cds--overflow-menu-options--lg': isTablet })}
+        >
           {children}
         </ul>
         <span />

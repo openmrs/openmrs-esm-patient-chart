@@ -60,8 +60,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 jest.mock('../common', () => ({
+  assessValue: jest.fn(),
+  getReferenceRangesForConcept: jest.fn(),
+  generatePlaceholder: jest.fn(),
+  interpretBloodPressure: jest.fn(),
   invalidateCachedVitalsAndBiometrics: jest.fn(),
   saveVitalsAndBiometrics: jest.fn(),
+  useVitalsAndBiometrics: jest.fn(),
 }));
 
 describe('VitalsBiometricsForm', () => {
@@ -186,14 +191,14 @@ describe('VitalsBiometricsForm', () => {
     );
   });
 
-  it('renders an error notification if there was a problem saving vital biometrics', async () => {
+  it('renders an error notification if there was a problem saving vitals and biometrics', async () => {
     const user = userEvent.setup();
 
     const error = {
-      message: 'Internal Server Error',
+      message: 'Some of the values entered are invalid',
       response: {
         status: 500,
-        statusText: 'Some of the values entered are invalid',
+        statusText: 'Internal Server Error',
       },
     };
 
@@ -225,7 +230,7 @@ describe('VitalsBiometricsForm', () => {
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
     expect(mockShowNotification).toHaveBeenCalledWith({
       critical: true,
-      description: 'Internal Server Error',
+      description: 'Some of the values entered are invalid',
       kind: 'error',
       title: 'Error saving vitals and biometrics',
     });

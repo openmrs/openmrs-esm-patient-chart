@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
@@ -29,35 +30,36 @@ interface VitalsChartData {
 
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
+  const id = useId();
   const [selectedVitalSign, setSelectedVitalsSign] = React.useState<VitalsChartData>({
-    title: `BP (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
+    title: `${t('bp', 'BP')} (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
     value: 'systolic',
   });
 
   const vitalSigns = [
     {
       id: 'bloodPressure',
-      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
+      title: withUnit(t('bp', 'BP'), conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
       value: 'systolic',
     },
     {
       id: 'oxygenSaturation',
-      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
+      title: withUnit(t('spo2', 'SpO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
       value: 'spo2',
     },
     {
       id: 'temperature',
-      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
+      title: withUnit(t('temp', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
       value: 'temperature',
     },
     {
       id: 'respiratoryRate',
-      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
+      title: withUnit(t('respiratoryRate', 'R. rate'), conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
       value: 'respiratoryRate',
     },
     {
       id: 'pulse',
-      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
+      title: withUnit(t('pulse', 'Pulse'), conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
       value: 'pulse',
     },
   ];
@@ -100,7 +102,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     title: selectedVitalSign.title,
     axes: {
       bottom: {
-        title: 'Date',
+        title: t('date', 'Date'),
         mapsTo: 'key',
         scaleType: ScaleTypes.LABELS,
       },
@@ -132,7 +134,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   return (
     <div className={styles.vitalsChartContainer}>
       <div className={styles.vitalSignsArea}>
-        <label className={styles.vitalsSignLabel} htmlFor="vitals-chart-tab-group">
+        <label className={styles.vitalsSignLabel} htmlFor={`${id}-tab`}>
           {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
         <Tabs className={styles.verticalTabs}>
@@ -140,8 +142,9 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
             {vitalSigns.map(({ id, title, value }) => {
               return (
                 <Tab
+                  className={classNames(styles.tab, { [styles.selectedTab]: selectedVitalSign.title === title })}
+                  id={`${id}-tab`}
                   key={id}
-                  className={`${styles.tab} ${selectedVitalSign.title === title && styles.selectedTab}`}
                   onClick={() =>
                     setSelectedVitalsSign({
                       title: title,

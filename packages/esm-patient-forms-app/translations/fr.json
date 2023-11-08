@@ -10,7 +10,7 @@
   "lastCompleted": "Dernière mise à jour",
   "never": "Jamais",
   "noFormsToDisplay": "There are no forms to display.",
-  "noMatchingFormsAvailable": "Il n'y a pas de formulaires {FormCategory} à afficher",
+  "noMatchingFormsAvailable": "Il n'y a pas de formulaires {{formCategory}} à afficher",
   "noMatchingFormsToDisplay": "Pas de formulaires correspondants à afficher",
   "offlineForms": "Offline forms",
   "offlineForms__lower": "offline forms",

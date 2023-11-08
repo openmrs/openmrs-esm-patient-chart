@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
@@ -83,7 +84,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles['button-container']}>
             <Button
-              className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+              className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
               kind="ghost"
               size="sm"
               onClick={launchVitalsAndBiometricsForm}
@@ -93,7 +94,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             </Button>
           </div>
         </div>
-        <div className={`${styles['row-container']} ${isWorkspaceOpen() && styles['workspace-open']}`}>
+        <div
+          className={classNames(styles['row-container'], {
+            [styles['workspace-open']]: isWorkspaceOpen(),
+          })}
+        >
           <div className={styles.row}>
             <VitalsHeaderItem
               interpretation={interpretBloodPressure(
@@ -174,7 +179,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
 
       <div className={styles.container}>
         <Button
-          className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+          className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
           onClick={launchVitalsAndBiometricsForm}
           kind="ghost"
           size="sm"

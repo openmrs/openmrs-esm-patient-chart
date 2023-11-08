@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import {
@@ -27,13 +28,13 @@ import { Controller, useController, useForm } from 'react-hook-form';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
-import {
-  type DosingUnit,
-  type DrugOrderBasketItem,
-  type DurationUnit,
-  type MedicationFrequency,
-  type MedicationRoute,
-  type QuantityUnit,
+import type {
+  DosingUnit,
+  DrugOrderBasketItem,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
 } from '../types';
 import styles from './drug-order-form.scss';
 
@@ -236,6 +237,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const { maxDispenseDurationInDays } = useConfig();
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -269,7 +271,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       {isTablet && !isLoadingPatientDetails && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={`${styles.text02} ${styles.bodyShort01}`}>
+          <span className={classNames(styles.text02, styles.bodyShort01)}>
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
@@ -506,7 +508,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                       label={t('duration', 'Duration')}
                       min={0}
                       step={1}
-                      max={99}
+                      max={maxDispenseDurationInDays}
                       allowEmpty={true}
                     />
                   ) : (
@@ -611,7 +613,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           </section>
         </div>
 
-        <ButtonSet className={`${styles.buttonSet} ${isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}`}>
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
           <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>
@@ -632,6 +636,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
 
 const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }) => {
   const { t } = useTranslation();
+  const { maxDispenseDurationInDays } = useConfig();
 
   const {
     field: { onBlur, onChange, value, ref },
@@ -643,7 +648,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
   };
 
   const increment = () => {
-    setValue(name, Math.min(Number(value) + 1, 99));
+    setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
   };
 
   const decrement = () => {

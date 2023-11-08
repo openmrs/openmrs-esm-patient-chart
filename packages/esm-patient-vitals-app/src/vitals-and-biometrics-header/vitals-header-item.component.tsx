@@ -1,30 +1,33 @@
 import React from 'react';
-import { ObservationInterpretation } from '../common';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import type { ObservationInterpretation } from '../common';
 import styles from './vitals-header-item.scss';
 
 interface VitalsHeaderItemProps {
   interpretation?: ObservationInterpretation;
   unitName: string;
-  unitSymbol: React.ReactChild;
+  unitSymbol: React.ReactNode;
   value: string | number;
 }
 
 const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, value, unitName, unitSymbol }) => {
+  const { t } = useTranslation();
   const flaggedCritical = interpretation && interpretation.includes('critically');
   const flaggedAbnormal = interpretation && interpretation !== 'normal';
 
   return (
-    <div className={styles.container}>
-      <div className={`${flaggedCritical && styles['critical-value']} ${flaggedAbnormal && styles['abnormal-value']}`}>
+    <section className={styles.container}>
+      <div
+        className={classNames({
+          [styles['critical-value']]: flaggedCritical,
+          [styles['abnormal-value']]: flaggedAbnormal,
+        })}
+      >
         <div className={styles['label-container']}>
           <label className={styles.label}>{unitName}</label>
           {flaggedAbnormal ? (
-            <div title="abnormal value">
-              {interpretation === 'high' ? <span className={styles.high}></span> : null}
-              {interpretation === 'critically_high' ? <span className={styles['critically-high']}></span> : null}
-              {interpretation === 'low' ? <span className={styles.low}></span> : null}
-              {interpretation === 'critically_low' ? <span className={styles['critically-low']}></span> : null}
-            </div>
+            <span className={styles[interpretation.replace('_', '-')]} title={t('abnormalValue', 'Abnormal value')} />
           ) : null}
         </div>
         <div className={styles['value-container']}>
@@ -34,7 +37,7 @@ const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, val
           </label>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

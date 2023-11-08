@@ -1,7 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
+import { Printer } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
@@ -11,9 +13,8 @@ import PanelView from '../panel-view';
 import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view';
 import Trendline from '../trendline/trendline.component';
+import type { ConfigObject } from '../../config-schema';
 import styles from './results-viewer.styles.scss';
-import { Printer } from '@carbon/react/icons';
-import { ConfigObject } from '../../config-schema';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
@@ -125,7 +126,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   return (
     <div className={styles.resultsContainer}>
       <div className={styles.resultsHeader}>
-        <div className={`${styles.leftSection} ${styles.leftHeaderSection}`}>
+        <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>

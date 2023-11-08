@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, InlineNotification, TextInput } from '@carbon/react';
-import { LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
-import { useLayoutType, useSession } from '@openmrs/esm-framework';
-import styles from './lab-order-form.scss';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, InlineNotification, TextInput } from '@carbon/react';
+import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, useSession } from '@openmrs/esm-framework';
+import { LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
 import { priorityOptions } from './lab-order';
-import { TestType, useTestTypes } from './useTestTypes';
+import { type TestType, useTestTypes } from './useTestTypes';
+import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
@@ -147,7 +148,9 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
             </Column>
           </Grid>
         </div>
-        <ButtonSet className={`${styles.buttonSet} ${isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}`}>
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
           <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
             {t('discard', 'Discard')}
           </Button>

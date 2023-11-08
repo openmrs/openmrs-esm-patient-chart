@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -18,7 +19,7 @@ import {
 import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { Condition, useConditions } from './conditions.resource';
+import { useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { compare } from './utils';
 import styles from './conditions-detailed-summary.scss';
@@ -142,7 +143,7 @@ function ConditionsDetailedSummary({ patient }) {
                     <TableRow>
                       {headers.map((header) => (
                         <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,

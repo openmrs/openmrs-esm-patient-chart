@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import first from 'lodash-es/first';
@@ -14,7 +15,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
@@ -114,7 +114,7 @@ const FormView: React.FC<FormViewProps> = ({
         <Tile className={styles.tile}>
           <EmptyDataIllustration />
           <p className={styles.content}>
-            {t('noMatchingFormsAvailable', 'There are no {formCategory} forms to display', {
+            {t('noMatchingFormsAvailable', 'There are no {{formCategory}} forms to display', {
               formCategory: category?.toLowerCase(),
             })}
           </p>
@@ -154,7 +154,7 @@ const FormView: React.FC<FormViewProps> = ({
                     <TableRow>
                       {headers.map((header) => (
                         <TableHeader
-                          className={`${styles.heading} ${styles.text02}`}
+                          className={classNames(styles.heading, styles.text02)}
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
