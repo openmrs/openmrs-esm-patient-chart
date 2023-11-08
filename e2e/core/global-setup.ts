@@ -21,7 +21,7 @@ async function globalSetup() {
       locale: 'en',
     },
     headers: {
-      'Content-Type': 'application/json',
+      Accept: 'application/json',
       Authorization: `Basic ${token}`,
     },
   });

@@ -1,6 +1,8 @@
 import { devices, PlaywrightTestConfig } from '@playwright/test';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { config as dotenvConfig } from 'dotenv';
+import { resolve } from 'node:path';
+dotenvConfig({ path: resolve(process.cwd(), 'example.env') });
+dotenvConfig();
 
 // See https://playwright.dev/docs/test-configuration.
 const config: PlaywrightTestConfig = {

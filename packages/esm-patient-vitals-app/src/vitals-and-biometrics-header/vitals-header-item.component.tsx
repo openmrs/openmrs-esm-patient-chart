@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import type { ObservationInterpretation } from '../vitals.resource';
+import type { ObservationInterpretation } from '../common';
 import styles from './vitals-header-item.scss';
 
 interface VitalsHeaderItemProps {

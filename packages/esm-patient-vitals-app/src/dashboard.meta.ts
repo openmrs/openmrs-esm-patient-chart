@@ -4,3 +4,5 @@ export const dashboardMeta = {
   path: 'Vitals & Biometrics',
   title: 'Vitals & Biometrics',
 };
+
+export default dashboardMeta;

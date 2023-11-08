@@ -7,15 +7,14 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchPatientWorkspace,
   useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
-import { launchVitalsForm } from './vitals-utils';
-import { useVitals } from './vitals.resource';
+import { launchVitalsAndBiometricsForm } from '../utils';
+import { useVitalsAndBiometrics } from '../common';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
@@ -28,17 +27,9 @@ interface VitalsOverviewProps {
   pageUrl: string;
 }
 
-export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  launchPatientWorkspace('patient-form-entry-workspace', {
-    workspaceTitle: formName,
-    formInfo: { formUuid, encounterUuid },
-  });
-}
-
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
-  const displayText = t('vitalSigns', 'Vital signs');
+  const config = useConfig<ConfigObject>();
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = useState(false);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
@@ -47,12 +38,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
+  const { data: vitals, isError, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
   const launchVitalsBiometricsForm = useCallback(() => {
-    launchVitalsForm(currentVisit, config);
+    launchVitalsAndBiometricsForm(currentVisit, config);
   }, [config, currentVisit]);
 
   const patientDetails = useMemo(() => {
@@ -214,7 +205,11 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
           );
         }
         return (
-          <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
+          <EmptyState
+            displayText={t('vitalSigns', 'Vital signs')}
+            headerTitle={headerTitle}
+            launchForm={launchVitalsBiometricsForm}
+          />
         );
       })()}
     </>
