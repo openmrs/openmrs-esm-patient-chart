@@ -1,6 +1,6 @@
 import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
-import dayjs from 'dayjs';
+import * as moment from 'moment';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
@@ -243,12 +243,21 @@ export class FormCreationService {
 
   private setDefaultValues(form: Form, createFormParams: CreateFormParams) {
     const { session } = createFormParams;
-    let currentDate = dayjs().format();
-    const visitStartDatetime = dayjs(this.singleSpaPropsService.getProp('visitStartDatetime')).format();
-    // If the visit start date is before the current date, use the visit start date as the default date.
-    if (visitStartDatetime && dayjs(visitStartDatetime).isBefore(currentDate, 'date')) {
-      currentDate = visitStartDatetime;
+    const config = this.configResourceService.getConfig();
+    let currentDate;
+
+    if (config.customEncounterDatetime === true) {
+      const visitStartDatetime = moment(this.singleSpaPropsService.getProp('visitStartDatetime')).format();
+      // If the visit start date is before the current date, use the visit start date as the default date.
+      if (visitStartDatetime && moment(visitStartDatetime).isBefore(currentDate, 'date')) {
+        currentDate = visitStartDatetime;
+      } else {
+        currentDate = moment().format();
+      }
+    } else {
+      currentDate = moment().format();
     }
+
     // Encounter date and time.
     const encounterDate = form.searchNodeByQuestionId('encDate');
     if (encounterDate.length > 0) {
