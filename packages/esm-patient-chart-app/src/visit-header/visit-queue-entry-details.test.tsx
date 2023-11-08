@@ -1,45 +1,61 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import VisitQueueEntryDetail from './visit-queue-entry-details.component';
-import { STATUS, PRIORITY } from '../constants';
+import { render, screen } from '@testing-library/react';
+import VisitQueueEntryDetails from './visit-queue-entry-details.component';
+import userEvent from '@testing-library/user-event';
 import { showModal } from '@openmrs/esm-framework';
+import { STATUS, PRIORITY } from '../constants';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  showModal: jest.fn(),
-}));
+const mockedShowModal = jest.mocked(showModal);
 
-describe('VisitQueueEntryDetail', () => {
-  const mockQueueEntry = {
+const testProps = {
+  queueEntry: {
     service: 'Test Service',
     status: STATUS.IN_SERVICE,
-  };
+  },
+  priority: PRIORITY.EMERGENCY,
+};
 
-  const mockPriority = PRIORITY.EMERGENCY;
-
-  it('renders without crashing', () => {
-    const { container } = render(<VisitQueueEntryDetail queueEntry={mockQueueEntry} priority={mockPriority} />);
-    expect(container).toBeInTheDocument();
-  });
-
+describe('VisitQueueEntryDetails', () => {
   it('displays the correct service message', () => {
-    const { getByText } = render(<VisitQueueEntryDetail queueEntry={mockQueueEntry} priority={mockPriority} />);
-    expect(getByText(`Attending ${mockQueueEntry.service}`)).toBeInTheDocument();
+    renderVisitQueueEntryDetails();
+
+    expect(screen.getByText(`Attending ${testProps.queueEntry.service}`)).toBeInTheDocument();
   });
 
-  it('displays the correct tag type based on priority', () => {
-    render(<VisitQueueEntryDetail queueEntry={mockQueueEntry} priority={mockPriority} />);
-    const attendingService = screen.getByText(`Attending ${mockQueueEntry.service}`);
+  it('displays the correct tag type based on the visit priority', () => {
+    renderVisitQueueEntryDetails();
+
+    const attendingService = screen.getByText(`Attending ${testProps.queueEntry.service}`);
     expect(attendingService).toBeInTheDocument();
 
-    const emergencyTag = screen.getByText(mockPriority);
+    const emergencyTag = screen.getByText(testProps.priority);
     expect(emergencyTag).toBeInTheDocument();
   });
 
-  it('calls showModal on edit button click', () => {
-    render(<VisitQueueEntryDetail queueEntry={mockQueueEntry} priority={mockPriority} />);
+  it('calls showModal on edit button click', async () => {
+    const user = userEvent.setup();
+
+    renderVisitQueueEntryDetails();
+
     const moveToNextServiceButton = screen.getByRole('button', { name: /move to next service/i });
     expect(moveToNextServiceButton).toBeInTheDocument();
-    fireEvent.click(moveToNextServiceButton);
-    expect(showModal).toHaveBeenCalled();
+
+    await user.click(moveToNextServiceButton);
+
+    expect(mockedShowModal).toHaveBeenCalled();
+
+    expect(mockedShowModal).toHaveBeenCalledWith(
+      'edit-queue-entry-status-modal',
+      expect.objectContaining({
+        queueEntry: {
+          service: 'Test Service',
+          status: 'in service',
+        },
+      }),
+    );
   });
 });
+
+function renderVisitQueueEntryDetails() {
+  render(<VisitQueueEntryDetails {...testProps} />);
+}

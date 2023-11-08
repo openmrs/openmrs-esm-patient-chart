@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { Tooltip } from '@carbon/react';
-import styles from './visit-header.scss';
-import { age, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@carbon/react';
+import { age, useLayoutType } from '@openmrs/esm-framework';
+import styles from './visit-header.scss';
 
 const PatientInfoCard = ({ patient }) => {
   const { t } = useTranslation();
