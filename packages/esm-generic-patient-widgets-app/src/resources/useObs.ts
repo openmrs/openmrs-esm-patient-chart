@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
 
 export interface UseObsResult {
   data: Array<ObsResult>;
@@ -20,7 +21,7 @@ type ObsResult = fhir.Observation & {
 export const pageSize = 100;
 
 export function useObs(patientUuid: string, includeEncounters: boolean = false): UseObsResult {
-  const { encounterTypes, data } = useConfig();
+  const { encounterTypes, data } = useConfig<ConfigObject>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
