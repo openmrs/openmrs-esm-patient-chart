@@ -57,6 +57,7 @@ function renderFormEntry() {
     closeWorkspace: jest.fn(),
     promptBeforeClosing: jest.fn(),
     patientUuid: mockPatient.id,
+    formInfo: { formUuid: 'some-form-uuid' },
     mutateForm: jest.fn(),
   };
 

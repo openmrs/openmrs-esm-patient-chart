@@ -38,10 +38,12 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
+  useConnectivity,
 } from '@openmrs/esm-framework';
 import {
   amPm,
   convertTime12to24,
+  createOfflineVisitForPatient,
   DefaultWorkspaceProps,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
@@ -55,6 +57,7 @@ import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
+import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 export type VisitFormData = {
   visitDate: Date;
@@ -74,15 +77,17 @@ export type VisitFormData = {
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const isOnline = useConnectivity();
   const sessionUser = useSession();
-  const { error: errorFetchingLocations } = useLocations();
+  const { error: errorFetchingLocations } = isOnline ? useLocations() : { error: false };
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const allVisitTypes = useVisitTypes();
+  const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
+  const { mutate } = useVisit(patientUuid);
   const { mutate: mutateVisit } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -170,6 +175,39 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       };
 
       const abortController = new AbortController();
+
+      if (!isOnline) {
+        createOfflineVisitForPatient(
+          patientUuid,
+          visitLocation.uuid,
+          config.offlineVisitTypeUuid,
+          payload.startDatetime,
+        ).then(
+          (offlineVisit) => {
+            //setCurrentVisit(patientUuid, offlineVisit.uuid);
+            mutate();
+            closeWorkspace();
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
+            });
+          },
+          (error) => {
+            showNotification({
+              title: t('startVisitError', 'Error starting visit'),
+              kind: 'error',
+              critical: true,
+              description: error?.message,
+            });
+          },
+        );
+        return;
+      }
+
       saveVisit(payload, abortController)
         .pipe(first())
         .subscribe(

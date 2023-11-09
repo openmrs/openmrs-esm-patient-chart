@@ -1,3 +1,18 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.emptyState {
+  text-align: center;
+}
+
+.emptyStateContent {
+  @include type.type-style("heading-compact-01");
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
 // Desktop
 :global(.omrs-breakpoint-gt-tablet) {
   .container {
