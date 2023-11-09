@@ -1,5 +1,21 @@
 import useSWR from 'swr';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
+
+export interface UseObsResult {
+  data: Array<ObsResult>;
+  error: Error;
+  isLoading: boolean;
+  isValidating: boolean;
+}
+
+type ObsResult = fhir.Observation & {
+  conceptUuid: string;
+  dataType?: string;
+  valueDateTime?: string;
+  encounter?: {
+    name?: string;
+  };
+};
 
 export const pageSize = 100;
 
@@ -15,7 +31,7 @@ export function useObs(patientUuid: string, includeEncounters: boolean = false):
     url += '&_include=Observation:encounter';
   }
 
-  const { data: result, error, isLoading, isValidating } = useSWR<{ data: ObsFetchResponse }, Error>(url, openmrsFetch);
+  const { data: result, error, isLoading, isValidating } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
 
   const encounters = includeEncounters ? getEncountersByResources(result?.data?.entry) : [];
   const observations = filterAndMapObservations(result?.data?.entry, encounters);
@@ -28,16 +44,20 @@ export function useObs(patientUuid: string, includeEncounters: boolean = false):
   };
 }
 
-function filterAndMapObservations(entries, encounters): ObsResult[] {
+function filterAndMapObservations(
+  entries: Array<fhir.BundleEntry>,
+  encounters: Array<{ reference: string; display: string }>,
+): ObsResult[] {
   return (
     entries
       ?.filter((entry) => entry?.resource?.resourceType === 'Observation')
       ?.map((entry) => {
+        const resource = entry.resource as fhir.Observation;
         const observation: ObsResult = {
-          ...entry.resource,
-          conceptUuid: entry.resource.code.coding.find((c) => isUuid(c.code))?.code,
+          ...resource,
+          conceptUuid: resource.code.coding.find((c) => isUuid(c.code))?.code,
         };
-        if (entry.resource.hasOwnProperty('valueDateTime')) {
+        if (resource.hasOwnProperty('valueDateTime')) {
           observation.dataType = 'DateTime';
         }
 
@@ -52,49 +72,26 @@ function filterAndMapObservations(entries, encounters): ObsResult[] {
         if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
           observation.dataType = 'Coded';
         }
-        observation.encounter.name = encounters.find((e) => e.reference === entry.resource.encounter.reference)
-          ?.display;
+
+        observation.encounter.name = encounters.find(
+          (e) =>
+            e.reference === (resource as fhir.Observation & { encounter: { reference?: string } }).encounter.reference,
+        )?.display;
 
         return observation;
       }) || []
   );
 }
 
-interface ObsFetchResponse {
-  entry: Array<{
-    resource: FHIRResource['resource'];
-  }>;
-  id: string;
-  meta: {
-    lastUpdated: string;
-  };
-  resourceType: string;
-  total: number;
-  type: string;
+function getEncountersByResources(resources: Array<fhir.BundleEntry>) {
+  return resources
+    ?.filter((entry) => entry?.resource?.resourceType === 'Encounter')
+    .map((entry: fhir.BundleEntry) => ({
+      reference: `Encounter/${entry.resource.id}`,
+      display: (entry.resource as fhir.Encounter).type?.[0]?.coding?.[0]?.display || '--',
+    }));
 }
-
-export interface UseObsResult {
-  data: Array<ObsResult>;
-  error: Error;
-  isLoading: boolean;
-  isValidating: boolean;
-}
-
-type ObsResult = FHIRResource['resource'] & {
-  conceptUuid: string;
-  dataType?: string;
-  valueDateTime?: string;
-};
 
 function isUuid(input: string) {
   return input.length === 36;
-}
-
-function getEncountersByResources(resources) {
-  return resources
-    ?.filter((entry) => entry?.resource?.resourceType === 'Encounter')
-    .map((entry) => ({
-      reference: `Encounter/${entry.resource.id}`,
-      display: entry.resource.type?.[0]?.coding?.[0]?.display || '--',
-    }));
 }
