@@ -72,7 +72,10 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     },
   });
   const config = useConfig<ConfigObject>();
-  const selectedLabTest = config.labTests.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid);
+  const selectedLabTest =
+    config && config.labTests
+      ? config.labTests.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid)
+      : null;
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
