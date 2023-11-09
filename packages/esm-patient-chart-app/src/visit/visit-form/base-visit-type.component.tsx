@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFormContext, Controller } from 'react-hook-form';
+import classNames from 'classnames';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { Layer, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton } from '@carbon/react';
-import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
-import styles from './visit-type-overview.scss';
-import { useFormContext, Controller } from 'react-hook-form';
 import { VisitFormData } from './visit-form.component';
+import styles from './visit-type-overview.scss';
 
 interface BaseVisitTypeProps {
   visitTypes: Array<VisitType>;
@@ -32,7 +33,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
   return (
-    <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
+    <div className={classNames(styles.visitTypeOverviewWrapper, isTablet ? styles.tablet : styles.desktop)}>
       {visitTypes.length ? (
         <>
           {isTablet ? (

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -83,7 +84,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
+                      className={classNames(styles.productiveHeading01, styles.text02)}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,

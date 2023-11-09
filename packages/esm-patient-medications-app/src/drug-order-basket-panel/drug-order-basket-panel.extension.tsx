@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
@@ -45,10 +46,12 @@ export default function DrugOrderBasketPanelExtension() {
   }, [orders]);
 
   return (
-    <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
+    <Tile
+      className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
+    >
       <div className={styles.heading}>
         <div className={styles.title}>
-          <div className={`${isTablet ? styles.tabletIcon : styles.desktopIcon}`}>
+          <div className={classNames(isTablet ? styles.tabletIcon : styles.desktopIcon)}>
             <RxIcon isTablet={isTablet} />
           </div>
           <h4>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>

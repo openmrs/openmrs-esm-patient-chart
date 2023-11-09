@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
@@ -18,13 +19,13 @@ const TimeSlots: React.FC<{
   style?: React.CSSProperties;
   className?: string;
 }> = ({ children = undefined, className, ...props }) => (
-  <div className={`${styles.timeSlotInner} ${className ? className : ''}`} {...props}>
+  <div className={classNames(styles.timeSlotInner, className)} {...props}>
     <div>{children}</div>
   </div>
 );
 
 const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
-  <TimeSlots className={`${styles.cornerGridElement} ${showShadow ? styles.shadow : ''}`}>{panelName}</TimeSlots>
+  <TimeSlots className={classNames(styles.cornerGridElement, { [styles.shadow]: showShadow })}>{panelName}</TimeSlots>
 );
 
 const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
@@ -70,7 +71,7 @@ const TimelineCell: React.FC<TimelineCellProps> = ({ text, interpretation = 'NOR
     : '';
 
   return (
-    <div className={`${styles.timelineDataCell} ${zebra ? styles.timelineCellZebra : ''} ${additionalClassname}`}>
+    <div className={classNames(styles.timelineDataCell, { [styles.timelineCellZebra]: zebra }, additionalClassname)}>
       <p>{text}</p>
     </div>
   );

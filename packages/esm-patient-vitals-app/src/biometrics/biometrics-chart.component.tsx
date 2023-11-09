@@ -1,10 +1,11 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
-import { PatientBiometrics } from './biometrics.resource';
+import { type PatientVitals } from '../common';
 import styles from './biometrics-chart.scss';
 
 enum ScaleTypes {
@@ -18,7 +19,7 @@ enum ScaleTypes {
 interface BiometricsChartProps {
   conceptUnits: Map<string, string>;
   config: ConfigObject;
-  patientBiometrics: Array<PatientBiometrics>;
+  patientBiometrics: Array<PatientVitals>;
 }
 
 interface BiometricChartData {
@@ -108,10 +109,10 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
               { id: 'bmi', label: `${t('bmi', 'BMI')} (${bmiUnit})` },
             ].map(({ id, label }) => (
               <Tab
+                className={classNames(styles.tab, styles.bodyLong01, {
+                  [styles.selectedTab]: selectedBiometrics.title === label,
+                })}
                 key={id}
-                className={`${styles.tab} ${styles.bodyLong01} ${
-                  selectedBiometrics.title === label && styles.selectedTab
-                }`}
                 onClick={() =>
                   setSelectedBiometrics({
                     title: label,

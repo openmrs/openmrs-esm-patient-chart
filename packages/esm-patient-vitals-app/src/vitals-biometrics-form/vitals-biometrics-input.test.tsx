@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { assessValue, getReferenceRangesForConcept } from '../vitals.resource';
+import { assessValue, getReferenceRangesForConcept } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 
 jest.mock('react-hook-form', () => ({

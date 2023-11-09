@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../../config-schema';
+import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
   extractNumbers,
@@ -28,9 +28,9 @@ import {
   assessValue,
   getReferenceRangesForConcept,
   interpretBloodPressure,
-  savePatientVitals,
-  useVitals,
-} from '../vitals.resource';
+  invalidateCachedVitalsAndBiometrics,
+  saveVitalsAndBiometrics as savePatientVitals,
+} from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
 
@@ -71,7 +71,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { mutate } = useVitals(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,16 +139,14 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     ],
   );
 
-  const savePatientVitalsAndBiometrics = (data: VitalsBiometricsFormData) => {
+  const savePatientVitalsAndBiometrics = useCallback((data: VitalsBiometricsFormData) => {
     const formData = data;
     setShowErrorMessage(true);
     setShowErrorNotification(false);
 
     data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
 
-    let allFieldsAreValid = false;
-
-    allFieldsAreValid = Object.entries(formData)
+    const allFieldsAreValid = Object.entries(formData)
       .filter(([, value]) => Boolean(value))
       .every(([key, value]) => isValueWithinReferenceRange(conceptMetadata, config.concepts[`${key}Uuid`], value));
 
@@ -170,7 +167,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       )
         .then((response) => {
           if (response.status === 201) {
-            mutate();
+            invalidateCachedVitalsAndBiometrics();
             closeWorkspace();
             showToast({
               critical: true,
@@ -190,7 +187,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
             kind: 'error',
             critical: true,
-            description: err?.message,
+            description: t('checkForValidity', 'Some of the values entered are invalid'),
           });
         })
         .finally(() => {
@@ -199,7 +196,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     } else {
       setHasInvalidVitals(true);
     }
-  };
+  }, []);
 
   if (config.vitals.useFormEngine) {
     return (

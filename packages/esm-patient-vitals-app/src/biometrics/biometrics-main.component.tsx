@@ -4,10 +4,9 @@ import BiometricsBase from './biometrics-base.component';
 
 interface BiometricsProps {
   patientUuid: string;
-  basePath: string;
 }
 
-const BiometricsMain: React.FC<BiometricsProps> = ({ patientUuid, basePath }) => {
+const BiometricsMain: React.FC<BiometricsProps> = ({ patientUuid }) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart`;

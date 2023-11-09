@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import {
@@ -27,13 +28,13 @@ import { Controller, useController, useForm } from 'react-hook-form';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { ConfigObject } from '../config-schema';
-import {
-  type DosingUnit,
-  type DrugOrderBasketItem,
-  type DurationUnit,
-  type MedicationFrequency,
-  type MedicationRoute,
-  type QuantityUnit,
+import type {
+  DosingUnit,
+  DrugOrderBasketItem,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
 } from '../types';
 import styles from './drug-order-form.scss';
 
@@ -270,7 +271,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       {isTablet && !isLoadingPatientDetails && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={`${styles.text02} ${styles.bodyShort01}`}>
+          <span className={classNames(styles.text02, styles.bodyShort01)}>
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
@@ -612,7 +613,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           </section>
         </div>
 
-        <ButtonSet className={`${styles.buttonSet} ${isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}`}>
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
           <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>

@@ -1,5 +1,4 @@
 import { Type } from '@openmrs/esm-framework';
-import biometricsConfigSchema, { BiometricsConfigObject } from './vitals/biometrics-config-schema';
 
 export const configSchema = {
   concepts: {
@@ -92,8 +91,19 @@ export const configSchema = {
       _description: 'Whether to show/use MUAC color codes. If set to true, the input will show status colors.',
     },
   },
-  biometrics: biometricsConfigSchema,
+  biometrics: {
+    bmiUnit: {
+      _type: Type.String,
+      _default: 'kg / m²',
+    },
+  },
 };
+
+export interface BiometricsConfigObject {
+  bmiUnit: string;
+  heightUnit: string;
+  weightUnit: string;
+}
 
 export interface ConfigObject {
   concepts: {

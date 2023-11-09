@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
@@ -6,31 +7,22 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import {
-  launchPatientWorkspace,
-  useVisitOrOfflineVisit,
-  useVitalsConceptMetadata,
-  useWorkspaces,
-} from '@openmrs/esm-patient-common-lib';
-import { ConfigObject } from '../../config-schema';
-import { assessValue, getReferenceRangesForConcept, interpretBloodPressure, useVitals } from '../vitals.resource';
-import { launchVitalsForm } from '../vitals-utils';
+import { useVisitOrOfflineVisit, useVitalsConceptMetadata, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { ConfigObject } from '../config-schema';
+import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+import { assessValue, getReferenceRangesForConcept, interpretBloodPressure, useVitalsAndBiometrics } from '../common';
 
 interface VitalsHeaderProps {
   patientUuid: string;
 }
 
-export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
-}
-
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
-  const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
+  const config = useConfig<ConfigObject>();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
-  const { vitals, isLoading, isValidating } = useVitals(patientUuid, true);
+  const { data: vitals, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid, 'both');
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
@@ -42,9 +34,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   }, [workspaces]);
 
   const launchVitalsAndBiometricsForm = useCallback(
-    (e) => {
+    (e: Event) => {
       e.stopPropagation();
-      launchVitalsForm(currentVisit, config);
+      launchForm(currentVisit, config);
     },
     [config, currentVisit],
   );
@@ -92,7 +84,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles['button-container']}>
             <Button
-              className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+              className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
               kind="ghost"
               size="sm"
               onClick={launchVitalsAndBiometricsForm}
@@ -102,7 +94,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             </Button>
           </div>
         </div>
-        <div className={`${styles['row-container']} ${isWorkspaceOpen() && styles['workspace-open']}`}>
+        <div
+          className={classNames(styles['row-container'], {
+            [styles['workspace-open']]: isWorkspaceOpen(),
+          })}
+        >
           <div className={styles.row}>
             <VitalsHeaderItem
               interpretation={interpretBloodPressure(
@@ -183,7 +179,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
 
       <div className={styles.container}>
         <Button
-          className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+          className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
           onClick={launchVitalsAndBiometricsForm}
           kind="ghost"
           size="sm"
