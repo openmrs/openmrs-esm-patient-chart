@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './cancel-visit-dialog.scss';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
-import { useDeleteVisit } from '../visits-widget/visit.resource';
+import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 
 interface CancelVisitDialogProps {
   patientUuid: string;

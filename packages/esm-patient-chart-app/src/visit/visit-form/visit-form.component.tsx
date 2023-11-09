@@ -279,7 +279,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             value: value as string,
           })),
       };
-      if (visitToEdit.uuid) {
+      if (visitToEdit?.uuid) {
         // The request throws 400 (Bad request)error when patient is passed in the update payload
 
         delete payload.patient;
