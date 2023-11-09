@@ -54,7 +54,7 @@ export const configSchema = {
         _elements: {
           uuid: {
             _type: Type.UUID,
-            _description: 'Lab test concept UUID',
+            _description: 'Concept UUID representing the order reason',
           },
           label: {
             _type: Type.String,
@@ -67,7 +67,7 @@ export const configSchema = {
       },
     },
     _default: [],
-    _description: 'Whether to allow for provision of order reason',
+    _description: 'Whether to allow for provision of coded order reason',
   },
 };
 
