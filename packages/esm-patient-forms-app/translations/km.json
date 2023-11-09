@@ -10,7 +10,7 @@
   "lastCompleted": "បញ្ចប់ចុងក្រោយ",
   "never": "មិនដែលសោះ",
   "noFormsToDisplay": "មិនមានទម្រង់ដែលត្រូវបង្ហាញទេ.",
-  "noMatchingFormsAvailable": "មិនមានទម្រង់ {formCategory} ដែលត្រូវបង្ហាញទេ",
+  "noMatchingFormsAvailable": "មិនមានទម្រង់ {{formCategory}} ដែលត្រូវបង្ហាញទេ",
   "noMatchingFormsToDisplay": "មិនមានទម្រង់ដែលត្រូវគ្នាដើម្បីបង្ហាញទេ",
   "offlineForms": "ទម្រង់មិនមានភ្ជាប់អ៊ីនធើណេត",
   "offlineForms__lower": "ទម្រង់មិនមានភ្ជាប់អ៊ីនធើណេត",

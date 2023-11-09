@@ -3,8 +3,13 @@
   "biometricDisplayed": "תצוגת מדדים ביומטריים",
   "biometrics": "מדדים ביומטריים",
   "biometrics_lower": "מדדים ביומטריים",
+  "bmi": "BMI",
+  "date": "Date",
+  "dateAndTime": "Date and time",
   "goToSummary": "עבור לסיכום",
+  "height": "Height",
   "loading": "טוען",
+  "muac": "MUAC",
   "seeAll": "ראה הכל",
   "Vitals & Biometrics": "מדדים וביומטריה",
   "weight": "משקל"

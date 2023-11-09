@@ -23,7 +23,7 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
-          {t('emptyStateText', 'There are no {displayText} to display for this patient', {
+          {t('emptyStateText', 'There are no {{displayText}} to display for this patient', {
             displayText: props.displayText.toLowerCase(),
           })}
         </p>

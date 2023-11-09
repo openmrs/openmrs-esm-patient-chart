@@ -56,6 +56,7 @@ import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 
 export type VisitFormData = {
   visitDate: Date;
@@ -86,6 +87,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
   const { mutate } = useVisit(patientUuid);
+  const { mutate: mutateVisit } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -93,6 +95,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [upcomingAppointment, setUpcomingAppointment] = useState(null);
   const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
+  const [visitUuid, setVisitUuid] = useState('');
+  const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
 
   const visitFormSchema = useMemo(() => {
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
@@ -210,7 +214,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             if (response.status === 201) {
               if (config.showServiceQueueFields) {
                 // retrieve values from queue extension
-
+                setVisitUuid(response.data.uuid);
                 const queueLocation = event?.target['queueLocation']?.value;
                 const serviceUuid = event?.target['service']?.value;
                 const priority = event?.target['priority']?.value;
@@ -230,7 +234,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutate();
+                      mutateVisit();
+                      mutateQueueEntry();
                       showToast({
                         kind: 'success',
                         title: t('visitStarted', 'Visit started'),
@@ -262,7 +267,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 saveAppointment(appointmentPayload, abortController).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutate();
+                      mutateVisit();
                       showToast({
                         critical: true,
                         kind: 'success',
@@ -281,13 +286,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   },
                 );
               }
-              mutate();
+              mutateVisit();
               closeWorkspace();
 
               showToast({
                 critical: true,
                 kind: 'success',
-                description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                description: t('visitStartedSuccessfully', '{{visit}} started successfully', {
                   visit: response?.data?.visitType?.display ?? `Visit`,
                 }),
                 title: t('visitStarted', 'Visit started'),
@@ -309,7 +314,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
-      mutate,
+      mutateVisit,
       patientUuid,
       upcomingAppointment,
       t,

@@ -6,6 +6,7 @@
   "bp": "Pression sanguine",
   "calculatedBmi": "IMC (calc.)",
   "checkForValidity": "Certaines des valeurs saisies ne sont pas valides.",
+  "date": "Date",
   "diastolic": "diastolique",
   "discard": "Abandonner",
   "error": "Error",

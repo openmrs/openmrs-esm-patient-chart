@@ -14,7 +14,7 @@ jest.mock('@openmrs/esm-framework', () => {
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
     translateFrom: (module, key, defaultValue, options = {}) => {
       Object.keys(options).forEach((key) => {
-        defaultValue = defaultValue.replace(`{${key}}`, options[key]);
+        defaultValue = defaultValue.replace(`{{${key}}}`, options[key]);
       });
       return defaultValue;
     },

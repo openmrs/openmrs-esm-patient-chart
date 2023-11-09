@@ -67,11 +67,12 @@ interface UseVisitQueueEntries {
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
+  mutate: () => void;
 }
 
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -105,6 +106,7 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
     isLoading,
     isError: error,
     isValidating,
+    mutate,
   };
 }
 

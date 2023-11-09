@@ -97,7 +97,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
               {!medication.duration
                 ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-                : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
+                : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                     duration: medication.duration,
                     durationUnit: medication.durationUnits?.display.toLowerCase(),
                   })}{' '}

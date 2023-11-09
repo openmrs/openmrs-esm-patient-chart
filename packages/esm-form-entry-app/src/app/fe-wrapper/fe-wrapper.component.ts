@@ -228,11 +228,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
                 });
             }
 
-            this.programService.handleProgramEnrollmentAndDiscontinuation(
-              this.form,
-              this.singleSpaPropsService.getProp('patientUuid'),
-              encounterToSubmit,
-            );
+            this.programService.handlePatientCareProgram(this.form, encounter.uuid);
             showToast({
               critical: true,
               kind: 'success',
