@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import {
@@ -195,7 +196,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   };
 
   if (!visits?.length) {
-    return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncountersFound', 'No encounters found')}</p>;
+    return (
+      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
+    );
   }
 
   return (

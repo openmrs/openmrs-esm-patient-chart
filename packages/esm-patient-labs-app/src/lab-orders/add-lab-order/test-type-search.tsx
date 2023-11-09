@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Layer, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItem, prepLabOrderPostData } from '../api';
-import styles from './test-type-search.scss';
-import { TestType, useTestTypes } from './useTestTypes';
+import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './lab-order';
+import styles from './test-type-search.scss';
 
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: LabOrderBasketItem) => void;
@@ -127,7 +128,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
           </div>
         </Tile>
       )}
-      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
+      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
     </>
   );
 }
@@ -168,11 +169,11 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
   return (
     <Tile
+      className={classNames(styles.searchResultTile, { [styles.tabletSearchResultTile]: isTablet })}
       key={testType.conceptUuid}
       role="listitem"
-      className={`${styles.searchResultTile} ${isTablet && styles.tabletSearchResultTile}`}
     >
-      <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
+      <div className={classNames(styles.searchResultTileContent, styles.text02)}>
         <p>
           <span className={styles.productiveHeading01}>{testType.label}</span>{' '}
         </p>
@@ -230,7 +231,7 @@ const TestTypeSearchSkeleton = () => {
       <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
-      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
+      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
     </div>
   );
 };

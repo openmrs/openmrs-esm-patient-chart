@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Button, IconButton } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
@@ -33,7 +34,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isWorkspaceActive && styles.active}`}
+        className={classNames(styles.container, { [styles.active]: isWorkspaceActive })}
         role="button"
         tabIndex={0}
         onClick={handler}
@@ -51,7 +52,9 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   return (
     <IconButton
       align="left"
-      className={`${styles.container} ${isWorkspaceActive && styles.active}`}
+      className={classNames(styles.container, {
+        [styles.active]: isWorkspaceActive,
+      })}
       enterDelayMs={1000}
       kind="ghost"
       label={iconDescription}
