@@ -105,7 +105,10 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
                 id: 'weight',
                 label: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
               },
-              { id: 'height', label: `{t('height',"Height")} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
+              {
+                id: 'height',
+                label: `${t('height', 'Height')} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})`,
+              },
               { id: 'bmi', label: `${t('bmi', 'BMI')} (${bmiUnit})` },
             ].map(({ id, label }) => (
               <Tab
