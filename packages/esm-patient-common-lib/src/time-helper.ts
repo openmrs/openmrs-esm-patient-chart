@@ -1,15 +1,18 @@
 export type amPm = 'AM' | 'PM';
 
-export const convertTime12to24 = (time12h, timeFormat: amPm) => {
-  let [hours, minutes] = time12h.split(':');
+export const time12HourFormatRegex = new RegExp(/^(1[0-2]|0?[1-9]):[0-5][0-9]$/);
 
-  if (hours === '12' && timeFormat === 'AM') {
-    hours = '00';
+export const convertTime12to24 = (time12h: string, timeFormat: amPm) => {
+  if (!time12h.match(time12HourFormatRegex)) {
+    return [0, 0];
   }
+
+  let [hours, minutes] = time12h.split(':').map((item) => parseInt(item, 10));
+  hours = hours % 12;
 
   if (timeFormat === 'PM') {
-    hours = hours === '12' ? hours : parseInt(hours, 10) + 12;
+    hours += 12;
   }
 
-  return [hours, minutes] as [number, number];
+  return [hours, minutes];
 };

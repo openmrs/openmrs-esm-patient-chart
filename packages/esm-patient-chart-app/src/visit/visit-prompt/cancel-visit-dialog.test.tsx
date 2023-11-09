@@ -66,20 +66,19 @@ describe('Cancel visit', () => {
 
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
 
-    // TODO: Will be fixed after the solution is finalized
-    // await waitFor(() => user.click(cancelVisitButton));
+    await waitFor(() => user.click(cancelVisitButton));
 
-    // expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
-    //   body: { voided: true },
-    //   headers: { 'Content-type': 'application/json' },
-    //   method: 'POST',
-    // });
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
+      body: { voided: true },
+      headers: { 'Content-type': 'application/json' },
+      method: 'POST',
+    });
 
-    // expect(mockShowToast).toHaveBeenCalledWith({
-    //   kind: 'success',
-    //   title: 'Cancel visit',
-    //   description: 'Canceled active visit successfully',
-    // });
+    expect(mockShowToast).toHaveBeenCalledWith({
+      kind: 'success',
+      title: 'Cancel visit',
+      description: 'Canceled active visit successfully',
+    });
   });
 
   it('displays an error message when cancelling a visit fails', async () => {
@@ -97,22 +96,20 @@ describe('Cancel visit', () => {
 
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
 
-    // TODO: Will be fixed after the solution is finalized
+    await waitFor(() => user.click(cancelVisitButton));
 
-    // await waitFor(() => user.click(cancelVisitButton));
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
+      body: { voided: true },
+      headers: { 'Content-type': 'application/json' },
+      method: 'POST',
+    });
 
-    // expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
-    //   body: { voided: true },
-    //   headers: { 'Content-type': 'application/json' },
-    //   method: 'POST',
-    // });
-
-    // expect(mockShowNotification).toHaveBeenCalledWith({
-    //   critical: true,
-    //   description: 'Internal server error',
-    //   kind: 'error',
-    //   title: 'Error cancelling active visit',
-    // });
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Internal server error',
+      kind: 'error',
+      title: 'Error cancelling active visit',
+    });
   });
 });
 

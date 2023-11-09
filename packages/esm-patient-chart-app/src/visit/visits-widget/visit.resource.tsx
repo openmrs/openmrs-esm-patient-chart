@@ -82,11 +82,7 @@ export function usePastVisits(patientUuid: string) {
 
 export function deleteVisit(visitUuid: string) {
   return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
-    headers: {
-      'content-type': 'application/json',
-    },
-    method: 'POST',
-    body: { voided: true },
+    method: 'DELETE',
   });
 }
 

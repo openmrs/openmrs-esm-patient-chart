@@ -18,7 +18,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const editVisitDetails = () => {
     launchPatientWorkspace('start-visit-workspace-form', {
       workspaceTitle: t('editVisitDetails', 'Edit visit details'),
-      visitDetails: visit,
+      visitToEdit: visit,
     });
   };
 
