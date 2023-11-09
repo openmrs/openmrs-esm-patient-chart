@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classNames from 'classnames';
 import {
   DataTable,
   Table,
@@ -42,7 +43,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
     <DataTable rows={data} headers={tableHeaders} size="sm" useZebraStyles>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
         <TableContainer
-          className={`${styles.tableContainer} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}
+          className={classNames(styles.tableContainer, isTablet ? styles.tablet : styles.desktop)}
           title={title}
           description={description}
           {...getTableContainerProps()}

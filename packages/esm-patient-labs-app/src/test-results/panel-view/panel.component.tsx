@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import styles from './result-panel.scss';
 import {
   DataTable,
   TableContainer,
@@ -13,8 +13,9 @@ import {
   Layer,
 } from '@carbon/react';
 import { getClass } from './helper';
-import { ObsRecord } from '../../types';
+import type { ObsRecord } from '../../types';
 import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import styles from './result-panel.scss';
 
 interface LabSetPanelProps {
   panel: ObsRecord;
@@ -91,10 +92,12 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
   return (
     <Layer>
       <div
+        className={classNames(styles.labSetPanel, {
+          [styles.activePanel]: activePanel?.conceptUuid === panel.conceptUuid,
+        })}
+        onClick={() => setActivePanel(panel)}
         role="button"
         tabIndex={0}
-        onClick={() => setActivePanel(panel)}
-        className={`${styles.labSetPanel} ${activePanel?.conceptUuid === panel.conceptUuid && styles.activePanel}`}
       >
         <div className={styles.panelHeader}>
           <h2 className={styles.productiveHeading02}>{panel.name}</h2>
@@ -120,7 +123,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
                 <TableBody>
                   {rows.map((row, indx) => {
                     return (
-                      <TableRow key={row.id} className={`${getClass(rowsData[indx]?.interpretation)} check`}>
+                      <TableRow key={row.id} className={classNames(getClass(rowsData[indx]?.interpretation), 'check')}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell?.value?.content ?? cell.value}</TableCell>
                         ))}

@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -51,11 +52,11 @@ import { ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { useVisits } from '../visits-widget/visit.resource';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
@@ -474,7 +475,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             {/* Date and time of visit. Defaults to the current date and time. */}
             <section>
               <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
-              <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
+              <div className={classNames(styles.dateTimeSection, styles.sectionField)}>
                 <Controller
                   name="visitDate"
                   control={control}

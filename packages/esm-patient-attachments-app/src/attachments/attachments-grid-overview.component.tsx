@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { SkeletonPlaceholder } from '@carbon/react';
 import { Attachment } from '../attachments-types';
 import AttachmentThumbnail from './attachment-thumbnail.component';
@@ -48,7 +49,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
           <div key={indx}>
             <AttachmentThumbnail imageProps={imageProps} item={item} />
             <p className={styles.bodyLong01}>{attachment.title}</p>
-            <p className={`${styles.bodyLong01} ${styles.muted}`}>{attachment.dateTime}</p>
+            <p className={classNames(styles.bodyLong01, styles.muted)}>{attachment.dateTime}</p>
           </div>
         );
       })}

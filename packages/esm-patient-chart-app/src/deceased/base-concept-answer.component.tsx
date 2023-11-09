@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { Layer, RadioButton, RadioButtonGroup, Search } from '@carbon/react';
@@ -35,9 +36,10 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
 
   return (
     <div
-      className={`${styles.conceptAnswerOverviewWrapper} ${
-        isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop
-      }`}
+      className={classNames(
+        styles.conceptAnswerOverviewWrapper,
+        isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop,
+      )}
     >
       <ResponsiveWrapper isTablet={isTablet}>
         <Search

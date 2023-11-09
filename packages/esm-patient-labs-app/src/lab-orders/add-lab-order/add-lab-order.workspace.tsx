@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
@@ -6,9 +7,9 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { age, formatDate, parseDate, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, launchPatientWorkspace, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItem } from '../api';
-import styles from './add-lab-order.scss';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form';
+import styles from './add-lab-order.scss';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
@@ -37,7 +38,7 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       {isTablet && !isLoadingPatient && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={`${styles.text02} ${styles.bodyShort01}`}>
+          <span className={classNames(styles.text02, styles.bodyShort01)}>
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>

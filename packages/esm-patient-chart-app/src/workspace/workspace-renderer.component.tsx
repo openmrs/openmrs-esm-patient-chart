@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { OpenWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { mountRootParcel, ParcelConfig } from 'single-spa';
@@ -43,9 +44,10 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
 
   return (
     <div
-      className={`${active ? styles.fixed : styles.hide} ${
-        maximized && !isTablet ? styles.fullWidth : styles.dynamicWidth
-      }`}
+      className={classNames(
+        active ? styles.fixed : styles.hide,
+        maximized && !isTablet ? styles.fullWidth : styles.dynamicWidth,
+      )}
     >
       {lifecycle ? (
         <Parcel key={workspace.name} config={lifecycle} mountParcel={mountRootParcel} {...props} />

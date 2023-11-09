@@ -4,10 +4,9 @@ import VitalsOverview from './vitals-overview.component';
 
 interface VitalsMainProps {
   patientUuid: string;
-  basePath: string;
 }
 
-const VitalsMain: React.FC<VitalsMainProps> = ({ patientUuid, basePath }) => {
+const VitalsMain: React.FC<VitalsMainProps> = ({ patientUuid }) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart`;
