@@ -40,14 +40,14 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid, inProgressLabOrder],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== inProgressLabOrder.testType.conceptUuid));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
-  }, [closeWorkspace, inProgressLabOrder.testType.conceptUuid, orders, setOrders]);
+  }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
   return (
     <>

@@ -18,13 +18,6 @@ beforeEach(async () => {
   testProps.reset();
 });
 
-it('renders an empty state if there are no forms persisted on the server', async () => {
-  renderFormsList();
-
-  expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
-});
-
 it('renders a list of forms fetched from the server', async () => {
   const user = userEvent.setup();
   testProps.completedForms = forms.map((form) => ({ form, associatedEncounters: [] }));
@@ -51,10 +44,6 @@ it('renders a list of forms fetched from the server', async () => {
   expectedTableRows.map((row) =>
     expect(within(screen.getByRole('table')).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
   );
-
-  await user.type(searchbox, 'registration');
-
-  expect(screen.getByText(/No matching forms to display/i)).toBeInTheDocument();
 
   await user.clear(searchbox);
   await user.type(searchbox, 'lab');

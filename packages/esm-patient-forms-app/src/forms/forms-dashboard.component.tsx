@@ -1,18 +1,26 @@
 import React, { useCallback, useMemo } from 'react';
-import { useConfig, usePatient } from '@openmrs/esm-framework';
-import { closeWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { Layer, Tile } from '@carbon/react';
+import { useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, closeWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import { useForms } from '../hooks/use-forms';
+import { useTranslation } from 'react-i18next';
 
 const FormsDashboard = () => {
+  const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
+  const isOnline = useConnectivity();
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { patient, patientUuid } = usePatient();
-  const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, undefined, config.orderBy);
+  const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+
+  function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+    return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+  }
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
@@ -38,6 +46,17 @@ const FormsDashboard = () => {
       ),
     }));
   }, [config.formSections, forms]);
+
+  if (forms?.length === 0) {
+    return (
+      <ResponsiveWrapper isTablet>
+        <Tile className={styles.emptyState}>
+          <EmptyDataIllustration />
+          <p className={styles.emptyStateContent}>{t('noFormsToDisplay', 'There are no forms to display.')}</p>
+        </Tile>
+      </ResponsiveWrapper>
+    );
+  }
 
   return (
     <div className={styles.container}>

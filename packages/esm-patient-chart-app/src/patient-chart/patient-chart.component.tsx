@@ -9,7 +9,7 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { changeWorkspaceContext, useAutoCreatedOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { changeWorkspaceContext, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { spaBasePath } from '../constants';
 import { LayoutMode } from './chart-review/dashboard-view.component';
 import ActionMenu from './action-menu/action-menu.component';
@@ -24,14 +24,12 @@ const PatientChart: React.FC = () => {
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const { workspaceWindowState, active } = useWorkspaces();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
-  const { offlineVisitTypeUuid } = useConfig();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
   // We are also the module that holds the offline visit type UUID config.
   // The following hook takes care of the creation.
-  useAutoCreatedOfflineVisit(patientUuid, offlineVisitTypeUuid);
 
   // Keep state updated with the current patient. Anything used outside the patient
   // chart (e.g., the current visit is used by the Active Visit Tag used in the
