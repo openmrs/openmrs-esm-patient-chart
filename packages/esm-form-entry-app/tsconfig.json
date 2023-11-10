@@ -12,16 +12,17 @@
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2020",
+    "target": "ES2022",
     "types": [
       "node",
-      "webpack-env",
+      "webpack-env"
     ],
     "lib": [
       "es2015",
       "dom"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "useDefineForClassFields": false,
   },
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true,
