@@ -73,6 +73,8 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       Promise.resolve(dashboard.title()).then(setResolvedTitle);
     } else if (typeof dashboard?.title === 'string') {
       setResolvedTitle(dashboard.title);
+    } else {
+      setResolvedTitle(undefined);
     }
   }, [dashboard]);
 
