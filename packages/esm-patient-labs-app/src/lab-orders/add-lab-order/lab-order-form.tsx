@@ -47,7 +47,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     setOrders(orders.filter((order) => order.testType.conceptUuid !== inProgressLabOrder.testType.conceptUuid));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
-  }, [closeWorkspace, inProgressLabOrder.testType.conceptUuid, orders, setOrders]);
+  }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
   return (
     <>
