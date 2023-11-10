@@ -40,7 +40,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid, inProgressLabOrder],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
   );
 
   const cancelOrder = useCallback(() => {
