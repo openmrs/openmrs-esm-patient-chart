@@ -2,6 +2,8 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
+import conditionsOverviewComponent from './conditions/conditions-overview.component';
+import conditionsDetailedSummaryComponent from './conditions/conditions-detailed-summary.component';
 
 const moduleName = '@openmrs/esm-patient-conditions-app';
 
@@ -16,15 +18,9 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const conditionsOverview = getAsyncLifecycle(
-  () => import('./conditions/conditions-overview.component'),
-  options,
-);
+export const conditionsOverview = getSyncLifecycle(conditionsOverviewComponent, options);
 
-export const conditionsDetailedSummary = getAsyncLifecycle(
-  () => import('./conditions/conditions-detailed-summary.component'),
-  options,
-);
+export const conditionsDetailedSummary = getSyncLifecycle(conditionsDetailedSummaryComponent, options);
 
 export const conditionsWidget = getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options);
 

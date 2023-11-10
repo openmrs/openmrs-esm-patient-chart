@@ -1,5 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import flagTagsComponent from './flags/flags-highlight-bar.component';
+import flagsOverviewComponent from './flags/flags.component';
 
 const moduleName = '@openmrs/esm-patient-flags-app';
 
@@ -15,12 +17,12 @@ export function startupApp() {
   );
 }
 
-export const flagTags = getAsyncLifecycle(() => import('./flags/flags-highlight-bar.component'), {
+export const flagTags = getSyncLifecycle(flagTagsComponent, {
   featureName: 'patient-flag-tags',
   moduleName,
 });
 
-export const flagsOverview = getAsyncLifecycle(() => import('./flags/flags.component'), {
+export const flagsOverview = getSyncLifecycle(flagsOverviewComponent, {
   featureName: 'patient-flags-overview',
   moduleName,
 });

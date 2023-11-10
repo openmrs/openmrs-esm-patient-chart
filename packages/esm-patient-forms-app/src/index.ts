@@ -10,6 +10,9 @@ import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
+import clinicalFormActionMenuComponent from './clinical-form-action-button.component';
+import offlineFormOverviewCardComponent from './offline-forms/offline-forms-overview-card.component';
+import offlineFormsComponent from './offline-forms/offline-forms.component';
 
 const moduleName = '@openmrs/esm-patient-forms-app';
 
@@ -46,21 +49,15 @@ export function startupApp() {
   });
 }
 
-export const offlineFormOverviewCard = getAsyncLifecycle(
-  () => import('./offline-forms/offline-forms-overview-card.component'),
-  options,
-);
+export const clinicalFormActionMenu = getSyncLifecycle(clinicalFormActionMenuComponent, options);
+
+export const offlineFormOverviewCard = getSyncLifecycle(offlineFormOverviewCardComponent, options);
 
 export const offlineFormsNavLink = getSyncLifecycle(
   () => OfflineToolsNavLink({ page: 'forms', title: 'Offline forms' }),
   options,
 );
 
-export const offlineForms = getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options);
-
-export const clinicalFormActionMenu = getAsyncLifecycle(
-  () => import('./clinical-form-action-button.component'),
-  options,
-);
+export const offlineForms = getSyncLifecycle(offlineFormsComponent, options);
 
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options);
