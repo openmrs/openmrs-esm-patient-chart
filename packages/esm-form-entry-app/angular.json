@@ -24,8 +24,13 @@
 					"builder": "ngx-build-plus:browser",
 					"options": {
             "allowedCommonJsDependencies": [
+              "core-js",
+              "dompurify",
+              "html2canvas",
               "lodash",
               "moment",
+              "raf",
+              "rgbcolor",
               "zone.js"
             ],
 						"preserveSymlinks": true,
