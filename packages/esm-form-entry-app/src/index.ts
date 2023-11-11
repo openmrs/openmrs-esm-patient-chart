@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import 'zone.js/dist/zone';
+import 'zone.js';
 import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 import { configSchema } from './config-schema';
