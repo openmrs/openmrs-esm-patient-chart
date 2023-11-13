@@ -5,7 +5,7 @@ import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, Order } from '@openmrs/esm-patient-common-lib';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import OrderDetailsTable from '../components/orders-details-table.component';
-import { usePatientLabOrders } from '../../../esm-patient-labs-app/src/lab-orders/api';
+import { usePatientOrders } from '../api/api';
 
 export interface LabOrdersSummaryProps {
   patientUuid: string;
@@ -21,7 +21,7 @@ export default function LabOrdersSummary({ patientUuid }: LabOrdersSummaryProps)
     error: error,
     isLoading: isLoading,
     isValidating: isValidating,
-  } = usePatientLabOrders(patientUuid, 'ACTIVE');
+  } = usePatientOrders(patientUuid, 'ACTIVE');
 
   const [pastOrders, activeOrders] = useMemo(() => {
     const currentDate = new Date();
