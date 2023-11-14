@@ -1,5 +1,8 @@
-import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import visitTagComponent from './banner-tags/visit-tag.component';
+import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.component';
+import patientBannerComponent from './banner/patient-banner.component';
 
 const moduleName = '@openmrs/esm-patient-banner-app';
 
@@ -19,11 +22,8 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const visitTag = getAsyncLifecycle(() => import('./banner-tags/visit-tag.component'), options);
+export const visitTag = getSyncLifecycle(visitTagComponent, options);
 
-export const deceasedPatientTag = getAsyncLifecycle(
-  () => import('./banner-tags/deceased-patient-tag.component'),
-  options,
-);
+export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, options);
 
-export const patientBanner = getAsyncLifecycle(() => import('./banner/patient-banner.component'), options);
+export const patientBanner = getSyncLifecycle(patientBannerComponent, options);

@@ -4,7 +4,6 @@ import debounce from 'lodash-es/debounce';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { formatDatetime, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
 import type { CompletedFormInfo } from '../types';
@@ -84,14 +83,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
   }
 
   if (completedForms?.length === 0) {
-    return (
-      <ResponsiveWrapper isTablet>
-        <Tile className={styles.emptyState}>
-          <EmptyDataIllustration />
-          <p className={styles.emptyStateContent}>{t('noFormsToDisplay', 'There are no forms to display.')}</p>
-        </Tile>
-      </ResponsiveWrapper>
-    );
+    return <></>;
   }
 
   if (sectionName === 'forms') {

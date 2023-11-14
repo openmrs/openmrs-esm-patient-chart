@@ -4,11 +4,11 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, formatDate, parseDate, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import { age, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, launchPatientWorkspace, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItem } from '../api';
 import { TestTypeSearch } from './test-type-search';
-import { LabOrderForm } from './lab-order-form';
+import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
 
 export interface AddLabOrderWorkspaceAdditionalProps {

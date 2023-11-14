@@ -33,9 +33,11 @@ import {
   useVisit,
   Visit,
   updateVisit,
+  useConnectivity,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
+  createOfflineVisitForPatient,
   DefaultWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
@@ -53,6 +55,7 @@ import styles from './visit-form.scss';
 import { VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
+import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit: Visit;
@@ -68,17 +71,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const isOnline = useConnectivity();
   const sessionUser = useSession();
-  const { error: errorFetchingLocations } = useLocations();
+  const { error: errorFetchingLocations } = isOnline ? useLocations() : { error: false };
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const allVisitTypes = useVisitTypes();
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
+  const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
+  const { mutate } = useVisit(patientUuid);
+  const { mutate: mutateVisit } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -305,121 +311,154 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-      (visitToEdit?.uuid
-        ? updateVisit(visitToEdit?.uuid, payload, abortController)
-        : saveVisit(payload, abortController)
-      )
-        .pipe(first())
-        .subscribe(
-          (response) => {
-            if (response.status === 201) {
-              if (config.showServiceQueueFields) {
-                // retrieve values from queue extension
-                setVisitUuid(response.data.uuid);
-                const queueLocation = event?.target['queueLocation']?.value;
-                const serviceUuid = event?.target['service']?.value;
-                const priority = event?.target['priority']?.value;
-                const status = event?.target['status']?.value;
-                const sortWeight = event?.target['sortWeight']?.value;
 
-                saveQueueEntry(
-                  response.data.uuid,
-                  serviceUuid,
-                  patientUuid,
-                  priority,
-                  status,
-                  sortWeight,
-                  new AbortController(),
-                  queueLocation,
-                  visitQueueNumberAttributeUuid,
-                ).then(
-                  ({ status }) => {
-                    if (status === 201) {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      mutateQueueEntry();
-                      showToast({
-                        kind: 'success',
-                        title: t('visitStarted', 'Visit started'),
-                        description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
-                      });
-                    }
-                  },
-                  (error) => {
-                    showNotification({
-                      title: t('queueEntryError', 'Error adding patient to the queue'),
-                      kind: 'error',
-                      critical: true,
-                      description: error?.message,
-                    });
-                  },
-                );
-              }
-              if (config.showUpcomingAppointments && upcomingAppointment) {
-                const appointmentPayload: AppointmentPayload = {
-                  appointmentKind: upcomingAppointment?.appointmentKind,
-                  serviceUuid: upcomingAppointment?.service.uuid,
-                  startDateTime: upcomingAppointment?.startDateTime,
-                  endDateTime: upcomingAppointment?.endDateTime,
-                  locationUuid: visitLocation?.uuid,
-                  patientUuid: patientUuid,
-                  uuid: upcomingAppointment?.uuid,
-                  dateHonored: dayjs(visitStartDate).format(),
-                };
-                saveAppointment(appointmentPayload, abortController).then(
-                  ({ status }) => {
-                    if (status === 201) {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      showToast({
+      if (isOnline) {
+        (visitToEdit?.uuid
+          ? updateVisit(visitToEdit?.uuid, payload, abortController)
+          : saveVisit(payload, abortController)
+        )
+          .pipe(first())
+          .subscribe(
+            (response) => {
+              if (response.status === 201) {
+                if (config.showServiceQueueFields) {
+                  // retrieve values from queue extension
+                  setVisitUuid(response.data.uuid);
+                  const queueLocation = event?.target['queueLocation']?.value;
+                  const serviceUuid = event?.target['service']?.value;
+                  const priority = event?.target['priority']?.value;
+                  const status = event?.target['status']?.value;
+                  const sortWeight = event?.target['sortWeight']?.value;
+
+                  saveQueueEntry(
+                    response.data.uuid,
+                    serviceUuid,
+                    patientUuid,
+                    priority,
+                    status,
+                    sortWeight,
+                    new AbortController(),
+                    queueLocation,
+                    visitQueueNumberAttributeUuid,
+                  ).then(
+                    ({ status }) => {
+                      if (status === 201) {
+                        mutateCurrentVisit();
+                        mutateVisits();
+                        mutateQueueEntry();
+                        showToast({
+                          kind: 'success',
+                          title: t('visitStarted', 'Visit started'),
+                          description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                        });
+                      }
+                    },
+                    (error) => {
+                      showNotification({
+                        title: t('queueEntryError', 'Error adding patient to the queue'),
+                        kind: 'error',
                         critical: true,
-                        kind: 'success',
-                        description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                        title: t('appointmentEdited', 'Appointment edited'),
+                        description: error?.message,
                       });
-                    }
-                  },
-                  (error) => {
-                    showNotification({
-                      title: t('updateError', 'Error updating upcoming appointment'),
-                      kind: 'error',
-                      critical: true,
-                      description: error?.message,
-                    });
-                  },
-                );
+                    },
+                  );
+                }
+                if (config.showUpcomingAppointments && upcomingAppointment) {
+                  const appointmentPayload: AppointmentPayload = {
+                    appointmentKind: upcomingAppointment?.appointmentKind,
+                    serviceUuid: upcomingAppointment?.service.uuid,
+                    startDateTime: upcomingAppointment?.startDateTime,
+                    endDateTime: upcomingAppointment?.endDateTime,
+                    locationUuid: visitLocation?.uuid,
+                    patientUuid: patientUuid,
+                    uuid: upcomingAppointment?.uuid,
+                    dateHonored: dayjs(visitStartDate).format(),
+                  };
+                  saveAppointment(appointmentPayload, abortController).then(
+                    ({ status }) => {
+                      if (status === 201) {
+                        mutateCurrentVisit();
+                        mutateVisits();
+                        showToast({
+                          critical: true,
+                          kind: 'success',
+                          description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                          title: t('appointmentEdited', 'Appointment edited'),
+                        });
+                      }
+                    },
+                    (error) => {
+                      showNotification({
+                        title: t('updateError', 'Error updating upcoming appointment'),
+                        kind: 'error',
+                        critical: true,
+                        description: error?.message,
+                      });
+                    },
+                  );
+                }
               }
-            }
-            mutateCurrentVisit();
-            mutateVisits();
-            closeWorkspace();
+              mutateCurrentVisit();
+              mutateVisits();
+              closeWorkspace();
 
+              showToast({
+                critical: true,
+                kind: 'success',
+                description: !visitToEdit
+                  ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                    })
+                  : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                      visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                    }),
+                title: !visitToEdit
+                  ? t('visitStarted', 'Visit started')
+                  : t('visitDetailsUpdated', 'Visit details updated'),
+              });
+            },
+            (error) => {
+              showNotification({
+                title: !visitToEdit
+                  ? t('startVisitError', 'Error starting visit')
+                  : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+                kind: 'error',
+                critical: true,
+                description: error?.message,
+              });
+            },
+          );
+      } else {
+        createOfflineVisitForPatient(
+          patientUuid,
+          visitLocation.uuid,
+          config.offlineVisitTypeUuid,
+          payload.startDatetime,
+        ).then(
+          (offlineVisit) => {
+            //setCurrentVisit(patientUuid, offlineVisit.uuid);
+            mutate();
+            closeWorkspace();
             showToast({
               critical: true,
               kind: 'success',
-              description: !visitToEdit
-                ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                  })
-                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                  }),
-              title: !visitToEdit
-                ? t('visitStarted', 'Visit started')
-                : t('visitDetailsUpdated', 'Visit details updated'),
+              description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
             });
           },
           (error) => {
             showNotification({
-              title: !visitToEdit
-                ? t('startVisitError', 'Error starting visit')
-                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+              title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
               critical: true,
               description: error?.message,
             });
           },
         );
+        return;
+      }
     },
     [
       closeWorkspace,

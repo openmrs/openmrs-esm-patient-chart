@@ -86,7 +86,7 @@ export function useAutoCreatedOfflineVisit(patientUuid: string, offlineVisitType
 
   useEffect(() => {
     if (!isOnline && !isValidating && !currentVisit && !error) {
-      createOfflineVisitForPatient(patientUuid, location, offlineVisitTypeUuid).finally(() => mutate());
+      createOfflineVisitForPatient(patientUuid, location, offlineVisitTypeUuid, new Date()).finally(() => mutate());
     }
   }, [isOnline, currentVisit, isValidating, error, mutate, location, offlineVisitTypeUuid, patientUuid]);
 }
@@ -100,6 +100,7 @@ export async function createOfflineVisitForPatient(
   patientUuid: string,
   location: string,
   offlineVisitTypeUuid: string,
+  startDatetime: Date,
 ) {
   const patientRegistrationSyncItems = await getSynchronizationItems<{ fhirPatient: fhir.Patient }>(
     'patient-registration',
@@ -111,7 +112,7 @@ export async function createOfflineVisitForPatient(
   const offlineVisit: OfflineVisit = {
     uuid: uuid(),
     patient: patientUuid,
-    startDatetime: new Date(),
+    startDatetime,
     location,
     visitType: offlineVisitTypeUuid,
   };
