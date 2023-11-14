@@ -7,7 +7,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import { Layer, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton } from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
-import { VisitFormData } from './visit-form.component';
+import { VisitFormData } from './visit-form.resource';
 import styles from './visit-type-overview.scss';
 
 interface BaseVisitTypeProps {

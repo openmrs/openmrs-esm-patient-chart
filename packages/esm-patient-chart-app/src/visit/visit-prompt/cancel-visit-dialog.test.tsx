@@ -1,7 +1,14 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useVisit, openmrsFetch, showNotification, showToast, FetchResponse } from '@openmrs/esm-framework';
+import {
+  useVisit,
+  openmrsFetch,
+  showNotification,
+  FetchResponse,
+  showToast,
+  showActionableNotification,
+} from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
 import { mockVisitQueueEntries } from '../../__mocks__/visitQueueEntry.mock';
@@ -12,6 +19,7 @@ import CancelVisitDialog from './cancel-visit-dialog.component';
 const mockedCloseModal = jest.fn();
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
+const mockedActionableNotification = jest.mocked(showActionableNotification);
 const mockedShowNotification = jest.mocked(showNotification);
 const mockedShowToast = jest.mocked(showToast);
 const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
@@ -56,7 +64,7 @@ describe('Cancel visit', () => {
       status: 200,
     };
 
-    mockedOpenmrsFetch.mockResolvedValueOnce(response as FetchResponse);
+    mockedOpenmrsFetch.mockResolvedValue(response as FetchResponse);
     mockedUseVisitQueueEntry.mockReturnValueOnce({
       queueEntry: mockVisitQueueEntries,
       isLoading: false,
@@ -84,16 +92,17 @@ describe('Cancel visit', () => {
     await user.click(cancelVisitButton);
 
     expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
-      body: { voided: true },
-      headers: { 'Content-type': 'application/json' },
-      method: 'POST',
+      method: 'DELETE',
     });
 
-    expect(mockedShowToast).toHaveBeenCalledWith({
-      kind: 'success',
-      title: 'Visit cancelled',
-      description: 'Active visit cancelled successfully',
-    });
+    expect(mockedActionableNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        title: 'Visit cancelled',
+        subtitle: 'Canceled active visit successfully',
+        actionButtonLabel: 'Undo',
+      }),
+    );
   });
 
   it('displays an error notification if there was problem with cancelling a visit', async () => {
@@ -130,16 +139,13 @@ describe('Cancel visit', () => {
     await user.click(cancelVisitButton);
 
     expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
-      body: { voided: true },
-      headers: { 'Content-type': 'application/json' },
-      method: 'POST',
+      method: 'DELETE',
     });
 
     expect(mockedShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal server error',
+      description: 'An error occured when deleting visit',
       kind: 'error',
-      title: 'Error cancelling visit',
+      title: 'Error cancelling active visit',
     });
   });
 });

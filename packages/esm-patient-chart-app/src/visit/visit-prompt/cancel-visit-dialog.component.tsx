@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
+import { useVisit } from '@openmrs/esm-framework';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import styles from './cancel-visit-dialog.scss';
+import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 
 interface CancelVisitDialogProps {
   patientUuid: string;
@@ -13,46 +14,18 @@ interface CancelVisitDialogProps {
 
 const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { currentVisit, mutate } = useVisit(patientUuid);
-  const [submitting, setSubmitting] = useState(false);
+  const { currentVisit } = useVisit(patientUuid);
   const visitQueryEntry = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
-  const cancelActiveVisit = useCallback(() => {
-    // TODO: Extend `updateVisit` functionality in esm-framework to support this request
-    setSubmitting(true);
-    openmrsFetch(`/ws/rest/v1/visit/${currentVisit.uuid}`, {
-      headers: {
-        'Content-type': 'application/json',
-      },
-      method: 'POST',
-      body: { voided: true },
-    }).then(
-      () => {
-        const queueEntry = visitQueryEntry?.queueEntry;
-        mutate();
-        closeModal();
-        setSubmitting(false);
-        if (queueEntry) {
-          removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, new AbortController());
-        }
+  const onDeleteVisit = useCallback(() => {
+    const queueEntry = visitQueryEntry?.queueEntry;
+    if (queueEntry) {
+      removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, new AbortController());
+    }
+    closeModal();
+  }, []);
 
-        showToast({
-          title: t('visitCancelled', 'Visit cancelled'),
-          kind: 'success',
-          description: t('visitCancelSuccessMessage', 'Active visit cancelled successfully'),
-        });
-      },
-      (error) => {
-        showNotification({
-          title: t('errorCancellingVisit', 'Error cancelling visit'),
-          kind: 'error',
-          critical: true,
-          description: error?.message,
-        });
-        setSubmitting(false);
-      },
-    );
-  }, [closeModal, currentVisit.uuid, mutate, t, visitQueryEntry?.queueEntry]);
+  const { initiateDeletingVisit, isDeletingVisit } = useDeleteVisit(patientUuid, currentVisit, onDeleteVisit);
 
   return (
     <div>
@@ -69,9 +42,9 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={submitting} kind="danger" onClick={cancelActiveVisit}>
-          {submitting ? (
-            <InlineLoading description={`${t('loading', 'Loading')} ...`} />
+        <Button disabled={isDeletingVisit} kind="danger" onClick={initiateDeletingVisit}>
+          {isDeletingVisit ? (
+            <InlineLoading description={t('cancellingVisit', 'Cancelling visit')} />
           ) : (
             t('cancelVisit', 'Cancel visit')
           )}
