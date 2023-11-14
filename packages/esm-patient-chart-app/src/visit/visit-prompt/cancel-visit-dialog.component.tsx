@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useVisit } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import styles from './cancel-visit-dialog.scss';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import styles from './cancel-visit-dialog.scss';
 import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 
 interface CancelVisitDialogProps {
@@ -31,12 +31,11 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('visit', 'Visit')}
-        title={t('cancelActiveVisit', 'Cancel active visit')}
+        title={t('cancelActiveVisitConfirmation', 'Are you sure you want to cancel this active visit?')}
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t('cancelVisitWarningMessage', 'Cancelling this visit will delete all associated encounters')}.
+          {t('cancelVisitExplainerMessage', 'Cancelling this visit will delete its associated encounters')}.
         </p>
       </ModalBody>
       <ModalFooter>

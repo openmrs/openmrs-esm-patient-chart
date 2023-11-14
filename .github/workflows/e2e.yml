@@ -22,7 +22,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: "16.x"
+          node-version: '16.x'
 
       - name: Cache dependencies
         id: cache
@@ -51,26 +51,26 @@ jobs:
         run: yarn test-e2e
 
       - name: Stop dev server
-        if: "!cancelled()"
+        if: '!cancelled()'
         run: docker stop $(docker ps -a -q)
 
       - name: Upload report
         uses: actions/upload-artifact@v3
-        if: "!cancelled()"
+        if: '!cancelled()'
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
 
       - name: Capture Server Logs
-        if: "!cancelled()"
+        if: '!cancelled()'
         uses: jwalton/gh-docker-logs@v2
         with:
           dest: './logs'
 
       - name: Upload Logs as Artifact
-        uses: actions/upload-artifact@v2
-        if: "!cancelled()"
+        uses: actions/upload-artifact@v3
+        if: '!cancelled()'
         with:
           name: server-logs
           path: './logs'
