@@ -48,10 +48,10 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
             ? t('visitDeleted', '{{visit}} deleted', {
                 visit: visit?.visitType?.display ?? t('visit', 'Visit'),
               })
-            : t('cancelVisit', 'Cancel visit'),
+            : t('visitCancelled', 'Visit cancelled'),
           kind: 'success',
           subtitle: !isCurrentVisitDeleted
-            ? t('visitDeletedSuccessfully', '{{visit}} is deleted successfully', {
+            ? t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
                 visit: visit?.visitType?.display ?? t('visit', 'Visit'),
               })
             : t('visitCanceled', 'Canceled active visit successfully'),
@@ -63,8 +63,8 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
       .catch(() => {
         showNotification({
           title: isCurrentVisitDeleted
-            ? t('errorDeletingVisit', 'Error deleting visit')
-            : t('cancelVisitError', 'Error cancelling active visit'),
+            ? t('errorCancellingVisit', 'Error cancelling active visit')
+            : t('errorDeletingVisit', 'Error deleting visit'),
           kind: 'error',
           description: t('errorOccuredDeletingVisit', 'An error occured when deleting visit'),
         });
