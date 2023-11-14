@@ -51,7 +51,7 @@ export const mockCurrentVisit = {
     display: 'Facility Visit',
   },
   attributes: [],
-  startDatetime: new Date('2021-03-16T08:16:00.000+0000'),
+  startDatetime: new Date('2021-03-16T08:16:00.000+0000').toISOString(),
   stopDatetime: null,
   location: {
     uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',

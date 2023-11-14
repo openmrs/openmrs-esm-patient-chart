@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import styles from './cancel-visit-dialog.scss';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import styles from './cancel-visit-dialog.scss';
 
 interface CancelVisitDialogProps {
   patientUuid: string;
@@ -18,7 +18,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
   const visitQueryEntry = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const cancelActiveVisit = useCallback(() => {
-    // TO DO expand updateVisit function in esm-api to support this request
+    // TODO: Extend `updateVisit` functionality in esm-framework to support this request
     setSubmitting(true);
     openmrsFetch(`/ws/rest/v1/visit/${currentVisit.uuid}`, {
       headers: {
@@ -37,14 +37,14 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
         }
 
         showToast({
-          title: t('cancelVisit', 'Cancel visit'),
+          title: t('visitCancelled', 'Visit cancelled'),
           kind: 'success',
-          description: t('visitCanceled', 'Canceled active visit successfully'),
+          description: t('visitCancelSuccessMessage', 'Active visit cancelled successfully'),
         });
       },
       (error) => {
         showNotification({
-          title: t('cancelVisitError', 'Error cancelling active visit'),
+          title: t('errorCancellingVisit', 'Error cancelling visit'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -58,12 +58,11 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('visit', 'Visit')}
-        title={t('cancelActiveVisit', 'Cancel active visit')}
+        title={t('cancelActiveVisitConfirmation', 'Are you sure you want to cancel this active visit?')}
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t('cancelVisitWarningMessage', 'Cancelling this visit will delete all associated encounters')}.
+          {t('cancelVisitExplainerMessage', 'Cancelling this visit will delete its associated encounters')}.
         </p>
       </ModalBody>
       <ModalFooter>
