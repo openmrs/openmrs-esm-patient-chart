@@ -222,7 +222,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
       validSubmission = false;
       setError('visitStopDate', {
-        message: t('invalidVisitStopDate', 'Stop date needs to be on or after {{lastEncounterDatetime}}', {
+        message: t('invalidVisitStopDateAccEncounter', 'Stop date needs to be on or after {{lastEncounterDatetime}}', {
           lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
           interpolation: {
             escapeValue: false,
@@ -467,7 +467,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       visitQueueNumberAttributeUuid,
       mutateCurrentVisit,
       mutateVisits,
-
       patientUuid,
       upcomingAppointment,
       t,
@@ -529,6 +528,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           )}
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
+              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
               dateFieldName="visitStartDate"
               timeFieldName="visitStartTime"
               timeFormatFieldName="visitStartTimeFormat"
@@ -537,6 +537,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
+                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
                 dateFieldName="visitStopDate"
                 timeFieldName="visitStopTime"
                 timeFormatFieldName="visitStopTimeFormat"
@@ -668,7 +669,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             kind="primary"
             type="submit"
           >
-            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisit', 'Update visit')}
+            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisitDetails', 'Update visit details')}
           </Button>
         </ButtonSet>
       </Form>
