@@ -66,7 +66,7 @@ describe('EncounterList', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
     expect(searchbox).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /filter by encounter type/i }));
+    expect(screen.getByRole('listbox', { name: /filter by encounter type/i }));
 
     const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /provider/];
     expectedColumnHeaders.forEach((header) => {
@@ -87,7 +87,7 @@ describe('EncounterList', () => {
     expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
 
     // filter table to show only `Admission` encounters
-    const encounterTypeFilter = screen.getByRole('combobox', { name: /filter by encounter type/i });
+    const encounterTypeFilter = screen.getByRole('button', { name: /filter by encounter type/i });
 
     await waitFor(() => user.click(encounterTypeFilter));
     await waitFor(() => user.click(screen.getByRole('option', { name: /Admission/i })));
