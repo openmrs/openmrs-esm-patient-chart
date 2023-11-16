@@ -117,6 +117,8 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBaske
       return <span className={styles.orderActionRevisedLabel}>{t('orderActionRevise', 'Modify')}</span>;
     case 'DISCONTINUE':
       return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionDiscontinue', 'Discontinue')}</span>;
+    case 'INCOMPLETE':
+      return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
     default:
       return <></>;
   }

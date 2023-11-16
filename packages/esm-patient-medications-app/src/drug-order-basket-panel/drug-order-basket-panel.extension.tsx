@@ -19,6 +19,7 @@ export default function DrugOrderBasketPanelExtension() {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
+  const incompleteOrderBasketItems = orders.filter((x) => x.action === 'INCOMPLETE');
   const newOrderBasketItems = orders.filter((x) => x.action === 'NEW');
   const renewedOrderBasketItems = orders.filter((x) => x.action === 'RENEW');
   const revisedOrderBasketItems = orders.filter((x) => x.action === 'REVISE');
@@ -83,6 +84,18 @@ export default function DrugOrderBasketPanelExtension() {
       </div>
       {isExpanded && (
         <>
+          {incompleteOrderBasketItems.length > 0 && (
+            <>
+              {incompleteOrderBasketItems.map((order, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={order}
+                  onItemClick={() => openDrugForm(order)}
+                  onRemoveClick={() => removeMedication(order)}
+                />
+              ))}
+            </>
+          )}
           {newOrderBasketItems.length > 0 && (
             <>
               {newOrderBasketItems.map((order, index) => (

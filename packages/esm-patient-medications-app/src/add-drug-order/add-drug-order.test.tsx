@@ -128,6 +128,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
+        action: 'INCOMPLETE',
         startDate: expect.any(Date),
       }),
     ]);

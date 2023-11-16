@@ -126,7 +126,12 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
               className={styles.bottomButton}
               kind="primary"
               onClick={handleSave}
-              disabled={!orders?.length || isLoadingEncounterUuid || (activeVisitRequired && !activeVisit)}
+              disabled={
+                !orders?.length ||
+                isLoadingEncounterUuid ||
+                (activeVisitRequired && !activeVisit) ||
+                orders?.some(({ action }) => action === 'INCOMPLETE')
+              }
             >
               {t('signAndClose', 'Sign and close')}
             </Button>
