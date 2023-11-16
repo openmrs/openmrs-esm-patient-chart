@@ -44,6 +44,7 @@
   "noResultsForDrugSearch": "אין תוצאות להצגה עבור \"{{searchTerm}}\"",
   "onDate": "on",
   "orderActionDiscontinue": "הפסק",
+  "orderActionIncomplete": "Incomplete",
   "orderActionNew": "חדש",
   "orderActionRenew": "Renew",
   "orderActionRevise": "Modify",
