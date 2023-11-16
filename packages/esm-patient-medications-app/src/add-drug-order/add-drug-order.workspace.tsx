@@ -39,12 +39,15 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
 
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
-      finalizedOrder.action = 'NEW';
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
-      newOrders[orders.indexOf(existingOrder)] = finalizedOrder;
+      newOrders[orders.indexOf(existingOrder)] = {
+        ...finalizedOrder,
+        // Incomplete orders should be marked as new orders on saving the form
+        action: finalizedOrder.action === 'INCOMPLETE' ? 'NEW' : finalizedOrder.action,
+      };
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');
