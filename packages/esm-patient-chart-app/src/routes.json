@@ -167,6 +167,12 @@
       "offline": true
     },
     {
+      "name": "modify-visit-date-dialog",
+      "component": "modifyVisitDateDialog",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "end-visit-dialog",
       "component": "endVisitDialog",
       "online": true,
