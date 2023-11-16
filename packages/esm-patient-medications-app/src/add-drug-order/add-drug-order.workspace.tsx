@@ -39,6 +39,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
 
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
+      finalizedOrder.action = 'NEW';
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
