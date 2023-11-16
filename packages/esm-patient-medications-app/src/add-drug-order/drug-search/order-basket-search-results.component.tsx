@@ -128,7 +128,6 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const isDrugTemplatePresent = useMemo(() => !!templates?.length, [templates]);
   const drugItemTemplateOptions: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length
@@ -139,9 +138,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
 
   const addToBasket = useCallback(
     (searchResult: DrugOrderBasketItem) => {
-      if (!isDrugTemplatePresent) {
-        searchResult.action = 'INCOMPLETE';
-      }
+      // Directly adding the order to basket should be marked as incomplete
+      searchResult.action = 'INCOMPLETE';
       setOrders([...orders, searchResult]);
       closeWorkspace('add-drug-order', true);
       launchPatientWorkspace('order-basket');
