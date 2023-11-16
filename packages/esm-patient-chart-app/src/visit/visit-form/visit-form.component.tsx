@@ -222,12 +222,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
       validSubmission = false;
       setError('visitStopDate', {
-        message: t('invalidVisitStopDateAccEncounter', 'Stop date needs to be on or after {{lastEncounterDatetime}}', {
-          lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
+        message: t(
+          'visitStopDateMustBeAfterMostRecentEncounter',
+          'Stop date needs to be on or after {{lastEncounterDatetime}}',
+          {
+            lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
+            interpolation: {
+              escapeValue: false,
+            },
           },
-        }),
+        ),
       });
     }
 
