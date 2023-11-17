@@ -13,7 +13,7 @@ export class FormResourceService {
   ) {}
   public getFormSchemaByFormUid(uuid: string, v: string = null): Observable<any> {
     const url = `${this.windowRef.openmrsRestBase}o3/forms/${uuid}`;
-    const params: HttpParams = new HttpParams().set('v', v && v.length > 0 ? v : 'default');
+    const params: HttpParams = v && v.length > 0 ? new HttpParams().set('v', v) : new HttpParams();
     return this.http.get(url, { params });
   }
 
