@@ -222,6 +222,14 @@ export const deleteVisitDialog = getAsyncLifecycle(() => import('./visit/visit-p
   moduleName,
 });
 
+export const modifyVisitDateDialog = getAsyncLifecycle(
+  () => import('./visit/visit-prompt/modify-visit-date-dialog.component'),
+  {
+    featureName: 'delete visit',
+    moduleName,
+  },
+);
+
 export const endVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
   featureName: 'end visit',
   moduleName,

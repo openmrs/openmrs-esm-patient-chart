@@ -153,19 +153,11 @@ export class FormSubmissionService {
     const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 
     if (encounterCreate.uuid) {
-      if (
-        visitStartDatetime &&
-        new Date(encounterCreate.encounterDatetime) < new Date(visitStartDatetime) &&
-        this.confirmVisitDateAdjustment()
-      ) {
+      if (visitStartDatetime && new Date(encounterCreate.encounterDatetime) < new Date(visitStartDatetime)) {
         return this.visitResourceService
           .updateVisitDates(visitUuid, encounterCreate.encounterDatetime, visitStopDatetime)
           .pipe(switchMap(() => this.updateOrSaveEncounter(encounterCreate)));
-      } else if (
-        visitStopDatetime &&
-        new Date(encounterCreate.encounterDatetime) > new Date(visitStopDatetime) &&
-        this.confirmVisitDateAdjustment()
-      ) {
+      } else if (visitStopDatetime && new Date(encounterCreate.encounterDatetime) > new Date(visitStopDatetime)) {
         return this.visitResourceService
           .updateVisitDates(visitUuid, visitStartDatetime, encounterCreate.encounterDatetime)
           .pipe(switchMap(() => this.updateOrSaveEncounter(encounterCreate)));
