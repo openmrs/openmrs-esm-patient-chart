@@ -63,10 +63,12 @@ describe('EncounterList', () => {
 
     renderVisitsTable();
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    await screen.findByRole('table');
+
+    const filterDropdown = screen.getByRole('combobox', { name: /filter by encounter type/i });
+
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
     expect(searchbox).toBeInTheDocument();
-    expect(screen.getByRole('listbox', { name: /filter by encounter type/i }));
 
     const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /provider/];
     expectedColumnHeaders.forEach((header) => {
@@ -87,26 +89,24 @@ describe('EncounterList', () => {
     expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
 
     // filter table to show only `Admission` encounters
-    const encounterTypeFilter = screen.getByRole('button', { name: /filter by encounter type/i });
-
-    await waitFor(() => user.click(encounterTypeFilter));
-    await waitFor(() => user.click(screen.getByRole('option', { name: /Admission/i })));
+    await user.click(filterDropdown);
+    await user.click(screen.getByRole('option', { name: /Admission/i }));
 
     expect(screen.queryByRole('cell', { name: /visit note/i })).not.toBeInTheDocument();
     expect(screen.getByRole('cell', { name: /admission/i })).toBeInTheDocument();
 
     // show all encounter types
-    await waitFor(() => user.click(encounterTypeFilter));
-    await waitFor(() => user.click(screen.getByRole('option', { name: /all/i })));
+    await user.click(filterDropdown);
+    await user.click(screen.getByRole('option', { name: /all/i }));
 
     // filter table by typing in the searchbox
-    await waitFor(() => user.type(searchbox, 'Visit Note'));
+    await user.type(searchbox, 'Visit Note');
 
     expect(screen.getByText(/visit note/i)).toBeInTheDocument();
     expect(screen.queryByText(/consultation/i)).not.toBeInTheDocument();
 
-    await waitFor(() => user.clear(searchbox));
-    await waitFor(() => user.type(searchbox, 'triage'));
+    await user.clear(searchbox);
+    await user.type(searchbox, 'triage');
 
     expect(screen.getByText(/no encounters to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
@@ -131,12 +131,11 @@ describe('Delete Encounter', () => {
     expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
     const expandEncounterButton = screen.getAllByRole('button', { name: /expand current row/i });
 
-    await waitFor(() => user.click(expandEncounterButton[0]));
+    await user.click(expandEncounterButton[0]);
 
     expect(screen.getByRole('button', { name: /Delete this encounter/i })).toBeInTheDocument();
 
-    const deleteButton = screen.getByRole('button', { name: /Delete/i });
-    await waitFor(() => user.click(deleteButton));
+    await user.click(screen.getByRole('button', { name: /Delete/i }));
   });
 });
 
