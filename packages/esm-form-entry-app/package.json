@@ -17,6 +17,9 @@
     "command": "yarn run serve",
     "url": "http://localhost:4200/openmrs-esm-form-entry-app.js"
   },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
   "keywords": [
     "openmrs"
   ],
