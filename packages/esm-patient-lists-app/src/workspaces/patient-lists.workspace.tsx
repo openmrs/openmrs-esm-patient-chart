@@ -29,11 +29,9 @@ function PatientListsWorkspace() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
-
-  const { patientLists, isLoading } = usePatientLists();
-
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
     closeWorkspace('patient-lists', true);
@@ -73,21 +71,13 @@ function PatientListsWorkspace() {
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
       filteredLists?.map((list) => ({
-        id: list.id,
-        name: list.name,
-        type: list.type,
+        ...list,
         numberOfPatients: list.size,
       })) ?? [],
     [filteredLists],
   );
 
-  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
-
-    if (searchTerm) {
-      setSearchTerm(searchTerm);
-    }
-  };
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
   if (isLoading)
     return (
@@ -111,7 +101,7 @@ function PatientListsWorkspace() {
                         expanded
                         onChange={handleSearchTermChange}
                         placeholder={t('searchThisList', 'Search this list')}
-                        size="sm"
+                        size={responsiveSize}
                       />
                     </TableToolbarContent>
                   </TableToolbar>
@@ -145,7 +135,7 @@ function PatientListsWorkspace() {
                   </Table>
                 ) : null}
               </TableContainer>
-              {rows.length === 0 ? (
+              {filteredLists?.length === 0 ? (
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
