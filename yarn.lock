@@ -6952,7 +6952,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-common-lib@^5.1.0, @openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib":
+"@openmrs/esm-patient-common-lib@^5.1.0, @openmrs/esm-patient-common-lib@workspace:*, @openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib"
   dependencies:
@@ -7060,6 +7060,25 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 5.x
     "@openmrs/esm-patient-common-lib": 5.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
+"@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app"
+  dependencies:
+    "@carbon/react": ^1.33.1
+    "@openmrs/esm-patient-common-lib": "workspace:*"
+    webpack: ^5.88.2
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 5.x
+    dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
