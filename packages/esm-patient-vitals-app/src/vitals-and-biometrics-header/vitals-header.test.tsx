@@ -141,6 +141,27 @@ describe('VitalsHeader: ', () => {
 
     expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
   });
+
+  test('should launch Form Entry vitals and biometrics form', async () => {
+    const user = userEvent.setup();
+    const { useConfig } = require('@openmrs/esm-framework');
+    const updateVitalsConfigMock = {
+      ...mockVitalsConfig,
+      vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
+    };
+    useConfig.mockImplementation(() => updateVitalsConfigMock);
+
+    renderVitalsHeader();
+    await waitForLoadingToFinish();
+
+    const recordVitalsButton = screen.getByText(/Record vitals/i);
+
+    await waitFor(() => user.click(recordVitalsButton));
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+      formInfo: { encounterUuid: '', formUuid: updateVitalsConfigMock.vitals.formUuid },
+      workspaceTitle: updateVitalsConfigMock.vitals.formName,
+    });
+  });
 });
 
 function renderVitalsHeader() {
