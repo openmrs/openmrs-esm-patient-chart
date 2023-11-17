@@ -243,9 +243,22 @@ export class FormCreationService {
 
   private setDefaultValues(form: Form, createFormParams: CreateFormParams) {
     const { session } = createFormParams;
+    const config = this.configResourceService.getConfig();
+    let currentDate;
+
+    if (config.customEncounterDatetime === true) {
+      const visitStartDatetime = moment(this.singleSpaPropsService.getProp('visitStartDatetime')).format();
+      // If the visit start date is before the current date, use the visit start date as the default date.
+      if (visitStartDatetime && moment(visitStartDatetime).isBefore(currentDate, 'date')) {
+        currentDate = visitStartDatetime;
+      } else {
+        currentDate = moment().format();
+      }
+    } else {
+      currentDate = moment().format();
+    }
 
     // Encounter date and time.
-    const currentDate = moment().format();
     const encounterDate = form.searchNodeByQuestionId('encDate');
     if (encounterDate.length > 0) {
       encounterDate[0].control.setValue(currentDate);

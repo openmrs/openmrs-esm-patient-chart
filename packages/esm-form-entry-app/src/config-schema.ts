@@ -41,4 +41,10 @@ export const configSchema = {
     _description:
       'Custom URL to load resources required for appointment monthly schedule feature (under `dataSources`).',
   },
+  customEncounterDatetime: {
+    _type: 'Boolean',
+    _default: false,
+    _description:
+      'Weather to default the encounterDate to visitStartDatetime if the visitStartDatetime is before current Date.',
+  },
 };
