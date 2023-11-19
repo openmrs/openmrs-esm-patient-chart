@@ -33,11 +33,12 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   if (layout === 'tablet') {
     return (
       <Button
-        kind="ghost"
         className={classNames(styles.container, { [styles.active]: isWorkspaceActive })}
+        iconDescription={iconDescription}
+        kind="ghost"
+        onClick={handler}
         role="button"
         tabIndex={0}
-        onClick={handler}
       >
         <div className={styles.elementContainer}>
           {getIcon({ size: 16 })}
@@ -57,7 +58,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       })}
       enterDelayMs={1000}
       kind="ghost"
-      label={iconDescription}
+      label={label}
       onClick={handler}
     >
       <div className={styles.elementContainer}>

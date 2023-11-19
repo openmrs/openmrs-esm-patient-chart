@@ -29,7 +29,7 @@ const ClinicalFormActionButton: React.FC = () => {
     <SiderailNavButton
       name={'clinical-form-action-menu'}
       getIcon={(props) => <Document {...props} />}
-      label={t('clinicalForm', 'Clinical form')}
+      label={t('clinicalForms', 'Clinical forms')}
       iconDescription={t('form', 'Form')}
       handler={launchWorkspace}
       type={'clinical-form'}
