@@ -44,6 +44,7 @@
   "noResultsForDrugSearch": "لا توجد نتائج لـ \"{{searchTerm}}\"",
   "onDate": "في",
   "orderActionDiscontinue": "إيقاف",
+  "orderActionIncomplete": "Incomplete",
   "orderActionNew": "جديد",
   "orderActionRenew": "تجديد",
   "orderActionRevise": "تعديل",

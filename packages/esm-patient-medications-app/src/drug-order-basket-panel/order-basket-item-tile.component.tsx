@@ -108,6 +108,10 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
 function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBasketItem }) {
   const { t } = useTranslation();
 
+  if (orderBasketItem.isOrderIncomplete) {
+    return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
+  }
+
   switch (orderBasketItem.action) {
     case 'NEW':
       return <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;

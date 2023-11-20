@@ -44,6 +44,7 @@
   "noResultsForDrugSearch": "No results to display for \"{{searchTerm}}\"",
   "onDate": "on",
   "orderActionDiscontinue": "Discontinue",
+  "orderActionIncomplete": "Incomplete",
   "orderActionNew": "New",
   "orderActionRenew": "Renew",
   "orderActionRevise": "Modify",

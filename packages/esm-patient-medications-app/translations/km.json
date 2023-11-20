@@ -44,6 +44,7 @@
   "noResultsForDrugSearch": "គ្មានលទ្ធផលដែលត្រូវបង្ហាញសម្រាប់ \"{{searchTerm}}\"",
   "onDate": "នៅលើ",
   "orderActionDiscontinue": "បញ្ឈប់",
+  "orderActionIncomplete": "Incomplete",
   "orderActionNew": "ថ្មី។",
   "orderActionRenew": "បន្ត",
   "orderActionRevise": "ផ្លាស់ប្តូរ",
