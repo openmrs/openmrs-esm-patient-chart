@@ -162,7 +162,7 @@
   "time": "זמן",
   "timeFormat ": "תבנית זמן",
   "type": "סוג",
-  "undo": "Undo",
+  "undo": "לבטל",
   "unknown": "לא ידוע",
   "unsavedChanges": "יש לך שינויים שלא נשמרו",
   "unsavedChangesInForm": "ישנם שינויים שלא נשמרו ב {{formName}}. נא לשמור אותם לפני פתיחת טופס נוסף.",
