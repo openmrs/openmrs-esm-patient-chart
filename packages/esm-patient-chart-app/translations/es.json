@@ -170,7 +170,7 @@
   "visitCancelled": "Visit cancelled",
   "visitCancelSuccessMessage": "Active {{visit}} cancelled successfully",
   "visitDeleted": "{{visit}} deleted",
-  "visitDeletedSuccessfully": "{{visit}} is deleted successfully",
+  "visitDeletedSuccessfully": "{{visit}} deleted successfully",
   "visitDetailsUpdated": "Visit details updated",
   "visitDetailsUpdatedSuccessfully": "{{visit}} updated successfully",
   "visitEnded": "Visita finalizada",

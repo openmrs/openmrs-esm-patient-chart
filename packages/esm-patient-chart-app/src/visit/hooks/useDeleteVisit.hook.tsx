@@ -51,7 +51,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
             : t('visitCancelled', 'Visit cancelled'),
           kind: 'success',
           subtitle: !isCurrentVisitDeleted
-            ? t('visitDeletedSuccessfully', '{{visit}} was deleted successfully', {
+            ? t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
                 visit: visit?.visitType?.display ?? t('visit', 'Visit'),
               })
             : t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
