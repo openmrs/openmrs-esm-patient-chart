@@ -8,6 +8,8 @@ import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/
 import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
 
+jest.setTimeout(10000);
+
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -88,7 +90,6 @@ describe('AddLabOrder', () => {
   });
 
   test('happy path fill and submit form', async () => {
-    jest.setTimeout(10000);
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
     await userEvent.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
