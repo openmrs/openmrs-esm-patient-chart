@@ -1,0 +1,121 @@
+// Zeplin screen: https://zpl.io/2GPjdzE
+
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  height: calc(100vh - 6rem);
+  background-color: colors.$white-0;
+}
+
+.skeletonContainer {
+  @extend .container;
+  margin: layout.$spacing-05;
+}
+
+.dataTableSkeleton {
+  background-color: transparent;
+  padding: 0rem;
+}
+
+.tableContainer {
+  padding: 0;
+
+  :global(.cds--data-table-content) {
+    border: 1px solid colors.$gray-20;
+    border-bottom: none;
+    overflow: visible;
+  }
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    height: 2rem;
+    min-height: 0rem;
+    overflow: visible;
+    top: 0;
+  }
+
+  &:global(.cds--data-table-container) {
+    padding-top: 0rem;
+  }
+}
+
+.toolbarWrapper {
+  position: relative;
+  display: flex;
+  height: layout.$spacing-09;
+  justify-content: flex-end;
+}
+
+.tableToolbar {
+  width: 20%;
+  min-width: 12.5rem;
+}
+
+.search {
+  input {
+    padding: 0 4rem !important;
+  }
+
+  :global(.cds--search-close:focus) {
+    outline: none;
+    outline-offset: 0;
+  }
+
+  :global(.cds--search-close:focus:before) {
+    background-color: none;
+  }
+}
+
+.table tr:last-of-type {
+  td {
+    border-bottom: none;
+  }
+}
+
+.link {
+  cursor: pointer;
+  text-decoration: none !important;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-70;
+  padding: 4rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emptyStateContainer {
+  @extend .container;
+  background-color: #ededed;
+}
+
+.emptyStateTile {
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.emptyStateContent {
+  @extend .content;
+  @include type.type-style("heading-compact-01");
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}

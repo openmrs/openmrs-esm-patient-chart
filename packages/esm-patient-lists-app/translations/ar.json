@@ -1,0 +1,19 @@
+{
+  "backToPatientLists": "العودة إلى قوائم المرضى",
+  "checkFilters": "تحقق من الفلاتر أعلاه",
+  "createdOn": "أنشئت على",
+  "identifier": "معرف",
+  "listName": "اسم القائمة",
+  "listType": "نوع القائمة",
+  "name": "اسم",
+  "noMatchingListsFound": "لم يتم العثور على قوائم متطابقة للعرض",
+  "noMatchingPatients": "لم يتم العثور على مرضى متطابقين للعرض",
+  "noPatientListsToDisplay": "لا توجد قوائم مرضى للعرض",
+  "noPatientsInList": "لا يوجد مرضى في هذه القائمة",
+  "numberOfPatients": "عدد المرضى",
+  "patientLists": "قوائم المرضى",
+  "patients": "المرضى",
+  "searchThisList": "ابحث في هذه القائمة",
+  "sex": "الجنس",
+  "startDate": "تاريخ البدء"
+}

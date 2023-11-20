@@ -227,6 +227,7 @@ export interface FormEntryConfig {
     moduleExport: 'default' | string;
   }[];
   appointmentsResourceUrl: string;
+  customEncounterDatetime: boolean;
 }
 
 export interface ListResult<T> {
