@@ -20,7 +20,7 @@
 .orderBasketSlot {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .orderBasketSlotTablet {
@@ -51,6 +51,6 @@
 
   .buttonSet {
     padding: 1.5rem 1rem;
-    background-color: $ui-02;   
+    background-color: $ui-02;
   }
 }

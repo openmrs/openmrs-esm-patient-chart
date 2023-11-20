@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './order-basket-item-tile.scss';
 import { DrugOrderBasketItem } from '../types';
+import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: DrugOrderBasketItem;
@@ -28,25 +29,23 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
     <div className={styles.orderBasketItemTile}>
       <p className={styles.clipTextWithEllipsis}>
         <OrderActionLabel orderBasketItem={orderBasketItem} />
-        <br />
         {orderBasketItem.isFreeTextDosage ? (
-          <>
+          <div>
             <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
             {orderBasketItem.freeTextDosage && (
               <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
             )}
-          </>
+          </div>
         ) : (
-          <>
+          <div>
             <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
               {orderBasketItem.drug?.strength && <>&mdash; {orderBasketItem.drug?.strength}</>}{' '}
               {orderBasketItem.drug?.dosageForm?.display && <>&mdash; {orderBasketItem.drug.dosageForm?.display}</>}
             </span>
-          </>
+          </div>
         )}
-        <br />
         <span className={styles.label01}>
           <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
           <span className={styles.dosageLabel}>
@@ -88,6 +87,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
           shouldOnClickBeCalled.current = false;
           onRemoveClick();
         }}
+        tooltipPosition="left"
       />
     </div>
   );
@@ -97,7 +97,10 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
   ) : (
     <ClickableTile
       role="listitem"
-      className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}
+      className={classNames({
+        [styles.clickableTileTablet]: isTablet,
+        [styles.clickableTileDesktop]: !isTablet,
+      })}
       onClick={() => shouldOnClickBeCalled.current && onItemClick()}
     >
       {tileContent}
@@ -109,7 +112,7 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBaske
   const { t } = useTranslation();
 
   if (orderBasketItem.isOrderIncomplete) {
-    return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
+    return <span className={styles.orderActionIncompleteLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
   }
 
   switch (orderBasketItem.action) {
