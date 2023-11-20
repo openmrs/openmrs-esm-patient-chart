@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
@@ -56,7 +57,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
               return (
                 <div className={styles.widgetCard}>
                   <div className={styles.externalOverviewHeader}>
-                    <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{cardTitle}</h4>
+                    <h4 className={classNames(styles.productiveHeading03, styles.text02)}>{cardTitle}</h4>
                     <Button
                       kind="ghost"
                       renderIcon={(props) => <ArrowRight size={16} {...props} />}

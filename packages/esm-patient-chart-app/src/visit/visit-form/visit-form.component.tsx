@@ -4,20 +4,14 @@ import {
   Button,
   ButtonSet,
   ContentSwitcher,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineNotification,
-  Layer,
   RadioButton,
   RadioButtonGroup,
   Row,
-  SelectItem,
   Stack,
   Switch,
-  TimePicker,
-  TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
@@ -37,11 +31,15 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
+  Visit,
+  updateVisit,
+  useConnectivity,
 } from '@openmrs/esm-framework';
 import {
-  amPm,
   convertTime12to24,
+  createOfflineVisitForPatient,
   DefaultWorkspaceProps,
+  time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
@@ -49,39 +47,43 @@ import { ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { VisitFormData } from './visit-form.resource';
+import VisitDateTimeField from './visit-date-time.component';
+import { useVisits } from '../visits-widget/visit.resource';
+import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
-export type VisitFormData = {
-  visitDate: Date;
-  visitTime: string;
-  timeFormat: 'PM' | 'AM';
-  programType: string;
-  visitType: string;
-  visitLocation: {
-    display: string;
-    uuid: string;
-  };
-  visitAttributes: {
-    [x: string]: string;
-  };
-};
+interface StartVisitFormProps extends DefaultWorkspaceProps {
+  visitToEdit: Visit;
+  showVisitEndDateTimeFields: boolean;
+}
 
-const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const StartVisitForm: React.FC<StartVisitFormProps> = ({
+  patientUuid,
+  closeWorkspace,
+  promptBeforeClosing,
+  visitToEdit,
+  showVisitEndDateTimeFields,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const isOnline = useConnectivity();
   const sessionUser = useSession();
-  const { error: errorFetchingLocations } = useLocations();
+  const { error: errorFetchingLocations } = isOnline ? useLocations() : { error: false };
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const allVisitTypes = useVisitTypes();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutateVisits } = useVisits(patientUuid);
+  const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
+  const { mutate } = useVisit(patientUuid);
   const { mutate: mutateVisit } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -92,6 +94,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
+
+  const displayVisitStopDateTimeFields = useMemo(
+    () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
+    [visitToEdit?.stopDatetime, showVisitEndDateTimeFields],
+  );
 
   const visitFormSchema = useMemo(() => {
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
@@ -109,9 +116,18 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     );
 
     return z.object({
-      visitDate: z.date(),
-      visitTime: z.string(),
-      timeFormat: z.enum(['PM', 'AM']),
+      visitStartDate: z.date(),
+      visitStartTime: z
+        .string()
+        .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
+      visitStartTimeFormat: z.enum(['PM', 'AM']),
+      visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
+      visitStopTime: displayVisitStopDateTimeFields
+        ? z
+            .string()
+            .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
+        : z.string().optional(),
+      visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
       programType: z.string().optional(),
       visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
       visitLocation: z.object({
@@ -120,20 +136,44 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       }),
       visitAttributes: z.object(visitAttributes),
     });
-  }, [t, config]);
+  }, [t, config, displayVisitStopDateTimeFields]);
 
-  type VisitFormData = z.infer<typeof visitFormSchema>;
+  const defaultValues = useMemo(() => {
+    const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
+    const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
+    let defaultValues: Partial<VisitFormData> = {
+      visitStartDate,
+      visitStartTime: dayjs(visitStartDate).format('hh:mm'),
+      visitStartTimeFormat: visitStartDate.getDate() >= 12 ? 'PM' : 'AM',
+
+      visitType: visitToEdit?.visitType?.uuid,
+      visitLocation: visitToEdit?.location ?? sessionLocation ?? {},
+      visitAttributes:
+        visitToEdit?.attributes.reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr.attributeType.uuid]: typeof curr.value === 'object' ? curr?.value?.uuid : `${curr.value ?? ''}`,
+          }),
+          {},
+        ) ?? {},
+    };
+
+    if (visitStopDate) {
+      defaultValues = {
+        ...defaultValues,
+        visitStopDate,
+        visitStopTime: dayjs(visitStopDate).format('hh:mm'),
+        visitStopTimeFormat: visitStopDate.getDate() >= 12 ? 'PM' : 'AM',
+      };
+    }
+
+    return defaultValues;
+  }, [visitToEdit]);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
     resolver: zodResolver(visitFormSchema),
-    defaultValues: {
-      visitDate: new Date(),
-      visitTime: dayjs(new Date()).format('hh:mm'),
-      timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
-      visitLocation: sessionLocation ? sessionLocation : {},
-      visitAttributes: {},
-    },
+    defaultValues,
   });
 
   const {
@@ -141,21 +181,99 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     control,
     getValues,
     formState: { errors },
+    setError,
   } = methods;
+
+  const validateVisitStartStopDatetime = useCallback(() => {
+    let visitStartDate = getValues('visitStartDate');
+    const visitStartTime = getValues('visitStartTime');
+    const visitStartTimeFormat = getValues('visitStartTimeFormat');
+
+    const [visitStartHours, visitStartMinutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
+
+    const visitStartDatetime = visitStartDate.setHours(visitStartHours, visitStartMinutes);
+
+    let validSubmission = true;
+
+    if (maxVisitStartDatetime && visitStartDatetime >= maxVisitStartDatetime) {
+      validSubmission = false;
+      setError('visitStartDate', {
+        message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
+          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
+          interpolation: {
+            escapeValue: false,
+          },
+        }),
+      });
+    }
+
+    if (!displayVisitStopDateTimeFields) {
+      return validSubmission;
+    }
+
+    let visitStopDate = getValues('visitStopDate');
+    const visitStopTime = getValues('visitStopTime');
+    const visitStopTimeFormat = getValues('visitStopTimeFormat');
+
+    const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
+
+    const visitStopDatetime = visitStopDate.setHours(visitStopHours, visitStopMinutes);
+
+    if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
+      validSubmission = false;
+      setError('visitStopDate', {
+        message: t('invalidVisitStopDate', 'Stop date needs to be on or after {{lastEncounterDatetime}}', {
+          lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
+          interpolation: {
+            escapeValue: false,
+          },
+        }),
+      });
+    }
+
+    if (visitStartDatetime >= visitStopDatetime) {
+      validSubmission = false;
+      setError('visitStopDate', {
+        message: t('invalidVisitStopDate', 'Visit stop date time cannot be on or before visit start date time'),
+      });
+    }
+
+    return validSubmission;
+  }, [setError]);
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
-      const { timeFormat, visitDate, visitLocation, visitTime, visitType, visitAttributes } = data;
+      if (visitToEdit && !validateVisitStartStopDatetime()) {
+        return;
+      }
+
+      const {
+        visitStartTimeFormat,
+        visitStartDate,
+        visitLocation,
+        visitStartTime,
+        visitType,
+        visitAttributes,
+        visitStopDate,
+        visitStopTime,
+        visitStopTimeFormat,
+      } = data;
 
       setIsSubmitting(true);
 
-      const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
+      const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
 
-      const payload: NewVisitPayload = {
+      let payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
           toOmrsIsoString(
-            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
+            new Date(
+              dayjs(visitStartDate).year(),
+              dayjs(visitStartDate).month(),
+              dayjs(visitStartDate).date(),
+              hours,
+              minutes,
+            ),
           ),
         ),
         visitType: visitType,
@@ -167,99 +285,168 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             value: value as string,
           })),
       };
+      if (visitToEdit?.uuid) {
+        // The request throws 400 (Bad request)error when patient is passed in the update payload
+
+        delete payload.patient;
+      }
+
+      if (displayVisitStopDateTimeFields) {
+        const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
+
+        payload = {
+          ...payload,
+          stopDatetime: toDateObjectStrict(
+            toOmrsIsoString(
+              new Date(
+                dayjs(visitStopDate).year(),
+                dayjs(visitStopDate).month(),
+                dayjs(visitStopDate).date(),
+                visitStopHours,
+                visitStopMinutes,
+              ),
+            ),
+          ),
+        };
+      }
 
       const abortController = new AbortController();
-      saveVisit(payload, abortController)
-        .pipe(first())
-        .subscribe(
-          (response) => {
-            if (response.status === 201) {
-              if (config.showServiceQueueFields) {
-                // retrieve values from queue extension
-                setVisitUuid(response.data.uuid);
-                const queueLocation = event?.target['queueLocation']?.value;
-                const serviceUuid = event?.target['service']?.value;
-                const priority = event?.target['priority']?.value;
-                const status = event?.target['status']?.value;
-                const sortWeight = event?.target['sortWeight']?.value;
 
-                saveQueueEntry(
-                  response.data.uuid,
-                  serviceUuid,
-                  patientUuid,
-                  priority,
-                  status,
-                  sortWeight,
-                  new AbortController(),
-                  queueLocation,
-                  visitQueueNumberAttributeUuid,
-                ).then(
-                  ({ status }) => {
-                    if (status === 201) {
-                      mutateVisit();
-                      mutateQueueEntry();
-                      showToast({
-                        kind: 'success',
-                        title: t('visitStarted', 'Visit started'),
-                        description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
-                      });
-                    }
-                  },
-                  (error) => {
-                    showNotification({
-                      title: t('queueEntryError', 'Error adding patient to the queue'),
-                      kind: 'error',
-                      critical: true,
-                      description: error?.message,
-                    });
-                  },
-                );
-              }
-              if (config.showUpcomingAppointments && upcomingAppointment) {
-                const appointmentPayload: AppointmentPayload = {
-                  appointmentKind: upcomingAppointment?.appointmentKind,
-                  serviceUuid: upcomingAppointment?.service.uuid,
-                  startDateTime: upcomingAppointment?.startDateTime,
-                  endDateTime: upcomingAppointment?.endDateTime,
-                  locationUuid: visitLocation?.uuid,
-                  patientUuid: patientUuid,
-                  uuid: upcomingAppointment?.uuid,
-                  dateHonored: dayjs(visitDate).format(),
-                };
-                saveAppointment(appointmentPayload, abortController).then(
-                  ({ status }) => {
-                    if (status === 201) {
-                      mutateVisit();
-                      showToast({
+      if (isOnline) {
+        (visitToEdit?.uuid
+          ? updateVisit(visitToEdit?.uuid, payload, abortController)
+          : saveVisit(payload, abortController)
+        )
+          .pipe(first())
+          .subscribe(
+            (response) => {
+              if (response.status === 201) {
+                if (config.showServiceQueueFields) {
+                  // retrieve values from queue extension
+                  setVisitUuid(response.data.uuid);
+                  const queueLocation = event?.target['queueLocation']?.value;
+                  const serviceUuid = event?.target['service']?.value;
+                  const priority = event?.target['priority']?.value;
+                  const status = event?.target['status']?.value;
+                  const sortWeight = event?.target['sortWeight']?.value;
+
+                  saveQueueEntry(
+                    response.data.uuid,
+                    serviceUuid,
+                    patientUuid,
+                    priority,
+                    status,
+                    sortWeight,
+                    new AbortController(),
+                    queueLocation,
+                    visitQueueNumberAttributeUuid,
+                  ).then(
+                    ({ status }) => {
+                      if (status === 201) {
+                        mutateCurrentVisit();
+                        mutateVisits();
+                        mutateQueueEntry();
+                        showToast({
+                          kind: 'success',
+                          title: t('visitStarted', 'Visit started'),
+                          description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                        });
+                      }
+                    },
+                    (error) => {
+                      showNotification({
+                        title: t('queueEntryError', 'Error adding patient to the queue'),
+                        kind: 'error',
                         critical: true,
-                        kind: 'success',
-                        description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                        title: t('appointmentEdited', 'Appointment edited'),
+                        description: error?.message,
                       });
-                    }
-                  },
-                  (error) => {
-                    showNotification({
-                      title: t('updateError', 'Error updating upcoming appointment'),
-                      kind: 'error',
-                      critical: true,
-                      description: error?.message,
-                    });
-                  },
-                );
+                    },
+                  );
+                }
+                if (config.showUpcomingAppointments && upcomingAppointment) {
+                  const appointmentPayload: AppointmentPayload = {
+                    appointmentKind: upcomingAppointment?.appointmentKind,
+                    serviceUuid: upcomingAppointment?.service.uuid,
+                    startDateTime: upcomingAppointment?.startDateTime,
+                    endDateTime: upcomingAppointment?.endDateTime,
+                    locationUuid: visitLocation?.uuid,
+                    patientUuid: patientUuid,
+                    uuid: upcomingAppointment?.uuid,
+                    dateHonored: dayjs(visitStartDate).format(),
+                  };
+                  saveAppointment(appointmentPayload, abortController).then(
+                    ({ status }) => {
+                      if (status === 201) {
+                        mutateCurrentVisit();
+                        mutateVisits();
+                        showToast({
+                          critical: true,
+                          kind: 'success',
+                          description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                          title: t('appointmentEdited', 'Appointment edited'),
+                        });
+                      }
+                    },
+                    (error) => {
+                      showNotification({
+                        title: t('updateError', 'Error updating upcoming appointment'),
+                        kind: 'error',
+                        critical: true,
+                        description: error?.message,
+                      });
+                    },
+                  );
+                }
               }
-              mutateVisit();
+              mutateCurrentVisit();
+              mutateVisits();
               closeWorkspace();
 
               showToast({
                 critical: true,
                 kind: 'success',
-                description: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                  visit: response?.data?.visitType?.display ?? `Visit`,
-                }),
-                title: t('visitStarted', 'Visit started'),
+                description: !visitToEdit
+                  ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                    })
+                  : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                      visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                    }),
+                title: !visitToEdit
+                  ? t('visitStarted', 'Visit started')
+                  : t('visitDetailsUpdated', 'Visit details updated'),
               });
-            }
+            },
+            (error) => {
+              showNotification({
+                title: !visitToEdit
+                  ? t('startVisitError', 'Error starting visit')
+                  : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+                kind: 'error',
+                critical: true,
+                description: error?.message,
+              });
+            },
+          );
+      } else {
+        createOfflineVisitForPatient(
+          patientUuid,
+          visitLocation.uuid,
+          config.offlineVisitTypeUuid,
+          payload.startDatetime,
+        ).then(
+          (offlineVisit) => {
+            //setCurrentVisit(patientUuid, offlineVisit.uuid);
+            mutate();
+            closeWorkspace();
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
+            });
           },
           (error) => {
             showNotification({
@@ -270,16 +457,22 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             });
           },
         );
+        return;
+      }
     },
     [
       closeWorkspace,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
-      mutateVisit,
+      mutateCurrentVisit,
+      mutateVisits,
+
       patientUuid,
       upcomingAppointment,
       t,
+      visitToEdit,
+      displayVisitStopDateTimeFields,
     ],
   );
 
@@ -287,6 +480,22 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     setIgnoreChanges((prevState) => !prevState);
     promptBeforeClosing(() => true);
   };
+
+  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
+    if (!visitToEdit?.encounters?.length) {
+      return [null, null];
+    }
+
+    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
+      Date.parse(encounterDatetime),
+    );
+    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
+    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
+    return [maxVisitStartDatetime, minVisitStopDatetime];
+  }, [visitToEdit]);
+
+  const visitStartDate = getValues('visitStartDate');
+  minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
 
   useEffect(() => {
     if (errorFetchingLocations) {
@@ -319,69 +528,21 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             </Row>
           )}
           <Stack gap={1} className={styles.container}>
-            {/* Date and time of visit. Defaults to the current date and time. */}
-            <section>
-              <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
-              <div className={`${styles.dateTimeSection} ${styles.sectionField}`}>
-                <Controller
-                  name="visitDate"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ResponsiveWrapper isTablet={isTablet}>
-                      <DatePicker
-                        dateFormat="d/m/Y"
-                        datePickerType="single"
-                        id="visitDate"
-                        style={{ paddingBottom: '1rem' }}
-                        maxDate={new Date().toISOString()}
-                        onChange={([date]) => onChange(date)}
-                        value={value}
-                      >
-                        <DatePickerInput
-                          id="visitStartDateInput"
-                          labelText={t('date', 'Date')}
-                          placeholder="dd/mm/yyyy"
-                          style={{ width: '100%' }}
-                        />
-                      </DatePicker>
-                    </ResponsiveWrapper>
-                  )}
-                />
-                <ResponsiveWrapper isTablet={isTablet}>
-                  <Controller
-                    name="visitTime"
-                    control={control}
-                    render={({ field: { onBlur, onChange, value } }) => (
-                      <TimePicker
-                        id="visitStartTime"
-                        labelText={t('time', 'Time')}
-                        onChange={(event) => onChange(event.target.value as amPm)}
-                        pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                        style={{ marginLeft: '0.125rem', flex: 'none' }}
-                        value={value}
-                        onBlur={onBlur}
-                      >
-                        <Controller
-                          name="timeFormat"
-                          control={control}
-                          render={({ field: { onChange, value } }) => (
-                            <TimePickerSelect
-                              id="visitStartTimeSelect"
-                              onChange={(event) => onChange(event.target.value as amPm)}
-                              value={value}
-                              aria-label={t('timeFormat ', 'Time Format')}
-                            >
-                              <SelectItem value="AM" text="AM" />
-                              <SelectItem value="PM" text="PM" />
-                            </TimePickerSelect>
-                          )}
-                        />
-                      </TimePicker>
-                    )}
-                  />
-                </ResponsiveWrapper>
-              </div>
-            </section>
+            <VisitDateTimeField
+              dateFieldName="visitStartDate"
+              timeFieldName="visitStartTime"
+              timeFormatFieldName="visitStartTimeFormat"
+              maxDate={maxVisitStartDatetime}
+            />
+
+            {displayVisitStopDateTimeFields && (
+              <VisitDateTimeField
+                dateFieldName="visitStopDate"
+                timeFieldName="visitStopTime"
+                timeFormatFieldName="visitStopTimeFormat"
+                minDate={minVisitStopDatetime}
+              />
+            )}
 
             {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
             {config.showUpcomingAppointments && (
@@ -507,16 +668,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             kind="primary"
             type="submit"
           >
-            {t('startVisit', 'Start visit')}
+            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisit', 'Update visit')}
           </Button>
         </ButtonSet>
       </Form>
     </FormProvider>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default StartVisitForm;

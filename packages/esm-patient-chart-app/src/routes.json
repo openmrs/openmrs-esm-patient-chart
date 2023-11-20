@@ -161,6 +161,18 @@
       "offline": true
     },
     {
+      "name": "delete-visit-dialog",
+      "component": "deleteVisitDialog",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "modify-visit-date-dialog",
+      "component": "modifyVisitDateDialog",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "end-visit-dialog",
       "component": "endVisitDialog",
       "online": true,
@@ -181,7 +193,7 @@
     {
       "name": "start-visit-button-patient-search",
       "slot": "start-visit-button-slot",
-      "component": "startVisitButtonPatientSearch",
+      "component": "startVisitPatientSearchActionButton",
       "online": true,
       "offline": true
     },
@@ -206,6 +218,22 @@
       },
       "online": true,
       "offline": true
+    },
+    {
+      "name": "edit-visit-action-button",
+      "slot": "visit-detail-overview-actions",
+      "component": "editVisitDetailsActionButton",
+      "online": true,
+      "offline": true,
+      "order": 0
+    },
+    {
+      "name": "delete-visit-action-button",
+      "slot": "visit-detail-overview-actions",
+      "component": "deleteVisitActionButton",
+      "online": true,
+      "offline": true,
+      "order": 1
     }
   ],
   "pages": [

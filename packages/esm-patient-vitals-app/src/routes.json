@@ -30,6 +30,24 @@
       "slot": "patient-info-slot"
     },
     {
+      "name": "biometrics-overview-widget",
+      "component": "biometricsOverview",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      },
+      "order": 2
+    },
+    {
+      "name": "biometrics-details-widget",
+      "component": "biometricsDetailedSummary",
+      "slot": "patient-chart-vitals-biometrics-dashboard-slot",
+      "meta": {
+        "view": "biometrics",
+        "title": "Biometrics"
+      }
+    },
+    {
       "name": "patient-vitals-biometrics-form-workspace",
       "component": "vitalsAndBiometricsForm",
       "meta": {
@@ -38,6 +56,23 @@
           "default": "Record Vitals and Biometrics"
         }
       }
+    },
+    {
+      "name": "results-summary-dashboard",
+      "component": "vitalsAndBiometricsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 2,
+      "meta": {
+        "slot": "patient-chart-vitals-biometrics-dashboard-slot",
+        "columns": 1,
+        "path": "Vitals & Biometrics"
+      }
+    }, 
+    {
+      "name": "weight-tile",
+      "component": "weightTile",
+      "slot": "visit-form-header-slot",
+      "order": 2
     }
   ],
   "pages": []

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import {
   ExtensionSlot,
   setCurrentVisit,
@@ -8,14 +9,14 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { changeWorkspaceContext, useAutoCreatedOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import ChartReview from '../patient-chart/chart-review/chart-review.component';
+import { changeWorkspaceContext, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { spaBasePath } from '../constants';
+import { LayoutMode } from './chart-review/dashboard-view.component';
 import ActionMenu from './action-menu/action-menu.component';
+import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
-import { spaBasePath } from '../constants';
-import { LayoutMode } from './chart-review/dashboard-view.component';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -23,14 +24,12 @@ const PatientChart: React.FC = () => {
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const { workspaceWindowState, active } = useWorkspaces();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
-  const { offlineVisitTypeUuid } = useConfig();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
   // We are also the module that holds the offline visit type UUID config.
   // The following hook takes care of the creation.
-  useAutoCreatedOfflineVisit(patientUuid, offlineVisitTypeUuid);
 
   // Keep state updated with the current patient. Anything used outside the patient
   // chart (e.g., the current visit is used by the Active Visit Tag used in the
@@ -51,12 +50,13 @@ const PatientChart: React.FC = () => {
   }, [leftNavBasePath]);
 
   return (
-    <main className={`omrs-main-content ${styles.chartContainer}`}>
+    <main className={classNames('omrs-main-content', styles.chartContainer)}>
       <>
         <div
-          className={`${styles.innerChartContainer} ${
-            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
-          }`}
+          className={classNames(
+            styles.innerChartContainer,
+            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
+          )}
         >
           <ExtensionSlot name="breadcrumbs-slot" />
           {isLoadingPatient ? (
@@ -69,7 +69,7 @@ const PatientChart: React.FC = () => {
                 <ExtensionSlot name="patient-info-slot" state={state} />
               </aside>
               <div className={styles.grid}>
-                <div className={`${styles.chartReview} ${layoutMode == 'contained' ? styles.widthContained : ''}`}>
+                <div className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}>
                   <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
                   <WorkspaceNotification />
                 </div>

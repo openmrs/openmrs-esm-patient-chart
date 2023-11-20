@@ -3,7 +3,7 @@ import { openmrsFetch, OpenmrsResource, Privilege, Visit } from '@openmrs/esm-fr
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -67,6 +67,22 @@ export function usePastVisits(patientUuid: string) {
     isLoading,
     isValidating,
   };
+}
+
+export function deleteVisit(visitUuid: string) {
+  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+    method: 'DELETE',
+  });
+}
+
+export function restoreVisit(visitUuid: string) {
+  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+    headers: {
+      'content-type': 'application/json',
+    },
+    method: 'POST',
+    body: { voided: false },
+  });
 }
 
 export function mapEncounters(visit: Visit): MappedEncounter[] {

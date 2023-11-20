@@ -1,15 +1,21 @@
 import React, { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
-import { DrugSearchResult, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
-import styles from './order-basket-search-results.scss';
-import { DrugOrderBasketItem } from '../../types';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
-import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { ordersEqual } from './helpers';
+import {
+  type DrugSearchResult,
+  getTemplateOrderBasketItem,
+  useDrugSearch,
+  useDrugTemplate,
+} from './drug-search.resource';
+import type { DrugOrderBasketItem } from '../../types';
+import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
@@ -70,7 +76,8 @@ export default function OrderBasketSearchResults({
             {drugs.map((drug) => (
               <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
             ))}
-            <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
+
+            <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
           </div>
         </div>
       ) : (
@@ -151,9 +158,11 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
         <Tile
           key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
           role="listitem"
-          className={`${styles.searchResultTile} ${isTablet && styles.tabletSearchResultTile}`}
+          className={classNames(styles.searchResultTile, {
+            [styles.tabletSearchResultTile]: isTablet,
+          })}
         >
-          <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
+          <div className={classNames(styles.searchResultTileContent, styles.text02)}>
             <p>
               <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
               {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
@@ -241,7 +250,8 @@ const DrugSearchSkeleton = () => {
       <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
-      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
+
+      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
     </div>
   );
 };

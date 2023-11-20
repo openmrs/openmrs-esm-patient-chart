@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import styles from './visit-form.scss';
-import { Location, OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
-import { ComboBox } from '@carbon/react';
-import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
-import { useTranslation } from 'react-i18next';
-import { useLocations } from '../hooks/useLocations';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import { ComboBox } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
-import { VisitFormData } from './visit-form.component';
+import { Location, OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
+import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
+import { useLocations } from '../hooks/useLocations';
+import { VisitFormData } from './visit-form.resource';
 import { ChartConfig } from '../../config-schema';
+import styles from './visit-form.scss';
 
 const LocationSelector = () => {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ const LocationSelector = () => {
   return (
     <section data-testid="combo">
       <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-      <div className={`${styles.selectContainer} ${styles.sectionField}`}>
+      <div className={classNames(styles.selectContainer, styles.sectionField)}>
         {!disableChangingVisitLocation ? (
           <Controller
             name="visitLocation"

@@ -1,13 +1,10 @@
-import {
-  defineConfigSchema,
-  fhirBaseUrl,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, fhirBaseUrl, getSyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
+import allergiesDetailedSummaryComponent from './allergies/allergies-detailed-summary.component';
+import allergyFormComponent from './allergies/allergies-form/allergy-form.component';
+import allergyTileComponent from './allergies/allergies-tile.component';
 
 const moduleName = '@openmrs/esm-patient-allergies-app';
 
@@ -37,10 +34,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const allergiesDetailedSummary = getAsyncLifecycle(
-  () => import('./allergies/allergies-detailed-summary.component'),
-  options,
-);
+export const allergiesDetailedSummary = getSyncLifecycle(allergiesDetailedSummaryComponent, options);
 
 // t('Allergies', 'Allergies')
 export const allergiesDashboardLink = getSyncLifecycle(
@@ -51,19 +45,6 @@ export const allergiesDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const allergiesForm = getAsyncLifecycle(
-  () => import('./allergies/allergies-form/allergy-form.component'),
-  options,
-);
+export const allergiesForm = getSyncLifecycle(allergyFormComponent, options);
 
-export const allergyTile = getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options);
-
-export const patientDetailsTile = getAsyncLifecycle(
-  () => import('../../esm-patient-chart-app/src/patient-details-tile/patient-details-tile.component'),
-  options,
-);
-
-export const weightTile = getAsyncLifecycle(
-  () => import('../../esm-patient-biometrics-app/src/biometrics/weight-tile.component'),
-  options,
-);
+export const allergyTile = getSyncLifecycle(allergyTileComponent, options);

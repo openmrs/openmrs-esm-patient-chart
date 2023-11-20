@@ -13,12 +13,12 @@ const endVisitPayload = {
   visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
 };
 
-const mockUseVisit = useVisit as jest.Mock;
-const mockUpdateVisit = updateVisit as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockMutate = jest.fn();
-const mockCloseModal = jest.fn();
+const mockedCloseModal = jest.fn();
+const mockedMutate = jest.fn();
+const mockedShowNotification = jest.mocked(showNotification);
+const mockedShowToast = jest.mocked(showToast);
+const mockedUpdateVisit = jest.mocked(updateVisit);
+const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -30,12 +30,12 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('End Visit', () => {
-  test('should end an active visit and display toast message', async () => {
+describe('End visit dialog', () => {
+  test('displays a success toast notification when the visit is ended successfully', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
-    mockUpdateVisit.mockReturnValueOnce(
+    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockedMutate });
+    mockedUpdateVisit.mockReturnValueOnce(
       of({
         status: 200,
         data: {
@@ -48,23 +48,27 @@ describe('End Visit', () => {
 
     renderEndVisitDialog();
 
-    expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
-    expect(
-      screen.getByText(/Ending this visit will not allow you to fill another encounter form for this patient/i),
-    ).toBeInTheDocument();
+    const closeModalButton = screen.getByRole('button', { name: /close/i });
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const endVisitButton = screen.getByRole('button', { name: /end visit/i });
 
-    const endVisitButton = await screen.findByRole('button', { name: /End Visit/i });
+    expect(closeModalButton).toBeInTheDocument();
+    expect(cancelButton).toBeInTheDocument();
     expect(endVisitButton).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /are you sure you want to end this active visit?/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one/i,
+      ),
+    ).toBeInTheDocument();
 
     await user.click(endVisitButton);
 
-    expect(updateVisit).toHaveBeenCalledWith(
-      '17f512b4-d264-4113-a6fe-160cb38cb46e',
-      endVisitPayload,
-      expect.anything(),
-    );
+    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
 
-    expect(mockShowToast).toHaveBeenCalledWith({
+    expect(mockedShowToast).toHaveBeenCalledWith({
       critical: true,
       description: 'Facility Visit ended successfully',
       kind: 'success',
@@ -72,39 +76,36 @@ describe('End Visit', () => {
     });
   });
 
-  test('should display error message when rest api call to end visit fails', async () => {
+  test('displays an error notification if there was a problem ending a visit', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
-    mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
+    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockedMutate });
+    mockedUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
 
     renderEndVisitDialog();
 
-    expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
-      screen.getByText(/Ending this visit will not allow you to fill another encounter form for this patient/i),
+      screen.getByText(
+        /Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one/i,
+      ),
     ).toBeInTheDocument();
 
-    const endVisitButton = await screen.findByRole('button', { name: /End Visit/i });
+    const endVisitButton = screen.getByRole('button', { name: /End Visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
     await user.click(endVisitButton);
 
-    expect(updateVisit).toHaveBeenCalledWith(
-      '17f512b4-d264-4113-a6fe-160cb38cb46e',
-      endVisitPayload,
-      expect.anything(),
-    );
+    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
 
-    expect(mockShowNotification).toHaveBeenCalledWith({
+    expect(mockedShowNotification).toHaveBeenCalledWith({
       description: 'Internal error message',
       kind: 'error',
-      title: 'Error ending active visit',
+      title: 'Error ending visit',
       critical: true,
     });
   });
 });
 
 function renderEndVisitDialog() {
-  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockedCloseModal} />);
 }

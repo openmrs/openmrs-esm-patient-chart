@@ -17,8 +17,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
 import { Controller, ControllerRenderProps, useFormContext } from 'react-hook-form';
-import { VisitFormData } from './visit-form.component';
 import dayjs from 'dayjs';
+import { VisitFormData } from './visit-form.resource';
 
 interface VisitAttributes {
   [uuid: string]: string;
