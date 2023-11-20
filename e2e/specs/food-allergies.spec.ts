@@ -21,7 +21,7 @@ test('Record an allergy to a food item', async ({ page, api }) => {
   });
 
   await test.step('And then I record an allergy to a food item', async () => {
-    await allergiesPage.page.getByText('Food').click();
+    await allergiesPage.page.getByRole('tab', { name: /food/i }).click();
     await allergiesPage.page.getByText('Eggs').click();
     await allergiesPage.page.getByText('Mental status change').click();
     await allergiesPage.page.getByText('Mild').click();
