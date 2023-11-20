@@ -1,6 +1,6 @@
 {
   "clinicalForm": "טופס קליני",
-  "editForm": "Edit form",
+  "editForm": "ערוך טופס",
   "form": "טופס",
   "formName": "שם הטופס (א-ת)",
   "forms": "טפסים",
@@ -8,11 +8,11 @@
   "homeOverviewCardView": "תצוגה",
   "lastCompleted": "הושלם לאחרונה",
   "never": "אף פעם",
-  "noFormsToDisplay": "There are no forms to display.",
+  "noFormsToDisplay": "אין טפסים לתצוגה.",
   "noMatchingFormsAvailable": "אין טפסים {{formCategory}} לתצוגה",
   "noMatchingFormsToDisplay": "אין טפסים מתאימים לתצוגה",
-  "offlineForms": "Offline forms",
-  "offlineForms__lower": "offline forms",
+  "offlineForms": "טפסים לא מקוונים",
+  "offlineForms__lower": "טפסים לא מקוונים",
   "offlineFormsOverviewCardAvailableOffline": "זמין לשימוש לא מקוון",
   "offlineFormsTableFormAvailableOffline": "לא מקוון",
   "offlineFormsTableFormNameHeader": "שם הטופס",
@@ -20,6 +20,6 @@
   "offlinePatientsTableSearchLabel": "חפש ברשימה זו",
   "offlinePatientsTableSearchPlaceholder": "חפש ברשימה זו",
   "offlineToggle": "מצב לא מקוון",
-  "searchForAForm": "Search for a form",
+  "searchForAForm": "חפש טופס",
   "searchThisList": "חפש ברשימה זו"
 }
