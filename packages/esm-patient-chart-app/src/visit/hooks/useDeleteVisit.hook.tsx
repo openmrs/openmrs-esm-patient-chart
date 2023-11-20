@@ -51,10 +51,12 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
             : t('visitCancelled', 'Visit cancelled'),
           kind: 'success',
           subtitle: !isCurrentVisitDeleted
-            ? t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
+            ? t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
                 visit: visit?.visitType?.display ?? t('visit', 'Visit'),
               })
-            : t('visitCanceled', 'Canceled active visit successfully'),
+            : t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
+                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+              }),
           actionButtonLabel: t('undo', 'Undo'),
           onActionButtonClick: restoreDeletedVisit,
         });
