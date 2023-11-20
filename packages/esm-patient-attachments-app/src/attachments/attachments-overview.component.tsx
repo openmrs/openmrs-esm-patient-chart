@@ -58,6 +58,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             title: t('fileDeleted', 'File deleted'),
             subtitle: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
+            isLowContrast: true,
           });
         })
         .catch((error) => {

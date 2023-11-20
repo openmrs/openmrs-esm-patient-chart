@@ -32,6 +32,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
               title: t('uploadComplete', 'Upload complete'),
               subtitle: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
               kind: 'success',
+              isLowContrast: true,
             });
             setFilesUploading((prevfilesToUpload) =>
               prevfilesToUpload.map((file, ind) =>
