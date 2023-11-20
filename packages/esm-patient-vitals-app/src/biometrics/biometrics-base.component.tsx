@@ -12,11 +12,11 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
+import { launchVitalsAndBiometricsForm } from '../utils';
+import { useVitalsAndBiometrics } from '../common';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
-import { launchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics } from '../common';
 
 interface BiometricsBaseProps {
   patientUuid: string;

@@ -91,7 +91,7 @@ describe('<OrderBasketActionButton/>', () => {
     render(<OrderBasketActionButton />);
 
     expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('20');
-    const orderBasketButton = screen.getByRole('button', { name: /Medications/i });
+    const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await waitFor(() => user.click(orderBasketButton));
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
@@ -107,7 +107,7 @@ describe('<OrderBasketActionButton/>', () => {
     }));
     const screen = render(<OrderBasketActionButton />);
 
-    const orderBasketButton = screen.getByRole('button', { name: /Medications/i });
+    const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await waitFor(() => user.click(orderBasketButton));
     expect(mockLaunchPatientWorkspace).not.toBeCalled();
@@ -121,7 +121,7 @@ describe('<OrderBasketActionButton/>', () => {
     expect(result.current.orders).toHaveLength(1); // sanity check
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByText(/medications/i)).toBeInTheDocument();
+    expect(screen.getByText(/order basket/i)).toBeInTheDocument();
     expect(screen.getByText(/1/i)).toBeInTheDocument();
   });
 
