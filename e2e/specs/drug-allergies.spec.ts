@@ -9,40 +9,39 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Add environmental allergy to patient', async ({ page, api }) => {
+test('Record an allergy to a drug', async ({ page, api }) => {
   const allergiesPage = new PatientAllergiesPage(page);
 
-  await test.step('When I visit the patient allergies page', async () => {
-    await allergiesPage.goto(patient.uuid);
+  await test.step('When I visit the Allergies page', async () => {
+    await allergiesPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click the Record allergy intolerance button', async () => {
+  await test.step('And I click the `Record allergy intolerance` link to launch the form', async () => {
     await allergiesPage.page.getByText('Record allergy').click();
   });
 
-  await test.step('And I filled the form', async () => {
-    await allergiesPage.page.getByText('Environmental').click();
-    await allergiesPage.page.getByText('Dust').click();
+  await test.step('And I record an allergy to a drug', async () => {
+    await allergiesPage.page.getByText('ACE inhibitors').click();
     await allergiesPage.page.getByText('Mental status change').click();
     await allergiesPage.page.getByText('Mild').click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
-  await test.step('And I click the save button', async () => {
-    await allergiesPage.page.getByText('Save').click();
+  await test.step('And I click the submit button', async () => {
+    await allergiesPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see the Allergy Saved notification', async () => {
-    await expect(allergiesPage.page.getByText('saved')).toBeVisible();
+  await test.step('Then I should see a success toast notification', async () => {
+    await expect(allergiesPage.page.getByText(/allergy saved/i)).toBeVisible();
   });
 
-  await test.step('And I see the recorded allergy data', async () => {
+  await test.step('And I should see the newly recorded drug allergen in the list', async () => {
     const rows = allergiesPage.allergyTable().locator('tr');
     const allergenCell = rows.locator('td:first-child');
     const severityCell = rows.locator('td:nth-child(2)');
     const reactionCell = rows.locator('td:nth-child(3)');
     const commentCell = rows.locator('td:nth-child(4)');
-    await expect(allergenCell).toHaveText('Dust');
+    await expect(allergenCell).toHaveText('ACE inhibitors');
     await expect(reactionCell).toHaveText('Mental status change');
     await expect(severityCell).toHaveText('low');
     await expect(commentCell).toHaveText('Test comment');
