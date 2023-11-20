@@ -144,7 +144,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     let defaultValues: Partial<VisitFormData> = {
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
-      visitStartTimeFormat: visitStartDate.getDate() >= 12 ? 'PM' : 'AM',
+      visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
 
       visitType: visitToEdit?.visitType?.uuid,
       visitLocation: visitToEdit?.location ?? sessionLocation ?? {},
@@ -163,7 +163,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ...defaultValues,
         visitStopDate,
         visitStopTime: dayjs(visitStopDate).format('hh:mm'),
-        visitStopTimeFormat: visitStopDate.getDate() >= 12 ? 'PM' : 'AM',
+        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
       };
     }
 
