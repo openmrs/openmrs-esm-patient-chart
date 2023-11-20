@@ -28,13 +28,15 @@ describe('workspace system', () => {
 
   test('registering, launching, and closing a workspace', () => {
     const store = getWorkspaceStore();
+    const mockedOnCloseWorkspace = jest.fn();
     registerWorkspace({ name: 'allergies', title: 'Allergies', load: jest.fn() });
-    launchPatientWorkspace('allergies', { foo: true });
+    launchPatientWorkspace('allergies', { foo: true, onCloseWorkspace: mockedOnCloseWorkspace });
     expect(store.getState().openWorkspaces.length).toEqual(1);
     const allergies = store.getState().openWorkspaces[0];
     expect(allergies.name).toBe('allergies');
     expect(allergies.additionalProps['foo']).toBe(true);
     allergies.closeWorkspace();
+    expect(mockedOnCloseWorkspace).toHaveBeenCalled();
     expect(store.getState().openWorkspaces.length).toEqual(0);
   });
 
@@ -304,11 +306,14 @@ describe('workspace system', () => {
 
   test('respects promptBeforeClosing function', () => {
     const store = getWorkspaceStore();
+    const mockedOnCloseWorkspace = jest.fn();
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
     registerWorkspace({ name: 'diabetes', title: 'Diabetes', load: jest.fn() });
     launchPatientWorkspace('hiv');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => false);
-    launchPatientWorkspace('diabetes');
+    launchPatientWorkspace('diabetes', {
+      onCloseWorkspace: mockedOnCloseWorkspace,
+    });
     expect(store.getState().prompt).toBeNull();
     expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
@@ -316,6 +321,8 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
     expect(store.getState().prompt.title).toBe('You have unsaved changes');
     store.getState().prompt.onConfirm();
+    // Should call the `onCloseWorkspace` function if passed
+    expect(mockedOnCloseWorkspace).toHaveBeenCalled();
     expect(store.getState().openWorkspaces[0].name).toBe('hiv');
   });
 
@@ -343,8 +350,11 @@ describe('workspace system', () => {
 
   test('respects promptBeforeClosing function before closing workspace, with unsaved changes', () => {
     const store = getWorkspaceStore();
+    const mockedOnCloseWorkspace = jest.fn();
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
-    launchPatientWorkspace('hiv');
+    launchPatientWorkspace('hiv', {
+      onCloseWorkspace: mockedOnCloseWorkspace,
+    });
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
     store.getState().openWorkspaces[0].closeWorkspace(false);
     expect(store.getState().prompt.title).toBe('Unsaved Changes');
@@ -353,6 +363,9 @@ describe('workspace system', () => {
     );
     expect(store.getState().prompt.confirmText).toBe('Discard');
     store.getState().prompt.onConfirm();
+    expect(store.getState().prompt).toBeNull();
+    // Should call the `onCloseWorkspace` function if passed
+    expect(mockedOnCloseWorkspace).toHaveBeenCalled();
     expect(store.getState().openWorkspaces.length).toBe(0);
   });
 });

@@ -36,7 +36,6 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   }, [workspaces, patientUuid]);
 
   const workspaceTitle = workspaces[0]?.additionalProps?.['workspaceTitle'] ?? workspaces[0]?.title ?? '';
-  const onCloseWorkspace = workspaces[0]?.additionalProps?.['onCloseWorkspace'] ?? null;
   const {
     canHide = false,
     canMaximize = false,
@@ -60,7 +59,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         {layout === 'tablet' && !canHide && (
-          <HeaderMenuButton renderMenuIcon={<ArrowLeft />} onClick={onCloseWorkspace ?? closeWorkspace} />
+          <HeaderMenuButton renderMenuIcon={<ArrowLeft />} onClick={closeWorkspace} />
         )}
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar className={styles.headerGlobalBar}>
@@ -74,7 +73,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   onClick={toggleWindowState}
                   size="lg"
                 >
-                  {maximized ? <Maximize /> : <Minimize />}
+                  {maximized ? <Minimize /> : <Maximize />}
                 </HeaderGlobalAction>
               )}
               {canHide ? (
@@ -90,7 +89,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                 <HeaderGlobalAction
                   align="bottom-right"
                   label={t('close', 'Close')}
-                  onClick={() => onCloseWorkspace?.() ?? closeWorkspace?.()}
+                  onClick={() => closeWorkspace?.()}
                   size="lg"
                 >
                   <Close />
@@ -99,11 +98,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
             </>
           )}
           {layout === 'tablet' && canHide && (
-            <HeaderGlobalAction
-              align="bottom-right"
-              label={t('close', 'Close')}
-              onClick={() => onCloseWorkspace?.() ?? closeWorkspace?.()}
-            >
+            <HeaderGlobalAction align="bottom-right" label={t('close', 'Close')} onClick={() => closeWorkspace?.()}>
               <DownToBottom />
             </HeaderGlobalAction>
           )}

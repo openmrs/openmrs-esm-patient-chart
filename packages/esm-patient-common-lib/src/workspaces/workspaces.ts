@@ -41,6 +41,12 @@ export interface WorkspaceRegistration {
   preferredWindowSize?: WorkspaceWindowState;
 }
 
+interface WorkspaceAdditionalProps {
+  workspaceTitle?: string;
+  onCloseWorkspace?: () => void;
+  [x: string]: any;
+}
+
 let registeredWorkspaces: Record<string, WorkspaceRegistration> = {};
 
 /**
@@ -154,12 +160,12 @@ function promptBeforeLaunchingWorkspace(
  * @param name The name of the workspace to launch
  * @param additionalProps Props to pass to the workspace component being launched
  */
-export function launchPatientWorkspace(name: string, additionalProps?: object) {
+export function launchPatientWorkspace(name: string, additionalProps?: WorkspaceAdditionalProps) {
   const store = getWorkspaceStore();
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
-    closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges),
+    closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges, additionalProps?.onCloseWorkspace),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
@@ -239,9 +245,23 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
-export function closeWorkspace(name: string, ignoreChanges: boolean) {
+export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWorkspace?: () => void) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  const updateStoreWithClosedWorkspace = () => {
+    const state = store.getState();
+    const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name !== name);
+
+    store.setState({
+      ...state,
+      prompt: null,
+      openWorkspaces: newOpenWorkspaces,
+    });
+
+    if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
+      onCloseWorkspace?.();
+    }
+  };
   if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
       title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
@@ -251,15 +271,13 @@ export function closeWorkspace(name: string, ignoreChanges: boolean) {
         `You have unsaved changes in the side panel. Do you want to discard these changes?`,
       ),
       onConfirm: () => {
-        const state = store.getState();
-        store.setState({ ...state, prompt: null, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+        updateStoreWithClosedWorkspace();
       },
       confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
     };
     store.setState({ ...store.getState(), prompt });
   } else {
-    const state = store.getState();
-    store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+    updateStoreWithClosedWorkspace();
   }
 }
 

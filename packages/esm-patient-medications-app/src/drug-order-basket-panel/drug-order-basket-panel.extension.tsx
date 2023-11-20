@@ -24,7 +24,6 @@ export default function DrugOrderBasketPanelExtension() {
   const discontinuedOrderBasketItems = orders.filter((x) => x.action === 'DISCONTINUE');
 
   const onClose = useCallback(() => {
-    closeWorkspace('add-drug-order', true);
     launchPatientWorkspace('order-basket');
   }, []);
 
