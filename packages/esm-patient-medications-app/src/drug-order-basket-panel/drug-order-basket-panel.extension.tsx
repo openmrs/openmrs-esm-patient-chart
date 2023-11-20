@@ -80,12 +80,10 @@ export default function DrugOrderBasketPanelExtension() {
     <Tile
       className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
     >
-      <div className={styles.heading}>
-        <div className={styles.title}>
-          <div className={classNames(isTablet ? styles.tabletIcon : styles.desktopIcon)}>
-            <RxIcon isTablet={isTablet} />
-          </div>
-          <h4>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
+      <div className={styles.container}>
+        <div className={styles.iconAndLabel}>
+          <RxIcon isTablet={isTablet} />
+          <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button
@@ -93,7 +91,7 @@ export default function DrugOrderBasketPanelExtension() {
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add medication"
             onClick={openDrugSearch}
-            size={isTablet ? 'lg' : 'sm'}
+            size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { screen, render, waitFor, renderHook } from '@testing-library/react';
+import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../tools/test-helpers';
-import OrderBasketActionButton from './order-basket-action-button.extension';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import OrderBasketActionButton from './order-basket-action-button.extension';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -80,7 +80,7 @@ describe('<OrderBasketActionButton/>', () => {
     expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('16');
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await waitFor(() => user.click(orderBasketButton));
+    await user.click(orderBasketButton);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
@@ -93,7 +93,7 @@ describe('<OrderBasketActionButton/>', () => {
     expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('20');
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await waitFor(() => user.click(orderBasketButton));
+    await user.click(orderBasketButton);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
@@ -109,7 +109,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await waitFor(() => user.click(orderBasketButton));
+    await user.click(orderBasketButton);
     expect(mockLaunchPatientWorkspace).not.toBeCalled();
     expect(mockLaunchStartVisitPrompt).toHaveBeenCalled();
     expect(orderBasketButton).toHaveClass('active');

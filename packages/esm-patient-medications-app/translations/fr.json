@@ -14,6 +14,7 @@
   "dosageInstructions": "1. Dosage instructions",
   "dose": "Dose",
   "drugAlreadyPrescribed": "Already prescribed",
+  "drugOrders": "Drug orders",
   "duration": "Duration",
   "durationUnit": "Duration unit",
   "durationUnitPlaceholder": "Duration Unit",
