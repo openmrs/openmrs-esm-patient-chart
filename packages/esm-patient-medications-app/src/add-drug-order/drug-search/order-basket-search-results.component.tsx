@@ -139,7 +139,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   const addToBasket = useCallback(
     (searchResult: DrugOrderBasketItem) => {
       // Directly adding the order to basket should be marked as incomplete
-      searchResult.action = 'INCOMPLETE';
+      searchResult.isOrderIncomplete = true;
       setOrders([...orders, searchResult]);
       closeWorkspace('add-drug-order', true);
       launchPatientWorkspace('order-basket');

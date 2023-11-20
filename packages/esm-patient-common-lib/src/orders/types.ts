@@ -1,7 +1,7 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface OrderBasketItem {
-  action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | 'INCOMPLETE' | undefined;
+  action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | undefined;
   display: string;
   uuid?: string;
   orderer?: string;
@@ -15,6 +15,7 @@ export interface OrderBasketItem {
       };
     };
   };
+  isOrderIncomplete?: boolean;
 }
 
 export interface OrderPost {

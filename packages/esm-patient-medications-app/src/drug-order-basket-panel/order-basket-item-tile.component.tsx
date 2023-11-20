@@ -108,6 +108,10 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
 function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBasketItem }) {
   const { t } = useTranslation();
 
+  if (orderBasketItem.isOrderIncomplete) {
+    return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
+  }
+
   switch (orderBasketItem.action) {
     case 'NEW':
       return <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;
@@ -117,8 +121,6 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: DrugOrderBaske
       return <span className={styles.orderActionRevisedLabel}>{t('orderActionRevise', 'Modify')}</span>;
     case 'DISCONTINUE':
       return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionDiscontinue', 'Discontinue')}</span>;
-    case 'INCOMPLETE':
-      return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
     default:
       return <></>;
   }

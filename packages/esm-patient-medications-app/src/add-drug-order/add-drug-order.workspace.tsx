@@ -45,8 +45,8 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       newOrders[orders.indexOf(existingOrder)] = {
         ...finalizedOrder,
-        // Incomplete orders should be marked as new orders on saving the form
-        action: finalizedOrder.action === 'INCOMPLETE' ? 'NEW' : finalizedOrder.action,
+        // Incomplete orders should be marked completed on saving the form
+        isOrderIncomplete: false,
       };
       setOrders(newOrders);
       closeWorkspace();

@@ -130,7 +130,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (activeVisitRequired && !activeVisit) ||
-                orders?.some(({ action }) => action === 'INCOMPLETE')
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
               }
             >
               {t('signAndClose', 'Sign and close')}
