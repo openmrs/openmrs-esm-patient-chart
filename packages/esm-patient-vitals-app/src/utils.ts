@@ -30,7 +30,7 @@ export function launchVitalsAndBiometricsForm(currentVisit: Visit, config: Confi
 
   if (config.vitals.useFormEngine) {
     const { formUuid, formName } = config.vitals;
-    launchFormEntry(formUuid, undefined, formName);
+    launchFormEntry(formUuid, '', formName);
   } else {
     launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
   }

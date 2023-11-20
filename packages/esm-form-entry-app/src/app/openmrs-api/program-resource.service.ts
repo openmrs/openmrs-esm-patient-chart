@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
-import { MetaData } from '../types';
+import { MetaData, PatientProgram } from '../types';
 import { parseDate, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import moment from 'moment';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ProgramResourceService {
@@ -57,24 +59,29 @@ export class ProgramResourceService {
       location: locationUuuid,
     };
 
-    this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
-      (response) => {
-        showSnackbar({
-          title: 'Program enrollment',
-          subtitle: 'Patient has been enrolled successfully',
-          kind: 'success',
-        });
-      },
-      (err) => {
-        // void created encounter to prevent enrollment missing an encounter
-        this.encounterResourceService.voidEncounter(encounterUuid);
-        showSnackbar({
-          title: 'Enrollment error',
-          subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
-          kind: 'error',
-        });
-      },
-    );
+
+    this.isPatientEnrolled(patientUuid, programUuid).subscribe((result: boolean) => {
+      if (!result) {
+        this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
+          (response) => {
+            showSnackbar({
+              title: 'Program enrollment',
+              subtitle: 'Patient has been enrolled successfully',
+              kind: 'success',
+            });
+          },
+          (err) => {
+            // void created encounter to prevent enrollment missing an encounter
+            this.encounterResourceService.voidEncounter(encounterUuid);
+            showSnackbar({
+              title: 'Enrollment error',
+              subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
+              kind: 'error',
+            });
+          },
+        );
+      }
+    });
   }
 
   public discontinuePatientFromCareProgram(discontinuationDate: string, encounterUuid: string) {
@@ -112,6 +119,20 @@ export class ProgramResourceService {
           kind: 'error',
         });
       },
+    );
+  }
+
+  public isPatientEnrolled(patientUuid: string, programUuid: string): Observable<boolean> {
+    const url = this.programEnrollmentUrl() + `?patient=${patientUuid}&v=full`;
+    return this.httpClient.get(url).pipe(
+      map((response: any) => {
+        if (response && response.results) {
+          return !!response.results.find((patientProgram: PatientProgram) => {
+            return patientProgram.program.uuid === programUuid && patientProgram.dateCompleted === null;
+          });
+        }
+        return false;
+      }),
     );
   }
 }

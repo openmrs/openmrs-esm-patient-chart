@@ -2,13 +2,14 @@ import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/cor
 import { registerLocaleData } from '@angular/common';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
-import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
+import { catchError, concatAll, map, mergeMap, switchMap, take } from 'rxjs/operators';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { Encounter, FormSchema, Identifier, Order } from '../types';
-import { showSnackbar, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
+import { Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
+import { showSnackbar, getSynchronizationItems, createGlobalStore, showModal, } from '@openmrs/esm-framework';
+
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
@@ -18,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ProgramResourceService } from '../openmrs-api/program-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
+import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 
 type FormState =
   | 'initial'
@@ -61,6 +63,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly programService: ProgramResourceService,
     private readonly formDataSourceService: FormDataSourceService,
     private readonly patientResourceService: PatientResourceService,
+    private readonly visitResourceService: VisitResourceService,
   ) {}
 
   public ngOnInit() {
@@ -194,11 +197,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     return from(this.patientPreviousEncounter.getPreviousEncounter(formSchema.encounterType?.uuid, patientUuid));
   }
 
-  public onSubmit() {
-    if (!this.validateForm()) {
-      return;
-    }
-
+  private handleFormSubmission() {
     this.changeState('submitting');
     this.patientResourceService.validateIdentifiers(this.form).subscribe((resp) => {
       if (resp.length > 0) {
@@ -255,6 +254,51 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         );
       }
     });
+  }
+
+  private modifyVisitDate(visitUuid: string, visitStartDatetime: string, visitStopDatetime: string) {
+    const dispose = showModal('modify-visit-date-dialog', {
+      onDiscard: () => {
+        dispose();
+      },
+      onConfirmation: () => {
+        this.visitResourceService
+          .updateVisitDates(visitUuid, visitStartDatetime, visitStopDatetime)
+          .subscribe(() => this.handleFormSubmission());
+        dispose();
+      },
+    });
+  }
+
+  private validateEncounterDatetimeWithVisit(encounterCreate: EncounterCreate) {
+    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitStartDatetime = this.singleSpaPropsService.getProp('visitStartDatetime');
+    const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
+
+    if (encounterCreate.uuid) {
+      if (visitStartDatetime && new Date(encounterCreate.encounterDatetime) < new Date(visitStartDatetime)) {
+        this.modifyVisitDate(visitUuid, encounterCreate.encounterDatetime, visitStopDatetime);
+        return false;
+      } else if (visitStopDatetime && new Date(encounterCreate.encounterDatetime) > new Date(visitStopDatetime)) {
+        this.modifyVisitDate(visitUuid, visitStartDatetime, encounterCreate.encounterDatetime);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public onSubmit() {
+    if (!this.validateForm()) {
+      return;
+    }
+
+    const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
+
+    const isEncounterDatetimeValid = this.validateEncounterDatetimeWithVisit(encounterToSubmit);
+
+    if (isEncounterDatetimeValid) {
+      this.handleFormSubmission();
+    }
   }
 
   /**
