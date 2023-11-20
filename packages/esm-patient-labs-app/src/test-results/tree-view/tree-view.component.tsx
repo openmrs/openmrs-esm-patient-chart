@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import classNames from 'classnames';
 import { AccordionSkeleton, DataTableSkeleton, Button } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
@@ -71,7 +72,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
           {!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
         </div>
       )}
-      <div className={`${styles.rightSection} ${expanded ? styles.fullView : styles.splitView}`}>
+      <div className={classNames(styles.rightSection, expanded ? styles.fullView : styles.splitView)}>
         {testUuid && type === 'trendline' ? (
           <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
         ) : loading || isLoadingPanelData ? (

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -99,8 +100,10 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
+            className={classNames(styles.orderBasketSlot, {
+              [styles.orderBasketSlotTablet]: isTablet,
+            })}
             name="order-basket-slot"
-            className={`${styles.orderBasketSlot} ${isTablet ? styles.orderBasketSlotTablet : ''}`}
           />
         </div>
 

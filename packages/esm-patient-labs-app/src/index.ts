@@ -8,6 +8,8 @@ import {
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './test-results/dashboard.meta';
+import externalOverviewComponent from './test-results/overview/external-overview.extension';
+import resultsViewerComponent from './test-results/results-viewer';
 
 const moduleName = '@openmrs/esm-patient-labs-app';
 
@@ -27,11 +29,8 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const externalOverview = getAsyncLifecycle(
-  () => import('./test-results/overview/external-overview.extension'),
-  options,
-);
-export const resultsViewer = getAsyncLifecycle(() => import('./test-results/results-viewer'), options);
+export const externalOverview = getSyncLifecycle(externalOverviewComponent, options);
+export const resultsViewer = getSyncLifecycle(resultsViewerComponent, options);
 export const printModal = getAsyncLifecycle(() => import('./test-results/print-modal/print-modal.extension'), options);
 
 export const testResultsDashboardLink =

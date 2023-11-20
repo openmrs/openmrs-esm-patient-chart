@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalBar, HeaderName, HeaderMenuButton, HeaderGlobalAction, IconButton } from '@carbon/react';
@@ -45,18 +46,16 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
 
   return (
     <aside
-      className={`${styles.container} ${width === 'narrow' ? styles.narrowWorkspace : styles.widerWorkspace} ${
-        maximized ? `${styles.maximized}` : undefined
-      } ${
-        isWorkspaceWindowOpen
-          ? `${styles.show}`
-          : `${styles.hide}
-      }`
-      }`}
+      className={classNames(
+        styles.container,
+        width === 'narrow' ? styles.narrowWorkspace : styles.widerWorkspace,
+        { [styles.maximized]: maximized },
+        isWorkspaceWindowOpen ? styles.show : styles.hide,
+      )}
     >
       <Header
         aria-label="Workspace Title"
-        className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
+        className={classNames(styles.header, maximized ? styles.fullWidth : styles.dynamicWidth)}
       >
         {layout === 'tablet' && !canHide && (
           <HeaderMenuButton renderMenuIcon={<ArrowLeft />} onClick={closeWorkspace} />

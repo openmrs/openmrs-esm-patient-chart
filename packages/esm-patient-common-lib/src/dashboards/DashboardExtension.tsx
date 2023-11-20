@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import classNames from 'classnames';
 import last from 'lodash-es/last';
-import { ConfigurableLink } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 export interface DashboardExtensionProps {
   path: string;
@@ -24,8 +25,8 @@ export const DashboardExtension = ({
   return (
     <div key={path}>
       <ConfigurableLink
+        className={classNames('cds--side-nav__link', { 'active-left-nav-link': path === navLink })}
         to={`${basePath}/${encodeURIComponent(path)}`}
-        className={`cds--side-nav__link ${path === navLink && 'active-left-nav-link'}`}
       >
         {t(title)}
       </ConfigurableLink>

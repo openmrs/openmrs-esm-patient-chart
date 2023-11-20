@@ -1,11 +1,11 @@
 import React from 'react';
+import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { parseDate, setCurrentVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { first } from 'rxjs/operators';
-import styles from './end-visit-dialog.scss';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
+import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
   patientUuid: string;
@@ -51,7 +51,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           },
           (error) => {
             showNotification({
-              title: t('endVisitError', 'Error ending active visit'),
+              title: t('errorEndingVisit', 'Error ending visit'),
               kind: 'error',
               critical: true,
               description: error?.message,
@@ -65,16 +65,14 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('visit', 'Visit')}
-        title={t('endActiveVisit', 'End active visit')}
+        title={t('endActiveVisitConfirmation', 'Are you sure you want to end this active visit?')}
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
           {t(
-            'endVisitWarningMessage',
-            'Ending this visit will not allow you to fill another encounter form for this patient',
+            'endVisitExplainerMessage',
+            'Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one.',
           )}
-          .
         </p>
       </ModalBody>
       <ModalFooter>

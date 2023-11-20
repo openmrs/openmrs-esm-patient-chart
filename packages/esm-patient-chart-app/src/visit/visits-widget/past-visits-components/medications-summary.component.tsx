@@ -1,7 +1,8 @@
 import React from 'react';
+import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import { OrderItem } from '../visit.resource';
+import type { OrderItem } from '../visit.resource';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 
@@ -80,7 +81,9 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
             ),
         )
       ) : (
-        <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noMedicationsFound', 'No medications found')}</p>
+        <p className={classNames(styles.bodyLong01, styles.text02)}>
+          {t('noMedicationsFound', 'No medications found')}
+        </p>
       )}
     </div>
   );

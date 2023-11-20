@@ -1,6 +1,7 @@
 {
   "chartView": "عرض الرسم البياني",
-  "dateAndTime": "Date and time",
+  "dateAndTime": "التاريخ والوقت",
   "displaying": "عرض",
+  "encounterType": "نوع اللقاء",
   "tableView": "عرض الجدول"
 }

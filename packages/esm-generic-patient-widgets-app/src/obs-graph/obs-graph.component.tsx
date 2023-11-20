@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
@@ -26,7 +27,7 @@ interface ObsGraphProps {
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
+  const { data: obss } = useObs(patientUuid);
 
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
     label: config.data[0]?.label,
@@ -45,6 +46,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     if (config.graphOldestFirst) {
       chartRecords.reverse();
     }
+
     return chartRecords;
   }, [obss, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
 
@@ -83,12 +85,14 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           <Tabs id="concept-tab-group" className={styles.verticalTabs} type="default">
             <TabList className={styles.tablist} aria-label="Obs tabs">
               {config.data.map(({ concept, label }, index) => {
+                const tabClasses = classNames(styles.tab, styles.bodyLong01, {
+                  [styles.selectedTab]: selectedConcept.label === label,
+                });
+
                 return (
                   <Tab
-                    key={index}
-                    className={`${styles.tab} ${styles.bodyLong01} ${
-                      selectedConcept.label === label && styles.selectedTab
-                    }`}
+                    key={concept}
+                    className={tabClasses}
                     onClick={() =>
                       setSelectedConcept({
                         label,

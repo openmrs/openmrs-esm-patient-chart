@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { Attachment } from '../attachments-types';
 import styles from './image-preview.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
 
 interface AttachmentPreviewProps {
   closePreview: any;
@@ -67,7 +68,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
       <div className={styles.rightPanel}>
         <h4 className={styles.productiveHeading02}>{attachmentToPreview.title}</h4>
         {attachmentToPreview?.description ? (
-          <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>{attachmentToPreview.description}</p>
+          <p className={classNames(styles.bodyLong01, styles.imageDescription)}>{attachmentToPreview.description}</p>
         ) : null}
       </div>
     </div>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import {
   DataTable,
   Table,
@@ -14,9 +16,8 @@ import {
 } from '@carbon/react';
 import { formatDate, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
+import type { PatientNote } from '../types';
 import orderBy from 'lodash-es/orderBy';
-import { PatientNote } from '../types';
 import styles from './notes-overview.scss';
 
 interface PaginatedNotes {
@@ -102,7 +103,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
+                      className={classNames(styles.productiveHeading01, styles.text02)}
                       {...getHeaderProps({
                         header,
                       })}

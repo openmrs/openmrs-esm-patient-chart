@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -183,7 +184,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
           <ExtensionSlot className={styles.content} name="patient-details-header-slot" state={patientState} />
         </Row>
       ) : null}
-      <div className={`${styles.form} ${isTablet ? styles.tablet : styles.desktop}`}>
+      <div className={classNames(styles.form, isTablet ? styles.tablet : styles.desktop)}>
         {/* This <div> is necessary for the styling in the `.form` class to work */}
         <div>
           <h1 className={styles.heading}>{t('allergensAndReactions', 'Allergens and reactions')}</h1>
@@ -196,7 +197,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           ) : null}
-          <div className={`${styles.container} ${isTablet ? styles.tabletContainer : styles.desktopContainer}`}>
+          <div className={classNames(styles.container, isTablet ? styles.tabletContainer : styles.desktopContainer)}>
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>{t('selectAllergens', 'Select the allergens')}</h2>
               <Tabs onSelectionChange={handleTabChange}>
@@ -310,7 +311,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             </section>
           </div>
           <h1 className={styles.heading}>{t('severityAndOnsetDate', 'Severity and date of onset')}</h1>
-          <div className={`${styles.container} ${isTablet ? styles.tabletContainer : styles.desktopContainer}`}>
+          <div className={classNames(styles.container, isTablet ? styles.tabletContainer : styles.desktopContainer)}>
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>{t('severityOfWorstReaction', 'Severity of worst reaction')}</h2>
               <div className={styles.wrapper}>

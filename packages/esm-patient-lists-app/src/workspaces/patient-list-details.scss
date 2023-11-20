@@ -1,0 +1,57 @@
+// Zeplin screen: https://zpl.io/aMwoNBz
+
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  height: calc(100vh - 6rem);
+}
+
+.backButton {
+  padding: layout.$spacing-03;
+
+  button {
+    display: flex;
+    padding-left: 0 !important;
+
+    svg {
+      order: 1;
+      margin-right: layout.$spacing-03;
+      margin-left: 0 !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.header {
+  background-color: colors.$gray-10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid colors.$gray-20;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  padding-right: 0;
+}
+
+.description {
+  @include type.type-style('body-short-02');
+  margin-top: layout.$spacing-03;
+}
+
+.label {
+  @include type.type-style('label-01');
+}
+
+.details {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-03;
+}
+
+.tableContainer {
+  margin-top: layout.$spacing-07;
+}

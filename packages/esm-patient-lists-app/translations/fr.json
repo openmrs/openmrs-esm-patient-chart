@@ -1,0 +1,19 @@
+{
+  "backToPatientLists": "Retour aux listes de patients",
+  "checkFilters": "Vérifiez les filtres ci-dessus",
+  "createdOn": "Créé le",
+  "identifier": "Identifiant",
+  "listName": "Nom de la liste",
+  "listType": "Type de liste",
+  "name": "Nom",
+  "noMatchingListsFound": "Aucune liste correspondante à afficher",
+  "noMatchingPatients": "Aucun patient correspondant à afficher",
+  "noPatientListsToDisplay": "Aucune liste de patients à afficher",
+  "noPatientsInList": "Il n'y a pas de patients dans cette liste",
+  "numberOfPatients": "Nombre de patients",
+  "patientLists": "Listes de patients",
+  "patients": "patients",
+  "searchThisList": "Rechercher dans cette liste",
+  "sex": "Sexe",
+  "startDate": "Date de début"
+}

@@ -79,6 +79,11 @@ export const configSchema = {
     _description: 'Type of display for data',
     _default: 'dateTime',
   },
+  showEncounterType: {
+    _type: Type.Boolean,
+    _description: 'Display Encounter type column',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {

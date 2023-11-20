@@ -64,7 +64,11 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                         </div>
                       </div>
                       <div>
-                        <ExtensionSlot name="visit-detail-overview-actions" state={{ patientUuid, visit }} />
+                        <ExtensionSlot
+                          name="visit-detail-overview-actions"
+                          className={styles.visitDetailOverviewActions}
+                          state={{ patientUuid, visit }}
+                        />
                       </div>
                     </div>
                   </div>

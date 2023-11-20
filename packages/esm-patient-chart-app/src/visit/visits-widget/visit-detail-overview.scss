@@ -181,6 +181,12 @@
   margin-bottom: 2rem;
 }
 
+.visitDetailOverviewActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .header {
@@ -191,3 +197,4 @@ html[dir='rtl'] {
     }
   }
 }
+

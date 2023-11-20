@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
@@ -40,10 +41,12 @@ export default function LabOrderBasketPanelExtension() {
   }, [orders]);
 
   return (
-    <Tile className={`${isTablet ? styles.tabletTile : styles.desktopTile} ${!isExpanded && styles.collapsedTile}`}>
+    <Tile
+      className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
+    >
       <div className={styles.heading}>
         <div className={styles.title}>
-          <div className={`${isTablet ? styles.tabletIcon : styles.desktopIcon}`}>
+          <div className={classNames(isTablet ? styles.tabletIcon : styles.desktopIcon)}>
             <LabIcon isTablet={isTablet} />
           </div>
           <h4>{`${t('labOrders', 'Lab orders')} (${orders.length})`}</h4>
