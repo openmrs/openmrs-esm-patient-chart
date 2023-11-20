@@ -16,7 +16,7 @@
   "closePreview": "סגור תצוגה מקדימה",
   "dateUploaded": "תאריך העלאה",
   "delete": "מחק",
-  "deleteAttachmentConfirmationText": "",
+  "deleteAttachmentConfirmationText": "אתה בטוח שברצונך למחוק את זה {{attachmentType}}? לא ניתן לבטל פעולה זו",
   "deleteImage": "מחק תמונה",
   "error": "שגיאה",
   "errorUploading": "שגיאה בהעלאת קובץ",
