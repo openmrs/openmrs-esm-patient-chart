@@ -7,7 +7,7 @@ import styles from './siderail-nav-button.scss';
 
 interface SiderailNavButtonProps {
   name: string;
-  getIcon: (props: Object) => JSX.Element;
+  getIcon: (props: object) => JSX.Element;
   label: string;
   iconDescription: string;
   handler: () => void;
