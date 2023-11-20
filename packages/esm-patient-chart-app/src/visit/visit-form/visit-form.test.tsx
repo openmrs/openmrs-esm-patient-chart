@@ -230,8 +230,8 @@ describe('Visit Form', () => {
 
     expect(showSnackbar).toHaveBeenCalledTimes(1);
     expect(showSnackbar).toHaveBeenCalledWith({
-      critical: true,
-      description: expect.stringContaining('started successfully'),
+      isLowContrast: true,
+      subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
     });
