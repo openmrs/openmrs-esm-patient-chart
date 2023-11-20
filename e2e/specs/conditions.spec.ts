@@ -46,7 +46,7 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
   });
 
   await test.step('Then if I click on the overflow menu and click the `Edit` button', async () => {
-    await page.getByRole('button', { name: /edit or delete condition/i }).click();
+    await page.getByLabel(/edit or delete condition/i).click();
     await page.getByRole('menuitem', { name: /edit/i }).click();
   });
 
@@ -73,7 +73,7 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
   });
 
   await test.step('And if I click the overflow menu and then click the `Delete` button', async () => {
-    await page.getByRole('button', { name: /edit or delete condition/i }).click();
+    await page.getByLabel(/edit or delete condition/i).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'danger Delete' }).click();
   });

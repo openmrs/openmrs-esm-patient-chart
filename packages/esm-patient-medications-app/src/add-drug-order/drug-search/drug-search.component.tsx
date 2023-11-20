@@ -31,7 +31,7 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
       <div className={styles.searchPopupContainer}>
         <ResponsiveWrapper isTablet={isTablet}>
           <Search
-            autofocus
+            autoFocus
             size="lg"
             placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
             labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
