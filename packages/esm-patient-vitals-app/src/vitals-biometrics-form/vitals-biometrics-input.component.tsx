@@ -146,8 +146,8 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               disableWheel
                               hideSteppers
                               id={`${fieldId}-${fieldProperty.id}`}
-                              max={fieldProperty.max}
-                              min={fieldProperty.min}
+                              max={fieldProperty.max ?? undefined}
+                              min={fieldProperty.min ?? undefined}
                               name={fieldProperty.name}
                               onBlur={() => handleFocusChange(false)}
                               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
