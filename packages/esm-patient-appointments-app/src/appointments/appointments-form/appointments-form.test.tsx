@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockLocations, mockLocationsDataResponse } from '../../__mocks__/location.mock';
-import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockSessionDataResponse } from '../../__mocks__/session.mock';
 import { mockUseAppointmentServiceData } from '../../__mocks__/appointments.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
@@ -17,8 +17,7 @@ const testProps = {
 
 const mockCreateAppointment = saveAppointment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -134,7 +133,7 @@ describe('AppointmentForm', () => {
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
-  it('renders a success toast notification upon successfully scheduling an appointment', async () => {
+  it('renders a success snackbar  upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
@@ -164,7 +163,7 @@ describe('AppointmentForm', () => {
     await waitFor(() => user.click(saveButton));
   });
 
-  it('renders an error notification if there was a problem scheduling an appointment', async () => {
+  it('renders an error snackbar if there was a problem scheduling an appointment', async () => {
     const user = userEvent.setup();
 
     const error = {

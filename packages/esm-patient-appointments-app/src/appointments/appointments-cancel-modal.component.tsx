@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { cancelAppointment, useAppointments } from './appointments.resource';
 
 interface CancelAppointmentModalProps {
@@ -28,20 +28,20 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
         if (status === 200) {
           mutate();
           closeCancelModal();
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
-            description: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
+            subtitle: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
             title: t('appointmentCancelled', 'Appointment cancelled'),
           });
         }
       })
       .catch((err) => {
-        showNotification({
+        showSnackbar({
           title: t('appointmentCancelError', 'Error cancelling appointment'),
           kind: 'error',
-          critical: true,
-          description: err?.message,
+          isLowContrast: true,
+          subtitle: err?.message,
         });
       });
   };

@@ -2,7 +2,7 @@ import React from 'react';
 import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { parseDate, setCurrentVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { parseDate, setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import styles from './end-visit-dialog.scss';
@@ -41,20 +41,20 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
               mutate();
               closeModal();
 
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 kind: 'success',
-                description: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+                subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
                 title: t('visitEnded', 'Visit ended'),
               });
             }
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('errorEndingVisit', 'Error ending visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              isLowContrast: false,
+              subtitle: error?.message,
             });
           },
         );

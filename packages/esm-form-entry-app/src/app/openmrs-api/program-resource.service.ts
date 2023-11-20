@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
 import { MetaData } from '../types';
-import { parseDate, showNotification, showToast } from '@openmrs/esm-framework';
+import { parseDate, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import moment from 'moment';
@@ -59,18 +59,18 @@ export class ProgramResourceService {
 
     this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
       (response) => {
-        showToast({
+        showSnackbar({
           title: 'Program enrollment',
-          description: 'Patient has been enrolled successfully',
+          subtitle: 'Patient has been enrolled successfully',
           kind: 'success',
         });
       },
       (err) => {
         // void created encounter to prevent enrollment missing an encounter
         this.encounterResourceService.voidEncounter(encounterUuid);
-        showNotification({
+        showSnackbar({
           title: 'Enrollment error',
-          description: 'An error occurred during care program enrollment, this encounter has been voided',
+          subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
           kind: 'error',
         });
       },
@@ -97,18 +97,18 @@ export class ProgramResourceService {
 
     this.httpClient.post(`${this.programEnrollmentUrl()}/${enrollmentDetails?.uuid}`, payload).subscribe(
       (resp) => {
-        showToast({
+        showSnackbar({
           title: 'Program discontinuation',
-          description: 'Patient has been discontinued from care successfully',
+          subtitle: 'Patient has been discontinued from care successfully',
           kind: 'success',
         });
       },
       (error) => {
         // void created encounter to prevent care program discontinuation missing an encounter
         this.encounterResourceService.voidEncounter(encounterUuid);
-        showNotification({
+        showSnackbar({
           title: 'Discontinuation error',
-          description: 'An error occurred during care program discontinuation, this encounter has been voided',
+          subtitle: 'An error occurred during care program discontinuation, this encounter has been voided',
           kind: 'error',
         });
       },

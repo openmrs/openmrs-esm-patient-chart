@@ -8,7 +8,7 @@ import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { Encounter, FormSchema, Identifier, Order } from '../types';
-import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
+import { showSnackbar, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
@@ -203,11 +203,11 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.patientResourceService.validateIdentifiers(this.form).subscribe((resp) => {
       if (resp.length > 0) {
         this.changeState('readyWithValidationErrors');
-        showNotification({
+        showSnackbar({
           title: this.translateService.instant('patientIdentifierDuplication'),
-          description: this.translateService.instant('patientIdentifierDuplicationDescription'),
+          subtitle: this.translateService.instant('patientIdentifierDuplicationDescription'),
           kind: 'error',
-          critical: true,
+          isLowContrast: false,
         });
       } else {
         const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
@@ -230,10 +230,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             }
 
             this.programService.handlePatientCareProgram(this.form, encounter.uuid);
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               kind: 'success',
-              description: this.translateService.instant('formSubmittedSuccessfully'),
+              subtitle: this.translateService.instant('formSubmittedSuccessfully'),
               title: this.form.schema.display ?? this.form.schema.name,
             });
 
@@ -241,15 +241,15 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           },
           (error: Error) => {
             this.changeState('submissionError');
-            showNotification({
-              critical: true,
+            showSnackbar({
+              isLowContrast: false,
               kind: 'error',
-              description: this.translateService
+              subtitle: this.translateService
                 .instant('formSubmissionFailed')
                 .replace('{error}', this.extractErrorMessagesFromResponse(error)),
 
               title: this.form.schema.display ?? this.form.schema.name,
-              millis: 5000,
+              timeoutInMs: 5000,
             });
           },
         );
@@ -279,11 +279,11 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       submittedOrders.map((order, index) => ` ${index + 1} : ${order.display} : ${order.orderNumber}`).join() ?? '';
 
     if (orders.length) {
-      showNotification({
+      showSnackbar({
         title: 'Lab order(s) generated',
         kind: 'success',
-        critical: true,
-        description: orders,
+        isLowContrast: true,
+        subtitle: orders,
       });
     }
   }
