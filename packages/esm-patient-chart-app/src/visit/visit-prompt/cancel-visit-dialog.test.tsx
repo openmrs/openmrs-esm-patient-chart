@@ -97,7 +97,7 @@ describe('Cancel visit', () => {
       expect.objectContaining({
         kind: 'success',
         title: 'Visit cancelled',
-        subtitle: 'Canceled active visit successfully',
+        subtitle: 'Active Facility Visit cancelled successfully',
         actionButtonLabel: 'Undo',
       }),
     );
