@@ -1,0 +1,58 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.skeletonContainer {
+  margin: layout.$spacing-05;
+}
+
+.dataTableSkeleton {
+  background-color: transparent;
+  padding: 0rem;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid colors.$gray-70;
+  margin: layout.$spacing-05 0;
+}
+
+.link {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.illo {
+  margin-top: layout.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-20;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyState {
+  align-items: center;
+  background-color: colors.$white-0;
+  display: flex;
+  justify-content: center;
+  padding: layout.$spacing-09 !important;
+  text-align: center;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: 0.5rem;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+}

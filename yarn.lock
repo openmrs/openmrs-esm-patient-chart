@@ -6952,7 +6952,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-common-lib@^5.1.0, @openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib":
+"@openmrs/esm-patient-common-lib@^5.1.0, @openmrs/esm-patient-common-lib@workspace:*, @openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib"
   dependencies:
@@ -7060,6 +7060,25 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 5.x
     "@openmrs/esm-patient-common-lib": 5.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
+"@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app"
+  dependencies:
+    "@carbon/react": ^1.33.1
+    "@openmrs/esm-patient-common-lib": "workspace:*"
+    webpack: ^5.88.2
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 5.x
+    dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -7288,8 +7307,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.426
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.426"
+  version: 1.0.0-pre.451
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.451"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -7312,7 +7331,7 @@ __metadata:
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: db5f378fd4617ff7f1d240c5c44ed7df10a1f96a3b46d4c77bb1dfbf08fa946f1bc83d1003a38877c9c72637b6138e09c548b5e3ad550918ef0d5818dc0fe050
+  checksum: 15361e6c7d51e44b80805f8d063c89d8a6f66ffbf76da32efcc6dd558ca7d0ad287f44f092b2d637c1dc058c5a8e982a6c4a0d434746b96f95d9c7b8226a0334
   languageName: node
   linkType: hard
 

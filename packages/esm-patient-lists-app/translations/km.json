@@ -1,0 +1,19 @@
+{
+  "backToPatientLists": "ត្រឡប់ទៅបញ្ជីអ្នកជំងឺ",
+  "checkFilters": "ពិនិត្យមើលតម្រងខាងលើ",
+  "createdOn": "បានបង្កើតនៅ",
+  "identifier": "អ្នកកំណត់សញ្ញាសញ្ញា",
+  "listName": "ឈ្មោះបញ្ជី",
+  "listType": "ប្រភេទបញ្ជី",
+  "name": "ឈ្មោះ",
+  "noMatchingListsFound": "រកមិនឃើញបញ្ជីដែលត្រូវគ្នា",
+  "noMatchingPatients": "រកមិនឃើញអ្នកជំងឺដែលត្រូវគ្នា",
+  "noPatientListsToDisplay": "គ្មានបញ្ជីអ្នកជំងឺត្រូវបង្ហាញ",
+  "noPatientsInList": "គ្មានអ្នកជំងឺនៅក្នុងបញ្ជីនេះ",
+  "numberOfPatients": "ចំនួនអ្នកជំងឺ",
+  "patientLists": "បញ្ជីអ្នកជំងឺ",
+  "patients": "អ្នកជំងឺ",
+  "searchThisList": "ស្វែងរកបញ្ជីនេះ",
+  "sex": "ភេទ",
+  "startDate": "ថ្ងៃចាប់ផ្ដើម"
+}
