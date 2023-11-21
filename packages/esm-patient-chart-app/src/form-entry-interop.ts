@@ -20,6 +20,8 @@ export function launchFormEntryOrHtmlForms(
         encounter.form.display,
         encounter.visitUuid,
         encounter.visitTypeUuid,
+        encounter.visitStartDatetime,
+        encounter.visitStopDatetime,
         mutateForms,
       );
     } else {
@@ -45,6 +47,8 @@ export function launchFormEntry(
   formName?: string,
   visitUuid?: string,
   visitTypeUuid?: string,
+  visitStartDatetime?: string,
+  visitStopDatetime?: string,
   mutateForm?: () => void,
 ) {
   launchPatientWorkspace('patient-form-entry-workspace', {
@@ -56,6 +60,8 @@ export function launchFormEntry(
       patientUuid,
       visitTypeUuid: visitTypeUuid,
       visitUuid: visitUuid,
+      visitStartDatetime,
+      visitStopDatetime,
     },
   });
 }
