@@ -249,14 +249,6 @@ export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWork
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
   const updateStoreWithClosedWorkspace = () => {
-    if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
-      try {
-        onCloseWorkspace();
-      } catch (e) {
-        console.error(`Custom 'onCloseWorkspace' for workspace ${name} caused an error`, e);
-      }
-    }
-
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name !== name);
 
@@ -265,6 +257,14 @@ export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWork
       prompt: null,
       openWorkspaces: newOpenWorkspaces,
     });
+
+    if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
+      try {
+        onCloseWorkspace();
+      } catch (e) {
+        console.error(`Custom 'onCloseWorkspace' for workspace ${name} caused an error`, e);
+      }
+    }
   };
   if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
