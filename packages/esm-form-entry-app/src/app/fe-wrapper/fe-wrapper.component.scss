@@ -13,6 +13,10 @@
   padding: 1.5rem 0 1.75rem;
 }
 
+.root-form {
+  position: relative;
+}
+
 /* Tablet */
 :host-context(.omrs-breakpoint-lt-desktop) .error-tile {
   background-color: $ui-02;

@@ -22,7 +22,7 @@
       class="form-container"
     >
       <div>
-        <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
+        <form class="root-form cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
           <ofe-form-renderer
             [formSubmissionTemplate]="buttonsTemplate"
             [labelMap]="labelMap"
