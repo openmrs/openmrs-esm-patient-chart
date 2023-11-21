@@ -39,9 +39,13 @@ test('Record an allergy to a food item', async ({ page, api }) => {
   });
 
   await test.step('And I should see the newly recorded food allergy in the list', async () => {
+    await expect(headerRow).toContainText(/allergen/i);
+    await expect(headerRow).toContainText(/severity/i);
+    await expect(headerRow).toContainText(/reaction/i);
+    await expect(headerRow).toContainText(/onset date and comments/i);
     await expect(dataRow).toContainText(/eggs/i);
-    await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/low/i);
+    await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/test comment/i);
   });
 });
