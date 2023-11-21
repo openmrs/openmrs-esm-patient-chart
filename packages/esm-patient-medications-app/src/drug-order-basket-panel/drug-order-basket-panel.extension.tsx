@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
@@ -19,10 +19,41 @@ export default function DrugOrderBasketPanelExtension() {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
-  const newOrderBasketItems = orders.filter((x) => x.action === 'NEW');
-  const renewedOrderBasketItems = orders.filter((x) => x.action === 'RENEW');
-  const revisedOrderBasketItems = orders.filter((x) => x.action === 'REVISE');
-  const discontinuedOrderBasketItems = orders.filter((x) => x.action === 'DISCONTINUE');
+  const {
+    incompleteOrderBasketItems,
+    newOrderBasketItems,
+    renewedOrderBasketItems,
+    revisedOrderBasketItems,
+    discontinuedOrderBasketItems,
+  } = useMemo(() => {
+    const incompleteOrderBasketItems: Array<DrugOrderBasketItem> = [];
+    const newOrderBasketItems: Array<DrugOrderBasketItem> = [];
+    const renewedOrderBasketItems: Array<DrugOrderBasketItem> = [];
+    const revisedOrderBasketItems: Array<DrugOrderBasketItem> = [];
+    const discontinuedOrderBasketItems: Array<DrugOrderBasketItem> = [];
+
+    orders.forEach((order) => {
+      if (order?.isOrderIncomplete) {
+        incompleteOrderBasketItems.push(order);
+      } else if (order.action === 'NEW') {
+        newOrderBasketItems.push(order);
+      } else if (order.action === 'RENEW') {
+        renewedOrderBasketItems.push(order);
+      } else if (order.action === 'REVISE') {
+        revisedOrderBasketItems.push(order);
+      } else if (order.action === 'DISCONTINUE') {
+        discontinuedOrderBasketItems.push(order);
+      }
+    });
+
+    return {
+      incompleteOrderBasketItems,
+      newOrderBasketItems,
+      renewedOrderBasketItems,
+      revisedOrderBasketItems,
+      discontinuedOrderBasketItems,
+    };
+  }, [orders]);
 
   const openDrugSearch = () => {
     launchPatientWorkspace('add-drug-order');
@@ -49,12 +80,10 @@ export default function DrugOrderBasketPanelExtension() {
     <Tile
       className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
     >
-      <div className={styles.heading}>
-        <div className={styles.title}>
-          <div className={classNames(isTablet ? styles.tabletIcon : styles.desktopIcon)}>
-            <RxIcon isTablet={isTablet} />
-          </div>
-          <h4>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
+      <div className={styles.container}>
+        <div className={styles.iconAndLabel}>
+          <RxIcon isTablet={isTablet} />
+          <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button
@@ -62,7 +91,7 @@ export default function DrugOrderBasketPanelExtension() {
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add medication"
             onClick={openDrugSearch}
-            size={isTablet ? 'lg' : 'sm'}
+            size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>
@@ -83,6 +112,18 @@ export default function DrugOrderBasketPanelExtension() {
       </div>
       {isExpanded && (
         <>
+          {incompleteOrderBasketItems.length > 0 && (
+            <>
+              {incompleteOrderBasketItems.map((order, index) => (
+                <OrderBasketItemTile
+                  key={index}
+                  orderBasketItem={order}
+                  onItemClick={() => openDrugForm(order)}
+                  onRemoveClick={() => removeMedication(order)}
+                />
+              ))}
+            </>
+          )}
           {newOrderBasketItems.length > 0 && (
             <>
               {newOrderBasketItems.map((order, index) => (

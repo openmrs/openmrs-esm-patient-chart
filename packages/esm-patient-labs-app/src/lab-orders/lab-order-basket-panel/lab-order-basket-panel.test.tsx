@@ -57,9 +57,9 @@ describe('LabOrderBasketPanel: ', () => {
     const hiv = screen.getByText(/HIV VIRAL LOAD/i).closest('div');
     const removeHivButton = within(hiv).getByRole('button', { name: /remove from basket/i });
     expect(removeHivButton).toBeVisible();
-    await waitFor(() => user.click(removeHivButton));
+    await user.click(removeHivButton);
     rerender(<LabOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
-    await waitFor(() => expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument());
+    await expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
     expect(screen.queryByText(/HIV VIRAL LOAD/i)).not.toBeInTheDocument();
   });

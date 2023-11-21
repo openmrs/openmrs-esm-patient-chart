@@ -44,12 +44,10 @@ export default function LabOrderBasketPanelExtension() {
     <Tile
       className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
     >
-      <div className={styles.heading}>
-        <div className={styles.title}>
-          <div className={classNames(isTablet ? styles.tabletIcon : styles.desktopIcon)}>
-            <LabIcon isTablet={isTablet} />
-          </div>
-          <h4>{`${t('labOrders', 'Lab orders')} (${orders.length})`}</h4>
+      <div className={styles.container}>
+        <div className={styles.iconAndLabel}>
+          <LabIcon isTablet={isTablet} />
+          <h4 className={styles.heading}>{`${t('labOrders', 'Lab orders')} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button
@@ -57,7 +55,7 @@ export default function LabOrderBasketPanelExtension() {
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add lab order"
             onClick={openNewLabForm}
-            size={isTablet ? 'lg' : 'sm'}
+            size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>

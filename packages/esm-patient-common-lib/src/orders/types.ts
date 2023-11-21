@@ -15,6 +15,7 @@ export interface OrderBasketItem {
       };
     };
   };
+  isOrderIncomplete?: boolean;
 }
 
 export interface OrderPost {
