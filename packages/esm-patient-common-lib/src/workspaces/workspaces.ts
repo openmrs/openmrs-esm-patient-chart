@@ -249,6 +249,10 @@ export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWork
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
   const updateStoreWithClosedWorkspace = () => {
+    if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
+      onCloseWorkspace?.();
+    }
+
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name !== name);
 
@@ -257,10 +261,6 @@ export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWork
       prompt: null,
       openWorkspaces: newOpenWorkspaces,
     });
-
-    if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
-      onCloseWorkspace?.();
-    }
   };
   if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
