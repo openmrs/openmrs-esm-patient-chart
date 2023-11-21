@@ -30,7 +30,6 @@ import {
   formatDatetime,
   getConfig,
   isDesktop,
-  navigate,
   parseDate,
   showModal,
   showToast,
@@ -39,10 +38,11 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { MappedEncounter } from '../../visit.resource';
+import { launchFormEntryOrHtmlForms } from '../../../../form-entry-interop';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 
@@ -121,28 +121,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       key: 'provider',
     },
   );
-
-  const launchWorkspace = (
-    formUuid: string,
-    visitUuid?: string,
-    encounterUuid?: string,
-    formName?: string,
-    visitTypeUuid?: string,
-    visitStartDatetime?: string,
-    visitStopDatetime?: string,
-  ) => {
-    const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlForm)) {
-      launchPatientWorkspace('patient-form-entry-workspace', {
-        workspaceTitle: formName,
-        formInfo: { visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime, formUuid, encounterUuid },
-      });
-    } else {
-      navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-      });
-    }
-  };
 
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
@@ -291,14 +269,10 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
                                       size={desktopLayout ? 'sm' : 'lg'}
                                       onClick={() => {
-                                        launchWorkspace(
-                                          selectedVisit?.form?.uuid,
-                                          selectedVisit?.visitUuid,
-                                          selectedVisit?.id,
-                                          selectedVisit?.form?.display,
-                                          selectedVisit?.visitTypeUuid,
-                                          selectedVisit?.visitStartDatetime,
-                                          selectedVisit?.visitStopDatetime,
+                                        launchFormEntryOrHtmlForms(
+                                          selectedVisit,
+                                          patientUuid,
+                                          htmlFormEntryFormsConfig,
                                         );
                                       }}
                                     />
@@ -328,15 +302,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   <Button
                                     kind="ghost"
                                     onClick={() => {
-                                      launchWorkspace(
-                                        selectedVisit.form.uuid,
-                                        selectedVisit.visitUuid,
-                                        selectedVisit.id,
-                                        selectedVisit.form.display,
-                                        selectedVisit.visitTypeUuid,
-                                        selectedVisit?.visitStartDatetime,
-                                        selectedVisit?.visitStopDatetime,
-                                      );
+                                      launchFormEntryOrHtmlForms(selectedVisit, patientUuid, htmlFormEntryFormsConfig);
                                     }}
                                     renderIcon={(props) => <Edit size={16} {...props} />}
                                   >
