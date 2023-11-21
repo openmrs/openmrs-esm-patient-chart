@@ -250,7 +250,11 @@ export function closeWorkspace(name: string, ignoreChanges: boolean, onCloseWork
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
   const updateStoreWithClosedWorkspace = () => {
     if (onCloseWorkspace && typeof onCloseWorkspace === 'function') {
-      onCloseWorkspace?.();
+      try {
+        onCloseWorkspace();
+      } catch (e) {
+        console.error(`Custom 'onCloseWorkspace' for workspace ${name} caused an error`, e);
+      }
     }
 
     const state = store.getState();
