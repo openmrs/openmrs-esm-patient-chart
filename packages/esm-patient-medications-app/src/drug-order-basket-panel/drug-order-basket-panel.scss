@@ -4,51 +4,48 @@
 @import "../root";
 
 .desktopTile {
+  border-left: 4px solid #0072c3;
   background-color: $ui-02;
-  padding: 0;
   border-top: 1px solid #bae6ff;
   border-right: none;
+  padding: 0;
 }
 
 .tabletTile {
-  background-color: $ui-02;
-  padding: 0;
+  @extend .desktopTile;
+  border-top: 1px solid #3778C1;
 }
 
 .collapsedTile {
   border-bottom: none;
   min-height: 0;
+
   .orderBasketHeader {
     margin-bottom: 0;
   }
 }
 
-.tabletTile.collapsedTile {
+.tabletTile .collapsedTile {
   border-bottom: 1px solid $grey-2;
 }
 
-.heading {
+.container {
   background-color: $ui-02;
   display: flex;
   justify-content: space-between;
   align-items: center;
   text-align: left;
-
 }
 
-.desktopTile .heading {
-  border-left: 4px solid #0072c3;
-
+.desktopTile .container {
   h4 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 }
 
-.tabletTile .heading {
+.tabletTile .container {
   padding: spacing.$spacing-03;
-  border: 1px solid $grey-2;
-  border-bottom: none;
 
   h4 {
     @include type.type-style('heading-03');
@@ -56,22 +53,23 @@
   }
 }
 
-.title {
+.heading {
+  margin-left: spacing.$spacing-03;
+}
+
+.iconAndLabel {
   display: flex;
   align-items: center;
-}
-
-.desktopIcon {
-  margin: 0.25rem 0.5rem 0.25rem 0.25rem;
-}
-
-.tabletIcon {
-  margin: 1rem 0.5rem 1rem 1rem;
+  margin: spacing.$spacing-03;
 }
 
 .buttonContainer {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+
+  :global(.cds--btn--icon-only) {
+    padding-block-start: 0.375rem;
+  }
 }
 
 .chevron {

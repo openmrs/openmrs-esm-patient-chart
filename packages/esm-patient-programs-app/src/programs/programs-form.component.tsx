@@ -170,6 +170,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       render={({ fieldState, field: { onChange, value } }) => (
         <>
           <Select
+            aria-label="program name"
             id="program"
             invalidText={t('required', 'Required')}
             labelText=""
@@ -196,6 +197,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <DatePicker
+          aria-label="enrollment date"
           id="enrollmentDate"
           datePickerType="single"
           dateFormat="d/m/Y"
@@ -216,6 +218,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <DatePicker
+          aria-label="completion date"
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
@@ -237,6 +240,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       control={control}
       render={({ field: { onChange, value } }) => (
         <Select
+          aria-label="enrollment location"
           id="location"
           invalidText="Required"
           labelText=""

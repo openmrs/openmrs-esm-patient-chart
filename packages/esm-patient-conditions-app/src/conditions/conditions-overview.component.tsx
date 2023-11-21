@@ -135,6 +135,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
           </div>
         </CardHeader>
         <DataTable
+          aria-label="conditions overview"
           rows={tableRows}
           headers={tableHeaders}
           isSortable

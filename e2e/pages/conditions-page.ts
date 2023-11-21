@@ -5,7 +5,7 @@ export class ConditionsPage {
 
   readonly conditionsTable = () => this.page.locator('tbody');
 
-  async goto(uuid: string) {
+  async goTo(uuid: string) {
     await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/Conditions`);
   }
 }

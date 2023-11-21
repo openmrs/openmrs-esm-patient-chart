@@ -14,7 +14,7 @@ export function isValueWithinReferenceRange(
   conceptUuid: string,
   value: string | number,
 ) {
-  const concept = conceptMetadata.find((c) => c.uuid === conceptUuid);
+  const concept = conceptMetadata?.find((c) => c.uuid === conceptUuid);
 
   if (value === undefined || value === '' || concept === undefined) {
     return true;

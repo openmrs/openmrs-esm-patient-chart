@@ -106,12 +106,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     ) ?? [];
 
   return (
-    <div
+    <header
       className={classNames(
         styles.container,
         isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer,
       )}
-      role="banner"
       ref={patientBannerRef}
     >
       <div
@@ -195,7 +194,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           deceased={isDeceased}
         />
       )}
-    </div>
+    </header>
   );
 };
 

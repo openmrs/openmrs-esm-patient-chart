@@ -1,12 +1,13 @@
-import { Locator, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
-export class ProgramPage {
+export class ProgramsPage {
   constructor(readonly page: Page) {}
 
-  readonly table = () => this.page.getByTestId('program-table');
+  // TODO: Switch to getByRole locators using the provided aria-labels
+  readonly programsTable = () => this.page.getByTestId('program-table');
   readonly editButton = () => this.page.getByTestId('edit-program-button');
 
-  async goto(patientUuid: string) {
+  async goTo(patientUuid: string) {
     await this.page.goto(`patient/${patientUuid}/chart/Programs`);
   }
 }

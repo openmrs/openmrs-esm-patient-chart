@@ -88,7 +88,14 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable useZebraStyles size={isTablet ? 'lg' : 'sm'}>
+        <DataTable
+          aria-label="allergies summary"
+          rows={tableRows}
+          headers={tableHeaders}
+          isSortable
+          useZebraStyles
+          size={isTablet ? 'lg' : 'sm'}
+        >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()}>

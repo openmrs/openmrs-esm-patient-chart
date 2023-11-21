@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../tools/test-helpers';
 import PatientBanner from './patient-banner.component';
@@ -70,7 +70,7 @@ describe('PatientBanner: ', () => {
       name: /^Show details$/i,
     });
 
-    await waitFor(() => user.click(showContactDetailsBtn));
+    await user.click(showContactDetailsBtn);
 
     const hideDetailsBtn = screen.getByRole('button', {
       name: /^Hide details$/i,
@@ -79,7 +79,7 @@ describe('PatientBanner: ', () => {
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(hideDetailsBtn));
+    await user.click(hideDetailsBtn);
 
     expect(showContactDetailsBtn).toBeInTheDocument();
   });
@@ -93,7 +93,7 @@ describe('PatientBanner: ', () => {
 
     const imgAvatar = screen.getByRole('img');
 
-    await waitFor(() => user.click(imgAvatar));
+    await user.click(imgAvatar);
 
     expect(mockNavigateTo).toHaveBeenCalledWith(patientBannerSeachPageProps.patientUuid);
     mockNavigateTo.mockClear();
@@ -102,7 +102,7 @@ describe('PatientBanner: ', () => {
       name: /^Show details$/i,
     });
 
-    await waitFor(() => user.click(showContactDetailsBtn));
+    await user.click(showContactDetailsBtn);
 
     expect(mockNavigateTo).toHaveBeenCalledTimes(1);
 

@@ -34,6 +34,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
     <>
       <ResponsiveWrapper isTablet={isTablet}>
         <Search
+          autoFocus
           size="lg"
           placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           labelText={t('searchFieldPlaceholder', 'Search for a test type')}

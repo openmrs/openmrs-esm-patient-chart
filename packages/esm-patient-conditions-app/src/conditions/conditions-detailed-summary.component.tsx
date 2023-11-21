@@ -138,7 +138,7 @@ function ConditionsDetailedSummary({ patient }) {
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <>
               <TableContainer>
-                <Table {...getTableProps()}>
+                <Table aria-label="conditions summary" {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
