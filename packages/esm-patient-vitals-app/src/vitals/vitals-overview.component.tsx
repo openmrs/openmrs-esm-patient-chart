@@ -145,7 +145,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
         if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
         if (vitals?.length) {
           return (
-            <div className={styles.widgetCard} data-testid="vitals-table">
+            <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
