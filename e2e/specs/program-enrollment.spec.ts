@@ -1,7 +1,7 @@
-import { test } from '../core';
-import { ProgramsPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { test } from '../core';
+import { ProgramsPage } from '../pages';
 
 let patient: Patient;
 
@@ -11,11 +11,8 @@ test.beforeEach(async ({ api }) => {
 
 test('Add and edit a program enrollment', async ({ page, api }) => {
   const programsPage = new ProgramsPage(page);
-  const row = programsPage.programsTable().locator('tr');
-  const programCell = row.locator('td:first-child');
-  const locationCell = row.locator('td:nth-child(2)');
-  const enrollmentDateCell = row.locator('td:nth-child(3)');
-  const completionDateCell = row.locator('td:nth-child(4)');
+  const headerRow = programsPage.programsTable().locator('thead > tr');
+  const dataRow = programsPage.programsTable().locator('tbody > tr');
 
   await test.step('When I visit the Programs page', async () => {
     await programsPage.goTo(patient.uuid);
@@ -42,14 +39,18 @@ test('Add and edit a program enrollment', async ({ page, api }) => {
   });
 
   await test.step('Then I should see newly recorded program enrollment in the list', async () => {
-    await expect(programCell).toHaveText(/hiv care and treatment/i);
-    await expect(enrollmentDateCell.getByText(/04-Jul-2023/i)).toBeVisible();
-    await expect(completionDateCell.getByText(/completed on 05-Jul-2023/i)).toBeVisible();
-    await expect(locationCell).toHaveText(/Outpatient Clinic/);
+    await expect(headerRow).toContainText(/active programs/i);
+    await expect(headerRow).toContainText(/location/i);
+    await expect(headerRow).toContainText(/date enrolled/i);
+    await expect(headerRow).toContainText(/status/i);
+    await expect(dataRow).toContainText(/hiv care and treatment/i);
+    await expect(dataRow).toContainText(/04-Jul-2023/i);
+    await expect(dataRow).toContainText(/completed on 05-Jul-2023/i);
+    await expect(dataRow).toContainText(/outpatient clinic/i);
   });
 
   await test.step('When I click the `Edit` button', async () => {
-    await programsPage.editButton().click();
+    await programsPage.editProgramButton().click();
   });
 
   await test.step('And I edit the program enrollment', async () => {
@@ -68,10 +69,10 @@ test('Add and edit a program enrollment', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the updated program enrollment in the list', async () => {
-    await expect(programCell).toHaveText(/hiv care and treatment/i);
-    await expect(enrollmentDateCell.getByText(/03-Jul-2023/i)).toBeVisible();
-    await expect(completionDateCell.getByText(/04-Jul-2023/i)).toBeVisible();
-    await expect(locationCell).toHaveText(/community outreach/i);
+    await expect(dataRow).toContainText(/hiv care and treatment/i);
+    await expect(dataRow).toContainText(/03-Jul-2023/i);
+    await expect(dataRow).toContainText(/completed on 04-Jul-2023/i);
+    await expect(dataRow).toContainText(/community outreach/i);
   });
 });
 

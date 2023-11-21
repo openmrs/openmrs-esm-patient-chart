@@ -55,7 +55,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
               </TableToolbar>
             </div>
             {rows.length > 0 && (
-              <Table {...getTableProps()} className={styles.table}>
+              <Table aria-label="forms" {...getTableProps()} className={styles.table}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

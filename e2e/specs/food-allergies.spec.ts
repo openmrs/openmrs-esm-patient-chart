@@ -1,7 +1,7 @@
-import { test } from '../core';
-import { PatientAllergiesPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { test } from '../core';
+import { PatientAllergiesPage } from '../pages';
 
 let patient: Patient;
 
@@ -11,6 +11,8 @@ test.beforeEach(async ({ api }) => {
 
 test('Record an allergy to a food item', async ({ page, api }) => {
   const allergiesPage = new PatientAllergiesPage(page);
+  const headerRow = allergiesPage.allergiesTable().locator('thead > tr');
+  const dataRow = allergiesPage.allergiesTable().locator('tbody > tr');
 
   await test.step('When I visit the Allergies page', async () => {
     await allergiesPage.goTo(patient.uuid);
@@ -37,15 +39,10 @@ test('Record an allergy to a food item', async ({ page, api }) => {
   });
 
   await test.step('And I should see the newly recorded food allergy in the list', async () => {
-    const rows = await allergiesPage.allergyTable().locator('tr');
-    const allergenCell = rows.locator('td:first-child');
-    const severityCell = rows.locator('td:nth-child(2)');
-    const reactionCell = rows.locator('td:nth-child(3)');
-    const commentCell = rows.locator('td:nth-child(4)');
-    await expect(allergenCell).toHaveText('Eggs');
-    await expect(reactionCell).toHaveText('Mental status change');
-    await expect(severityCell).toHaveText('low');
-    await expect(commentCell).toHaveText('Test comment');
+    await expect(dataRow).toContainText(/eggs/i);
+    await expect(dataRow).toContainText(/mental status change/i);
+    await expect(dataRow).toContainText(/low/i);
+    await expect(dataRow).toContainText(/test comment/i);
   });
 });
 

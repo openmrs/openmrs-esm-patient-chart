@@ -88,17 +88,10 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <DataTable
-          aria-label="allergies summary"
-          rows={tableRows}
-          headers={tableHeaders}
-          isSortable
-          useZebraStyles
-          size={isTablet ? 'lg' : 'sm'}
-        >
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable useZebraStyles size={isTablet ? 'lg' : 'sm'}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="allergies summary" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -114,7 +107,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="allergy-table">
+                <TableBody>
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
