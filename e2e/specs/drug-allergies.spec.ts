@@ -23,9 +23,9 @@ test('Record an allergy to a drug', async ({ page, api }) => {
   });
 
   await test.step('And I record an allergy to a drug', async () => {
-    await allergiesPage.page.getByText('ACE inhibitors').click();
-    await allergiesPage.page.getByText('Mental status change').click();
-    await allergiesPage.page.getByText('Mild').click();
+    await allergiesPage.page.getByText(/ace inhibitors/i).click();
+    await allergiesPage.page.getByText(/mental status change/i).click();
+    await allergiesPage.page.getByText(/mild/i).click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 

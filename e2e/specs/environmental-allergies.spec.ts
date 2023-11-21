@@ -24,9 +24,9 @@ test('Record an allergy to an environmental factors', async ({ page, api }) => {
 
   await test.step('And I record an allergy to an environmental factor', async () => {
     await allergiesPage.page.getByRole('tab', { name: /environmental/i }).click();
-    await allergiesPage.page.getByText('Dust').click();
-    await allergiesPage.page.getByText('Mental status change').click();
-    await allergiesPage.page.getByText('Mild').click();
+    await allergiesPage.page.getByText(/dust/i).click();
+    await allergiesPage.page.getByText(/mental status change/i).click();
+    await allergiesPage.page.getByText(/mild/i).click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
