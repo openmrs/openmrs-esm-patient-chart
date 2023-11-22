@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { showToast, showNotification } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { Button, ModalFooter, ModalHeader, ModalBody } from '@carbon/react';
 import { markPatientAlive } from './deceased.resource';
 
@@ -20,20 +20,20 @@ const MarkPatientAsAlive: React.FC<ConfirmationDialogProps> = ({ closeDialog, pa
       .then((response) => {
         if (response.ok) {
           closeDialog();
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
             title: t('markAsAlive', 'Mark As Alive'),
-            description: t('setAliveSuccessfully', 'Patient has been marked alive successfully'),
+            subtitle: t('setAliveSuccessfully', 'Patient has been marked alive successfully'),
           });
         }
       })
       .catch((error) => {
-        showNotification({
+        showSnackbar({
           title: t('setAliveError', 'Error marking patient alive'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       });
   };

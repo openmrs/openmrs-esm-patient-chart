@@ -5,7 +5,7 @@ import orderBy from 'lodash-es/orderBy';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Layer, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, showToast, showNotification, parseDate, formatDate } from '@openmrs/esm-framework';
+import { useLayoutType, showSnackbar, parseDate, formatDate } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
 import { getFlagType } from './utils';
 import styles from './flags-list.scss';
@@ -55,17 +55,17 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     if (res.status === 200) {
       mutate();
       setIsEnabling(false);
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'success',
-        description: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
+        subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
         title: t('enabledFlag', 'Enabled flag'),
       });
     } else {
-      showNotification({
-        critical: true,
+      showSnackbar({
+        isLowContrast: false,
         kind: 'error',
-        description: t('flagEnableError', 'Error enabling flag'),
+        subtitle: t('flagEnableError', 'Error enabling flag'),
         title: t('flagEnabled', 'flag enabled'),
       });
     }
@@ -78,17 +78,17 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     if (res.status === 204) {
       mutate();
       setIsDisabling(false);
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'success',
-        description: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
+        subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
         title: t('flagDisabled', 'Flag disabled'),
       });
     } else {
-      showNotification({
-        critical: true,
+      showSnackbar({
+        isLowContrast: false,
         kind: 'error',
-        description: t('flagDisableError', 'Error disabling the flag'),
+        subtitle: t('flagDisableError', 'Error disabling the flag'),
         title: t('disableFlagError', 'Disable flag error'),
       });
     }

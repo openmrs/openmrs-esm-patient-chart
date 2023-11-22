@@ -4,9 +4,8 @@ import userEvent from '@testing-library/user-event';
 import {
   useVisit,
   openmrsFetch,
-  showNotification,
+  showSnackbar,
   FetchResponse,
-  showToast,
   showActionableNotification,
 } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../__mocks__/visits.mock';
@@ -20,8 +19,7 @@ const mockedCloseModal = jest.fn();
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
 const mockedActionableNotification = jest.mocked(showActionableNotification);
-const mockedShowNotification = jest.mocked(showNotification);
-const mockedShowToast = jest.mocked(showToast);
+const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
 const mockedUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
 
@@ -142,8 +140,8 @@ describe('Cancel visit', () => {
       method: 'DELETE',
     });
 
-    expect(mockedShowNotification).toHaveBeenCalledWith({
-      description: 'An error occured when deleting visit',
+    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+      subtitle: 'An error occured when deleting visit',
       kind: 'error',
       title: 'Error cancelling active visit',
     });

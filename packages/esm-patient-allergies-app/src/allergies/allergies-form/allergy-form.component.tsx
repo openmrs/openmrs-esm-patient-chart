@@ -23,14 +23,7 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller, Control, UseFormSetValue } from 'react-hook-form';
-import {
-  ExtensionSlot,
-  FetchResponse,
-  showNotification,
-  showToast,
-  useConfig,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { ExtensionSlot, FetchResponse, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type AllergensAndAllergicReactions,
@@ -154,21 +147,21 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               mutate();
               closeWorkspace();
 
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 kind: 'success',
                 title: t('allergySaved', 'Allergy saved'),
-                description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+                subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
               });
             }
           },
           (err) => {
             setError(err);
-            showNotification({
+            showSnackbar({
               title: t('allergySaveError', 'Error saving allergy'),
               kind: 'error',
-              critical: true,
-              description: err?.message,
+              isLowContrast: false,
+              subtitle: err?.message,
             });
           },
         )

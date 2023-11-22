@@ -20,8 +20,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   saveVisit,
-  showNotification,
-  showToast,
+  showSnackbar,
   useSession,
   ExtensionSlot,
   NewVisitPayload,
@@ -350,19 +349,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                         mutateCurrentVisit();
                         mutateVisits();
                         mutateQueueEntry();
-                        showToast({
+                        showSnackbar({
                           kind: 'success',
                           title: t('visitStarted', 'Visit started'),
-                          description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                          subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
                         });
                       }
                     },
                     (error) => {
-                      showNotification({
+                      showSnackbar({
                         title: t('queueEntryError', 'Error adding patient to the queue'),
                         kind: 'error',
-                        critical: true,
-                        description: error?.message,
+                        isLowContrast: false,
+                        subtitle: error?.message,
                       });
                     },
                   );
@@ -383,20 +382,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       if (status === 201) {
                         mutateCurrentVisit();
                         mutateVisits();
-                        showToast({
-                          critical: true,
+                        showSnackbar({
+                          isLowContrast: true,
                           kind: 'success',
-                          description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
                           title: t('appointmentEdited', 'Appointment edited'),
                         });
                       }
                     },
                     (error) => {
-                      showNotification({
+                      showSnackbar({
                         title: t('updateError', 'Error updating upcoming appointment'),
                         kind: 'error',
-                        critical: true,
-                        description: error?.message,
+                        isLowContrast: false,
+                        subtitle: error?.message,
                       });
                     },
                   );
@@ -406,10 +405,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               mutateVisits();
               closeWorkspace();
 
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 kind: 'success',
-                description: !visitToEdit
+                subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
                       visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
                     })
@@ -422,13 +421,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               });
             },
             (error) => {
-              showNotification({
+              showSnackbar({
                 title: !visitToEdit
                   ? t('startVisitError', 'Error starting visit')
                   : t('errorUpdatingVisitDetails', 'Error updating visit details'),
                 kind: 'error',
-                critical: true,
-                description: error?.message,
+                isLowContrast: false,
+                subtitle: error?.message,
               });
             },
           );
@@ -443,21 +442,21 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
             closeWorkspace();
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               kind: 'success',
-              description: t('visitStartedSuccessfully', '{visit} started successfully', {
+              subtitle: t('visitStartedSuccessfully', '{visit} started successfully', {
                 visit: t('offlineVisit', 'Offline Visit'),
               }),
               title: t('visitStarted', 'Visit started'),
             });
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              isLowContrast: false,
+              subtitle: error?.message,
             });
           },
         );

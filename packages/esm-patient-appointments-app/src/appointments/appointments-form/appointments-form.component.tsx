@@ -24,7 +24,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
+import { useLocations, useSession, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
@@ -191,10 +191,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           closeWorkspace();
           mutate();
 
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
-            description: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
+            subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
             title:
               context === 'editing'
                 ? t('appointmentEdited', 'Appointment edited')
@@ -203,27 +203,27 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         }
         if (status === 204) {
           setIsSubmitting(false);
-          showNotification({
+          showSnackbar({
             title:
               context === 'editing'
                 ? t('appointmentEditError', 'Error editing appointment')
                 : t('appointmentFormError', 'Error scheduling appointment'),
             kind: 'error',
-            critical: true,
-            description: t('noContent', 'No Content'),
+            isLowContrast: false,
+            subtitle: t('noContent', 'No Content'),
           });
         }
       },
       (error) => {
         setIsSubmitting(false);
-        showNotification({
+        showSnackbar({
           title:
             context === 'editing'
               ? t('appointmentEditError', 'Error editing appointment')
               : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );

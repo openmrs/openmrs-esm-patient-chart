@@ -33,7 +33,7 @@ import {
   navigate,
   parseDate,
   showModal,
-  showToast,
+  showSnackbar,
   useLayoutType,
   usePagination,
   useSession,
@@ -162,17 +162,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              showToast({
+              showSnackbar({
                 title: t('encounterDeleted', 'Encounter deleted'),
-                description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
               mutateVisits?.();
             })
             .catch(() => {
-              showToast({
+              showSnackbar({
                 title: t('error', 'Error'),
-                description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',
               });
             });

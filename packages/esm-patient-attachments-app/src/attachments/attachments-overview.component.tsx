@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showToast, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { showModal, showSnackbar, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
@@ -25,10 +25,10 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   useEffect(() => {
     if (error === true) {
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'error',
-        description: t('fileUnsupported', 'File uploaded is not supported'),
+        subtitle: t('fileUnsupported', 'File uploaded is not supported'),
         title: t('errorUploading', 'Error uploading a file'),
       });
       setError(false);
@@ -54,16 +54,17 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           mutate();
           setAttachmentToPreview(null);
 
-          showToast({
+          showSnackbar({
             title: t('fileDeleted', 'File deleted'),
-            description: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
+            subtitle: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
+            isLowContrast: true,
           });
         })
         .catch((error) => {
-          showToast({
+          showSnackbar({
             title: t('error', 'Error'),
-            description: `${attachment.title} ${t('failedDeleting', "couldn't be deleted")}`,
+            subtitle: `${attachment.title} ${t('failedDeleting', "couldn't be deleted")}`,
             kind: 'error',
           });
         });

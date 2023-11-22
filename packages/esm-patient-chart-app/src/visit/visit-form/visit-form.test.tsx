@@ -2,7 +2,7 @@ import React from 'react';
 import { of, throwError } from 'rxjs';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { saveVisit, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockLocations } from '../../__mocks__/location.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
 import { mockVisitTypes } from '../../__mocks__/visits.mock';
@@ -228,10 +228,10 @@ describe('Visit Form', () => {
       new AbortController(),
     );
 
-    expect(showToast).toHaveBeenCalledTimes(1);
-    expect(showToast).toHaveBeenCalledWith({
-      critical: true,
-      description: expect.stringContaining('started successfully'),
+    expect(showSnackbar).toHaveBeenCalledTimes(1);
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
     });
@@ -252,8 +252,8 @@ describe('Visit Form', () => {
 
     await waitFor(() => user.click(saveButton));
 
-    expect(showNotification).toHaveBeenCalledTimes(1);
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(showSnackbar).toHaveBeenCalledTimes(1);
+    expect(showSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'error',
         title: 'Error starting visit',
