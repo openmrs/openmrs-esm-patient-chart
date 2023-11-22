@@ -21,12 +21,12 @@ import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
-import styles from './medications-details-table.scss';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
+import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
