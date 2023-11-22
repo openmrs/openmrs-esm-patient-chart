@@ -1,7 +1,7 @@
-import { test } from '../core';
-import { ConditionsPage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { test } from '../core';
+import { ConditionsPage } from '../pages';
 
 let patient: Patient;
 
@@ -11,9 +11,8 @@ test.beforeEach(async ({ api }) => {
 
 test('Record, edit and delete a condition', async ({ page, api }) => {
   const conditionsPage = new ConditionsPage(page);
-  const table = conditionsPage.page.getByRole('table', { name: /conditions summary/i });
-  const headerRow = table.locator('thead > tr');
-  const dataRow = table.locator('tbody > tr');
+  const headerRow = conditionsPage.conditionsTable().locator('thead > tr');
+  const dataRow = conditionsPage.conditionsTable().locator('tbody > tr');
 
   await test.step('When I go to the Conditions page', async () => {
     await conditionsPage.goTo(patient.uuid);

@@ -74,7 +74,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (biometrics?.length) {
     return (
-      <div className={styles.widgetCard} data-testid="biometrics-table">
+      <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
