@@ -109,6 +109,7 @@ export class ProgramResourceService {
           title: 'Program discontinuation',
           subtitle: 'Patient has been discontinued from care successfully',
           kind: 'success',
+          isLowContrast: true,
         });
       },
       (error) => {
@@ -118,6 +119,7 @@ export class ProgramResourceService {
           title: 'Discontinuation error',
           subtitle: 'An error occurred during care program discontinuation, this encounter has been voided',
           kind: 'error',
+          isLowContrast: false,
         });
       },
     );
