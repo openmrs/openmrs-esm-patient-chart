@@ -21,11 +21,15 @@ import {
   Button,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyDataIllustration,
+  PatientChartPagination,
+  launchFormEntryOrHtmlForms,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
-import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import styles from './form-view.scss';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
@@ -174,12 +178,15 @@ const FormView: React.FC<FormViewProps> = ({
                             <label
                               onClick={() =>
                                 launchFormEntryOrHtmlForms(
-                                  currentVisit,
-                                  row.id,
-                                  patient,
                                   htmlFormEntryForms,
-                                  '',
+                                  patientUuid,
+                                  row.id,
+                                  currentVisit.uuid,
+                                  undefined,
                                   results[index].form.display ?? results[index].form.name,
+                                  currentVisit.visitType.uuid,
+                                  currentVisit.startDatetime,
+                                  currentVisit.stopDatetime,
                                   mutateForms,
                                 )
                               }
@@ -193,12 +200,15 @@ const FormView: React.FC<FormViewProps> = ({
                             <label
                               onClick={() =>
                                 launchFormEntryOrHtmlForms(
-                                  currentVisit,
-                                  row.id,
-                                  patient,
                                   htmlFormEntryForms,
+                                  patientUuid,
+                                  patientUuid,
+                                  currentVisit.uuid,
                                   first(results[index].associatedEncounters)?.uuid,
                                   results[index].form.display ?? results[index].form.name,
+                                  currentVisit.visitType.uuid,
+                                  currentVisit.startDatetime,
+                                  currentVisit.stopDatetime,
                                   mutateForms,
                                 )
                               }
@@ -216,12 +226,15 @@ const FormView: React.FC<FormViewProps> = ({
                                 iconDescription={t('editForm', 'Edit form')}
                                 onClick={() =>
                                   launchFormEntryOrHtmlForms(
-                                    currentVisit,
-                                    row.id,
-                                    patient,
                                     htmlFormEntryForms,
+                                    patientUuid,
+                                    patientUuid,
+                                    currentVisit.uuid,
                                     first(results[index].associatedEncounters)?.uuid,
                                     results[index].form.display ?? results[index].form.name,
+                                    currentVisit.visitType.uuid,
+                                    currentVisit.startDatetime,
+                                    currentVisit.stopDatetime,
                                     mutateForms,
                                   )
                                 }

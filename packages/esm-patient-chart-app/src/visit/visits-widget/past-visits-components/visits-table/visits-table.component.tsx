@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   DataTable,
@@ -38,11 +37,10 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { MappedEncounter } from '../../visit.resource';
-import { launchFormEntryOrHtmlForms } from '../../../../form-entry-interop';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 
@@ -270,9 +268,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                       size={desktopLayout ? 'sm' : 'lg'}
                                       onClick={() => {
                                         launchFormEntryOrHtmlForms(
-                                          selectedVisit,
-                                          patientUuid,
                                           htmlFormEntryFormsConfig,
+                                          patientUuid,
+                                          selectedVisit?.form?.uuid,
+                                          selectedVisit?.visitUuid,
+                                          selectedVisit?.id,
+                                          selectedVisit?.form?.display,
+                                          selectedVisit?.visitTypeUuid,
+                                          selectedVisit?.visitStartDatetime,
+                                          selectedVisit?.visitStopDatetime,
                                         );
                                       }}
                                     />
@@ -302,7 +306,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   <Button
                                     kind="ghost"
                                     onClick={() => {
-                                      launchFormEntryOrHtmlForms(selectedVisit, patientUuid, htmlFormEntryFormsConfig);
+                                      launchFormEntryOrHtmlForms(
+                                        htmlFormEntryFormsConfig,
+                                        patientUuid,
+                                        selectedVisit?.form?.uuid,
+                                        selectedVisit?.visitUuid,
+                                        selectedVisit?.id,
+                                        selectedVisit?.form?.display,
+                                        selectedVisit?.visitTypeUuid,
+                                        selectedVisit?.visitStartDatetime,
+                                        selectedVisit?.visitStopDatetime,
+                                      );
                                     }}
                                     renderIcon={(props) => <Edit size={16} {...props} />}
                                   >

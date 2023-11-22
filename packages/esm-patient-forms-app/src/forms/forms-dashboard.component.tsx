@@ -1,11 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, closeWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyDataIllustration,
+  closeWorkspace,
+  launchFormEntryOrHtmlForms,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
-import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
@@ -26,12 +30,15 @@ const FormsDashboard = () => {
     (formUuid: string, encounterUuid: string, formName: string) => {
       closeWorkspace('clinical-forms-workspace', true);
       launchFormEntryOrHtmlForms(
-        currentVisit,
-        formUuid,
-        patient,
         htmlFormEntryForms,
+        patientUuid,
+        formUuid,
+        currentVisit.uuid,
         encounterUuid,
         formName,
+        currentVisit.visitType.uuid,
+        currentVisit.startDatetime,
+        currentVisit.stopDatetime,
         mutateForms,
       );
     },

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, usePatient } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, FormEntryProps, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 interface FormEntryComponentProps extends DefaultWorkspaceProps {
@@ -13,6 +13,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
   const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
+  const isOnline = useConnectivity();
   const state = useMemo(
     () => ({
       view: 'form',
@@ -21,6 +22,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
       visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? null,
       visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
+      isOffline: !isOnline,
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? null,
