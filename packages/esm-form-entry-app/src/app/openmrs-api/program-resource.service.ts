@@ -59,7 +59,6 @@ export class ProgramResourceService {
       location: locationUuuid,
     };
 
-
     this.isPatientEnrolled(patientUuid, programUuid).subscribe((result: boolean) => {
       if (!result) {
         this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
@@ -68,6 +67,7 @@ export class ProgramResourceService {
               title: 'Program enrollment',
               subtitle: 'Patient has been enrolled successfully',
               kind: 'success',
+              isLowContrast: true,
             });
           },
           (err) => {
@@ -77,6 +77,7 @@ export class ProgramResourceService {
               title: 'Enrollment error',
               subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
               kind: 'error',
+              isLowContrast: false,
             });
           },
         );
