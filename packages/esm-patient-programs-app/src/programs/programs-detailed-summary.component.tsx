@@ -115,17 +115,10 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             title={t('fullyEnrolled', 'Enrolled in all programs')}
           />
         ) : null}
-        <DataTable
-          aria-label="program enrollments"
-          rows={tableRows}
-          headers={tableHeaders}
-          isSortable
-          size={isTablet ? 'lg' : 'sm'}
-          useZebraStyles
-        >
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="program enrollments" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -142,7 +135,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                     <TableHeader />
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="program-table">
+                <TableBody>
                   {rows.map((row, i) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
@@ -182,8 +175,6 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
       hasIconOnly
       tooltipPosition="left"
       size={isTablet ? 'lg' : 'sm'}
-      // TODO: Remove in favor of the aria-label above
-      data-testid="edit-program-button"
     />
   );
 }

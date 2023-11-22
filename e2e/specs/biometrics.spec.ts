@@ -1,8 +1,8 @@
+import { expect } from '@playwright/test';
+import { Visit } from '@openmrs/esm-framework';
+import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
-import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
-import { Visit } from '@openmrs/esm-framework';
 
 let patient: Patient;
 let visit: Visit;
@@ -25,7 +25,7 @@ test('Record biometrics', async ({ page, api }) => {
 
   await test.step('And then I fill the form', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('170');
-    await biometricsPage.page.getByRole('spinbutton', { name: /Weight/i }).fill('65');
+    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('65');
     await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('22.5');
     await biometricsPage.page.getByRole('spinbutton', { name: /muac/i }).fill('25');
   });
@@ -40,12 +40,12 @@ test('Record biometrics', async ({ page, api }) => {
 
   await test.step('And I should see the newly recorded biometrics on the page', async () => {
     const headerRow = biometricsPage.biometricsTable().locator('thead > tr');
+    const dataRow = biometricsPage.biometricsTable().locator('tbody > tr');
+
     await expect(headerRow).toContainText(/weight/i);
     await expect(headerRow).toContainText(/height/i);
     await expect(headerRow).toContainText(/bmi/i);
     await expect(headerRow).toContainText(/muac/i);
-
-    const dataRow = biometricsPage.biometricsTable().locator('tbody > tr');
     await expect(dataRow).toContainText('65');
     await expect(dataRow).toContainText('170');
     await expect(dataRow).toContainText('22.5');

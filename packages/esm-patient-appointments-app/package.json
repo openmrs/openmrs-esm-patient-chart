@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-appointments-app",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "license": "MPL-2.0",
   "description": "Patient appointments microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-appointments-app.js",
@@ -50,6 +50,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-patient-common-lib": "workspace:*",
     "webpack": "^5.88.2"
   }
 }

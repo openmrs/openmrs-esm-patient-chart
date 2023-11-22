@@ -42,6 +42,19 @@
     border-radius: 50%;
     top: -10px;
     right: -10px;
+  } 
+
+  .interruptedTag {
+    position: absolute;
+    text-align: center;
+    color: $ui-01;
+    background-color: $danger;
+    padding: 0 5px 0 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    top: -10px;
+    right: -10px;
   }
 }
 
