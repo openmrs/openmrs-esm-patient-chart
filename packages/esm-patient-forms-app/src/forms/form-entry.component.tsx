@@ -45,6 +45,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       currentVisit?.stopDatetime,
       patientUuid,
       patient,
+      isOnline,
       mutateForm,
       closeWorkspace,
     ],
