@@ -40,6 +40,10 @@ $actionPanelOffset: 3rem;
 
         &:hover {
           background-color: $color-gray-30;
+
+          :global(.cds--btn--ghost:focus) {
+            box-shadow: none;
+          }
         }
 
         &:focus {

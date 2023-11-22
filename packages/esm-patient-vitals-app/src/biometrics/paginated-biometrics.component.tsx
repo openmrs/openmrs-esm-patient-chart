@@ -36,7 +36,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       <DataTable rows={paginatedBiometrics} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()}>
+            <Table aria-label="biometrics" {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

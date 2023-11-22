@@ -3,7 +3,17 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, ButtonSet, Column, Form, InlineNotification, Row, Stack } from '@carbon/react';
+import {
+  Button,
+  ButtonSkeleton,
+  ButtonSet,
+  Column,
+  Form,
+  InlineNotification,
+  NumberInputSkeleton,
+  Row,
+  Stack,
+} from '@carbon/react';
 import {
   age,
   createErrorHandler,
@@ -71,7 +81,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading, isError } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
@@ -216,6 +226,38 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     );
   }
 
+  if (isLoading) {
+    return (
+      <Form className={styles.form}>
+        <div className={styles.grid}>
+          <Stack>
+            <Column>
+              <p className={styles.title}>{t('recordVitals', 'Record vitals')}</p>
+            </Column>
+            <Row className={styles.row}>
+              <Column>
+                <NumberInputSkeleton />
+              </Column>
+              <Column>
+                <NumberInputSkeleton />
+              </Column>
+              <Column>
+                <NumberInputSkeleton />
+              </Column>
+              <Column>
+                <NumberInputSkeleton />
+              </Column>
+            </Row>
+          </Stack>
+        </div>
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <ButtonSkeleton className={styles.button} />
+          <ButtonSkeleton className={styles.button} type="submit" />
+        </ButtonSet>
+      </Form>
+    );
+  }
+
   return (
     <Form className={styles.form}>
       <div className={styles.grid}>
@@ -230,8 +272,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 fieldProperties={[
                   {
                     id: 'temperature',
-                    max: concepts.temperatureRange.highAbsolute,
-                    min: concepts.temperatureRange.lowAbsolute,
+                    max: concepts.temperatureRange?.highAbsolute,
+                    min: concepts.temperatureRange?.lowAbsolute,
                     name: t('temperature', 'Temperature'),
                     type: 'number',
                   },
@@ -261,15 +303,15 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('systolic', 'systolic'),
                     separator: '/',
                     type: 'number',
-                    min: concepts.systolicBloodPressureRange.lowAbsolute,
-                    max: concepts.systolicBloodPressureRange.highAbsolute,
+                    min: concepts.systolicBloodPressureRange?.lowAbsolute,
+                    max: concepts.systolicBloodPressureRange?.highAbsolute,
                     id: 'systolicBloodPressure',
                   },
                   {
                     name: t('diastolic', 'diastolic'),
                     type: 'number',
-                    min: concepts.diastolicBloodPressureRange.lowAbsolute,
-                    max: concepts.diastolicBloodPressureRange.highAbsolute,
+                    min: concepts.diastolicBloodPressureRange?.lowAbsolute,
+                    max: concepts.diastolicBloodPressureRange?.highAbsolute,
                     id: 'diastolicBloodPressure',
                   },
                 ]}
@@ -308,8 +350,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('pulse', 'Pulse'),
                     type: 'number',
-                    min: concepts.pulseRange.lowAbsolute,
-                    max: concepts.pulseRange.highAbsolute,
+                    min: concepts.pulseRange?.lowAbsolute,
+                    max: concepts.pulseRange?.highAbsolute,
                     id: 'pulse',
                   },
                 ]}
@@ -330,8 +372,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('respirationRate', 'Respiration rate'),
                     type: 'number',
-                    min: concepts.respiratoryRateRange.lowAbsolute,
-                    max: concepts.respiratoryRateRange.highAbsolute,
+                    min: concepts.respiratoryRateRange?.lowAbsolute,
+                    max: concepts.respiratoryRateRange?.highAbsolute,
                     id: 'respiratoryRate',
                   },
                 ]}
@@ -358,8 +400,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('oxygenSaturation', 'Oxygen saturation'),
                     type: 'number',
-                    min: concepts.oxygenSaturationRange.lowAbsolute,
-                    max: concepts.oxygenSaturationRange.highAbsolute,
+                    min: concepts.oxygenSaturationRange?.lowAbsolute,
+                    max: concepts.oxygenSaturationRange?.highAbsolute,
                     id: 'oxygenSaturation',
                   },
                 ]}
@@ -415,8 +457,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('weight', 'Weight'),
                     type: 'number',
-                    min: concepts.weightRange.lowAbsolute,
-                    max: concepts.weightRange.highAbsolute,
+                    min: concepts.weightRange?.lowAbsolute,
+                    max: concepts.weightRange?.highAbsolute,
                     id: 'weight',
                   },
                 ]}
@@ -439,8 +481,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('height', 'Height'),
                     type: 'number',
-                    min: concepts.heightRange.lowAbsolute,
-                    max: concepts.heightRange.highAbsolute,
+                    min: concepts.heightRange?.lowAbsolute,
+                    max: concepts.heightRange?.highAbsolute,
                     id: 'height',
                   },
                 ]}
@@ -478,8 +520,8 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   {
                     name: t('muac', 'MUAC'),
                     type: 'number',
-                    min: concepts.midUpperArmCircumferenceRange.lowAbsolute,
-                    max: concepts.midUpperArmCircumferenceRange.highAbsolute,
+                    min: concepts.midUpperArmCircumferenceRange?.lowAbsolute,
+                    max: concepts.midUpperArmCircumferenceRange?.highAbsolute,
                     id: 'midUpperArmCircumference',
                   },
                 ]}

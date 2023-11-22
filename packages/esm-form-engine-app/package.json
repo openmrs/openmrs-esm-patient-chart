@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "license": "MPL-2.0",
   "description": "Forms engine microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-engine-app.js",
@@ -52,6 +52,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-patient-common-lib": "workspace:*",
     "webpack": "^5.88.2"
   }
 }

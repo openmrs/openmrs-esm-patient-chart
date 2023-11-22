@@ -4,48 +4,53 @@
 @import "../root";
 
 .clickableTileDesktop {
-  margin-bottom: 0.5rem;
-  border-left: 4px solid #0072c3;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid $ui-03;
 }
 
 .clickableTileTablet {
+  padding: 0.75rem 1rem;
   background-color: $ui-02;
-  &:not(:last-of-type) {
-    padding: 15px;
-  }
+  border-bottom: 1px solid $ui-03;
 }
 
 .orderBasketItemTile {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+}
+
+.label {
+  display: inline-block;
+  @include type.type-style("label-01");
+  margin-bottom: 0.5rem;
 }
 
 .orderActionNewLabel {
-  margin-bottom: 0.5625rem;
-  @extend .label01;
-  color: $support-02; 
+  @extend .label;
+  color: $support-02;
 }
 
 .orderActionRenewLabel {
-  margin-bottom: 0.5625rem;
-  @extend .label01;
+  @extend .label;
   color: $support-02;
-  font-weight: 500;
 }
 
 .orderActionRevisedLabel {
-  margin-bottom: 0.5625rem;
-  @extend .label01;
+  @extend .label;
   color: #943d00;
-  font-weight: 500;
 }
 
 .orderActionDiscontinueLabel {
-  margin-bottom: 0.5625rem;
-  @extend .label01;
+  @extend .label;
   color: $danger;
-  font-weight: 500;
+}
+
+.orderActionIncompleteLabel {
+  @extend .label;
+  color: white;
+  background-color: $danger;
+  padding: 0 0.25rem;
 }
 
 .orderErrorText {
@@ -55,7 +60,7 @@
 }
 
 .doseCaption {
-  @include type.type-style("body-compact-01");  
+  @include type.type-style("body-compact-01");
   color: $text-02;
 }
 
@@ -64,24 +69,22 @@
 }
 
 .dosageInfo {
-  @include type.type-style("body-compact-01");  
-  color: $text-02;
+  @include type.type-style("body-compact-01");
+  color: black;
 }
 
 .drugName {
   @include type.type-style("heading-compact-01");
-  color: $text-02;
+  color: black;
 }
 
 .indicationLabel {
-  @include type.type-style('label-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }
 
 .removeButton {
-  flex: 0 0 auto; 
-}
-
-.removeButton svg {
-  fill: $danger !important;
+  svg {
+    fill: $danger ;
+  }
 }

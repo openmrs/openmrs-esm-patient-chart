@@ -12,11 +12,11 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
+import { launchVitalsAndBiometricsForm } from '../utils';
+import { useVitalsAndBiometrics } from '../common';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
-import { launchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics } from '../common';
 
 interface BiometricsBaseProps {
   patientUuid: string;
@@ -74,7 +74,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (biometrics?.length) {
     return (
-      <div className={styles.widgetCard} data-testid="biometrics-table">
+      <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>

@@ -1,13 +1,17 @@
-import 'zone.js/dist/zone';
 import 'reflect-metadata';
-import './styles.css';
+import 'zone.js';
 import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
-import { configSchema } from './config-schema';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
+import { configSchema } from './config-schema';
+import './styles.css';
 
 const moduleName = '@openmrs/esm-form-entry-app';
 
-export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+export const importTranslation = import.meta.webpackContext('../translations', {
+  regExp: /\.json$/,
+  recursive: false,
+  mode: 'lazy',
+});
 
 export function startupApp() {
   setupStaticDataOfflinePrecaching();

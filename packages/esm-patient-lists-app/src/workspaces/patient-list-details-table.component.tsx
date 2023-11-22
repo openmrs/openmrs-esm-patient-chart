@@ -104,10 +104,16 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
               size={responsiveSize}
             />
           </Layer>
-          <DataTable rows={tableRows} headers={tableHeaders} size={responsiveSize} useZebraStyles>
+          <DataTable
+            aria-label="patient list details"
+            rows={tableRows}
+            headers={tableHeaders}
+            size={responsiveSize}
+            useZebraStyles
+          >
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer>
-                <Table {...getTableProps()} data-testid="patientsTable">
+                <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

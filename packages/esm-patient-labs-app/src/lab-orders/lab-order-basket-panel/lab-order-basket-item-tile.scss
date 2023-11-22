@@ -4,28 +4,33 @@
 @import "../../root";
 
 .clickableTileDesktop {
-  margin-bottom: 0.5rem;
-  border-left: 4px solid #6929c4;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid $ui-03;
 }
 
 .clickableTileTablet {
+  padding: 0.75rem 1rem;
   background-color: $ui-02;
-  &:not(:last-of-type) {
-    padding: 15px;
-  }
+  border-bottom: 1px solid $ui-03;
 }
-
 
 .orderBasketItemTile {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+}
+
+.label {
+  display: inline-block;
+  @include type.type-style("label-01");
+  margin-bottom: 0.5rem;
 }
 
 .orderActionNewLabel {
-  margin-bottom: 0.5625rem;
-  @extend .label01;
-  color: $support-02; 
+  @extend .label;
+  color: black;
+  background-color: #C4F4CC;
+  padding: 0 0.25rem;
 }
 
 .orderErrorText {
@@ -36,13 +41,11 @@
 
 .name {
   @include type.type-style("heading-compact-01");
-  color: $text-02;
+  color: black;
 }
 
 .removeButton {
-  flex: 0 0 auto; 
-}
-
-.removeButton svg {
-  fill: $danger !important;
+  svg {
+    fill: $danger !important;
+  }
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import style from './rx-icon.scss';
 
 interface RxIconProps {
   isTablet: boolean;
@@ -8,15 +7,20 @@ interface RxIconProps {
 function RxIcon({ isTablet }: RxIconProps) {
   const size = isTablet ? 40 : 24;
   return (
-    <div className={style.background}>
-      <svg width={size} height={size} viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_11156_284438)">
+        <path d="M24 0H0V24H24V0Z" fill="#BAE6FF" />
         <path
-          d="M5.667 25.701V2.334h9.32c3.83-.038 6.304 2.152 6.509 6.033.066 1.262-.235 3.03-.665 3.887-.43.857-1.55 2.654-4.031 3.128l1.582 3.044 2.94-3.706H24l-4.58 5.73 2.753 5.251H18.98l-1.495-2.927-2.267 2.927H12.48l3.961-5.055-2.515-5.002h-5.47v10.057h-2.79zm2.796-12.447h6.911c.804-.053 3.133-.053 3.133-4.732 0-3.077-1.87-3.721-3.55-3.712H8.464v8.444z"
-          fill="#0072C3"
-          fillRule="nonzero"
+          d="M7 19.0208V5.00029H12.5924C14.8905 4.9776 16.3746 6.29147 16.4974 8.6203C16.5374 9.37725 16.3564 10.4385 16.0984 10.9525C15.8404 11.4665 15.1686 12.5446 13.6799 12.8291L14.6294 14.6554L16.3928 12.432H18L15.252 15.8701L16.9039 19.0208H14.9881L14.0908 17.2643L12.7308 19.0208H11.0881L13.4648 15.9874L11.9557 12.9865H8.67359V19.0208H7ZM8.67754 11.5522H12.8245C13.3068 11.5208 14.7039 11.5208 14.7039 8.71341C14.7039 6.86701 13.5819 6.48032 12.5746 6.48612H8.67754V11.5522Z"
+          fill="#00539A"
         />
-      </svg>
-    </div>
+      </g>
+      <defs>
+        <clipPath id="clip0_11156_284438">
+          <rect width={size} height={size} fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
   );
 }
 

@@ -55,7 +55,7 @@ jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => 
     workspaces: [
       {
         name: 'clinical-forms-workspace',
-        title: 'Clinical form',
+        title: 'Clinical forms',
         preferredWindowSize: 'normal',
         type: 'form',
       },
@@ -71,7 +71,7 @@ test('should display clinical form action button on tablet view', () => {
   render(<ClinicalFormActionButton />);
   expect(screen.getByTestId('document-icon').getAttribute('size')).toBe('16');
 
-  expect(screen.getByRole('button', { name: /Clinical form/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Clinical forms/i })).toBeInTheDocument();
 });
 
 test('should display clinical form action button on desktop view', () => {
@@ -81,5 +81,5 @@ test('should display clinical form action button on desktop view', () => {
   expect(screen.getByTestId('document-icon').getAttribute('size')).toBe('20');
 
   const clinicalActionButton = screen.getByRole('button', { name: /Form/i });
-  expect(clinicalActionButton).not.toHaveTextContent('Clinical form');
+  expect(clinicalActionButton).not.toHaveTextContent('Clinical forms');
 });
