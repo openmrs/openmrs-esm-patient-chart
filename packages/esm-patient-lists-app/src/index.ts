@@ -28,7 +28,7 @@ export function startupApp() {
     name: 'patient-list-details',
     title: 'Patient List Details',
     load: getAsyncLifecycle(() => import('./workspaces/patient-list-details.workspace'), options),
-    type: 'patient-list-details',
+    type: 'patient-lists',
     canHide: false,
     width: 'wider',
   });
