@@ -12,14 +12,19 @@
 }
 
 .tile {
+  border: 1px solid colors.$gray-20;
+  padding: 1.5rem 0;
+  margin: 0 layout.$spacing-05;
   text-align: center;
-  border: 1px solid colors.$gray-70;
-  margin: layout.$spacing-05 0;
 }
 
 .link {
   cursor: pointer;
   text-decoration: none;
+}
+
+.emptyStateContainer {
+  background-color: colors.$white-0;
 }
 
 .illo {
@@ -28,7 +33,7 @@
 
 .content {
   @include type.type-style('heading-compact-01');
-  color: colors.$gray-20;
+  color: colors.$gray-70;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
 }

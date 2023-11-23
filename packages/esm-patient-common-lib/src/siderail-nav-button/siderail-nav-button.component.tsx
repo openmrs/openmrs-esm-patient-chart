@@ -56,7 +56,6 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       className={classNames(styles.container, {
         [styles.active]: isWorkspaceActive,
       })}
-      enterDelayMs={1000}
       kind="ghost"
       label={label}
       onClick={handler}

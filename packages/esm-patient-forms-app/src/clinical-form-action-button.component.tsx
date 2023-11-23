@@ -30,7 +30,7 @@ const ClinicalFormActionButton: React.FC = () => {
       name={'clinical-form-action-menu'}
       getIcon={(props) => <Document {...props} />}
       label={t('clinicalForms', 'Clinical forms')}
-      iconDescription={t('form', 'Form')}
+      iconDescription={t('clinicalForms', 'Clinical forms')}
       handler={launchWorkspace}
       type={'clinical-form'}
     />

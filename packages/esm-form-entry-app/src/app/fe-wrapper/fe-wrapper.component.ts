@@ -8,7 +8,7 @@ import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { Encounter, EncounterCreate, FormSchema, Identifier, Order } from '../types';
-import { showSnackbar, getSynchronizationItems, createGlobalStore, showModal, } from '@openmrs/esm-framework';
+import { showSnackbar, getSynchronizationItems, createGlobalStore, showModal } from '@openmrs/esm-framework';
 
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
