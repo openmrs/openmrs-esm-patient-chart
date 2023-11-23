@@ -1,7 +1,7 @@
 import map from 'lodash-es/map';
 import find from 'lodash-es/find';
-import { ExistingDoses, Immunization } from '../types';
-import { ImmunizationSequenceDefinition, OpenmrsConcept, ImmunizationData } from './immunization-domain';
+import { type ExistingDoses, type Immunization } from '../types';
+import { type ImmunizationSequenceDefinition, type OpenmrsConcept, type ImmunizationData } from './immunization-domain';
 
 export const findConfiguredSequences = (
   configuredSequences: Array<ImmunizationSequenceDefinition>,

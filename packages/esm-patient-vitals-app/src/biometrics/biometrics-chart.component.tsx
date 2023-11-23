@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { type PatientVitals } from '../common';
 import styles from './biometrics-chart.scss';
 

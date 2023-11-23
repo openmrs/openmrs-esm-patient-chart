@@ -1,5 +1,5 @@
-import { VisitType, useConfig } from '@openmrs/esm-framework';
-import { ChartConfig } from '../../config-schema';
+import { type VisitType, useConfig } from '@openmrs/esm-framework';
+import { type ChartConfig } from '../../config-schema';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -1,8 +1,8 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMatch } from 'react-router-dom';
 import {
   Extension,
-  ExtensionData,
+  type ExtensionData,
   ExtensionSlot,
   getExtensionNameFromId,
   useExtensionSlotMeta,

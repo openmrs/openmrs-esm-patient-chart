@@ -1,11 +1,11 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from '@carbon/react';
 import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
-import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
+import { type ImmunizationFormData, type ImmunizationSequence } from './immunization-domain';
 import { immunizationFormSub } from './immunization-utils';
 import styles from './immunizations-form.scss';
 

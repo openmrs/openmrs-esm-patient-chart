@@ -4,7 +4,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Layer, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, showSnackbar, parseDate, formatDate } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
 import { getFlagType } from './utils';

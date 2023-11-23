@@ -1,10 +1,10 @@
 import {
-  PatientData,
-  ObsRecord,
-  ConceptUuid,
-  ConceptRecord,
-  ObsMetaInfo,
-  OBSERVATION_INTERPRETATION,
+  type PatientData,
+  type ObsRecord,
+  type ConceptUuid,
+  type ConceptRecord,
+  type ObsMetaInfo,
+  type OBSERVATION_INTERPRETATION,
 } from '@openmrs/esm-patient-common-lib';
 
 const PAGE_SIZE = 300;

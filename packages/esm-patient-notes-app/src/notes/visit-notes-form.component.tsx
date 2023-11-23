@@ -1,10 +1,10 @@
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, Control, FormState } from 'react-hook-form';
+import { useForm, Controller, type Control } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -32,7 +32,7 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {

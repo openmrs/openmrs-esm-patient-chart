@@ -2,8 +2,8 @@ import React from 'react';
 import { screen, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
-import { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import { LabOrderBasketItem } from '../api';
+import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type LabOrderBasketItem } from '../api';
 
 const mockUseOrderBasket = jest.fn();
 

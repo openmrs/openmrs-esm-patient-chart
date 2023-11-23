@@ -1,6 +1,6 @@
 import { useConfig } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { ChartConfig } from '../../config-schema';
+import { type ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import {
   TextInput,
@@ -16,9 +16,9 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
-import { Controller, ControllerRenderProps, useFormContext } from 'react-hook-form';
+import { Controller, type ControllerRenderProps, useFormContext } from 'react-hook-form';
 import dayjs from 'dayjs';
-import { VisitFormData } from './visit-form.resource';
+import { type VisitFormData } from './visit-form.resource';
 
 interface VisitAttributes {
   [uuid: string]: string;

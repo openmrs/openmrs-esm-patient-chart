@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
 import includes from 'lodash-es/includes';
 import split from 'lodash-es/split';
-import { FHIRImmunizationBundle, FHIRImmunizationResource, OpenmrsConcept } from './immunization-domain';
+import { type FHIRImmunizationBundle, type FHIRImmunizationResource, type OpenmrsConcept } from './immunization-domain';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 
 function getImmunizationsConceptSetByUuid(

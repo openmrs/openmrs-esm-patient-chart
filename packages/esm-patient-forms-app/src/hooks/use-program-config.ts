@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, type OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 interface ProgramConfigObj {
   name: string;

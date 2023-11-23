@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { DrugOrderBasketItem } from '../types';
+import { type DrugOrderBasketItem } from '../types';
 import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {

@@ -5,7 +5,7 @@ import { ChartLineSmooth, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import ObsGraph from '../obs-graph/obs-graph.component';
 import ObsTable from '../obs-table/obs-table.component';
 import styles from './obs-switchable.scss';

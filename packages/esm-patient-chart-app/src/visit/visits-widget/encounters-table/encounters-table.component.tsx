@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Table,
   TableBody,
   TableCell,

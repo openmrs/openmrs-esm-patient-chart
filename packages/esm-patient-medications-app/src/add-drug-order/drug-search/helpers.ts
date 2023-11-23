@@ -1,4 +1,4 @@
-import { DrugOrderBasketItem } from '../../types';
+import { type DrugOrderBasketItem } from '../../types';
 
 type DrugsOrOrders = Pick<DrugOrderBasketItem, 'action' | 'commonMedicationName'>;
 

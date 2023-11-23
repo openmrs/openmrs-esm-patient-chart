@@ -1,4 +1,4 @@
-import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 interface Observation {
   display: string;
   flatName: string;

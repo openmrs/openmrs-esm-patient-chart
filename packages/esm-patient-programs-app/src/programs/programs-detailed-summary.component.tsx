@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
@@ -21,7 +21,7 @@ import {
   formatDate,
   formatDatetime,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';

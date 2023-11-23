@@ -5,7 +5,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Dropdown,
   Layer,
   OverflowMenu,
@@ -42,7 +42,7 @@ import {
 import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
-import { MappedEncounter } from '../../visit.resource';
+import { type MappedEncounter } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 

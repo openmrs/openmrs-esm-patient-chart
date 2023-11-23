@@ -9,7 +9,7 @@ import {
   mockDrugOrderTemplateApiData,
   mockPatientDrugOrdersApiData,
 } from '../__mocks__/medication.mock';
-import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useSession } from '@openmrs/esm-framework';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 

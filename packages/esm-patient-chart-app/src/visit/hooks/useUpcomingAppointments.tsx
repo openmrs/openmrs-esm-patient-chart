@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
+import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface AppointmentPayload {
   patientUuid: string;

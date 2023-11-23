@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
+import { type OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 
 /**
  * Custom hook to fetch form schema based on its form UUID.

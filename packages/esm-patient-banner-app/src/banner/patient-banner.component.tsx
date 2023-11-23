@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';

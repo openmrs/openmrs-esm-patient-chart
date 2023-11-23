@@ -6,7 +6,7 @@ dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Table,
   TableCell,
   TableContainer,
@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { Appointment } from '../types';
+import { type Appointment } from '../types';
 import { AppointmentsActionMenu } from './appointments-action-menu.component';
 import styles from './appointments-table.scss';
 

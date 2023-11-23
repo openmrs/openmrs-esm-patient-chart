@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
-import { Condition } from './conditions.resource';
+import { type Condition } from './conditions.resource';
 import styles from './conditions-action-menu.scss';
 
 interface conditionsActionMenuProps {
