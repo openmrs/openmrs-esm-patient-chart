@@ -26,8 +26,6 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
 }) => {
   const layout = useLayoutType();
   const { workspaces, workspaceWindowState } = useWorkspaces();
-  console.log('workspaces: ', workspaces);
-  console.log('workspaceWindowState: ', workspaceWindowState);
   const workspaceIndex = workspaces?.findIndex(({ type: workspaceType }) => workspaceType === type) ?? -1;
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
   const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
