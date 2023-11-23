@@ -155,8 +155,6 @@ export function useOrderTypes() {
   };
 }
 
-type orderSummaryType = {};
-
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', orderType?: string) {
   const baseOrdersUrl = `/ws/rest/v1/order?v=full&patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderType=${orderType}` : baseOrdersUrl;
@@ -171,7 +169,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     [patientUuid],
   );
 
-  const labOrders = useMemo(
+  const orders = useMemo(
     () =>
       data?.data?.results
         ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
@@ -180,7 +178,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
   );
 
   return {
-    data: data ? labOrders : null,
+    data: data ? orders : null,
     error,
     isLoading,
     isValidating,

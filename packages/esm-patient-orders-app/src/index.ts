@@ -3,6 +3,7 @@ import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-com
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
+import OrdersSummary from './orders-summary/orders-summary.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -35,7 +36,4 @@ export const ordersDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const ordersDashboard = getAsyncLifecycle(
-  () => import('../../esm-patient-orders-app/src/orders-summary/orders-summary.component'),
-  options,
-);
+export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);

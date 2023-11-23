@@ -33,8 +33,6 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
     [data],
   );
 
-  console.log('labOrders', labOrders);
-
   return {
     data: data ? labOrders : null,
     error,

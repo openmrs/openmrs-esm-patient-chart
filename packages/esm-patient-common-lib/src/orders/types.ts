@@ -123,6 +123,14 @@ export interface Order {
   type: string;
 }
 
+export interface OrderType {
+  uuid: string;
+  display: string;
+  name: string;
+  retired: boolean;
+  description: string;
+}
+
 export interface Drug {
   uuid: string;
   strength: string;
