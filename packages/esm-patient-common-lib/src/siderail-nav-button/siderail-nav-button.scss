@@ -38,25 +38,18 @@
     text-align: center;
     color: $ui-01;
     background-color: $danger;
-    padding: 0 3px 0 4px;
+    padding: 0 4px;
     border-radius: 50%;
     top: -10px;
     right: -10px;
-  } 
+  }
 
   .interruptedTag {
-    position: absolute;
+    @extend .countTag;
     font-size: 10px;
-    text-align: center;
-    color: $ui-01;
-    background-color: $danger;
     padding: 0 5px;
     width: 14px;
     height: 14px;
-    border-radius: 50%;
-    top: -10px;
-    right: -10px;
-    font-size: 9px;
   }
 }
 

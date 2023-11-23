@@ -30,6 +30,20 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
   const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
+  function Tags({ isTablet }: { isTablet: boolean }) {
+    return (
+      <>
+        {getIcon({ size: isTablet ? 16 : 20 })}
+
+        {formOpenInTheBackground ? (
+          <span className={styles.interruptedTag}>!</span>
+        ) : (
+          <span className={styles.countTag}>{tagContent}</span>
+        )}
+      </>
+    );
+  }
+
   if (layout === 'tablet') {
     return (
       <Button
@@ -40,11 +54,9 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
         role="button"
         tabIndex={0}
       >
-        <div className={styles.elementContainer}>
-          {getIcon({ size: 16 })}
-          {formOpenInTheBackground ? <span className={styles.interruptedTag}>!</span> : null}
-          {!formOpenInTheBackground ? <span className={styles.countTag}>{tagContent}</span> : null}
-        </div>
+        <span className={styles.elementContainer}>
+          <Tags isTablet />
+        </span>
 
         <span>{label}</span>
       </Button>
@@ -57,15 +69,13 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       className={classNames(styles.container, {
         [styles.active]: isWorkspaceActive,
       })}
-      enterDelayMs={1000}
+      enterDelayMs={300}
       kind="ghost"
       label={label}
       onClick={handler}
     >
       <div className={styles.elementContainer}>
-        {getIcon({ size: 20 })}
-        {formOpenInTheBackground ? <span className={styles.interruptedTag}>!</span> : null}
-        {!formOpenInTheBackground ? <span className={styles.countTag}>{tagContent}</span> : null}
+        <Tags isTablet={false} />
       </div>
     </IconButton>
   );
