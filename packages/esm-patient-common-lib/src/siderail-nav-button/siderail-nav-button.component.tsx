@@ -42,7 +42,8 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       >
         <div className={styles.elementContainer}>
           {getIcon({ size: 16 })}
-          <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
+          {formOpenInTheBackground ? <span className={styles.interruptedTag}>!</span> : null}
+          {!formOpenInTheBackground ? <span className={styles.countTag}>{tagContent}</span> : null}
         </div>
 
         <span>{label}</span>
@@ -56,13 +57,15 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       className={classNames(styles.container, {
         [styles.active]: isWorkspaceActive,
       })}
+      enterDelayMs={1000}
       kind="ghost"
       label={label}
       onClick={handler}
     >
       <div className={styles.elementContainer}>
         {getIcon({ size: 20 })}
-        <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
+        {formOpenInTheBackground ? <span className={styles.interruptedTag}>!</span> : null}
+        {!formOpenInTheBackground ? <span className={styles.countTag}>{tagContent}</span> : null}
       </div>
     </IconButton>
   );
