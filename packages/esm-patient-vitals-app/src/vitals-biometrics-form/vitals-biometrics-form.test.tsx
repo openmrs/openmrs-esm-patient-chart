@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../tools/test-helpers';
 import { saveVitalsAndBiometrics } from '../common';

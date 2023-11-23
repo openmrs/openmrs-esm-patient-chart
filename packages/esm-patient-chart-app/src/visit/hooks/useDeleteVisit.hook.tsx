@@ -1,4 +1,4 @@
-import { Visit, showActionableNotification, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { type Visit, showActionableNotification, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { deleteVisit, restoreVisit, useVisits } from '../visits-widget/visit.resource';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';

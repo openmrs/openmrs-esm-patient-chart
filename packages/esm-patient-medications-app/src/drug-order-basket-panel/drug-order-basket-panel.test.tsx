@@ -5,7 +5,7 @@ import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData, patientUuid } from '../__mocks__/medication.mock';
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
-import { DrugOrderBasketItem } from '../types';
+import { type DrugOrderBasketItem } from '../types';
 
 const mockUseOrderBasket = jest.fn();
 

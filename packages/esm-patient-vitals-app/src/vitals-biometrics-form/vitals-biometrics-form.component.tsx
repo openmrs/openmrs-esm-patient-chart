@@ -26,7 +26,7 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,

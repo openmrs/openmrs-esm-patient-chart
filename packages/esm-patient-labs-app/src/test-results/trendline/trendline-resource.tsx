@@ -2,8 +2,8 @@ import useSWR from 'swr';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue } from '../loadPatientTestData/helpers';
 import { useMemo } from 'react';
-import { FetchResponse, openmrsFetch, showNotification } from '@openmrs/esm-framework';
-import { TreeNode } from '../filter/filter-types';
+import { type FetchResponse, openmrsFetch, showNotification } from '@openmrs/esm-framework';
+import { type TreeNode } from '../filter/filter-types';
 
 function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];

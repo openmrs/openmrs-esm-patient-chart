@@ -7,10 +7,10 @@ import {
   postOrders,
   useOrderBasket,
   useVisitOrOfflineVisit,
-  OrderBasketItem,
-  DefaultWorkspaceProps,
+  type OrderBasketItem,
+  type DefaultWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 

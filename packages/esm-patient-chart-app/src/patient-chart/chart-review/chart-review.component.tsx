@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
-import { ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
+import { type ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
-import { DashboardView, DashboardConfig, LayoutMode } from './dashboard-view.component';
+import { DashboardView, type DashboardConfig, type LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {

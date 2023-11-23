@@ -3,9 +3,9 @@ import { render, renderHook, screen, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
 import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
-import { LabOrderBasketItem } from '../api';
+import { type LabOrderBasketItem } from '../api';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
-import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
 
 jest.setTimeout(10000);

@@ -13,7 +13,7 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, useLayoutType, showSnackbar, showModal } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';

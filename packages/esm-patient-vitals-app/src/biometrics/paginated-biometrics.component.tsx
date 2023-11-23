@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   DataTable,
-  DataTableRow,
+  type DataTableRow,
   Table,
   TableCell,
   TableContainer,

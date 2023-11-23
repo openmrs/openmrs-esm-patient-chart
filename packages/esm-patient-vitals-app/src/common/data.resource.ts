@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { type FHIRResource, type FetchResponse, fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { type ObsRecord, useVitalsConceptMetadata, ConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type ObsRecord, useVitalsConceptMetadata, type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { type KeyedMutator } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';

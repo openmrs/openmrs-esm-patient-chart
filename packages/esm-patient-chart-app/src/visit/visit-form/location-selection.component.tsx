@@ -4,11 +4,11 @@ import isEmpty from 'lodash/isEmpty';
 import { ComboBox } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
-import { Location, OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
+import { type Location, type OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import { useLocations } from '../hooks/useLocations';
-import { VisitFormData } from './visit-form.resource';
-import { ChartConfig } from '../../config-schema';
+import { type VisitFormData } from './visit-form.resource';
+import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
 
 const LocationSelector = () => {

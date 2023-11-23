@@ -31,7 +31,7 @@ import {
   saveRecurringAppointments,
   useAppointments,
   useAppointmentService,
-} from './../appointments.resource';
+} from '../appointments.resource';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../../constants';
 import styles from './appointments-form.scss';

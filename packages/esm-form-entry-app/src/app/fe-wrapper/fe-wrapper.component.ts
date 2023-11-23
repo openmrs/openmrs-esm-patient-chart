@@ -2,7 +2,7 @@ import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/cor
 import { registerLocaleData } from '@angular/common';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
-import { catchError, concatAll, map, mergeMap, switchMap, take } from 'rxjs/operators';
+import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';

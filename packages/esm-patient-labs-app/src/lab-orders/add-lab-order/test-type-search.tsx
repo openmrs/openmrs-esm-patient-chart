@@ -5,7 +5,7 @@ import { Button, ButtonSkeleton, Layer, Search, SkeletonText, Tile } from '@carb
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import { type LabOrderBasketItem, prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './lab-order';
 import styles from './test-type-search.scss';

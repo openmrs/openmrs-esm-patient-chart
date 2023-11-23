@@ -2,7 +2,7 @@ import { useStoreWithActions } from '@openmrs/esm-framework';
 import type { OrderBasketItem, PostDataPrepFunction } from './types';
 import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
 import { useEffect } from 'react';
-import { OrderBasketStore, orderBasketStore } from './store';
+import { type OrderBasketStore, orderBasketStore } from './store';
 
 const orderBasketStoreActions = {
   setOrderBasketItems(

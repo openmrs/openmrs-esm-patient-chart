@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OpenWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { mountRootParcel, ParcelConfig } from 'single-spa';
+import { type OpenWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { mountRootParcel, type ParcelConfig } from 'single-spa';
 import Parcel from 'single-spa-react/parcel';
 import Loader from '../loader/loader.component';
 import styles from './workspace-window.scss';

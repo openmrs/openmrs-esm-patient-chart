@@ -29,7 +29,7 @@ import {
   useLayoutType,
   parseDate,
 } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
   useAvailablePrograms,

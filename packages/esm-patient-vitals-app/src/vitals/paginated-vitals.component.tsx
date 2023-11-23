@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  DataTableHeader,
-  DataTableRow,
+  type DataTableHeader,
+  type DataTableRow,
   Table,
   TableCell,
   TableContainer,

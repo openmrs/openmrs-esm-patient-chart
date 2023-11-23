@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
-import { Visit } from '@openmrs/esm-framework';
+import { type Visit } from '@openmrs/esm-framework';
 import useFormSchema from '../hooks/useFormSchema';
 import FormError from './form-error.component';
 import styles from './form-renderer.scss';

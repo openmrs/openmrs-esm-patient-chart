@@ -1,12 +1,12 @@
 import React from 'react';
 import styles from './visit-form.scss';
 import { Controller, useFormContext } from 'react-hook-form';
-import { VisitFormData } from './visit-form.resource';
+import { type VisitFormData } from './visit-form.resource';
 import { DatePicker, DatePickerInput, Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { amPm } from '@openmrs/esm-patient-common-lib';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
 
 interface VisitDateTimeFieldProps {
   visitDatetimeLabel: string;

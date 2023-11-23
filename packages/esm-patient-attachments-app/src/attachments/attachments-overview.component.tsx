@@ -5,7 +5,7 @@ import { showModal, showSnackbar, useLayoutType, UserHasAccess } from '@openmrs/
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
-import { UploadedFile, Attachment } from '../attachments-types';
+import { type UploadedFile, type Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';

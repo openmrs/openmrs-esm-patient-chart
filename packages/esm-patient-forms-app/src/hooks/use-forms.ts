@@ -7,7 +7,7 @@ import {
   userHasAccess,
   useSession,
 } from '@openmrs/esm-framework';
-import { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
+import { type ListResponse, type Form, type EncounterWithFormRef, type CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { type ConfigObject } from '../config-schema';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';

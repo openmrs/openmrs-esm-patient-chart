@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import fuzzy from 'fuzzy';
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { Concept } from '../../types';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type Concept } from '../../types';
 
 export interface TestType {
   label: string;

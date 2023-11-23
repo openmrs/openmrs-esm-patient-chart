@@ -2,12 +2,12 @@ import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import { openmrsFetch, openmrsObservableFetch, useConfig } from '@openmrs/esm-framework';
 import {
-  EncountersFetchResponse,
-  RESTPatientNote,
-  PatientNote,
-  VisitNotePayload,
-  DiagnosisPayload,
-  Concept,
+  type EncountersFetchResponse,
+  type RESTPatientNote,
+  type PatientNote,
+  type VisitNotePayload,
+  type DiagnosisPayload,
+  type Concept,
 } from '../types';
 
 interface UseVisitNotes {

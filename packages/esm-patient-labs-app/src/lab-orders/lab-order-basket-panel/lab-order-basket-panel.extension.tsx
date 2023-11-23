@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepLabOrderPostData } from '../api';
 import LabIcon from './lab-icon.component';

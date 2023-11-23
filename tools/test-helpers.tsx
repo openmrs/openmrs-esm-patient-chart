@@ -1,6 +1,6 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
-import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 // This component wraps whatever component is passed to it with an SWRConfig context which provides a global configuration for all SWR hooks.
 const swrWrapper = ({ children }: { children: React.ReactNode }) => {

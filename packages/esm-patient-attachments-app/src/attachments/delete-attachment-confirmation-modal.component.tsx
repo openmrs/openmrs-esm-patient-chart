@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
-import { Attachment } from '../attachments-types';
+import { type Attachment } from '../attachments-types';
 import styles from './delete-attachment-confirmation-modal.scss';
 
 interface DeleteAttachmentConfirmationProps {

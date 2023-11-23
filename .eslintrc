@@ -12,7 +12,15 @@
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-types": "off",
+    // Use `import type` instead of `import` for type imports https://typescript-eslint.io/blog/consistent-type-imports-and-exports-why-and-how
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "fixStyle": "inline-type-imports"
+      }
+    ],
     "prefer-const": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
     "no-unsafe-optional-chaining": "off",
     "no-explicit-any": "off",
     "no-extra-boolean-cast": "off",

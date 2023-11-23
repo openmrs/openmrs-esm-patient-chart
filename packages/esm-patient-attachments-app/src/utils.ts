@@ -1,4 +1,4 @@
-import { AttachmentResponse, Attachment } from './attachments-types';
+import { type AttachmentResponse, type Attachment } from './attachments-types';
 import { attachmentUrl } from './attachments.resource';
 import { formatDate } from '@openmrs/esm-framework';
 

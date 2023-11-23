@@ -1,7 +1,7 @@
 import React from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import { Encounter } from '../visit.resource';
+import { type ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import { type Encounter } from '../visit.resource';
 
 const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encounters: Array<Encounter> }) => {
   const filter = React.useMemo<ExternalOverviewProps['filter']>(() => {
