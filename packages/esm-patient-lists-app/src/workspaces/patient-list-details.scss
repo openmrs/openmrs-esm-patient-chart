@@ -5,11 +5,13 @@
 @use '@carbon/type';
 
 .container {
+  background-color: colors.$white-0;
   height: calc(100vh - 6rem);
 }
 
 .backButton {
-  padding: layout.$spacing-03;
+  margin: 0 layout.$spacing-05;
+  padding: layout.$spacing-03 0;
 
   button {
     display: flex;
