@@ -10,12 +10,12 @@ function PatientListsActionButton() {
 
   return (
     <SiderailNavButton
-      name="patient-lists-action-menu"
+      name={'patient-lists-action-menu'}
       getIcon={(props) => <Events {...props} />}
       label={t('patientLists', 'Patient lists')}
       iconDescription={t('patientLists', 'Patient lists')}
       handler={handleLaunchPatientListsWorkspace}
-      type="patient-lists"
+      type={'patient-list'}
     />
   );
 }
