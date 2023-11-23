@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../tools/test-helpers';
 import { saveVitalsAndBiometrics } from '../common';
@@ -22,9 +22,9 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const mockShowToast = jest.mocked(showToast);
+const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-const mockShowNotification = jest.mocked(showNotification);
+const mockshowSnackbar = jest.mocked(showSnackbar);
 
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
@@ -180,8 +180,8 @@ describe('VitalsBiometricsForm', () => {
       undefined,
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith(
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         critical: true,
         description: 'They are now visible on the Vitals and Biometrics page',
@@ -227,8 +227,8 @@ describe('VitalsBiometricsForm', () => {
 
     await waitFor(() => user.click(saveButton));
 
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
+    expect(mockshowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockshowSnackbar).toHaveBeenCalledWith({
       critical: true,
       description: 'Some of the values entered are invalid',
       kind: 'error',

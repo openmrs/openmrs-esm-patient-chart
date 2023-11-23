@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showNotification, showToast, showSnackbar } from '@openmrs/esm-framework';
 import { deleteCondition, useConditions } from './conditions.resource';
 
 interface DeleteConditionModalProps {
@@ -24,10 +24,10 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
       if (res.status === 200) {
         mutate();
         closeDeleteModal();
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionDeletedSuccessfully', 'Condition deleted successfully'),
+          subtitle: t('conditionDeletedSuccessfully', 'Condition deleted successfully'),
           title: t('conditionDeleted', 'Condition Deleted'),
         });
       }

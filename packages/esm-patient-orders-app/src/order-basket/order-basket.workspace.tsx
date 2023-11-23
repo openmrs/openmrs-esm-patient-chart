@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   postOrders,
   useOrderBasket,
@@ -169,11 +169,11 @@ function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[
     .map((item) => item.display)
     .join(', ');
 
-  showToast({
-    critical: true,
+  showSnackbar({
+    isLowContrast: true,
     kind: 'success',
     title: t('orderCompleted', 'Placed orders'),
-    description:
+    subtitle:
       (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
       (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
       (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
@@ -181,11 +181,11 @@ function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[
 }
 
 function showOrderFailureToast(t: TFunction) {
-  showToast({
-    critical: true,
+  showSnackbar({
+    isLowContrast: false,
     kind: 'error',
     title: t('error', 'Error'),
-    description: t('errorSavingOrder', 'There were errors saving some orders.'),
+    subtitle: t('errorSavingOrder', 'There were errors saving some orders.'),
   });
 }
 
