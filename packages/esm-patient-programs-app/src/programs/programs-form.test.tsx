@@ -3,7 +3,7 @@ import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createErrorHandler, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,
@@ -25,8 +25,7 @@ const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockUpdateProgramEnrollment = updateProgramEnrollment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -35,7 +34,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     createErrorHandler: jest.fn(),
     showNotification: jest.fn(),
-    showToast: jest.fn(),
+    showSnackbar: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
   };
 });
@@ -87,8 +86,8 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       critical: true,
       description: 'It is now visible in the Programs table',
       kind: 'success',
@@ -130,7 +129,7 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledWith(
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         critical: true,
         description: 'Changes to the program are now visible in the Programs table',
@@ -174,7 +173,7 @@ describe('ProgramsForm', () => {
     await waitFor(() => user.click(enrollButton));
 
     expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       critical: true,
       description: 'Internal Server Error',
       kind: 'error',
