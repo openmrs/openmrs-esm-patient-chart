@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../tools/test-helpers';
 import { saveVitalsAndBiometrics } from '../common';
@@ -22,9 +22,8 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const mockShowToast = jest.mocked(showToast);
-const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-const mockShowNotification = jest.mocked(showNotification);
+const mockedShowSnackbar = jest.mocked(showSnackbar);
+const mockedSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
 
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
@@ -70,6 +69,10 @@ jest.mock('../common', () => ({
 }));
 
 describe('VitalsBiometricsForm', () => {
+  beforeEach(() => {
+    mockedShowSnackbar.mockClear();
+  });
+
   it('renders the vitals and biometrics form', async () => {
     renderForm();
 
@@ -125,7 +128,7 @@ describe('VitalsBiometricsForm', () => {
       data: [],
     };
 
-    mockSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
+    mockedSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
 
     renderForm();
 
@@ -159,8 +162,8 @@ describe('VitalsBiometricsForm', () => {
 
     await waitFor(() => user.click(saveButton));
 
-    expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
-    expect(mockSavePatientVitals).toHaveBeenCalledWith(
+    expect(mockedSavePatientVitals).toHaveBeenCalledTimes(1);
+    expect(mockedSavePatientVitals).toHaveBeenCalledWith(
       mockVitalsConfig.vitals.encounterTypeUuid,
       mockVitalsConfig.vitals.formUuid,
       mockVitalsConfig.concepts,
@@ -180,12 +183,12 @@ describe('VitalsBiometricsForm', () => {
       undefined,
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith(
+    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
-        critical: true,
-        description: 'They are now visible on the Vitals and Biometrics page',
+        isLowContrast: true,
         kind: 'success',
+        subtitle: 'They are now visible on the Vitals and Biometrics page',
         title: 'Vitals and Biometrics saved',
       }),
     );
@@ -202,7 +205,7 @@ describe('VitalsBiometricsForm', () => {
       },
     };
 
-    mockSavePatientVitals.mockRejectedValueOnce(error);
+    mockedSavePatientVitals.mockRejectedValueOnce(error);
 
     renderForm();
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
@@ -227,11 +230,11 @@ describe('VitalsBiometricsForm', () => {
 
     await waitFor(() => user.click(saveButton));
 
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Some of the values entered are invalid',
+    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
       kind: 'error',
+      subtitle: 'Some of the values entered are invalid',
       title: 'Error saving vitals and biometrics',
     });
   });

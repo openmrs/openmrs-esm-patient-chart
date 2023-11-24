@@ -17,8 +17,7 @@ import {
 import {
   age,
   createErrorHandler,
-  showToast,
-  showNotification,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useSession,
@@ -179,25 +178,22 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           if (response.status === 201) {
             invalidateCachedVitalsAndBiometrics();
             closeWorkspace();
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               kind: 'success',
               title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-              description: t(
-                'vitalsAndBiometricsNowAvailable',
-                'They are now visible on the Vitals and Biometrics page',
-              ),
+              subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
             });
           }
         })
         .catch((err) => {
           setIsSubmitting(false);
           createErrorHandler();
-          showNotification({
+          showSnackbar({
             title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
             kind: 'error',
-            critical: true,
-            description: t('checkForValidity', 'Some of the values entered are invalid'),
+            isLowContrast: false,
+            subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
           });
         })
         .finally(() => {

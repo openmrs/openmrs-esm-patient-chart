@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
@@ -100,10 +100,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 201) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionSaved', 'Condition saved'),
         });
 
@@ -142,10 +142,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 200) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionUpdated', 'Condition updated'),
         });
 
