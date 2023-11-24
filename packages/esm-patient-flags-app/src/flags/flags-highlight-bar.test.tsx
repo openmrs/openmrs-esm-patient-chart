@@ -7,6 +7,8 @@ import { mockPatientFlags } from '../__mocks__/patient-flags.mock';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsHighlightBar from './flags-highlight-bar.component';
 
+jest.setTimeout(5000);
+
 const mockedUsePatientFlags = usePatientFlags as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {

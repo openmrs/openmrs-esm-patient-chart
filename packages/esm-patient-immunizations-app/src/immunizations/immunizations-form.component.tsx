@@ -82,6 +82,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           showSnackbar({
             kind: 'success',
             title: t('vaccinationSaved', 'Vaccination saved successfully'),
+            isLowContrast: true,
           });
         },
         (err) => {
@@ -208,6 +209,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           {t('cancel', 'Cancel')}
         </Button>
         <Button
+          type="submit"
           className={styles.button}
           kind="primary"
           disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}

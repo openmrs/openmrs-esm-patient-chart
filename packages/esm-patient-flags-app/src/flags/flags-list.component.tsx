@@ -137,6 +137,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
                       t('retiredFirst', 'Retired first'),
                     ]}
                     onChange={handleSortByChange}
+                    titleText="Sort by"
                   />
                 </>
               ) : null}
@@ -207,11 +208,11 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
           type="submit"
           onClick={() => closeWorkspace()}
         >
-          {isEnabling
-            ? t('enablingFlag', 'Enabling flag...')
-            : isDisabling
-            ? t('disablingFlag', 'Disabling flag...')
-            : t('saveAndClose', 'Save & close')}
+          {(() => {
+            if (isEnabling) return t('enablingFlag', 'Enabling flag...');
+            if (isDisabling) return t('disablingFlag', 'Disabling flag...');
+            return t('saveAndClose', 'Save & close');
+          })()}
         </Button>
       </ButtonSet>
     </Form>

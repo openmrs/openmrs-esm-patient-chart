@@ -236,10 +236,10 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           createErrorHandler();
 
           showSnackbar({
-            isLowContrast: false,
-            kind: 'error',
-            subtitle: err?.message,
             title: t('visitNoteSaveError', 'Error saving visit note'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: err?.message,
           });
         })
         .finally(() => {

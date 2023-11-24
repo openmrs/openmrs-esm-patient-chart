@@ -33,7 +33,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    showNotification: jest.fn(),
     showSnackbar: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
   };
@@ -88,8 +87,8 @@ describe('ProgramsForm', () => {
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      critical: true,
-      description: 'It is now visible in the Programs table',
+      isLowContrast: true,
+      subtitle: 'It is now visible in the Programs table',
       kind: 'success',
       title: 'Program enrollment saved',
     });
@@ -131,8 +130,8 @@ describe('ProgramsForm', () => {
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
-        critical: true,
-        description: 'Changes to the program are now visible in the Programs table',
+        isLowContrast: true,
+        subtitle: 'Changes to the program are now visible in the Programs table',
         kind: 'success',
         title: 'Program enrollment updated',
       }),
@@ -174,8 +173,8 @@ describe('ProgramsForm', () => {
 
     expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal Server Error',
+      isLowContrast: false,
+      subtitle: 'Internal Server Error',
       kind: 'error',
       title: 'Error saving program enrollment',
     });

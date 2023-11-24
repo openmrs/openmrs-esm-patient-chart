@@ -252,7 +252,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-role="medications" {...getTableProps()}>
+              <Table aria-label="medications" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -488,7 +488,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
+    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}
