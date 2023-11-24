@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showToast, showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type CodedCondition,
   type ConditionDataTableRow,

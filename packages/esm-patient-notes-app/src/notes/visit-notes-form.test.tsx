@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
-import { showNotification, useConfig, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import { fetchConceptDiagnosisByName, saveVisitNote } from './visit-notes.resource';
 import { ConfigMock } from '../__mocks__/chart-widgets-config.mock';
 import {
@@ -24,7 +24,7 @@ const testProps = {
 
 const mockFetchConceptDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
+const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 
@@ -192,10 +192,10 @@ test('renders an error notification if there was a problem recording a condition
 
   await userEvent.click(submitButton);
 
-  expect(mockShowNotification).toHaveBeenCalledWith({
-    critical: true,
-    description: 'Internal Server Error',
+  expect(mockedShowSnackbar).toHaveBeenCalledWith({
+    isLowContrast: false,
     kind: 'error',
+    subtitle: 'Internal Server Error',
     title: 'Error saving visit note',
   });
 });

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showNotification, showToast, showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { deleteCondition, useConditions } from './conditions.resource';
 
 interface DeleteConditionModalProps {
@@ -27,18 +27,17 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         showSnackbar({
           isLowContrast: true,
           kind: 'success',
-          subtitle: t('conditionDeletedSuccessfully', 'Condition deleted successfully'),
-          title: t('conditionDeleted', 'Condition Deleted'),
+          title: t('conditionDeleted', 'Condition deleted'),
         });
       }
     } catch (error) {
       console.error('Error deleting condition: ', error);
 
-      showNotification({
-        title: t('errorDeletingCondition', 'Error deleting condition'),
+      showSnackbar({
+        isLowContrast: false,
         kind: 'error',
-        critical: true,
-        description: error?.message,
+        title: t('errorDeletingCondition', 'Error deleting condition'),
+        subtitle: error?.message,
       });
     }
   }, [closeDeleteModal, conditionId, mutate, t]);
