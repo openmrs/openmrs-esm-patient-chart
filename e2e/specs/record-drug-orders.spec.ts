@@ -54,6 +54,17 @@ test('Order a drug', async ({ page, api }) => {
   await test.step('Then I should see a success notification', async () => {
     await expect(medicationsPage.page.getByText(/placed order for aspirin/i)).toBeVisible();
   });
+
+  await test.step('And I should see the newly added order in the list', async () => {
+    const headerRow = medicationsPage.medicationsTable().locator('thead > tr');
+    const dataRow = medicationsPage.medicationsTable().locator('tbody > tr');
+
+    await expect(headerRow).toContainText(/start date/i);
+    await expect(headerRow).toContainText(/details/i);
+    await expect(dataRow).toContainText(/aspirin 81mg/i);
+    await expect(dataRow).toContainText(/3 days/i);
+    await expect(dataRow).toContainText(/indication headache/i);
+  });
 });
 
 test.afterEach(async ({ api }) => {
