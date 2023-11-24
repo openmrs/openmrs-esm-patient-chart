@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
-import { Visit } from '@openmrs/esm-framework';
+import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
-import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
+import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { BiometricsAndVitalsPage } from '../pages';
 
 let patient: Patient;

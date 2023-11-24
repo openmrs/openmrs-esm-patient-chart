@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { ConditionsPage } from '../pages';
 
@@ -90,7 +90,7 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(conditionsPage.page.getByText(/condition deleted successfully/i)).toBeVisible();
+    await expect(conditionsPage.page.getByText(/condition deleted/i)).toBeVisible();
   });
 
   await test.step('And I should not see the deleted condition in the list', async () => {

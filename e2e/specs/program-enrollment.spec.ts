@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { ProgramsPage } from '../pages';
 
