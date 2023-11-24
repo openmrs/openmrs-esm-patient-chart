@@ -275,7 +275,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                             <Layer className={styles.layer}>
                               <OverflowMenu
                                 data-floating-menu-container
-                                ariaLabel="Encounter table actions menu"
+                                aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
                               >

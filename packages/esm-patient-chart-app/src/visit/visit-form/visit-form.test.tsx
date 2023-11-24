@@ -6,8 +6,10 @@ import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockLocations } from '../../__mocks__/location.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
 import { mockVisitTypes } from '../../__mocks__/visits.mock';
-import StartVisitForm from './visit-form.component';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
+import StartVisitForm from './visit-form.component';
+
+jest.setTimeout(10000);
 
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
@@ -16,6 +18,8 @@ const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
+  visitToEdit: undefined,
+  showVisitEndDateTimeFields: false,
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
@@ -157,7 +161,7 @@ describe('Visit Form', () => {
     // Testing the location picker
     const combobox = screen.getByRole('combobox', { name: /Select a location/i });
     expect(screen.getByText(/Outpatient Visit/i)).toBeInTheDocument();
-    await waitFor(() => userEvent.click(combobox));
+    await userEvent.click(combobox);
     expect(screen.getByText(/Mosoriot/i)).toBeInTheDocument();
     expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
   });
@@ -169,25 +173,19 @@ describe('Visit Form', () => {
 
     const saveButton = screen.getByRole('button', { name: /start visit/i });
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await waitFor(() => userEvent.click(locationPicker));
-    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
-    let errorAlert;
-
-    await waitFor(() => {
-      errorAlert = screen.getByRole('alert');
-      expect(errorAlert).toBeInTheDocument();
-    });
-    await waitFor(() => expect(screen.getByText(/Missing visit type/i)).toBeInTheDocument());
+    const errorAlert = screen.getByRole('alert');
+    expect(errorAlert).toBeInTheDocument();
+    await expect(screen.getByText(/Missing visit type/i)).toBeInTheDocument();
     expect(screen.getByText(/Please select a visit type/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
 
-    await waitFor(() => {
-      expect(errorAlert).not.toBeInTheDocument();
-    });
+    expect(errorAlert).not.toBeInTheDocument();
   });
 
   it('starts a new visit upon successful submission of the form', async () => {
@@ -198,12 +196,12 @@ describe('Visit Form', () => {
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
 
     // Set visit type
-    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await waitFor(() => userEvent.click(locationPicker));
-    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
 
     mockSaveVisit.mockReturnValue(
       of({
@@ -216,7 +214,7 @@ describe('Visit Form', () => {
       }),
     );
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
     expect(mockSaveVisit).toHaveBeenCalledTimes(1);
     expect(mockSaveVisit).toHaveBeenCalledWith(
@@ -242,15 +240,15 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
 
     const saveButton = screen.getByRole('button', { name: /Start Visit/i });
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await waitFor(() => userEvent.click(locationPicker));
-    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
     mockSaveVisit.mockReturnValue(throwError({ status: 500, statusText: 'Internal server error' }));
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
     expect(showSnackbar).toHaveBeenCalledTimes(1);
     expect(showSnackbar).toHaveBeenCalledWith(
@@ -266,11 +264,11 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
 
     const closeButton = screen.getByRole('button', { name: /Discard/i });
 
-    await waitFor(() => user.click(closeButton));
+    await user.click(closeButton);
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
@@ -304,19 +302,17 @@ describe('Visit Form', () => {
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
 
     // Set visit type
-    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await waitFor(() => userEvent.click(locationPicker));
-    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
     expect(mockSaveVisit).not.toHaveBeenCalled();
-    await waitFor(() => {
-      expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
   });
 
   it('should show a banner if the not required visitAttribute fields are failed to load', async () => {

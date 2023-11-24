@@ -36,7 +36,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    showNotification: jest.fn(),
     showSnackbar: jest.fn(),
     useConfig: jest.fn().mockImplementation(() => ConfigMock),
     useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
@@ -117,7 +116,7 @@ test('closes the form and the workspace when the cancel button is clicked', asyn
   expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
 });
 
-test('renders a success toast notification upon successfully recording a visit note', async () => {
+test('renders a success snackbar upon successfully recording a visit note', async () => {
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
@@ -162,7 +161,7 @@ test('renders a success toast notification upon successfully recording a visit n
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
 });
 
-test('renders an error notification if there was a problem recording a condition', async () => {
+test('renders an error snackbar if there was a problem recording a condition', async () => {
   const error = {
     message: 'Internal Server Error',
     response: {

@@ -119,7 +119,7 @@ describe('VitalsBiometricsForm', () => {
     expect(bmiInput).toHaveValue(19.1);
   });
 
-  it('renders a success toast notification upon clicking the save button', async () => {
+  it('renders a success snackbar upon clicking the save button', async () => {
     const user = userEvent.setup();
 
     const response: Partial<FetchResponse> = {
@@ -194,7 +194,7 @@ describe('VitalsBiometricsForm', () => {
     );
   });
 
-  it('renders an error notification if there was a problem saving vitals and biometrics', async () => {
+  it('renders an error snackbar if there was a problem saving vitals and biometrics', async () => {
     const user = userEvent.setup();
 
     const error = {
