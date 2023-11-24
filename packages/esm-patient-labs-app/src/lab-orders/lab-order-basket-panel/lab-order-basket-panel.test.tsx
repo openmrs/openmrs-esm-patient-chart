@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor, within } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
@@ -54,8 +54,7 @@ describe('LabOrderBasketPanel: ', () => {
     expect(screen.getByText(/Lab orders \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV VIRAL LOAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
-    const hiv = screen.getByText(/HIV VIRAL LOAD/i).closest('div');
-    const removeHivButton = within(hiv).getByRole('button', { name: /remove from basket/i });
+    const removeHivButton = screen.getAllByRole('button', { name: /remove from basket/i })[0];
     expect(removeHivButton).toBeVisible();
     await user.click(removeHivButton);
     rerender(<LabOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
