@@ -4,6 +4,8 @@ import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-frame
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 import { configSchema } from './config-schema';
 import './styles.css';
+// @ts-ignore
+require('./styles.css?ngGlobalStyle');
 
 const moduleName = '@openmrs/esm-form-entry-app';
 
