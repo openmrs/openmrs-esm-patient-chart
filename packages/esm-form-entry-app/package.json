@@ -59,7 +59,7 @@
     "single-spa-angular": "^8.1.1",
     "slick-carousel": "^1.8.1",
     "systemjs-webpack-interop": "^2.3.7",
-    "tree-model": "^1.0.5",
+    "tree-model": "^1.0.7",
     "tslib": "^2.4.1",
     "uuid": "^8.3.2",
     "zone.js": "~0.11.8"
