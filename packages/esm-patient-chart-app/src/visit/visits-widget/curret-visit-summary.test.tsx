@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import CurrentVisitSummary from './current-visit-summary.component';
 import { useVisit, getConfig } from '@openmrs/esm-framework';
 
@@ -65,13 +65,12 @@ describe('CurrentVisitSummary', () => {
     });
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
-    await waitFor(() => {
-      expect(screen.getByText('Current Visit')).toBeInTheDocument();
-      expect(screen.getByText('Diagnoses')).toBeInTheDocument();
-      const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
-      buttonNames.forEach((buttonName) => {
-        expect(screen.getByText(buttonName)).toBeInTheDocument();
-      });
+
+    expect(screen.getByText('Current Visit')).toBeInTheDocument();
+    expect(screen.getByText('Diagnoses')).toBeInTheDocument();
+    const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
+    buttonNames.forEach((buttonName) => {
+      expect(screen.getByText(buttonName)).toBeInTheDocument();
     });
   });
 });

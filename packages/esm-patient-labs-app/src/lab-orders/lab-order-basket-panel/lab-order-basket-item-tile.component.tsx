@@ -35,7 +35,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
       onClick={() => shouldOnClickBeCalled.current && onItemClick()}
     >
       <div className={styles.orderBasketItemTile}>
-        <p className={styles.clipTextWithEllipsis}>
+        <div className={styles.clipTextWithEllipsis}>
           <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>
           <br />
           <>
@@ -53,7 +53,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
               </>
             )}
           </span>
-        </p>
+        </div>
         <Button
           className={styles.removeButton}
           kind="ghost"

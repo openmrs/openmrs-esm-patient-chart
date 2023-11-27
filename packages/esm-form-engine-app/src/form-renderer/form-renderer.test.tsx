@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import FormRenderer from './form-renderer.component';
 import useFormSchema from '../hooks/useFormSchema';
 
@@ -43,7 +43,7 @@ describe('FormRenderer', () => {
     mockUseFormSchema.mockReturnValue({ schema: { id: 'test-schema' }, isLoading: false, error: null });
 
     render(<FormRenderer {...defaultProps} />);
-    await waitFor(() => expect(screen.getByText(/form engine lib/i)).toBeInTheDocument());
+    await expect(screen.getByText(/form engine lib/i)).toBeInTheDocument();
     expect(mockUseFormSchema).toHaveBeenCalledWith('test-form-uuid');
   });
 });

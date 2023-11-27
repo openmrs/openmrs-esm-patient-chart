@@ -1,6 +1,6 @@
 import React from 'react';
 import { of, throwError } from 'rxjs';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockLocations } from '../../__mocks__/location.mock';

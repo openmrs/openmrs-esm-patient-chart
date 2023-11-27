@@ -1,7 +1,7 @@
 import React from 'react';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import {
@@ -66,13 +66,13 @@ describe('ProgramsForm', () => {
     const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
     const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
 
-    await waitFor(() => user.type(enrollmentDateInput, '2020-05-05'));
-    await waitFor(() => user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]));
-    await waitFor(() => user.selectOptions(selectLocationInput, [inpatientWardUuid]));
+    await user.type(enrollmentDateInput, '2020-05-05');
+    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockCreateProgramEnrollment).toHaveBeenCalledTimes(1);
     expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
@@ -105,15 +105,15 @@ describe('ProgramsForm', () => {
 
     mockUpdateProgramEnrollment.mockReturnValueOnce(of({ status: 200, statusText: 'OK' }));
 
-    await waitFor(() => user.type(dateCompletedInput, '05/05/2020'));
+    await user.type(dateCompletedInput, '05/05/2020');
 
     expect(dateCompletedInput).toHaveValue('05/05/2020');
 
-    await waitFor(() => user.tab());
+    await user.tab();
 
     expect(enrollButton).not.toBeDisabled();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledTimes(1);
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledWith(
@@ -163,13 +163,13 @@ describe('ProgramsForm', () => {
     const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
     const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
 
-    await waitFor(() => user.type(enrollmentDateInput, '2020-05-05'));
-    await waitFor(() => user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]));
-    await waitFor(() => user.selectOptions(selectLocationInput, [inpatientWardUuid]));
+    await user.type(enrollmentDateInput, '2020-05-05');
+    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
     expect(enrollButton).not.toBeDisabled();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({

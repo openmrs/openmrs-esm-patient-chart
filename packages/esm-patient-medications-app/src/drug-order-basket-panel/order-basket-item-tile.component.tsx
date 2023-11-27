@@ -27,7 +27,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
 
   const tileContent = (
     <div className={styles.orderBasketItemTile}>
-      <p className={styles.clipTextWithEllipsis}>
+      <div className={styles.clipTextWithEllipsis}>
         <OrderActionLabel orderBasketItem={orderBasketItem} />
         {orderBasketItem.isFreeTextDosage ? (
           <div>
@@ -77,7 +77,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             </>
           )}
         </span>
-      </p>
+      </div>
       <Button
         className={styles.removeButton}
         kind="ghost"

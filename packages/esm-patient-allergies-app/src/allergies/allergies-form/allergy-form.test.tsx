@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mockAllergensAndAllergicReactions, mockAllergyResult } from '../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
@@ -66,7 +66,7 @@ describe('AllergyForm ', () => {
 
     tabNames.map((tabName) => expect(screen.getByRole('tab', { name: tabName })).toBeInTheDocument());
 
-    await waitFor(() => user.click(screen.getByRole('tab', { name: /drug/i })));
+    await user.click(screen.getByRole('tab', { name: /drug/i }));
 
     expect(screen.getByRole('tab', { name: /drug/i })).toBeChecked;
     expect(screen.getByRole('radio', { name: /ace inhibitors/i })).toBeInTheDocument();
@@ -87,10 +87,10 @@ describe('AllergyForm ', () => {
 
     renderAllergyForm();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /ace inhibitors/i })));
-    await waitFor(() => user.click(screen.getByRole('checkbox', { name: /cough/i })));
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /moderate/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /save and close/i })));
+    await user.click(screen.getByRole('radio', { name: /ace inhibitors/i }));
+    await user.click(screen.getByRole('checkbox', { name: /cough/i }));
+    await user.click(screen.getByRole('radio', { name: /moderate/i }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -114,8 +114,8 @@ describe('AllergyForm ', () => {
 
     renderAllergyForm();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /ace inhibitors/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /save and close/i })));
+    await user.click(screen.getByRole('radio', { name: /ace inhibitors/i }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({

@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor, within } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData, patientUuid } from '../__mocks__/medication.mock';
@@ -46,11 +46,10 @@ describe('OrderBasketPanel: ', () => {
     expect(getByTextWithMarkup(/Renew\s*Sulfacetamide 0.1 — 10%/i)).toBeVisible();
     expect(getByTextWithMarkup(/Modify\s*Aspirin 162.5mg — 162.5mg — tablet/i)).toBeVisible();
     expect(getByTextWithMarkup(/Discontinue\s*Acetaminophen 325 mg — 325mg — tablet/i)).toBeVisible();
-    const aspirin81 = getByTextWithMarkup(/New\s*Aspirin 81mg — 81mg — Tablet/i).closest('div');
-    const removeAspirin81Button = within(aspirin81).getByRole('button', { name: /remove from basket/i });
+    const removeAspirin81Button = screen.getAllByRole('button', { name: /remove from basket/i })[0];
     expect(removeAspirin81Button).toBeVisible();
-    await waitFor(() => user.click(removeAspirin81Button));
+    await user.click(removeAspirin81Button);
     rerender(<DrugOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
-    await waitFor(() => expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument());
+    await expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument();
   });
 });

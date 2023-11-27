@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import {
@@ -94,7 +94,7 @@ describe('VitalsOverview', () => {
     ).toBeInTheDocument();
   });
 
-  /* 
+  /*
   //
     The following two tests are failing in the CI environment with the following error:
       `TypeError: Cannot read properties of undefined (reading 'baseVal')`
@@ -150,7 +150,7 @@ describe('VitalsOverview', () => {
       name: /chart view/i,
     });
 
-    await waitFor(() => user.click(chartViewButton));
+    await user.click(chartViewButton);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/vital sign displayed/i)).toBeInTheD;

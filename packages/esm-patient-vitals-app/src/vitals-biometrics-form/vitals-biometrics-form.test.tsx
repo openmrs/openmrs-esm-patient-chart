@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
@@ -113,8 +113,8 @@ describe('VitalsBiometricsForm', () => {
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
     const bmiInput = screen.getByRole('spinbutton', { name: /bmi/i });
 
-    await waitFor(() => user.type(heightInput, '180'));
-    await waitFor(() => user.type(weightInput, '62'));
+    await user.type(heightInput, '180');
+    await user.type(weightInput, '62');
 
     expect(bmiInput).toHaveValue(19.1);
   });
@@ -143,14 +143,14 @@ describe('VitalsBiometricsForm', () => {
     const muac = screen.getByRole('spinbutton', { name: /muac/i });
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
-    await waitFor(() => user.type(heightInput, heightValue.toString()));
-    await waitFor(() => user.type(weightInput, weightValue.toString()));
-    await waitFor(() => user.type(systolic, systolicBloodPressureValue.toString()));
-    await waitFor(() => user.type(pulse, pulseValue.toString()));
-    await waitFor(() => user.type(oxygenSaturation, oxygenSaturationValue.toString()));
-    await waitFor(() => user.type(respirationRate, respiratoryRateValue.toString()));
-    await waitFor(() => user.type(temperature, temperatureValue.toString()));
-    await waitFor(() => user.type(muac, muacValue.toString()));
+    await user.type(heightInput, heightValue.toString());
+    await user.type(weightInput, weightValue.toString());
+    await user.type(systolic, systolicBloodPressureValue.toString());
+    await user.type(pulse, pulseValue.toString());
+    await user.type(oxygenSaturation, oxygenSaturationValue.toString());
+    await user.type(respirationRate, respiratoryRateValue.toString());
+    await user.type(temperature, temperatureValue.toString());
+    await user.type(muac, muacValue.toString());
 
     expect(bmiInput).toHaveValue(19.1);
     expect(systolic).toHaveValue(120);
@@ -160,7 +160,7 @@ describe('VitalsBiometricsForm', () => {
     expect(temperature).toHaveValue(37);
     expect(muac).toHaveValue(23);
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
     expect(mockedSavePatientVitals).toHaveBeenCalledTimes(1);
     expect(mockedSavePatientVitals).toHaveBeenCalledWith(
@@ -217,18 +217,18 @@ describe('VitalsBiometricsForm', () => {
     const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
     const muac = screen.getByRole('spinbutton', { name: /muac/i });
 
-    await waitFor(() => user.type(heightInput, heightValue.toString()));
-    await waitFor(() => user.type(weightInput, weightValue.toString()));
-    await waitFor(() => user.type(systolic, systolicBloodPressureValue.toString()));
-    await waitFor(() => user.type(pulse, pulseValue.toString()));
-    await waitFor(() => user.type(oxygenSaturation, oxygenSaturationValue.toString()));
-    await waitFor(() => user.type(respirationRate, respiratoryRateValue.toString()));
-    await waitFor(() => user.type(temperature, temperatureValue.toString()));
-    await waitFor(() => user.type(muac, muacValue.toString()));
+    await user.type(heightInput, heightValue.toString());
+    await user.type(weightInput, weightValue.toString());
+    await user.type(systolic, systolicBloodPressureValue.toString());
+    await user.type(pulse, pulseValue.toString());
+    await user.type(oxygenSaturation, oxygenSaturationValue.toString());
+    await user.type(respirationRate, respiratoryRateValue.toString());
+    await user.type(temperature, temperatureValue.toString());
+    await user.type(muac, muacValue.toString());
 
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
     expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
