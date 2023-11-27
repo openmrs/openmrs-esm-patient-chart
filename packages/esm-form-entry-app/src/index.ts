@@ -4,7 +4,7 @@ import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-frame
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 import { configSchema } from './config-schema';
 
-// FIXME This workaround originated from and should be replaced with a better solution https://github.com/single-spa/single-spa-angular/issues/463#issuecomment-1468350850
+// FIXME: Workaround https://github.com/single-spa/single-spa-angular/issues/463#issuecomment-1468350850
 // @ts-ignore
 require('./styles.css?ngGlobalStyle');
 
