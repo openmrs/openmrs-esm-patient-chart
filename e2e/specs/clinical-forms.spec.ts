@@ -54,14 +54,12 @@ test('Fill a clinical form', async ({ page, api }) => {
 
     await chartPage.page
       .locator('#SOAPAssessmentid')
-      .fill(
-        'Advise use of over-the-counter ibuprofen as needed for headache pain.Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.',
-      );
+      .fill('Diagnosis: Tension-type headache. Differential Diagnoses: Migraine, sinusitis, refractive error.');
 
     await chartPage.page
       .locator('#SOAPPlanid')
       .fill(
-        'Advise use of over-the-counter ibuprofen as needed for headache pain.Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.',
+        'Advise use of over-the-counter ibuprofen as needed for headache pain. Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.',
       );
   });
 
