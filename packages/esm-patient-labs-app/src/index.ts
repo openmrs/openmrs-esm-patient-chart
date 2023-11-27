@@ -4,6 +4,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
@@ -51,6 +52,7 @@ export const labOrderPanel = getAsyncLifecycle(
 registerWorkspace({
   name: 'add-lab-order',
   type: 'order',
-  title: 'Add lab order',
+  // t('addLabOrder', 'Add lab order')
+  title: translateFrom(moduleName, 'addLabOrder', 'Add lab order'),
   load: getAsyncLifecycle(() => import('./lab-orders/add-lab-order/add-lab-order.workspace'), options),
 });

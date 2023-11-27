@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
 import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
@@ -18,7 +18,8 @@ export function startupApp() {
 
 registerWorkspace({
   name: 'order-basket',
-  title: 'Order Basket',
+  // t('orderBasketWorkspaceTitle', 'Order Basket')
+  title: translateFrom(moduleName, 'orderBasketWorkspaceTitle', 'Order Basket'),
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
   canHide: true,
