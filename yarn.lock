@@ -4974,7 +4974,7 @@ __metadata:
     slick-carousel: ^1.8.1
     style-loader: 2.x
     systemjs-webpack-interop: ^2.3.7
-    tree-model: ^1.0.5
+    tree-model: ^1.0.7
     tslib: ^2.4.1
     uuid: ^8.3.2
     webpack: ~5.89.0
@@ -24951,7 +24951,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tree-model@npm:^1.0.5":
+"tree-model@npm:^1.0.7":
   version: 1.0.7
   resolution: "tree-model@npm:1.0.7"
   dependencies:
