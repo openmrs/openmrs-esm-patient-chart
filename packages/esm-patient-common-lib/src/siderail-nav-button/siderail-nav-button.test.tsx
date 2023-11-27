@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor, cleanup } from '@testing-library/react';
+import { screen, render, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { SiderailNavButton } from './siderail-nav-button.component';
@@ -62,7 +62,7 @@ describe('SiderailNavButton', () => {
 
     const button = screen.getByRole('button', { name: /Visit note/i });
     expect(button).toBeInTheDocument();
-    await waitFor(() => user.click(button));
+    await user.click(button);
     expect(handler).toBeCalled();
 
     expect(button).not.toHaveClass('active');
@@ -177,7 +177,7 @@ describe('SiderailNavButton', () => {
 
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
-    await waitFor(() => user.click(button));
+    await user.click(button);
     expect(handler).toBeCalled();
 
     expect(button).not.toHaveClass('active');

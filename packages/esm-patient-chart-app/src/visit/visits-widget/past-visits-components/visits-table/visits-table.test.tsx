@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { getConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from '../../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../__mocks__/visits.mock';
@@ -45,10 +45,8 @@ describe('EncounterList', () => {
 
     renderVisitsTable();
 
-    await waitFor(() => {
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
-      expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
-    });
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {

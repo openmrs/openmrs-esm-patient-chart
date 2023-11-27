@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor, within } from '@testing-library/react';
+import { screen, render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData, patientUuid } from '../__mocks__/medication.mock';
@@ -49,8 +49,8 @@ describe('OrderBasketPanel: ', () => {
     const aspirin81 = getByTextWithMarkup(/New\s*Aspirin 81mg — 81mg — Tablet/i).closest('div');
     const removeAspirin81Button = within(aspirin81).getByRole('button', { name: /remove from basket/i });
     expect(removeAspirin81Button).toBeVisible();
-    await waitFor(() => user.click(removeAspirin81Button));
+    await user.click(removeAspirin81Button);
     rerender(<DrugOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
-    await waitFor(() => expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument());
+    await expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument();
   });
 });

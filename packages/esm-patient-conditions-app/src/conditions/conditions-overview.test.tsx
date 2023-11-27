@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -108,7 +108,7 @@ describe('ConditionsOverview: ', () => {
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 
-    await waitFor(() => user.click(nextPageButton));
+    await user.click(nextPageButton);
 
     expect(screen.getAllByRole('row').length).toEqual(6);
   });
@@ -124,7 +124,7 @@ describe('ConditionsOverview: ', () => {
 
     const recordConditionsLink = screen.getByText(/record conditions/i);
 
-    await waitFor(() => user.click(recordConditionsLink));
+    await user.click(recordConditionsLink);
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {

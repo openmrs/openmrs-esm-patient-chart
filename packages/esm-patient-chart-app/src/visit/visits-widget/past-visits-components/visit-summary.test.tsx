@@ -1,6 +1,6 @@
 import React from 'react';
 import { getConfig } from '@openmrs/esm-framework';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../../tools/test-helpers';
@@ -41,21 +41,21 @@ describe('VisitSummary', () => {
     //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
 
-    await waitFor(() => user.click(notesTab));
+    await user.click(notesTab);
 
     expect(screen.getByText(/^No notes found$/)).toBeInTheDocument();
 
     // should display medication panel
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
 
-    await waitFor(() => user.click(medicationTab));
+    await user.click(medicationTab);
 
     expect(screen.getByText(/^No medications found$/)).toBeInTheDocument();
 
     // should display tests panel with test panel extension
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
 
-    await waitFor(() => user.click(testsTab));
+    await user.click(testsTab);
 
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
@@ -76,7 +76,7 @@ describe('VisitSummary', () => {
 
     //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
-    await waitFor(() => user.click(notesTab));
+    await user.click(notesTab);
 
     expect(screen.getAllByText(/Dr James Cook/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/Admin/i)[0]).toBeInTheDocument();
@@ -84,11 +84,11 @@ describe('VisitSummary', () => {
 
     // should display medication panel
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
-    await waitFor(() => user.click(medicationTab));
+    await user.click(medicationTab);
 
     // should display tests panel with test panel extension
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
-    await waitFor(() => user.click(testsTab));
+    await user.click(testsTab);
 
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });

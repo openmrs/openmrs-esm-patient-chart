@@ -135,7 +135,7 @@ describe('Switchable obs viewer ', () => {
       name: /chart view/i,
     });
 
-    // await waitFor(() => user.click(chartViewButton));
+    // await user.click(chartViewButton);
 
     // expect(screen.queryByRole('table')).not.toBeInTheDocument();
     // expect(screen.getByRole('tab', { name: /viral load/i })).toHaveValue('');
