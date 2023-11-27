@@ -1,6 +1,7 @@
 {
   "add": "បន្ថែម",
   "cancel": "បោះបង់",
+  "edit": "Edit",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
   "goToSummary": "ចូលទៅកាន់តារាងសង្ខេប",
@@ -13,6 +14,7 @@
   "save": "Save",
   "seeAll": "ឃើញ​ទាំងអស់",
   "sequence": "Sequence",
+  "singleDose": "Single Dose",
   "singleDoseOn": "Single Dose on",
   "vaccinationDate": "Vaccination date",
   "vaccinationSaved": "Vaccination saved successfully",

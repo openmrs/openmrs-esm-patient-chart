@@ -106,6 +106,7 @@
   "noObservationsFound": "Aucune observation trouvée",
   "notes": "Notes",
   "Offline Actions dashboard": "Tableau de bord des actions hors ligne",
+  "offlineVisit": "Offline Visit",
   "openAnyway": "Ouvert dans tous les cas",
   "optional": "optionnel",
   "orderDurationAndUnit": "pour {{duration}} {{durationUnit}}",

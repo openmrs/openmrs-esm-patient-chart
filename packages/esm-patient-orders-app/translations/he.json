@@ -1,3 +1,18 @@
 {
-  "Medications": "תרופות"
+  "activeVisitRequired": "An active visit is required to make orders",
+  "cancel": "Cancel",
+  "discontinued": "Discontinued",
+  "error": "Error",
+  "errorCreatingAnEncounter": "Error when creating an encounter",
+  "errorSavingOrder": "There were errors saving some orders.",
+  "medications": "Medications",
+  "orderBasket": "Order basket",
+  "orderBasketWorkspaceTitle": "Order Basket",
+  "orderCompleted": "Placed orders",
+  "ordered": "Placed order for",
+  "signAndClose": "Sign and close",
+  "startAVisitToRecordOrders": "Start a visit to order",
+  "startVisit": "Start visit",
+  "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
+  "updated": "Updated"
 }
