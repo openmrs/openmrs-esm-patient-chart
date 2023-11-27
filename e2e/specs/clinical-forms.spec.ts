@@ -64,6 +64,7 @@ test('Fill a clinical form', async ({ page, api }) => {
   });
 
   await test.step('And I click the submit button', async () => {
+    await chartPage.page.getByRole('button', { name: /save and close/i }).scrollIntoViewIfNeeded();
     await chartPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
