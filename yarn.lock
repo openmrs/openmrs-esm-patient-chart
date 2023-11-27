@@ -5566,30 +5566,30 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 4.0.1-pre.330
-  resolution: "@openmrs/ngx-formentry@npm:4.0.1-pre.330"
+  version: 5.0.1-pre.345
+  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.345"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
-    "@angular/animations": ^14.3.0
-    "@angular/cdk": ^14.2.7
-    "@angular/common": ^14.3.0
-    "@angular/compiler": ^14.3.0
-    "@angular/compiler-cli": ^14.3.0
-    "@angular/core": ^14.3.0
-    "@angular/forms": ^14.3.0
+    "@angular/animations": ^15.2.10
+    "@angular/cdk": ^15.2.9
+    "@angular/common": ^15.2.10
+    "@angular/compiler": ^15.2.10
+    "@angular/compiler-cli": ^15.2.10
+    "@angular/core": ^15.2.10
+    "@angular/forms": ^15.2.10
     "@carbon/styles": ^1.11.0
-    "@ng-select/ng-select": ^9.1.0
+    "@ng-select/ng-select": ^10.0.4
     "@ngx-translate/core": ^14.0.0
     "@openmrs/ngx-file-uploader": "*"
-    lodash: "*"
+    lodash: ^4.17.21
     moment: ^2.29.4
     ngx-webcam: ^0.4.1
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
-    slick-carousel: ^1.6.0
-    tree-model: ^1.0.5
-  checksum: a881cd3d65b0f77cf1c845c4c9358f45fd6653e70fc70f0ad71798dd14c972907a3e58860d977924c6b69bbface198eacf8aadd828fd22d8ff6e677da5e3c0c3
+    slick-carousel: ^1.8.1
+    tree-model: ^1.0.7
+  checksum: eccf979176f8d98e0a215753e49f1d59277c0f8f7e03fd4b81a71e8605830c8acf96cdc5c00d998dd6556f2582868c00442ac121a50de1153e0e977cadfe9768
   languageName: node
   linkType: hard
 

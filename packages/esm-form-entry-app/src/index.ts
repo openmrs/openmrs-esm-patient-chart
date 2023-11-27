@@ -3,7 +3,8 @@ import 'zone.js';
 import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 import { configSchema } from './config-schema';
-import './styles.css';
+
+// FIXME This workaround originated from and should be replaced with a better solution https://github.com/single-spa/single-spa-angular/issues/463#issuecomment-1468350850
 // @ts-ignore
 require('./styles.css?ngGlobalStyle');
 
