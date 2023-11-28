@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
-import { ChartPage } from '../pages';
+import { ChartPage, VisitsPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
@@ -14,6 +14,7 @@ test.beforeEach(async ({ api }) => {
 
 test('Fill a clinical form', async ({ page, api }) => {
   const chartPage = new ChartPage(page);
+  const visitsPage = new VisitsPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
     await chartPage.goTo(patient.uuid);
@@ -64,12 +65,36 @@ test('Fill a clinical form', async ({ page, api }) => {
   });
 
   await test.step('And I click the submit button', async () => {
-    await chartPage.page.getByRole('button', { name: /save and close/i }).scrollIntoViewIfNeeded();
     await chartPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
     await expect(chartPage.page.getByText(/the form has been submitted successfully/i)).toBeVisible();
+  });
+
+  await test.step('And if I navigate to the visits dashboard', async () => {
+    await visitsPage.goTo(patient.uuid);
+  });
+
+  await test.step('Then I should the newly filled form in the encounters table', async () => {
+    await expect(visitsPage.page.getByRole('tab', { name: /visit summaries/i })).toBeVisible();
+    await expect(visitsPage.page.getByRole('tab', { name: /all encounters/i })).toBeVisible();
+
+    await visitsPage.page.getByRole('tab', { name: /^encounters$/i }).click();
+
+    const headerRow = visitsPage.page.getByRole('table').locator('thead > tr');
+
+    await expect(headerRow).toContainText(/date & time/i);
+    await expect(headerRow).toContainText(/encounter type/i);
+    await expect(headerRow).toContainText(/provider/i);
+
+    await visitsPage.page.getByRole('table').locator('th#expand').click();
+
+    await expect(visitsPage.page.getByText(/assessment/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(/i've had a headache for the last two days/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(/plan/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(/subjective findings/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(/objective findings/i)).toBeVisible();
   });
 });
 

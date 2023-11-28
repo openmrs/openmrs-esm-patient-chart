@@ -4,3 +4,4 @@ export * from './conditions-page';
 export * from './medications-page';
 export * from './program-page';
 export * from './vitals-and-biometrics-page';
+export * from './visits-page';
