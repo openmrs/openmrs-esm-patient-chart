@@ -1,5 +1,5 @@
 import React from 'react';
-import { PatientData } from '@openmrs/esm-patient-common-lib';
+import { type PatientData } from '@openmrs/esm-patient-common-lib';
 import loadPatientData from './loadPatientData';
 
 type LoadingState = {

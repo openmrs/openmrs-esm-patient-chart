@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import capitalize from 'lodash-es/capitalize';
 import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
-import { FHIRAllergy, FHIRAllergyResponse } from '../types';
+import { type FHIRAllergy, type FHIRAllergyResponse } from '../types';
 
 export type Allergy = {
   id: string;

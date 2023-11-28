@@ -4,7 +4,7 @@ import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
-import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
 import CommonDataTable from '../overview/common-datatable.component';

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { ConditionDataTableRow, useConditions } from './conditions.resource';
+import { type ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
 

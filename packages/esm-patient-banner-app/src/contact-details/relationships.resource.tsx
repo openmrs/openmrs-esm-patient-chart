@@ -1,6 +1,6 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 
 const customRepresentation =
   'custom:(display,uuid,personA:(uuid,age,display),personB:(uuid,age,display),relationshipType:(uuid,display,description,aIsToB,bIsToA))';

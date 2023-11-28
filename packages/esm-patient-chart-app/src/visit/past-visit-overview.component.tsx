@@ -10,12 +10,12 @@ import {
   TableRow,
   TableHeader,
   TableCell,
-  DataTableHeader,
+  type DataTableHeader,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { setCurrentVisit } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
 

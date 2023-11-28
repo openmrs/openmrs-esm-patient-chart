@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, OpenmrsResource, Privilege, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =

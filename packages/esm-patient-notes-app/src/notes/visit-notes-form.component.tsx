@@ -1,10 +1,10 @@
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, Control, FormState } from 'react-hook-form';
+import { useForm, Controller, type Control } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -26,13 +26,12 @@ import { Add, WarningFilled } from '@carbon/react/icons';
 import {
   createErrorHandler,
   ExtensionSlot,
-  showNotification,
-  showToast,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -226,9 +225,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           mutateVisitNotes();
           closeWorkspace();
 
-          showToast({
-            critical: true,
-            description: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
+          showSnackbar({
+            isLowContrast: true,
+            subtitle: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
             kind: 'success',
             title: t('visitNoteSaved', 'Visit note saved'),
           });
@@ -236,11 +235,11 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         .catch((err) => {
           createErrorHandler();
 
-          showNotification({
+          showSnackbar({
             title: t('visitNoteSaveError', 'Error saving visit note'),
             kind: 'error',
-            critical: true,
-            description: err?.message,
+            isLowContrast: false,
+            subtitle: err?.message,
           });
         })
         .finally(() => {

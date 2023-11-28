@@ -1,7 +1,7 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../tools/test-helpers';
 import { saveVitalsAndBiometrics } from '../common';
@@ -22,9 +22,8 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const mockShowToast = jest.mocked(showToast);
-const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-const mockShowNotification = jest.mocked(showNotification);
+const mockedShowSnackbar = jest.mocked(showSnackbar);
+const mockedSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
 
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
@@ -70,6 +69,10 @@ jest.mock('../common', () => ({
 }));
 
 describe('VitalsBiometricsForm', () => {
+  beforeEach(() => {
+    mockedShowSnackbar.mockClear();
+  });
+
   it('renders the vitals and biometrics form', async () => {
     renderForm();
 
@@ -110,13 +113,13 @@ describe('VitalsBiometricsForm', () => {
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
     const bmiInput = screen.getByRole('spinbutton', { name: /bmi/i });
 
-    await waitFor(() => user.type(heightInput, '180'));
-    await waitFor(() => user.type(weightInput, '62'));
+    await user.type(heightInput, '180');
+    await user.type(weightInput, '62');
 
     expect(bmiInput).toHaveValue(19.1);
   });
 
-  it('renders a success toast notification upon clicking the save button', async () => {
+  it('renders a success snackbar upon clicking the save button', async () => {
     const user = userEvent.setup();
 
     const response: Partial<FetchResponse> = {
@@ -125,7 +128,7 @@ describe('VitalsBiometricsForm', () => {
       data: [],
     };
 
-    mockSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
+    mockedSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
 
     renderForm();
 
@@ -140,14 +143,14 @@ describe('VitalsBiometricsForm', () => {
     const muac = screen.getByRole('spinbutton', { name: /muac/i });
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
-    await waitFor(() => user.type(heightInput, heightValue.toString()));
-    await waitFor(() => user.type(weightInput, weightValue.toString()));
-    await waitFor(() => user.type(systolic, systolicBloodPressureValue.toString()));
-    await waitFor(() => user.type(pulse, pulseValue.toString()));
-    await waitFor(() => user.type(oxygenSaturation, oxygenSaturationValue.toString()));
-    await waitFor(() => user.type(respirationRate, respiratoryRateValue.toString()));
-    await waitFor(() => user.type(temperature, temperatureValue.toString()));
-    await waitFor(() => user.type(muac, muacValue.toString()));
+    await user.type(heightInput, heightValue.toString());
+    await user.type(weightInput, weightValue.toString());
+    await user.type(systolic, systolicBloodPressureValue.toString());
+    await user.type(pulse, pulseValue.toString());
+    await user.type(oxygenSaturation, oxygenSaturationValue.toString());
+    await user.type(respirationRate, respiratoryRateValue.toString());
+    await user.type(temperature, temperatureValue.toString());
+    await user.type(muac, muacValue.toString());
 
     expect(bmiInput).toHaveValue(19.1);
     expect(systolic).toHaveValue(120);
@@ -157,10 +160,10 @@ describe('VitalsBiometricsForm', () => {
     expect(temperature).toHaveValue(37);
     expect(muac).toHaveValue(23);
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
-    expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
-    expect(mockSavePatientVitals).toHaveBeenCalledWith(
+    expect(mockedSavePatientVitals).toHaveBeenCalledTimes(1);
+    expect(mockedSavePatientVitals).toHaveBeenCalledWith(
       mockVitalsConfig.vitals.encounterTypeUuid,
       mockVitalsConfig.vitals.formUuid,
       mockVitalsConfig.concepts,
@@ -180,18 +183,18 @@ describe('VitalsBiometricsForm', () => {
       undefined,
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith(
+    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
-        critical: true,
-        description: 'They are now visible on the Vitals and Biometrics page',
+        isLowContrast: true,
         kind: 'success',
+        subtitle: 'They are now visible on the Vitals and Biometrics page',
         title: 'Vitals and Biometrics saved',
       }),
     );
   });
 
-  it('renders an error notification if there was a problem saving vitals and biometrics', async () => {
+  it('renders an error snackbar if there was a problem saving vitals and biometrics', async () => {
     const user = userEvent.setup();
 
     const error = {
@@ -202,7 +205,7 @@ describe('VitalsBiometricsForm', () => {
       },
     };
 
-    mockSavePatientVitals.mockRejectedValueOnce(error);
+    mockedSavePatientVitals.mockRejectedValueOnce(error);
 
     renderForm();
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
@@ -214,24 +217,24 @@ describe('VitalsBiometricsForm', () => {
     const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
     const muac = screen.getByRole('spinbutton', { name: /muac/i });
 
-    await waitFor(() => user.type(heightInput, heightValue.toString()));
-    await waitFor(() => user.type(weightInput, weightValue.toString()));
-    await waitFor(() => user.type(systolic, systolicBloodPressureValue.toString()));
-    await waitFor(() => user.type(pulse, pulseValue.toString()));
-    await waitFor(() => user.type(oxygenSaturation, oxygenSaturationValue.toString()));
-    await waitFor(() => user.type(respirationRate, respiratoryRateValue.toString()));
-    await waitFor(() => user.type(temperature, temperatureValue.toString()));
-    await waitFor(() => user.type(muac, muacValue.toString()));
+    await user.type(heightInput, heightValue.toString());
+    await user.type(weightInput, weightValue.toString());
+    await user.type(systolic, systolicBloodPressureValue.toString());
+    await user.type(pulse, pulseValue.toString());
+    await user.type(oxygenSaturation, oxygenSaturationValue.toString());
+    await user.type(respirationRate, respiratoryRateValue.toString());
+    await user.type(temperature, temperatureValue.toString());
+    await user.type(muac, muacValue.toString());
 
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
 
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Some of the values entered are invalid',
+    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
       kind: 'error',
+      subtitle: 'Some of the values entered are invalid',
       title: 'Error saving vitals and biometrics',
     });
   });

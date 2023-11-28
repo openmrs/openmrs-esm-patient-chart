@@ -11,7 +11,7 @@ import {
 import { useParams } from 'react-router-dom';
 import { changeWorkspaceContext, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { spaBasePath } from '../constants';
-import { LayoutMode } from './chart-review/dashboard-view.component';
+import { type LayoutMode } from './chart-review/dashboard-view.component';
 import ActionMenu from './action-menu/action-menu.component';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';

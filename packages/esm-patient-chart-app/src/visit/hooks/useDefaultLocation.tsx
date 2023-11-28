@@ -1,6 +1,6 @@
-import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { ChartConfig } from '../../config-schema';
+import { type ChartConfig } from '../../config-schema';
 
 export const useDefaultLoginLocation = () => {
   const config = useConfig() as ChartConfig;

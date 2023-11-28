@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, InlineNotification, TextInput } from '@carbon/react';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';
-import { LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
+import { type LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
 import { priorityOptions } from './lab-order';
 import { type TestType, useTestTypes } from './useTestTypes';
 import styles from './lab-order-form.scss';

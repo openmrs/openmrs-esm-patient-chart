@@ -1,8 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { usePagination } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr } from '../../../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../../../tools/test-helpers';
 import { mockEncounters2 } from '../../../__mocks__/visits.mock';
 import EncountersTable from './encounters-table.component';
 

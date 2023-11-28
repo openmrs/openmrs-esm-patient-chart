@@ -1,9 +1,9 @@
 import React from 'react';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createErrorHandler, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,
@@ -25,8 +25,7 @@ const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockUpdateProgramEnrollment = updateProgramEnrollment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -34,8 +33,7 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    showNotification: jest.fn(),
-    showToast: jest.fn(),
+    showSnackbar: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
   };
 });
@@ -68,13 +66,13 @@ describe('ProgramsForm', () => {
     const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
     const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
 
-    await waitFor(() => user.type(enrollmentDateInput, '2020-05-05'));
-    await waitFor(() => user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]));
-    await waitFor(() => user.selectOptions(selectLocationInput, [inpatientWardUuid]));
+    await user.type(enrollmentDateInput, '2020-05-05');
+    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockCreateProgramEnrollment).toHaveBeenCalledTimes(1);
     expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
@@ -87,10 +85,10 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
-      critical: true,
-      description: 'It is now visible in the Programs table',
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: 'It is now visible in the Programs table',
       kind: 'success',
       title: 'Program enrollment saved',
     });
@@ -107,15 +105,15 @@ describe('ProgramsForm', () => {
 
     mockUpdateProgramEnrollment.mockReturnValueOnce(of({ status: 200, statusText: 'OK' }));
 
-    await waitFor(() => user.type(dateCompletedInput, '05/05/2020'));
+    await user.type(dateCompletedInput, '05/05/2020');
 
     expect(dateCompletedInput).toHaveValue('05/05/2020');
 
-    await waitFor(() => user.tab());
+    await user.tab();
 
     expect(enrollButton).not.toBeDisabled();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledTimes(1);
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledWith(
@@ -130,10 +128,10 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledWith(
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
-        critical: true,
-        description: 'Changes to the program are now visible in the Programs table',
+        isLowContrast: true,
+        subtitle: 'Changes to the program are now visible in the Programs table',
         kind: 'success',
         title: 'Program enrollment updated',
       }),
@@ -165,18 +163,18 @@ describe('ProgramsForm', () => {
     const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
     const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
 
-    await waitFor(() => user.type(enrollmentDateInput, '2020-05-05'));
-    await waitFor(() => user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]));
-    await waitFor(() => user.selectOptions(selectLocationInput, [inpatientWardUuid]));
+    await user.type(enrollmentDateInput, '2020-05-05');
+    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
     expect(enrollButton).not.toBeDisabled();
 
-    await waitFor(() => user.click(enrollButton));
+    await user.click(enrollButton);
 
     expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal Server Error',
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
+      subtitle: 'Internal Server Error',
       kind: 'error',
       title: 'Error saving program enrollment',
     });

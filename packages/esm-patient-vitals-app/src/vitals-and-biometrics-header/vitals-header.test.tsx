@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -105,7 +105,7 @@ describe('VitalsHeader: ', () => {
 
     const recordVitalsButton = screen.getByText(/Record vitals/i);
 
-    await waitFor(() => user.click(recordVitalsButton));
+    await user.click(recordVitalsButton);
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
@@ -156,7 +156,7 @@ describe('VitalsHeader: ', () => {
 
     const recordVitalsButton = screen.getByText(/Record vitals/i);
 
-    await waitFor(() => user.click(recordVitalsButton));
+    await user.click(recordVitalsButton);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: { encounterUuid: '', formUuid: updateVitalsConfigMock.vitals.formUuid },
       workspaceTitle: updateVitalsConfigMock.vitals.formName,

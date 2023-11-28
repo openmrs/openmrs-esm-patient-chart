@@ -5,7 +5,7 @@ import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/
 import { useTranslation } from 'react-i18next';
 import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../config-schema';
+import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
 import { ordersEqual } from './helpers';
 import {

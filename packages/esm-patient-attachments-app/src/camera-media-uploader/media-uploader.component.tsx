@@ -4,7 +4,7 @@ import styles from './media-uploader.scss';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { readFileAsString } from '../utils';
 import { useTranslation } from 'react-i18next';
-import { showToast, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 const MediaUploaderComponent = () => {
   const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
@@ -30,9 +30,9 @@ const MediaUploaderComponent = () => {
             ]);
           });
         } else {
-          showToast({
+          showSnackbar({
             title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
-            description: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
+            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
             kind: 'error',
           });
         }

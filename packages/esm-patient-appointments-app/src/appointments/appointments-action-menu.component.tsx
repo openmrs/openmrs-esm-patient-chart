@@ -36,7 +36,7 @@ export const AppointmentsActionMenu = ({ appointment, patientUuid }: appointment
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu ariaLabel="Edit or delete appointment" size={isTablet ? 'lg' : 'sm'} flipped>
+      <OverflowMenu aria-label="Edit or delete appointment" size={isTablet ? 'lg' : 'sm'} flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editAppointment"

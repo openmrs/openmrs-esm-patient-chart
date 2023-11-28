@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import styles from './uploading-status.scss';
 import { FileUploaderItem, Button, ButtonSet, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
@@ -28,10 +28,11 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
       filesToUpload.map((file, indx) =>
         saveFile(file)
           .then(() => {
-            showToast({
+            showSnackbar({
               title: t('uploadComplete', 'Upload complete'),
-              description: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
+              subtitle: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
               kind: 'success',
+              isLowContrast: true,
             });
             setFilesUploading((prevfilesToUpload) =>
               prevfilesToUpload.map((file, ind) =>
@@ -45,9 +46,9 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
             );
           })
           .catch((err) => {
-            showToast({
+            showSnackbar({
               title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
-              description: err,
+              subtitle: err,
               kind: 'error',
             });
           }),

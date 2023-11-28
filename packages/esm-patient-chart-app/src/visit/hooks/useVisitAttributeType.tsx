@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, showNotification } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 

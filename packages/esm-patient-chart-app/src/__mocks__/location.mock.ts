@@ -10,9 +10,3 @@ export const mockLocations = [
     name: 'Inpatient Ward',
   },
 ];
-
-export const mockLocationsDataResponse = {
-  data: {
-    results: mockLocations,
-  },
-};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Visit, formatDatetime } from '@openmrs/esm-framework';
+import { type Visit, formatDatetime } from '@openmrs/esm-framework';
 import styles from './start-visit-dialog.scss';
 import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 

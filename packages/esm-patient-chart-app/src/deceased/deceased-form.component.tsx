@@ -13,8 +13,8 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, useLayoutType, showNotification, showToast, showModal } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, useLayoutType, showSnackbar, showModal } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
 
@@ -36,21 +36,21 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     markPatientDeceased(newDeceasedDate, patientUuid, selectedCauseOfDeath, new AbortController())
       .then((response) => {
         if (response.ok) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
             title: t('confirmDeceased', 'Confirm Deceased'),
-            description: t('setDeceasedSuccessfully', 'Patient has been marked dead successfully'),
+            subtitle: t('setDeceasedSuccessfully', 'Patient has been marked dead successfully'),
           });
           closeWorkspace();
         }
       })
       .catch((error) => {
-        showNotification({
+        showSnackbar({
           title: t('setDeceasedError', 'Error marking patient deceased'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       });
   };

@@ -1,4 +1,4 @@
-import { Visit, showActionableNotification, showNotification, useVisit } from '@openmrs/esm-framework';
+import { type Visit, showActionableNotification, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { deleteVisit, restoreVisit, useVisits } from '../visits-widget/visit.resource';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
@@ -12,9 +12,9 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
   const restoreDeletedVisit = () => {
     restoreVisit(visit?.uuid)
       .then(() => {
-        showNotification({
+        showSnackbar({
           title: t('visitRestored', 'Visit restored'),
-          description: t('visitRestoredSuccessfully', '{{visit}} restored successfully', {
+          subtitle: t('visitRestoredSuccessfully', '{{visit}} restored successfully', {
             visit: visit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'success',
@@ -24,9 +24,9 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
         onVisitRestore?.();
       })
       .catch(() => {
-        showNotification({
+        showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
-          description: t('errorWhenRestoringVisit', 'Error occured when restoring {{visit}}', {
+          subtitle: t('errorWhenRestoringVisit', 'Error occured when restoring {{visit}}', {
             visit: visit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'error',
@@ -63,12 +63,12 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
         onVisitDelete?.();
       })
       .catch(() => {
-        showNotification({
+        showSnackbar({
           title: isCurrentVisitDeleted
             ? t('errorCancellingVisit', 'Error cancelling active visit')
             : t('errorDeletingVisit', 'Error deleting visit'),
           kind: 'error',
-          description: t('errorOccuredDeletingVisit', 'An error occured when deleting visit'),
+          subtitle: t('errorOccuredDeletingVisit', 'An error occured when deleting visit'),
         });
       })
       .finally(() => {

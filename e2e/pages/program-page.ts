@@ -3,9 +3,8 @@ import { Page } from '@playwright/test';
 export class ProgramsPage {
   constructor(readonly page: Page) {}
 
-  // TODO: Switch to getByRole locators using the provided aria-labels
-  readonly programsTable = () => this.page.getByTestId('program-table');
-  readonly editButton = () => this.page.getByTestId('edit-program-button');
+  readonly programsTable = () => this.page.getByRole('table', { name: /program enrollments/i });
+  readonly editProgramButton = () => this.page.getByRole('button', { name: /edit program/i });
 
   async goTo(patientUuid: string) {
     await this.page.goto(`patient/${patientUuid}/chart/Programs`);

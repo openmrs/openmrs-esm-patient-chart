@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockWeightAndViralLoadResult } from '../__mocks__/generic-widgets.mock';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import ObsSwitchable from './obs-switchable.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
@@ -135,7 +135,7 @@ describe('Switchable obs viewer ', () => {
       name: /chart view/i,
     });
 
-    // await waitFor(() => user.click(chartViewButton));
+    // await user.click(chartViewButton);
 
     // expect(screen.queryByRole('table')).not.toBeInTheDocument();
     // expect(screen.getByRole('tab', { name: /viral load/i })).toHaveValue('');

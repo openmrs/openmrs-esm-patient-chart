@@ -14,7 +14,7 @@ import {
 import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Attachment } from '../attachments-types';
+import { type Attachment } from '../attachments-types';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {

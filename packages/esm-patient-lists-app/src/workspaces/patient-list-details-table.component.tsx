@@ -172,14 +172,16 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
   }
 
   return (
-    <Layer>
-      <Tile className={styles.tile}>
-        <div className={styles.illo}>
-          <EmptyDataIllustration />
-        </div>
-        <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
-      </Tile>
-    </Layer>
+    <div className={styles.emptyStateContainer}>
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={styles.illo}>
+            <EmptyDataIllustration />
+          </div>
+          <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
+        </Tile>
+      </Layer>
+    </div>
   );
 };
 

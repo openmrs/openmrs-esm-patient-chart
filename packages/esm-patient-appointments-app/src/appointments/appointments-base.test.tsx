@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '../__mocks__/appointments.mock';
@@ -94,7 +94,7 @@ describe('AppointmensOverview', () => {
     expect(screen.getByTitle(/Empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no upcoming appointments to display for this patient/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(pastAppointmentsTab));
+    await user.click(pastAppointmentsTab);
     expect(screen.getByRole('table')).toBeInTheDocument();
 
     const expectedColumnHeaders = [/date/, /location/, /service/];

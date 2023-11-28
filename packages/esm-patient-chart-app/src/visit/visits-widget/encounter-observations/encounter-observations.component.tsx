@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { Observation } from '../visit.resource';
+import { type Observation } from '../visit.resource';
 import styles from './styles.scss';
 
 interface EncounterObservationsProps {

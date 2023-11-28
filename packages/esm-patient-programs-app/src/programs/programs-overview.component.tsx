@@ -24,7 +24,7 @@ import {
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import {
-  ConfigObject,
+  type ConfigObject,
   formatDate,
   formatDatetime,
   useConfig,
@@ -33,7 +33,7 @@ import {
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { usePrograms } from './programs.resource';
-import { ConfigurableProgram } from '../types';
+import { type ConfigurableProgram } from '../types';
 import styles from './programs-overview.scss';
 
 interface ProgramsOverviewProps {
@@ -126,7 +126,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="programs overview" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

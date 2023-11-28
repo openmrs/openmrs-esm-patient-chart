@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { DrugOrderBasketItem } from '../types';
+import { type DrugOrderBasketItem } from '../types';
 import styles from './order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
@@ -27,7 +27,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
 
   const tileContent = (
     <div className={styles.orderBasketItemTile}>
-      <p className={styles.clipTextWithEllipsis}>
+      <div className={styles.clipTextWithEllipsis}>
         <OrderActionLabel orderBasketItem={orderBasketItem} />
         {orderBasketItem.isFreeTextDosage ? (
           <div>
@@ -77,7 +77,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             </>
           )}
         </span>
-      </p>
+      </div>
       <Button
         className={styles.removeButton}
         kind="ghost"

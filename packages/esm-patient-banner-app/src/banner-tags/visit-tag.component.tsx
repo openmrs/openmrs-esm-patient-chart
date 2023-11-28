@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { Visit, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { type Visit, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-tag.scss';
 

@@ -107,7 +107,7 @@ function PatientListsWorkspace() {
                   </TableToolbar>
                 </div>
                 {rows.length > 0 ? (
-                  <Table className={styles.table} {...getTableProps()}>
+                  <Table aria-label="patient lists" className={styles.table} {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (

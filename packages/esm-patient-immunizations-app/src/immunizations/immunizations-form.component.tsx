@@ -1,11 +1,11 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { type SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from '@carbon/react';
-import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { showSnackbar, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
-import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
+import { type ImmunizationFormData, type ImmunizationSequence } from './immunization-domain';
 import { immunizationFormSub } from './immunization-utils';
 import styles from './immunizations-form.scss';
 
@@ -79,17 +79,18 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       ).then(
         (response) => {
           response.status === 201 && closeWorkspace();
-          showToast({
+          showSnackbar({
             kind: 'success',
-            description: t('vaccinationSaved', 'Vaccination saved successfully'),
+            title: t('vaccinationSaved', 'Vaccination saved successfully'),
+            isLowContrast: true,
           });
         },
         (err) => {
-          showNotification({
+          showSnackbar({
             title: t('errorSaving', 'Error saving vaccination'),
             kind: 'error',
-            critical: true,
-            description: err?.message,
+            isLowContrast: false,
+            subtitle: err?.message,
           });
         },
       );
@@ -208,6 +209,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           {t('cancel', 'Cancel')}
         </Button>
         <Button
+          type="submit"
           className={styles.button}
           kind="primary"
           disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}

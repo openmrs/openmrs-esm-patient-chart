@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
-import { UploadedFile } from '../attachments-types';
-import { FetchResponse, showToast } from '@openmrs/esm-framework';
+import { type UploadedFile } from '../attachments-types';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { useTranslation } from 'react-i18next';
 import CameraComponent from './camera.component';
@@ -36,8 +36,8 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 
   useEffect(() => {
     if (error) {
-      showToast({
-        description: error.message,
+      showSnackbar({
+        subtitle: error.message,
         kind: 'error',
         title: t('cameraError', 'Camera Error'),
       });

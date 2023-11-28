@@ -1,8 +1,8 @@
+import { expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
+import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
-import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, Patient, startVisit, endVisit } from '../commands';
-import { Visit } from '@openmrs/esm-framework';
 
 let patient: Patient;
 let visit: Visit;
@@ -14,6 +14,8 @@ test.beforeEach(async ({ api }) => {
 
 test('Record vital signs', async ({ page, api }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
+  const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -42,14 +44,11 @@ test('Record vital signs', async ({ page, api }) => {
   });
 
   await test.step('And I should see the newly recorded vital signs on the page', async () => {
-    const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
     await expect(headerRow).toContainText(/temp/i);
     await expect(headerRow).toContainText(/bp/i);
     await expect(headerRow).toContainText(/pulse/i);
     await expect(headerRow).toContainText(/r. rate/i);
     await expect(headerRow).toContainText(/SPO2/i);
-
-    const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
     await expect(dataRow).toContainText('37');
     await expect(dataRow).toContainText('120 / 100');
     await expect(dataRow).toContainText('65');

@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../tools/test-helpers';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
