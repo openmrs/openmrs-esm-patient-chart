@@ -20,12 +20,12 @@ import {
 } from '@carbon/react';
 import {
   CardHeader,
-  Order,
-  OrderBasketItem,
+  type Order,
+  type OrderBasketItem,
   PatientChartPagination,
   useOrderBasket,
   useLaunchWorkspaceRequiringVisit,
-  OrderType,
+  type OrderType,
   EmptyState,
   ErrorState,
 } from '@openmrs/esm-patient-common-lib';
@@ -34,11 +34,11 @@ import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } 
 import { useTranslation } from 'react-i18next';
 import styles from './order-details-table.scss';
 import { useReactToPrint } from 'react-to-print';
-import { orderPriorityToColor } from '../utils/utils';
+import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
 import { useOrderTypes, usePatientOrders } from '../api/api';
-import { parseDate } from '@openmrs/esm-framework';
 import { orderBy } from 'lodash-es';
+import { Tooltip } from '@carbon/react';
 
 interface OrderDetailsProps {
   title?: string;
@@ -57,6 +57,7 @@ interface OrderHeaderProps {
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, showAddButton, showPrintButton }) => {
   const { t } = useTranslation();
   const defaultPageSize = 5;
+  const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const contentToPrintRef = useRef(null);
@@ -72,8 +73,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const {
     data: allOrders,
     error: isError,
-    isLoading: isLoading,
-    isValidating: isValidating,
+    isLoading,
+    isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -84,12 +85,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     },
     {
       key: 'dateOfOrder',
-      header: t('dateOfOrder', 'Date of Order'),
+      header: t('dateOfOrder', 'Date of order'),
       isSortable: true,
     },
     {
       key: 'orderType',
-      header: t('orderType', 'Order Type'),
+      header: t('orderType', 'Order type'),
       isSortable: true,
     },
     {
@@ -104,18 +105,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     },
     {
       key: 'orderedBy',
-      header: t('orderedBy', 'Ordered By'),
+      header: t('orderedBy', 'Ordered by'),
       isSortable: false,
     },
     {
       key: 'status',
       header: t('status', 'Status'),
       isSortable: true,
-    },
-    {
-      key: 'actions',
-      header: t('actions', 'Actions'),
-      isSortable: false,
     },
   ];
 
@@ -133,7 +129,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     orderId: order.orderNumber,
     dateOfOrder: formatDate(new Date(order.dateActivated)),
     orderType: capitalize(order.orderType?.display ?? '--'),
-    order: order.display,
+    order: <div>{order.display.length > 20 ? order.display.substring(0, 20).concat('...') : order.display}</div>,
     priority: (
       <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
         {capitalize(order.urgency)}
@@ -141,7 +137,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     ),
     orderedBy: order.orderer?.display,
     status: capitalize(order.fulfillerStatus ?? '--'),
-    // actions: 'TBD'
   }));
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
@@ -229,7 +224,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
         if (isError) return <ErrorState error={isError} headerTitle={title} />;
-        if (tableRows) {
+        if (tableRows?.length) {
           return (
             <div className={styles.widgetCard}>
               <CardHeader title={title}>
@@ -349,11 +344,23 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               </div>
             </div>
           );
+        } else {
+          return <EmptyState displayText={headerTitle} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
         }
       })()}
     </>
   );
 };
+
+function OrderDisplayTooltip({ orderDisplay }: { orderDisplay: string }) {
+  return (
+    <>
+      <Tooltip align="bottom" label={orderDisplay}>
+        {orderDisplay.substring(0, 20).concat('...')}
+      </Tooltip>
+    </>
+  );
+}
 
 function InfoTooltip({ orderer }: { orderer: string }) {
   return (
@@ -430,26 +437,6 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
-}
-
-/**
- * Enables a comparison of arbitrary values with support for undefined/null.
- * Requires the `<` and `>` operators to return something reasonable for the provided values.
- */
-function compare<T>(x?: T, y?: T) {
-  if (x == undefined && y == undefined) {
-    return 0;
-  } else if (x == undefined) {
-    return -1;
-  } else if (y == undefined) {
-    return 1;
-  } else if (x < y) {
-    return -1;
-  } else if (x > y) {
-    return 1;
-  } else {
-    return 0;
-  }
 }
 
 export default OrderDetailsTable;
