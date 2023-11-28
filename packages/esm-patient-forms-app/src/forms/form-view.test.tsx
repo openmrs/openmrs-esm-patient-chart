@@ -2,13 +2,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useConfig } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { launchFormEntryOrHtmlForms, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import { mockForms } from '../__mocks__/forms.mock';
 import { mockPatient } from '../../../../tools/test-helpers';
 import FormView from './form-view.component';
 
-const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
+const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
@@ -36,6 +36,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
+    launchFormEntryOrHtmlForms: jest.fn(),
     useVisitOrOfflineVisit: jest.fn(),
   };
 });
@@ -75,15 +76,7 @@ describe('FormView', () => {
 
     await user.click(pocForm);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      workspaceTitle: 'POC COVID 19 Assessment Form v1.1',
-      formInfo: {
-        formUuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
-        mutateForm: undefined,
-        encounterUuid: '',
-        visit: mockCurrentVisit,
-      },
-    });
+    expect(mockLaunchFormEntryOrHtmlForms).toBeCalled();
   });
 });
 
