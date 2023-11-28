@@ -28,6 +28,8 @@ import {
   type OrderType,
   EmptyState,
   ErrorState,
+  usePatientOrders,
+  useOrderTypes,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
@@ -36,7 +38,6 @@ import styles from './order-details-table.scss';
 import { useReactToPrint } from 'react-to-print';
 import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
-import { useOrderTypes, usePatientOrders } from '../api/api';
 import { orderBy } from 'lodash-es';
 import { Tooltip } from '@carbon/react';
 

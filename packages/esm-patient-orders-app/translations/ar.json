@@ -1,5 +1,4 @@
 {
-  "actions": "Actions",
   "add": "Add",
   "addResults": "Add Results",
   "cancelOrder": "Cancel Order",
@@ -10,6 +9,7 @@
   "order": "Order",
   "orderedBy": "Ordered By",
   "orderId": "Order ID",
+  "orders": "Orders",
   "Orders": "Orders",
   "orderType": "Order Type",
   "other": "Other",
