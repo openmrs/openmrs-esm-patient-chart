@@ -11,8 +11,8 @@ import {
   TableBody,
 } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { OverviewPanelData } from './useOverviewData';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type OverviewPanelData } from './useOverviewData';
 import styles from './common-datatable.scss';
 
 interface CommonDataTableProps {

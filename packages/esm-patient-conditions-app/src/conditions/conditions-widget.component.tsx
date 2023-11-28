@@ -1,4 +1,4 @@
-import React, { Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
@@ -17,17 +17,17 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
-  CodedCondition,
-  ConditionDataTableRow,
+  type CodedCondition,
+  type ConditionDataTableRow,
   createCondition,
-  FormFields,
+  type FormFields,
   updateCondition,
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { ConditionFormData } from './conditions-form.component';
+import { type ConditionFormData } from './conditions-form.component';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
@@ -100,10 +100,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 201) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionSaved', 'Condition saved'),
         });
 
@@ -142,10 +142,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 200) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionUpdated', 'Condition updated'),
         });
 

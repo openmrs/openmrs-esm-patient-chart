@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { FetchResponse, openmrsFetch, OpenmrsResource, parseDate, Visit } from '@openmrs/esm-framework';
-import { OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, openmrsFetch, type OpenmrsResource, parseDate, type Visit } from '@openmrs/esm-framework';
+import { type OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -41,7 +41,7 @@ describe('VisitNoteActionButton', () => {
     const visitNoteButton = screen.getByRole('button', { name: /Visit note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
-    await waitFor(() => user.click(visitNoteButton));
+    await user.click(visitNoteButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('visit-notes-form-workspace');
     expect(visitNoteButton).toHaveClass('active');
@@ -58,7 +58,7 @@ describe('VisitNoteActionButton', () => {
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
-    await waitFor(() => user.click(visitNoteButton));
+    await user.click(visitNoteButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('visit-notes-form-workspace');
     expect(visitNoteButton).toHaveClass('active');

@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import { FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { type FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
-import { DrugOrderBasketItem } from '../types';
+import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 

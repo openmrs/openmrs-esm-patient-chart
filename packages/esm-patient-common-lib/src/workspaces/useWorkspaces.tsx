@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getWorkspaceStore, OpenWorkspace, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
-import { Prompt, WorkspaceStoreState, updateWorkspaceWindowState } from './workspaces';
+import { getWorkspaceStore, type OpenWorkspace, type WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { type Prompt, type WorkspaceStoreState, updateWorkspaceWindowState } from './workspaces';
 
 export interface WorkspacesInfo {
   active: boolean;

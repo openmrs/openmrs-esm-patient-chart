@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { CameraMediaUploaderContextType } from './camera-media-uploader-types';
+import { type CameraMediaUploaderContextType } from './camera-media-uploader-types';
 
 const CameraMediaUploaderContext = createContext<CameraMediaUploaderContextType>({});
 

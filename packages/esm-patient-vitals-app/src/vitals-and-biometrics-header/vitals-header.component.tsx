@@ -8,7 +8,7 @@ import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit, useVitalsConceptMetadata, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';

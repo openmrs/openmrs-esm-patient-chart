@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import StartVisitDialog from './start-visit-dialog.component';
@@ -33,7 +33,7 @@ describe('StartVisit', () => {
 
     const startNewVisitButton = screen.getByRole('button', { name: /Start new visit/i });
 
-    await waitFor(() => user.click(startNewVisitButton));
+    await user.click(startNewVisitButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
@@ -53,7 +53,7 @@ describe('StartVisit', () => {
 
     const editPastVisitButton = screen.getByRole('button', { name: /Edit past visit/i });
 
-    await waitFor(() => user.click(editPastVisitButton));
+    await user.click(editPastVisitButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('past-visits-overview');
   });

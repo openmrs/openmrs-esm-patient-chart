@@ -22,14 +22,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createErrorHandler,
-  showNotification,
-  showToast,
+  showSnackbar,
   useSession,
   useLocations,
   useLayoutType,
   parseDate,
 } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
   useAvailablePrograms,
@@ -109,10 +108,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
                 mutateEnrollments();
                 closeWorkspace();
 
-                showToast({
-                  critical: true,
+                showSnackbar({
+                  isLowContrast: true,
                   kind: 'success',
-                  description: t(
+                  subtitle: t(
                     'enrollmentUpdatesNowVisible',
                     'Changes to the program are now visible in the Programs table',
                   ),
@@ -123,11 +122,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             (err) => {
               createErrorHandler();
 
-              showNotification({
+              showSnackbar({
                 title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
                 kind: 'error',
-                critical: true,
-                description: err?.message,
+                isLowContrast: false,
+                subtitle: err?.message,
               });
             },
           )
@@ -137,10 +136,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
                 mutateEnrollments();
                 closeWorkspace();
 
-                showToast({
-                  critical: true,
+                showSnackbar({
+                  isLowContrast: true,
                   kind: 'success',
-                  description: t('enrollmentNowVisible', 'It is now visible in the Programs table'),
+                  subtitle: t('enrollmentNowVisible', 'It is now visible in the Programs table'),
                   title: t('enrollmentSaved', 'Program enrollment saved'),
                 });
               }
@@ -148,11 +147,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             (err) => {
               createErrorHandler();
 
-              showNotification({
+              showSnackbar({
                 title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
                 kind: 'error',
-                critical: true,
-                description: err?.message,
+                isLowContrast: false,
+                subtitle: err?.message,
               });
             },
           );

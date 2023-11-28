@@ -1,4 +1,4 @@
-import { amPm } from '@openmrs/esm-patient-common-lib';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
 
 export type VisitFormData = {
   visitStartDate: Date;

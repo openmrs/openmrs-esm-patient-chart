@@ -5,8 +5,8 @@ import debounce from 'lodash-es/debounce';
 import first from 'lodash-es/first';
 import {
   DataTable,
-  DataTableHeader,
-  DataTableRow,
+  type DataTableHeader,
+  type DataTableRow,
   Layer,
   Table,
   TableBody,
@@ -28,8 +28,8 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
-import { CompletedFormInfo } from '../types';
+import { type ConfigObject } from '../config-schema';
+import { type CompletedFormInfo } from '../types';
 import styles from './form-view.scss';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';

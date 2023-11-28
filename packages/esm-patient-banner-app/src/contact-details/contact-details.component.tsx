@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';

@@ -1,4 +1,4 @@
-import { FetchResponse, Location, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, type Location, openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 

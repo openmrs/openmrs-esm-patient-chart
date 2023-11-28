@@ -1,4 +1,11 @@
-import { ReducerAction, ReducerState, ReducerActionType, TreeParents, TreeNode, LowestNode } from './filter-types';
+import {
+  type ReducerAction,
+  type ReducerState,
+  ReducerActionType,
+  type TreeParents,
+  type TreeNode,
+  type LowestNode,
+} from './filter-types';
 
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;

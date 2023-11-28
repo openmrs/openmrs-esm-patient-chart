@@ -1,7 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
-import { OrderBasketStore, orderBasketStore } from './store';
-import { OrderBasketItem, OrderPost } from './types';
+import { type OrderBasketStore, orderBasketStore } from './store';
+import { type OrderBasketItem, type OrderPost } from './types';
 
 export async function postOrders(encounterUuid: string, abortController: AbortController) {
   const patientUuid = getPatientUuidFromUrl();

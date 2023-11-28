@@ -30,7 +30,7 @@ import {
 import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { useImmunizations, useImmunizationsConceptSet } from './immunizations.resource';
 import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
-import { ExistingDoses, Sequence } from '../types';
+import { type ExistingDoses, type Sequence } from '../types';
 import { immunizationFormSub } from './immunization-utils';
 import SequenceTable from './immunizations-sequence-table';
 import styles from './immunizations-detailed-summary.scss';

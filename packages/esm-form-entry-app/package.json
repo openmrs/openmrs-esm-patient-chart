@@ -11,7 +11,7 @@
     "serve": "ng serve --port 4200 --live-reload true",
     "debug": "yarn run serve",
     "build": "ng build --configuration production",
-    "lint": "cross-env eslint src --ext ts --fix --max-warnings=0"
+    "lint": "ng lint"
   },
   "openmrs:develop": {
     "command": "yarn run serve",
@@ -59,7 +59,7 @@
     "single-spa-angular": "^8.1.1",
     "slick-carousel": "^1.8.1",
     "systemjs-webpack-interop": "^2.3.7",
-    "tree-model": "^1.0.5",
+    "tree-model": "^1.0.7",
     "tslib": "^2.4.1",
     "uuid": "^8.3.2",
     "zone.js": "~0.11.8"
@@ -71,6 +71,11 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.10",
+    "@angular-eslint/builder": "15.2.1",
+    "@angular-eslint/eslint-plugin": "15.2.1",
+    "@angular-eslint/eslint-plugin-template": "15.2.1",
+    "@angular-eslint/schematics": "15.2.1",
+    "@angular-eslint/template-parser": "15.2.1",
     "@angular/cli": "^15.2.10",
     "@angular/compiler-cli": "^15.2.10",
     "@angular/language-service": "^15.2.10",
@@ -79,8 +84,11 @@
     "@types/jasmine": "~3.6.11",
     "@types/jasminewd2": "~2.0.3",
     "@types/webpack-env": "^1.18.2",
+    "@typescript-eslint/eslint-plugin": "5.48.2",
+    "@typescript-eslint/parser": "5.48.2",
     "codelyzer": "^6.0.2",
     "copy-webpack-plugin": "^11.0.0",
+    "eslint": "^8.33.0",
     "jasmine-core": "~5.1.1",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.4.2",

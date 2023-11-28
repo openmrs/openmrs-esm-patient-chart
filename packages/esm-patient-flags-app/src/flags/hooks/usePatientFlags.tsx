@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse } from '@openmrs/esm-framework';
 
 interface FlagFetchResponse {
   uuid: string;

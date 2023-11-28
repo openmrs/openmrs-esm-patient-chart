@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { Attachment } from '../attachments-types';
+import { type Attachment } from '../attachments-types';
 import styles from './image-preview.scss';
 
 interface AttachmentPreviewProps {

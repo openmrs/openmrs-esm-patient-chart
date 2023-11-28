@@ -6,7 +6,7 @@ import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
-import { VitalsBiometricsFormData } from './vitals-biometrics-form.component';
+import { type VitalsBiometricsFormData } from './vitals-biometrics-form.component';
 import styles from './vitals-biometrics-input.scss';
 
 type fieldId =

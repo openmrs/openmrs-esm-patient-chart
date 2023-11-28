@@ -2,10 +2,10 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import {
-  AppointmentPayload,
-  AppointmentService,
-  AppointmentsFetchResponse,
-  RecurringAppointmentsPayload,
+  type AppointmentPayload,
+  type AppointmentService,
+  type AppointmentsFetchResponse,
+  type RecurringAppointmentsPayload,
 } from '../types';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);

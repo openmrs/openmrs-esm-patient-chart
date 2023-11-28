@@ -1,7 +1,7 @@
 import React from 'react';
-import { screen, within, waitFor } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockEnrolledProgramsResponse } from '../__mocks__/programs.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
@@ -90,12 +90,12 @@ describe('ProgramsDetailedSummary ', () => {
     expect(editButton).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
-    await waitFor(() => user.click(addButton));
+    await user.click(addButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
     // Clicking the edit button launches the edit form in a workspace
-    await waitFor(() => user.click(editButton));
+    await user.click(editButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,

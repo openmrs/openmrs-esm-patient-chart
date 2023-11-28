@@ -4,7 +4,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import { Button, DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import ImmunizationsForm from './immunizations-form.component';
-import { ExistingDoses, Immunization } from '../types';
+import { type ExistingDoses, type Immunization } from '../types';
 
 interface SequenceTableProps {
   immunizations: Immunization;

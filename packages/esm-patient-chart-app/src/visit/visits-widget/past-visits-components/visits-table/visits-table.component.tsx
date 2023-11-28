@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Dropdown,
   Layer,
   OverflowMenu,
@@ -31,7 +31,7 @@ import {
   isDesktop,
   parseDate,
   showModal,
-  showToast,
+  showSnackbar,
   useLayoutType,
   usePagination,
   useSession,
@@ -40,7 +40,7 @@ import {
 import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
-import { MappedEncounter } from '../../visit.resource';
+import { type MappedEncounter } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 
@@ -138,17 +138,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              showToast({
+              showSnackbar({
                 title: t('encounterDeleted', 'Encounter deleted'),
-                description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
               mutateVisits?.();
             })
             .catch(() => {
-              showToast({
+              showSnackbar({
                 title: t('error', 'Error'),
-                description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',
               });
             });
@@ -251,7 +251,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                             <Layer className={styles.layer}>
                               <OverflowMenu
                                 data-floating-menu-container
-                                ariaLabel="Encounter table actions menu"
+                                aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
                               >

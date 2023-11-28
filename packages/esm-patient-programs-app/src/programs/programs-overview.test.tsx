@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -103,7 +103,7 @@ describe('ProgramsOverview', () => {
     expect(screen.getByRole('row', { name: /HIV Care and Treatment/i })).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
-    await waitFor(() => user.click(addButton));
+    await user.click(addButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
   });

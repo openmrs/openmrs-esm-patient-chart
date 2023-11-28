@@ -1,4 +1,4 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface OrderBasketItem {
   action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | undefined;

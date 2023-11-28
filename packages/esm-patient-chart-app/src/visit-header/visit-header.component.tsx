@@ -16,7 +16,7 @@ import {
   interpolateUrl,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
-import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
+import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';

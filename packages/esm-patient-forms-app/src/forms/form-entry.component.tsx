@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useConnectivity, usePatient } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps, FormEntryProps, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import {
+  type DefaultWorkspaceProps,
+  type FormEntryProps,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 
 interface FormEntryComponentProps extends DefaultWorkspaceProps {
   mutateForm: () => void;

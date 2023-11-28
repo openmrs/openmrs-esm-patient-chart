@@ -1,4 +1,4 @@
-import { Visit } from '@openmrs/esm-framework';
+import { type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';

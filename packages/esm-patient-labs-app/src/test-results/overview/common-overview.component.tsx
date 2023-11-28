@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Button, TableToolbarContent, TableToolbar, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { ChartLine, Information, Table } from '@carbon/react/icons';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { OverviewPanelEntry } from './useOverviewData';
+import { type OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, navigate } from '@openmrs/esm-framework';
 import CommonDataTable from './common-datatable.component';

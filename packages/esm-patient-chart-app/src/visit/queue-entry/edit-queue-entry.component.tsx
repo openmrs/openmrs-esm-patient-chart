@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import styles from './edit-queue-entry.scss';
-import { MappedVisitQueueEntry } from './queue.resource';
+import { type MappedVisitQueueEntry } from './queue.resource';
 import { Edit } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 

@@ -4,8 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
-import { EmptyState, ExternalOverviewProps, PanelFilterProps, PatientData } from '@openmrs/esm-patient-common-lib';
-import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
+import {
+  EmptyState,
+  type ExternalOverviewProps,
+  type PanelFilterProps,
+  type PatientData,
+} from '@openmrs/esm-patient-common-lib';
+import { parseSingleEntry, type OverviewPanelEntry } from './useOverviewData';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import CommonOverview from './common-overview.component';
 import styles from './external-overview.scss';
