@@ -57,6 +57,7 @@ describe('FormView', () => {
 
     await user.click(pocForm);
 
+    expect(mockLaunchFormEntryOrHtmlForms).toHaveBeenCalledTimes(1);
     expect(mockShowModal).toHaveBeenCalledTimes(1);
   });
 
