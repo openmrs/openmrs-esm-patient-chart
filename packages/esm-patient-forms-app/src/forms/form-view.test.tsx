@@ -35,8 +35,9 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-    launchFormEntryOrHtmlForms: jest.fn(),
+    launchFormEntryOrHtmlForms: jest.fn().mockImplementation((data) => {
+      showModal(data);
+    }),
     useVisitOrOfflineVisit: jest.fn(),
   };
 });
@@ -57,7 +58,7 @@ describe('FormView', () => {
 
     await user.click(pocForm);
 
-    expect(mockLaunchFormEntryOrHtmlForms).toHaveBeenCalledTimes(1);
+    expect(mockShowModal).toHaveBeenCalledTimes(1);
   });
 
   test('should launch form-entry patient-workspace window when visit is started', async () => {
