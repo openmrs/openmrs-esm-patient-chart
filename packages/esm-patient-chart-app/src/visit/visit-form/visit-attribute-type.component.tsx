@@ -1,5 +1,5 @@
 import { useConfig } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { type ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import {
@@ -34,26 +34,37 @@ interface VisitAttributeTypeFieldsProps {
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setErrorFetchingResources }) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
-  const { control } = useFormContext<VisitFormData>();
+  const { control, getValues } = useFormContext<VisitFormData>();
 
   if (visitAttributeTypes?.length) {
     return (
       <>
-        {visitAttributeTypes.map((attributeType, indx) => (
-          <Controller
-            key={attributeType.uuid}
-            name={`visitAttributes.${attributeType.uuid}`}
-            control={control}
-            render={({ field }) => (
-              <AttributeTypeField
-                key={indx}
-                attributeType={attributeType}
-                setErrorFetchingResources={setErrorFetchingResources}
-                fieldProps={field}
+        {visitAttributeTypes.map((attributeType) => {
+          const shouldShowAttribute = () => {
+            if (!attributeType?.showWhenExpression) return true;
+            const { visitAttributes } = getValues();
+            const attributeEval = new Function('visitAttributes', `return ${attributeType.showWhenExpression}`);
+            return attributeEval(visitAttributes);
+          };
+
+          return (
+            shouldShowAttribute() && (
+              <Controller
+                key={attributeType.uuid}
+                name={`visitAttributes.${attributeType.uuid}`}
+                control={control}
+                render={({ field }) => (
+                  <AttributeTypeField
+                    key={attributeType.uuid}
+                    attributeType={attributeType}
+                    setErrorFetchingResources={setErrorFetchingResources}
+                    fieldProps={field}
+                  />
+                )}
               />
-            )}
-          />
-        ))}
+            )
+          );
+        })}
       </>
     );
   }
