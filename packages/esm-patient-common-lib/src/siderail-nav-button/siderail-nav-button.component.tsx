@@ -66,6 +66,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   return (
     <IconButton
       align="left"
+      aria-label={iconDescription}
       className={classNames(styles.container, {
         [styles.active]: isWorkspaceActive,
       })}
