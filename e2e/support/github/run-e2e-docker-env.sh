@@ -5,11 +5,7 @@ script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # create a temporary working directory
 working_dir=$(mktemp -d "${TMPDIR:-/tmp/}openmrs-e2e-frontends.XXXXXXXXXX")
 # get a list of all the apps in this workspace
-apps=$(yarn workspaces list --json | jq -r 'if ((.location == ".") or (.location | test("-app") | not)) then halt else .name end')
-
-# Remove "esm-form-engine-app" from the list
-apps=$(echo "$apps" | grep -v "esm-form-engine-app")
-
+apps=$(yarn workspaces list --json | jq -r 'if ((.location == ".") or (.location | test("form-engine-app")) or (.location | test("-app") | not)) then halt else .name end')
 # this array will hold all of the packed app names
 app_names=()
 
