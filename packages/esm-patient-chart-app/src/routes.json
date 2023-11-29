@@ -113,15 +113,6 @@
       }
     },
     {
-      "name": "start-visit-workspace-form",
-      "component": "startVisitForm",
-      "meta": {
-        "title": "Start a visit"
-      },
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "mark-patient-deceased-workspace-form",
       "component": "markPatientDeceasedForm",
       "meta": {

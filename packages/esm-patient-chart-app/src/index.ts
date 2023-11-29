@@ -5,6 +5,7 @@ import {
   getSyncLifecycle,
   defineExtensionConfigSchema,
   registerFeatureFlag,
+  translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
@@ -28,7 +29,7 @@ import patientDetailsTileComponent from './patient-details-tile/patient-details-
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
 import genericNavGroupComponent from './side-nav/generic-nav-group.component';
 import genericDashboardComponent from './side-nav/generic-dashboard.component';
-import startVisitFormComponent from './visit/visit-form/visit-form.component';
+import startVisitFormWorkspace from './visit/visit-form/visit-form.workspace';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -79,6 +80,15 @@ export function startupApp() {
       parent: spaBasePath,
     },
   ]);
+
+  PatientCommonLib.registerWorkspace({
+    name: 'start-visit-workspace-form',
+    load: getSyncLifecycle(startVisitFormWorkspace, {
+      featureName: 'start-visit-form',
+      moduleName,
+    }),
+    title: translateFrom('@openmrs/esm-patient-chart-app', 'startVisit', 'Start a visit'),
+  });
 
   registerFeatureFlag(
     'rde',
@@ -194,11 +204,6 @@ export const genericNavGroup = getSyncLifecycle(genericNavGroupComponent, {
 
 export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
   featureName: 'Dashboard',
-  moduleName,
-});
-
-export const startVisitForm = getSyncLifecycle(startVisitFormComponent, {
-  featureName: 'start-visit-form',
   moduleName,
 });
 

@@ -70,6 +70,9 @@ function getWorkspaceRegistration(name: string): WorkspaceRegistration {
   } else {
     const workspaceExtension = getExtensionRegistration(name);
     if (workspaceExtension) {
+      console.warn(
+        `Workspace '${name}' is registered as an extension. This method of registering workspaces will be removed in a future release. Please use 'registerWorkspace' instead.`,
+      );
       return {
         name: workspaceExtension.name,
         title: getTitleFromExtension(workspaceExtension),
