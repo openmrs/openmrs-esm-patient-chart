@@ -7,6 +7,11 @@ import { ChartPage, VisitsPage } from '../pages';
 let patient: Patient;
 let visit: Visit;
 
+const subjectiveFindings = `I've had a headache for the last two days`;
+const objectiveFindings = `General appearance is healthy. No signs of distress. Head exam shows no abnormalities, no tenderness on palpation. Neurological exam is normal; cranial nerves intact, normal gait and coordination.`;
+const assessment = `Diagnosis: Tension-type headache. Differential Diagnoses: Migraine, sinusitis, refractive error.`;
+const plan = `Advise use of over-the-counter ibuprofen as needed for headache pain. Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.`;
+
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
@@ -45,23 +50,10 @@ test('Fill a clinical form', async ({ page, api }) => {
     await expect(chartPage.page.getByRole('button', { name: /save and close/i })).toBeVisible();
     await expect(chartPage.page.getByRole('button', { name: /discard/i })).toBeVisible();
 
-    await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill("I've had a headache for the last two days");
-
-    await chartPage.page
-      .locator('#SOAPObjectiveFindingsid')
-      .fill(
-        'General appearance is healthy. No signs of distress. Head exam shows no abnormalities, no tenderness on palpation. Neurological exam is normal; cranial nerves intact, normal gait and coordination.',
-      );
-
-    await chartPage.page
-      .locator('#SOAPAssessmentid')
-      .fill('Diagnosis: Tension-type headache. Differential Diagnoses: Migraine, sinusitis, refractive error.');
-
-    await chartPage.page
-      .locator('#SOAPPlanid')
-      .fill(
-        'Advise use of over-the-counter ibuprofen as needed for headache pain. Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.',
-      );
+    await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill(subjectiveFindings);
+    await chartPage.page.locator('#SOAPObjectiveFindingsid').fill(objectiveFindings);
+    await chartPage.page.locator('#SOAPAssessmentid').fill(assessment);
+    await chartPage.page.locator('#SOAPPlanid').fill(plan);
   });
 
   await test.step('And I click the submit button', async () => {
@@ -90,11 +82,10 @@ test('Fill a clinical form', async ({ page, api }) => {
 
     await visitsPage.page.getByRole('table').locator('th#expand').click();
 
-    await expect(visitsPage.page.getByText(/assessment/i)).toBeVisible();
-    await expect(visitsPage.page.getByText(/i've had a headache for the last two days/i)).toBeVisible();
-    await expect(visitsPage.page.getByText(/plan/i)).toBeVisible();
-    await expect(visitsPage.page.getByText(/subjective findings/i)).toBeVisible();
-    await expect(visitsPage.page.getByText(/objective findings/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(subjectiveFindings)).toBeVisible();
+    await expect(visitsPage.page.getByText(objectiveFindings)).toBeVisible();
+    await expect(visitsPage.page.getByText(assessment)).toBeVisible();
+    await expect(visitsPage.page.getByText(plan)).toBeVisible();
   });
 });
 
