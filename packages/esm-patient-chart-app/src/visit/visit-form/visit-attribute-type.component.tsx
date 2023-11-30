@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo } from 'react';
 import {
-  TextInput,
-  TextInputSkeleton,
-  TextArea,
-  NumberInput,
-  SelectSkeleton,
-  Select,
-  SelectItem,
   Checkbox,
   DatePicker,
   DatePickerInput,
+  NumberInput,
+  Select,
+  SelectItem,
+  SelectSkeleton,
+  TextArea,
+  TextInput,
+  TextInputSkeleton,
 } from '@carbon/react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -33,26 +33,20 @@ interface VisitAttributeTypeFieldsProps {
 }
 
 /**
- * The `evaluateExpression` function is used to evaluate the optional showWhenExpression for an attribute type. If a showWhenExpression is provided evaluates to true, the attribute type field is rendered. Otherwise, if no showWhenExpression is provided, the attribute type field gets rendered by default.
+ * Evaluates a given expression using the provided visitAttributes.
  *
- * @param {string} expression - The showWhenExpression for the attribute type field.
- * @param {VisitAttributes} visitAttributes - The visit attributes object
- * @returns {boolean} - The result of the expression evaluation
+ * @param {string} expression - The expression to be evaluated. This should be a string of JavaScript code.
+ * @param {VisitAttributes} visitAttributes - An object containing visit attributes which will be used in the evaluation of the expression.
+ *
+ * @returns {boolean} - The boolean value of the result of the evaluated expression.
+ *
  */
-
 function evaluateExpression(expression: string, visitAttributes: VisitAttributes) {
-  const [left, operator, right] = expression.split(' ');
-  const attributeUuid = left.match(/\['(.*?)'\]/)[1];
-  const attributeValue = right.replace(/'/g, '');
+  const func = new Function('visitAttributes', `return ${expression};`);
 
-  switch (operator) {
-    case '===':
-      return visitAttributes[attributeUuid] === attributeValue;
-    case '!==':
-      return visitAttributes[attributeUuid] !== attributeValue;
-    default:
-      return false;
-  }
+  const result = func(visitAttributes);
+
+  return Boolean(result);
 }
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setErrorFetchingResources }) => {
