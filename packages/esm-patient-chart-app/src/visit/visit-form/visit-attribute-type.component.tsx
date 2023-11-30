@@ -56,7 +56,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ set
   if (visitAttributeTypes?.length) {
     return (
       <>
-        {visitAttributeTypes.map((attributeType, indx) => {
+        {visitAttributeTypes.map((attributeType) => {
           const { visitAttributes } = getValues();
 
           const showAttributeType = attributeType?.showWhenExpression
@@ -254,4 +254,5 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
 
   return <div className={styles.visitAttributeField}>{fieldToRender}</div>;
 };
+
 export default VisitAttributeTypeFields;
