@@ -22,7 +22,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, WarningFilled } from '@carbon/react/icons';
+import { Add, Edit, WarningFilled } from '@carbon/react/icons';
 import {
   createErrorHandler,
   ExtensionSlot,
@@ -44,6 +44,7 @@ import {
 import styles from './visit-notes-form.scss';
 import { UploadedFile } from '@openmrs/esm-patient-attachments-app/src/attachments-types';
 import { createAttachment } from '@openmrs/esm-patient-attachments-app/src/attachments.resource';
+import { mutate } from 'swr';
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -99,7 +100,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     },
   });
 
+  const currentImage = watch('image');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
+  const mutateAttachments = () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/attachment`));
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
 
@@ -238,6 +241,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         })
         .then(() => {
           mutateVisitNotes();
+          if (data.image) {
+            mutateAttachments();
+          }
           closeWorkspace();
 
           showSnackbar({
@@ -283,6 +289,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       saveFile: (file: UploadedFile) => {
         console.log(file);
         setValue('image', file);
+        close();
         return Promise.resolve();
       },
       closeModal: () => {
@@ -537,7 +544,17 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
-              <Button
+              {
+                currentImage?.base64Content ?
+                <Button
+                style={{ marginTop: '1rem' }}
+                kind={isTablet ? 'ghost' : 'tertiary'}
+                onClick={() => showImageCaptureModal()}
+                renderIcon={(props) => <Edit size={16} {...props} />}
+              >
+                {t('changeImage', 'Change image')}
+              </Button>
+                : <Button
                 style={{ marginTop: '1rem' }}
                 kind={isTablet ? 'ghost' : 'tertiary'}
                 onClick={() => showImageCaptureModal()}
@@ -545,10 +562,13 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               >
                 {t('addImage', 'Add image')}
               </Button>
+              }
+              {currentImage?.base64Content ?
+                <div className={styles.imgThumbnailContainer}>
+                  <img src={currentImage.base64Content} className={styles.imgThumbnail}/>
+                </div> : null }
             </FormGroup>
-          </Column>
-          <Column>
-            <img src={getValues('image')?.base64Content} />
+                      
           </Column>
         </Row>
       </Stack>
