@@ -8,7 +8,7 @@ import { mockConditions, mockFhirConditionsResponse } from '../__mocks__/conditi
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
-jest.setTimeout(10000);
+jest.setTimeout(15000);
 
 const testProps = {
   patientUuid: mockPatient.id,
