@@ -1,6 +1,7 @@
 {
   "add": "הוסף",
   "cancel": "ביטול",
+  "edit": "Edit",
   "errorSaving": "שגיאה בשמירת החיסון",
   "expirationDate": "תאריך תפוגה",
   "goToSummary": "עבור לסיכום",
@@ -13,6 +14,7 @@
   "save": "שמור",
   "seeAll": "ראה הכל",
   "sequence": "סדר",
+  "singleDose": "Single Dose",
   "singleDoseOn": "מנת יחידה בתאריך",
   "vaccinationDate": "תאריך החיסון",
   "vaccinationSaved": "החיסון נשמר בהצלחה",

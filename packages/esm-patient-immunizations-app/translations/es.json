@@ -1,6 +1,7 @@
 {
   "add": "Agregar",
   "cancel": "Cancelar",
+  "edit": "Edit",
   "errorSaving": "Error al guardar la vacunación",
   "expirationDate": "Fecha de vencimiento",
   "goToSummary": "Ir al resumen",
@@ -13,6 +14,7 @@
   "save": "Guardar",
   "seeAll": "Ver todo",
   "sequence": "Secuencia",
+  "singleDose": "Single Dose",
   "singleDoseOn": "Dosis única el",
   "vaccinationDate": "Fecha de vacunación",
   "vaccinationSaved": "Vacunación guardada exitosamente",

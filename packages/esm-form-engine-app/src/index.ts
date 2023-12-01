@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, translateFrom } from '@openmrs/esm-framework';
 import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 
@@ -15,7 +15,8 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
   registerWorkspace({
     name: 'patient-form-entry-workspace',
-    title: 'Clinical Form',
+    // t('clinicalForm', 'Clinical Form')
+    title: translateFrom(moduleName, 'clinicalForm', 'Clinical Form'),
     load: getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options),
     canMaximize: true,
     canHide: true,

@@ -106,6 +106,7 @@
   "noObservationsFound": "لم يتم العثور على ملاحظات",
   "notes": "ملاحظات",
   "Offline Actions dashboard": "لوحة الإجراءات دون اتصال",
+  "offlineVisit": "Offline Visit",
   "openAnyway": "افتح على أي حال",
   "optional": "اختياري",
   "orderDurationAndUnit": "لمدة {{duration}} {{durationUnit}}",

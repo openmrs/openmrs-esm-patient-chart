@@ -1,6 +1,7 @@
 {
   "add": "Add",
   "cancel": "Cancel",
+  "edit": "Edit",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
   "goToSummary": "Go to Summary",
@@ -13,6 +14,7 @@
   "save": "Save",
   "seeAll": "See all",
   "sequence": "Sequence",
+  "singleDose": "Single Dose",
   "singleDoseOn": "Single Dose on",
   "vaccinationDate": "Vaccination date",
   "vaccinationSaved": "Vaccination saved successfully",

@@ -1,6 +1,7 @@
 {
   "add": "إضافة",
   "cancel": "إلغاء",
+  "edit": "Edit",
   "errorSaving": "خطأ في حفظ التطعيم",
   "expirationDate": "تاريخ الانتهاء",
   "goToSummary": "الانتقال إلى الملخص",
@@ -13,6 +14,7 @@
   "save": "حفظ",
   "seeAll": "عرض الكل",
   "sequence": "تسلسل",
+  "singleDose": "Single Dose",
   "singleDoseOn": "جرعة واحدة في",
   "vaccinationDate": "تاريخ التطعيم",
   "vaccinationSaved": "تم حفظ التطعيم بنجاح",
