@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-allergies-app",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "license": "MPL-2.0",
   "description": "Patient allergies microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-allergies-app.js",
