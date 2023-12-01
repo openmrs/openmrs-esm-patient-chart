@@ -5,6 +5,7 @@ import CameraMediaUploaderContext from './camera-media-uploader-context.resource
 import { readFileAsString } from '../utils';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+
 const MediaUploaderComponent = () => {
   const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();

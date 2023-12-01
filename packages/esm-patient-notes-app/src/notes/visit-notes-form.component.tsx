@@ -26,6 +26,7 @@ import { Add, WarningFilled } from '@carbon/react/icons';
 import {
   createErrorHandler,
   ExtensionSlot,
+  showModal,
   showSnackbar,
   useConfig,
   useLayoutType,
@@ -41,6 +42,8 @@ import {
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
+import { UploadedFile } from '@openmrs/esm-patient-attachments-app/src/attachments-types';
+import { createAttachment } from '@openmrs/esm-patient-attachments-app/src/attachments.resource';
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -49,7 +52,10 @@ const visitNoteFormSchema = z.object({
   }),
   secondaryDiagnosisSearch: z.string().optional(),
   clinicalNote: z.string().optional(),
+  image: z.any(),
 });
+
+type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
 
 interface DiagnosisSearchProps {
   name: 'noteDate' | 'primaryDiagnosisSearch' | 'secondaryDiagnosisSearch' | 'clinicalNote';
@@ -59,8 +65,6 @@ interface DiagnosisSearchProps {
   handleSearch: (fieldName) => void;
   error?: Object;
 }
-
-type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
 
 const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const searchTimeoutInMs = 500;
@@ -80,9 +84,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [searchSecondaryResults, setSearchSecondaryResults] = useState<Array<Concept>>([]);
   const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
   const [rows, setRows] = useState<number>();
+  const attachmentConfig = useConfig({ externalModuleName: '@openmrs/esm-patient-attachments-app' });
+
+  // const visitNoteFormSchemaWithValidator = visitNoteFormSchema.extend({
+  //   image: visitNoteFormSchema.shape.image.refine((file) => file?.size <= attachmentConfig.fileSize * 1024 * 1024, `Max image size is ${attachmentConfig.fileSize}MB.`)
+  // })
 
   const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
+    // resolver: zodResolver(visitNoteFormSchemaWithValidator),
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
       noteDate: new Date(),
@@ -222,6 +232,11 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           }
         })
         .then(() => {
+          if (data.image) {
+            return createAttachment(patientUuid, data.image);
+          }
+        })
+        .then(() => {
           mutateVisitNotes();
           closeWorkspace();
 
@@ -262,6 +277,21 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       t,
     ],
   );
+
+  const showImageCaptureModal = useCallback(() => {
+    const close = showModal('capture-photo-modal', {
+      saveFile: (file: UploadedFile) => {
+        console.log(file);
+        setValue('image', file);
+        return Promise.resolve();
+      },
+      closeModal: () => {
+        close();
+      },
+      multipleFiles: false,
+      collectDescription: false,
+    });
+  }, [patientUuid]);
 
   const onError = (errors) => console.error(errors);
 
@@ -510,12 +540,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               <Button
                 style={{ marginTop: '1rem' }}
                 kind={isTablet ? 'ghost' : 'tertiary'}
-                onClick={() => {}}
+                onClick={() => showImageCaptureModal()}
                 renderIcon={(props) => <Add size={16} {...props} />}
               >
                 {t('addImage', 'Add image')}
               </Button>
             </FormGroup>
+          </Column>
+          <Column>
+            <img src={getValues('image')?.base64Content} />
           </Column>
         </Row>
       </Stack>
