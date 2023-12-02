@@ -20,7 +20,8 @@
         "path": "Orders",
         "hideDashboardTitle": true
       },
-      "order": 4
+      "order": 4,
+      "featureFlag": "ordersSummary"
     },
     {
       "name": "patient-orders-dashboard",
@@ -28,7 +29,8 @@
       "slot": "patient-chart-orders-dashboard-slot",
       "meta": {
         "columnSpan": 4
-      }
+      },
+      "featureFlag": "ordersSummary"
     }
   ]
 }

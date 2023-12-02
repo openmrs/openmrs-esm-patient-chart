@@ -1,7 +1,7 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useCallback, useMemo } from 'react';
-import { type OrderBasketItem, type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -38,7 +38,10 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
 
 export function useOrderTypes() {
   const orderTypesUrl = `/ws/rest/v1/ordertype`;
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse, Error>(orderTypesUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<OrderTypeFetchResponse>, Error>(
+    orderTypesUrl,
+    openmrsFetch,
+  );
 
   return {
     data: data?.data?.results,

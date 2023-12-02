@@ -30,7 +30,8 @@ import {
   ErrorState,
   usePatientOrders,
   useOrderTypes,
-} from '@openmrs/esm-patient-common-lib';
+} from '../../../esm-patient-common-lib';
+// } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +41,6 @@ import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
 import { orderBy } from 'lodash-es';
 import { Tooltip } from '@carbon/react';
-
 interface OrderDetailsProps {
   title?: string;
   patientUuid: string;
@@ -130,7 +130,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     orderId: order.orderNumber,
     dateOfOrder: formatDate(new Date(order.dateActivated)),
     orderType: capitalize(order.orderType?.display ?? '--'),
-    order: <div>{order.display.length > 20 ? order.display.substring(0, 20).concat('...') : order.display}</div>,
+    order: order.display,
+    // order: (
+    //   <div>{order.display.length > 20 ? <OrderDisplayTooltip orderDisplay={order.display} /> : order.display}</div>
+    // ),
     priority: (
       <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
         {capitalize(order.urgency)}
@@ -191,18 +194,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
-  // trigger a refetch to parent component if selectedOrderType changes
-  useEffect(() => {
-    // TODO: this is a hack to trigger a refetch of the parent component
-  }, [selectedOrderTypeUuid]);
-
   const onBeforeGetContentResolve = useRef(null);
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
     }
-  }, [isPrinting]);
+  }, [isPrinting, onBeforeGetContentResolve]);
 
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
@@ -312,7 +310,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                             <TableRow className={styles.row} {...getRowProps({ row })}>
                               {row.cells.map((cell) => (
                                 <TableCell className={styles.tableCell} key={cell.id}>
-                                  {cell.value?.content ?? cell.value}
+                                  <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
                                 </TableCell>
                               ))}
                               {!isPrinting && (
@@ -353,12 +351,16 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   );
 };
 
-function OrderDisplayTooltip({ orderDisplay }: { orderDisplay: string }) {
+function FormatCellDisplay({ rowDisplay }: { rowDisplay: string }) {
   return (
     <>
-      <Tooltip align="bottom" label={orderDisplay}>
-        {orderDisplay.substring(0, 20).concat('...')}
-      </Tooltip>
+      {typeof rowDisplay === 'string' && rowDisplay.length > 20 ? (
+        <Tooltip align="bottom" label={rowDisplay.concat(' test')}>
+          <>{rowDisplay.substring(0, 20).concat('...')}</>
+        </Tooltip>
+      ) : (
+        rowDisplay
+      )}
     </>
   );
 }

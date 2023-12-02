@@ -123,6 +123,10 @@ export interface Order {
   type: string;
 }
 
+export interface OrderTypeFetchResponse {
+  results: Array<OrderType>;
+}
+
 export interface OrderType {
   uuid: string;
   display: string;

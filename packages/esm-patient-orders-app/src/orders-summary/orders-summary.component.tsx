@@ -8,7 +8,7 @@ export interface OrdersSummaryProps {
 
 const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const ordersDisplayText = t('Orders', 'Orders');
+  const ordersDisplayText = t('orders', 'Orders');
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>
@@ -16,7 +16,7 @@ const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid }) => {
         title={ordersDisplayText}
         patientUuid={patientUuid}
         showAddButton={true}
-        showPrintButton={false} // TODO: find out preferred way to print orders
+        showPrintButton={false}
       />
     </div>
   );
