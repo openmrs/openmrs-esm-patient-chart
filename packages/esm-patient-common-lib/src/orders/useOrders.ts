@@ -28,7 +28,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
   );
 
   return {
-    data: data ? orders : null,
+    data: orders,
     error,
     isLoading,
     isValidating,
