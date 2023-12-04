@@ -9,6 +9,28 @@
       "component": "orderBasketActionMenu",
       "slot": "action-menu-chart-items-slot",
       "order": 0
+    },
+    {
+      "name": "patient-orders-summary-dashboard",
+      "component": "ordersDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "slot": "patient-chart-orders-dashboard-slot",
+        "columns": 1,
+        "path": "Orders",
+        "hideDashboardTitle": true
+      },
+      "order": 4,
+      "featureFlag": "ordersSummary"
+    },
+    {
+      "name": "patient-orders-dashboard",
+      "component": "ordersDashboard",
+      "slot": "patient-chart-orders-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      },
+      "featureFlag": "ordersSummary"
     }
   ]
 }
