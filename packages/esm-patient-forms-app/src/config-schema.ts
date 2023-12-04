@@ -29,6 +29,18 @@ export const configSchema = {
           ),
         ],
       },
+      formEditUiPage: {
+        _type: Type.String,
+        _description:
+          'The HTMLFormEntry page to use to edit this form. Should be one of "editHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
+        _validators: [
+          validator(
+            (v: unknown) =>
+              typeof v === 'string' && (v === 'editHtmlFormWithStandardUi' || v === 'editHtmlFormWithSimpleUi'),
+            'Must be one of "enterHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
+          ),
+        ],
+      },
     },
     _default: [
       {
@@ -36,30 +48,35 @@ export const configSchema = {
         formName: 'Admission (Simple)',
         formUiResource: 'referenceapplication:htmlforms/simpleAdmission.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
+        formEditUiPage: 'editHtmlFormWithStandardUi',
       },
       {
         formUuid: 'b5f8ffd8-fbde-11e2-8ff2-fd54ab5fdb2a',
         formName: 'Discharge (Simple)',
         formUiResource: 'referenceapplication:htmlforms/simpleDischarge.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
+        formEditUiPage: 'editHtmlFormWithStandardUi',
       },
       {
         formUuid: 'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
         formName: 'Transfer Within Hospital (Simple)',
         formUiResource: 'referenceapplication:htmlforms/simpleTransfer.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
+        formEditUiPage: 'editHtmlFormWithStandardUi',
       },
       {
         formUuid: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
         formName: 'Visit Note',
         formUiResource: 'referenceapplication:htmlforms/simpleVisitNote.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
+        formEditUiPage: 'editHtmlFormWithStandardUi',
       },
       {
         formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
         formName: 'Vitals',
         formUiResource: 'referenceapplication:htmlforms/vitals.xml',
         formUiPage: 'enterHtmlFormWithSimpleUi',
+        formEditUiPage: 'editHtmlFormWithSimpleUi',
       },
     ],
   },
@@ -121,6 +138,7 @@ export interface HtmlFormEntryForm {
   formName: string;
   formUiResource: string;
   formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
+  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
 }
 
 export interface FormsSection {
