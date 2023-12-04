@@ -1,22 +1,22 @@
-import { useConfig } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { type ChartConfig } from '../../config-schema';
-import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
+import React, { useEffect, useMemo } from 'react';
 import {
-  TextInput,
-  TextInputSkeleton,
-  TextArea,
-  NumberInput,
-  SelectSkeleton,
-  Select,
-  SelectItem,
   Checkbox,
   DatePicker,
   DatePickerInput,
+  NumberInput,
+  Select,
+  SelectItem,
+  SelectSkeleton,
+  TextArea,
+  TextInput,
+  TextInputSkeleton,
 } from '@carbon/react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerRenderProps, useFormContext } from 'react-hook-form';
+import { useConfig } from '@openmrs/esm-framework';
+import { type ChartConfig } from '../../config-schema';
+import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import { type VisitFormData } from './visit-form.resource';
 import styles from './visit-attribute-type.scss';
 
@@ -32,28 +32,55 @@ interface VisitAttributeTypeFieldsProps {
   >;
 }
 
+/**
+ * Evaluates a given expression using the provided visitAttributes.
+ *
+ * @param {string} expression - The expression to be evaluated. This should be a string of JavaScript code.
+ * @param {VisitAttributes} visitAttributes - An object containing visit attributes which will be used in the evaluation of the expression.
+ *
+ * @returns {boolean} - The boolean value of the result of the evaluated expression.
+ *
+ */
+function evaluateExpression(expression: string, visitAttributes: VisitAttributes) {
+  const func = new Function('visitAttributes', `return ${expression};`);
+
+  const result = func(visitAttributes);
+
+  return Boolean(result);
+}
+
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setErrorFetchingResources }) => {
-  const { visitAttributeTypes } = useConfig() as ChartConfig;
-  const { control } = useFormContext<VisitFormData>();
+  const { visitAttributeTypes } = useConfig<ChartConfig>();
+  const { control, getValues } = useFormContext<VisitFormData>();
 
   if (visitAttributeTypes?.length) {
     return (
       <>
-        {visitAttributeTypes.map((attributeType, indx) => (
-          <Controller
-            key={attributeType.uuid}
-            name={`visitAttributes.${attributeType.uuid}`}
-            control={control}
-            render={({ field }) => (
-              <AttributeTypeField
-                key={indx}
-                attributeType={attributeType}
-                setErrorFetchingResources={setErrorFetchingResources}
-                fieldProps={field}
+        {visitAttributeTypes.map((attributeType) => {
+          const { visitAttributes } = getValues();
+
+          const showAttributeType = attributeType?.showWhenExpression
+            ? evaluateExpression(attributeType?.showWhenExpression, visitAttributes)
+            : true;
+
+          return (
+            showAttributeType && (
+              <Controller
+                key={attributeType.uuid}
+                name={`visitAttributes.${attributeType.uuid}`}
+                control={control}
+                render={({ field }) => (
+                  <AttributeTypeField
+                    key={attributeType.uuid}
+                    attributeType={attributeType}
+                    setErrorFetchingResources={setErrorFetchingResources}
+                    fieldProps={field}
+                  />
+                )}
               />
-            )}
-          />
-        ))}
+            )
+          );
+        })}
       </>
     );
   }
@@ -227,4 +254,5 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
 
   return <div className={styles.visitAttributeField}>{fieldToRender}</div>;
 };
+
 export default VisitAttributeTypeFields;

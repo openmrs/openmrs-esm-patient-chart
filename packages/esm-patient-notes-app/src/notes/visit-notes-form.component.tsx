@@ -567,7 +567,7 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
               labelText={labelText}
               className={error && styles.diagnosisErrorOutline}
               placeholder={placeholder}
-              renderIcon={error && <WarningFilled fill="red" />}
+              renderIcon={error && ((props) => <WarningFilled fill="red" {...props} />)}
               onChange={(e) => {
                 onChange(e);
                 handleSearch(name);
