@@ -42,7 +42,7 @@ import {
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
-import { UploadedFile } from '@openmrs/esm-patient-attachments-app/src/attachments-types';
+import { type UploadedFile } from '@openmrs/esm-patient-attachments-app/src/attachments-types';
 import { createAttachment } from '@openmrs/esm-patient-attachments-app/src/attachments.resource';
 import { mutate } from 'swr';
 
@@ -536,7 +536,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup legendText={t('addImageToVisit', 'Add an image to this visit')}>
+            <FormGroup>
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
