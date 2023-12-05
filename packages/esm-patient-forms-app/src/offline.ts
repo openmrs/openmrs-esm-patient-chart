@@ -8,7 +8,7 @@ import {
   type SyncProcessOptions,
   type Visit,
 } from '@openmrs/esm-framework';
-import { launchFormEntry } from './form-entry-interop';
+import { launchFormEntry } from '@openmrs/esm-patient-common-lib';
 import { type Form } from './types';
 import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
 import { formEncounterUrl, formEncounterUrlPoc } from './constants';

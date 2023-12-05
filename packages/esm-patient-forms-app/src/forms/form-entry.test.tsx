@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
-import { usePatient } from '@openmrs/esm-framework';
+import { useConnectivity, usePatient } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../tools/test-helpers';
 import FormEntry from './form-entry.component';
@@ -9,6 +9,7 @@ import FormEntry from './form-entry.component';
 const mockFormEntrySub = jest.fn();
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
+const mockUseConnectivity = useConnectivity as jest.Mock;
 
 const mockCurrentVisit = {
   uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
@@ -35,12 +36,14 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 jest.mock('@openmrs/esm-framework', () => ({
   ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
   usePatient: jest.fn(),
+  useConnectivity: jest.fn(),
 }));
 
 describe('FormEntry', () => {
   it('renders an extension where the form entry widget plugs in', () => {
     mockUsePatient.mockReturnValue({ patient: mockPatient });
     mockUseVisitOrOfflineVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
+    mockUseConnectivity.mockReturnValue(true);
     mockFormEntrySub.mockReturnValue(
       new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
     );
