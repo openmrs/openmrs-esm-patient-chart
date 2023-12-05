@@ -55,8 +55,14 @@ export default function DrugOrderBasketPanelExtension() {
     };
   }, [orders]);
 
+  const onClose = useCallback(() => {
+    launchPatientWorkspace('order-basket');
+  }, []);
+
   const openDrugSearch = () => {
-    launchPatientWorkspace('add-drug-order');
+    launchPatientWorkspace('add-drug-order', {
+      onCloseWorkspace: onClose,
+    });
   };
 
   const openDrugForm = (order: DrugOrderBasketItem) => {
