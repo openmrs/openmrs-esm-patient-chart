@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { usePatientAttributes, usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import ContactDetails from './contact-details.component';
@@ -90,12 +90,12 @@ const mockCohorts = [
 ];
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.mock('../hooks/usePatientAttributes.tsx', () => ({
+jest.mock('../hooks/usePatientAttributes', () => ({
   usePatientAttributes: jest.fn(),
   usePatientContactAttributes: jest.fn(),
 }));
 
-jest.mock('../hooks/usePatientListsForPatient.tsx', () => ({
+jest.mock('../hooks/usePatientListsForPatient', () => ({
   usePatientListsForPatient: jest.fn(),
 }));
 

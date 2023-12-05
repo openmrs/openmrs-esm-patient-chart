@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, Tile, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';

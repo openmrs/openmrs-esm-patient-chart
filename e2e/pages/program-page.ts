@@ -1,12 +1,12 @@
-import { Locator, Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
-export class ProgramPage {
+export class ProgramsPage {
   constructor(readonly page: Page) {}
 
-  readonly table = () => this.page.getByTestId('program-table');
-  readonly editButton = () => this.page.getByTestId('edit-program-button');
+  readonly programsTable = () => this.page.getByRole('table', { name: /program enrollments/i });
+  readonly editProgramButton = () => this.page.getByRole('button', { name: /edit program/i });
 
-  async goto(patientUuid: string) {
+  async goTo(patientUuid: string) {
     await this.page.goto(`patient/${patientUuid}/chart/Programs`);
   }
 }

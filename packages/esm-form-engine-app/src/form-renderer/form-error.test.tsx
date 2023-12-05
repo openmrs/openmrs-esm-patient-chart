@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
@@ -30,7 +30,7 @@ describe('FormError', () => {
 
     const closeButton = screen.getByRole('button', { name: /close this panel/i });
 
-    await waitFor(() => user.click(closeButton));
+    await user.click(closeButton);
 
     expect(closeWorkspace).toHaveBeenCalled();
   });
@@ -43,7 +43,7 @@ describe('FormError', () => {
 
     const link = screen.getByRole('button', { name: /this list/i });
 
-    await waitFor(() => user.click(link));
+    await user.click(link);
 
     expect(closeWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('clinical-forms-workspace');

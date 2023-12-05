@@ -1,12 +1,12 @@
 import {
   getSynchronizationItems,
-  NewVisitPayload,
-  QueueItemDescriptor,
+  type NewVisitPayload,
+  type QueueItemDescriptor,
   queueSynchronizationItem,
   useConnectivity,
   useSession,
   useVisit,
-  Visit,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';

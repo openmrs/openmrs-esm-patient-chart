@@ -1,8 +1,8 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockLocations, mockLocationsDataResponse } from '../../__mocks__/location.mock';
-import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { mockLocations } from '../../__mocks__/location.mock';
+import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockSessionDataResponse } from '../../__mocks__/session.mock';
 import { mockUseAppointmentServiceData } from '../../__mocks__/appointments.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
@@ -17,8 +17,7 @@ const testProps = {
 
 const mockCreateAppointment = saveAppointment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -129,12 +128,12 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
-    await waitFor(() => user.click(cancelButton));
+    await user.click(cancelButton);
 
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
-  it('renders a success toast notification upon successfully scheduling an appointment', async () => {
+  it('renders a success snackbar  upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
@@ -153,18 +152,18 @@ describe('AppointmentForm', () => {
 
     expect(saveButton).not.toBeDisabled();
 
-    await waitFor(() => user.clear(dateInput));
-    await waitFor(() => user.type(dateInput, '4/4/2021'));
-    await waitFor(() => user.clear(timeInput));
-    await waitFor(() => user.type(timeInput, '09:30'));
-    await waitFor(() => user.selectOptions(timeFormat, 'AM'));
-    await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
+    await user.clear(dateInput);
+    await user.type(dateInput, '4/4/2021');
+    await user.clear(timeInput);
+    await user.type(timeInput, '09:30');
+    await user.selectOptions(timeFormat, 'AM');
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
 
-    await waitFor(() => user.click(saveButton));
+    await user.click(saveButton);
   });
 
-  it('renders an error notification if there was a problem scheduling an appointment', async () => {
+  it('renders an error snackbar if there was a problem scheduling an appointment', async () => {
     const user = userEvent.setup();
 
     const error = {
@@ -189,14 +188,14 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
-    await waitFor(() => user.clear(dateInput));
-    await waitFor(() => user.type(dateInput, '4/4/2021'));
-    await waitFor(() => user.clear(timeInput));
-    await waitFor(() => user.type(timeInput, '09:30'));
-    await waitFor(() => user.selectOptions(timeFormat, 'AM'));
-    await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
-    await waitFor(() => user.click(saveButton));
+    await user.clear(dateInput);
+    await user.type(dateInput, '4/4/2021');
+    await user.clear(timeInput);
+    await user.type(timeInput, '09:30');
+    await user.selectOptions(timeFormat, 'AM');
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    await user.click(saveButton);
   });
 });
 

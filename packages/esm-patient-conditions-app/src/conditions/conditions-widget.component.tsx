@@ -1,4 +1,4 @@
-import React, { Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
@@ -17,17 +17,17 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
-  CodedCondition,
-  ConditionDataTableRow,
+  type CodedCondition,
+  type ConditionDataTableRow,
   createCondition,
-  FormFields,
+  type FormFields,
   updateCondition,
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { ConditionFormData } from './conditions-form.component';
+import { type ConditionFormData } from './conditions-form.component';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
@@ -54,7 +54,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 }) => {
   const { t } = useTranslation();
   const { conditions, mutate } = useConditions(patientUuid);
-  const { control, watch, getValues, formState } = useFormContext<ConditionFormData>();
+  const {
+    control,
+    watch,
+    getValues,
+    formState: { errors },
+  } = useFormContext<ConditionFormData>();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const searchInputRef = useRef(null);
@@ -74,7 +79,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const displayName = getFieldValue(conditionToEdit?.cells, 'display');
   const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
-  const { searchResults, isSearching } = useConditionsSearch(watch('search'));
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
   const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
   }, []);
@@ -100,10 +107,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 201) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionSaved', 'Condition saved'),
         });
 
@@ -142,10 +149,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       if (res.status === 200) {
         mutate();
 
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           kind: 'success',
-          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
           title: t('conditionUpdated', 'Condition updated'),
         });
 
@@ -175,19 +182,21 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     searchInputRef.current.focus();
   };
 
+  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
+
   useEffect(() => {
-    if (formState?.errors?.search) {
+    if (errors?.search) {
       searchInputFocus();
     }
     if (isSubmittingForm) {
-      if (Object.keys(formState.errors).length > 0) {
+      if (Object.keys(errors).length > 0) {
         setIsSubmittingForm(false);
-        Object.entries(formState.errors).map((key, err) => console.error(`${key}: ${err} `));
+        Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
         return;
       }
       editing ? handleUpdate() : handleCreate();
     }
-  }, [handleUpdate, editing, handleCreate, isSubmittingForm, formState.errors, setIsSubmittingForm]);
+  }, [handleUpdate, editing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
 
   return (
     <div className={styles.formContainer}>
@@ -203,22 +212,29 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 render={({ field: { onChange, value, onBlur } }) => (
                   <ResponsiveWrapper isTablet={isTablet}>
                     <Search
+                      autoFocus
                       ref={searchInputRef}
                       size="md"
                       id="conditionsSearch"
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
-                      className={formState?.errors?.search && styles.conditionsError}
-                      onChange={onChange}
-                      renderIcon={formState?.errors?.search && <WarningFilled />}
+                      className={errors?.search && styles.conditionsError}
+                      onChange={(e) => {
+                        onChange(e);
+                        handleSearchTermChange(e);
+                      }}
+                      renderIcon={errors?.search && <WarningFilled />}
                       onBlur={onBlur}
-                      onClear={() => setSelectedCondition(null)}
+                      onClear={() => {
+                        setSearchTerm('');
+                        setSelectedCondition(null);
+                      }}
                       disabled={editing}
                       value={(() => {
                         if (selectedCondition) {
                           return selectedCondition.display;
                         }
-                        if (getValues('search')) {
+                        if (debouncedSearchTerm) {
                           return value;
                         }
                       })()}
@@ -226,9 +242,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {formState?.errors?.search && <p className={styles.errorMessage}>{formState?.errors?.search?.message}</p>}
+              {errors?.search && <p className={styles.errorMessage}>{errors?.search?.message}</p>}
               {(() => {
-                if (!getValues('search') || selectedCondition) return null;
+                if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
                   return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
                 if (searchResults && searchResults.length) {
@@ -251,7 +267,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   <Layer>
                     <Tile className={styles.emptyResults}>
                       <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{getValues('search')}"</strong>
+                        {t('noResultsFor', 'No results for')} <strong>"{debouncedSearchTerm}"</strong>
                       </span>
                     </Tile>
                   </Layer>

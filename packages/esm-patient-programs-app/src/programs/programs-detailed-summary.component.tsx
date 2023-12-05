@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
@@ -21,7 +21,7 @@ import {
   formatDate,
   formatDatetime,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
@@ -118,7 +118,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="program enrollments" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -135,7 +135,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                     <TableHeader />
                   </TableRow>
                 </TableHead>
-                <TableBody data-testid="program-table">
+                <TableBody>
                   {rows.map((row, i) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
@@ -167,6 +167,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
 
   return (
     <Button
+      aria-label="edit program"
       kind="ghost"
       renderIcon={(props) => <Edit size={16} {...props} />}
       iconDescription={t('editProgram', 'Edit Program')}
@@ -174,7 +175,6 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
       hasIconOnly
       tooltipPosition="left"
       size={isTablet ? 'lg' : 'sm'}
-      data-testid="edit-program-button"
     />
   );
 }

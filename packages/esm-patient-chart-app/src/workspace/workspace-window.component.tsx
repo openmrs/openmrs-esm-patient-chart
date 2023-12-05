@@ -72,7 +72,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                   onClick={toggleWindowState}
                   size="lg"
                 >
-                  {maximized ? <Maximize /> : <Minimize />}
+                  {maximized ? <Minimize /> : <Maximize />}
                 </HeaderGlobalAction>
               )}
               {canHide ? (

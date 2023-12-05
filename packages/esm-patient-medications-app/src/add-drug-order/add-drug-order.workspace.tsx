@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import DrugSearch from './drug-search/drug-search.component';
-import { DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
 import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
-import { DrugOrderBasketItem } from '../types';
+import type { DrugOrderBasketItem } from '../types';
 import { ordersEqual } from './drug-search/helpers';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
@@ -43,7 +43,11 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
-      newOrders[orders.indexOf(existingOrder)] = finalizedOrder;
+      newOrders[orders.indexOf(existingOrder)] = {
+        ...finalizedOrder,
+        // Incomplete orders should be marked completed on saving the form
+        isOrderIncomplete: false,
+      };
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');

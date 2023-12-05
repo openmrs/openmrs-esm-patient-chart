@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  DataTableHeader,
-  DataTableRow,
+  type DataTableHeader,
+  type DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -77,7 +77,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()}>
+            <Table aria-label="vitals" {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

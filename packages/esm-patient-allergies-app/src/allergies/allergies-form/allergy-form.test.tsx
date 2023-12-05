@@ -1,15 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { screen, render } from '@testing-library/react';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { mockAllergensAndAllergicReactions, mockAllergyResult } from '../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
 import { saveAllergy, useAllergensAndAllergicReactions } from './allergy-form.resource';
 import AllergyForm from './allergy-form.component';
 
 const mockSaveAllergy = saveAllergy as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 const mockUseAllergensAndAllergicReactions = useAllergensAndAllergicReactions as jest.Mock;
 
 jest.setTimeout(15000);
@@ -67,7 +66,7 @@ describe('AllergyForm ', () => {
 
     tabNames.map((tabName) => expect(screen.getByRole('tab', { name: tabName })).toBeInTheDocument());
 
-    await waitFor(() => user.click(screen.getByRole('tab', { name: /drug/i })));
+    await user.click(screen.getByRole('tab', { name: /drug/i }));
 
     expect(screen.getByRole('tab', { name: /drug/i })).toBeChecked;
     expect(screen.getByRole('radio', { name: /ace inhibitors/i })).toBeInTheDocument();
@@ -81,28 +80,28 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
   });
 
-  xit('renders a success notification after successful submission', async () => {
+  xit('renders a success Snackbar after successful submission', async () => {
     const user = userEvent.setup();
 
     mockSaveAllergy.mockResolvedValueOnce({ data: mockAllergyResult, status: 201, statusText: 'Created' });
 
     renderAllergyForm();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /ace inhibitors/i })));
-    await waitFor(() => user.click(screen.getByRole('checkbox', { name: /cough/i })));
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /moderate/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /save and close/i })));
+    await user.click(screen.getByRole('radio', { name: /ace inhibitors/i }));
+    await user.click(screen.getByRole('checkbox', { name: /cough/i }));
+    await user.click(screen.getByRole('radio', { name: /moderate/i }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
-      critical: true,
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
       kind: 'success',
       title: 'Allergy saved',
-      description: 'It is now visible on the Allergies page',
+      subtitle: 'It is now visible on the Allergies page',
     });
   });
 
-  xit('renders an error notification upon an invalid submission', async () => {
+  xit('renders an error snackbar upon an invalid submission', async () => {
     const user = userEvent.setup();
 
     mockSaveAllergy.mockRejectedValue({
@@ -115,11 +114,11 @@ describe('AllergyForm ', () => {
 
     renderAllergyForm();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /ace inhibitors/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /save and close/i })));
+    await user.click(screen.getByRole('radio', { name: /ace inhibitors/i }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       critical: true,
       description: 'Internal Server Error',
       kind: 'error',

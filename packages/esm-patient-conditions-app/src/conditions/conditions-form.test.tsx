@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { searchedCondition } from '../__mocks__/conditions.mock';
 import { getByTextWithMarkup, mockPatient } from '../../../../tools/test-helpers';
 import { createCondition, useConditionsSearch } from './conditions.resource';
@@ -38,7 +38,7 @@ const testProps = {
 
 const mockCreateCondition = createCondition as jest.Mock;
 const mockUseConditionsSearch = useConditionsSearch as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockshowSnackbar = showSnackbar as jest.Mock;
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -47,7 +47,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    showToast: jest.fn(),
+    showSnackbar: jest.fn(),
   };
 });
 

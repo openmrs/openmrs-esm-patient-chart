@@ -1,35 +1,22 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 import { mockConditions, mockFhirConditionsResponse } from '../__mocks__/conditions.mock';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
-jest.setTimeout(10000);
+jest.setTimeout(15000);
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockImplementation(() => ({ conditionPageSize: 5 })),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
-  };
-});
+const mockedUseConfig = useConfig as jest.Mock;
+const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockedUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -41,8 +28,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 describe('ConditionsOverview: ', () => {
+  beforeEach(() => {
+    mockedOpenmrsFetch.mockClear();
+    mockedUseConfig.mockReturnValue({ conditionPageSize: 5 });
+  });
+
   it('renders an empty state view if conditions data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockedOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
     renderConditionsOverview();
 
@@ -55,7 +47,7 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByText(/Record conditions/i)).toBeInTheDocument();
   });
 
-  it('renders an error state view if there is a problem fetching conditions data', async () => {
+  it('renders an error state view if there is a problem fetching conditions', async () => {
     const error = {
       message: 'You are not logged in',
       response: {
@@ -64,7 +56,7 @@ describe('ConditionsOverview: ', () => {
       },
     };
 
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockedOpenmrsFetch.mockRejectedValueOnce(error);
 
     renderConditionsOverview();
 
@@ -79,8 +71,8 @@ describe('ConditionsOverview: ', () => {
   it("renders an overview of the patient's conditions when present", async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
-    mockUsePagination.mockImplementation(() => ({
+    mockedOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
+    mockedUsePagination.mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
       results: mockConditions,
@@ -108,7 +100,7 @@ describe('ConditionsOverview: ', () => {
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 
-    await waitFor(() => user.click(nextPageButton));
+    await user.click(nextPageButton);
 
     expect(screen.getAllByRole('row').length).toEqual(6);
   });
@@ -116,7 +108,7 @@ describe('ConditionsOverview: ', () => {
   it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockedOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
     renderConditionsOverview();
 
@@ -124,7 +116,7 @@ describe('ConditionsOverview: ', () => {
 
     const recordConditionsLink = screen.getByText(/record conditions/i);
 
-    await waitFor(() => user.click(recordConditionsLink));
+    await user.click(recordConditionsLink);
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {

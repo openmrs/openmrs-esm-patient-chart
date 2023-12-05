@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { parseDate } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState, Order } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, type Order } from '@openmrs/esm-patient-common-lib';
 import { usePatientOrders } from '../api/api';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;

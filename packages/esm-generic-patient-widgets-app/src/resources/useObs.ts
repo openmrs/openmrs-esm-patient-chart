@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 
 export interface UseObsResult {
   data: Array<ObsResult>;

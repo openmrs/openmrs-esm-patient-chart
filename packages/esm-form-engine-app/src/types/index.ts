@@ -1,5 +1,5 @@
-import { OpenmrsFormResource } from '@openmrs/openmrs-form-engine-lib';
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import { type OpenmrsFormResource } from '@openmrs/openmrs-form-engine-lib';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface Form {
   uuid: string;

@@ -4,6 +4,8 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
+$container-width: calc(100% - 3rem);
+
 .header {
   box-sizing: content-box;
   border-bottom: 1px solid $text-03;
@@ -45,10 +47,9 @@
 }
 
 .fullWidth {
-  // Subtract side rail width
-  width: calc(100% - 3rem);
+  // Subtract the width of the side rail from the viewport
+  width: $container-width;
 }
-
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
@@ -76,6 +77,7 @@
 
   .narrowWorkspace {
     width: 26.25rem;
+
     .dynamicWidth {
       width: 26.25rem;
     }
@@ -84,16 +86,12 @@
   .headerGlobalBar {
     button {
       background-color: $ui-02;
-      border-right: 1px solid $ui-03;
+      border-right: 1px solid colors.$gray-20;
 
-      &>svg{
+      & > svg {
         fill:colors.$cool-gray-100 !important; // force svg to be visible
       }
     }
-    button:last-child {
-      border-right: none;
-    }
-    
   }
 }
 

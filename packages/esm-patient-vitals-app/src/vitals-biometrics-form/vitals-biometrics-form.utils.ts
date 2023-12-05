@@ -1,5 +1,5 @@
 import isNumber from 'lodash/isNumber';
-import { ConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
 
 export function calculateBodyMassIndex(weight: number, height: number): number {
   if (!weight || !height) return;
@@ -14,7 +14,7 @@ export function isValueWithinReferenceRange(
   conceptUuid: string,
   value: string | number,
 ) {
-  const concept = conceptMetadata.find((c) => c.uuid === conceptUuid);
+  const concept = conceptMetadata?.find((c) => c.uuid === conceptUuid);
 
   if (value === undefined || value === '' || concept === undefined) {
     return true;

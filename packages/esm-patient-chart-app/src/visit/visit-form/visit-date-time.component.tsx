@@ -1,14 +1,15 @@
 import React from 'react';
 import styles from './visit-form.scss';
 import { Controller, useFormContext } from 'react-hook-form';
-import { VisitFormData } from './visit-form.resource';
+import { type VisitFormData } from './visit-form.resource';
 import { DatePicker, DatePickerInput, Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { amPm } from '@openmrs/esm-patient-common-lib';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
 
 interface VisitDateTimeFieldProps {
+  visitDatetimeLabel: string;
   dateFieldName: 'visitStartDate' | 'visitStopDate';
   timeFieldName: 'visitStartTime' | 'visitStopTime';
   timeFormatFieldName: 'visitStartTimeFormat' | 'visitStopTimeFormat';
@@ -17,6 +18,7 @@ interface VisitDateTimeFieldProps {
 }
 
 const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
+  visitDatetimeLabel,
   dateFieldName,
   timeFieldName,
   timeFormatFieldName,
@@ -28,7 +30,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   const {
     control,
     formState: { errors },
-    getValues,
   } = useFormContext<VisitFormData>();
 
   // Since we have the separate date and time fields, the final validation needs to be done at the form
@@ -39,7 +40,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
 
   return (
     <section>
-      <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
+      <div className={styles.sectionTitle}>{visitDatetimeLabel}</div>
       <div className={classNames(styles.dateTimeSection, styles.sectionField)}>
         <Controller
           name={dateFieldName}

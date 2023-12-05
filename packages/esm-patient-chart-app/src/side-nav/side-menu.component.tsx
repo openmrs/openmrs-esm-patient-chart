@@ -1,7 +1,6 @@
 import React from 'react';
-import { SideNavProps } from '@carbon/react';
+import { type SideNavProps } from '@carbon/react';
 import { LeftNavMenu, useLayoutType } from '@openmrs/esm-framework';
-import { isDesktop } from '../utils';
 
 interface SideMenuPanelProps extends SideNavProps {}
 

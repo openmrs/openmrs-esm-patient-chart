@@ -128,6 +128,7 @@ export interface ChartConfig {
     uuid: string;
     required: boolean;
     displayInThePatientBanner: boolean;
+    showWhenExpression?: string;
   }>;
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;

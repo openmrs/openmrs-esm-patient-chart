@@ -5,7 +5,7 @@ script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # create a temporary working directory
 working_dir=$(mktemp -d "${TMPDIR:-/tmp/}openmrs-e2e-frontends.XXXXXXXXXX")
 # get a list of all the apps in this workspace
-apps=$(yarn workspaces list --json | jq -r 'if ((.location == ".") or (.location | test("-app") | not)) then halt else .name end')
+apps=$(yarn workspaces list --json | jq -r 'if ((.location == ".") or (.location | test("form-engine-app")) or (.location | test("-app") | not)) then halt else .name end')
 # this array will hold all of the packed app names
 app_names=()
 
@@ -20,7 +20,7 @@ do
   # run yarn pack for our app and add it to the working directory
   yarn workspace "$app" pack -o "$working_dir/$app_name.tgz" >/dev/null;
 done;
-echo "Created packed app archives" 
+echo "Created packed app archives"
 
 echo "Creating dynamic spa-assemble-config.json..."
 # dynamically assemble our list of frontend modules, prepending the login app and

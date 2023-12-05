@@ -1,7 +1,6 @@
 {
-  "clinicalForm": "Formulario clínico",
+  "clinicalForms": "Formularios clínicos",
   "editForm": "Editar formulario",
-  "form": "Formulario",
   "formName": "Nombre de formulario (A-Z)",
   "forms": "Formularios",
   "formSearchHint": "Intente buscar el formulario utilizando un nombre alternativo o palabra clave",

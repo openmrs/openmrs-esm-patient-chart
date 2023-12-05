@@ -6,7 +6,13 @@ import {
   extractMetaInformation,
   addUserDataToCache,
 } from './helpers';
-import { PatientData, ObsRecord, ConceptUuid, ObsUuid, ObsMetaInfo } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientData,
+  type ObsRecord,
+  type ConceptUuid,
+  type ObsUuid,
+  type ObsMetaInfo,
+} from '@openmrs/esm-patient-common-lib';
 import uniq from 'lodash-es/uniq';
 
 function parseSingleObsData(

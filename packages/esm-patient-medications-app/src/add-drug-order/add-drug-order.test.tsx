@@ -9,7 +9,7 @@ import {
   mockDrugOrderTemplateApiData,
   mockPatientDrugOrdersApiData,
 } from '../__mocks__/medication.mock';
-import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useSession } from '@openmrs/esm-framework';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 
@@ -128,6 +128,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
+        isOrderIncomplete: true,
         startDate: expect.any(Date),
       }),
     ]);

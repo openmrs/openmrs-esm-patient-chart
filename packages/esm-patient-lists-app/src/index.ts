@@ -19,8 +19,8 @@ export function startupApp() {
     name: 'patient-lists',
     title: 'Patient Lists',
     load: getAsyncLifecycle(() => import('./workspaces/patient-lists.workspace'), options),
-    type: 'patient-list',
-    canHide: true,
+    type: 'patient-lists',
+    canHide: false,
     width: 'wider',
   });
 
@@ -28,8 +28,8 @@ export function startupApp() {
     name: 'patient-list-details',
     title: 'Patient List Details',
     load: getAsyncLifecycle(() => import('./workspaces/patient-list-details.workspace'), options),
-    type: 'patient-list-details',
-    canHide: true,
+    type: 'patient-lists',
+    canHide: false,
     width: 'wider',
   });
 }

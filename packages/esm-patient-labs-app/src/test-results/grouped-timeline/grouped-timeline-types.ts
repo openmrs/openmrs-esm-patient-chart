@@ -1,5 +1,5 @@
 import type { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { TreeNode } from '../filter/filter-types';
+import { type TreeNode } from '../filter/filter-types';
 
 export interface PanelNameCornerProps {
   showShadow: boolean;

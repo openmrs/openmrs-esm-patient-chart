@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Dropdown,
   Layer,
   OverflowMenu,
@@ -30,19 +29,18 @@ import {
   formatDatetime,
   getConfig,
   isDesktop,
-  navigate,
   parseDate,
   showModal,
-  showToast,
+  showSnackbar,
   useLayoutType,
   usePagination,
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
-import { MappedEncounter } from '../../visit.resource';
+import { type MappedEncounter } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 
@@ -122,28 +120,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     },
   );
 
-  const launchWorkspace = (
-    formUuid: string,
-    visitUuid?: string,
-    encounterUuid?: string,
-    formName?: string,
-    visitTypeUuid?: string,
-    visitStartDatetime?: string,
-    visitStopDatetime?: string,
-  ) => {
-    const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlForm)) {
-      launchPatientWorkspace('patient-form-entry-workspace', {
-        workspaceTitle: formName,
-        formInfo: { visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime, formUuid, encounterUuid },
-      });
-    } else {
-      navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-      });
-    }
-  };
-
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
@@ -162,17 +138,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              showToast({
+              showSnackbar({
                 title: t('encounterDeleted', 'Encounter deleted'),
-                description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
               mutateVisits?.();
             })
             .catch(() => {
-              showToast({
+              showSnackbar({
                 title: t('error', 'Error'),
-                description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',
               });
             });
@@ -275,7 +251,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                             <Layer className={styles.layer}>
                               <OverflowMenu
                                 data-floating-menu-container
-                                ariaLabel="Encounter table actions menu"
+                                aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
                               >
@@ -291,7 +267,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
                                       size={desktopLayout ? 'sm' : 'lg'}
                                       onClick={() => {
-                                        launchWorkspace(
+                                        launchFormEntryOrHtmlForms(
+                                          htmlFormEntryFormsConfig,
+                                          patientUuid,
                                           selectedVisit?.form?.uuid,
                                           selectedVisit?.visitUuid,
                                           selectedVisit?.id,
@@ -328,12 +306,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   <Button
                                     kind="ghost"
                                     onClick={() => {
-                                      launchWorkspace(
-                                        selectedVisit.form.uuid,
-                                        selectedVisit.visitUuid,
-                                        selectedVisit.id,
-                                        selectedVisit.form.display,
-                                        selectedVisit.visitTypeUuid,
+                                      launchFormEntryOrHtmlForms(
+                                        htmlFormEntryFormsConfig,
+                                        patientUuid,
+                                        selectedVisit?.form?.uuid,
+                                        selectedVisit?.visitUuid,
+                                        selectedVisit?.id,
+                                        selectedVisit?.form?.display,
+                                        selectedVisit?.visitTypeUuid,
                                         selectedVisit?.visitStartDatetime,
                                         selectedVisit?.visitStopDatetime,
                                       );

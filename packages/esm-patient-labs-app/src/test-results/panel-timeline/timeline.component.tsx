@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { ParsedTimeType } from '../filter/filter-types';
+import { type ParsedTimeType } from '../filter/filter-types';
 import type { ObsRecord } from '../../types';
 import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';

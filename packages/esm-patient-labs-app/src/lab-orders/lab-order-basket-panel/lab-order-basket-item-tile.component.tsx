@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './order-basket-item-tile.scss';
-import { LabOrderBasketItem } from '../api';
+import { type LabOrderBasketItem } from '../api';
+import styles from './lab-order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: LabOrderBasketItem;
@@ -27,11 +28,14 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   return (
     <ClickableTile
       role="listitem"
-      className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}
+      className={classNames({
+        [styles.clickableTileTablet]: isTablet,
+        [styles.clickableTileDesktop]: !isTablet,
+      })}
       onClick={() => shouldOnClickBeCalled.current && onItemClick()}
     >
       <div className={styles.orderBasketItemTile}>
-        <p className={styles.clipTextWithEllipsis}>
+        <div className={styles.clipTextWithEllipsis}>
           <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>
           <br />
           <>
@@ -49,7 +53,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
               </>
             )}
           </span>
-        </p>
+        </div>
         <Button
           className={styles.removeButton}
           kind="ghost"
@@ -60,6 +64,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
             shouldOnClickBeCalled.current = false;
             onRemoveClick();
           }}
+          tooltipPosition="left"
         />
       </div>
     </ClickableTile>

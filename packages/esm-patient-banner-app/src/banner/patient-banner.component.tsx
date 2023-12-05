@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
@@ -106,12 +106,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     ) ?? [];
 
   return (
-    <div
+    <header
       className={classNames(
         styles.container,
         isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer,
       )}
-      role="banner"
       ref={patientBannerRef}
     >
       <div
@@ -195,7 +194,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           deceased={isDeceased}
         />
       )}
-    </div>
+    </header>
   );
 };
 

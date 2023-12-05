@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { FHIRCondition, FHIRConditionResponse } from '../types';
+import { type FHIRCondition, type FHIRConditionResponse } from '../types';
 
 export type Condition = {
   clinicalStatus: string;

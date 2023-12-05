@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -89,7 +89,7 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
 
   const recordConditionsLink = screen.getByText(/record conditions/i);
 
-  await waitFor(() => user.click(recordConditionsLink));
+  await user.click(recordConditionsLink);
 
   expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
   expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {

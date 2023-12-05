@@ -16,17 +16,17 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { CardHeader, Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
-import styles from './medications-details-table.scss';
-import { AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
-import { DrugOrderBasketItem } from '../types';
-import { ConfigObject } from '../config-schema';
+import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { type DrugOrderBasketItem } from '../types';
+import { type ConfigObject } from '../config-schema';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
+import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -252,7 +252,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="medications" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -488,7 +488,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
+    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

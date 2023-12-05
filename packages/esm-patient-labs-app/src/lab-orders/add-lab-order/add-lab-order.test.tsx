@@ -3,10 +3,12 @@ import { render, renderHook, screen, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
 import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
-import { LabOrderBasketItem } from '../api';
+import { type LabOrderBasketItem } from '../api';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
-import { PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
+
+jest.setTimeout(10000);
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -88,7 +90,6 @@ describe('AddLabOrder', () => {
   });
 
   test('happy path fill and submit form', async () => {
-    jest.setTimeout(10000);
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
     await userEvent.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');

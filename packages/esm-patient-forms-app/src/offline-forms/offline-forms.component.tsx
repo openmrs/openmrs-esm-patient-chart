@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  DataTableCustomRenderProps,
-  DataTableHeader,
-  DataTableRow,
+  type DataTableCustomRenderProps,
+  type DataTableHeader,
+  type DataTableRow,
   Layer,
   Search,
   SkeletonPlaceholder,
@@ -28,7 +28,7 @@ import {
   useSession,
 } from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
-import { Form } from '../types';
+import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.styles.scss';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';

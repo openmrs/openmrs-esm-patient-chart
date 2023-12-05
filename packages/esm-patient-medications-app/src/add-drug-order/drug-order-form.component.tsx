@@ -27,7 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import type {
   DosingUnit,
   DrugOrderBasketItem,

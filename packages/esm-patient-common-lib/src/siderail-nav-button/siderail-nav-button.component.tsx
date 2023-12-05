@@ -7,7 +7,7 @@ import styles from './siderail-nav-button.scss';
 
 interface SiderailNavButtonProps {
   name: string;
-  getIcon: (props: Object) => JSX.Element;
+  getIcon: (props: object) => JSX.Element;
   label: string;
   iconDescription: string;
   handler: () => void;
@@ -30,19 +30,33 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
   const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
+  function Tags({ isTablet }: { isTablet: boolean }) {
+    return (
+      <>
+        {getIcon({ size: isTablet ? 16 : 20 })}
+
+        {formOpenInTheBackground ? (
+          <span className={styles.interruptedTag}>!</span>
+        ) : (
+          <span className={styles.countTag}>{tagContent}</span>
+        )}
+      </>
+    );
+  }
+
   if (layout === 'tablet') {
     return (
       <Button
-        kind="ghost"
         className={classNames(styles.container, { [styles.active]: isWorkspaceActive })}
+        iconDescription={iconDescription}
+        kind="ghost"
+        onClick={handler}
         role="button"
         tabIndex={0}
-        onClick={handler}
       >
-        <div className={styles.elementContainer}>
-          {getIcon({ size: 16 })}
-          <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
-        </div>
+        <span className={styles.elementContainer}>
+          <Tags isTablet />
+        </span>
 
         <span>{label}</span>
       </Button>
@@ -52,17 +66,17 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   return (
     <IconButton
       align="left"
+      aria-label={iconDescription}
       className={classNames(styles.container, {
         [styles.active]: isWorkspaceActive,
       })}
-      enterDelayMs={1000}
+      enterDelayMs={300}
       kind="ghost"
-      label={iconDescription}
+      label={label}
       onClick={handler}
     >
       <div className={styles.elementContainer}>
-        {getIcon({ size: 20 })}
-        <span className={styles.countTag}>{formOpenInTheBackground ? '!' : tagContent}</span>
+        <Tags isTablet={false} />
       </div>
     </IconButton>
   );

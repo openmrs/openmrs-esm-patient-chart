@@ -1,7 +1,7 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
-import { CohortMemberResponse } from '../types';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type CohortMemberResponse } from '../types';
 
 export function usePatientListsForPatient(patientUuid: string) {
   const customRepresentation = 'custom:(uuid,patient:ref,cohort:(uuid,name,startDate,endDate))';

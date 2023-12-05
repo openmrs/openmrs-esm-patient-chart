@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isDesktop } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, registerWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -63,7 +63,7 @@ xdescribe('WorkspaceWindow', () => {
 
     expect(workspaceContainer).toHaveClass('hide');
 
-    await waitFor(() => launchPatientWorkspace('Clinical Form', { workspaceTitle: 'POC Triage' }));
+    await launchPatientWorkspace('Clinical Form', { workspaceTitle: 'POC Triage' });
 
     expect(await screen.findByRole('complementary')).toHaveClass('show');
   });

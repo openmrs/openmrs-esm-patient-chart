@@ -43,8 +43,8 @@
       "component": "clinicalFormsWorkspace",
       "meta": {
         "title": {
-          "key": "clinicalForm",
-          "default": "Clinical form"
+          "key": "clinicalForms",
+          "default": "Clinical forms"
         },
         "type": "clinical-form",
         "canMaximize": true,

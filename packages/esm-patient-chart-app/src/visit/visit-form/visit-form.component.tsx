@@ -20,39 +20,38 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   saveVisit,
-  showNotification,
-  showToast,
+  showSnackbar,
   useSession,
   ExtensionSlot,
-  NewVisitPayload,
+  type NewVisitPayload,
   toOmrsIsoString,
   toDateObjectStrict,
   useLayoutType,
   useVisitTypes,
   useConfig,
   useVisit,
-  Visit,
+  type Visit,
   updateVisit,
   useConnectivity,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
-  DefaultWorkspaceProps,
+  type DefaultWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { ChartConfig } from '../../config-schema';
+import { type ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import styles from './visit-form.scss';
-import { VisitFormData } from './visit-form.resource';
+import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
@@ -144,7 +143,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     let defaultValues: Partial<VisitFormData> = {
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
-      visitStartTimeFormat: visitStartDate.getDate() >= 12 ? 'PM' : 'AM',
+      visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
 
       visitType: visitToEdit?.visitType?.uuid,
       visitLocation: visitToEdit?.location ?? sessionLocation ?? {},
@@ -163,7 +162,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ...defaultValues,
         visitStopDate,
         visitStopTime: dayjs(visitStopDate).format('hh:mm'),
-        visitStopTimeFormat: visitStopDate.getDate() >= 12 ? 'PM' : 'AM',
+        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
       };
     }
 
@@ -222,12 +221,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
       validSubmission = false;
       setError('visitStopDate', {
-        message: t('invalidVisitStopDate', 'Stop date needs to be on or after {{lastEncounterDatetime}}', {
-          lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
+        message: t(
+          'visitStopDateMustBeAfterMostRecentEncounter',
+          'Stop date needs to be on or after {{lastEncounterDatetime}}',
+          {
+            lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
+            interpolation: {
+              escapeValue: false,
+            },
           },
-        }),
+        ),
       });
     }
 
@@ -346,19 +349,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                         mutateCurrentVisit();
                         mutateVisits();
                         mutateQueueEntry();
-                        showToast({
+                        showSnackbar({
                           kind: 'success',
                           title: t('visitStarted', 'Visit started'),
-                          description: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                          subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
                         });
                       }
                     },
                     (error) => {
-                      showNotification({
+                      showSnackbar({
                         title: t('queueEntryError', 'Error adding patient to the queue'),
                         kind: 'error',
-                        critical: true,
-                        description: error?.message,
+                        isLowContrast: false,
+                        subtitle: error?.message,
                       });
                     },
                   );
@@ -379,20 +382,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       if (status === 201) {
                         mutateCurrentVisit();
                         mutateVisits();
-                        showToast({
-                          critical: true,
+                        showSnackbar({
+                          isLowContrast: true,
                           kind: 'success',
-                          description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
                           title: t('appointmentEdited', 'Appointment edited'),
                         });
                       }
                     },
                     (error) => {
-                      showNotification({
+                      showSnackbar({
                         title: t('updateError', 'Error updating upcoming appointment'),
                         kind: 'error',
-                        critical: true,
-                        description: error?.message,
+                        isLowContrast: false,
+                        subtitle: error?.message,
                       });
                     },
                   );
@@ -402,10 +405,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               mutateVisits();
               closeWorkspace();
 
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 kind: 'success',
-                description: !visitToEdit
+                subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
                       visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
                     })
@@ -418,13 +421,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               });
             },
             (error) => {
-              showNotification({
+              showSnackbar({
                 title: !visitToEdit
                   ? t('startVisitError', 'Error starting visit')
                   : t('errorUpdatingVisitDetails', 'Error updating visit details'),
                 kind: 'error',
-                critical: true,
-                description: error?.message,
+                isLowContrast: false,
+                subtitle: error?.message,
               });
             },
           );
@@ -439,21 +442,21 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
             closeWorkspace();
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               kind: 'success',
-              description: t('visitStartedSuccessfully', '{visit} started successfully', {
+              subtitle: t('visitStartedSuccessfully', '{visit} started successfully', {
                 visit: t('offlineVisit', 'Offline Visit'),
               }),
               title: t('visitStarted', 'Visit started'),
             });
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              isLowContrast: false,
+              subtitle: error?.message,
             });
           },
         );
@@ -467,7 +470,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       visitQueueNumberAttributeUuid,
       mutateCurrentVisit,
       mutateVisits,
-
       patientUuid,
       upcomingAppointment,
       t,
@@ -529,6 +531,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           )}
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
+              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
               dateFieldName="visitStartDate"
               timeFieldName="visitStartTime"
               timeFormatFieldName="visitStartTimeFormat"
@@ -537,6 +540,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
+                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
                 dateFieldName="visitStopDate"
                 timeFieldName="visitStopTime"
                 timeFormatFieldName="visitStopTimeFormat"
@@ -668,7 +672,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             kind="primary"
             type="submit"
           >
-            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisit', 'Update visit')}
+            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisitDetails', 'Update visit details')}
           </Button>
         </ButtonSet>
       </Form>

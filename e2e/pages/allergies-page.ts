@@ -1,11 +1,11 @@
-import { Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export class PatientAllergiesPage {
   constructor(readonly page: Page) {}
 
-  readonly allergyTable = () => this.page.getByTestId('allergy-table');
+  readonly allergiesTable = () => this.page.getByRole('table', { name: /allergies summary/i });
 
-  async goto(uuid: string) {
+  async goTo(uuid: string) {
     await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/Allergies');
   }
 }

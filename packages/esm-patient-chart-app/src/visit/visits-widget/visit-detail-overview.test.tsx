@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
@@ -95,7 +95,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
     expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(allVisitsTab));
+    await user.click(allVisitsTab);
 
     expect(allVisitsTab).toHaveAttribute('aria-selected', 'true');
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');

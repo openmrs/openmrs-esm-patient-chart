@@ -4,7 +4,7 @@ import styles from './media-uploader.scss';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { readFileAsString } from '../utils';
 import { useTranslation } from 'react-i18next';
-import { showToast, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 const MediaUploaderComponent = () => {
   const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
@@ -30,9 +30,9 @@ const MediaUploaderComponent = () => {
             ]);
           });
         } else {
-          showToast({
+          showSnackbar({
             title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
-            description: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
+            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
             kind: 'error',
           });
         }
@@ -48,7 +48,7 @@ const MediaUploaderComponent = () => {
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions ?? '*'}
+          accept={allowedExtensions ?? ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
