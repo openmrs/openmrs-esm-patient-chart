@@ -14,10 +14,6 @@ export interface AllergiesConfigObject {
 }
 export const configSchema = {
   concepts: {
-    allergenUuid: {
-      _type: Type.ConceptUuid,
-      _default: '493a20d1-345a-407c-ba34-345050fa5538',
-    },
     drugAllergenUuid: {
       _type: Type.ConceptUuid,
       _default: '162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',

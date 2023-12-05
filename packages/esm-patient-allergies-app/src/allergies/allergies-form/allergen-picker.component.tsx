@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Allergen } from './allergy-form.resource';
+import { type Allergen } from './allergy-form.resource';
 import { Search } from '@carbon/react';
-import styles from './allergy-form.scss';
+import styles from './allergen-picker.component.scss';
 import { AllergenType } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';

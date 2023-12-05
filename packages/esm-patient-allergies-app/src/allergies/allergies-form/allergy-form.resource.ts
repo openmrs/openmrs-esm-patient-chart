@@ -46,6 +46,11 @@ export interface Allergen {
   type: AllergenType;
 }
 
+export interface AllergicReaction {
+  uuid: string;
+  display: string;
+}
+
 export function useAllergicReactions() {
   const allergyReactionUuid = useConfig().concepts.allergyReactionUuid;
   const { data: allergicReactionsData, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }>(
@@ -53,7 +58,7 @@ export function useAllergicReactions() {
     openmrsFetch,
   );
 
-  const allergicReactions = allergicReactionsData?.data.setMembers.map((allergicReaction) => {
+  const allergicReactions: AllergicReaction[] = allergicReactionsData?.data.setMembers.map((allergicReaction) => {
     return { uuid: allergicReaction.uuid, display: allergicReaction.display };
   });
 

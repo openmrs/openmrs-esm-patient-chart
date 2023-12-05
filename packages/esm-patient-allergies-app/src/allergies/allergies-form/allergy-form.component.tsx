@@ -19,7 +19,7 @@ import {
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { type Control, Controller, FormProvider, useForm, type UseFormSetValue } from 'react-hook-form';
 import {
   ExtensionSlot,
   type FetchResponse,
@@ -31,6 +31,7 @@ import {
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type Allergen,
+  type AllergicReaction,
   type NewAllergy,
   saveAllergy,
   useAllergens,
@@ -97,7 +98,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   const selectedNonCodedAllergicReaction = watch('nonCodedAllergicReaction');
 
   useEffect(() => {
-    const reactionsValidation = selectedAllergicReactions.some((item) => item !== undefined);
+    const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
     if (!!selectedAllergen && reactionsValidation && !!selectedSeverityOfWorstReaction) setIsDisabled(false);
     else setIsDisabled(true);
   }, [
@@ -120,7 +121,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
         severityOfWorstReaction,
       } = data;
 
-      const selectedAllergicReactions = allergicReactions.filter((value) => value !== undefined);
+      const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
       let payload: NewAllergy = {
         allergen:
           allergen.uuid == otherConceptUuid
@@ -228,28 +229,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
                   legendText={t('selectReactions', 'Select the reactions')}
                   data-testid="allergic-reactions-container"
                 >
-                  {allergicReactions.map((reaction, index) => (
-                    <Controller
-                      key={reaction.uuid}
-                      name={`allergicReactions.${index}`}
-                      control={control}
-                      render={({ field: { onBlur, onChange, value } }) => (
-                        <Checkbox
-                          className={styles.checkbox}
-                          labelText={reaction.display}
-                          id={reaction.uuid}
-                          onChange={(event, { checked, id }) => {
-                            setValue(`allergicReactions.${index}`, checked ? id : undefined, {
-                              shouldValidate: true,
-                            });
-                            onChange(checked ? id : undefined);
-                          }}
-                          checked={Boolean(value)}
-                          onBlur={onBlur}
-                        />
-                      )}
-                    />
-                  ))}
+                  <AllergicReactionsField allergicReactions={allergicReactions} methods={{ setValue, control }} />
                 </FormGroup>
               )}
             </div>
@@ -359,4 +339,44 @@ function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; 
   return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
+function AllergicReactionsField({
+  allergicReactions,
+  methods: { control, setValue },
+}: {
+  allergicReactions: AllergicReaction[];
+  methods: { control: Control<AllergyFormData>; setValue: UseFormSetValue<AllergyFormData> };
+}) {
+  const handleAllergicReactionChange = useCallback(
+    (onChange, checked, id, index) => {
+      onChange(id);
+      setValue(`allergicReactions.${index}`, checked ? id : '', {
+        shouldValidate: true,
+      });
+    },
+    [setValue],
+  );
+
+  const controlledFields = allergicReactions.map((reaction, index) => (
+    <Controller
+      key={reaction.uuid}
+      name={`allergicReactions.${index}`}
+      control={control}
+      defaultValue=""
+      render={({ field: { onBlur, onChange, value } }) => (
+        <Checkbox
+          className={styles.checkbox}
+          labelText={reaction.display}
+          id={reaction.uuid}
+          onChange={(event, { checked, id }) => {
+            handleAllergicReactionChange(onChange, checked, id, index);
+          }}
+          checked={Boolean(value)}
+          onBlur={onBlur}
+        />
+      )}
+    />
+  ));
+
+  return <React.Fragment>{controlledFields}</React.Fragment>;
+}
 export default AllergyForm;
