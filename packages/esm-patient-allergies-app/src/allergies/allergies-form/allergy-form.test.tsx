@@ -1,19 +1,17 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor, within } from '@testing-library/react';
-import { FetchResponse, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showNotification, showSnackbar, showToast } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions, mockAllergyResult } from '../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../../tools/test-helpers';
-import { NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
+import { type NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
 import AllergyForm from './allergy-form.component';
 
 const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
-const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
 const mockUseAllergens = useAllergens as jest.Mock;
 const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
-const mockUseAllergensAndAllergicReactions = useAllergensAndAllergicReactions as jest.Mock;
+const mockShowToast = showToast as jest.Mock;
 
 jest.setTimeout(15000);
 
@@ -164,18 +162,18 @@ describe('AllergyForm ', () => {
     await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
-    expect(mockShowSnackbar).toHaveBeenCalledWith({
-      isLowContrast: true,
+    expect(mockShowToast).toHaveBeenCalledTimes(1);
+    expect(mockShowToast).toHaveBeenCalledWith({
+      critical: true,
       kind: 'success',
       title: 'Allergy saved',
-      subtitle: 'It is now visible on the Allergies page',
+      description: 'It is now visible on the Allergies page',
     });
   });
 
   it('renders an error snackbar upon an invalid submission', async () => {
     mockSaveAllergy.mockClear();
-    mockShowToast.mockClear();
+    mockShowSnackbar.mockClear();
     mockSaveAllergy.mockRejectedValue({
       message: 'Internal Server Error',
       response: {
@@ -200,10 +198,10 @@ describe('AllergyForm ', () => {
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal Server Error',
-      kind: 'error',
+      isLowContrast: false,
       title: 'Error saving allergy',
+      subtitle: 'Internal Server Error',
+      kind: 'error',
     });
   });
 });
