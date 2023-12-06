@@ -25,14 +25,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller, type Control, type UseFormSetValue } from 'react-hook-form';
 import { ExtensionSlot, type FetchResponse, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import {
-  type AllergensAndAllergicReactions,
-  type NewAllergy,
-  saveAllergy,
-  useAllergensAndAllergicReactions,
-} from './allergy-form.resource';
-import { useAllergies } from '../allergy-intolerance.resource';
+
+// ... (your existing imports)
+
+// Remove unnecessary imports
+import { saveAllergy, useAllergies } from '../allergy-intolerance.resource';
 import styles from './allergy-form.scss';
+import { type NewAllergy, useAllergensAndAllergicReactions } from './allergy-form.resource';
 
 type AllergenType = 'FOOD' | 'DRUG' | 'ENVIRONMENT';
 
