@@ -167,10 +167,8 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const updateStoreWithNewWorkspace = (workspaceToBeAdded: OpenWorkspace, restWorkspaces = null) => {
     store.setState((state) => {
       const openWorkspaces = [workspaceToBeAdded, ...(restWorkspaces ?? state.openWorkspaces)];
-      let workspaceWindowState = state.workspaceWindowState;
-      if (workspaceWindowState === 'hidden') {
-        workspaceWindowState = workspaceToBeAdded.preferredWindowSize === 'maximized' ? 'maximized' : 'normal';
-      }
+      let workspaceWindowState = getUpdatedWorkspaceWindowState(openWorkspaces[0]);
+
       return {
         ...state,
         openWorkspaces,
@@ -242,6 +240,19 @@ export function cancelPrompt() {
 export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
+
+  const updateStoreWithClosedWorkspace = () => {
+    const state = store.getState();
+    const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name != name);
+
+    store.setState({
+      ...state,
+      prompt: null,
+      openWorkspaces: newOpenWorkspaces,
+      workspaceWindowState: getUpdatedWorkspaceWindowState(newOpenWorkspaces?.[0]),
+    });
+  };
+
   if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
       title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
@@ -251,15 +262,13 @@ export function closeWorkspace(name: string, ignoreChanges: boolean) {
         `You have unsaved changes in the side panel. Do you want to discard these changes?`,
       ),
       onConfirm: () => {
-        const state = store.getState();
-        store.setState({ ...state, prompt: null, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+        updateStoreWithClosedWorkspace();
       },
       confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
     };
     store.setState({ ...store.getState(), prompt });
   } else {
-    const state = store.getState();
-    store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+    updateStoreWithClosedWorkspace();
   }
 }
 
@@ -296,6 +305,10 @@ export function updateWorkspaceWindowState(value: WorkspaceWindowState) {
   const store = getWorkspaceStore();
   const state = store.getState();
   store.setState({ ...state, workspaceWindowState: value });
+}
+
+function getUpdatedWorkspaceWindowState(workspaceAtTop: OpenWorkspace) {
+  return workspaceAtTop?.preferredWindowSize ?? 'normal';
 }
 
 /**
