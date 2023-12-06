@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AllergenPicker from './allergen-picker.component';
 import { AllergenType } from '../../types';
-import { Allergen } from './allergy-form.resource';
+import { type Allergen } from './allergy-form.resource';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@openmrs/esm-framework', () => {

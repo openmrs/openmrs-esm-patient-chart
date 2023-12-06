@@ -16,7 +16,7 @@
   "moderate": "Modéré",
   "name": "Nom",
   "nonCodedAllergenWarningDescription": "L’ajout d’un allergène personnalisé peut avoir un impact sur les notifications d’allergies à l’échelle du système. Il est recommandé de choisir dans la liste fournie pour des alertes précises. Les entrées personnalisées peuvent ne pas déclencher de notifications dans tous les contextes pertinents.",
-  "nonCodedAllergenWarningTitle": "Avertissement : entrée d'allergène personnalisée",
+  "nonCodedAllergenWarningTitle": "Avertissement entrée d'allergène personnalisée",
   "onsetDateAndComments": "Date de début et commentaires",
   "other": "Autre",
   "otherNonCodedAllergen": "Autre allergène non codé",

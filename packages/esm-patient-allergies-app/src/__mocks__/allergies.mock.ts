@@ -1,4 +1,4 @@
-import { Allergen } from '../allergies/allergies-form/allergy-form.resource';
+import { type Allergen } from '../allergies/allergies-form/allergy-form.resource';
 import { AllergenType } from '../types';
 
 export const mockAllergyResult = {
