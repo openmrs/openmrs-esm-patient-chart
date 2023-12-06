@@ -83,7 +83,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
     const reactionsValidation = allergicReactions?.some((item) => item !== '');
     if (!!selectedAllergen && reactionsValidation && !!severityOfWorstReaction) setIsDisabled(false);
     else setIsDisabled(true);
-  }, [allergicReactions, watch, selectedAllergen, severityOfWorstReaction, otherConceptUuid, nonCodedAllergenType]);
+  }, [allergicReactions, selectedAllergen, severityOfWorstReaction, otherConceptUuid, nonCodedAllergenType]);
 
   const handleTabChange = (index: number) => {
     switch (index) {
@@ -394,19 +394,26 @@ function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; 
   return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
-function AllergicReactionsField({
-  allergensAndAllergicReactions,
-  methods: { control, setValue },
-}: {
+type AllergensAndAllergicReactions = {
+  allergicReactions: Array<{
+    uuid: string;
+    display: string;
+  }>;
+};
+
+type AllergicReactionsFieldProps = {
   allergensAndAllergicReactions: AllergensAndAllergicReactions;
-  methods: { control: Control<AllergyFormData>; setValue: UseFormSetValue<AllergyFormData> };
-}) {
+  methods: { setValue: UseFormSetValue<any>; control: Control<any> };
+};
+
+function AllergicReactionsField({ allergensAndAllergicReactions, methods }: AllergicReactionsFieldProps) {
+  const { setValue, control } = methods;
+
+  // Define handleAllergicReactionChange outside of this component
   const handleAllergicReactionChange = useCallback(
     (onChange, checked, id, index) => {
       onChange(id);
-      setValue(`allergicReactions.${index}`, checked ? id : '', {
-        shouldValidate: true,
-      });
+      setValue(`allergicReactions.${index}`, checked ? id : '');
     },
     [setValue],
   );
@@ -435,4 +442,4 @@ function AllergicReactionsField({
   return <React.Fragment>{controlledFields}</React.Fragment>;
 }
 
-export default AllergyForm;
+export default AllergicReactionsField;
