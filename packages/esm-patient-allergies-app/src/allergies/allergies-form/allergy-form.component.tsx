@@ -49,7 +49,7 @@ const allergyFormSchema = z.object({
       type: z.string(),
     })
     .required(),
-  nonCodedAllergenType: z.string().optional(),
+  nonCodedAllergen: z.string().optional(),
   allergicReactions: z.array(z.string().optional()),
   nonCodedAllergicReaction: z.string().optional(),
   severityOfWorstReaction: z.string(),
@@ -58,7 +58,7 @@ const allergyFormSchema = z.object({
 
 type AllergyFormData = {
   allergen: Allergen;
-  nonCodedAllergenType: string;
+  nonCodedAllergen: string;
   allergicReactions: string[];
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
@@ -78,8 +78,6 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   );
   const { allergicReactions, isLoading } = useAllergicReactions();
   const { allergens } = useAllergens();
-  const [error, setError] = useState<Error | null>(null);
-
   const [isDisabled, setIsDisabled] = useState(true);
   const { mutate } = useAllergies(patientUuid);
 
@@ -94,7 +92,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   const selectedAllergen = watch('allergen');
   const selectedAllergicReactions = watch('allergicReactions');
   const selectedSeverityOfWorstReaction = watch('severityOfWorstReaction');
-  const selectedNonCodedAllergenType = watch('nonCodedAllergenType');
+  const selectednonCodedAllergen = watch('nonCodedAllergen');
   const selectedNonCodedAllergicReaction = watch('nonCodedAllergicReaction');
 
   useEffect(() => {
@@ -107,7 +105,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
     selectedAllergen,
     selectedSeverityOfWorstReaction,
     otherConceptUuid,
-    selectedNonCodedAllergenType,
+    selectednonCodedAllergen,
   ]);
 
   const onSubmit = useCallback(
@@ -115,7 +113,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
       const {
         allergen,
         comment,
-        nonCodedAllergenType,
+        nonCodedAllergen,
         nonCodedAllergicReaction,
         allergicReactions,
         severityOfWorstReaction,
@@ -128,7 +126,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             ? {
                 allergenType: allergen.type,
                 codedAllergen: { uuid: allergen.uuid },
-                nonCodedAllergen: nonCodedAllergenType,
+                nonCodedAllergen: nonCodedAllergen,
               }
             : {
                 allergenType: allergen.type,
@@ -151,7 +149,6 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             if (response.status === 201) {
               mutate();
               closeWorkspace();
-
               showToast({
                 critical: true,
                 kind: 'success',
@@ -161,7 +158,6 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             }
           },
           (err) => {
-            setError(err);
             showSnackbar({
               title: t('allergySaveError', 'Error saving allergy'),
               kind: 'error',
@@ -184,32 +180,38 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
       ) : null}
       <div className={styles.form}>
         <Stack gap={7}>
-          {error ? (
+          {selectedAllergen?.uuid === otherConceptUuid && (
             <InlineNotification
-              style={{ margin: '0rem', minWidth: '100%' }}
-              kind="error"
+              style={{ minWidth: '100%' }}
+              kind="warning"
               lowContrast={true}
-              title={t('errorFetchingData', 'Error fetching allergens and reactions')}
-              subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-            />
-          ) : null}
-          <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
-            <Controller
-              name="allergen"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <AllergenPicker allergens={allergens} selectedAllergen={value} onAllergenChange={onChange} />
+              hideCloseButton={true}
+              title={t('nonCodedAllergenWarningTitle', 'Warning: Custom Allergen Entry')}
+              subtitle={t(
+                'nonCodedAllergenWarningDescription',
+                "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
               )}
             />
-          </FormGroup>
+          )}
+          <ResponsiveWrapper isTablet={isTablet}>
+            <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
+              <Controller
+                name="allergen"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <AllergenPicker allergens={allergens} selectedAllergen={value} onAllergenChange={onChange} />
+                )}
+              />
+            </FormGroup>
+          </ResponsiveWrapper>
           {selectedAllergen?.uuid === otherConceptUuid && (
             <ResponsiveWrapper isTablet={isTablet}>
               <Controller
-                name="nonCodedAllergenType"
+                name="nonCodedAllergen"
                 control={control}
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextInput
-                    id="nonCodedAllergenType"
+                    id="nonCodedAllergen"
                     labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
                     onChange={onChange}
                     onBlur={onBlur}
@@ -311,7 +313,6 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               />
             </ResponsiveWrapper>
           </div>
-
           <ButtonSet className={isTablet ? styles.tabletButtons : styles.desktopButtons}>
             <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
               {t('discard', 'Discard')}
@@ -320,7 +321,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               className={styles.button}
               disabled={
                 isDisabled ||
-                (selectedAllergen === otherConceptUuid && !selectedNonCodedAllergenType) ||
+                (selectedAllergen?.uuid === otherConceptUuid && !selectednonCodedAllergen) ||
                 (selectedAllergicReactions?.includes(otherConceptUuid) && !selectedNonCodedAllergicReaction)
               }
               type="submit"
