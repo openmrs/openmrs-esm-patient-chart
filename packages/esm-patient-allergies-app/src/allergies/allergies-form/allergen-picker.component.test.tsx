@@ -59,7 +59,7 @@ describe('Allergen Picker', () => {
     expect(allergenList).not.toBeInTheDocument();
   });
 
-  it('should filter allergens by keyword', async () => {
+  it('filters allergens by keyword', async () => {
     render(<AllergenPicker allergens={allergens} onAllergenChange={jest.fn()} selectedAllergen={null} />);
     const allergenSearch = screen.getByPlaceholderText(/search allergen/i);
 
@@ -70,7 +70,7 @@ describe('Allergen Picker', () => {
     expect(screen.queryByText('Aspirin')).not.toBeInTheDocument();
   });
 
-  it('should always display other allergen along with the filtered allergens', async () => {
+  it('always displays other allergen along with the filtered allergens', async () => {
     render(<AllergenPicker allergens={allergens} onAllergenChange={jest.fn()} selectedAllergen={null} />);
     const allergenSearch = screen.getByPlaceholderText(/search allergen/i);
 
@@ -79,7 +79,7 @@ describe('Allergen Picker', () => {
     expect(screen.getByText('Other')).toBeInTheDocument();
   });
 
-  it('should call onAllergenChange when an allergen is selected', async () => {
+  it('calls onAllergenChange when an allergen is selected', async () => {
     const onAllergenChange = jest.fn();
     render(<AllergenPicker allergens={allergens} onAllergenChange={onAllergenChange} selectedAllergen={null} />);
     const allergenSearch = screen.getByPlaceholderText(/search allergen/i);
@@ -88,7 +88,7 @@ describe('Allergen Picker', () => {
     expect(onAllergenChange).toHaveBeenCalledWith(allergens[0]);
   });
 
-  it('should clear the selected allergen when the search field is cleared', async () => {
+  it('clears the selected allergen when the search field is cleared', async () => {
     const onAllergenChange = jest.fn();
     render(
       <AllergenPicker allergens={allergens} onAllergenChange={onAllergenChange} selectedAllergen={allergens[0]} />,

@@ -130,7 +130,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               }
             : {
                 allergenType: allergen.type,
-                codedAllergen: { uuid: allergen?.uuid },
+                codedAllergen: { uuid: allergen.uuid },
               },
         severity: {
           uuid: severityOfWorstReaction,
