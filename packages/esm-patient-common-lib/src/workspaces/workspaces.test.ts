@@ -246,6 +246,47 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces[0].name).toBe('vitals');
       expect(store.getState().openWorkspaces[1].name).toBe('attachments');
     });
+
+    it("should launch workspace in workspace's preferredSize", () => {
+      const store = getWorkspaceStore();
+      registerWorkspace({
+        name: 'allergies',
+        title: 'Allergies',
+        load: jest.fn(),
+        canHide: true,
+        type: 'form',
+        preferredWindowSize: 'maximized',
+      });
+      registerWorkspace({
+        name: 'attachments',
+        title: 'Attachements',
+        load: jest.fn(),
+        canHide: true,
+        type: 'attachments-form',
+      });
+      registerWorkspace({
+        name: 'conditions',
+        title: 'Conditions',
+        load: jest.fn(),
+        type: 'conditions-form',
+        preferredWindowSize: 'maximized',
+      });
+      launchPatientWorkspace('allergies');
+      expect(store.getState().openWorkspaces.length).toBe(1);
+      expect(store.getState().workspaceWindowState).toBe('maximized');
+      launchPatientWorkspace('attachments');
+      expect(store.getState().openWorkspaces.length).toBe(2);
+      expect(store.getState().workspaceWindowState).toBe('normal');
+      launchPatientWorkspace('conditions');
+      expect(store.getState().openWorkspaces.length).toBe(3);
+      expect(store.getState().workspaceWindowState).toBe('maximized');
+      store.getState().openWorkspaces[0].closeWorkspace(false);
+      expect(store.getState().workspaceWindowState).toBe('normal');
+      store.getState().openWorkspaces[0].closeWorkspace(false);
+      expect(store.getState().workspaceWindowState).toBe('maximized');
+      store.getState().openWorkspaces[0].closeWorkspace(false);
+      expect(store.getState().workspaceWindowState).toBe('normal');
+    });
   });
 
   test('coexisting and non-coexisting workspaces', () => {
@@ -353,6 +394,7 @@ describe('workspace system', () => {
     );
     expect(store.getState().prompt.confirmText).toBe('Discard');
     store.getState().prompt.onConfirm();
+    expect(store.getState().prompt).toBeNull();
     expect(store.getState().openWorkspaces.length).toBe(0);
   });
 });

@@ -65,7 +65,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
           <ExtensionSlot name={patientChartWorkspaceHeaderSlot} />
           {isDesktop(layout) && (
             <>
-              {canMaximize && (
+              {(canMaximize || maximized) && (
                 <HeaderGlobalAction
                   align="bottom"
                   label={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
