@@ -5,6 +5,27 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces } from '../workspaces';
 import styles from './siderail-nav-button.scss';
 
+interface TagsProps {
+  isTablet: boolean;
+  getIcon: (props: object) => JSX.Element;
+  formOpenInTheBackground: boolean;
+  tagContent?: string | React.ReactNode;
+}
+
+function Tags({ isTablet, getIcon, formOpenInTheBackground, tagContent }: TagsProps) {
+  return (
+    <>
+      {getIcon({ size: isTablet ? 16 : 20 })}
+
+      {formOpenInTheBackground ? (
+        <span className={styles.interruptedTag}>!</span>
+      ) : (
+        <span className={styles.countTag}>{tagContent}</span>
+      )}
+    </>
+  );
+}
+
 interface SiderailNavButtonProps {
   name: string;
   getIcon: (props: object) => JSX.Element;
@@ -30,20 +51,6 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
   const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
-  function Tags({ isTablet }: { isTablet: boolean }) {
-    return (
-      <>
-        {getIcon({ size: isTablet ? 16 : 20 })}
-
-        {formOpenInTheBackground ? (
-          <span className={styles.interruptedTag}>!</span>
-        ) : (
-          <span className={styles.countTag}>{tagContent}</span>
-        )}
-      </>
-    );
-  }
-
   if (layout === 'tablet') {
     return (
       <Button
@@ -55,9 +62,8 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
         tabIndex={0}
       >
         <span className={styles.elementContainer}>
-          <Tags isTablet />
+          <Tags isTablet formOpenInTheBackground={formOpenInTheBackground} getIcon={getIcon} tagContent={tagContent} />
         </span>
-
         <span>{label}</span>
       </Button>
     );
@@ -76,7 +82,12 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       onClick={handler}
     >
       <div className={styles.elementContainer}>
-        <Tags isTablet={false} />
+        <Tags
+          isTablet={false}
+          formOpenInTheBackground={formOpenInTheBackground}
+          getIcon={getIcon}
+          tagContent={tagContent}
+        />
       </div>
     </IconButton>
   );
