@@ -153,6 +153,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
   const { data: relationships, isLoading } = useRelationships(patientId);
+  const config = useConfig();
 
   const extractName = (display: string) => {
     const pattern = /-\s*(.*)$/;
@@ -174,7 +175,17 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
             <>
               {relationships.map((r) => (
                 <li key={r.uuid} className={styles.relationship}>
-                  <div>{extractName(r.display)}</div>
+                  {config.useRelationshipNameLink ? (
+                    <ConfigurableLink
+                      style={{ textDecoration: 'none', maxWidth: '50%' }}
+                      to={`${window.getOpenmrsSpaBase()}patient/${r.relativeUuid}/chart`}
+                    >
+                      {r.display}
+                    </ConfigurableLink>
+                  ) : (
+                    <div>{extractName(r.display)}</div>
+                  )}
+
                   <div>{r.relationshipType}</div>
                   <div>
                     {`${r.relativeAge ? r.relativeAge : '--'} ${
