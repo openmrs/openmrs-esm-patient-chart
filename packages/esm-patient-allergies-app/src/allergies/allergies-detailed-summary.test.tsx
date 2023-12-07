@@ -56,7 +56,7 @@ describe('AllergiesDetailedSummary: ', () => {
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /onset date and comments/i];
+    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /Onset comments/i];
     const expectedAllergies = [
       /ACE inhibitors unable-to-assess Anaphylaxis/i,
       /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
