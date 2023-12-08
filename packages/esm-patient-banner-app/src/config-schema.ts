@@ -26,6 +26,11 @@ export const configSchema = {
       _default: {},
     },
   },
+  useRelationshipNameLink: {
+    _type: Type.Boolean,
+    _description: 'Enable the use of a link to the patient chart in relationship names',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
@@ -34,4 +39,5 @@ export interface ConfigObject {
     enabled: boolean;
     customAddressLabel: Object;
   };
+  useRelationshipNameLink: boolean;
 }
