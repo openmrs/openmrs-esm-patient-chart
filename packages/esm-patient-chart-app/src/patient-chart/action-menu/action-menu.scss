@@ -98,6 +98,18 @@ $actionPanelOffset: 3rem;
   }
 }
 
+:global(.omrs-breakpoint-lt-desktop) {
+  .hiddenSideRail {
+   display: none;
+  }
+}
+:global(.omrs-breakpoint-lt-desktop) {
+  .showSideRail {
+   display: flex;
+  }
+}
+
+
 .divider {
   background-color: $text-03;
   margin: 0.75rem 0;
