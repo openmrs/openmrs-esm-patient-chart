@@ -100,12 +100,12 @@ $actionPanelOffset: 3rem;
 
 :global(.omrs-breakpoint-lt-desktop) {
   .hiddenSideRail {
-   visibility: hidden;
+   display: none;
   }
 }
 :global(.omrs-breakpoint-lt-desktop) {
   .showSideRail {
-   visibility: visible;
+   display: flex;
   }
 }
 
