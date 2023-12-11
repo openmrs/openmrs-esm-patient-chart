@@ -22,3 +22,5 @@ export * from './useVitalsConceptMetadata';
 export * from './workspaces';
 export * from './siderail-nav-button';
 export * from './form-entry-interop';
+export * from './bills';
+export * from './launchPayBillPrompt';

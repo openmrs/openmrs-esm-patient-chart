@@ -102,6 +102,11 @@ export const configSchema = {
       ),
     ],
   },
+  showBillingDialog: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to restrict displaying forms for patients with unpaid bills.',
+  },
   formSections: {
     _type: Type.Array,
     _elements: {
@@ -152,4 +157,5 @@ export interface ConfigObject {
   customFormsUrl: string;
   orderBy: 'name' | 'most-recent';
   showHtmlFormEntryForms: boolean;
+  showBillingDialog: boolean;
 }

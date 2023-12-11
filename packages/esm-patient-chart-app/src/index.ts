@@ -262,3 +262,8 @@ export const deleteVisitActionButton = getAsyncLifecycle(
   () => import('./visit/visit-action-items/delete-visit-action-item.component'),
   { featureName: 'delete-visit', moduleName },
 );
+
+export const payBillDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/pay-bill-dialog.component'), {
+  featureName: 'pay-bill-dialog',
+  moduleName,
+});

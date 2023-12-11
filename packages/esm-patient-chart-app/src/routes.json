@@ -234,6 +234,12 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "pay-bill-dialog",
+      "component": "payBillDialog",
+      "online": true,
+      "offline": true
     }
   ],
   "pages": [
