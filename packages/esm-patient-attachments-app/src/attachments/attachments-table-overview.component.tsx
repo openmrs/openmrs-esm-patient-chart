@@ -10,6 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Popover,
 } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
@@ -81,7 +82,13 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
 
   return (
     <TableContainer>
-      <DataTable rows={rows} headers={headers} size={isTablet ? 'lg' : 'sm'} overflowMenuOnHover={isDesktop}>
+      <DataTable
+        className={styles.attachmentTable}
+        rows={rows}
+        headers={headers}
+        size={isTablet ? 'lg' : 'sm'}
+        overflowMenuOnHover={isDesktop}
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <Table {...getTableProps()} useZebraStyles>
             <TableHead>
@@ -106,7 +113,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
                   <TableCell className="cds--table-column-menu">
-                    <OverflowMenu size={isTablet ? 'lg' : 'sm'} flipped>
+                    <OverflowMenu size={isTablet ? 'lg' : 'sm'} flipped enterDelayMs={1000000}>
                       <OverflowMenuItem
                         itemText={t('delete', 'Delete')}
                         isDelete
