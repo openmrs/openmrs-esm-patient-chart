@@ -90,6 +90,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }>(null);
   const [upcomingAppointment, setUpcomingAppointment] = useState(null);
   const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
+  const [billingInfo, setBillingInfo] = useState(null);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
@@ -365,6 +366,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       });
                     },
                   );
+                }
+                if (config.showBillingSlot) {
+                  const { handleCreateBill } = billingInfo ?? {};
+                  handleCreateBill && handleCreateBill();
                 }
                 if (config.showUpcomingAppointments && upcomingAppointment) {
                   const appointmentPayload: AppointmentPayload = {
@@ -644,6 +649,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   />
                 </div>
               </section>
+            )}
+
+            {config.showBillingSlot && (
+              <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="billing-checkin-slot" />
             )}
 
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
