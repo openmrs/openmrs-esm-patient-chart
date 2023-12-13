@@ -65,10 +65,16 @@ export interface AllergicReaction {
   manifestation: Array<{
     coding: CodingData;
   }>;
-  severity: string;
+  severity: ReactionSeverity;
   substance: {
     coding: Array<CodingData>;
   };
+}
+
+export enum ReactionSeverity {
+  MILD = 'mild',
+  MODERATE = 'moderate',
+  SEVERE = 'severe',
 }
 
 export interface CodingData {

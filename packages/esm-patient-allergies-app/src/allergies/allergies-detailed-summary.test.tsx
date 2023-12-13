@@ -58,11 +58,11 @@ describe('AllergiesDetailedSummary: ', () => {
 
     const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /onset date and comments/i];
     const expectedAllergies = [
-      /ACE inhibitors unable-to-assess Anaphylaxis/i,
-      /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
-      /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
-      /Morphine high Mental status change Comments/i,
-      /Aspirin high Mental status change Comments/i,
+      /ACE inhibitors moderate Anaphylaxis/i,
+      /Fish mild Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
+      /Penicillins severe Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
+      /Morphine severe Mental status change Comments/i,
+      /Aspirin severe Mental status change Comments/i,
     ];
 
     expectedColumnHeaders.forEach((header) =>
