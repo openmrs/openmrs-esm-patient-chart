@@ -60,7 +60,7 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('heading', { name: /select the reactions/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /severity and date of onset/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /severity of worst reaction/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /date and comments/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /onset comments/i })).toBeInTheDocument();
 
     const tabNames = [/drug/i, /food/i, /environmental/i];
 
@@ -74,7 +74,7 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /severe/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /anaemia/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date of onset and comments/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /onset comments/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();

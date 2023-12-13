@@ -343,7 +343,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               </div>
             </section>
             <section className={styles.section}>
-              <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
+              <h2 className={styles.sectionHeading}>{t('onSetComments', 'Onset comments')}</h2>
               <div className={styles.wrapper}>
                 <ResponsiveWrapper isTablet={isTablet}>
                   <Controller
@@ -351,10 +351,10 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
                     control={control}
                     render={({ field: { onBlur, onChange, value } }) => (
                       <TextArea
-                        cols={20}
+                        cols={40}
                         id="comments"
                         invalidText={t('invalidComment', 'Invalid comment, try again')}
-                        labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
+                        labelText={t('onSetComments', 'Onset comments')}
                         onChange={onChange}
                         placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                         onBlur={onBlur}

@@ -42,7 +42,7 @@ test('Record an allergy to an environmental factors', async ({ page, api }) => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
-    await expect(headerRow).toContainText(/onset date and comments/i);
+    await expect(headerRow).toContainText(/onset comments/i);
     await expect(dataRow).toContainText(/dust/i);
     await expect(dataRow).toContainText(/low/i);
     await expect(dataRow).toContainText(/mental status change/i);
