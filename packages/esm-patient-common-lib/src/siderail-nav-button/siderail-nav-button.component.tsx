@@ -15,7 +15,7 @@ interface TagsProps {
 function Tags({ isTablet, getIcon, formOpenInTheBackground, tagContent }: TagsProps) {
   return (
     <>
-      {getIcon({ size: !isTablet ? 16 : 20 })}
+      {getIcon({ size: 16 })}
 
       {formOpenInTheBackground ? (
         <span className={styles.interruptedTag}>!</span>
