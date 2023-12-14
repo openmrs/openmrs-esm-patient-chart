@@ -3,17 +3,20 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+  margin-top: spacing.$spacing-02;
+  margin-bottom: spacing.$spacing-02;
+  border-radius: 50%;
   color: $ui-05;
   max-width: none;
 
   &:hover {
+    background-color: $color-gray-30;
     color: $text-02;
+  }
+
+  &:focus {
+          border-color: $interactive-01;
+
   }
 
   & > span {
