@@ -128,17 +128,17 @@ const CameraMediaUploadTabs = () => {
     <div className={styles.cameraSection}>
       <ModalHeader closeModal={closeModal} title={t('addAttachment_title', 'Add Attachment')} />
       <ModalBody className={styles.modalBody}>
-        <Tabs className={styles.tabs}>
-          <TabList aria-label="Attachments-upload-section">
-            <Tab onClick={() => setView('upload')}>{t('uploadMedia', 'Upload media')}</Tab>
+        <Tabs className={styles.tabs} defaultSelectedIndex={1}>
+          <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
             <Tab onClick={() => setView('camera')}>{t('webcam', 'Webcam')}</Tab>
+            <Tab onClick={() => setView('upload')}>{t('uploadMedia', 'Upload media')}</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
-              <MediaUploaderComponent />
+              {view === 'camera' && <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />}
             </TabPanel>
             <TabPanel>
-              {view === 'camera' && <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />}
+              <MediaUploaderComponent />
             </TabPanel>
           </TabPanels>
         </Tabs>

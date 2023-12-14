@@ -16,7 +16,7 @@
 
 .uploadFile {
   color: $ui-02;
-  
+
   label {
     max-width: unset;
   }
@@ -37,6 +37,25 @@
 @media (max-width: $breakpoint-tablet-max){
   .frameContent {
     width: 65%;
-  }  
+  }
 }
 
+.tabList {
+  border-bottom: 2px solid $ui-03;
+
+  div {
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 100%;
+    z-index: 1;
+
+    button > div {
+      align-items: center;
+    }
+  }
+}
+
+:global(.cds--tabs .cds--tabs__nav-item--selected) {
+  border-bottom: 2px solid var(--brand-03);
+}
