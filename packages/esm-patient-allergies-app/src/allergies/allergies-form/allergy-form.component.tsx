@@ -13,14 +13,13 @@ import {
   RadioButton,
   RadioButtonGroup,
   Row,
-  Search,
   Stack,
   TextArea,
   TextInput,
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type Control, Controller, FormProvider, useForm, type UseFormSetValue } from 'react-hook-form';
+import { type Control, Controller, useForm, type UseFormSetValue } from 'react-hook-form';
 import {
   ExtensionSlot,
   type FetchResponse,
@@ -41,6 +40,7 @@ import {
 import { useAllergies } from '../allergy-intolerance.resource';
 import styles from './allergy-form.scss';
 import { AllergenType } from '../../types';
+import classNames from 'classnames';
 
 const allergyFormSchema = z.object({
   allergen: z
@@ -329,7 +329,9 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               />
             </ResponsiveWrapper>
           </div>
-          <ButtonSet className={isTablet ? styles.tabletButtons : styles.desktopButtons}>
+          <ButtonSet
+            className={classNames(isTablet ? styles.tabletButtons : styles.desktopButtons, styles.actionButtons)}
+          >
             <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
               {t('discard', 'Discard')}
             </Button>

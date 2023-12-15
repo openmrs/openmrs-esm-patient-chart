@@ -65,6 +65,11 @@
   background-color: $ui-02;
 }
 
+.actionButtons {
+  position: sticky;
+  bottom: 0;
+}
+
 .form {
   margin: 1rem;
 }
