@@ -250,6 +250,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 if (searchResults && searchResults.length) {
                   return (
                     <ul className={styles.conditionsList}>
+                      {/*TODO: use uuid instead of index as the key*/}
                       {searchResults?.map((searchResult, index) => (
                         <li
                           role="menuitem"
