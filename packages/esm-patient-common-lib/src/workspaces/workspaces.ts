@@ -189,14 +189,19 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       name,
       additionalProps,
     });
-  } else if (isWorkspaceAlreadyOpen) {
-    openWorkspaces[workspaceIndexInOpenWorkspaces].additionalProps = newWorkspace.additionalProps;
-    const restOfWorkspaces = openWorkspaces.filter((w) => w.name != name);
-    updateStoreWithNewWorkspace(openWorkspaces[workspaceIndexInOpenWorkspaces], restOfWorkspaces);
-  } else if (!!openedWorkspaceWithSameType) {
-    const restOfWorkspaces = store.getState().openWorkspaces.filter((w) => w.type != newWorkspace.type);
-    updateStoreWithNewWorkspace(openedWorkspaceWithSameType, restOfWorkspaces);
-    promptBeforeLaunchingWorkspace(openedWorkspaceWithSameType, {
+  } else if (isWorkspaceAlreadyOpen || !!openedWorkspaceWithSameType) {
+    const workspaceToApply: OpenWorkspace = !!openedWorkspaceWithSameType
+      ? openedWorkspaceWithSameType
+      : {
+        ...openWorkspaces[workspaceIndexInOpenWorkspaces],
+        additionalProps: newWorkspace.additionalProps
+      };
+    const restOfWorkspaces = !!openedWorkspaceWithSameType
+      ? openWorkspaces.filter((w) => w.type != newWorkspace.type)
+      : openWorkspaces.filter((w) => w.name != name);
+
+    updateStoreWithNewWorkspace(workspaceToApply, restOfWorkspaces);
+    promptBeforeLaunchingWorkspace(workspaceToApply, {
       name,
       additionalProps,
     });
