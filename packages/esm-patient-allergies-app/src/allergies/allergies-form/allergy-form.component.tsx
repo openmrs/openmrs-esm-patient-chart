@@ -185,7 +185,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
         </Row>
       ) : null}
       <div className={styles.form}>
-        <Stack gap={7}>
+        <Stack gap={7} className={styles.formContent}>
           {selectedAllergen?.uuid === otherConceptUuid && (
             <InlineNotification
               style={{ minWidth: '100%' }}
@@ -329,26 +329,26 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               />
             </ResponsiveWrapper>
           </div>
-          <ButtonSet
-            className={classNames(isTablet ? styles.tabletButtons : styles.desktopButtons, styles.actionButtons)}
-          >
-            <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
-              {t('discard', 'Discard')}
-            </Button>
-            <Button
-              className={styles.button}
-              disabled={
-                isDisabled ||
-                (selectedAllergen?.uuid === otherConceptUuid && !selectednonCodedAllergen) ||
-                (selectedAllergicReactions?.includes(otherConceptUuid) && !selectedNonCodedAllergicReaction)
-              }
-              type="submit"
-              kind="primary"
-            >
-              {t('saveAndClose', 'Save and close')}
-            </Button>
-          </ButtonSet>
         </Stack>
+        <ButtonSet
+          className={classNames(isTablet ? styles.tabletButtons : styles.desktopButtons, styles.actionButtons)}
+        >
+          <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            disabled={
+              isDisabled ||
+              (selectedAllergen?.uuid === otherConceptUuid && !selectednonCodedAllergen) ||
+              (selectedAllergicReactions?.includes(otherConceptUuid) && !selectedNonCodedAllergicReaction)
+            }
+            type="submit"
+            kind="primary"
+          >
+            {t('saveAndClose', 'Save and close')}
+          </Button>
+        </ButtonSet>
       </div>
     </Form>
   );
