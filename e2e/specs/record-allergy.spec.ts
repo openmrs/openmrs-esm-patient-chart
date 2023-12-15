@@ -23,6 +23,7 @@ test('Record an allergy', async ({ page, api }) => {
   });
 
   await test.step('And I fill the form', async () => {
+    await allergiesPage.page.getByPlaceholder(/select the allergen/i).click();
     await allergiesPage.page.getByText(/ace inhibitors/i).click();
     await allergiesPage.page.getByText(/mental status change/i).click();
     await allergiesPage.page.getByText(/mild/i).click();
