@@ -2,8 +2,10 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 
-td {
-  white-space: nowrap;
+.table {
+  td {
+    white-space: nowrap;
+  }
 }
 
 .criticallyLow, .criticallyHigh, .low, .high {
