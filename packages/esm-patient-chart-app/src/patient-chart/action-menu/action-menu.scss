@@ -25,31 +25,10 @@ $actionPanelOffset: 3rem;
     align-items: center;
     border-left: 1px solid $text-03;
 
-    & div {
+    & .container {
       display: flex;
       align-items: center;
       flex-direction: column;
-
-      & button {
-        width: $icon-button-size;
-        height: $icon-button-size;
-        justify-content: center;
-        margin-top: spacing.$spacing-02;
-        margin-bottom: spacing.$spacing-02;
-        border-radius: 50%;
-
-        &:hover {
-          background-color: $color-gray-30;
-
-          :global(.cds--btn--ghost:focus) {
-            box-shadow: none;
-          }
-        }
-
-        &:focus {
-          border-color: $interactive-01;
-        }
-      }
     }
   }
 }
@@ -97,6 +76,18 @@ $actionPanelOffset: 3rem;
     }
   }
 }
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .hiddenSideRail {
+   display: none;
+  }
+}
+:global(.omrs-breakpoint-lt-desktop) {
+  .showSideRail {
+   display: flex;
+  }
+}
+
 
 .divider {
   background-color: $text-03;

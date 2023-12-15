@@ -90,7 +90,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseLayoutType.mockReturnValue('desktop');
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('20');
+    expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('16');
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
