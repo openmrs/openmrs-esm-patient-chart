@@ -4,6 +4,7 @@ import {
   Button,
   ButtonSet,
   Checkbox,
+  ComboBox,
   Form,
   FormGroup,
   InlineLoading,
@@ -39,7 +40,7 @@ import {
 } from './allergy-form.resource';
 import { useAllergies } from '../allergy-intolerance.resource';
 import styles from './allergy-form.scss';
-import AllergenPicker from './allergen-picker.component';
+import { AllergenType } from '../../types';
 
 const allergyFormSchema = z.object({
   allergen: z
@@ -85,7 +86,12 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
     mode: 'all',
     resolver: zodResolver(allergyFormSchema),
     defaultValues: {
+      allergen: null,
+      nonCodedAllergen: '',
       allergicReactions: [],
+      nonCodedAllergicReaction: '',
+      severityOfWorstReaction: null,
+      comment: '',
     },
   });
 
@@ -199,7 +205,17 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
                 name="allergen"
                 control={control}
                 render={({ field: { value, onChange } }) => (
-                  <AllergenPicker allergens={allergens} selectedAllergen={value} onAllergenChange={onChange} />
+                  <ComboBox
+                    id="allergen"
+                    items={[
+                      ...allergens,
+                      { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType.OTHER },
+                    ]}
+                    itemToString={(item: Allergen) => item?.display}
+                    placeholder={t('selectAllergen', 'Select the allergen')}
+                    selectedItem={value}
+                    onChange={({ selectedItem }) => onChange(selectedItem)}
+                  />
                 )}
               />
             </FormGroup>

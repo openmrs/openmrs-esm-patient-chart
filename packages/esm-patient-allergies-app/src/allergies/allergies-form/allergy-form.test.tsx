@@ -6,6 +6,7 @@ import { mockAllergens, mockAllergicReactions, mockAllergyResult } from '../../_
 import { mockPatient } from '../../../../../tools/test-helpers';
 import { type NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
 import AllergyForm from './allergy-form.component';
+import { AllergenType } from '../../types';
 
 const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
 const mockUseAllergens = useAllergens as jest.Mock;
@@ -61,15 +62,17 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('AllergyForm ', () => {
   it('renders the allergy form with all the expected fields and values', async () => {
     renderAllergyForm();
+    const user = userEvent.setup();
 
     const allergensContainer = screen.getByTestId('allergens-container');
+    const allergenInput = screen.queryByPlaceholderText(/select the allergen/i);
 
-    expect(screen.getByPlaceholderText(/search allergen/i)).toBeInTheDocument();
+    expect(allergenInput).toBeInTheDocument();
+    await user.click(allergenInput);
     mockAllergens.forEach((allergen) => {
       expect(within(allergensContainer).getByText(allergen.display)).toBeInTheDocument();
     });
 
-    const reactionsContainer = screen.getByTestId('allergic-reactions-container');
     expect(screen.getByText(/select the reactions/i)).toBeInTheDocument();
     mockAllergicReactions.forEach((reaction) => {
       expect(screen.getByRole('checkbox', { name: reaction.display })).toBeInTheDocument();
@@ -92,9 +95,11 @@ describe('AllergyForm ', () => {
     const reaction = mockAllergicReactions[0];
 
     const saveButton = screen.getByRole('button', { name: /save and close/i });
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     expect(saveButton).toBeDisabled();
 
+    await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     expect(saveButton).toBeDisabled();
 
@@ -104,9 +109,10 @@ describe('AllergyForm ', () => {
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
     expect(saveButton).toBeEnabled();
 
-    await userEvent.click(screen.getByRole('button', { name: /clear allergen search/i }));
+    await user.click(screen.getByRole('button', { name: /Clear selected item/i }));
     expect(saveButton).toBeDisabled();
 
+    await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     expect(saveButton).toBeEnabled();
 
@@ -118,11 +124,13 @@ describe('AllergyForm ', () => {
     renderAllergyForm();
 
     const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
     const reaction = mockAllergicReactions[0];
     const comment = 'some comment';
 
+    await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
@@ -144,6 +152,62 @@ describe('AllergyForm ', () => {
     expect(mockSaveAllergy.mock.calls[0][0]).toEqual(expectedPayload);
   });
 
+  it('displays a custom input and a warning message when select other allergen', async () => {
+    renderAllergyForm();
+
+    const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
+    const allergensContainer = screen.getByTestId('allergens-container');
+
+    await user.click(allergenInput);
+    await user.click(within(allergensContainer).getByText(/other/i));
+
+    const otherInput = screen.queryByLabelText(/Other non-coded allergen/i);
+    expect(otherInput).toBeInTheDocument();
+
+    const warningMessage = screen.queryByText(
+      "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
+    );
+    expect(warningMessage).toBeInTheDocument();
+  });
+
+  it('calls the saveAllergy function with the correct payload when select other allergen', async () => {
+    mockSaveAllergy.mockClear();
+    renderAllergyForm();
+
+    const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
+    const allergensContainer = screen.getByTestId('allergens-container');
+    const customAllergen = 'some other allergen';
+    const reaction = mockAllergicReactions[0];
+    const comment = 'some comment';
+
+    await user.click(allergenInput);
+    await user.click(within(allergensContainer).getByText(/other/i));
+
+    const customAllergenInput = screen.getByLabelText(/Other non-coded allergen/i);
+
+    await user.type(customAllergenInput, customAllergen);
+    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
+    await user.click(screen.getByRole('radio', { name: /moderate/i }));
+    await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
+    const expectedPayload: NewAllergy = {
+      allergen: {
+        allergenType: AllergenType.OTHER,
+        codedAllergen: { uuid: mockConcepts.otherConceptUuid },
+        nonCodedAllergen: customAllergen,
+      },
+      comment,
+      reactions: [{ reaction: { uuid: reaction.uuid } }],
+      severity: { uuid: mockConcepts.moderateReactionUuid },
+    };
+
+    expect(mockSaveAllergy.mock.calls[0][0]).toEqual(expectedPayload);
+  });
+
   it('renders a success notification after successful submission', async () => {
     mockSaveAllergy.mockClear();
     mockShowToast.mockClear();
@@ -151,11 +215,13 @@ describe('AllergyForm ', () => {
     renderAllergyForm();
 
     const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
     const reaction = mockAllergicReactions[0];
     const comment = 'some comment';
 
+    await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
@@ -185,11 +251,13 @@ describe('AllergyForm ', () => {
     renderAllergyForm();
 
     const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
     const reaction = mockAllergicReactions[0];
     const comment = 'some comment';
 
+    await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
