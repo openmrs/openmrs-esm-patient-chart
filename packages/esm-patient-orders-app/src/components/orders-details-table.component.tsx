@@ -411,7 +411,13 @@ function OrderBasketItemActions({
   }, [items, orderItem, setItems]);
 
   return (
-    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
+    <OverflowMenu
+      ariaLabel="Actions menu"
+      selectorPrimaryFocus={'#modify'}
+      flipped
+      size={isTablet ? 'lg' : 'md'}
+      align="left"
+    >
       <OverflowMenuItem
         className={styles.menuItem}
         id="modify"
