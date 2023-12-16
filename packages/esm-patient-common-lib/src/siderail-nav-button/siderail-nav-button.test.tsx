@@ -173,7 +173,7 @@ describe('SiderailNavButton', () => {
     );
 
     expect(screen.getByTestId('pen-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('pen-icon').innerHTML).toBe('size: 20');
+    expect(screen.getByTestId('pen-icon').innerHTML).toBe('size: 16');
 
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
