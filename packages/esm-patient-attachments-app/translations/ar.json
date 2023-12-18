@@ -30,6 +30,7 @@
   "fileSizeLimitExceeded": "تجاوز حجم الملف المسموح به",
   "fileSizeLimitExceededText": "تم تجاوز الحد الأقصى لحجم الملف",
   "fileUnsupported": "الملف المحمل غير مدعوم",
+  "fileUploadSizeConstraints": "الحد الأقصى لحجم الملف هو {{fileSize}}ميغابايت",
   "image": "صورة",
   "imageDescription": "وصف الصورة",
   "name": "الاسم",

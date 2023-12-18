@@ -30,6 +30,7 @@
   "fileSizeLimitExceeded": "חריג מגודל הקובץ של",
   "fileSizeLimitExceededText": "חריגה ממגבלת גודל הקובץ",
   "fileUnsupported": "הקובץ שהועלה אינו נתמך",
+  "fileUploadSizeConstraints": "מגבלת הקובץ היא {{fileSize}}MB",
   "image": "תמונה",
   "imageDescription": "תיאור התמונה",
   "name": "שם",

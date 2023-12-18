@@ -30,6 +30,7 @@
   "fileSizeLimitExceeded": "លើសពីទំហំឯកសារ",
   "fileSizeLimitExceededText": "លើសទំហំឯកសារកំណត់",
   "fileUnsupported": "ឯកសារដែលបានបង្ហោះមិនត្រូវបានគាំទ្រទេ",
+  "fileUploadSizeConstraints": "ដែនកំណត់ឯកសារគឺ {{fileSize}}MB",
   "image": "រូបភាព",
   "imageDescription": "ការពិពណ៌នារូបភាព",
   "name": "ឈ្មោះ",

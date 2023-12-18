@@ -30,6 +30,7 @@
   "fileSizeLimitExceeded": "dépasse la taille de fichier de",
   "fileSizeLimitExceededText": "Limite de taille de fichier dépassée",
   "fileUnsupported": "Le fichier téléchargé n'est pas pris en charge",
+  "fileUploadSizeConstraints": "La limite de fichier est {{fileSize}}MB",
   "image": "Image",
   "imageDescription": "Description de l'image",
   "name": "Nom",
