@@ -100,6 +100,39 @@ export interface Order {
   route: OpenmrsResource;
   scheduleDate: null;
   urgency: string;
+
+  // additional properties
+  accessionNumber: string;
+  scheduledDate: string;
+  display: string;
+  auditInfo: {
+    creator: {
+      uuid: string;
+      display: string;
+    };
+    dateCreated: string;
+    changedBy: string;
+    dateChanged: string;
+  };
+  fulfillerStatus: string;
+  fulfillerComment: string;
+  specimenSource: string;
+  laterality: string;
+  clinicalHistory: string;
+  numberOfRepeats: string;
+  type: string;
+}
+
+export interface OrderTypeFetchResponse {
+  results: Array<OrderType>;
+}
+
+export interface OrderType {
+  uuid: string;
+  display: string;
+  name: string;
+  retired: boolean;
+  description: string;
 }
 
 export interface Drug {

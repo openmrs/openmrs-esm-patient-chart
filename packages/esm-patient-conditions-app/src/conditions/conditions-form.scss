@@ -20,6 +20,7 @@
   @include type.type-style("body-compact-01");
   color: $text-02;
   min-height: 1rem;
+  border: 1px solid $ui-03;
 }
 
 .form {
@@ -83,5 +84,11 @@
 .radioGroup {
   :global(.cds--radio-button-wrapper) {
     margin-block-end: .375rem !important;
+  }
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: 1rem;
   }
 }

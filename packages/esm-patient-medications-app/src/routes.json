@@ -7,7 +7,7 @@
     {
       "name": "medications-details-widget",
       "component": "medicationsSummary",
-      "slot": "patient-chart-orders-dashboard-slot",
+      "slot": "patient-chart-medications-dashboard-slot",
       "meta": {
         "columnSpan": 1
       }
@@ -19,7 +19,7 @@
       "meta": {
         "columnSpan": 4
       },
-      "order": 4 
+      "order": 4
     },
     {
       "name": "medications-summary-dashboard",
@@ -27,7 +27,7 @@
       "slot": "patient-chart-dashboard-slot",
       "order": 3,
       "meta": {
-        "slot": "patient-chart-orders-dashboard-slot",
+        "slot": "patient-chart-medications-dashboard-slot",
         "columns": 1,
         "path": "Medications"
       }

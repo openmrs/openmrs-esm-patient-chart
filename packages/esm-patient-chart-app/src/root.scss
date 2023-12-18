@@ -20,11 +20,6 @@
     scrollbar-width: none;
   }
 
-  ::-webkit-scrollbar {
-    width: 0px;
-    background-color: transparent
-  }
-
   :global(.cds--side-nav__overlay-active) {
     background-color: transparent;
   }

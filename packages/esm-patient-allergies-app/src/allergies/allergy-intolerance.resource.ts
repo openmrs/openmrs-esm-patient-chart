@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import capitalize from 'lodash-es/capitalize';
 import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
-import { type FHIRAllergy, type FHIRAllergyResponse } from '../types';
+import { type FHIRAllergy, type FHIRAllergyResponse, type ReactionSeverity } from '../types';
 
 export type Allergy = {
   id: string;
@@ -15,7 +15,7 @@ export type Allergy = {
   note: string;
   reactionToSubstance: string;
   reactionManifestations: Array<string>;
-  reactionSeverity: string;
+  reactionSeverity: ReactionSeverity;
   lastUpdated: string;
 };
 
@@ -65,7 +65,7 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
     note: allergy?.note?.[0]?.text,
     reactionToSubstance: allergy?.reaction[0]?.substance?.coding[1]?.display,
     reactionManifestations: manifestations,
-    reactionSeverity: capitalize(allergy?.reaction[0]?.severity),
+    reactionSeverity: allergy?.reaction[0]?.severity,
     lastUpdated: allergy?.meta?.lastUpdated,
   };
 }

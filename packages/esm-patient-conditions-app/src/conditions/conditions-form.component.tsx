@@ -15,6 +15,7 @@ interface ConditionFormProps {
   formContext: 'creating' | 'editing';
   patientUuid?: string;
 }
+
 const conditionSchema = z.object({
   clinicalStatus: z.string(),
   endDate: z.date().optional(),
@@ -45,7 +46,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
             : null
           : null,
       clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
-      search: condition?.cells?.find((cell) => cell?.info?.header === 'display')?.value,
+      search: '',
     },
   });
 
@@ -65,7 +66,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
           patientUuid={patientUuid}
           closeWorkspace={closeWorkspace}
           conditionToEdit={condition}
-          editing={formContext === 'editing' ? true : false}
+          editing={formContext === 'editing'}
           setErrorCreating={setErrorCreating}
           setErrorUpdating={setErrorUpdating}
           isSubmittingForm={isSubmittingForm}
@@ -102,7 +103,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
             </Button>
             <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
               {isSubmittingForm ? (
-                <InlineLoading description={t('saving', 'Saving') + '...'} />
+                <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
               ) : (
                 <span>{t('saveAndClose', 'Save & close')}</span>
               )}

@@ -30,7 +30,7 @@
   "fileSizeLimitExceeded": "חריג מגודל הקובץ של",
   "fileSizeLimitExceededText": "חריגה ממגבלת גודל הקובץ",
   "fileUnsupported": "הקובץ שהועלה אינו נתמך",
-  "fileUploadSizeConstrains": "מגבלת הקובץ היא",
+  "fileUploadSizeConstraints": "מגבלת הקובץ היא {{fileSize}}MB",
   "image": "תמונה",
   "imageDescription": "תיאור התמונה",
   "name": "שם",
@@ -38,8 +38,8 @@
   "type": "סוג",
   "uploadComplete": "ההעלאה הושלמה",
   "uploadedSuccessfully": "הועלה בהצלחה",
+  "uploadFiles": "Upload files",
   "uploading": "מעלה",
-  "uploadMedia": "העלה מדיה",
   "uploadWillContinueInTheBackground": "הקבצים ייעלו ברקע. ניתן לסגור את החלון.",
   "webcam": "מצלמת אינטרנט"
 }

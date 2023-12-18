@@ -43,7 +43,7 @@
       "component": "clinicalFormsWorkspace",
       "meta": {
         "title": {
-          "key": "clinicalForm",
+          "key": "clinicalForms",
           "default": "Clinical forms"
         },
         "type": "clinical-form",

@@ -30,7 +30,7 @@
   "fileSizeLimitExceeded": "تجاوز حجم الملف المسموح به",
   "fileSizeLimitExceededText": "تم تجاوز الحد الأقصى لحجم الملف",
   "fileUnsupported": "الملف المحمل غير مدعوم",
-  "fileUploadSizeConstrains": "الحد الأقصى لحجم الملف هو",
+  "fileUploadSizeConstraints": "الحد الأقصى لحجم الملف هو {{fileSize}}ميغابايت",
   "image": "صورة",
   "imageDescription": "وصف الصورة",
   "name": "الاسم",
@@ -38,8 +38,8 @@
   "type": "النوع",
   "uploadComplete": "اكتمل التحميل",
   "uploadedSuccessfully": "تم التحميل بنجاح",
+  "uploadFiles": "Upload files",
   "uploading": "جاري التحميل",
-  "uploadMedia": "تحميل وسائط",
   "uploadWillContinueInTheBackground": "سيتم تحميل الملفات في الخلفية. يمكنك إغلاق هذه النافذة.",
   "webcam": "كاميرا ويب"
 }

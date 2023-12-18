@@ -3,6 +3,8 @@ import useSWR, { useSWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, type OpenmrsResource, parseDate, type Visit } from '@openmrs/esm-framework';
 import { type OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
+export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
+
 /**
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
  * Refreshes patient orders for all kinds of orders.
