@@ -34,7 +34,7 @@ export const resultsViewer = getSyncLifecycle(resultsViewerComponent, options);
 export const printModal = getAsyncLifecycle(() => import('./test-results/print-modal/print-modal.extension'), options);
 
 export const testResultsDashboardLink =
-  // t('Test Results', 'Test Results')
+  // t('Results Viewer', 'Results Viewer')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
