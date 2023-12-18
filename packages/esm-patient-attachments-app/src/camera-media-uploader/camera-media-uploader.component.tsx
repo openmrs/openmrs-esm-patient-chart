@@ -131,7 +131,7 @@ const CameraMediaUploadTabs = () => {
         <Tabs className={styles.tabs} defaultSelectedIndex={1}>
           <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
             <Tab onClick={() => setView('camera')}>{t('webcam', 'Webcam')}</Tab>
-            <Tab onClick={() => setView('upload')}>{t('uploadMedia', 'Upload media')}</Tab>
+            <Tab onClick={() => setView('upload')}>{t('uploadFiles', 'Upload files')}</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
