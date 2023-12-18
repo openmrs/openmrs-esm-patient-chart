@@ -37,8 +37,8 @@
   "type": "Type",
   "uploadComplete": "Téléchargement terminé",
   "uploadedSuccessfully": "téléchargé avec succès",
+  "uploadFiles": "Upload files",
   "uploading": "En cours de téléchargement",
-  "uploadMedia": "Télécharger le média",
   "uploadWillContinueInTheBackground": "Les fichiers seront téléchargés en arrière-plan. Vous pouvez fermer cette fenêtre.",
   "webcam": "Webcam"
 }

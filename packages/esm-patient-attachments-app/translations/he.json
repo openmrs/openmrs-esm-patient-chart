@@ -37,8 +37,8 @@
   "type": "סוג",
   "uploadComplete": "ההעלאה הושלמה",
   "uploadedSuccessfully": "הועלה בהצלחה",
+  "uploadFiles": "Upload files",
   "uploading": "מעלה",
-  "uploadMedia": "העלה מדיה",
   "uploadWillContinueInTheBackground": "הקבצים ייעלו ברקע. ניתן לסגור את החלון.",
   "webcam": "מצלמת אינטרנט"
 }

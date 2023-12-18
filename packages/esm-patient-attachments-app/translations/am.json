@@ -37,8 +37,8 @@
   "type": "Type",
   "uploadComplete": "Upload complete",
   "uploadedSuccessfully": "uploaded successfully",
+  "uploadFiles": "Upload files",
   "uploading": "Uploading",
-  "uploadMedia": "Upload media",
   "uploadWillContinueInTheBackground": "Files will be uploaded in the background. You can close this modal.",
   "webcam": "Webcam"
 }

@@ -37,8 +37,8 @@
   "type": "Tipo",
   "uploadComplete": "Carga completa",
   "uploadedSuccessfully": "cargado con éxito",
+  "uploadFiles": "Upload files",
   "uploading": "Cargando",
-  "uploadMedia": "Cargar medios",
   "uploadWillContinueInTheBackground": "Los archivos se cargarán en segundo plano. Puede cerrar esta ventana.",
   "webcam": "Cámara web"
 }
