@@ -12,7 +12,7 @@
       "meta": {
         "slot": "patient-chart-test-results-dashboard-slot",
         "columns": 1,
-        "path": "Test Results",
+        "path": "Results Viewer",
         "hideDashboardTitle": true
       },
       "order": 4

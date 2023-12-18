@@ -59,7 +59,7 @@ export function startupApp() {
    * t('Programs dashboard', 'Programs dashboard')
    * t('Offline Actions dashboard', 'Offline Actions dashboard')
    * t('Forms & Notes dashboard', 'Forms & Notes dashboard')
-   * t('Test Results dashboard', 'Test Results dashboard')
+   * t('Results Viewer dashboard', 'Results Viewer dashboard')
    */
   registerBreadcrumbs([
     {
