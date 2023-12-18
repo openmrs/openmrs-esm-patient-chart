@@ -30,7 +30,7 @@
   "fileSizeLimitExceeded": "exceeds the file size of",
   "fileSizeLimitExceededText": "File size limit exceeded",
   "fileUnsupported": "File uploaded is not supported",
-  "fileUploadSizeConstrains": "File limit is",
+  "fileUploadSizeConstraints": "File limit is {{fileSize}}MB",
   "image": "Image",
   "imageDescription": "Image description",
   "name": "name",
@@ -38,8 +38,8 @@
   "type": "Type",
   "uploadComplete": "Upload complete",
   "uploadedSuccessfully": "uploaded successfully",
+  "uploadFiles": "Upload files",
   "uploading": "Uploading",
-  "uploadMedia": "Upload media",
   "uploadWillContinueInTheBackground": "Files will be uploaded in the background. You can close this modal.",
   "webcam": "Webcam"
 }

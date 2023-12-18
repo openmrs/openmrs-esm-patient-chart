@@ -30,7 +30,7 @@
   "fileSizeLimitExceeded": "supera el tamaño de archivo de",
   "fileSizeLimitExceededText": "Límite de tamaño de archivo excedido",
   "fileUnsupported": "Archivo no compatible cargado",
-  "fileUploadSizeConstrains": "Límite de archivo es",
+  "fileUploadSizeConstraints": "Límite de archivo es {{fileSize}}MB",
   "image": "Imagen",
   "imageDescription": "Descripción de imagen",
   "name": "nombre",
@@ -38,8 +38,8 @@
   "type": "Tipo",
   "uploadComplete": "Carga completa",
   "uploadedSuccessfully": "cargado con éxito",
+  "uploadFiles": "Upload files",
   "uploading": "Cargando",
-  "uploadMedia": "Cargar medios",
   "uploadWillContinueInTheBackground": "Los archivos se cargarán en segundo plano. Puede cerrar esta ventana.",
   "webcam": "Cámara web"
 }

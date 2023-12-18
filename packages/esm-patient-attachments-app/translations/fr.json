@@ -30,7 +30,7 @@
   "fileSizeLimitExceeded": "dépasse la taille de fichier de",
   "fileSizeLimitExceededText": "Limite de taille de fichier dépassée",
   "fileUnsupported": "Le fichier téléchargé n'est pas pris en charge",
-  "fileUploadSizeConstrains": "La limite de fichier est",
+  "fileUploadSizeConstraints": "La limite de fichier est {{fileSize}}MB",
   "image": "Image",
   "imageDescription": "Description de l'image",
   "name": "Nom",
@@ -38,8 +38,8 @@
   "type": "Type",
   "uploadComplete": "Téléchargement terminé",
   "uploadedSuccessfully": "téléchargé avec succès",
+  "uploadFiles": "Upload files",
   "uploading": "En cours de téléchargement",
-  "uploadMedia": "Télécharger le média",
   "uploadWillContinueInTheBackground": "Les fichiers seront téléchargés en arrière-plan. Vous pouvez fermer cette fenêtre.",
   "webcam": "Webcam"
 }
