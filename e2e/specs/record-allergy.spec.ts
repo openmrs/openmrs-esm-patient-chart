@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Record an allergy to a food item', async ({ page, api }) => {
+test('Record an allergy', async ({ page, api }) => {
   const allergiesPage = new PatientAllergiesPage(page);
   const headerRow = allergiesPage.allergiesTable().locator('thead > tr');
   const dataRow = allergiesPage.allergiesTable().locator('tbody > tr');
@@ -22,9 +22,9 @@ test('Record an allergy to a food item', async ({ page, api }) => {
     await allergiesPage.page.getByText(/record allergy intolerance/i).click();
   });
 
-  await test.step('And then I record an allergy to a food item', async () => {
-    await allergiesPage.page.getByRole('tab', { name: /food/i }).click();
-    await allergiesPage.page.getByText(/eggs/i).click();
+  await test.step('And I fill the form', async () => {
+    await allergiesPage.page.getByPlaceholder(/select the allergen/i).click();
+    await allergiesPage.page.getByText(/ace inhibitors/i).click();
     await allergiesPage.page.getByText(/mental status change/i).click();
     await allergiesPage.page.getByText(/mild/i).click();
     await allergiesPage.page.locator('#comments').fill('Test comment');
@@ -38,13 +38,13 @@ test('Record an allergy to a food item', async ({ page, api }) => {
     await expect(allergiesPage.page.getByText(/allergy saved/i)).toBeVisible();
   });
 
-  await test.step('And I should see the newly recorded food allergy in the list', async () => {
+  await test.step('And I should see the newly recorded drug allergen in the list', async () => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
     await expect(headerRow).toContainText(/onset date and comments/i);
-    await expect(dataRow).toContainText(/eggs/i);
-    await expect(dataRow).toContainText(/low/i);
+    await expect(dataRow).toContainText(/ace inhibitors/i);
+    await expect(dataRow).toContainText(/MILD/i);
     await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/test comment/i);
   });

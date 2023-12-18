@@ -26,6 +26,14 @@
   color: $ui-01;
 }
 
+.closePreviewButton  {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .closePreviewButton > svg > path {
   fill: $ui-01 !important;
 }
@@ -55,7 +63,7 @@
   fill: $ui-01;
 }
 
-.overflowMenu:hover button svg circle, 
+.overflowMenu:hover button svg circle,
 .overflowMenu:focus button svg circle {
   fill: $ui-05;
 }

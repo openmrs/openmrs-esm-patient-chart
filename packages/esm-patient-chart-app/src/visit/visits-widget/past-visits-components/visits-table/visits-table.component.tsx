@@ -254,6 +254,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
+                                align="left"
                               >
                                 <OverflowMenuItem
                                   size={desktopLayout ? 'sm' : 'lg'}
