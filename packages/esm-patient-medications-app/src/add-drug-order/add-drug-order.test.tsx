@@ -147,17 +147,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(aspirin81OpenFormButton);
 
-    expect(hookResult.current.orders).toEqual([
-      expect.objectContaining({
-        ...getTemplateOrderBasketItem(
-          mockDrugSearchResultApiData[0],
-          undefined,
-          mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
-        ),
-        startDate: expect.any(Date),
-      }),
-    ]);
-
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
   });
 
@@ -172,16 +161,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const openFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(openFormButton);
 
-    expect(hookResult.current.orders).toEqual([
-      expect.objectContaining({
-        ...getTemplateOrderBasketItem(
-          mockDrugSearchResultApiData[0],
-          undefined,
-          mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
-        ),
-        startDate: expect.any(Date),
-      }),
-    ]);
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
   });
 });

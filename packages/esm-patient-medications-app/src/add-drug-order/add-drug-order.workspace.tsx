@@ -32,7 +32,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
         setCurrentOrder(searchResult);
       }
     },
-    [setOrders, orders],
+    [orders],
   );
 
   const saveDrugOrder = useCallback(
