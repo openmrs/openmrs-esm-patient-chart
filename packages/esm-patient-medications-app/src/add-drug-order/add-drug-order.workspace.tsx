@@ -41,11 +41,15 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
-      newOrders[orders.indexOf(existingOrder)] = {
-        ...finalizedOrder,
-        // Incomplete orders should be marked completed on saving the form
-        isOrderIncomplete: false,
-      };
+      if (existingOrder) {
+        newOrders[orders.indexOf(existingOrder)] = {
+          ...finalizedOrder,
+          // Incomplete orders should be marked completed on saving the form
+          isOrderIncomplete: false,
+        };
+      } else {
+        newOrders.push(finalizedOrder);
+      }
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');
