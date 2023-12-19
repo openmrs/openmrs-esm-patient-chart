@@ -19,7 +19,6 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
-    setOrders(orders.filter((order) => !ordersEqual(order, currentOrder)));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, currentOrder, orders, setOrders]);
@@ -30,7 +29,6 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       if (existingOrder) {
         setCurrentOrder(existingOrder);
       } else {
-        setOrders([...orders, searchResult]);
         setCurrentOrder(searchResult);
       }
     },
