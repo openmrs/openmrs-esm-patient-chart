@@ -106,10 +106,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ...acc,
         [uuid]: required
           ? z
-              .string({
-                required_error: t('fieldRequired', 'This field is required'),
-              })
-              .refine((value) => !!value, t('fieldRequired', 'This field is required'))
+            .string({
+              required_error: t('fieldRequired', 'This field is required'),
+            })
+            .refine((value) => !!value, t('fieldRequired', 'This field is required'))
           : z.string().optional(),
       }),
       {},
@@ -124,8 +124,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
       visitStopTime: displayVisitStopDateTimeFields
         ? z
-            .string()
-            .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
+          .string()
+          .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
         : z.string().optional(),
       visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
       programType: z.string().optional(),
@@ -315,7 +315,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-
+      if (config.showBillingSlot) {
+        const { handleCreateBill, attributes } = billingInfo ?? {};
+        payload.attributes = attributes;
+        handleCreateBill && handleCreateBill();
+      }
       if (isOnline) {
         (visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
@@ -367,10 +371,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     },
                   );
                 }
-                if (config.showBillingSlot) {
-                  const { handleCreateBill } = billingInfo ?? {};
-                  handleCreateBill && handleCreateBill();
-                }
+
                 if (config.showUpcomingAppointments && upcomingAppointment) {
                   const appointmentPayload: AppointmentPayload = {
                     appointmentKind: upcomingAppointment?.appointmentKind,
@@ -416,11 +417,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 kind: 'success',
                 subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                    })
+                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                  })
                   : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                      visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                    }),
+                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                  }),
                 title: !visitToEdit
                   ? t('visitStarted', 'Visit started')
                   : t('visitDetailsUpdated', 'Visit details updated'),
@@ -655,14 +656,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="billing-checkin-slot" />
             )}
 
-            {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
-            <section>
-              <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
-              <div className={styles.sectionField}>
-                <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
-              </div>
-            </section>
-
             {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
             {config.showServiceQueueFields && (
               <section>
@@ -672,6 +665,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 </div>
               </section>
             )}
+
+            {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
+            <section>
+              <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
+              <div className={styles.sectionField}>
+                <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
+              </div>
+            </section>
+
+
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
