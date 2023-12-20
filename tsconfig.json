@@ -24,6 +24,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext",
-    "typeRoots": ["./node_modules/@types"],
-  }
+    "typeRoots": ["./node_modules/@types", "./node_modules/testing-library"],
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+  },
 }

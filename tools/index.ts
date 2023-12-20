@@ -6,3 +6,5 @@ export {
   renderWithSwr,
   waitForLoadingToFinish,
 } from './test-utils';
+
+export * from './setup-tests';

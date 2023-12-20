@@ -4,7 +4,6 @@ import { useConfig } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit } from '__mocks__';
 import FormsDashboard from './forms-dashboard.component';
-import { useForms } from '../hooks/use-forms';
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
