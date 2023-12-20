@@ -4,13 +4,9 @@ import { of } from 'rxjs/internal/observable/of';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
-import {
-  mockCareProgramsResponse,
-  mockEnrolledProgramsResponse,
-  mockLocationsResponse,
-} from '../__mocks__/programs.mock';
+import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { createProgramEnrollment, updateProgramEnrollment } from './programs.resource';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatient } from 'tools';
 import ProgramsForm from './programs-form.component';
 
 jest.setTimeout(20000);

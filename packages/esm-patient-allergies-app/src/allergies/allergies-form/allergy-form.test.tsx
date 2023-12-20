@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor, within } from '@testing-library/react';
-import { type FetchResponse, showNotification, showSnackbar, showToast } from '@openmrs/esm-framework';
-import { mockAllergens, mockAllergicReactions, mockAllergyResult } from '../../__mocks__/allergies.mock';
-import { mockPatient } from '../../../../../tools/test-helpers';
+import { screen, render, within } from '@testing-library/react';
+import { type FetchResponse, showSnackbar, showToast } from '@openmrs/esm-framework';
+import { mockAllergens, mockAllergicReactions } from '__mocks__';
+import { mockPatient } from 'tools';
 import { type NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
 import AllergyForm from './allergy-form.component';
 import { AllergenType } from '../../types';

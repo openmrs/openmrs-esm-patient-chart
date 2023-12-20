@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { formatDatetime } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockCurrentVisit } from '__mocks__';
+import { mockPatient } from 'tools';
 import VisitTag from './visit-tag.component';
 
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;

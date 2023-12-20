@@ -8,8 +8,8 @@ import {
   mockFhirVitalsResponse,
   mockVitalsConfig,
   mockVitalsSignsConcept,
-} from '../__mocks__/vitals.mock';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+} from '__mocks__';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import VitalsOverview from './vitals-overview.component';
 
 const testProps = {

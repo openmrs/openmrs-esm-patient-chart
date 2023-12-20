@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { renderWithSwr } from 'tools';
 import FormsList, { type FormsListProps } from './forms-list.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));

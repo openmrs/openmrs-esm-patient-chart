@@ -3,7 +3,7 @@ import CancelVisitOverflowMenuItem from './cancel-visit.component';
 import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useVisit } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
+import { mockCurrentVisit } from '__mocks__';
 
 const mockUseVisit = useVisit as jest.Mock;
 const mockShowModal = showModal as jest.Mock;

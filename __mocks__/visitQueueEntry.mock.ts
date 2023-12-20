@@ -1,4 +1,4 @@
-import type { QueueStatus } from '../visit/queue-entry/queue.resource';
+import type { QueueStatus } from '../packages/esm-patient-chart-app/src/visit/queue-entry/queue.resource';
 
 export const mockVisitQueueEntries = {
   id: 'eb8b58c1-4889-4a2b-ac7a-cedb90753349',

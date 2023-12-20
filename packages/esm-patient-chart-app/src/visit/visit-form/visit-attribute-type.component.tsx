@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useId, useMemo } from 'react';
 import {
   Checkbox,
   DatePicker,
@@ -114,6 +114,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     error: errorFetchingVisitAttributeAnswers,
   } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
+  const id = useId();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
   const {
@@ -150,6 +151,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
 
         return (
           <Select
+            id={`select-${id}`}
             {...fieldProps}
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}

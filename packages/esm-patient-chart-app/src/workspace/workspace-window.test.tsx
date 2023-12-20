@@ -3,7 +3,7 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isDesktop } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, registerWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatient } from 'tools';
 import WorkspaceWindow from './workspace-window.component';
 
 const mockExtensionRegistry = {};

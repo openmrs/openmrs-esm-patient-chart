@@ -2,7 +2,7 @@ import React from 'react';
 import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
+import { mockVisitTypes } from '__mocks__';
 import BaseVisitType from './base-visit-type.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));

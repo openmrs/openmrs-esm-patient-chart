@@ -1,4 +1,4 @@
-import type { FHIRImmunizationBundle } from '../immunizations/immunization-domain';
+import type { FHIRImmunizationBundle } from '../packages/esm-patient-immunizations-app/src/immunizations/immunization-domain';
 import dayjs from 'dayjs';
 
 export const mockImmunizationConfig = {

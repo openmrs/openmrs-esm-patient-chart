@@ -1,4 +1,4 @@
-import type { Condition } from '../conditions/conditions.resource';
+import type { Condition } from '../packages/esm-patient-conditions-app/src/conditions/conditions.resource';
 
 export const mockFhirConditionsResponse = {
   resourceType: 'Bundle',

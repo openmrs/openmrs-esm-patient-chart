@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatient } from 'tools';
 import PatientBanner from './patient-banner.component';
 import { useConnectedExtensions } from '@openmrs/esm-framework';
 

@@ -1,13 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsResponse, mockConceptMetadata } from '../__mocks__/biometrics.mock';
-import {
-  mockPatient,
-  patientChartBasePath,
-  renderWithSwr,
-  waitForLoadingToFinish,
-} from '../../../../tools/test-helpers';
+import { formattedBiometrics, mockBiometricsResponse, mockConceptMetadata } from '__mocks__';
+import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import BiometricsOverview from './biometrics-overview.component';
 
 const testProps = {

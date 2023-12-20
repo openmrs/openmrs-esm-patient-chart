@@ -1,5 +1,5 @@
-import { type Allergen } from '../allergies/allergies-form/allergy-form.resource';
-import { AllergenType } from '../types';
+import { type Allergen } from '../packages/esm-patient-allergies-app/src/allergies/allergies-form/allergy-form.resource';
+import { AllergenType } from '../packages/esm-patient-allergies-app/src/types';
 
 export const mockAllergyResult = {
   display: 'ACE inhibitors',

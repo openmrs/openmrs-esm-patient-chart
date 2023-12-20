@@ -2,9 +2,8 @@ import React from 'react';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePagination } from '@openmrs/esm-framework';
-import { formattedVisitNotes, mockVisitNotes } from '../__mocks__/visit-notes.mock';
-import { mockPatient, patientChartBasePath, renderWithSwr } from '../../../../tools/test-helpers';
-import { ConfigMock } from '../__mocks__/chart-widgets-config.mock';
+import { formattedVisitNotes, mockVisitNotes, ConfigMock } from '__mocks__';
+import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import NotesOverview from './notes-overview.component';
 import { useVisitNotes } from './visit-notes.resource';
 

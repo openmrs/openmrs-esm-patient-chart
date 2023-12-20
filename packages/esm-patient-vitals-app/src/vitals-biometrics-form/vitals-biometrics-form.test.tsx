@@ -2,8 +2,8 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
-import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../__mocks__/vitals.mock';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '__mocks__';
+import { mockPatient } from 'tools';
 import { saveVitalsAndBiometrics } from '../common';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 

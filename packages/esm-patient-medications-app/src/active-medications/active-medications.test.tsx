@@ -1,10 +1,9 @@
 import React from 'react';
 import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { mockPatientDrugOrdersApiData } from '../__mocks__/medication.mock';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ActiveMedications from './active-medications.component';
-import { mockSessionDataResponse } from '../__mocks__/session.mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
