@@ -130,11 +130,13 @@ describe('AddLabOrder', () => {
     expect(cd4).toBeInTheDocument();
     const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Add to basket');
     await userEvent.click(cd4OrderButton);
-    expect(hookResult.current.orders).toEqual([createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid')]);
+    expect(hookResult.current.orders).toEqual([
+      { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
+    ]);
+
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
-
   test('back to order basket', async () => {
     const user = userEvent.setup();
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
