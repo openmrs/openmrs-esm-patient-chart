@@ -28,7 +28,7 @@ jest.mock('@openmrs/esm-framework', () => {
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
-      goTo: () => {},
+      goTo: () => { },
       results: data,
     })),
   };
@@ -41,7 +41,7 @@ describe('EncounterList', () => {
     mockedGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => {},
+      goTo: () => { },
       results: [],
     }));
 
@@ -57,7 +57,7 @@ describe('EncounterList', () => {
 
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => {},
+      goTo: () => { },
       results: mockEncounters,
     }));
 
@@ -67,11 +67,11 @@ describe('EncounterList', () => {
 
     const filterDropdown = screen.getByRole('combobox', { name: /filter by encounter type/i });
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
-    const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /provider/];
+    const expectedColumnHeaders = [/date & time/, /visit type/, /Form name/, /encounter type/, /provider/];
     const expectedTableRows = [
-      /18-Jan-2022, 04:25\s+PM Facility Visit Admission/,
-      /03-Aug-2021, 12:47\s+AM Facility Visit Visit Note User One/,
-      /05-Jul-2021, 10:07\s+AM Facility Visit Consultation Dennis The Doctor/,
+      /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/,
+      /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/,
+      /05-Jul-2021, 10:07 AM Facility Visit Consultation Covid 19 Dennis The Doctor Options/,
     ];
 
     expectedColumnHeaders.forEach((header) => {
@@ -115,7 +115,7 @@ describe('Delete Encounter', () => {
     mockedUserHasAccess.mockReturnValue(true);
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => {},
+      goTo: () => { },
       results: mockEncounters,
     }));
 
@@ -124,7 +124,9 @@ describe('Delete Encounter', () => {
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const row = screen.getByRole('row', { name: /18-Jan-2022, 04:25\s+PM Facility Visit Admission/i });
+    const row = screen.getByRole('row', {
+      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger Delete this encounter/i }));
