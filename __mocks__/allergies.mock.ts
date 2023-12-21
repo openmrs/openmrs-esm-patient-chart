@@ -1,5 +1,9 @@
-import { type Allergen } from '../packages/esm-patient-allergies-app/src/allergies/allergies-form/allergy-form.resource';
-import { AllergenType } from '../packages/esm-patient-allergies-app/src/types';
+enum AllergenType {
+  DRUG = 'DRUG',
+  FOOD = 'FOOD',
+  ENVIRONMENT = 'ENVIRONMENT',
+  OTHER = 'OTHER',
+}
 
 export const mockAllergyResult = {
   display: 'ACE inhibitors',
@@ -504,7 +508,7 @@ export const mockFhirAllergyIntoleranceResponse = {
   ],
 };
 
-export const mockAllergens: Allergen[] = [
+export const mockAllergens = [
   { uuid: '162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'ACE inhibitors', type: AllergenType.DRUG },
   {
     uuid: '162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',

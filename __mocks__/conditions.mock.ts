@@ -1,5 +1,3 @@
-import type { Condition } from '../packages/esm-patient-conditions-app/src/conditions/conditions.resource';
-
 export const mockFhirConditionsResponse = {
   resourceType: 'Bundle',
   id: 'da5b65d7-4e14-407d-9655-6207ef755b8a',
@@ -336,7 +334,7 @@ export const mockFhirConditionsResponse = {
   ],
 };
 
-export const mockConditions: Array<Condition> = [
+export const mockConditions = [
   {
     clinicalStatus: 'active',
     conceptId: '138571AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
