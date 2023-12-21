@@ -13,6 +13,7 @@
   "errorLoadingTestTypes": "Error occured when loading test types",
   "female": "Female",
   "full": "Full",
+  "incomplete": "Incomplete",
   "labOrders": "Lab orders",
   "labReferenceNumber": "Lab reference number",
   "loading": "Loading",

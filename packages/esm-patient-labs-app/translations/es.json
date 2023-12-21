@@ -13,6 +13,7 @@
   "errorLoadingTestTypes": "Error al cargar los tipos de pruebas",
   "female": "Female",
   "full": "Full",
+  "incomplete": "Incomplete",
   "labOrders": "Lab orders",
   "labReferenceNumber": "Número de referencia del laboratorio",
   "loading": "Cargando",

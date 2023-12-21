@@ -13,6 +13,7 @@
   "errorLoadingTestTypes": "حدث خطأ أثناء تحميل أنواع الاختبارات",
   "female": "Female",
   "full": "Full",
+  "incomplete": "Incomplete",
   "labOrders": "Lab orders",
   "labReferenceNumber": "رقم المرجع المخبري",
   "loading": "جار التحميل",
