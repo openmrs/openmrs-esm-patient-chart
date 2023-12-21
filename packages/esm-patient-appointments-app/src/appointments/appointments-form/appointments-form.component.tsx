@@ -531,7 +531,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                         datePickerType="single"
                         dateFormat={datePickerFormat}
                         value={value.startDate}
-                        onChange={([date]) => onChange({ startDate: date })}
+                        onChange={([date]) => onChange({ ...value, startDate: date })}
                       >
                         <DatePickerInput
                           id="datePickerInput"
