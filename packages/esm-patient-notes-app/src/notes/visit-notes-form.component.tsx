@@ -24,6 +24,7 @@ import {
 } from '@carbon/react';
 import { Add, Edit, WarningFilled } from '@carbon/react/icons';
 import {
+  type UploadedFile,
   createErrorHandler,
   ExtensionSlot,
   showModal,
@@ -31,6 +32,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  createAttachment,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -42,8 +44,6 @@ import {
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
-import { type UploadedFile } from '@openmrs/esm-patient-attachments-app/src/attachments-types';
-import { createAttachment } from '@openmrs/esm-patient-attachments-app/src/attachments.resource';
 import { mutate } from 'swr';
 
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
