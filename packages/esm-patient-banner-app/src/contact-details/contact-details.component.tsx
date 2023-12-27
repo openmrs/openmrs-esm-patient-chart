@@ -62,10 +62,6 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
-  const { useCustomAddressLabel } = useConfig<ConfigObject>();
-  const useCustomAddressLabelEnabled = useCustomAddressLabel?.enabled;
-  const customAddressLabel = useCustomAddressLabel?.customAddressLabel;
-
   const getAddressKey = (url) => url.split('#')[1];
   /*
     DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
@@ -90,20 +86,19 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
         {address ? (
           <React.Fragment>
             {Object.entries(address)
-              .filter(([key]) => !['use', 'id'].some((k) => k === key))
+              .filter(([key]) => !['use', 'id'].includes(key))
               .map(([key, value]) =>
                 key === 'extension' ? (
-                  address?.extension[0]?.extension.map((add, i) => (
-                    <li key={`address-${key}-${i}`}>
-                      {useCustomAddressLabelEnabled
-                        ? t(customAddressLabel[getAddressKey(add.url)])
-                        : t(getAddressKey(add.url))}
-                      : {add.valueString}
-                    </li>
-                  ))
+                  address?.extension[0]?.extension.map((add, i) => {
+                    return (
+                      <li key={`address-${key}-${i}`}>
+                        {t(getAddressKey(add.url))}: {add.valueString}
+                      </li>
+                    );
+                  })
                 ) : (
                   <li key={`address-${key}`}>
-                    {useCustomAddressLabelEnabled ? t(customAddressLabel[key]) : t(key)}: {value}
+                    {t(key)}: {value}
                   </li>
                 ),
               )}

@@ -4,40 +4,29 @@ export const configSchema = {
   contactAttributeType: {
     _type: Type.UUID,
     _description:
-      'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
+      'The UUID of a person attribute type that captures contact information, such as "Next of kin contact details"',
     _default: [],
   },
   excludePatientIdentifierCodeTypes: {
     uuids: {
       _type: Type.Array,
-      _description: 'The Uuids of patient identifier types that should be excluded from patient banner.',
+      _description: 'The UUIDs of patient identifier types that should be excluded from patient banner.',
       _default: [],
-    },
-  },
-  useCustomAddressLabel: {
-    enabled: {
-      _type: Type.Boolean,
-      _description: 'whether to enable using custom address labels',
-      _default: false,
-    },
-    customAddressLabel: {
-      _type: Type.Object,
-      _description: 'custom labels for addresses',
-      _default: {},
+      _elements: {
+        _type: Type.UUID,
+      },
     },
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
-    _description: 'Enable the use of a link to the patient chart in relationship names',
+    _description: 'Whether to use the relationship name as a link to the related person',
     _default: false,
   },
 };
 
 export interface ConfigObject {
   contactAttributeType: Array<string>;
-  useCustomAddressLabel: {
-    enabled: boolean;
-    customAddressLabel: Object;
-  };
+  excludePatientIdentifierCodeTypes: Array<String>;
+  customAddressLabels: Object;
   useRelationshipNameLink: boolean;
 }
