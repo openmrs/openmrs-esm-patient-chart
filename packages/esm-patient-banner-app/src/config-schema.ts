@@ -19,7 +19,7 @@ export const configSchema = {
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
-    _description: 'Whether to use the relationship name as a link to the related person',
+    _description: "Whether to use the relationship name as a link to the person's patient chart",
     _default: false,
   },
 };
