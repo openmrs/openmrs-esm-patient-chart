@@ -7,13 +7,15 @@ const customRepresentation =
   'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name),identifierType:(uuid,name,format,formatDescription,validator)),person:(uuid,display,gender,birthdate,dead,age,deathDate,birthdateEstimated,causeOfDeath,preferredName:(uuid,preferred,givenName,middleName,familyName),attributes,preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))';
 
 /**
- *  React hook that takes patientUuid and return Patient Attributes {@link Attribute}
- * @param patientUuid Unique Patient identifier
- * @returns Object containing `patient-attributes`, `isLoading` loading status, `error`
+ * React hook for obtaining patient attributes for a given patient {@link Attribute}
+ *
+ * If `patientUuid` is null, the hook does nothing.
+ *
+ * @param patientUuid The patient's UUID
  */
-export const usePatientAttributes = (patientUuid: string) => {
+export const usePatientAttributes = (patientUuid: string | null) => {
   const { data, error, isLoading } = useSWRImmutable<{ data: Patient }>(
-    `/ws/rest/v1/patient/${patientUuid}?v=${customRepresentation}`,
+    patientUuid ? `/ws/rest/v1/patient/${patientUuid}?v=${customRepresentation}` : null,
     openmrsFetch,
   );
 
@@ -33,7 +35,7 @@ export const usePatientAttributes = (patientUuid: string) => {
  */
 export const usePatientContactAttributes = (patientUuid: string) => {
   const { contactAttributeTypes } = useConfig() as ConfigObject;
-  const { attributes, isLoading } = usePatientAttributes(patientUuid);
+  const { attributes, isLoading } = usePatientAttributes(contactAttributeTypes.length ? patientUuid : null);
   const contactAttributes = attributes?.filter(({ attributeType }) =>
     contactAttributeTypes.includes(attributeType?.uuid),
   );
