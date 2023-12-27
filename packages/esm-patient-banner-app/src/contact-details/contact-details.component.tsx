@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
@@ -116,8 +116,15 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
+
+  const contacts = useMemo(
+    () => [
+      ...telecom?.map((contact) => [t(contact.system), contact.value]),
+      ...contactAttributes?.map((contact) => [t(contact.attributeType.display), contact.value]),
+    ],
+    [telecom, contactAttributes],
+  );
 
   return (
     <>
@@ -126,16 +133,12 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
         <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
       ) : (
         <ul>
-          {value ? (
-            <React.Fragment>
-              <li>{value}</li>
-              {contactAttributes?.length > 0 &&
-                contactAttributes.map(({ attributeType, value, uuid }) => (
-                  <li key={uuid}>
-                    {attributeType.display}: {value}
-                  </li>
-                ))}
-            </React.Fragment>
+          {contacts.length ? (
+            contacts.map(([label, value], index) => (
+              <li key={`${label}-${value}-${index}`}>
+                {label}: {value}
+              </li>
+            ))
           ) : (
             <li>--</li>
           )}
