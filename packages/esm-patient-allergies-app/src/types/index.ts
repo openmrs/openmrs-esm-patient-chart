@@ -65,10 +65,16 @@ export interface AllergicReaction {
   manifestation: Array<{
     coding: CodingData;
   }>;
-  severity: string;
+  severity: ReactionSeverity;
   substance: {
     coding: Array<CodingData>;
   };
+}
+
+export enum ReactionSeverity {
+  MILD = 'mild',
+  MODERATE = 'moderate',
+  SEVERE = 'severe',
 }
 
 export interface CodingData {
@@ -81,4 +87,11 @@ export interface CodingData {
 export interface OpenMRSResource {
   uuid: string;
   display: string;
+}
+
+export enum AllergenType {
+  DRUG = 'DRUG',
+  FOOD = 'FOOD',
+  ENVIRONMENT = 'ENVIRONMENT',
+  OTHER = 'OTHER',
 }

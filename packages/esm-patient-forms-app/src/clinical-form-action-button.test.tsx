@@ -78,7 +78,7 @@ test('should display clinical form action button on desktop view', () => {
   mockedUseLayoutType.mockReturnValue('desktop');
 
   render(<ClinicalFormActionButton />);
-  expect(screen.getByTestId('document-icon').getAttribute('size')).toBe('20');
+  expect(screen.getByTestId('document-icon').getAttribute('size')).toBe('16');
 
   const clinicalActionButton = screen.getByRole('button', { name: /Form/i });
   expect(clinicalActionButton).not.toHaveTextContent('Clinical forms');

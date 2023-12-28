@@ -159,13 +159,14 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
   const addToBasket = useCallback(() => {
     const labOrder = createLabOrder(testType);
+    labOrder.isOrderIncomplete = true;
     setOrders([...orders, labOrder]);
     closeWorkspace('add-lab-order', true);
     launchPatientWorkspace('order-basket');
   }, [orders, setOrders, createLabOrder, testType]);
 
   const removeFromBasket = useCallback(() => {
-    setOrders(orders.filter((order) => order.testType.conceptUuid != testType.conceptUuid));
+    setOrders(orders.filter((order) => order.testType.conceptUuid !== testType.conceptUuid));
   }, [orders, setOrders, testType.conceptUuid]);
 
   return (

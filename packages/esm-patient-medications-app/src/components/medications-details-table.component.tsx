@@ -488,7 +488,13 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
+    <OverflowMenu
+      aria-label="Actions menu"
+      selectorPrimaryFocus={'#modify'}
+      flipped
+      size={isTablet ? 'lg' : 'md'}
+      align="left"
+    >
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

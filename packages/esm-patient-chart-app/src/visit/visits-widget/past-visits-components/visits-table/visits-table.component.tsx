@@ -93,7 +93,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   const tableHeaders = [
     {
-      id: 1,
       header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
@@ -101,7 +100,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   if (showAllEncounters) {
     tableHeaders.push({
-      id: 2,
       header: t('visitType', 'Visit type'),
       key: 'visitType',
     });
@@ -109,12 +107,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   tableHeaders.push(
     {
-      id: 3,
       header: t('encounterType', 'Encounter type'),
       key: 'encounterType',
     },
     {
-      id: 4,
+      header: t('form', 'Form name'),
+      key: 'formName',
+    },
+    {
       header: t('provider', 'Provider'),
       key: 'provider',
     },
@@ -123,6 +123,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
+      formName: encounter.form?.display ?? '--',
       datetime: formatDatetime(parseDate(encounter.datetime)),
     }));
   }, [paginatedVisits]);
@@ -254,6 +255,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
+                                align="left"
                               >
                                 <OverflowMenuItem
                                   size={desktopLayout ? 'sm' : 'lg'}

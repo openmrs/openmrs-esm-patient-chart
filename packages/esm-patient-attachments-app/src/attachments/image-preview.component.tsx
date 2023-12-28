@@ -42,6 +42,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           iconDescription={t('closePreview', 'Close preview')}
           label={t('closePreview', 'Close preview')}
           kind="ghost"
+          size="md"
           className={styles.closePreviewButton}
           hasIconOnly
           renderIcon={Close}

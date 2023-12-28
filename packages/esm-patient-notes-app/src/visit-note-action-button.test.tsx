@@ -54,7 +54,7 @@ describe('VisitNoteActionButton', () => {
 
     render(<VisitNoteActionButton />);
 
-    expect(screen.getByTestId('pen-icon').getAttribute('size')).toBe('20');
+    expect(screen.getByTestId('pen-icon').getAttribute('size')).toBe('16');
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
