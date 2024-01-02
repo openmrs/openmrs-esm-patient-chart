@@ -33,6 +33,13 @@
   padding: 0 0.25rem;
 }
 
+.orderActionIncompleteLabel {
+  @extend .label;
+  color: white;
+  background-color: $danger;
+  padding: 0 0.25rem;
+}
+
 .orderErrorText {
   color: $danger;
   display: flex;
