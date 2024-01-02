@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, within, renderHook } from '@testing-library/react';
+import { screen, render, within, renderHook, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
@@ -100,7 +100,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
-  test('no buttons to click if the medicaiton is already prescribed', async () => {
+  test('no buttons to click if the medication is already prescribed', async () => {
     usePatientOrdersMock.mockReturnValue({
       isLoading: false,
       data: [mockPatientDrugOrdersApiData[0]],
@@ -147,21 +147,10 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(aspirin81OpenFormButton);
 
-    expect(hookResult.current.orders).toEqual([
-      expect.objectContaining({
-        ...getTemplateOrderBasketItem(
-          mockDrugSearchResultApiData[0],
-          undefined,
-          mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
-        ),
-        startDate: expect.any(Date),
-      }),
-    ]);
-
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
   });
 
-  test('can open an item in the medication form', async () => {
+  test('can open an item in the medication form and on saving, it should add the order in the order basket store', async () => {
     const user = userEvent.setup();
     renderDrugSearch();
     const { result: hookResult } = renderHook(() =>
@@ -172,16 +161,26 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const openFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(openFormButton);
 
-    expect(hookResult.current.orders).toEqual([
-      expect.objectContaining({
-        ...getTemplateOrderBasketItem(
-          mockDrugSearchResultApiData[0],
-          undefined,
-          mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
-        ),
-        startDate: expect.any(Date),
-      }),
-    ]);
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+    const indicationField = screen.getByRole('textbox', { name: 'Indication' });
+    await user.type(indicationField, 'Hypertension');
+    const saveFormButton = screen.getByText(/Save order/i);
+    fireEvent.click(saveFormButton);
+
+    await waitFor(() =>
+      expect(hookResult.current.orders).toEqual([
+        expect.objectContaining({
+          ...getTemplateOrderBasketItem(
+            mockDrugSearchResultApiData[0],
+            undefined,
+            mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
+          ),
+          startDate: expect.any(Date),
+          indication: 'Hypertension',
+          careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
+          orderer: 'mock-provider-uuid',
+        }),
+      ]),
+    );
   });
 });
