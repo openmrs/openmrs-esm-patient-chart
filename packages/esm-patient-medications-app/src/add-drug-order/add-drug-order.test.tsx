@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, within, renderHook } from '@testing-library/react';
+import { screen, render, within, renderHook, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
@@ -100,7 +100,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
-  test('no buttons to click if the medicaiton is already prescribed', async () => {
+  test('no buttons to click if the medication is already prescribed', async () => {
     usePatientOrdersMock.mockReturnValue({
       isLoading: false,
       data: [mockPatientDrugOrdersApiData[0]],
@@ -162,5 +162,19 @@ describe('AddDrugOrderWorkspace drug search', () => {
     await user.click(openFormButton);
 
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+    //   const dosageInput = screen.getByRole('textbox', { name: 'dosage' });
+    //   const saveFormButton = screen.getByText(/Save order/i);
+    //   fireEvent.click(saveFormButton);
+    //
+    //   expect(hookResult.current.orders).toEqual([
+    //     expect.objectContaining({
+    //       ...getTemplateOrderBasketItem(
+    //         mockDrugSearchResultApiData[0],
+    //         undefined,
+    //         mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
+    //       ),
+    //       startDate: expect.any(Date),
+    //     }),
+    //   ]);
   });
 });
