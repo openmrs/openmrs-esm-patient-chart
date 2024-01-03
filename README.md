@@ -109,6 +109,10 @@ yarn test-e2e
 
 Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing) to learn more about End-to-End tests in this project.
 
+### Updating Playwright
+
+The Playwright version in the [Bamboo e2e Dockerfile](e2e/support/bamboo/playwright.Dockerfile#L2) and the `package.json` file must match. If you update the Playwright version in one place, you must update it in the other.
+
 ## Troubleshooting
 
 If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in [dev3](https://dev3.openmrs.org/openmrs/spa), you likely have outdated versions of core libraries. To update core libraries, run the following commands:
