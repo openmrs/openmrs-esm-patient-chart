@@ -28,7 +28,7 @@ jest.mock('@openmrs/esm-framework', () => {
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
-      goTo: () => { },
+      goTo: () => {},
       results: data,
     })),
   };
@@ -41,7 +41,7 @@ describe('EncounterList', () => {
     mockedGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => { },
+      goTo: () => {},
       results: [],
     }));
 
@@ -57,7 +57,7 @@ describe('EncounterList', () => {
 
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => { },
+      goTo: () => {},
       results: mockEncounters,
     }));
 
@@ -115,7 +115,7 @@ describe('Delete Encounter', () => {
     mockedUserHasAccess.mockReturnValue(true);
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
-      goTo: () => { },
+      goTo: () => {},
       results: mockEncounters,
     }));
 
