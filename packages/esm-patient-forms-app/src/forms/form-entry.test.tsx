@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
 import { useConnectivity, usePatient } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatient } from 'tools';
 import FormEntry from './form-entry.component';
 
 const mockFormEntrySub = jest.fn();

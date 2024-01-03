@@ -1,14 +1,10 @@
 import React from 'react';
 import { screen, render, within, renderHook, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { getByTextWithMarkup } from 'tools';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
-import {
-  mockDrugSearchResultApiData,
-  mockDrugOrderTemplateApiData,
-  mockPatientDrugOrdersApiData,
-} from '../__mocks__/medication.mock';
+import { mockDrugSearchResultApiData, mockDrugOrderTemplateApiData, mockPatientDrugOrdersApiData } from '__mocks__';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useSession } from '@openmrs/esm-framework';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';

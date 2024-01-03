@@ -1,4 +1,3 @@
-import type { FHIRImmunizationBundle } from '../immunizations/immunization-domain';
 import dayjs from 'dayjs';
 
 export const mockImmunizationConfig = {
@@ -106,7 +105,7 @@ export const mockPatientImmunization = {
   ],
 };
 
-export const mockPatientImmunizationsSearchResponse: FHIRImmunizationBundle = {
+export const mockPatientImmunizationsSearchResponse = {
   resourceType: 'Bundle',
   entry: [
     {

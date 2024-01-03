@@ -1,13 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsResponse, mockConceptMetadata } from '../__mocks__/biometrics.mock';
-import {
-  mockPatient,
-  patientChartBasePath,
-  renderWithSwr,
-  waitForLoadingToFinish,
-} from '../../../../tools/test-helpers';
+import { formattedBiometrics, mockBiometricsResponse, mockConceptMetadata } from '__mocks__';
+import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import BiometricsOverview from './biometrics-overview.component';
 
 const testProps = {
@@ -204,7 +200,7 @@ describe('BiometricsOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  xit("renders a tabular overview of the patient's biometrics data when available", async () => {
+  it("renders a tabular overview of the patient's biometrics data when available", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
     mockUsePagination.mockReturnValueOnce({
       currentPage: 1,
@@ -217,8 +213,8 @@ describe('BiometricsOverview: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /table view/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
 
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/];
 
@@ -235,6 +231,35 @@ describe('BiometricsOverview: ', () => {
     ];
 
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+  });
+
+  it('toggles between rendering either a tabular view or a chart view', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
+    mockUsePagination.mockReturnValueOnce({
+      currentPage: 1,
+      goTo: () => {},
+      results: formattedBiometrics.slice(0, 5),
+    });
+
+    renderBiometricsOverview();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('table', { name: /biometrics/i })).toBeInTheDocument();
+
+    const chartViewButton = screen.getByRole('tab', {
+      name: /chart view/i,
+    });
+
+    await user.click(chartViewButton);
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText(/biometric displayed/i)).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
   });
 });
 

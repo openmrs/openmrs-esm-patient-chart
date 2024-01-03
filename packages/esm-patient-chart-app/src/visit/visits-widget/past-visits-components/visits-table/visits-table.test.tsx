@@ -2,8 +2,8 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, usePagination, userHasAccess } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr } from '../../../../../../../tools/test-helpers';
-import { mockEncounters } from '../../../../__mocks__/visits.mock';
+import { mockPatient, renderWithSwr } from 'tools';
+import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
 jest.setTimeout(10000);

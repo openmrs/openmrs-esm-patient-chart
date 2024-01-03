@@ -8,9 +8,8 @@ import {
   type FetchResponse,
   showActionableNotification,
 } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../tools/test-helpers';
-import { mockVisitQueueEntries } from '../../__mocks__/visitQueueEntry.mock';
+import { mockCurrentVisit, mockVisitQueueEntries } from '__mocks__';
+import { mockPatient } from 'tools';
 import { type MappedVisitQueueEntry, useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import CancelVisitDialog from './cancel-visit-dialog.component';

@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import CurrentVisitSummary from './current-visit-summary.component';
 import { useVisit, getConfig } from '@openmrs/esm-framework';
+import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockUseVisits = useVisit as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
+
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework/mock'),
   useVisits: jest.fn(),
@@ -66,7 +67,7 @@ describe('CurrentVisitSummary', () => {
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
 
-    expect(screen.getByText('Current Visit')).toBeInTheDocument();
+    await screen.findByText('Current Visit');
     expect(screen.getByText('Diagnoses')).toBeInTheDocument();
     const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
     buttonNames.forEach((buttonName) => {

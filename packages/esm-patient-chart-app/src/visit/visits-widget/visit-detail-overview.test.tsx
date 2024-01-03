@@ -2,8 +2,8 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { visitOverviewDetailMockData } from '../../__mocks__/visits.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
 
 const testProps = {

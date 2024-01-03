@@ -1,13 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import {
-  getByTextWithMarkup,
-  mockPatient,
-  renderWithSwr,
-  waitForLoadingToFinish,
-} from '../../../../tools/test-helpers';
-import { mockBiometricsResponse, mockConceptMetadata } from '../__mocks__/biometrics.mock';
+import { getByTextWithMarkup, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { mockBiometricsResponse, mockConceptMetadata } from '__mocks__';
 import WeightTile from './weight-tile.component';
 
 const mockVitalsSignsConcepts = {

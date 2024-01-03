@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { usePatientAttributes, usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import ContactDetails from './contact-details.component';
@@ -24,6 +24,7 @@ const testProps = {
   telecom: [{ value: '+0123456789' }],
   patientId: '1111',
   deceased: false,
+  isTabletViewport: false,
 };
 
 const mockRelationships = [
@@ -227,7 +228,15 @@ describe('ContactDetails', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderWithSwr(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    renderWithSwr(
+      <ContactDetails
+        address={null}
+        telecom={null}
+        patientId={'some-uuid'}
+        isTabletViewport={false}
+        deceased={false}
+      />,
+    );
 
     await waitForLoadingToFinish();
 

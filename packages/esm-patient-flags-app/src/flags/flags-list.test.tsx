@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { mockPatient } from '../../../../tools/test-helpers';
-import { mockPatientFlags } from '../__mocks__/patient-flags.mock';
+import { mockPatient } from 'tools';
+import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsList from './flags-list.component';
 

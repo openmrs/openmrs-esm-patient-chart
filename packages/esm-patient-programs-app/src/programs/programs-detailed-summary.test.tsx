@@ -3,8 +3,8 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockEnrolledProgramsResponse } from '../__mocks__/programs.mock';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockEnrolledProgramsResponse } from '__mocks__';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
 jest.setTimeout(20000);

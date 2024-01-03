@@ -11,8 +11,8 @@ import {
   showModal,
 } from '@openmrs/esm-framework';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
+import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
+import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;

@@ -3,8 +3,8 @@ import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { searchedCondition } from '../__mocks__/conditions.mock';
-import { getByTextWithMarkup, mockPatient } from '../../../../tools/test-helpers';
+import { searchedCondition } from '__mocks__';
+import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm from './conditions-form.component';
 

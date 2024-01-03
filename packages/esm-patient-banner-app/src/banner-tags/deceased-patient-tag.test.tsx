@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { mockPatient } from '../../../../tools/test-helpers';
-import { mockDeceasedPatient } from '../__mocks__/mockDeceasedPatient';
+import { mockPatient } from 'tools';
+import { mockDeceasedPatient } from '__mocks__';
 import DeceasedPatientBannerTag from './deceased-patient-tag.component';
 
 describe('DeceasedPatientTag', () => {

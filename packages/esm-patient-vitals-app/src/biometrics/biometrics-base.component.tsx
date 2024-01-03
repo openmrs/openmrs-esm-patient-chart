@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
+import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
@@ -81,12 +81,12 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
           </div>
           <div className={styles.biometricsHeaderActionItems}>
             <ContentSwitcher onChange={(evt) => setChartView(evt.name === 'chartView')} size={isTablet ? 'md' : 'sm'}>
-              <Switch name="tableView">
+              <IconSwitch name="tableView" text="Table view">
                 <Table size={16} />
-              </Switch>
-              <Switch name="chartView">
+              </IconSwitch>
+              <IconSwitch name="chartView" text="Chart view">
                 <ChartLineSmooth size={16} />
-              </Switch>
+              </IconSwitch>
             </ContentSwitcher>
             <>
               <span className={styles.divider}>|</span>

@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../tools/test-helpers';
-import PatientBanner from './patient-banner.component';
+import { render, screen } from '@testing-library/react';
 import { useConnectedExtensions } from '@openmrs/esm-framework';
+import { mockPatient } from 'tools';
+import PatientBanner from './patient-banner.component';
 
 class ResizeObserverMock {
   callback: any;
@@ -25,6 +25,7 @@ const testProps = {
 };
 
 const mockNavigateTo = jest.fn();
+const mockUseConnectedExtensions = useConnectedExtensions as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
@@ -54,7 +55,7 @@ describe('PatientBanner: ', () => {
 
   it('shoulld not render actions menu if no actions connected', () => {
     window.ResizeObserver = ResizeObserverMock;
-    useConnectedExtensions.mockReturnValue([]); // override the default mock to one that returns an empty array
+    mockUseConnectedExtensions.mockReturnValue([]); // override the default mock to one that returns an empty array
 
     renderPatientBanner();
     expect(screen.queryByRole('button', { name: /^Actions$/i })).not.toBeInTheDocument();

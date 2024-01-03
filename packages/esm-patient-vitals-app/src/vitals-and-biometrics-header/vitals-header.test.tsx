@@ -3,20 +3,15 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import {
-  mockPatient,
-  getByTextWithMarkup,
-  renderWithSwr,
-  waitForLoadingToFinish,
-} from '../../../../tools/test-helpers';
-import {
-  mockConceptMetadata,
+  mockVitalsConceptMetadata,
   mockFhirVitalsResponse,
   mockVitalsConfig,
   mockVitalsSignsConcept,
-} from '../__mocks__/vitals.mock';
+  mockCurrentVisit,
+} from '__mocks__';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -39,7 +34,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     launchPatientWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+      conceptMetadata: mockVitalsConceptMetadata,
     })),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useWorkspaces: jest.fn().mockImplementation(() => ({ workspaces: [] })),

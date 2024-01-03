@@ -48,7 +48,7 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
 
         <div className={styles.printedBy}>
           {t('printedBy', 'Printed by')}
-          <span className={styles.printedBy}>{session.user.display}</span>
+          <span className={styles.printedBy}>{session?.user?.display}</span>
         </div>
       </header>
 

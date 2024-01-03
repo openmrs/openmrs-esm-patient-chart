@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
-import { mockConditions, mockFhirConditionsResponse } from '../__mocks__/conditions.mock';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockConditions, mockFhirConditionsResponse } from '__mocks__';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
 jest.setTimeout(15000);

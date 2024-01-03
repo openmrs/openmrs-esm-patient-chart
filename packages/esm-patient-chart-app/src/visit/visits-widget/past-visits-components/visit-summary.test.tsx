@@ -2,8 +2,8 @@ import React from 'react';
 import { getConfig } from '@openmrs/esm-framework';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../../tools/test-helpers';
+import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
+import { mockPatient } from 'tools';
 import VisitSummary from './visit-summary.component';
 
 const mockVisit = visitOverviewDetailMockData.data.results[0];
