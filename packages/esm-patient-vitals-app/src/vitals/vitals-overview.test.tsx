@@ -26,6 +26,12 @@ const mockConceptUnits = new Map<string, string>(
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
@@ -94,14 +100,7 @@ describe('VitalsOverview', () => {
     ).toBeInTheDocument();
   });
 
-  /*
-  //
-    The following two tests are failing in the CI environment with the following error:
-      `TypeError: Cannot read properties of undefined (reading 'baseVal')`
-        at SVGElement.<anonymous> (node_modules/@carbon/charts/bundle.js:15:466852)
-  //
-  */
-  xit("renders a tabular overview of the patient's vital signs", async () => {
+  it("renders a tabular overview of the patient's vital signs", async () => {
     mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
     mockUsePagination.mockReturnValue({
       results: formattedVitals.slice(0, 5),
@@ -113,24 +112,22 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
-
+    expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
     const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/];
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
     const expectedTableRows = [
-      /19 - May - 2021, 07:26 121 \/ 121 12 76 37/,
-      /10 - May - 2021, 09:41 120 \/ 120 45 66 90 37/,
-      /07 - May - 2021, 12:04 120 \/ 120/,
+      /19 - May - 2021, 07:26 37 125 \/ 93 76 12/,
+      /10 - May - 2021, 09:41 37 120 \/ 85 66 45 90/,
+      /07 - May - 2021, 12:04 107 \/ 90/,
     ];
 
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
-  xit('toggles between rendering either a tabular view or a chart view', async () => {
+  it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
@@ -144,17 +141,21 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
 
-    const chartViewButton = screen.getByRole('button', {
+    const chartViewButton = screen.getByRole('tab', {
       name: /chart view/i,
     });
 
     await user.click(chartViewButton);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/vital sign displayed/i)).toBeInTheD;
-    expect(screen.getByRole('tab', { name: /bp/i })).toHaveValue('');
+    expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /bp/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /pulse/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
   });
 });
 

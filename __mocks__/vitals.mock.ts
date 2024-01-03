@@ -6007,27 +6007,27 @@ export const mockVitalsConfig = {
 
 export const formattedVitals = [
   {
-    id: '0',
+    id: '6f4ed885-2bc1-4ed4-92e5-3dddb9180f30',
     date: '19 - May - 2021, 07:26',
-    bloodPressure: '121 / 121',
+    bloodPressure: '125 / 93',
     pulse: 76,
     spo2: undefined,
     temperature: 37,
     respiratoryRate: 12,
   },
   {
-    id: '1',
+    id: 'dab186be-0058-41c6-9c8e-ceeff09ef162',
     date: '10 - May - 2021, 09:41',
-    bloodPressure: '120 / 120',
+    bloodPressure: '120 / 85',
     pulse: 66,
     spo2: 90,
     temperature: 37,
     respiratoryRate: 45,
   },
   {
-    id: '2',
+    id: 'fd4a9e7b-4bb4-4a41-b8c5-44393097df6c',
     date: '07 - May - 2021, 12:04',
-    bloodPressure: '120 / 120',
+    bloodPressure: '107 / 90',
     pulse: undefined,
     spo2: undefined,
     temperature: undefined,

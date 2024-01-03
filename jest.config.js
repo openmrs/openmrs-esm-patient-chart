@@ -11,6 +11,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
+    '^@carbon/charts-react$': path.resolve(__dirname, '__mocks__', '@carbon__charts-react.ts'),
     '^dexie$': require.resolve('dexie'),
     '^lodash-es/(.*)$': 'lodash/$1',
     '^react-i18next$': path.resolve(__dirname, '__mocks__', 'react-i18next.js'),

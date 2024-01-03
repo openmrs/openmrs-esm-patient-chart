@@ -24,7 +24,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext",
-    "typeRoots": ["./node_modules/@types", "./node_modules/testing-library"],
+    "typeRoots": ["./node_modules/@types", "./node_modules/testing-library"]
   },
-    "include": ["./tools/setup-tests.ts"],
 }
