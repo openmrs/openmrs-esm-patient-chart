@@ -1,50 +1,33 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
-import { Button, DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import ImmunizationsForm from './immunizations-form.component';
-import { type ExistingDoses, type Immunization } from '../types';
+import {
+  Button,
+  DataTable,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from '@carbon/react';
+import { ImmunizationGrouped } from '../types';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { immunizationFormSub } from './utils';
 
 interface SequenceTableProps {
-  immunizations: Immunization;
-  patientUuid: string;
+  immunizationsByVaccine: ImmunizationGrouped;
+  launchPatientImmunizationForm: () => void;
 }
 
-const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
+const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, launchPatientImmunizationForm }) => {
   const { t } = useTranslation();
-  const { existingDoses, sequences } = immunizations;
-
-  const launchPatientImmunizationForm = useCallback(
-    (immunizationFormData: Immunization, existingDoses: ExistingDoses) => {
-      launchPatientWorkspace('immunization-form-workspace');
-
-      // What's all this about?
-
-      // const { vaccineName, vaccineUuid, sequences } = immunizationFormData;
-      // const { sequenceLabel, sequenceNumber } = existingDoses;
-      // const formHeader = t('immunizationForm', 'Immunization Form');
-      // openWorkspaceTab(ImmunizationsForm, formHeader, {
-      //   vaccineName,
-      //   vaccineUuid,
-      //   immunizationObsUuid: existingDoses.immunizationObsUuid,
-      //   manufacturer: existingDoses.manufacturer,
-      //   lotNumber: existingDoses.lotNumber,
-      //   expirationDate: existingDoses.expirationDate,
-      //   sequences,
-      //   currentDose: {
-      //     sequenceLabel,
-      //     sequenceNumber,
-      //   },
-      //   vaccinationDate: existingDoses?.occurrenceDateTime,
-      // });
-    },
-    [],
-  );
+  const { existingDoses, sequences, vaccineUuid } = immunizationsByVaccine;
 
   const tableHeader = useMemo(
     () => [
-      { key: 'sequence', header: t('sequence', 'Sequence') },
+      { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose Number') },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination Date') },
       { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
       { key: 'edit', header: '' },
@@ -52,14 +35,32 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
     [t],
   );
 
-  const tableRows = existingDoses?.map((dose, index) => {
+  const tableRows = existingDoses?.map((dose) => {
     return {
       id: dose?.immunizationObsUuid,
-      sequence: isEmpty(sequences) ? t('singleDose', 'Single Dose') : sequences[index]?.sequenceLabel,
-      vaccinationDate: dose?.occurrenceDateTime,
-      expirationDate: dose?.expirationDate,
+      sequence: isEmpty(sequences)
+        ? dose.doseNumber
+        : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
+      vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
+      expirationDate: dose?.expirationDate && formatDate(new Date(dose.expirationDate)),
       edit: (
-        <Button kind="ghost" iconDescription="Edit" onClick={() => launchPatientImmunizationForm(immunizations, dose)}>
+        <Button
+          kind="ghost"
+          iconDescription="Edit"
+          onClick={() => {
+            immunizationFormSub.next({
+              vaccineUuid: vaccineUuid,
+              immunizationId: dose.immunizationObsUuid,
+              vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
+              doseNumber: dose.doseNumber,
+              expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
+              lotNumber: dose.lotNumber,
+              manufacturer: dose.manufacturer,
+              visitId: dose.visitUuid,
+            });
+            launchPatientImmunizationForm();
+          }}
+        >
           {t('edit', 'Edit')}
         </Button>
       ),
@@ -70,26 +71,28 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
     tableRows.length > 0 && (
       <DataTable rows={tableRows} headers={tableHeader} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <Table {...getTableProps()}>
-            <TableHead>
-              <TableRow>
-                {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => {
-                return (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell?.id}>{cell?.value}</TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <TableContainer>
+            <Table {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => {
+                  return (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell?.id}>{cell?.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </DataTable>
     )
