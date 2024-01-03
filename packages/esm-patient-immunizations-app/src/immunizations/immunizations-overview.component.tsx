@@ -22,9 +22,9 @@ import {
   ErrorState,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { useImmunizations } from './immunizations.resource';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './immunizations-overview.scss';
+import { useImmunizations } from '../hooks/useImmunizations';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;

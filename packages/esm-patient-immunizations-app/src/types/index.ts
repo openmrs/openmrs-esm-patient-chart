@@ -8,9 +8,33 @@ export interface Immunization {
   expirationDate?: string;
   occurrenceDateTime?: string;
   lotNumber?: string;
-  sequenceLabel?: string;
-  sequenceNumber?: string | number;
+  doseNumber?: number;
   formChanged?: any;
+}
+
+export interface ImmunizationGrouped {
+  vaccineName: string;
+  vaccineUuid: string;
+  existingDoses: Array<ExistingDoses>;
+  sequences?: Array<Sequence>;
+}
+
+export interface ImmunizationFormState {
+  vaccineUuid: string;
+  immunizationId?: string;
+  vaccinationDate: Date;
+  doseNumber: number;
+  expirationDate: Date;
+  lotNumber: string;
+  manufacturer: string;
+  visitId?: string;
+  locationId?: string;
+  providers?: string[];
+}
+
+export interface ImmunizationFormData extends ImmunizationFormState {
+  patientUuid: string;
+  vaccineName: string;
 }
 
 export interface Sequence {
@@ -19,11 +43,11 @@ export interface Sequence {
 }
 
 export interface ExistingDoses {
-  expirationDate: string | Date;
+  expirationDate: string;
   immunizationObsUuid: string;
+  visitUuid?: string;
   lotNumber: string;
   manufacturer: string;
-  sequenceLabel: string | null;
-  sequenceNumber: string | number;
-  occurrenceDateTime: string | Date;
+  occurrenceDateTime: string;
+  doseNumber: number;
 }

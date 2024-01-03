@@ -1,4 +1,3 @@
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 import find from 'lodash-es/find';
 import get from 'lodash-es/get';
 import groupBy from 'lodash-es/groupBy';
@@ -6,35 +5,31 @@ import isUndefined from 'lodash-es/isUndefined';
 import map from 'lodash-es/map';
 import orderBy from 'lodash-es/orderBy';
 import {
-  type Code,
-  type FHIRImmunizationBundle,
-  type FHIRImmunizationBundleEntry,
-  type FHIRImmunizationResource,
-  type ImmunizationData,
-  type ImmunizationDoseData,
-  type ImmunizationFormData,
-  type Reference,
-} from './immunization-domain';
+  Code,
+  FHIRImmunizationBundle,
+  FHIRImmunizationBundleEntry,
+  FHIRImmunizationResource,
+  Reference,
+} from '../types/fhir-immunization-domain';
+import { ExistingDoses, ImmunizationFormData, ImmunizationGrouped } from '../types';
 
-const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEntry): ImmunizationDoseData => {
+const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEntry): ExistingDoses => {
   const immunizationResource = immunizationBundleEntry?.resource;
   const immunizationObsUuid = immunizationResource?.id;
   const manufacturer = immunizationResource?.manufacturer?.display;
   const lotNumber = immunizationResource?.lotNumber;
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
-  const sequenceLabel = protocolApplied?.series;
-  const sequenceNumber = protocolApplied?.doseNumberPositiveInt;
-  const occurrenceDateTime = formatDate(new Date(immunizationResource?.occurrenceDateTime));
-  const expirationDate = formatDate(new Date(immunizationResource?.expirationDate));
-
+  const doseNumber = protocolApplied?.doseNumberPositiveInt;
+  const occurrenceDateTime = immunizationResource?.occurrenceDateTime as any as string;
+  const expirationDate = immunizationResource?.expirationDate as any as string;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
-    sequenceLabel,
-    sequenceNumber,
+    doseNumber,
     occurrenceDateTime,
     expirationDate,
+    visitUuid: fromReference(immunizationResource?.encounter),
   };
 };
 
@@ -45,12 +40,14 @@ const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationRe
   });
 };
 
-export const mapFromFHIRImmunizationBundle = (immunizationBundle: FHIRImmunizationBundle): Array<ImmunizationData> => {
+export const mapFromFHIRImmunizationBundle = (
+  immunizationBundle: FHIRImmunizationBundle,
+): Array<ImmunizationGrouped> => {
   const groupByImmunization = groupBy(immunizationBundle.entry, (immunizationResourceEntry) => {
     return findCodeWithoutSystem(immunizationResourceEntry.resource)?.code;
   });
   return map(groupByImmunization, (immunizationsForOneVaccine: Array<FHIRImmunizationBundleEntry>) => {
-    const existingDoses: Array<ImmunizationDoseData> = map(immunizationsForOneVaccine, mapToImmunizationDose);
+    const existingDoses: Array<ExistingDoses> = map(immunizationsForOneVaccine, mapToImmunizationDose);
     const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]?.resource);
 
     return {
@@ -66,16 +63,20 @@ function toReferenceOfType(type: string, referenceValue: string): Reference {
   return { type, reference };
 }
 
+function fromReference(reference: Reference): string {
+  return reference.reference.split('/')[1];
+}
+
 export const mapToFHIRImmunizationResource = (
   immunizationFormData: ImmunizationFormData,
-  visitUuid,
-  locationUuid,
-  providerUuid,
+  visitUuid: string,
+  locationUuid: string,
+  providerUuid: string,
 ): FHIRImmunizationResource => {
   return {
     resourceType: 'Immunization',
     status: 'completed',
-    id: immunizationFormData.immunizationObsUuid,
+    id: immunizationFormData.immunizationId,
     vaccineCode: {
       coding: [
         {
@@ -86,16 +87,16 @@ export const mapToFHIRImmunizationResource = (
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
-    occurrenceDateTime: parseDate(immunizationFormData.vaccinationDate),
-    expirationDate: parseDate(immunizationFormData.expirationDate),
+    occurrenceDateTime: immunizationFormData.vaccinationDate,
+    expirationDate: immunizationFormData.expirationDate,
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
     manufacturer: { display: immunizationFormData.manufacturer },
     lotNumber: immunizationFormData.lotNumber,
     protocolApplied: [
       {
-        doseNumberPositiveInt: immunizationFormData.currentDose.sequenceNumber,
-        series: immunizationFormData.currentDose.sequenceLabel,
+        doseNumberPositiveInt: immunizationFormData.doseNumber,
+        series: null, // the backend currently does not support "series"
       },
     ],
   };

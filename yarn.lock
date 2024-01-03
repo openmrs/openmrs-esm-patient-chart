@@ -4804,13 +4804,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-immunizations-app@workspace:packages/esm-patient-immunizations-app"
   dependencies:
+<<<<<<< HEAD
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": "workspace:*"
+=======
+    "@hookform/resolvers": ^3.3.1
+>>>>>>> 207c0d43... Revamp form and detailed summary widget
     lodash-es: ^4.17.21
+    react-hook-form: ^7.46.2
     webpack: ^5.88.2
+    zod: ^3.22.2
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 5.x
+    "@openmrs/esm-patient-common-lib": "*"
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
