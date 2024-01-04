@@ -333,16 +333,17 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           });
           payload.attributes = addedAttributes;
           for (const attribute of updatedAttributes) {
-            await openmrsFetch(`/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
+            await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
               method: 'POST',
+              headers: {
+                'Content-type': 'application/json',
+              },
               body: {
                 value: attribute.value,
               },
             }).catch((err) => {
               showSnackbar({
-                title: !visitToEdit
-                  ? t('startVisitError', 'Error starting visit')
-                  : t('errorUpdatingVisitDetails', 'Error updating visit attributes'),
+                title: t('errorUpdatingVisitAttribute', 'Error updating visit attribute'),
                 kind: 'error',
                 isLowContrast: false,
                 subtitle: err?.message,
