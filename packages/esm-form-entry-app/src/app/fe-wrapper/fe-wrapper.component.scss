@@ -180,6 +180,7 @@
 
   & button {
     width: 100%;
-    padding-inline-end: 0;
+    padding-inline: 15px 0;
+    padding-block: calc(0.875rem - 3px);
   }
 }
