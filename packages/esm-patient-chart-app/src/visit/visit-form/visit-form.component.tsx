@@ -33,6 +33,7 @@ import {
   type Visit,
   updateVisit,
   useConnectivity,
+  openmrsFetch,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -247,7 +248,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [setError]);
 
   const onSubmit = useCallback(
-    (data: VisitFormData, event) => {
+    async (data: VisitFormData, event) => {
       if (visitToEdit && !validateVisitStartStopDatetime()) {
         return;
       }
@@ -318,6 +319,37 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       const abortController = new AbortController();
 
       if (isOnline) {
+        if (visitToEdit?.uuid) {
+          const existingAttributes = visitToEdit.attributes.map((attr) => attr.attributeType.uuid) || [];
+          const updatedAttributes = [];
+          const addedAttributes = [];
+          payload.attributes.forEach((attribute) => {
+            if (existingAttributes.includes(attribute.attributeType)) {
+              const attributeUuid = visitToEdit.attributes.filter(
+                (attr) => attr.attributeType.uuid === attribute.attributeType,
+              )[0].uuid;
+              updatedAttributes.push({ uuid: attributeUuid, value: attribute.value });
+            } else addedAttributes.push(attribute);
+          });
+          payload.attributes = addedAttributes;
+          for (const attribute of updatedAttributes) {
+            await openmrsFetch(`/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
+              method: 'POST',
+              body: {
+                value: attribute.value,
+              },
+            }).catch((err) => {
+              showSnackbar({
+                title: !visitToEdit
+                  ? t('startVisitError', 'Error starting visit')
+                  : t('errorUpdatingVisitDetails', 'Error updating visit attributes'),
+                kind: 'error',
+                isLowContrast: false,
+                subtitle: err?.message,
+              });
+            });
+          }
+        }
         (visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController)
