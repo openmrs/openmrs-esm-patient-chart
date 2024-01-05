@@ -5056,8 +5056,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 5.0.1-pre.358
-  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.358"
+  version: 5.0.1-pre.363
+  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.363"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -5077,9 +5077,8 @@ __metadata:
     ngx-webcam: ^0.4.1
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
-    slick-carousel: ^1.8.1
     tree-model: ^1.0.7
-  checksum: 538a665464bf7c68690591943407431cb543e6a9d83caff342d8175d10b43e706914d7877a3c82b9446963d71900ea7742e2a151f8bf09a2ee543d9b7d0e5604
+  checksum: d56a31608df25b8288251442b03eb89089d7164ead16c141d7191a8832c8dc46e32c7c05db32ef0462d3b7523df2ab2dfee47d137eb2a8f2515dc3a3f0f2539e
   languageName: node
   linkType: hard
 
