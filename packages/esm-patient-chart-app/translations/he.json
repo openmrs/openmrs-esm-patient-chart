@@ -61,6 +61,7 @@
   "errorDeletingVisit": "שגיאה במחיקת הביקור",
   "errorEndingVisit": "שגיאה בסיום הביקור",
   "errorOccuredDeletingVisit": "אירעה שגיאה בעת מחיקת הביקור",
+  "errorUpdatingVisitAttribute": "Error updating visit attribute",
   "errorUpdatingVisitDetails": "שגיאה בעדכון פרטי הביקור",
   "errorWhenRestoringVisit": "שגיאה בשחזור {{visit}}",
   "failedDeleting": "לא ניתן למחוק",
