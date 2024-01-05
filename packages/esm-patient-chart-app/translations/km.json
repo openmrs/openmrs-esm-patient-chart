@@ -64,6 +64,7 @@
   "errorDeletingVisit": "មានបញ្ហាបច្ចេកទេសក្នុងការលុបការពិនិត្យជំងឺ",
   "errorEndingVisit": "មានបញ្ហាបច្ចេកទេសបញ្ចប់ការពិនិត្យជំងឺ",
   "errorOccuredDeletingVisit": "មានបញ្ហាបច្ចេកទេសនៅពេលលុបការពិនិត្យជំងឺ",
+  "errorUpdatingVisitAttribute": "Error updating visit attribute",
   "errorUpdatingVisitDetails": "មានបញ្ហាបច្ចេកទេសក្នុងការធ្វើបច្ចុប្បន្នភាពព័ត៌មានលម្អិតនៃការពិនិត្យជំងឺ",
   "errorWhenRestoringVisit": "មានបញ្ហាបច្ចេកទេសនៅពេលទាញមកវិញនូវ{{visit}}",
   "failedDeleting": "មិនអាចលុបបានទេ",

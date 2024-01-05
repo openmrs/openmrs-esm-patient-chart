@@ -66,6 +66,7 @@
   "errorDeletingVisit": "Error deleting visit",
   "errorEndingVisit": "Error ending visit",
   "errorOccuredDeletingVisit": "An error occured when deleting visit",
+  "errorUpdatingVisitAttribute": "Error updating visit attribute",
   "errorUpdatingVisitDetails": "Error updating visit details",
   "errorWhenRestoringVisit": "Error occured when restoring {{visit}}",
   "failedDeleting": "couldn't be deleted",

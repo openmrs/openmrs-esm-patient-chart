@@ -247,8 +247,32 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return validSubmission;
   }, [setError]);
 
+  const updateVisitAttributes = useCallback(
+    async (updatedAttributes) => {
+      for (const attribute of updatedAttributes) {
+        await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: {
+            value: attribute.value,
+          },
+        }).catch((err) => {
+          showSnackbar({
+            title: t('errorUpdatingVisitAttribute', 'Error updating visit attribute'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: err?.message,
+          });
+        });
+      }
+    },
+    [visitToEdit],
+  );
+
   const onSubmit = useCallback(
-    async (data: VisitFormData, event) => {
+    (data: VisitFormData, event) => {
       if (visitToEdit && !validateVisitStartStopDatetime()) {
         return;
       }
@@ -318,46 +342,31 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
       const abortController = new AbortController();
 
+      const existingAttributes = !visitToEdit
+        ? []
+        : visitToEdit.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
+      const updatedAttributes = [];
+      const addedAttributes = [];
+
+      payload.attributes?.forEach((attribute) => {
+        if (attribute.attributeType && existingAttributes.includes(attribute.attributeType)) {
+          const attributeUuid = visitToEdit.attributes.filter(
+            (attr) => attr.attributeType.uuid === attribute.attributeType,
+          )[0].uuid;
+          updatedAttributes.push({ uuid: attributeUuid, value: attribute.value });
+        } else addedAttributes.push(attribute);
+      });
+
+      payload.attributes = addedAttributes;
+
       if (isOnline) {
-        if (visitToEdit?.uuid) {
-          const existingAttributes = visitToEdit.attributes.map((attr) => attr.attributeType.uuid) || [];
-          const updatedAttributes = [];
-          const addedAttributes = [];
-          payload.attributes.forEach((attribute) => {
-            if (existingAttributes.includes(attribute.attributeType)) {
-              const attributeUuid = visitToEdit.attributes.filter(
-                (attr) => attr.attributeType.uuid === attribute.attributeType,
-              )[0].uuid;
-              updatedAttributes.push({ uuid: attributeUuid, value: attribute.value });
-            } else addedAttributes.push(attribute);
-          });
-          payload.attributes = addedAttributes;
-          for (const attribute of updatedAttributes) {
-            await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
-              method: 'POST',
-              headers: {
-                'Content-type': 'application/json',
-              },
-              body: {
-                value: attribute.value,
-              },
-            }).catch((err) => {
-              showSnackbar({
-                title: t('errorUpdatingVisitAttribute', 'Error updating visit attribute'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: err?.message,
-              });
-            });
-          }
-        }
         (visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController)
         )
           .pipe(first())
           .subscribe(
-            (response) => {
+            async (response) => {
               if (response.status === 201) {
                 if (config.showServiceQueueFields) {
                   // retrieve values from queue extension
@@ -436,6 +445,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
               }
+
+              await updateVisitAttributes(updatedAttributes);
               mutateCurrentVisit();
               mutateVisits();
               closeWorkspace({ ignoreChanges: true });
