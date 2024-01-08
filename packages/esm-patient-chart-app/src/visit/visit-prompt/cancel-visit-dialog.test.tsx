@@ -17,7 +17,6 @@ import CancelVisitDialog from './cancel-visit-dialog.component';
 const mockedCloseModal = jest.fn();
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
-const mockedActionableNotification = jest.mocked(showActionableNotification);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
 const mockedUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
@@ -92,12 +91,11 @@ describe('Cancel visit', () => {
       method: 'DELETE',
     });
 
-    expect(mockedActionableNotification).toHaveBeenCalledWith(
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'success',
         title: 'Visit cancelled',
         subtitle: 'Active Facility Visit cancelled successfully',
-        actionButtonLabel: 'Undo',
       }),
     );
   });
