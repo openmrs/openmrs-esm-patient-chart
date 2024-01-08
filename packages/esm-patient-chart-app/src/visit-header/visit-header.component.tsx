@@ -59,8 +59,8 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const priority = queueEntry?.priority ?? '';
 
   const getServiceString = useCallback(() => {
-    if (queueEntry?.status) {
-      return `${queueEntry.status} - ${queueEntry.service}`;
+    if (queueEntry?.status && queueEntry.service) {
+      return `${t(queueEntry.status)} - ${t(queueEntry.service)}`;
     } else {
       return '';
     }
