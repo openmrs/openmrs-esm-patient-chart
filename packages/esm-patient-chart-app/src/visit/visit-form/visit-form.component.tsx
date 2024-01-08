@@ -407,6 +407,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
               showSnackbar({
                 isLowContrast: true,
+                timeoutInMs: 5000,
                 kind: 'success',
                 subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
