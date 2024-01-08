@@ -59,15 +59,10 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const priority = queueEntry?.priority ?? '';
 
   const getServiceString = useCallback(() => {
-    switch (queueEntry?.status?.toLowerCase()) {
-      case 'waiting':
-        return `Waiting for ${queueEntry.service}`;
-      case 'in service':
-        return `Attending ${queueEntry.service}`;
-      case 'finished service':
-        return `Finished ${queueEntry.service}`;
-      default:
-        return '';
+    if (queueEntry?.status) {
+      return `${queueEntry.status} - ${queueEntry.service}`;
+    } else {
+      return '';
     }
   }, [queueEntry]);
 
