@@ -231,6 +231,7 @@ describe('Visit Form', () => {
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
+      timeoutInMs: 5000,
     });
   });
 
