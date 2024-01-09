@@ -1,4 +1,3 @@
-import type { FHIRImmunizationBundle } from '../types/fhir-immunization-domain';
 import dayjs from 'dayjs';
 
 export const mockImmunizationConfig = {

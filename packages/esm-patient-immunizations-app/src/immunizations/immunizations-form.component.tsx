@@ -16,25 +16,24 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import {
-  showNotification,
-  showToast,
   useSession,
   useVisit,
   useLayoutType,
   useConfig,
   toOmrsIsoString,
   toDateObjectStrict,
+  showSnackbar,
 } from '@openmrs/esm-framework';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { z } from 'zod';
+import { type DefaultWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import styles from './immunizations-form.scss';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
-import { ConfigObject } from '../config-schema';
-import { ImmunizationFormData } from '../types';
-import { z } from 'zod';
+import { type ConfigObject } from '../config-schema';
+import { type ImmunizationFormData } from '../types';
 import dayjs from 'dayjs';
 import { immunizationFormSub } from './utils';
 
@@ -135,6 +134,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             sequencies.length ? (
               <Dropdown
                 id="sequence"
+                label={t('pleaseSelect', 'Please select')}
                 titleText={t('sequence', 'Sequence')}
                 items={sequencies?.map((sequence) => sequence.sequenceNumber) || []}
                 itemToString={(item) => sequencies.find((s) => s.sequenceNumber === item)?.sequenceLabel}
@@ -144,7 +144,6 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             ) : (
               <NumberInput
                 id="doseNumber"
-                invalidText={t('invalidNumber', 'Number is not valid')}
                 label={t('doseNumber', 'Dose number within series')}
                 min={0}
                 onChange={(event) => onChange(parseInt(event.target.value || 0))}
@@ -196,6 +195,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         lotNumber,
         manufacturer,
       };
+
       savePatientImmunization(
         mapToFHIRImmunizationResource(
           immunization,
@@ -208,13 +208,14 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       ).then(
         (response) => {
           response.ok && closeWorkspace();
-          showToast({
+          showSnackbar({
             kind: 'success',
             title: t('vaccinationSaved', 'Vaccination saved successfully'),
             isLowContrast: true,
           });
         },
         (err) => {
+          setIsSubmitting(false);
           showSnackbar({
             title: t('errorSaving', 'Error saving vaccination'),
             kind: 'error',
@@ -264,7 +265,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                     <DatePickerInput
                       id="vaccinationDateInput"
                       placeholder="dd/mm/yyyy"
-                      labelText={t('vaccinationDate', 'Vaccination date')}
+                      labelText={t('vaccinationDate', 'Vaccination Date')}
                       type="text"
                       invalid={!!errors['vaccinationDate']}
                       invalidText={errors['vaccinationDate']?.message}
@@ -314,6 +315,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                 <div className={styles.row}>
                   <Dropdown
                     id="immunization"
+                    label={t('pleaseSelect', 'Please select')}
                     titleText={t('immunization', 'Immunization')}
                     items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
                     itemToString={(item) =>
@@ -385,7 +387,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                   <DatePicker
                     id="vaccinationExpiration"
                     className="vaccinationExpiration"
-                    // minDate={new Date().toISOString()}
+                    minDate={immunizationToEditMeta ? null : new Date().toISOString()}
                     dateFormat={datePickerFormat}
                     datePickerType="single"
                     value={value}

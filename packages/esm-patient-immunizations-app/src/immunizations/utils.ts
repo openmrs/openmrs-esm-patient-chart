@@ -1,7 +1,7 @@
 import map from 'lodash-es/map';
 import find from 'lodash-es/find';
-import { ExistingDoses, ImmunizationFormState, ImmunizationGrouped } from '../types';
-import { ImmunizationSequenceDefinition, OpenmrsConcept } from '../types/fhir-immunization-domain';
+import { type ExistingDoses, type ImmunizationFormState, type ImmunizationGrouped } from '../types';
+import { type ImmunizationSequenceDefinition, type OpenmrsConcept } from '../types/fhir-immunization-domain';
 import { BehaviorSubject } from 'rxjs';
 
 export const immunizationFormSub = new BehaviorSubject<ImmunizationFormState | null>(null);

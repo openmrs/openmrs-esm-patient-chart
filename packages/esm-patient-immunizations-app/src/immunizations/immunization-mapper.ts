@@ -5,13 +5,13 @@ import isUndefined from 'lodash-es/isUndefined';
 import map from 'lodash-es/map';
 import orderBy from 'lodash-es/orderBy';
 import {
-  Code,
-  FHIRImmunizationBundle,
-  FHIRImmunizationBundleEntry,
-  FHIRImmunizationResource,
-  Reference,
+  type Code,
+  type FHIRImmunizationBundle,
+  type FHIRImmunizationBundleEntry,
+  type FHIRImmunizationResource,
+  type Reference,
 } from '../types/fhir-immunization-domain';
-import { ExistingDoses, ImmunizationFormData, ImmunizationGrouped } from '../types';
+import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
 const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEntry): ExistingDoses => {
   const immunizationResource = immunizationBundleEntry?.resource;

@@ -28,7 +28,7 @@ import { useConfig, useLayoutType, usePagination, useVisit } from '@openmrs/esm-
 import styles from './immunizations-detailed-summary.scss';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
 import { orderBy, get, first, isEmpty } from 'lodash-es';
-import { ExistingDoses, Sequence } from '../types';
+import { type ExistingDoses, type Sequence } from '../types';
 import SequenceTable from './immunizations-sequence-table';
 import { useImmunizations } from '../hooks/useImmunizations';
 
