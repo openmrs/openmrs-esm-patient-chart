@@ -45,7 +45,7 @@
   "peerDependencies": {
     "@carbon/react": "1.x",
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "*",
+    "@openmrs/esm-patient-common-lib": "5.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",
