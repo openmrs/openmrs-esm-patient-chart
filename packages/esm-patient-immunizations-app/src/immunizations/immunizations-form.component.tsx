@@ -99,11 +99,12 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
       if (props) {
+        const vaccinationDateOrNow = props.vaccinationDate || new Date();
         reset({
           vaccineUuid: props.vaccineUuid,
-          vaccinationDate: props.vaccinationDate,
-          vaccinationTime: dayjs(props.vaccinationDate).format('hh:mm'),
-          timeFormat: props.vaccinationDate.getHours() >= 12 ? 'PM' : 'AM',
+          vaccinationDate: vaccinationDateOrNow,
+          vaccinationTime: dayjs(vaccinationDateOrNow).format('hh:mm'),
+          timeFormat: vaccinationDateOrNow.getHours() >= 12 ? 'PM' : 'AM',
           doseNumber: props.doseNumber,
           expirationDate: props.expirationDate,
           lotNumber: props.lotNumber,
