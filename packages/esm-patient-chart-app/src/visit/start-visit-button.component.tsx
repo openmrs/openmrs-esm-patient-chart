@@ -12,9 +12,6 @@ const StartVisitButton = ({ patientUuid }) => {
       patientUuid,
       workspaceName: 'start-visit-workspace-form',
     });
-    navigate({
-      to: `\${openmrsSpaBase}/patient/${patientUuid}/chart`,
-    });
   }, [patientUuid]);
 
   return (
