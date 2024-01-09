@@ -1,6 +1,6 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { ImmunizationWidgetConfigObject, OpenmrsConcept } from '../types/fhir-immunization-domain';
+import { type ImmunizationWidgetConfigObject, type OpenmrsConcept } from '../types/fhir-immunization-domain';
 
 export function useImmunizationsConceptSet(config: ImmunizationWidgetConfigObject) {
   const conceptRepresentation =

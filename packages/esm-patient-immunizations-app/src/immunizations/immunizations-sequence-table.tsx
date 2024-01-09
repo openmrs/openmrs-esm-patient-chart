@@ -12,7 +12,7 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { ImmunizationGrouped } from '../types';
+import { type ImmunizationGrouped } from '../types';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { immunizationFormSub } from './utils';
 
@@ -39,10 +39,10 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
     return {
       id: dose?.immunizationObsUuid,
       sequence: isEmpty(sequences)
-        ? dose.doseNumber
+        ? dose.doseNumber || 0
         : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
       vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
-      expirationDate: dose?.expirationDate && formatDate(new Date(dose.expirationDate)),
+      expirationDate: dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true }),
       edit: (
         <Button
           kind="ghost"

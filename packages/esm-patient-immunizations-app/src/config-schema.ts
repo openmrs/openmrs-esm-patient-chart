@@ -1,5 +1,5 @@
 import immunizationWidgetSchema from './immunizations/immunization-widget-config-schema';
-import { ImmunizationWidgetConfigObject } from './types/fhir-immunization-domain';
+import { type ImmunizationWidgetConfigObject } from './types/fhir-immunization-domain';
 
 export const configSchema = {
   immunizationsConfig: immunizationWidgetSchema,

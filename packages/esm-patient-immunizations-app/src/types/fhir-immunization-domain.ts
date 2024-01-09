@@ -61,19 +61,6 @@ export type ImmunizationWidgetConfigObject = {
   sequenceDefinitions: Array<ImmunizationSequenceDefinition>;
 };
 
-// export type ImmunizationFormData = {
-//   //Used to capture the Immunization form data
-//   patientUuid: string;
-//   immunizationId: string;
-//   vaccineName: string;
-//   vaccineUuid: string;
-//   doseNumber: number;
-//   vaccinationDate: string;
-//   manufacturer?: string;
-//   expirationDate?: string;
-//   lotNumber?: string;
-// };
-
 export type ImmunizationDoseData = {
   immunizationObsUuid: string;
   manufacturer: string;
