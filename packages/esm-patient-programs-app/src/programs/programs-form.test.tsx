@@ -9,8 +9,6 @@ import { createProgramEnrollment, updateProgramEnrollment } from './programs.res
 import { mockPatient } from 'tools';
 import ProgramsForm from './programs-form.component';
 
-jest.setTimeout(20000);
-
 const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,

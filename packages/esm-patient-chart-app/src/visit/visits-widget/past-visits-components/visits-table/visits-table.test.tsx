@@ -6,8 +6,6 @@ import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
-jest.setTimeout(10000);
-
 const testProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,

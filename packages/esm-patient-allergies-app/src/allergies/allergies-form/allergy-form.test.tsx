@@ -14,8 +14,6 @@ const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 
-jest.setTimeout(15000);
-
 jest.mock('./allergy-form.resource', () => {
   const originalModule = jest.requireActual('./allergy-form.resource');
 

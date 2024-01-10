@@ -10,8 +10,6 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-jest.setTimeout(5000);
-
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;

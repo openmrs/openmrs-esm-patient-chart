@@ -8,8 +8,6 @@ import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
-jest.setTimeout(10000);
-
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 

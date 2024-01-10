@@ -8,8 +8,6 @@ import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
 
-jest.setTimeout(10000);
-
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
