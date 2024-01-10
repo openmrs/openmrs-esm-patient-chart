@@ -40,7 +40,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/immunizations';
 
-  const { data: immunizations, isError, isLoading, isValidating } = useImmunizations(patientUuid);
+  const { data: immunizations, error, isLoading, isValidating } = useImmunizations(patientUuid);
   const { results: paginatedImmunizations, goTo, currentPage } = usePagination(immunizations ?? [], immunizationsCount);
 
   const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
@@ -69,7 +69,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   }, [paginatedImmunizations]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (immunizations?.length) {
     return (
       <div className={styles.widgetCard}>
