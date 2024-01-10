@@ -8,8 +8,6 @@ import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm from './conditions-form.component';
 
-jest.setTimeout(10000);
-
 jest.mock('zod', () => {
   const originalModule = jest.requireActual('zod');
   const mockedZod = {

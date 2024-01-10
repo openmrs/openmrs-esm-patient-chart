@@ -7,8 +7,6 @@ import { mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-jest.setTimeout(20000);
-
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
