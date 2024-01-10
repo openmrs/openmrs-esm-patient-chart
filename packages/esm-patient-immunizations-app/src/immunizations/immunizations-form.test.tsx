@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ImmunizationsForm from './immunizations-form.component';
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
@@ -104,7 +105,7 @@ describe('Immunizations Form', () => {
     expect(screen.getByRole('textbox', { name: /Expiration Date/i })).toBeInTheDocument();
   });
 
-  it('should render dose field appropriately', () => {
+  it('should render dose field appropriately', async () => {
     function verifyDoseFieldType(type: 'sequence-coded' | 'number', shouldExist: boolean) {
       const field =
         type === 'sequence-coded'
@@ -124,19 +125,20 @@ describe('Immunizations Form', () => {
     const vaccinesDropdown = screen.getByRole('combobox', { name: /Immunization/i });
 
     // select a vaccine without configured sequences
-    selectOption(vaccinesDropdown, 'Hepatitis B vaccination');
+    await selectOption(vaccinesDropdown, 'Hepatitis B vaccination');
 
     verifyDoseFieldType('number', true);
     verifyDoseFieldType('sequence-coded', false);
 
     // select a vaccine with configured sequences
-    selectOption(vaccinesDropdown, 'Polio vaccination, oral');
+    await selectOption(vaccinesDropdown, 'Polio vaccination, oral');
 
     verifyDoseFieldType('number', false);
     verifyDoseFieldType('sequence-coded', true);
   });
 
   it('should save immunization data on submit', async () => {
+    const user = userEvent.setup();
     renderImmunizationForm();
     const formValues = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -156,17 +158,14 @@ describe('Immunizations Form', () => {
 
     // fill up the form
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
-    selectOption(vaccineField, 'Hepatitis B vaccination');
+    await selectOption(vaccineField, 'Hepatitis B vaccination');
     const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
-    fireEvent.change(doseField, { target: { value: formValues.doseNumber } });
+    await user.type(doseField, formValues.doseNumber.toString());
     const manufacturer = screen.getByRole('textbox', { name: /Manufacturer/i });
-    fireEvent.change(manufacturer, { target: { value: formValues.manufacturer } });
-
+    await user.type(manufacturer, formValues.manufacturer);
     const saveButton = screen.getByRole('button', { name: /Save/i });
 
-    await act(async () => {
-      fireEvent.click(saveButton);
-    });
+    await user.click(saveButton);
 
     expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
     expect(mockSavePatientImmunization).toHaveBeenCalledWith(
@@ -195,6 +194,7 @@ describe('Immunizations Form', () => {
   });
 
   it('should support editing immunizations', async () => {
+    const user = userEvent.setup();
     // setup and render the form
     const immunizationToEdit = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -238,12 +238,11 @@ describe('Immunizations Form', () => {
     expect(expirationDateField).toHaveValue('19/05/2024');
 
     // edit the form
-    selectOption(vaccineField, 'Hepatitis B vaccination');
-    fireEvent.change(doseField, { target: { value: 2 } });
+    await selectOption(vaccineField, 'Hepatitis B vaccination');
+    await user.clear(doseField);
+    await user.type(doseField, '2');
 
-    await act(async () => {
-      fireEvent.click(saveButton);
-    });
+    await user.click(saveButton);
 
     expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
     expect(mockSavePatientImmunization).toHaveBeenCalledWith(
@@ -276,8 +275,8 @@ function renderImmunizationForm() {
   render(<ImmunizationsForm {...testProps} />);
 }
 
-function selectOption(dropdown: HTMLElement, optionLabel: string) {
-  fireEvent.click(dropdown);
-  const option = screen.getByText(optionLabel);
-  fireEvent.click(option);
+async function selectOption(dropdown: HTMLElement, optionLabel: string) {
+  const user = userEvent.setup();
+  await user.click(dropdown);
+  await user.click(screen.getByText(optionLabel));
 }
