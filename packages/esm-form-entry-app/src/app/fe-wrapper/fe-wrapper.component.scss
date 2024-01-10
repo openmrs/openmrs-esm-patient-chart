@@ -180,7 +180,6 @@
 
   & button {
     width: 100%;
-    padding-inline: 15px 0;
-    padding-block: calc(0.875rem - 3px);
+    padding: spacing.$spacing-04 spacing.$spacing-05;
   }
 }
