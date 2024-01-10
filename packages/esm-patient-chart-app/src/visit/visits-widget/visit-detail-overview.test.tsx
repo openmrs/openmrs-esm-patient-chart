@@ -92,8 +92,8 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
     expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
 
     await user.click(allVisitsTab);
 
@@ -123,8 +123,8 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
     expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
   });
 });
 

@@ -37,7 +37,7 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
@@ -172,10 +172,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     );
   };
 
+  // All encounters tab in visits
   if (!visits?.length) {
-    return (
-      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
-    );
+    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('encounters', 'Encounters')} />;
   }
 
   return (
