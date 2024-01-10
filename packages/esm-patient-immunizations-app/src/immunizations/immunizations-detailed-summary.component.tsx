@@ -53,7 +53,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const isTablet = useLayoutType() === 'tablet';
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
-  const { data: existingImmunizations, isLoading, isError, isValidating } = useImmunizations(patientUuid);
+  const { data: existingImmunizations, isLoading, error, isValidating } = useImmunizations(patientUuid);
   const consolidatedImmunizations = linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
 
   const launchImmunizationsForm = React.useCallback(() => {
@@ -123,7 +123,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const { results: paginatedImmunizations, currentPage, goTo } = usePagination(tableRows, 10);
 
   if (isLoading || !sortedImmunizations) return <DataTableSkeleton role="progressbar" />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (sortedImmunizations?.length) {
     return (
       <div className={styles.widgetCard}>

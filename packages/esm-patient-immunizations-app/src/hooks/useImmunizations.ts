@@ -14,7 +14,7 @@ export function useImmunizations(patientUuid: string) {
 
   return {
     data: existingImmunizations,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutate,
