@@ -57,7 +57,7 @@ export type ImmunizationSequenceDefinition = {
 };
 
 export type ImmunizationWidgetConfigObject = {
-  vaccinesConceptSet: string;
+  immunizationConceptSet: string;
   sequenceDefinitions: Array<ImmunizationSequenceDefinition>;
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Stack,
@@ -11,7 +11,6 @@ import {
   SelectItem,
   Form,
   Dropdown,
-  NumberInput,
   TextInput,
   InlineNotification,
 } from '@carbon/react';
@@ -36,6 +35,8 @@ import { type ConfigObject } from '../config-schema';
 import { type ImmunizationFormData } from '../types';
 import dayjs from 'dayjs';
 import { immunizationFormSub } from './utils';
+import { DoseInput } from './components/dose-input.component';
+import { useImmunizations } from '../hooks/useImmunizations';
 
 const datePickerFormat = 'd/m/Y';
 
@@ -47,6 +48,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
+  const { mutate } = useImmunizations(patientUuid);
   const [immunizationToEditMeta, setImmunizationToEditMeta] = useState<{
     immunizationObsUuid: string;
     visitUuid?: string;
@@ -121,44 +123,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     };
   }, []);
 
-  const doseNumberInput = useMemo(() => {
-    const sequencies =
-      immunizationsConfig.sequenceDefinitions.find((sequence) => sequence.vaccineConceptUuid === vaccineUuid)
-        ?.sequences || [];
-
-    return (
-      <div className={styles.row}>
-        <Controller
-          name="doseNumber"
-          control={control}
-          render={({ field: { onChange, value } }) =>
-            sequencies.length ? (
-              <Dropdown
-                id="sequence"
-                label={t('pleaseSelect', 'Please select')}
-                titleText={t('sequence', 'Sequence')}
-                items={sequencies?.map((sequence) => sequence.sequenceNumber) || []}
-                itemToString={(item) => sequencies.find((s) => s.sequenceNumber === item)?.sequenceLabel}
-                onChange={(val) => onChange(parseInt(val.selectedItem || 0))}
-                selectedItem={value}
-              />
-            ) : (
-              <NumberInput
-                id="doseNumber"
-                label={t('doseNumber', 'Dose number within series')}
-                min={0}
-                onChange={(event) => onChange(parseInt(event.target.value || 0))}
-                value={value}
-                hideSteppers={true}
-              />
-            )
-          }
-        />
-      </div>
-    );
-  }, [immunizationsConfig, t, control, vaccineUuid]);
-
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (data: ImmunizationFormInputData) => {
       setIsSubmitting(true);
       const {
@@ -207,8 +172,10 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         immunizationToEditMeta?.immunizationObsUuid,
         abortController,
       ).then(
-        (response) => {
-          response.ok && closeWorkspace();
+        () => {
+          setIsSubmitting(false);
+          closeWorkspace();
+          mutate();
           showSnackbar({
             kind: 'success',
             title: t('vaccinationSaved', 'Vaccination saved successfully'),
@@ -344,7 +311,11 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               </div>
             </section>
           )}
-          {vaccineUuid && <section>{doseNumberInput}</section>}
+          {vaccineUuid && (
+            <section>
+              <DoseInput vaccine={vaccineUuid} sequences={immunizationsConfig.sequenceDefinitions} control={control} />
+            </section>
+          )}
           <section>
             <Controller
               name="manufacturer"

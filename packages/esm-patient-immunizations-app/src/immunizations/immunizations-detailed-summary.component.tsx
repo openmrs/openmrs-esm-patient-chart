@@ -29,7 +29,7 @@ import styles from './immunizations-detailed-summary.scss';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
 import { orderBy, get, first, isEmpty } from 'lodash-es';
 import { type ExistingDoses, type Sequence } from '../types';
-import SequenceTable from './immunizations-sequence-table';
+import SequenceTable from './components/immunizations-sequence-table.component';
 import { useImmunizations } from '../hooks/useImmunizations';
 
 interface ImmunizationsDetailedSummaryProps {
@@ -47,7 +47,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const displayText = t('immunizations', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const locale = i18n.language.replace('_', '-');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart`;
+  const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
   const urlLabel = t('goToSummary', 'Go to Summary');
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';

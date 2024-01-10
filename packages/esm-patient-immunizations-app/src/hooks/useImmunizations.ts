@@ -6,16 +6,17 @@ import { mapFromFHIRImmunizationBundle } from '../immunizations/immunization-map
 export function useImmunizations(patientUuid: string) {
   const immunizationsUrl = `${fhirBaseUrl}/Immunization?patient=${patientUuid}`;
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRImmunizationBundle }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRImmunizationBundle }, Error>(
     immunizationsUrl,
     openmrsFetch,
   );
   const existingImmunizations = data ? mapFromFHIRImmunizationBundle(data.data) : null;
 
   return {
-    data: data ? existingImmunizations : null,
+    data: existingImmunizations,
     isError: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }

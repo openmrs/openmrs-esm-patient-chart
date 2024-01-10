@@ -12,9 +12,9 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { type ImmunizationGrouped } from '../types';
+import { type ImmunizationGrouped } from '../../types';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { immunizationFormSub } from './utils';
+import { immunizationFormSub } from '../utils';
 
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
