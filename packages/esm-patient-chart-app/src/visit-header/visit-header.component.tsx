@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Header, HeaderGlobalAction, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
-import { CloseFilled } from '@carbon/react/icons';
+import { Button, Header, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import {
   age,
   ConfigurableLink,
@@ -9,7 +8,6 @@ import {
   useLayoutType,
   usePatient,
   useVisit,
-  navigate,
   useConfig,
   showModal,
   ExtensionSlot,
@@ -21,6 +19,7 @@ import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component'
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 import RetrospectiveVisitLabel from './retrospective-visit-label.component';
+import { CloseButton } from './close-button.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -139,10 +138,6 @@ const VisitHeader: React.FC = () => {
 
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
 
-  const onClosePatientChart = useCallback(() => {
-    document.referrer === '' ? navigate({ to: `${window.spaBase}/home` }) : window.history.back();
-  }, []);
-
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {
       closeModal: () => dispose(),
@@ -198,13 +193,7 @@ const VisitHeader: React.FC = () => {
             )}
           </>
         )}
-        <HeaderGlobalAction
-          className={styles.headerGlobalBarCloseButton}
-          aria-label={t('close', 'Close')}
-          onClick={onClosePatientChart}
-        >
-          <CloseFilled size={20} />
-        </HeaderGlobalAction>
+        <CloseButton />
       </HeaderGlobalBar>
       <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
     </Header>
