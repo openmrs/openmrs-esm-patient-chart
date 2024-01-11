@@ -6,10 +6,6 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './close-button.scss';
 
-/**
- * The close button keeps track of where each patient chart should close to, within the
- * context of the session.
- */
 export function CloseButton() {
   const { t } = useTranslation();
   const { patientUuid } = usePatient();
