@@ -30,9 +30,13 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ maxWidth: '64px' }}>
-        <img src={dataUri || initialState || placeholder} onClick={showCam} alt="Preview" style={{ width: '100%' }} />
-      </div>
+      <button
+        type="button"
+        onClick={showCam}
+        style={{ border: 'none', maxWidth: '64px', padding: 0, margin: 0, background: 'none', cursor: 'pointer' }}
+      >
+        <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
+      </button>
       <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
         {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
       </Button>
