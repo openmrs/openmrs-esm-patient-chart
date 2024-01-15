@@ -335,6 +335,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     diastolicBloodPressure,
                   )
                 }
+                showErrorMessage={showErrorMessage}
                 label={t('bloodPressure', 'Blood pressure')}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
               />
@@ -358,6 +359,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   pulse && isValueWithinReferenceRange(conceptMetadata, config.concepts['pulseUuid'], pulse)
                 }
                 label={t('heartRate', 'Heart rate')}
+                showErrorMessage={showErrorMessage}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
               />
             </Column>
@@ -557,6 +559,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           <InlineNotification
             className={styles.errorNotification}
             lowContrast={false}
+            onClose={() => setHasInvalidVitals(false)}
             title={t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics')}
             subtitle={t('checkForValidity', 'Some of the values entered are invalid')}
           />

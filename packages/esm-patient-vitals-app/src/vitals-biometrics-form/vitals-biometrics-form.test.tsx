@@ -238,6 +238,33 @@ describe('VitalsBiometricsForm', () => {
       title: 'Error saving vitals and biometrics',
     });
   });
+
+  it('Display an inline error notification on submit if value of vitals entered is invalid', async () => {
+    const user = userEvent.setup();
+
+    renderForm();
+    const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
+    const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
+    const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
+    const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
+
+    await user.type(systolic, '1000');
+    await user.type(pulse, pulseValue.toString());
+    await user.type(oxygenSaturation, '200');
+    await user.type(temperature, temperatureValue.toString());
+
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    await user.click(saveButton);
+
+    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
+
+    // close the inline notification --> resubmit --> check for presence of inline notification
+    const closeInlineNotificationButton = screen.getByTitle(/close notification/i);
+    await user.click(closeInlineNotificationButton);
+    expect(screen.queryByText(/some of the values entered are invalid/i)).not.toBeInTheDocument();
+    await user.click(saveButton);
+    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
+  });
 });
 
 function renderForm() {
