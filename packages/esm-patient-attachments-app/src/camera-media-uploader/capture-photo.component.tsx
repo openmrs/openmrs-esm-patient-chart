@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import placeholder from '../assets/placeholder.svg';
+import styles from './capture-photo.scss';
 
 export interface CapturePhotoProps {
   onCapturePhoto(dataUri: string, photoDateTime: string): void;
@@ -30,11 +31,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <button
-        type="button"
-        onClick={showCam}
-        style={{ border: 'none', maxWidth: '64px', padding: 0, margin: 0, background: 'none', cursor: 'pointer' }}
-      >
+      <button type="button" onClick={showCam} className={styles.buttonCssReset}>
         <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
       </button>
       <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
