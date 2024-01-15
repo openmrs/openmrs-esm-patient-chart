@@ -1,18 +1,17 @@
 {
-  "all": "全部",
-  "clinicalForm": "临床表单",
-  "completed": "已完成",
-  "form": "表单",
+  "clinicalForms": "Clinical forms",
+  "editForm": "Edit form",
   "formName": "表单名称（A-Z）",
   "forms": "表单",
   "formSearchHint": "尝试使用替代名称或关键词搜索表单",
-  "goToSummary": "前往摘要",
   "homeOverviewCardView": "查看",
   "lastCompleted": "Last Completed",
   "never": "Never",
-  "noFormsAvailable": "该患者没有可显示的表单",
+  "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "没有可显示的 {formCategory} 表单",
   "noMatchingFormsToDisplay": "没有匹配的表单可显示",
+  "offlineForms": "Offline forms",
+  "offlineForms__lower": "offline forms",
   "offlineFormsOverviewCardAvailableOffline": "离线可用",
   "offlineFormsTableFormAvailableOffline": "离线",
   "offlineFormsTableFormNameHeader": "表单名称",
@@ -20,7 +19,6 @@
   "offlinePatientsTableSearchLabel": "搜索此列表",
   "offlinePatientsTableSearchPlaceholder": "搜索此列表",
   "offlineToggle": "离线切换",
-  "recommended": "Recommended",
-  "searchThisList": "搜索此列表",
-  "seeAll": "查看全部"
+  "searchForAForm": "Search for a form",
+  "searchThisList": "搜索此列表"
 }

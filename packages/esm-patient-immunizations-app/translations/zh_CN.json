@@ -1,1 +1,20 @@
-{}
+{
+  "add": "Add",
+  "cancel": "Cancel",
+  "errorSaving": "Error saving vaccination",
+  "expirationDate": "Expiration Date",
+  "goToSummary": "Go to Summary",
+  "immunizations": "Immunizations",
+  "Immunizations": "Immunizations",
+  "lotNumber": "Lot Number",
+  "manufacturer": "Manufacturer",
+  "pleaseSelect": "Please select",
+  "recentVaccination": "Recent vaccination",
+  "save": "Save",
+  "seeAll": "See all",
+  "sequence": "Sequence",
+  "singleDoseOn": "Single Dose on",
+  "vaccinationDate": "Vaccination date",
+  "vaccinationSaved": "Vaccination saved successfully",
+  "vaccine": "Vaccine"
+}
