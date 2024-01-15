@@ -19,8 +19,6 @@
   "patientLists": "患者列表",
   "postalCode": "邮政编码",
   "relationships": "关系",
-  "seeMoreLists_one": "查看另外 {{count}} 个列表",
-  "seeMoreLists_other": "查看另外 {{count}} 个列表",
   "showDetails": "显示详情",
   "started": "已开始",
   "state": "省份",
