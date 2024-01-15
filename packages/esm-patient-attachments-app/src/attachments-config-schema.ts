@@ -10,7 +10,7 @@ export const attachmentsConfigSchema = {
     _elements: {
       _type: Type.String,
     },
-    _description: 'Allowed extensions for attachemnts',
-    _default: ['.jpg', '.nad', '.csv'],
+    _description: 'Allowed extensions for attachments',
+    _default: undefined,
   },
 };
