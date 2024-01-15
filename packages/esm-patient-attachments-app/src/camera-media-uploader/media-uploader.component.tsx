@@ -13,7 +13,19 @@ const MediaUploaderComponent = () => {
   const upload = useCallback(
     (files: Array<File>) => {
       files.forEach((file) => {
-        if (file.size <= fileSize * 1024 * 1024) {
+        if (file.size > fileSize * 1024 * 1024) {
+          showSnackbar({
+            title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
+            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
+            kind: 'error',
+          });
+        } else if (!isFileExtensionAllowed(file.name, allowedExtensions)) {
+          showSnackbar({
+            title: t('fileExtensionNotAllowedText', 'File extension is not allowed'),
+            subtitle: `${file.name} ${t('allowedExtensionsAre', 'Allowed extensions are:')} ${allowedExtensions}`,
+            kind: 'error',
+          });
+        } else {
           // Changing MB to bytes
           readFileAsString(file).then((base64Content) => {
             setFilesToUpload((uriData) => [
@@ -29,17 +41,16 @@ const MediaUploaderComponent = () => {
               },
             ]);
           });
-        } else {
-          showSnackbar({
-            title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
-            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
-            kind: 'error',
-          });
         }
       });
     },
     [setFilesToUpload, fileSize, t],
   );
+
+  const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
+    const fileExtension = '.' + fileName.split('.').pop();
+    return allowedExtensions.includes(fileExtension);
+  };
 
   return (
     <div className="cds--file__container">

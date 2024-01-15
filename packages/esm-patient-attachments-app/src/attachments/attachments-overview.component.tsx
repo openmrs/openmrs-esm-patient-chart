@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showSnackbar, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { showModal, showSnackbar, useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
@@ -20,6 +20,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
   const isTablet = useLayoutType() === 'tablet';
+  const { allowedExtensions } = useConfig();
 
   const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
@@ -38,6 +39,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
+      allowedExtensions: allowedExtensions,
       closeModal: () => {
         close();
       },
