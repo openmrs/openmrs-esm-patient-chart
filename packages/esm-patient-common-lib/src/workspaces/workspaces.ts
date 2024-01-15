@@ -58,6 +58,7 @@ export function registerWorkspace(workspace: WorkspaceRegistration) {
   };
 }
 
+const workspaceExtensionWarningsIssued = new Set();
 /**
  * This exists for compatibility with the old way of registering
  * workspaces (as extensions).
@@ -70,6 +71,12 @@ function getWorkspaceRegistration(name: string): WorkspaceRegistration {
   } else {
     const workspaceExtension = getExtensionRegistration(name);
     if (workspaceExtension) {
+      if (!workspaceExtensionWarningsIssued.has(name)) {
+        console.warn(
+          `The workspace '${name}' is registered as an extension. This is deprecated. Please use the 'registerWorkspace' function instead.`,
+        );
+        workspaceExtensionWarningsIssued.add(name);
+      }
       return {
         name: workspaceExtension.name,
         title: getTitleFromExtension(workspaceExtension),
