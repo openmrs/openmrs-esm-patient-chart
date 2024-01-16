@@ -361,6 +361,7 @@ describe('workspace system', () => {
   });
 
   test('is compatible with workspaces registered as extensions', () => {
+    console.warn = jest.fn();
     const store = getWorkspaceStore();
     registerExtension({
       name: 'lab-results',
@@ -375,6 +376,7 @@ describe('workspace system', () => {
     expect(workspace.additionalProps['foo']).toBe(true);
     expect(workspace.title).toBe('Lab Results');
     expect(workspace.preferredWindowSize).toBe('maximized');
+    expect(console.warn).toHaveBeenCalled();
   });
 
   test('launching unregistered workspace throws an error', () => {

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import styles from './contact-details.scss';
+import { ConfigObject } from '../config-schema';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -62,10 +62,6 @@ const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
-  const { useCustomAddressLabel } = useConfig<ConfigObject>();
-  const useCustomAddressLabelEnabled = useCustomAddressLabel?.enabled;
-  const customAddressLabel = useCustomAddressLabel?.customAddressLabel;
-
   const getAddressKey = (url) => url.split('#')[1];
   /*
     DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
@@ -90,20 +86,19 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
         {address ? (
           <React.Fragment>
             {Object.entries(address)
-              .filter(([key]) => !['use', 'id'].some((k) => k === key))
+              .filter(([key]) => !['use', 'id'].includes(key))
               .map(([key, value]) =>
                 key === 'extension' ? (
-                  address?.extension[0]?.extension.map((add, i) => (
-                    <li key={`address-${key}-${i}`}>
-                      {useCustomAddressLabelEnabled
-                        ? t(customAddressLabel[getAddressKey(add.url)])
-                        : t(getAddressKey(add.url))}
-                      : {add.valueString}
-                    </li>
-                  ))
+                  address?.extension[0]?.extension.map((add, i) => {
+                    return (
+                      <li key={`address-${key}-${i}`}>
+                        {t(getAddressKey(add.url), getAddressKey(add.url))}: {add.valueString}
+                      </li>
+                    );
+                  })
                 ) : (
                   <li key={`address-${key}`}>
-                    {useCustomAddressLabelEnabled ? t(customAddressLabel[key]) : t(key)}: {value}
+                    {t(key, key)}: {value}
                   </li>
                 ),
               )}
@@ -121,8 +116,18 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
+
+  const contacts = useMemo(
+    () => [
+      ...telecom?.map((contact) => [t(contact.system, contact.system), contact.value]),
+      ...contactAttributes?.map((contact) => [
+        t(contact.attributeType.display, contact.attributeType.display),
+        contact.value,
+      ]),
+    ],
+    [telecom, contactAttributes],
+  );
 
   return (
     <>
@@ -131,16 +136,12 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
         <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
       ) : (
         <ul>
-          {value ? (
-            <React.Fragment>
-              <li>{value}</li>
-              {contactAttributes?.length > 0 &&
-                contactAttributes.map(({ attributeType, value, uuid }) => (
-                  <li key={uuid}>
-                    {attributeType.display}: {value}
-                  </li>
-                ))}
-            </React.Fragment>
+          {contacts.length ? (
+            contacts.map(([label, value], index) => (
+              <li key={`${label}-${value}-${index}`}>
+                {label}: {value}
+              </li>
+            ))
           ) : (
             <li>--</li>
           )}
@@ -153,7 +154,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
   const { data: relationships, isLoading } = useRelationships(patientId);
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
 
   const extractName = (display: string) => {
     const pattern = /-\s*(.*)$/;
