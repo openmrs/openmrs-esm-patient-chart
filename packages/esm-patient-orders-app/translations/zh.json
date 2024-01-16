@@ -1,0 +1,22 @@
+{
+  "add": "Add",
+  "addResults": "Add Results",
+  "cancelOrder": "Cancel Order",
+  "dateOfOrder": "Date of order",
+  "female": "Female",
+  "male": "Male",
+  "onDate": "on",
+  "order": "Order",
+  "orderedBy": "Ordered by",
+  "orderId": "Order ID",
+  "orders": "Orders",
+  "Orders": "Orders",
+  "orderType": "Order type",
+  "other": "Other",
+  "print": "Print",
+  "printedBy": "Printed by",
+  "priority": "Priority",
+  "status": "Status",
+  "unknown": "Unknown",
+  "viewEdit": "View/Edit Order"
+}

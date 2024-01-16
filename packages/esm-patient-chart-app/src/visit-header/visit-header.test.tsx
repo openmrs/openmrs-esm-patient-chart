@@ -9,6 +9,9 @@ import {
   useVisit,
   navigate,
   showModal,
+  getHistory,
+  goBackInHistory,
+  age,
 } from '@openmrs/esm-framework';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
@@ -19,26 +22,21 @@ const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;
 const mockUseLayoutType = useLayoutType as jest.Mock;
-const mockExtensionRegistry = {};
 const mockShowModal = showModal as jest.Mock;
-const mockNavigateBack = jest.fn();
+const mockGetHistory = getHistory as jest.Mock;
+const mockGoBackInHistory = goBackInHistory as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
     ...originalModule,
-    usePatient: jest.fn(),
-    useAssignedExtensions: jest.fn(),
-    age: jest.fn(() => 20),
+    age: jest.fn().mockReturnValue('20'),
+    getHistory: jest.fn(() => []),
+    goBackInHistory: jest.fn(),
     LeftNavMenu: jest.fn().mockImplementation(() => <div>Left Nav Menu</div>),
-    useVisit: jest.fn(),
-    registerExtension: (ext) => {
-      mockExtensionRegistry[ext.name] = ext;
-    },
-    getExtensionRegistration: (name) => mockExtensionRegistry[name],
     translateFrom: (module, key, defaultValue, options) => defaultValue,
+    useAssignedExtensions: jest.fn(),
     useOnClickOutside: jest.fn(),
-    showModal: jest.fn(),
   };
 });
 
@@ -47,20 +45,19 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
-    navigate: jest.fn(),
   };
 });
 
 describe('Visit Header', () => {
   beforeEach(() => {
-    window.history.back = mockNavigateBack;
+    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
+    mockGoBackInHistory.mockClear();
   });
 
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
-    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
       isLoading: false,
@@ -70,7 +67,7 @@ describe('Visit Header', () => {
     mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
     mockUseLayoutType.mockReturnValue('tablet');
 
-    renderVisitHeader();
+    render(<VisitHeader />);
 
     const headerBanner = screen.getByRole('banner', { name: /OpenMRS/i });
     expect(headerBanner).toBeInTheDocument();
@@ -96,25 +93,10 @@ describe('Visit Header', () => {
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);
-    expect(launchPatientWorkspace).toHaveBeenCalled();
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
-
-    const closeButton = screen.getByRole('button', { name: 'Close' });
-    expect(closeButton).toBeInTheDocument();
-
-    // Should close the visit-header
-    await user.click(closeButton);
-    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
-    expect(window.history.back).not.toHaveBeenCalled();
-
-    Object.defineProperty(document, 'referrer', { value: 'some-uuid', configurable: true });
-    await user.click(closeButton);
-    expect(window.history.back).toHaveBeenCalled();
-    expect(mockNavigateBack).toHaveBeenCalled();
   });
 
   test('should display a truncated name when the patient name is very long', async () => {
-    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatientWithLongName,
       isLoading: false,
@@ -124,7 +106,7 @@ describe('Visit Header', () => {
     mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
     mockUseLayoutType.mockReturnValue('desktop');
 
-    renderVisitHeader();
+    render(<VisitHeader />);
 
     const longNameText = screen.getByText(/^Some very long given name...$/i);
     expect(longNameText).toBeInTheDocument();
@@ -133,7 +115,6 @@ describe('Visit Header', () => {
 
   it('should be able to show configurable stop visit button and modal to stop current visit', async () => {
     const user = userEvent.setup();
-    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatientWithLongName,
       isLoading: false,
@@ -143,7 +124,7 @@ describe('Visit Header', () => {
     mockUseVisit.mockReturnValue({ isValidating: false, currentVisit: mockCurrentVisit });
     mockUseLayoutType.mockReturnValue('desktop');
 
-    renderVisitHeader();
+    render(<VisitHeader />);
 
     // Should be able to end a visit
     const endVisitButton = screen.getByRole('button', { name: /End visit/i });
@@ -154,14 +135,33 @@ describe('Visit Header', () => {
     expect(mockShowModal).toHaveBeenCalledTimes(1);
 
     const closeButton = screen.getByRole('button', { name: 'Close' });
-    expect(closeButton).toBeInTheDocument();
-
-    // Should close the visit-header
     await user.click(closeButton);
-    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
+    expect(navigate).toHaveBeenCalled();
+  });
+
+  test('close button should navigate back to before the patient chart', async () => {
+    const user = userEvent.setup();
+    mockGetHistory.mockReturnValue([
+      'https://o3.openmrs.org/openmrs/spa/home',
+      'https://o3.openmrs.org/openmrs/spa/patient/1234/chart',
+      `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart`,
+      `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart/labs`,
+    ]);
+    render(<VisitHeader />);
+    const closeButton = screen.getByRole('button', { name: 'Close' });
+    await user.click(closeButton);
+    expect(goBackInHistory).toHaveBeenCalledWith({ toUrl: 'https://o3.openmrs.org/openmrs/spa/patient/1234/chart' });
+  });
+
+  test('close button should navigate to home if no such URL exists in history', async () => {
+    const user = userEvent.setup();
+    render(<VisitHeader />);
+    mockGetHistory.mockReturnValue([
+      `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart`,
+      `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart/labs`,
+    ]);
+    const closeButton = screen.getByRole('button', { name: 'Close' });
+    await user.click(closeButton);
+    expect(navigate).toHaveBeenCalledWith({ to: '${openmrsSpaBase}/home' });
   });
 });
-
-function renderVisitHeader() {
-  render(<VisitHeader />);
-}
