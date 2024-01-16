@@ -33,6 +33,7 @@ function extractRelationshipData(
     if (patientIdentifier === r.personA.uuid) {
       relationshipsData.push({
         uuid: r.uuid,
+        name: extractName(r.personB.display),
         display: r.personB.display,
         relativeAge: r.personB.age,
         relativeUuid: r.personB.uuid,
@@ -41,6 +42,7 @@ function extractRelationshipData(
     } else {
       relationshipsData.push({
         uuid: r.uuid,
+        name: extractName(r.personA.display),
         display: r.personA.display,
         relativeAge: r.personA.age,
         relativeUuid: r.personA.uuid,
@@ -51,12 +53,22 @@ function extractRelationshipData(
   return relationshipsData;
 }
 
+const extractName = (display: string) => {
+  const pattern = /-\s*(.*)$/;
+  const match = display.match(pattern);
+  if (match && match.length > 1) {
+    return match[1].trim();
+  }
+  return display.trim();
+};
+
 interface RelationshipsResponse {
   results: Array<Relationship>;
 }
 
 interface ExtractedRelationship {
   uuid: string;
+  name: string;
   display: string;
   relativeAge: number;
   relativeUuid: string;
