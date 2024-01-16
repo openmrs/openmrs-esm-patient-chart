@@ -49,14 +49,6 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 
-[o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-biometrics-app]
-file_filter            = packages/esm-patient-biometrics-app/translations/<lang>.json
-source_file            = packages/esm-patient-biometrics-app/translations/en.json
-source_lang            = en
-type                   = KEYVALUEJSON
-replace_edited_strings = false
-keep_translations      = false
-
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-chart-app]
 file_filter            = packages/esm-patient-chart-app/translations/<lang>.json
 source_file            = packages/esm-patient-chart-app/translations/en.json
