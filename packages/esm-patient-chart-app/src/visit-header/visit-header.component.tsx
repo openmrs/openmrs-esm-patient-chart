@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Header, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import {
@@ -12,8 +12,16 @@ import {
   showModal,
   ExtensionSlot,
   interpolateUrl,
+  translateFrom,
+  navigate,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import {
+  getWorkspaceStore,
+  launchPatientWorkspace,
+  type Prompt,
+  useSystemVisitSetting,
+  useWorkspaces,
+} from '@openmrs/esm-patient-common-lib';
 import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
@@ -133,6 +141,7 @@ const VisitHeader: React.FC = () => {
   const { logo } = useConfig();
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isTablet = useLayoutType() === 'tablet';
+  const { workspaces } = useWorkspaces();
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
@@ -146,6 +155,30 @@ const VisitHeader: React.FC = () => {
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
+
+  useEffect(() => {
+    const handleBeforeRouting = ({ detail }: any) => {
+      if (workspaces.length) {
+        detail.cancelNavigation();
+        const areAllWorkspacesClosed = workspaces.every((workspace) => {
+          workspace.promptBeforeClosing(() => true);
+          return workspace.closeWorkspace(false);
+        });
+
+        if (areAllWorkspacesClosed) {
+          navigate({ to: detail.newUrl });
+        }
+      } else {
+        navigate({ to: detail.newUrl });
+      }
+    };
+
+    window.addEventListener('single-spa:before-routing-event', handleBeforeRouting);
+
+    return () => {
+      window.removeEventListener('single-spa:before-routing-event', handleBeforeRouting);
+    };
+  }, [workspaces]);
 
   return (
     <Header aria-label="OpenMRS" className={styles.topNavHeader}>
