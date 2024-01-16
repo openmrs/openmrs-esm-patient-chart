@@ -6,7 +6,7 @@ import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import styles from './contact-details.scss';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -156,15 +156,6 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { data: relationships, isLoading } = useRelationships(patientId);
   const config = useConfig<ConfigObject>();
 
-  const extractName = (display: string) => {
-    const pattern = /-\s*(.*)$/;
-    const match = display.match(pattern);
-    if (match && match.length > 1) {
-      return match[1].trim();
-    }
-    return display.trim();
-  };
-
   return (
     <>
       <p className={styles.heading}>{t('relationships', 'Relationships')}</p>
@@ -184,7 +175,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
                       {r.display}
                     </ConfigurableLink>
                   ) : (
-                    <div>{extractName(r.display)}</div>
+                    <div>{r.name}</div>
                   )}
 
                   <div>{r.relationshipType}</div>
