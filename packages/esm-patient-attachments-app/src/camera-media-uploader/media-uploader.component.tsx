@@ -48,8 +48,11 @@ const MediaUploaderComponent = () => {
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
+    if (!allowedExtensions) {
+      return true;
+    }
     const fileExtension = '.' + fileName.split('.').pop();
-    return allowedExtensions.includes(fileExtension);
+    return allowedExtensions?.includes(fileExtension);
   };
 
   return (
