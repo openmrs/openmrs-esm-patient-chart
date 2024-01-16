@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import styles from './contact-details.scss';
+import { ConfigObject } from '../config-schema';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -92,13 +92,13 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
                   address?.extension[0]?.extension.map((add, i) => {
                     return (
                       <li key={`address-${key}-${i}`}>
-                        {t(getAddressKey(add.url))}: {add.valueString}
+                        {t(getAddressKey(add.url), getAddressKey(add.url))}: {add.valueString}
                       </li>
                     );
                   })
                 ) : (
                   <li key={`address-${key}`}>
-                    {t(key)}: {value}
+                    {t(key, key)}: {value}
                   </li>
                 ),
               )}
@@ -120,8 +120,11 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 
   const contacts = useMemo(
     () => [
-      ...telecom?.map((contact) => [t(contact.system), contact.value]),
-      ...contactAttributes?.map((contact) => [t(contact.attributeType.display), contact.value]),
+      ...telecom?.map((contact) => [t(contact.system, contact.system), contact.value]),
+      ...contactAttributes?.map((contact) => [
+        t(contact.attributeType.display, contact.attributeType.display),
+        contact.value,
+      ]),
     ],
     [telecom, contactAttributes],
   );
@@ -151,7 +154,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
   const { data: relationships, isLoading } = useRelationships(patientId);
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
 
   const extractName = (display: string) => {
     const pattern = /-\s*(.*)$/;

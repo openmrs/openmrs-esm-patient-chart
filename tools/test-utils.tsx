@@ -23,9 +23,11 @@ export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper,
 
 // Helper function that waits for a loading state to disappear from the screen
 export function waitForLoadingToFinish() {
-  return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
-    timeout: 4000,
-  });
+  if (screen.queryAllByRole('progressbar').length) {
+    return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
+      timeout: 4000,
+    });
+  }
 }
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
