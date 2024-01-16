@@ -35,6 +35,7 @@ const testProps = {
 const mockRelationships = [
   {
     display: '100ADT - Amanda Robinson',
+    name: 'Amanda Robinson',
     relationshipType: 'Sibling',
     relativeAge: 24,
     relativeUuid: '07006bcb-91d4-4c57-a5f7-49751899d9b5',
