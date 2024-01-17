@@ -1,8 +1,17 @@
-import { type ExtensionRegistration, getGlobalStore, navigate, translateFrom } from '@openmrs/esm-framework';
+import {
+  type ExtensionRegistration,
+  getGlobalStore,
+  navigate,
+  translateFrom,
+  openmrsFetch,
+  type Visit,
+  showModal,
+} from '@openmrs/esm-framework';
 // FIXME We should not rely on internals here
 import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
 import { type WorkspaceWindowState } from '../types/workspace';
+import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
 
 export interface Prompt {
   title: string;
@@ -19,6 +28,7 @@ export interface WorkspaceStoreState {
   openWorkspaces: Array<OpenWorkspace>;
   prompt: Prompt | null;
   workspaceWindowState: WorkspaceWindowState;
+  promptBeforeOpening: boolean | null;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
@@ -161,8 +171,16 @@ function promptBeforeLaunchingWorkspace(
  * @param name The name of the workspace to launch
  * @param additionalProps Props to pass to the workspace component being launched
  */
-export function launchPatientWorkspace(name: string, additionalProps?: object) {
+export async function launchPatientWorkspace(name: string, additionalProps?: object) {
   const store = getWorkspaceStore();
+  const state = store.getState();
+  const patientUuid = getPatientUuidFromUrl();
+
+  if (state.promptBeforeOpening) {
+    const dispose = showModal('require-billing-modal', { closeModal: () => dispose(), patientUuid });
+    return;
+  }
+
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
@@ -297,6 +315,7 @@ const initialState: WorkspaceStoreState = {
   openWorkspaces: [],
   prompt: null,
   workspaceWindowState: 'normal',
+  promptBeforeOpening: false,
 };
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);

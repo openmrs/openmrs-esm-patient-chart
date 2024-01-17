@@ -55,6 +55,7 @@ import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import { mutate as mutateSWR } from 'swr';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit: Visit;
@@ -106,10 +107,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ...acc,
         [uuid]: required
           ? z
-            .string({
-              required_error: t('fieldRequired', 'This field is required'),
-            })
-            .refine((value) => !!value, t('fieldRequired', 'This field is required'))
+              .string({
+                required_error: t('fieldRequired', 'This field is required'),
+              })
+              .refine((value) => !!value, t('fieldRequired', 'This field is required'))
           : z.string().optional(),
       }),
       {},
@@ -124,8 +125,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
       visitStopTime: displayVisitStopDateTimeFields
         ? z
-          .string()
-          .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
+            .string()
+            .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
         : z.string().optional(),
       visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
       programType: z.string().optional(),
@@ -410,6 +411,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               mutateCurrentVisit();
               mutateVisits();
               closeWorkspace();
+              mutateSWR(
+                (key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill?v=full'),
+                undefined,
+                {
+                  revalidate: true,
+                },
+              );
 
               showSnackbar({
                 isLowContrast: true,
@@ -417,11 +425,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 kind: 'success',
                 subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                  })
+                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                    })
                   : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                  }),
+                      visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                    }),
                 title: !visitToEdit
                   ? t('visitStarted', 'Visit started')
                   : t('visitDetailsUpdated', 'Visit details updated'),
@@ -673,8 +681,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
               </div>
             </section>
-
-
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
