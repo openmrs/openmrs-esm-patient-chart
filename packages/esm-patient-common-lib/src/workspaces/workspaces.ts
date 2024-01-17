@@ -23,8 +23,8 @@ export interface WorkspaceStoreState {
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
-  closeWorkspace(promptBeforeClosing?: boolean): boolean;
-  closeWorkspace(): boolean;
+  closeWorkspace(promptBeforeClosing?: boolean): void;
+  closeWorkspace(): void;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -247,7 +247,6 @@ export function cancelPrompt() {
 export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
-
   const updateStoreWithClosedWorkspace = () => {
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name != name);
@@ -262,7 +261,7 @@ export function closeWorkspace(name: string, ignoreChanges: boolean) {
 
   if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
-      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
+      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
       body: translateFrom(
         '@openmrs/esm-patient-chart-app',
         'unsavedChangeText',
@@ -274,10 +273,8 @@ export function closeWorkspace(name: string, ignoreChanges: boolean) {
       confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
     };
     store.setState({ ...store.getState(), prompt });
-    return false;
   } else {
     updateStoreWithClosedWorkspace();
-    return true;
   }
 }
 

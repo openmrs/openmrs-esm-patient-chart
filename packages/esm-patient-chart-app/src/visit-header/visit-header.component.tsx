@@ -136,6 +136,7 @@ const VisitHeader: React.FC = () => {
   const { patient } = usePatient();
   const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(patient?.id);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
+  const [isClosingPatientChart, setIsClosingPatientChart] = useState({ value: false, url: '', openWorkspaces: [] });
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { logo } = useConfig();
   const { systemVisitEnabled } = useSystemVisitSetting();
@@ -156,19 +157,21 @@ const VisitHeader: React.FC = () => {
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
   useEffect(() => {
+    const { value, url, openWorkspaces } = isClosingPatientChart;
+    if (value && !!url && workspaces.length < openWorkspaces.length) {
+      navigate({ to: isClosingPatientChart.url });
+    }
+  }, [workspaces, isClosingPatientChart]);
+
+  useEffect(() => {
     const handleBeforeRouting = ({ detail }: any) => {
+      setIsClosingPatientChart({ value: true, url: detail.newUrl, openWorkspaces: workspaces });
       if (workspaces.length) {
         detail.cancelNavigation();
-        const areAllWorkspacesClosed = workspaces.every((workspace) => {
-          workspace.promptBeforeClosing(() => true);
-          return workspace.closeWorkspace(false);
-        });
-
-        if (areAllWorkspacesClosed) {
-          navigate({ to: detail.newUrl });
-        }
+        workspaces[0].promptBeforeClosing(() => true);
+        workspaces[0].closeWorkspace(false);
       } else {
-        navigate({ to: detail.newUrl });
+        setIsClosingPatientChart({ value: false, url: '', openWorkspaces: [] });
       }
     };
 
