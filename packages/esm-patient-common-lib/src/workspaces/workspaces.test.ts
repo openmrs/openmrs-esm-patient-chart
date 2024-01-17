@@ -390,9 +390,9 @@ describe('workspace system', () => {
     launchPatientWorkspace('hiv');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
     store.getState().openWorkspaces[0].closeWorkspace(false);
-    expect(store.getState().prompt.title).toBe('Unsaved Changes');
+    expect(store.getState().prompt.title).toBe('You have unsaved changes');
     expect(store.getState().prompt.body).toBe(
-      'You have unsaved changes in the side panel. Do you want to discard these changes?',
+      'There are unsaved changes in HIV. Do you want to discard these changes?',
     );
     expect(store.getState().prompt.confirmText).toBe('Discard');
     store.getState().prompt.onConfirm();

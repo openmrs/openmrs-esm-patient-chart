@@ -247,6 +247,7 @@ export function cancelPrompt() {
 export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  const workspace = store.getState().openWorkspaces.filter((w) => w.name == name)[0];
   const updateStoreWithClosedWorkspace = () => {
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name != name);
@@ -264,8 +265,9 @@ export function closeWorkspace(name: string, ignoreChanges: boolean) {
       title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
       body: translateFrom(
         '@openmrs/esm-patient-chart-app',
-        'unsavedChangeText',
-        `You have unsaved changes in the side panel. Do you want to discard these changes?`,
+        'unsavedChangesInFormToBeClosed',
+        'There are unsaved changes in {{formName}}. Do you want to discard these changes?',
+        { formName: workspace.title ?? workspace.name },
       ),
       onConfirm: () => {
         updateStoreWithClosedWorkspace();
