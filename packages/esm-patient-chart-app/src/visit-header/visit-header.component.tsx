@@ -16,7 +16,6 @@ import {
   navigate,
 } from '@openmrs/esm-framework';
 import {
-  getWorkspaceStore,
   launchPatientWorkspace,
   type Prompt,
   useSystemVisitSetting,

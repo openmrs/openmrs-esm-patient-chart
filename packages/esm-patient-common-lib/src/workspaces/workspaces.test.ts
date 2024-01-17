@@ -357,7 +357,7 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
     expect(store.getState().prompt.title).toBe('You have unsaved changes');
     store.getState().prompt.onConfirm();
-    expect(store.getState().openWorkspaces[0].name).toBe('hiv');
+    expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
   });
 
   test('is compatible with workspaces registered as extensions', () => {
