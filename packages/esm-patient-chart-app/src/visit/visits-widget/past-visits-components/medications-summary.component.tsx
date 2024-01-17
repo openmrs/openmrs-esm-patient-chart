@@ -26,7 +26,10 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     <div>
                       <p className={styles.bodyLong01}>
                         <strong>{capitalize(medication?.order?.drug?.display)}</strong>{' '}
-                        {medication?.order?.drug?.strength?.toLowerCase() && (
+                        {medication?.order?.drug?.strength && (
+                          <>&mdash; {medication?.order?.drug?.strength?.toLowerCase()}</>
+                        )}{' '}
+                        {medication?.order?.doseUnits?.display && (
                           <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
                         )}{' '}
                       </p>
@@ -35,6 +38,9 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         <span className={styles.dosage}>
                           {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
                         </span>{' '}
+                        {medication.order?.route?.display && (
+                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
+                        )}
                         {medication?.order?.frequency?.display?.toLowerCase()} &mdash;{' '}
                         {!medication?.order?.duration
                           ? t('orderIndefiniteDuration', 'Indefinite duration')
