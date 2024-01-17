@@ -1,18 +1,19 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { Fragment, useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack,
   Button,
   ButtonSet,
   DatePicker,
   DatePickerInput,
+  Dropdown,
+  Form,
+  InlineNotification,
+  Layer,
+  SelectItem,
+  Stack,
+  TextInput,
   TimePicker,
   TimePickerSelect,
-  SelectItem,
-  Form,
-  Dropdown,
-  TextInput,
-  InlineNotification,
 } from '@carbon/react';
 import {
   useSession,
@@ -37,6 +38,11 @@ import dayjs from 'dayjs';
 import { immunizationFormSub } from './utils';
 import { DoseInput } from './components/dose-input.component';
 import { useImmunizations } from '../hooks/useImmunizations';
+
+interface ResponsiveWrapperProps {
+  children: React.ReactNode;
+  isTablet: boolean;
+}
 
 const datePickerFormat = 'd/m/Y';
 
@@ -217,85 +223,91 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         <Stack gap={1} className={styles.container}>
           <section className={` ${styles.row}`}>
             <div className={styles.dateTimeSection}>
-              <Controller
-                name="vaccinationDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    id="vaccinationDate"
-                    maxDate={new Date().toISOString()}
-                    dateFormat={datePickerFormat}
-                    datePickerType="single"
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                    style={{ paddingBottom: '1rem' }}
-                  >
-                    <DatePickerInput
-                      id="vaccinationDateInput"
-                      placeholder="dd/mm/yyyy"
-                      labelText={t('vaccinationDate', 'Vaccination Date')}
-                      type="text"
-                      invalid={!!errors['vaccinationDate']}
-                      invalidText={errors['vaccinationDate']?.message}
-                      style={{ width: '100%' }}
-                    />
-                  </DatePicker>
-                )}
-              />
-              <Controller
-                name="vaccinationTime"
-                control={control}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <TimePicker
-                    id="vaccinationTime"
-                    labelText={t('time', 'Time')}
-                    onChange={(event) => onChange(event.target.value as amPm)}
-                    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                    style={{ marginLeft: '0.125rem', flex: 'none' }}
-                    value={value}
-                    onBlur={onBlur}
-                  >
-                    <Controller
-                      name="timeFormat"
-                      control={control}
-                      render={({ field: { onChange, value } }) => (
-                        <TimePickerSelect
-                          id="timeFormatSelect"
-                          onChange={(event) => onChange(event.target.value as amPm)}
-                          value={value}
-                          aria-label={t('timeFormat ', 'Time Format')}
-                        >
-                          <SelectItem value="AM" text="AM" />
-                          <SelectItem value="PM" text="PM" />
-                        </TimePickerSelect>
-                      )}
-                    />
-                  </TimePicker>
-                )}
-              />
+              <ResponsiveWrapper isTablet={isTablet}>
+                <Controller
+                  name="vaccinationDate"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      id="vaccinationDate"
+                      maxDate={new Date().toISOString()}
+                      dateFormat={datePickerFormat}
+                      datePickerType="single"
+                      value={value}
+                      onChange={([date]) => onChange(date)}
+                      style={{ paddingBottom: '1rem' }}
+                    >
+                      <DatePickerInput
+                        id="vaccinationDateInput"
+                        placeholder="dd/mm/yyyy"
+                        labelText={t('vaccinationDate', 'Vaccination Date')}
+                        type="text"
+                        invalid={!!errors['vaccinationDate']}
+                        invalidText={errors['vaccinationDate']?.message}
+                        style={{ width: '100%' }}
+                      />
+                    </DatePicker>
+                  )}
+                />
+              </ResponsiveWrapper>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <Controller
+                  name="vaccinationTime"
+                  control={control}
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <TimePicker
+                      id="vaccinationTime"
+                      labelText={t('time', 'Time')}
+                      onChange={(event) => onChange(event.target.value as amPm)}
+                      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                      style={{ marginLeft: '0.125rem', flex: 'none' }}
+                      value={value}
+                      onBlur={onBlur}
+                    >
+                      <Controller
+                        name="timeFormat"
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <TimePickerSelect
+                            id="timeFormatSelect"
+                            onChange={(event) => onChange(event.target.value as amPm)}
+                            value={value}
+                            aria-label={t('timeFormat ', 'Time Format')}
+                          >
+                            <SelectItem value="AM" text="AM" />
+                            <SelectItem value="PM" text="PM" />
+                          </TimePickerSelect>
+                        )}
+                      />
+                    </TimePicker>
+                  )}
+                />
+              </ResponsiveWrapper>
             </div>
           </section>
           <section>
-            <Controller
-              name="vaccineUuid"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <Dropdown
-                    id="immunization"
-                    label={t('pleaseSelect', 'Please select')}
-                    titleText={t('immunization', 'Immunization')}
-                    items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
-                    itemToString={(item) =>
-                      immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
-                    }
-                    onChange={(val) => onChange(val.selectedItem)}
-                    selectedItem={value}
-                    invalid={!!errors?.vaccineUuid}
-                  />
-                </div>
-              )}
-            />
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Controller
+                name="vaccineUuid"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <Dropdown
+                      id="immunization"
+                      label={t('pleaseSelect', 'Please select')}
+                      titleText={t('immunization', 'Immunization')}
+                      items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
+                      itemToString={(item) =>
+                        immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
+                      }
+                      onChange={(val) => onChange(val.selectedItem)}
+                      selectedItem={value}
+                      invalid={!!errors?.vaccineUuid}
+                    />
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
           </section>
           {errors?.vaccineUuid && (
             <section>
@@ -313,68 +325,80 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           )}
           {vaccineUuid && (
             <section>
-              <DoseInput vaccine={vaccineUuid} sequences={immunizationsConfig.sequenceDefinitions} control={control} />
+              <ResponsiveWrapper isTablet={isTablet}>
+                <DoseInput
+                  vaccine={vaccineUuid}
+                  sequences={immunizationsConfig.sequenceDefinitions}
+                  control={control}
+                />
+              </ResponsiveWrapper>
             </section>
           )}
           <section>
-            <Controller
-              name="manufacturer"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <TextInput
-                    type="text"
-                    id="manufacturer"
-                    labelText={t('manufacturer', 'Manufacturer')}
-                    value={value}
-                    onChange={(evt) => onChange(evt.target.value)}
-                  />
-                </div>
-              )}
-            />
-          </section>
-          <section>
-            <Controller
-              name="lotNumber"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <TextInput
-                    type="text"
-                    id="lotNumber"
-                    labelText={t('lotNumber', 'Lot Number')}
-                    value={value}
-                    onChange={(evt) => onChange(evt.target.value)}
-                  />
-                </div>
-              )}
-            />
-          </section>
-          <section>
-            <Controller
-              name="expirationDate"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <DatePicker
-                    id="vaccinationExpiration"
-                    className="vaccinationExpiration"
-                    minDate={immunizationToEditMeta ? null : new Date().toISOString()}
-                    dateFormat={datePickerFormat}
-                    datePickerType="single"
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
-                      id="date-picker-calendar-id"
-                      placeholder="dd/mm/yyyy"
-                      labelText={t('expirationDate', 'Expiration Date')}
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Controller
+                name="manufacturer"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <TextInput
                       type="text"
+                      id="manufacturer"
+                      labelText={t('manufacturer', 'Manufacturer')}
+                      value={value}
+                      onChange={(evt) => onChange(evt.target.value)}
                     />
-                  </DatePicker>
-                </div>
-              )}
-            />
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
+          </section>
+          <section>
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Controller
+                name="lotNumber"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <TextInput
+                      type="text"
+                      id="lotNumber"
+                      labelText={t('lotNumber', 'Lot Number')}
+                      value={value}
+                      onChange={(evt) => onChange(evt.target.value)}
+                    />
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
+          </section>
+          <section>
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Controller
+                name="expirationDate"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <DatePicker
+                      id="vaccinationExpiration"
+                      className="vaccinationExpiration"
+                      minDate={immunizationToEditMeta ? null : new Date().toISOString()}
+                      dateFormat={datePickerFormat}
+                      datePickerType="single"
+                      value={value}
+                      onChange={([date]) => onChange(date)}
+                    >
+                      <DatePickerInput
+                        id="date-picker-calendar-id"
+                        placeholder="dd/mm/yyyy"
+                        labelText={t('expirationDate', 'Expiration Date')}
+                        type="text"
+                      />
+                    </DatePicker>
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
           </section>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
@@ -389,5 +413,9 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     </FormProvider>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: ResponsiveWrapperProps) {
+  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <Fragment>{children}</Fragment>;
+}
 
 export default ImmunizationsForm;
