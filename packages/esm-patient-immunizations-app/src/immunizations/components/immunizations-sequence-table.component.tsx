@@ -15,6 +15,7 @@ import {
 import { type ImmunizationGrouped } from '../../types';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
+import styles from './immunizations-sequence-table.scss';
 
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
@@ -85,7 +86,9 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
                   return (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell?.id}>{cell?.value}</TableCell>
+                        <TableCell key={cell?.id} className={styles.tableCell}>
+                          {cell?.value}
+                        </TableCell>
                       ))}
                     </TableRow>
                   );
