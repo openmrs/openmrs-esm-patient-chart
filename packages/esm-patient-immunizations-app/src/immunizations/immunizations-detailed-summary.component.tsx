@@ -98,9 +98,11 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           recentVaccination: occurrenceDate,
           add: (
             <Button
+              size="sm"
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add"
+              hasIconOnly
               onClick={() => {
                 immunizationFormSub.next({
                   vaccineUuid: immunization.vaccineUuid,

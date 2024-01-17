@@ -12,6 +12,7 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
 import { type ImmunizationGrouped } from '../../types';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
@@ -48,6 +49,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
         <Button
           kind="ghost"
           iconDescription="Edit"
+          renderIcon={(props) => <Edit size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,
@@ -72,7 +74,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
     tableRows.length > 0 && (
       <DataTable rows={tableRows} headers={tableHeader} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <TableContainer>
+          <TableContainer className={styles.sequenceTable}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
