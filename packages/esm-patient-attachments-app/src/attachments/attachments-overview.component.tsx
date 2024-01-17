@@ -11,6 +11,7 @@ import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
 import { List, Thumbnail_2, Add } from '@carbon/react/icons';
+import { useAllowedExtensions } from './use-allowed-extensions';
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
   const isTablet = useLayoutType() === 'tablet';
-  const { allowedExtensions } = useConfig();
+  const { allowedExtensions } = useAllowedExtensions();
 
   const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
@@ -47,7 +48,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       multipleFiles: true,
       collectDescription: true,
     });
-  }, [patientUuid, mutate]);
+  }, [patientUuid, mutate, allowedExtensions]);
 
   const deleteAttachment = useCallback(
     (attachment: Attachment) => {

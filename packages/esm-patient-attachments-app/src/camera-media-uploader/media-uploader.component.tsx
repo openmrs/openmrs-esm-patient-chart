@@ -51,7 +51,7 @@ const MediaUploaderComponent = () => {
     if (!allowedExtensions) {
       return true;
     }
-    const fileExtension = '.' + fileName.split('.').pop();
+    const fileExtension = fileName.split('.').pop();
     return allowedExtensions?.includes(fileExtension);
   };
 
@@ -64,7 +64,7 @@ const MediaUploaderComponent = () => {
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions ?? ['*']}
+          accept={allowedExtensions?.map<string>((ext) => (ext = '.' + ext)) ?? ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
