@@ -1,9 +1,13 @@
 {
   "add": "Add",
   "cancel": "Cancel",
+  "doseNumber": "Dose Number",
+  "edit": "Edit",
+  "error": "Error",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
   "goToSummary": "Go to Summary",
+  "immunization": "Immunization",
   "immunizations": "Immunizations",
   "Immunizations": "Immunizations",
   "lotNumber": "Lot Number",
@@ -14,7 +18,11 @@
   "seeAll": "See all",
   "sequence": "Sequence",
   "singleDoseOn": "Single Dose on",
+  "time": "Time",
+  "timeFormat ": "Time Format",
   "vaccinationDate": "Vaccination date",
+  "vaccinationDateRequired": "Vaccination date required",
   "vaccinationSaved": "Vaccination saved successfully",
-  "vaccine": "Vaccine"
+  "vaccine": "Vaccine",
+  "vaccineRequired": "Vaccine required"
 }

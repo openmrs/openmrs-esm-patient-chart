@@ -2,8 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.immunizationSequenceSelect{
-  margin: spacing.$spacing-05 spacing.$spacing-07 spacing.$spacing-05;
+.container {
+  margin: spacing.$spacing-05;
+
+  & section {
+    margin: spacing.$spacing-05 0;
+  }
 }
 
 .form {
@@ -28,4 +32,14 @@
 
 .desktop {
   padding: 0rem;
+}
+
+.dateTimeSection {
+  display: flex;
+}
+
+@media screen and (max-width: 600px) {
+  .dateTimeSection {
+    flex-direction: column;
+  }
 }

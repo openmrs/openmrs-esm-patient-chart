@@ -2,6 +2,7 @@ export type OpenmrsConcept = {
   uuid: string;
   display: string;
   setMembers?: Array<OpenmrsConcept>;
+  answers?: Array<OpenmrsConcept>;
 };
 
 export type Code = {
@@ -35,7 +36,6 @@ export type FHIRImmunizationResource = {
     },
   ];
 };
-
 export type FHIRImmunizationBundleEntry = {
   fullUrl: string;
   resource: FHIRImmunizationResource;
@@ -57,32 +57,21 @@ export type ImmunizationSequenceDefinition = {
 };
 
 export type ImmunizationWidgetConfigObject = {
-  vaccinesConceptSet: string;
+  immunizationConceptSet: string;
   sequenceDefinitions: Array<ImmunizationSequenceDefinition>;
-};
-
-export type ImmunizationFormData = {
-  //Used to capture the Immunization form data
-  patientUuid: string;
-  immunizationObsUuid: string;
-  vaccineName: string;
-  vaccineUuid: string;
-  manufacturer: string;
-  expirationDate: string;
-  vaccinationDate: string;
-  lotNumber: string;
-  currentDose: ImmunizationSequence;
-  sequences?: Array<ImmunizationSequence>;
 };
 
 export type ImmunizationDoseData = {
   immunizationObsUuid: string;
   manufacturer: string;
   lotNumber: string;
-  sequenceLabel: string;
-  sequenceNumber: number;
+  doseNumber: number;
   occurrenceDateTime: string;
   expirationDate: string;
+  meta?: {
+    encounterUuid?: string;
+    location?: string;
+  };
 };
 
 /*This represents a single consolidated immunization used on the UI with below details
