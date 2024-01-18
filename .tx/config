@@ -1,6 +1,14 @@
 [main]
 host = https://www.transifex.com
 
+[o:openmrs:p:openmrs-esm-patient-chart:r:esm-form-engine-app]
+file_filter            = packages/esm-form-engine-app/translations/<lang>.json
+source_file            = packages/esm-form-engine-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-form-entry-app]
 file_filter            = packages/esm-form-entry-app/translations/<lang>.json
 source_file            = packages/esm-form-entry-app/translations/en.json
@@ -65,6 +73,14 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 
+[o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-flags-app]
+file_filter            = packages/esm-patient-flags-app/translations/<lang>.json
+source_file            = packages/esm-patient-flags-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-forms-app]
 file_filter            = packages/esm-patient-forms-app/translations/<lang>.json
 source_file            = packages/esm-patient-forms-app/translations/en.json
@@ -89,6 +105,14 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 
+[o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-lists-app]
+file_filter            = packages/esm-patient-lists-app/translations/<lang>.json
+source_file            = packages/esm-patient-lists-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-medications-app]
 file_filter            = packages/esm-patient-medications-app/translations/<lang>.json
 source_file            = packages/esm-patient-medications-app/translations/en.json
@@ -100,6 +124,14 @@ keep_translations      = false
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-notes-app]
 file_filter            = packages/esm-patient-notes-app/translations/<lang>.json
 source_file            = packages/esm-patient-notes-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+
+[o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-orders-app]
+file_filter            = packages/esm-patient-orders-app/translations/<lang>.json
+source_file            = packages/esm-patient-orders-app/translations/en.json
 source_lang            = en
 type                   = KEYVALUEJSON
 replace_edited_strings = false
@@ -120,4 +152,3 @@ source_lang            = en
 type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
-
