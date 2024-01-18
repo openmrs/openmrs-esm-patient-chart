@@ -6,10 +6,6 @@
 .tableContainer {
   padding: 0;
 
-  :global(.cds--data-table) td {
-    text-align: start;
-  }
-
   :global(.cds--data-table-header) {
     padding: 0;
   }
@@ -22,10 +18,6 @@
 
   &:global(.cds--data-table-container) {
     background: none !important;
-  }
-
-  :global(.cds--table-header-label) {
-    text-align: start;
   }
 }
 
