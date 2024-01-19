@@ -37,6 +37,10 @@ type Form = {
   formUuid: string;
 };
 
+type PreFilledQuestions = {
+  [key: string]: string;
+};
+
 // Add any custom single-spa props you have to this type def
 // https://single-spa.js.org/docs/building-applications.html#custom-props
 export type SingleSpaProps = AppProps &
@@ -46,6 +50,7 @@ export type SingleSpaProps = AppProps &
   EncounterProperties &
   PatientProperties &
   UIBehavior &
+  PreFilledQuestions &
   ApplicationStatus & {
     additionalProps?: any;
   };
