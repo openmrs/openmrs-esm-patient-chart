@@ -5,7 +5,7 @@ import { FormDataSourceService } from '../form-data-source/form-data-source.serv
 import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
-import { Encounter, FormSchema, Identifier } from '../types';
+import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
 import { Session } from '@openmrs/esm-framework';
 import { isFunction } from 'lodash-es';
 
@@ -40,7 +40,7 @@ export interface CreateFormParams {
   /**
    * Pre-filled questions
    */
-  preFilledQuestions?: any;
+  preFilledQuestions?: PreFilledQuestions;
 }
 
 const loadedCustomDataSources: Record<string, unknown> = {};
