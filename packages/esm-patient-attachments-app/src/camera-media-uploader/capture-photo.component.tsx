@@ -29,10 +29,18 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
     });
   }, [onCapturePhoto]);
 
+  const showPlaceholderIcon = !dataUri && !initialState;
+
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <button type="button" onClick={showCam} className={styles.buttonCssReset}>
-        <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
+        <div className={showPlaceholderIcon ? styles.placeholderIconContainer : null}>
+          <img
+            src={dataUri || initialState || placeholder}
+            alt="Preview"
+            style={showPlaceholderIcon ? { width: '30%' } : { width: '100%' }}
+          />
+        </div>
       </button>
       <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
         {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
