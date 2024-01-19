@@ -12,7 +12,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
   const { systemVisitEnabled } = useSystemVisitSetting();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchOrderBasket = useCallback(
+  const launchWorkspace = useCallback(
     (additionalProps?: T) => {
       if (!systemVisitEnabled || currentVisit) {
         launchPatientWorkspace(workspaceName, additionalProps);
@@ -22,5 +22,5 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
     },
     [currentVisit, systemVisitEnabled, workspaceName],
   );
-  return launchOrderBasket;
+  return launchWorkspace;
 }
