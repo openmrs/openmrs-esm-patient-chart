@@ -48,14 +48,14 @@ describe('NotesMain: ', () => {
   });
 
   test('renders an error state view if there is a problem fetching encounter data', async () => {
-    const error = {
+    const mockError = {
       message: 'You are not logged in',
       response: {
         status: 401,
         statusText: 'Unauthorized',
       },
     };
-    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
+    mockUseVisitNotes.mockReturnValueOnce({ error: mockError });
 
     renderNotesMain();
 

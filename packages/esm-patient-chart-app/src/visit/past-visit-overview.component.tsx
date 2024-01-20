@@ -23,7 +23,7 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
 
-  const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
+  const { pastVisits, error, isLoading } = usePastVisits(patientUuid);
 
   const headerData: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -59,9 +59,11 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
-  if (isError) {
-    return <ErrorState error={isError} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />;
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />;
   }
+
   if (pastVisits?.length) {
     return (
       <div className={styles.container}>

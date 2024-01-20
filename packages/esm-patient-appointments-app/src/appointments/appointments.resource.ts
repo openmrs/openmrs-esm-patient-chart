@@ -55,23 +55,23 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
     ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isToday());
 
   return {
-    data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
-    isError: error,
+    appointmentsData: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
+    error,
     isLoading,
     isValidating,
     mutate,
   };
 }
 
-export function useAppointmentService() {
+export function useAppointmentServices() {
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
     `/ws/rest/v1/appointmentService/all/full`,
     openmrsFetch,
   );
 
   return {
-    data: data ? data.data : null,
-    isError: error,
+    services: data ? data.data : null,
+    error,
     isLoading,
   };
 }

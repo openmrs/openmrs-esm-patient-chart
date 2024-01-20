@@ -153,7 +153,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
-  const { data: relationships, isLoading } = useRelationships(patientId);
+  const { relationships, isLoading } = useRelationships(patientId);
   const config = useConfig<ConfigObject>();
 
   return (

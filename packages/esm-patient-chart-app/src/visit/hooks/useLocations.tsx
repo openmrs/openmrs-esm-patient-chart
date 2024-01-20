@@ -1,5 +1,5 @@
-import { type FetchResponse, type Location, openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
+import { type FetchResponse, type Location, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export function useLocations(searchString?: string) {

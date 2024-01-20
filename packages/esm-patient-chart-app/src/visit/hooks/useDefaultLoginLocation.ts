@@ -8,8 +8,8 @@ export const useDefaultLoginLocation = () => {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
-    defaultFacility: data ? data?.data : null,
-    isLoading: isLoading,
-    isError: error,
+    defaultLoginLocation: data ? data?.data : null,
+    isLoadingDefaultLoginLocation: isLoading,
+    error,
   };
 };

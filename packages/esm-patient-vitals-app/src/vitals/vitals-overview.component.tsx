@@ -38,9 +38,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
-  const { data: vitals, isError, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
-
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
+  const { conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
   const launchVitalsBiometricsForm = useCallback(() => {
@@ -143,7 +142,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-        if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+
+        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+
         if (vitals?.length) {
           return (
             <div className={styles.widgetCard}>

@@ -11,7 +11,7 @@ export function useVisits(patientUuid: string) {
   );
   return {
     visits: data ? data?.data?.results : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutateVisits: mutate,
@@ -62,8 +62,8 @@ export function usePastVisits(patientUuid: string) {
   );
 
   return {
-    data: data ? data.data.results : null,
-    isError: error,
+    pastVisits: data ? data.data.results : null,
+    error,
     isLoading,
     isValidating,
   };

@@ -42,7 +42,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
   const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesCount);
 
   const tableHeaders = [
@@ -68,7 +68,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>

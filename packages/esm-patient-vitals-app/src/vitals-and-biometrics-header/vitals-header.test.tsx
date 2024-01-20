@@ -33,7 +33,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
+      conceptUnits: mockConceptUnits,
       conceptMetadata: mockVitalsConceptMetadata,
     })),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),

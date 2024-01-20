@@ -61,7 +61,7 @@ describe('NotesOverview: ', () => {
       },
     };
 
-    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
+    mockUseVisitNotes.mockReturnValueOnce({ error: error });
 
     renderNotesOverview();
 

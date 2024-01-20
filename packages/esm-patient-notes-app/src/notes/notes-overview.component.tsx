@@ -8,7 +8,7 @@ interface NotesOverviewProps {
   basePath: string;
 }
 
-const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, basePath }) => {
+const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient }) => {
   const pageSize = 5;
   const { t } = useTranslation();
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Forms & Notes`;

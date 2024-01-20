@@ -1,7 +1,7 @@
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { of, throwError } from 'rxjs';
 import { screen, render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockLocations, mockVisitTypes } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -104,21 +104,22 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    useActivePatientEnrollment: jest.fn().mockReturnValue({
-      activePatientEnrollment: [],
+    useActivePatientEnrollments: jest.fn().mockReturnValue({
+      activePatientEnrollments: [],
       isLoading: false,
     }),
   };
 });
 
-jest.mock('../hooks/useDefaultLocation', () => {
-  const requireActual = jest.requireActual('../hooks/useDefaultLocation');
+jest.mock('../hooks/useDefaultLoginLocation', () => {
+  const requireActual = jest.requireActual('../hooks/useDefaultLoginLocation');
 
   return {
     ...requireActual,
     useDefaultLoginLocation: jest.fn(() => ({
-      defaultFacility: null,
-      isLoading: false,
+      defaultLoginLocation: null,
+      isLoadingDefaultLoginLocation: false,
+      error: null,
     })),
   };
 });
@@ -136,9 +137,7 @@ jest.mock('../hooks/useLocations', () => {
 });
 
 describe('Visit Form', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  beforeEach(() => jest.clearAllMocks());
 
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
@@ -347,6 +346,7 @@ describe('Visit Form', () => {
         retired: false,
       },
     });
+
     mockedUseConfig.mockReturnValue({
       visitAttributeTypes: [
         {
@@ -356,6 +356,7 @@ describe('Visit Form', () => {
         },
       ],
     });
+
     renderVisitForm();
 
     expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();

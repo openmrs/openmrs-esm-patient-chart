@@ -25,7 +25,7 @@ export function useEnrollments(patientUuid: string) {
 
   return {
     data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     activeEnrollments,
@@ -48,7 +48,7 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
 
   return {
     data: availablePrograms,
-    isError: error,
+    error,
     isLoading,
     eligiblePrograms,
   };
@@ -93,14 +93,14 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
 export const usePrograms = (patientUuid: string) => {
   const {
     data: enrollments,
-    isError: enrollError,
+    error,
     isLoading: enrolLoading,
     isValidating,
     activeEnrollments,
   } = useEnrollments(patientUuid);
   const { data: availablePrograms, eligiblePrograms } = useAvailablePrograms(enrollments);
 
-  const status = { isLoading: enrolLoading, isError: enrollError };
+  const status = { isLoading: enrolLoading, error };
   return {
     enrollments,
     ...status,

@@ -105,6 +105,7 @@
   "noObservationsFound": "No observations found",
   "notes": "Notes",
   "Offline Actions dashboard": "Offline Actions dashboard",
+  "offlineVisit": "Offline Visit",
   "openAnyway": "Open anyway",
   "optional": "optional",
   "orderDurationAndUnit": "for {{duration}} {{durationUnit}}",

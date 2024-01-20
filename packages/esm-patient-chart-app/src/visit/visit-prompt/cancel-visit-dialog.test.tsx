@@ -1,13 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  useVisit,
-  openmrsFetch,
-  showSnackbar,
-  type FetchResponse,
-  showActionableNotification,
-} from '@openmrs/esm-framework';
+import { useVisit, openmrsFetch, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit, mockVisitQueueEntries } from '__mocks__';
 import { mockPatient } from 'tools';
 import { type MappedVisitQueueEntry, useVisitQueueEntry } from '../queue-entry/queue.resource';
@@ -63,8 +57,8 @@ describe('Cancel visit', () => {
     mockedOpenmrsFetch.mockResolvedValue(response as FetchResponse);
     mockedUseVisitQueueEntry.mockReturnValueOnce({
       queueEntry: mockVisitQueueEntries,
+      error: undefined,
       isLoading: false,
-      isError: undefined,
       isValidating: false,
       mutate: jest.fn(),
     });
@@ -113,7 +107,7 @@ describe('Cancel visit', () => {
     mockedUseVisitQueueEntry.mockReturnValueOnce({
       queueEntry: {} as MappedVisitQueueEntry,
       isLoading: false,
-      isError: undefined,
+      error: undefined,
       isValidating: false,
       mutate: jest.fn(),
     });

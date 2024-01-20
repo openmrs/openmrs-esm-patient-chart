@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
 import { ComboBox } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
 import { type Location, type OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
-import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
+import { useDefaultLoginLocation } from '../hooks/useDefaultLoginLocation';
 import { useLocations } from '../hooks/useLocations';
 import { type VisitFormData } from './visit-form.resource';
 import { type ChartConfig } from '../../config-schema';
@@ -17,12 +16,12 @@ const LocationSelector = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
   const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
-  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
+  const { defaultLoginLocation, isLoadingDefaultLoginLocation } = useDefaultLoginLocation();
   const config = useConfig() as ChartConfig;
   const disableChangingVisitLocation = config?.disableChangingVisitLocation;
   const locationsToShow: Array<OpenmrsResource> =
-    !loadingDefaultFacility && !isEmpty(defaultFacility)
-      ? [defaultFacility]
+    !isLoadingDefaultLoginLocation && defaultLoginLocation
+      ? [defaultLoginLocation]
       : locations
       ? locations
       : selectedSessionLocation
@@ -53,8 +52,8 @@ const LocationSelector = () => {
                 selectedItem={value}
                 onChange={({ selectedItem }) => onChange(selectedItem)}
                 onBlur={onBlur}
-                itemToString={(loc: Location) => loc?.display}
-                onInputChange={(loc) => handleSearch(loc)}
+                itemToString={(location: Location) => location?.display}
+                onInputChange={(location) => handleSearch(location)}
                 readOnly={disableChangingVisitLocation}
               />
             )}

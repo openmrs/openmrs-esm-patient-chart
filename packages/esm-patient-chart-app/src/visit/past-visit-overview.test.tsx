@@ -1,6 +1,6 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { openmrsFetch, setCurrentVisit } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import PastVisitOverview from './past-visit-overview.component';
@@ -79,14 +79,19 @@ describe('PastVisitOverview', () => {
 
   it(`will enter retrospective entry mode for a specific visit`, async () => {
     const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
+
     renderPastVisitOverview();
+
     await waitForLoadingToFinish();
-    const editButtons = screen.queryAllByLabelText('Edit this visit');
+
+    const editButtons = screen.queryAllByLabelText(/Edit this visit/i);
     expect(editButtons.length).toBe(2);
+
     await user.click(editButtons[1]);
 
-    expect(mockSetCurrentVisit).toBeCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
+    expect(mockSetCurrentVisit).toHaveBeenCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });

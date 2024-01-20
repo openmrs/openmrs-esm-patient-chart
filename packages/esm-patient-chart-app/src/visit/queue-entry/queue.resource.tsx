@@ -65,7 +65,7 @@ export interface MappedVisitQueueEntry {
 interface UseVisitQueueEntries {
   queueEntry: MappedVisitQueueEntry | null;
   isLoading: boolean;
-  isError: Error;
+  error: Error;
   isValidating?: boolean;
   mutate: () => void;
 }
@@ -103,8 +103,8 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
 
   return {
     queueEntry: mappedVisitQueueEntry,
+    error,
     isLoading,
-    isError: error,
     isValidating,
     mutate,
   };
@@ -118,11 +118,11 @@ interface FHIRResponse {
 }
 export function useQueueLocations() {
   const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
-  const { data, error } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
 
   const queueLocations = useMemo(
     () => data?.data?.entry?.map((response) => response.resource) ?? [],
     [data?.data?.entry],
   );
-  return { queueLocations: queueLocations ? queueLocations : [], isLoading: !data && !error, error };
+  return { queueLocations: queueLocations ? queueLocations : [], isLoading, error };
 }

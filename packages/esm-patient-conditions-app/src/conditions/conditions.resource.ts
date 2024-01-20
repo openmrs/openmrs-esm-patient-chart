@@ -95,7 +95,7 @@ export function useConditions(patientUuid: string) {
 
   return {
     conditions: data ? formattedConditions : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutate,

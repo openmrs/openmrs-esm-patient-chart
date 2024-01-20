@@ -105,6 +105,7 @@
   "noObservationsFound": "לא נמצאו תצפיות",
   "notes": "הערות",
   "Offline Actions dashboard": "לוח הפעולות לא מקוונות",
+  "offlineVisit": "Offline Visit",
   "openAnyway": "פתח בכל מקרה",
   "optional": "אופציונלי",
   "orderDurationAndUnit": "למשך {{duration}} {{durationUnit}}",

@@ -30,7 +30,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
-  const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
@@ -78,7 +78,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   }, [allergies]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>

@@ -15,7 +15,7 @@ interface VisitOverviewComponentProps {
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
-  const { visits, isError, isLoading, mutateVisits } = useVisits(patientUuid);
+  const { visits, error, isLoading, mutateVisits } = useVisits(patientUuid);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
 
   const visitsWithEncounters = visits
@@ -43,8 +43,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
           <TabPanel>
             {isLoading ? (
               <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-            ) : isError ? (
-              <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
+            ) : error ? (
+              <ErrorState headerTitle={t('visits', 'visits')} error={error} />
             ) : visits?.length ? (
               visits.map((visit, i) => (
                 <div className={styles.container} key={i}>
@@ -83,8 +83,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             <TabPanel>
               {isLoading ? (
                 <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-              ) : isError ? (
-                <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
+              ) : error ? (
+                <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : visits?.length ? (
                 <VisitsTable
                   mutateVisits={mutateVisits}

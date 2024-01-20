@@ -2,10 +2,10 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useVisit } from '@openmrs/esm-framework';
-import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { useDeleteVisit } from '../hooks/useDeleteVisit';
+import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import styles from './cancel-visit-dialog.scss';
-import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 
 interface CancelVisitDialogProps {
   patientUuid: string;

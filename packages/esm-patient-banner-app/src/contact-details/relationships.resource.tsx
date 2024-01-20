@@ -12,13 +12,13 @@ export function useRelationships(patientUuid: string) {
     openmrsFetch,
   );
 
-  const formattedRelationships = useMemo(() => {
+  const relationships = useMemo(() => {
     return data?.data?.results?.length ? extractRelationshipData(patientUuid, data.data.results) : null;
   }, [data?.data?.results, patientUuid]);
 
   return {
-    data: formattedRelationships,
-    isError: error,
+    relationships,
+    error,
     isLoading,
     isValidating,
   };

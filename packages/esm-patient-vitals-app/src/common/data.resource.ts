@@ -70,7 +70,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     [swrKeyNeedle, mode, conceptUuids],
   );
 
-  const { data, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
+  const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
     getPage,
     handleFetch,
   );
@@ -158,8 +158,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
   return {
     data: data ? formattedObs : undefined,
-    isLoading: !data && !error,
-    isError: error,
+    isLoading,
+    error,
     hasMore: data?.length
       ? !!data[data.length - 1].data?.link?.some((link: { relation?: string }) => link.relation === 'next')
       : false,

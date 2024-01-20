@@ -31,8 +31,8 @@ export function useVitalsConceptMetadata() {
     : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]);
 
   return {
-    data: conceptUnits,
-    isError: error,
+    conceptUnits,
+    error,
     isLoading,
     conceptMetadata,
     conceptRanges,

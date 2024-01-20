@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface AppointmentPayload {

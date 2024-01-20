@@ -30,7 +30,7 @@ import {
   saveAppointment,
   saveRecurringAppointments,
   useAppointments,
-  useAppointmentService,
+  useAppointmentServices,
 } from '../appointments.resource';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../../constants';
@@ -85,7 +85,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const session = useSession();
-  const { data: services, isLoading } = useAppointmentService();
+  const { services, isLoading } = useAppointmentServices();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
 

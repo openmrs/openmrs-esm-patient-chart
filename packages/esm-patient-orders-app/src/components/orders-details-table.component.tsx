@@ -72,7 +72,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
 
   const {
     data: allOrders,
-    error: isError,
+    error,
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
@@ -221,8 +221,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
-  if (isError) {
-    return <ErrorState error={isError} headerTitle={title} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={title} />;
   }
 
   if (!tableRows?.length) {

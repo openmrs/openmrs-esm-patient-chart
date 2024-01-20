@@ -26,7 +26,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
   const { currentVisit } = useVisit(patientUuid);
   const displayText = t('visitNotes', 'Visit notes');
   const headerTitle = t('visitNotes', 'Visit notes');
-  const { visitNotes, isError, isLoading, isValidating } = useVisitNotes(patientUuid);
+  const { visitNotes, error, isLoading, isValidating } = useVisitNotes(patientUuid);
   const layout = useLayoutType();
   const isDesktop = layout === 'large-desktop' || layout === 'small-desktop';
 
@@ -41,9 +41,11 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   }
-  if (isError) {
-    return <ErrorState error={isError} headerTitle={headerTitle} />;
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
   }
+
   if (!visitNotes?.length) {
     return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
   }

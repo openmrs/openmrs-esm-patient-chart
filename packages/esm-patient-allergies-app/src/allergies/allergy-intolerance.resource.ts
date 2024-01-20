@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import capitalize from 'lodash-es/capitalize';
 import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { type FHIRAllergy, type FHIRAllergyResponse, type ReactionSeverity } from '../types';
 
@@ -21,7 +20,7 @@ export type Allergy = {
 
 type UseAllergies = {
   allergies: Array<Allergy>;
-  isError: Error | null;
+  error: Error | null;
   isLoading: boolean;
   isValidating: boolean;
   mutate: () => void;
@@ -45,7 +44,7 @@ export function useAllergies(patientUuid: string): UseAllergies {
 
   return {
     allergies: data ? formattedAllergies : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutate,

@@ -1,6 +1,6 @@
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 
 interface VisitAttributeType {
   uuid: string;

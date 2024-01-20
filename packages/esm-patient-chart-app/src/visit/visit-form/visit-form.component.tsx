@@ -19,42 +19,42 @@ import { first } from 'rxjs/operators';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ExtensionSlot,
   saveVisit,
   showSnackbar,
-  useSession,
-  ExtensionSlot,
-  type NewVisitPayload,
-  toOmrsIsoString,
   toDateObjectStrict,
-  useLayoutType,
-  useVisitTypes,
-  useConfig,
-  useVisit,
+  toOmrsIsoString,
+  type NewVisitPayload,
   type Visit,
   updateVisit,
+  useConfig,
   useConnectivity,
+  useLayoutType,
+  useSession,
+  useVisit,
+  useVisitTypes,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
   type DefaultWorkspaceProps,
   time12HourFormatRegex,
-  useActivePatientEnrollment,
+  useActivePatientEnrollments,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { type ChartConfig } from '../../config-schema';
-import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { type ChartConfig } from '../../config-schema';
+import { type VisitFormData } from './visit-form.resource';
+import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { useVisits } from '../visits-widget/visit.resource';
+import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selection.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
-import styles from './visit-form.scss';
-import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
-import { useVisits } from '../visits-widget/visit.resource';
-import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import styles from './visit-form.scss';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit: Visit;
@@ -78,18 +78,17 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const { activePatientEnrollments, isLoading } = useActivePatientEnrollments(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
   const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
   const { mutate } = useVisit(patientUuid);
-  const { mutate: mutateVisit } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
-  const [upcomingAppointment, setUpcomingAppointment] = useState(null);
-  const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState(null);
+  const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointments }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
@@ -366,15 +365,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     },
                   );
                 }
-                if (config.showUpcomingAppointments && upcomingAppointment) {
+                if (config.showUpcomingAppointments && upcomingAppointments) {
                   const appointmentPayload: AppointmentPayload = {
-                    appointmentKind: upcomingAppointment?.appointmentKind,
-                    serviceUuid: upcomingAppointment?.service.uuid,
-                    startDateTime: upcomingAppointment?.startDateTime,
-                    endDateTime: upcomingAppointment?.endDateTime,
+                    appointmentKind: upcomingAppointments?.appointmentKind,
+                    serviceUuid: upcomingAppointments?.service.uuid,
+                    startDateTime: upcomingAppointments?.startDateTime,
+                    endDateTime: upcomingAppointments?.endDateTime,
                     locationUuid: visitLocation?.uuid,
                     patientUuid: patientUuid,
-                    uuid: upcomingAppointment?.uuid,
+                    uuid: upcomingAppointments?.uuid,
                     dateHonored: dayjs(visitStartDate).format(),
                   };
                   saveAppointment(appointmentPayload, abortController).then(
@@ -472,7 +471,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       patientUuid,
-      upcomingAppointment,
+      upcomingAppointments,
       t,
       visitToEdit,
       displayVisitStopDateTimeFields,
@@ -575,11 +574,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       <RadioButtonGroup
                         orientation="vertical"
                         onChange={(uuid) =>
-                          onChange(activePatientEnrollment.find(({ program }) => program.uuid === uuid)?.uuid)
+                          onChange(activePatientEnrollments.find(({ program }) => program.uuid === uuid)?.uuid)
                         }
                         name="program-type-radio-group"
                       >
-                        {activePatientEnrollment.map(({ uuid, display, program }) => (
+                        {activePatientEnrollments.map(({ uuid, display, program }) => (
                           <RadioButton
                             key={uuid}
                             className={styles.radioButton}
@@ -612,7 +611,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       <MemoizedRecommendedVisitType
                         patientUuid={patientUuid}
                         patientProgramEnrollment={(() => {
-                          return activePatientEnrollment?.find(
+                          return activePatientEnrollments?.find(
                             ({ program }) => program.uuid === getValues('programType'),
                           );
                         })()}

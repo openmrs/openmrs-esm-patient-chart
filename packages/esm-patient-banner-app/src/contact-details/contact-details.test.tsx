@@ -112,7 +112,7 @@ describe('ContactDetails', () => {
     });
     mockUseRelationships.mockReturnValue({
       isLoading: false,
-      data: [],
+      relationships: [],
     });
   });
 
@@ -129,7 +129,7 @@ describe('ContactDetails', () => {
 
     mockUseRelationships.mockReturnValue({
       isLoading: false,
-      data: mockRelationships,
+      relationships: mockRelationships,
     });
 
     renderContactDetails();
@@ -158,7 +158,7 @@ describe('ContactDetails', () => {
 
     mockUseRelationships.mockReturnValue({
       isLoading: false,
-      data: mockRelationships,
+      relationships: mockRelationships,
     });
 
     mockUsePatientListsForPatient.mockReturnValueOnce({
@@ -196,7 +196,7 @@ describe('ContactDetails', () => {
 
     mockUseRelationships.mockReturnValue({
       isLoading: false,
-      data: mockRelationships,
+      relationships: mockRelationships,
     });
 
     const props = { ...testProps, isTabletViewport: false };

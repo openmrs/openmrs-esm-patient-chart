@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Visit, formatDatetime } from '@openmrs/esm-framework';
+import { useDeleteVisit } from '../hooks/useDeleteVisit';
 import styles from './start-visit-dialog.scss';
-import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
 
 interface DeleteVisitDialogProps {
   closeModal: () => void;

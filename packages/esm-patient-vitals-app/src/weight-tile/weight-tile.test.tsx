@@ -145,7 +145,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
+      conceptUnits: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,
     })),
   };
