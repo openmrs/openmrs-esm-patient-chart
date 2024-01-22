@@ -18,9 +18,11 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile(file: UploadedFile) {
-        setDataUri(file.base64Content);
-        onCapturePhoto(file.base64Content, toOmrsIsoString(new Date()));
-        close();
+        return Promise.resolve().then(() => {
+          setDataUri(file.base64Content);
+          onCapturePhoto(file.base64Content, toOmrsIsoString(new Date()));
+          close();
+        });
       },
       collectDescription: false,
       closeModal: () => {
