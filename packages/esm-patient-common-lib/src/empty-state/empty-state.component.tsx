@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
+import { Button } from '@carbon/react';
 
 export interface EmptyStateProps {
   displayText: string;
@@ -30,11 +31,11 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         <p className={styles.action}>
           {props.launchForm && (
             <span>
-              <Link onClick={() => props.launchForm()}>
+              <Button onClick={() => props.launchForm()} kind="ghost">
                 <>
                   {t('record', 'Record')} {props.displayText.toLowerCase()}
                 </>
-              </Link>
+              </Button>
             </span>
           )}
         </p>

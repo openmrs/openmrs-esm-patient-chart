@@ -16,10 +16,6 @@
   margin: 1.3125rem;
 }
 
-:global(.cds--link) {
-  cursor: pointer;
-}
-
 :global(.omrs-breakpoint-lt-desktop) .dashboard {
   grid-template-columns: 1fr;
 }
