@@ -1,7 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import {
+  ExtensionSlot,
+  navigate,
+  translateFrom,
+  useBodyScrollLock,
+  useLayoutType,
+  usePatient,
+} from '@openmrs/esm-framework';
+import {
+  type OpenWorkspace,
+  useWorkspaces,
+  updateWorkspaceWindowState,
+  handleBeforeRouting,
+} from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalBar, HeaderName, HeaderMenuButton, HeaderGlobalAction, IconButton } from '@carbon/react';
 import { ArrowLeft, ArrowRight, Close, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +55,16 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
     width = 'narrow',
     closeWorkspace = () => {},
   } = useMemo(() => workspaces?.[0] ?? ({} as OpenWorkspace), [workspaces]);
+
+  useEffect(() => {
+    if (handleBeforeRouting) {
+      window.addEventListener('single-spa:before-routing-event', handleBeforeRouting);
+
+      return () => {
+        window.removeEventListener('single-spa:before-routing-event', handleBeforeRouting);
+      };
+    }
+  }, [handleBeforeRouting]);
 
   return (
     <aside

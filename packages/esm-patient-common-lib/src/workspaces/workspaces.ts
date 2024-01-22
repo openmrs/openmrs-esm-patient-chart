@@ -325,3 +325,32 @@ function getUpdatedWorkspaceWindowState(workspaceAtTop: OpenWorkspace) {
 export function resetWorkspaceStore() {
   getWorkspaceStore().setState(initialState);
 }
+
+// listen to single-spa:before-routing-event and prompt to close workspaces
+export function handleBeforeRouting({ detail }: any) {
+  const store = getWorkspaceStore();
+  const workspaces = store.getState().openWorkspaces;
+  const isRoutingFromPatientChart = new RegExp(/\/patient\/([a-zA-Z0-9\-]+)\/?/).test(detail.oldUrl);
+
+  if (workspaces.length && isRoutingFromPatientChart) {
+    detail.cancelNavigation();
+
+    const workspaceNames = workspaces.map((workspace) => workspace.title || workspace.name);
+    const prompt: Prompt = {
+      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+      body: translateFrom(
+        '@openmrs/esm-patient-chart-app',
+        'unsavedChangesInForms',
+        `There are unsaved changes in {{formNames}}. Do you want to discard these changes?`,
+        { formNames: workspaceNames.join(', ') },
+      ),
+      onConfirm: () => {
+        closeAllWorkspaces();
+        navigate(detail.newUrl);
+      },
+      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
+    };
+
+    store.setState({ ...store.getState(), prompt });
+  }
+}
