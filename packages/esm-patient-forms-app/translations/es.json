@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "Formularios clínicos",
+  "clinicalForms": "Clinical Forms",
   "editForm": "Editar formulario",
-  "formName": "Nombre de formulario (A-Z)",
+  "formName": "Form name (A-Z)",
   "forms": "Formularios",
-  "formSearchHint": "Intente buscar el formulario utilizando un nombre alternativo o palabra clave",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "Ver",
   "lastCompleted": "Último completado",
   "never": "Nunca",

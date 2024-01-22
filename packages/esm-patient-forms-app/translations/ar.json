@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "النماذج السريرية",
+  "clinicalForms": "Clinical Forms",
   "editForm": "تعديل النموذج",
-  "formName": "اسم النموذج (أ-ي)",
+  "formName": "Form name (A-Z)",
   "forms": "النماذج",
-  "formSearchHint": "جرب استخدام اسم بديل أو كلمة مفتاحية",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "عرض",
   "lastCompleted": "آخر اكتمال",
   "never": "أبدًا",

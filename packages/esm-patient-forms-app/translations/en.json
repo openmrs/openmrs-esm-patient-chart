@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "Clinical forms",
+  "clinicalForms": "Clinical Forms",
   "editForm": "Edit form",
-  "formName": "Form Name (A-Z)",
+  "formName": "Form name (A-Z)",
   "forms": "Forms",
-  "formSearchHint": "Try searching for the form using an alternative name or keyword",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "View",
   "lastCompleted": "Last completed",
   "never": "Never",

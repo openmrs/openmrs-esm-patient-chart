@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "Clinical forms",
+  "clinicalForms": "Clinical Forms",
   "editForm": "Edit form",
-  "formName": "表单名称（A-Z）",
+  "formName": "Form name (A-Z)",
   "forms": "表单",
-  "formSearchHint": "尝试使用替代名称或关键词搜索表单",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "查看",
   "lastCompleted": "Last Completed",
   "never": "Never",

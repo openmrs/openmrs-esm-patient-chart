@@ -45,7 +45,7 @@
   "noUpcomingAppointmentsForPatient": "មិនមានការណាត់ជួបនាពេលខាងមុខដើម្បីបង្ហាញសម្រាប់អ្នកជំងឺនេះទេ",
   "past": "អតីតកាល",
   "period": "រយៈពេល",
-  "recurringAppointment": "ការណាត់ជួបច្រើនដង",
+  "recurringAppointment": "Recurring Appointment",
   "repeatEvery": "ធ្វើម្តងទៀតរៀងរាល់",
   "saveAndClose": "រក្សាទុក និងបិទ",
   "scheduleAppointment": "កំណត់ពេលណាត់ជួប",

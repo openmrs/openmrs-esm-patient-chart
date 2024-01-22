@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "טפסים קליניים",
+  "clinicalForms": "Clinical Forms",
   "editForm": "ערוך טופס",
-  "formName": "שם הטופס (א-ת)",
+  "formName": "Form name (A-Z)",
   "forms": "טפסים",
-  "formSearchHint": "נסה לחפש את הטופס באמצעות שם חלופי או מילת מפתח",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "תצוגה",
   "lastCompleted": "הושלם לאחרונה",
   "never": "אף פעם",

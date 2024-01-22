@@ -1,10 +1,10 @@
 {
   "clinicalForm": "Clinical Form",
-  "clinicalForms": "ទម្រង់វេជ្ជសាស្ត្រ",
+  "clinicalForms": "Clinical Forms",
   "editForm": "កែទម្រង់",
-  "formName": "ឈ្មោះទម្រង់ (ក-ហ្ស)",
+  "formName": "Form name (A-Z)",
   "forms": "ទម្រង់ទាំងអស់",
-  "formSearchHint": "ព្យាយាមស្វែងរកទម្រង់ដោយប្រើឈ្មោះជំនួស ឬពាក្យគន្លឹះ",
+  "formSearchHint": "Try using an alternative name or keyword",
   "homeOverviewCardView": "ពិនិត្យមើល",
   "lastCompleted": "បញ្ចប់ចុងក្រោយ",
   "never": "មិនដែលសោះ",
