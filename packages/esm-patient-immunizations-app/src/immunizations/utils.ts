@@ -1,15 +1,18 @@
 import map from 'lodash-es/map';
 import find from 'lodash-es/find';
-import { type ExistingDoses, type Immunization } from '../types';
-import { type ImmunizationSequenceDefinition, type OpenmrsConcept, type ImmunizationData } from './immunization-domain';
+import { type ExistingDoses, type ImmunizationFormState, type ImmunizationGrouped } from '../types';
+import { type ImmunizationSequenceDefinition, type OpenmrsConcept } from '../types/fhir-immunization-domain';
+import { BehaviorSubject } from 'rxjs';
+
+export const immunizationFormSub = new BehaviorSubject<ImmunizationFormState | null>(null);
 
 export const findConfiguredSequences = (
   configuredSequences: Array<ImmunizationSequenceDefinition>,
   immunizationsConceptSet: OpenmrsConcept,
 ) => {
-  const immunizationConcepts: Array<OpenmrsConcept> = immunizationsConceptSet?.setMembers;
+  const immunizationConcepts: Array<OpenmrsConcept> = immunizationsConceptSet?.answers;
   return map(immunizationConcepts, (immunizationConcept) => {
-    const immunizationDataFromConfig: ImmunizationData = {
+    const immunizationDataFromConfig: ImmunizationGrouped = {
       vaccineName: immunizationConcept.display,
       vaccineUuid: immunizationConcept.uuid,
       existingDoses: [],
@@ -25,9 +28,9 @@ export const findConfiguredSequences = (
 };
 
 export const findExistingDoses = (
-  configuredImmunizations: Array<Immunization>,
-  existingImmunizationsForPatient: Array<Immunization>,
-): Array<Immunization> => {
+  configuredImmunizations: Array<ImmunizationGrouped>,
+  existingImmunizationsForPatient: Array<ImmunizationGrouped>,
+): Array<ImmunizationGrouped> => {
   return map(configuredImmunizations, (immunizationFromConfig) => {
     const matchingExistingImmunization = find(
       existingImmunizationsForPatient,
@@ -37,6 +40,20 @@ export const findExistingDoses = (
       immunizationFromConfig.existingDoses = matchingExistingImmunization.existingDoses;
     }
     return immunizationFromConfig;
+  }).filter((immunizationFromConfig) => immunizationFromConfig.existingDoses?.length);
+};
+
+export const linkConfiguredSequences = (
+  existingImmunizations: Array<ImmunizationGrouped>,
+  configuredSequences: Array<ImmunizationSequenceDefinition>,
+): Array<ImmunizationGrouped> => {
+  return map(existingImmunizations, (immunization) => {
+    const matchingSequenceDef = find(
+      configuredSequences,
+      (sequencesDef) => sequencesDef.vaccineConceptUuid === immunization.vaccineUuid,
+    );
+    immunization.sequences = matchingSequenceDef?.sequences || [];
+    return immunization;
   });
 };
 
