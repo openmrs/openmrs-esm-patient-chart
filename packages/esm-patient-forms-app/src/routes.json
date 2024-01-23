@@ -37,21 +37,6 @@
       "offline": true,
       "online": true,
       "order": 2
-    },
-    {
-      "name": "clinical-forms-workspace",
-      "component": "clinicalFormsWorkspace",
-      "meta": {
-        "title": {
-          "key": "clinicalForms",
-          "default": "Clinical forms"
-        },
-        "type": "clinical-form",
-        "canMaximize": true,
-        "width": "wider"
-      },
-      "offline": true,
-      "online": true
     }
   ]
 }

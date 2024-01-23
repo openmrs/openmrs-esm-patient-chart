@@ -1,14 +1,18 @@
 import React from 'react';
 import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useWorkspaces, launchPatientWorkspace, SiderailNavButton } from '@openmrs/esm-patient-common-lib';
-import useLaunchFormsWorkspace from './forms/use-launch-forms-workspace';
+import {
+  useWorkspaces,
+  launchPatientWorkspace,
+  SiderailNavButton,
+  useLaunchWorkspaceRequiringVisit,
+} from '@openmrs/esm-patient-common-lib';
 import { formEntryWorkspace } from './constants';
 
 const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
-  const { launchFormsWorkspace } = useLaunchFormsWorkspace();
+  const launchFormsWorkspace = useLaunchWorkspaceRequiringVisit('clinical-forms-workspace');
 
   const formEntryWorkspaces = workspaces.filter((w) => w.name === formEntryWorkspace);
   const recentlyOpenedForm = formEntryWorkspaces[0];
