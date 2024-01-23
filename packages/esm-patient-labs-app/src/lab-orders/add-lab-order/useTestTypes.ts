@@ -16,8 +16,8 @@ export interface UseTestType {
 }
 
 export function useTestTypes(searchTerm: string = ''): UseTestType {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<Concept> }>>(
-    () => `/ws/rest/v1/concept?class=Test`,
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ answers: Array<Concept> }>>(
+    () => `/ws/rest/v1/concept/1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=custom:(answers)`,
     openmrsFetch,
     {
       shouldRetryOnError(err) {
@@ -27,7 +27,7 @@ export function useTestTypes(searchTerm: string = ''): UseTestType {
   );
 
   const testTypes = useMemo(() => {
-    const results = data?.data.results ?? ([] as Concept[]);
+    const results = data?.data.answers ?? ([] as Concept[]);
     return results.map((concept) => ({
       label: concept.display,
       conceptUuid: concept.uuid,

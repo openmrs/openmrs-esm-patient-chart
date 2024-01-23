@@ -175,7 +175,7 @@ export async function launchPatientWorkspace(name: string, additionalProps?: obj
   const store = getWorkspaceStore();
   const state = store.getState();
   const patientUuid = getPatientUuidFromUrl();
-
+  console.log('launchPatientWorkspace', name, patientUuid);
   if (state.promptBeforeOpening) {
     const dispose = showModal('require-billing-modal', { closeModal: () => dispose(), patientUuid });
     return;

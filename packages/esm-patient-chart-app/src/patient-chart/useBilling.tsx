@@ -1,5 +1,11 @@
-import { type OpenmrsResource, openmrsFetch, showModal, useOpenmrsSWR, useVisit } from '@openmrs/esm-framework';
-import { getWorkspaceStore } from '@openmrs/esm-patient-common-lib';
+import {
+  type OpenmrsResource,
+  openmrsFetch,
+  showModal,
+  useOpenmrsSWR,
+  useVisit,
+  navigate,
+} from '@openmrs/esm-framework';
 import sortBy from 'lodash-es/sortBy';
 import { useEffect } from 'react';
 import useSWR from 'swr';
@@ -55,8 +61,8 @@ export type Payment = {
 };
 
 export const useBilling = (patientUuid) => {
-  const { bills } = useBills(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
+  const { bills, isLoading } = useBills(patientUuid);
+  const { currentVisit, isLoading: isLoadingCurrentVisit } = useVisit(patientUuid);
   const attributes = currentVisit?.attributes;
   const billingInformation: BillingInformation =
     attributes?.find((attribute) => attribute.attributeType.uuid === '919b51c9-8e2e-468f-8354-181bf3e55786')?.value ??
@@ -70,14 +76,40 @@ export const useBilling = (patientUuid) => {
   const patientBillBalance = totalBill - totalPayments;
 
   useEffect(() => {
-    const shouldPromptForPayment =
-      patientBillBalance > 0 && currentVisit?.visitType?.uuid === '3371a4d4-f66f-4454-a86d-92c7b3da990c';
-    const store = getWorkspaceStore();
-    const state = store.getState();
-    store.setState({ ...state, promptBeforeOpening: Boolean(shouldPromptForPayment) });
-  }, [patientBillBalance, currentVisit]);
+    let isEffectActive = true; // Flag to track if effect is active
 
-  return { patientBillBalance, bills, billingInformation };
+    if (!isLoading && !isLoadingCurrentVisit) {
+      const shouldPromptForPayment =
+        patientBillBalance > 0 && currentVisit?.visitType?.uuid === '3371a4d4-f66f-4454-a86d-92c7b3da990c';
+
+      if (shouldPromptForPayment && isEffectActive) {
+        // Check if effect is still active
+        const dispose = showModal('require-billing-modal', {
+          closeModal: () => {
+            if (dispose) {
+              dispose();
+            }
+            navigate({ to: '${openmrsSpaBase}/home' });
+          },
+          patientUuid,
+        });
+
+        // Cleanup
+        return () => {
+          isEffectActive = false; // Mark effect as inactive
+          if (dispose) {
+            console.log('Cleanup: Disposing resources');
+            dispose();
+          }
+        };
+      }
+    }
+    return () => {
+      isEffectActive = false; // Mark effect as inactive for cleanup
+    };
+  }, [patientUuid, currentVisit, isLoading, isLoadingCurrentVisit, patientBillBalance]);
+
+  return { patientBillBalance, bills, billingInformation, isLoading: isLoading && isLoadingCurrentVisit };
 };
 
 export const useBills = (patientUuid) => {
