@@ -56,7 +56,6 @@ export function startupApp() {
     title: translateFrom('@openmrs/esm-patient-forms-app', 'clinicalForms', 'Clinical Forms'),
     load: getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options),
     type: 'clinical-form',
-    canMaximize: true,
     width: 'wider',
   });
 }
