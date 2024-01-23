@@ -30,13 +30,9 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         </p>
         <p className={styles.action}>
           {props.launchForm && (
-            <span>
-              <Button onClick={() => props.launchForm()} kind="ghost">
-                <>
-                  {t('record', 'Record')} {props.displayText.toLowerCase()}
-                </>
-              </Button>
-            </span>
+            <Button onClick={() => props.launchForm()} kind="ghost" size={isTablet ? 'lg' : 'sm'}>
+              {t('record', 'Record')} {props.displayText.toLowerCase()}
+            </Button>
           )}
         </p>
       </Tile>
