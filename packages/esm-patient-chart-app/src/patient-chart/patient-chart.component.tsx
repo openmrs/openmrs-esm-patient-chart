@@ -2,14 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   ExtensionSlot,
+  navigate,
   setCurrentVisit,
   setLeftNav,
+  showModal,
   unsetLeftNav,
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { changeWorkspaceContext, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { changeWorkspaceContext, getWorkspaceStore, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { spaBasePath } from '../constants';
 import { type LayoutMode } from './chart-review/dashboard-view.component';
 import ActionMenu from './action-menu/action-menu.component';
@@ -27,6 +29,7 @@ const PatientChart: React.FC = () => {
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
   const { patientBillBalance } = useBilling(patientUuid);
+
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
   // We are also the module that holds the offline visit type UUID config.
