@@ -12,7 +12,10 @@ import {
   type OpenWorkspace,
   useWorkspaces,
   updateWorkspaceWindowState,
-  handleBeforeRouting,
+  closeAllWorkspaces,
+  getWhetherWorkspaceCanBeClosed,
+  getWorkspaceStore,
+  resetWorkspaceStore,
 } from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalBar, HeaderName, HeaderMenuButton, HeaderGlobalAction, IconButton } from '@carbon/react';
 import { ArrowLeft, ArrowRight, Close, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
@@ -57,14 +60,42 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
   } = useMemo(() => workspaces?.[0] ?? ({} as OpenWorkspace), [workspaces]);
 
   useEffect(() => {
-    if (handleBeforeRouting) {
-      window.addEventListener('single-spa:before-routing-event', handleBeforeRouting);
+    const handleRouting = (event) => {
+      const {
+        detail: { cancelNavigation, newUrl },
+      } = event as { detail: { cancelNavigation: () => void; newUrl: string } };
 
-      return () => {
-        window.removeEventListener('single-spa:before-routing-event', handleBeforeRouting);
-      };
-    }
-  }, [handleBeforeRouting]);
+      const regex = new RegExp(/\/patient\/([a-zA-Z0-9\-]+)\/?/);
+      const isNewUrlPatientChartUrl = regex.test(newUrl);
+      const canCloseAllWorkspaces = getWorkspaceStore()
+        .getState()
+        .openWorkspaces.every(({ name }) => {
+          const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+          return canCloseWorkspace;
+        });
+
+      if (!isNewUrlPatientChartUrl) {
+        if (!canCloseAllWorkspaces) {
+          cancelNavigation();
+          const navigateToNewUrl = () => {
+            function getUrlWithoutPrefix(url: string) {
+              return url.split(window['getOpenmrsSpaBase']())?.[1];
+            }
+            navigate({ to: `\${openmrsSpaBase}/${getUrlWithoutPrefix(newUrl)}` });
+          };
+
+          closeAllWorkspaces(navigateToNewUrl);
+        } else {
+          resetWorkspaceStore();
+        }
+      }
+    };
+    window.addEventListener('single-spa:before-routing-event', handleRouting);
+
+    return () => {
+      window.removeEventListener('single-spa:before-routing-event', handleRouting);
+    };
+  }, []);
 
   return (
     <aside
