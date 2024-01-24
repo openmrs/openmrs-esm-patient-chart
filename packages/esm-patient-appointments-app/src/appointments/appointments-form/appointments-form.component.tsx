@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -25,7 +25,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useLocations, useSession, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
   saveRecurringAppointments,
@@ -60,12 +60,10 @@ const appointmentsFormSchema = z.object({
 
 type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
-interface AppointmentsFormProps {
+interface AppointmentsFormProps extends DefaultWorkspaceProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
-  patientUuid?: string;
   context?: string;
-  closeWorkspace: () => void;
 }
 
 const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
@@ -74,6 +72,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   patientUuid,
   context,
   closeWorkspace,
+  promptBeforeClosing,
 }) => {
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
   const defaultTimeFormat = appointment?.startDateTime
@@ -109,7 +108,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
     : dayjs(new Date()).format('hh:mm');
 
-  const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
+  const {
+    control,
+    getValues,
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { isDirty },
+  } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
     defaultValues: {
@@ -130,6 +136,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
     },
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const handleMultiselectChange = (e) => {
     setValue(
