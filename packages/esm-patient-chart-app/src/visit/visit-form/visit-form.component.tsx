@@ -247,25 +247,65 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return validSubmission;
   }, [setError]);
 
-  const updateVisitAttributes = useCallback(
-    async (updatedAttributes) => {
-      for (const attribute of updatedAttributes) {
-        await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attribute.uuid}`, {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
-          body: {
-            value: attribute.value,
-          },
-        }).catch((err) => {
-          showSnackbar({
-            title: t('errorUpdatingVisitAttribute', 'Error updating visit attribute'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: err?.message,
+  const handleVisitAttributes = useCallback(
+    async (visitAttributes: { [p: string]: string }) => {
+      const existingAttributes = visitToEdit?.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
+      const attributes = Object.entries(visitAttributes).map(([key, value]) => ({
+        attributeType: key,
+        value: value as string,
+      }));
+
+      for (const attribute of attributes) {
+        if (attribute.attributeType && existingAttributes.includes(attribute.attributeType)) {
+          const attributeToEdit = visitToEdit.attributes.filter(
+            (attr) => attr.attributeType.uuid === attribute.attributeType,
+          )[0];
+
+          if (attributeToEdit) {
+            // continue to next attribute if the previous value is same as new value
+            if (attributeToEdit.value.display === attribute.value) continue;
+            if (attribute.value) {
+              // Update attribute with updated value
+              await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attributeToEdit.uuid}`, {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: { value: attribute.value },
+              }).catch((err) => {
+                showSnackbar({
+                  title: t('errorUpdatingVisitAttribute', 'Error on updating visit attribute'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              });
+            } else {
+              // Delete attribute if the was no value provided
+              await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attributeToEdit.uuid}`, {
+                method: 'DELETE',
+              }).catch((err) => {
+                showSnackbar({
+                  title: t('errorDeletingVisitAttribute', 'Error on deleting visit attribute'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              });
+            }
+          }
+        } else {
+          await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute`, {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: attribute,
+          }).catch((err) => {
+            showSnackbar({
+              title: t('errorCreatingVisitAttribute', 'Error on creating visit attribute'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: err?.message,
+            });
           });
-        });
+        }
       }
     },
     [visitToEdit],
@@ -308,16 +348,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ),
         visitType: visitType,
         location: visitLocation?.uuid,
-        attributes: Object.entries(visitAttributes)
-          .filter(([key, value]) => !!value)
-          .map(([key, value]) => ({
-            attributeType: key,
-            value: value as string,
-          })),
       };
+
       if (visitToEdit?.uuid) {
         // The request throws 400 (Bad request)error when patient is passed in the update payload
-
         delete payload.patient;
       }
 
@@ -341,23 +375,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-
-      const existingAttributes = !visitToEdit
-        ? []
-        : visitToEdit.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
-      const updatedAttributes = [];
-      const addedAttributes = [];
-
-      payload.attributes?.forEach((attribute) => {
-        if (attribute.attributeType && existingAttributes.includes(attribute.attributeType)) {
-          const attributeUuid = visitToEdit.attributes.filter(
-            (attr) => attr.attributeType.uuid === attribute.attributeType,
-          )[0].uuid;
-          updatedAttributes.push({ uuid: attributeUuid, value: attribute.value });
-        } else addedAttributes.push(attribute);
-      });
-
-      payload.attributes = addedAttributes;
 
       if (isOnline) {
         (visitToEdit?.uuid
@@ -446,7 +463,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 }
               }
 
-              await updateVisitAttributes(updatedAttributes);
+              await handleVisitAttributes(visitAttributes);
               mutateCurrentVisit();
               mutateVisits();
               closeWorkspace({ ignoreChanges: true });
