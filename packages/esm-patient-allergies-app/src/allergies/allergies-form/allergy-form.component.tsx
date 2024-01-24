@@ -66,7 +66,7 @@ type AllergyFormData = {
   comment: string;
 };
 
-function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
+function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: DefaultWorkspaceProps) {
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -82,7 +82,14 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { mutate } = useAllergies(patientUuid);
 
-  const { control, handleSubmit, watch, getValues, setValue } = useForm<AllergyFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { isDirty },
+  } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema),
     defaultValues: {
@@ -94,6 +101,10 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
       comment: '',
     },
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const selectedAllergen = watch('allergen');
   const selectedAllergicReactions = watch('allergicReactions');
