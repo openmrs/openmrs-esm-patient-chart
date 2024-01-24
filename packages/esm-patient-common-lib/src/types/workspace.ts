@@ -1,6 +1,13 @@
 /* The possible states a workspace window can be opened in. */
 export type WorkspaceWindowState = 'maximized' | 'hidden' | 'normal';
 
+export interface CloseWorkspaceOptions {
+  workspaceTitle?: string;
+  ignoreChanges?: boolean;
+  onWorkspaceClose?: () => void;
+  confirmBeforeClosing?: boolean;
+}
+
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {
   /**
@@ -8,7 +15,7 @@ export interface DefaultWorkspaceProps {
    * prompted to save changes before closing, even if the `testFcn` passed to `promptBeforeClosing`
    * returns `true`.
    */
-  closeWorkspace(ignoreChanges?: boolean): void;
+  closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
   /**
    * Call this with a no-args function that returns true if the user should be prompted before
    * this workspace is closed; e.g. if there is unsaved data.

@@ -38,10 +38,6 @@
       "component": "conditionsWidget"
     },
     {
-      "name": "conditions-form-workspace",
-      "component": "conditionsFormWorkspace"
-    },
-    {
       "name": "condition-delete-confirmation-dialog",
       "component": "conditionDeleteConfirmationDialog"
     }

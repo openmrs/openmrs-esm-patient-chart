@@ -2,7 +2,7 @@ import { type ExtensionRegistration, getGlobalStore, navigate, translateFrom } f
 // FIXME We should not rely on internals here
 import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
-import { type WorkspaceWindowState } from '../types/workspace';
+import { type WorkspaceWindowState, type CloseWorkspaceOptions } from '../types/workspace';
 
 export interface Prompt {
   title: string;
@@ -19,13 +19,6 @@ export interface WorkspaceStoreState {
   openWorkspaces: Array<OpenWorkspace>;
   prompt: Prompt | null;
   workspaceWindowState: WorkspaceWindowState;
-}
-
-interface CloseWorkspaceOptions {
-  workspaceTitle?: string;
-  ignoreChanges?: boolean;
-  onWorkspaceClose?: () => void;
-  confirmBeforeClosing?: boolean;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
