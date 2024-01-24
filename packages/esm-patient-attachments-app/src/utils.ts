@@ -1,6 +1,4 @@
-import { type AttachmentResponse, type Attachment } from './attachments-types';
-import { attachmentUrl } from './attachments.resource';
-import { formatDate } from '@openmrs/esm-framework';
+import { type AttachmentResponse, type Attachment, attachmentUrl, formatDate } from '@openmrs/esm-framework';
 
 export function readFileAsString(file: File) {
   return new Promise<string>((resolve) => {
