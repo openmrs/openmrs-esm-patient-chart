@@ -248,7 +248,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [setError]);
 
   const handleVisitAttributes = useCallback(
-    async (visitAttributes: { [p: string]: string }) => {
+    async (visitAttributes: { [p: string]: string }, visitUuid: string) => {
       const existingAttributes = visitToEdit?.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
       const attributes = Object.entries(visitAttributes).map(([key, value]) => ({
         attributeType: key,
@@ -266,7 +266,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             if (attributeToEdit.value.display === attribute.value) continue;
             if (attribute.value) {
               // Update attribute with updated value
-              await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attributeToEdit.uuid}`, {
+              await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
                 method: 'POST',
                 headers: { 'Content-type': 'application/json' },
                 body: { value: attribute.value },
@@ -280,7 +280,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               });
             } else {
               // Delete attribute if the was no value provided
-              await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute/${attributeToEdit.uuid}`, {
+              await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
                 method: 'DELETE',
               }).catch((err) => {
                 showSnackbar({
@@ -293,18 +293,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             }
           }
         } else {
-          await openmrsFetch(`/ws/rest/v1/visit/${visitToEdit.uuid}/attribute`, {
-            method: 'POST',
-            headers: { 'Content-type': 'application/json' },
-            body: attribute,
-          }).catch((err) => {
-            showSnackbar({
-              title: t('errorCreatingVisitAttribute', 'Error on creating visit attribute'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: err?.message,
+          if (attribute.value) {
+            await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+              method: 'POST',
+              headers: { 'Content-type': 'application/json' },
+              body: attribute,
+            }).catch((err) => {
+              showSnackbar({
+                title: t('errorCreatingVisitAttribute', 'Error on creating visit attribute'),
+                kind: 'error',
+                isLowContrast: false,
+                subtitle: err?.message,
+              });
             });
-          });
+          }
         }
       }
     },
@@ -463,7 +465,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 }
               }
 
-              await handleVisitAttributes(visitAttributes);
+              await handleVisitAttributes(visitAttributes, response.data.uuid);
               mutateCurrentVisit();
               mutateVisits();
               closeWorkspace({ ignoreChanges: true });
