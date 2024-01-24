@@ -335,18 +335,18 @@ export function showWorkspacePrompts(
   switch (promptType) {
     case 'closing-workspace': {
       const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'unsavedChangesInForm',
-          'There are unsaved changes in {{formName}}. Please save them before opening another form.',
-          { formName: workspaceTitle },
+          'unsavedChangeText',
+          `You have unsaved changes in the side panel. Do you want to discard these changes?`,
         ),
         onConfirm: () => {
           onConfirmation?.();
         },
-        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
       };
+      store.setState({ ...store.getState(), prompt });
       store.setState((prevState) => ({ ...prevState, prompt }));
       return;
     }
