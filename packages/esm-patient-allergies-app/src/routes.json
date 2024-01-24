@@ -24,18 +24,6 @@
       }
     },
     {
-      "name": "patient-allergy-form-workspace",
-      "component": "allergiesForm",
-      "online": true,
-      "offline": true,
-      "meta": {
-        "title": {
-          "key": "recordNewAllergy",
-          "default": "Record a new allergy"
-        }
-      }
-    },
-    {
       "name": "allergies-summary-dashboard",
       "component": "allergiesDashboardLink",
       "slot": "patient-chart-dashboard-slot",
