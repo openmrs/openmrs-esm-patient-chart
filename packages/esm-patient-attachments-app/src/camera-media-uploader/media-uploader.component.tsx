@@ -45,9 +45,10 @@ const MediaUploaderComponent = () => {
   return (
     <div className="cds--file__container">
       <p className="cds--label-description">
-        {t('fileUploadSizeConstraints', 'File limit is {{fileSize}}MB', {
+        {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
           fileSize,
         })}
+        {t('supportedFileTypes', 'Supported file types are: JPEG, PNG, and WEBP')}
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
