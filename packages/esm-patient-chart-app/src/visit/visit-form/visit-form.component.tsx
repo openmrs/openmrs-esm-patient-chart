@@ -138,13 +138,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [t, config, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
-    const visitStartDate = new Date();
+    const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
     const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
-
-    const currentDateTime = new Date();
-
     let defaultValues: Partial<VisitFormData> = {
-      visitStartDate: currentDateTime,
+      visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
       visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
 
@@ -161,12 +158,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     };
 
     if (visitStopDate) {
-      const currentStopDateTime = new Date();
       defaultValues = {
         ...defaultValues,
-        visitStopDate: currentStopDateTime,
-        visitStopTime: dayjs(currentStopDateTime).format('hh:mm'),
-        visitStopTimeFormat: currentStopDateTime.getHours() >= 12 ? 'PM' : 'AM',
+        visitStopDate,
+        visitStopTime: dayjs(visitStopDate).format('hh:mm'),
+        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
       };
     }
 
@@ -501,8 +497,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return [maxVisitStartDatetime, minVisitStopDatetime];
   }, [visitToEdit]);
 
-  const visitStartDate = getValues('visitStartDate');
-  minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
+  const visitStartDate = getValues('visitStartDate') || new Date();
+  const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
+  minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
   useEffect(() => {
     if (errorFetchingLocations) {
