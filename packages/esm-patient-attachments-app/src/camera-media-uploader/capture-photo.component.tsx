@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
+import { Camera } from '@carbon/react/icons';
 import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
-import { Camera } from '@carbon/react/icons';
 
 export interface CapturePhotoProps {
   onCapturePhoto(dataUri: string, photoDateTime: string): void;
@@ -32,17 +32,17 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
   const showPlaceholderIcon = !dataUri && !initialState;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div className={styles.container}>
       <button type="button" onClick={showCam} className={styles.buttonCssReset}>
         {showPlaceholderIcon ? (
           <div className={styles.placeholderIconContainer}>
-            <Camera size="20"></Camera>
+            <Camera size="20" />
           </div>
         ) : (
-          <img src={dataUri || initialState} alt="Preview" style={{ width: '100%' }} />
+          <img src={dataUri || initialState} alt="Preview" className={styles.preview} />
         )}
       </button>
-      <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
+      <Button kind="ghost" onClick={showCam} className={styles.actionButton}>
         {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
       </Button>
     </div>
