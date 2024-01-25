@@ -57,6 +57,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         <div className={styles.overflowMenu}>
           <OverflowMenu className={styles.overflowMenu} flipped size={isTablet ? 'lg' : 'md'}>
             <OverflowMenuItem
+              className={styles.menuItem}
               hasDivider
               isDelete
               itemText={t('deleteImage', 'Delete image')}
