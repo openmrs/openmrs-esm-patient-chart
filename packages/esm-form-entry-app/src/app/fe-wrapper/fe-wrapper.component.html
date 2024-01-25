@@ -21,15 +21,14 @@
       "
       class="form-container"
     >
-      <div>
-        <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
-          <ofe-form-renderer
-            [formSubmissionTemplate]="buttonsTemplate"
-            [labelMap]="labelMap"
-            [node]="form.rootNode"
-          ></ofe-form-renderer>
-        </form>
-      </div>
+      <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
+        <ofe-form-renderer
+          [formSubmissionTemplate]="buttonsTemplate"
+          [labelMap]="labelMap"
+          [node]="form.rootNode"
+          class="form-renderer"
+        ></ofe-form-renderer>
+      </form>
       <ng-template #buttonsTemplate>
         <div *ngIf="showDiscardSubmitButtons" class="saveAndCloseButtons">
           <button

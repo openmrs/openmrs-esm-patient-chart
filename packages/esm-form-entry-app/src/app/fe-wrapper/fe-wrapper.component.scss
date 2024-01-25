@@ -113,6 +113,15 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  & > .cds--form {
+    height: inherit;
+  }
+}
+
+.form-renderer {
+  display: block;
+  height: inherit;
 }
 
 .button-set {
