@@ -138,10 +138,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [t, config, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
-    const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
+    const visitStartDate = new Date();
     const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
+
+    const currentDateTime = new Date();
+
     let defaultValues: Partial<VisitFormData> = {
-      visitStartDate,
+      visitStartDate: currentDateTime,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
       visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
 
@@ -158,11 +161,12 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     };
 
     if (visitStopDate) {
+      const currentStopDateTime = new Date();
       defaultValues = {
         ...defaultValues,
-        visitStopDate,
-        visitStopTime: dayjs(visitStopDate).format('hh:mm'),
-        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
+        visitStopDate: currentStopDateTime,
+        visitStopTime: dayjs(currentStopDateTime).format('hh:mm'),
+        visitStopTimeFormat: currentStopDateTime.getHours() >= 12 ? 'PM' : 'AM',
       };
     }
 
