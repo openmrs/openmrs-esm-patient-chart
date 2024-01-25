@@ -64,7 +64,7 @@ const MediaUploaderComponent = () => {
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions?.map<string>((ext) => (ext = '.' + ext)) ?? ['*']}
+          accept={allowedExtensions?.map((ext) =>  '.' + ext) || ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
