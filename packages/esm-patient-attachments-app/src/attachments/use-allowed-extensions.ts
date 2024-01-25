@@ -22,7 +22,7 @@ export const useAllowedExtensions = () => {
 
   const extensions: Array<string> =
     data?.data?.results?.length > 0
-      ? data?.data?.results[0].value?.split(',').map<string>((ext) => (ext = '.' + ext))
+      ? data?.data?.results[0].value?.split(',').map((ext) => '.' + ext)
       : undefined;
 
   return {
