@@ -1,5 +1,10 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
 .buttonCssReset {
-	max-width: 64px;
+	max-width: 4rem;
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -8,10 +13,19 @@
 }
 
 .placeholderIconContainer {
-	width: 64px;
-	height: 64px;
+	width: 4rem;
+	height: 4rem;
 	background-color: #D8D8D8;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.actionButton {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.preview {
+  width: 100%;
 }
