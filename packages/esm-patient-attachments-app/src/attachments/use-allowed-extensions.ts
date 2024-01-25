@@ -1,29 +1,27 @@
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { allowedExtensionsGlobalProperty } from '../constants';
 
 export interface GlobalProperty {
   uuid: string;
   property: string;
   value: string;
-  description: string;
 }
+
+/**
+ * Global property created by the openmrs-module-attachment
+ */
+const allowedExtensionsGlobalProperty: string = 'attachments.allowedFileExtensions';
 
 /**
  * React hook that takes returns the allowed file extensions
  * @returns String array containing the `allowedExtensions`, `isLoading` loading status, `error`
  */
 export const useAllowedExtensions = () => {
-  const customRepresentation = 'custom:(uuid,property,value,description)';
+  const customRepresentation = 'custom:(uuid,property,value)';
   const { data, error, isLoading } = useSWRImmutable<{ data: { results: Array<GlobalProperty> } }>(
     `/ws/rest/v1/systemsetting?&v=${customRepresentation}&q=${allowedExtensionsGlobalProperty}`,
     openmrsFetch,
   );
-
-  const extensions: Array<string> =
-    data?.data?.results?.length > 0
-      ? data?.data?.results[0].value?.split(',').map((ext) => '.' + ext)
-      : undefined;
 
   return {
     isLoading,
