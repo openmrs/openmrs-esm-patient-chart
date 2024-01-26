@@ -3,6 +3,6 @@ export const attachmentsConfigSchema = {
   fileSize: {
     _type: Type.Number,
     _description: 'Max file size limit to upload (in MB)',
-    _default: 10,
+    _default: 1,
   },
 };

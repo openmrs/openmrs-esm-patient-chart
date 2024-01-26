@@ -35,6 +35,7 @@
   "imageDescription": "Description de l'image",
   "name": "Nom",
   "successfullyDeleted": "Supprimé avec succès",
+  "supportedFileTypes": "Supported file types are: JPEG, PNG, and WEBP",
   "type": "Type",
   "uploadComplete": "Téléchargement terminé",
   "uploadedSuccessfully": "téléchargé avec succès",
