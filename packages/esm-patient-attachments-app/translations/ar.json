@@ -35,6 +35,7 @@
   "imageDescription": "وصف الصورة",
   "name": "الاسم",
   "successfullyDeleted": "تم الحذف بنجاح",
+  "supportedFileTypes": "Supported file types are: JPEG, PNG, and WEBP",
   "type": "النوع",
   "uploadComplete": "اكتمل التحميل",
   "uploadedSuccessfully": "تم التحميل بنجاح",
