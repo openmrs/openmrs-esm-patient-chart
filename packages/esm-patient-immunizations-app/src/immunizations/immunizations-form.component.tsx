@@ -102,6 +102,10 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     watch,
   } = formProps;
 
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
+
   const vaccineUuid = watch('vaccineUuid');
 
   useEffect(() => {
@@ -214,12 +218,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
 
   return (
     <FormProvider {...formProps}>
-      <Form
-        className={styles.form}
-        onChange={() => promptBeforeClosing(() => true)}
-        onSubmit={handleSubmit(onSubmit)}
-        data-testid="immunization-form"
-      >
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={1} className={styles.container}>
           <section className={` ${styles.row}`}>
             <div className={styles.dateTimeSection}>
@@ -402,10 +401,10 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           </section>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(!isDirty)}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button className={styles.button} kind="primary" disabled={isSubmitting || !isDirty} type="submit">
+          <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">
             {t('save', 'Save')}
           </Button>
         </ButtonSet>

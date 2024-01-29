@@ -1,5 +1,5 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import immunizationsOverviewComponent from './immunizations/immunizations-overview.component';
@@ -32,7 +32,9 @@ export const immunizationsDashboardLink =
     options,
   );
 
-export const immunizationsForm = getAsyncLifecycle(
-  () => import('./immunizations/immunizations-form.component'),
-  options,
-);
+// t('immunizationWorkspaceTitle', 'Immunization Form')
+export const immunizationsForm = registerWorkspace({
+  name: 'immunization-form-workspace',
+  load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
+  title: translateFrom(moduleName, 'immunizationWorkspaceTitle', 'Immunization Form'),
+});
