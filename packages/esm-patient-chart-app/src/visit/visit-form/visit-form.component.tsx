@@ -12,7 +12,6 @@ import {
   Row,
   Stack,
   Switch,
-  DatePicker,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
