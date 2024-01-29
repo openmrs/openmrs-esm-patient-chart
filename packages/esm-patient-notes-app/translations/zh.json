@@ -29,5 +29,6 @@
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved successfully",
-  "visitNoteSaveError": "Error saving visit note"
+  "visitNoteSaveError": "Error saving visit note",
+  "visitNoteWorkspaceTitle": "Visit Note"
 }
