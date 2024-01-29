@@ -20,12 +20,16 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { closeWorkspace, launchPatientWorkspace, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import {
+  launchPatientWorkspace,
+  EmptyDataIllustration,
+  type DefaultWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
 import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
-function PatientListsWorkspace() {
+function PatientListsWorkspace({ closeWorkspace }: DefaultWorkspaceProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
@@ -34,8 +38,9 @@ function PatientListsWorkspace() {
   const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
-    closeWorkspace('patient-lists', true);
-    launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
+    closeWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name }),
+    });
   }, []);
 
   const tableHeaders: Array<typeof DataTableHeader> = [

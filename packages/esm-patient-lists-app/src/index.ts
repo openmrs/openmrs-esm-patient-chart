@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
 import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 
@@ -15,18 +15,20 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
+  // t('patientListsWorkspaceTitle', 'Patient Lists')
   registerWorkspace({
     name: 'patient-lists',
-    title: 'Patient Lists',
+    title: translateFrom(moduleName, 'patientListsWorkspaceTitle', 'Patient Lists'),
     load: getAsyncLifecycle(() => import('./workspaces/patient-lists.workspace'), options),
     type: 'patient-lists',
     canHide: false,
     width: 'wider',
   });
 
+  // t('patientListDetailWorkspaceTitle', 'Patient List Details')
   registerWorkspace({
     name: 'patient-list-details',
-    title: 'Patient List Details',
+    title: translateFrom(moduleName, 'patientListDetailWorkspaceTitle', 'Patient List Details'),
     load: getAsyncLifecycle(() => import('./workspaces/patient-list-details.workspace'), options),
     type: 'patient-lists',
     canHide: false,
@@ -35,8 +37,3 @@ export function startupApp() {
 }
 
 export const patientListsActionMenu = getSyncLifecycle(patientListsActionButtonComponent, options);
-
-export const patientListDetailsWorkspace = getAsyncLifecycle(
-  () => import('./workspaces/patient-list-details.workspace'),
-  options,
-);
