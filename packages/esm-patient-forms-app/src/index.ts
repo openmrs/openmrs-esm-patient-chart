@@ -42,7 +42,7 @@ export function startupApp() {
   // t('clinicalForm', 'Clinical Form')
   registerWorkspace({
     name: 'patient-form-entry-workspace',
-    title: translateFrom('@openmrs/esm-patient-forms-app', 'clinicalForm', 'Clinical Form'),
+    title: translateFrom(moduleName, 'clinicalForm', 'Clinical Form'),
     load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
     canMaximize: true,
     canHide: true,
@@ -53,7 +53,7 @@ export function startupApp() {
   // t('clinicalForms', 'Clinical Forms')
   registerWorkspace({
     name: 'clinical-forms-workspace',
-    title: translateFrom('@openmrs/esm-patient-forms-app', 'clinicalForms', 'Clinical Forms'),
+    title: translateFrom(moduleName, 'clinicalForms', 'Clinical Forms'),
     load: getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options),
     type: 'clinical-form',
     canMaximize: true,
