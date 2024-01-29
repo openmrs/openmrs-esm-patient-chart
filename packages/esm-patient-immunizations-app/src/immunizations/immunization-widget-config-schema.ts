@@ -1,7 +1,7 @@
 import { Type } from '@openmrs/esm-framework';
 
 export default {
-  vaccinesConceptSet: {
+  immunizationConceptSet: {
     _type: Type.String,
     _default: 'CIEL:984',
     _description: 'A uuid or concept mapping which will have all the possible vaccines as set-members.',

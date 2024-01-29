@@ -1,5 +1,4 @@
-import { type UploadedFile } from '../attachments-types';
-import { type FetchResponse } from '@openmrs/esm-framework';
+import { type UploadedFile, type FetchResponse } from '@openmrs/esm-framework';
 
 export interface CameraMediaUploaderContextType {
   multipleFiles?: boolean;

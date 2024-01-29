@@ -23,9 +23,11 @@ export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper,
 
 // Helper function that waits for a loading state to disappear from the screen
 export function waitForLoadingToFinish() {
-  return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
-    timeout: 4000,
-  });
+  if (screen.queryAllByRole('progressbar').length) {
+    return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
+      timeout: 4000,
+    });
+  }
 }
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
@@ -59,14 +61,14 @@ export const mockPatient = {
       id: '1f0ad7a1-430f-4397-b571-59ea654a52db',
       use: 'secondary',
       system: 'Old Identification Number',
-      type: { text: 'Old Identification Number' },
+      type: { text: 'Old Identification Number', coding: [{ code: 'Old Identification Number' }] },
       value: '100732HE',
     },
     {
       id: '1f0ad7a1-430f-4397-b571-59ea654a52db',
       use: 'usual',
       system: 'OpenMRS ID',
-      type: { text: 'OpenMRS ID' },
+      type: { text: 'OpenMRS ID', coding: [{ code: 'OpenMRS ID' }] },
       value: '100GEJ',
     },
   ],

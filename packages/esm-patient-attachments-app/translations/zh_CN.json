@@ -37,6 +37,7 @@
   "imageDescription": "图像描述",
   "name": "name",
   "successfullyDeleted": "删除成功",
+  "supportedFileTypes": "Supported file types are: JPEG, PNG, and WEBP",
   "type": "类型",
   "uploadComplete": "上传完成",
   "uploadedSuccessfully": "上传成功",

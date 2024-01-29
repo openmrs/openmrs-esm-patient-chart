@@ -1,9 +1,13 @@
 {
   "add": "Agregar",
   "cancel": "Cancelar",
+  "doseNumber": "Dose Number",
+  "edit": "Edit",
+  "error": "Error",
   "errorSaving": "Error al guardar la vacunación",
   "expirationDate": "Fecha de vencimiento",
   "goToSummary": "Ir al resumen",
+  "immunization": "Immunization",
   "immunizations": "Inmunizaciones",
   "Immunizations": "Inmunizaciones",
   "lotNumber": "Número de lote",
@@ -14,7 +18,11 @@
   "seeAll": "Ver todo",
   "sequence": "Secuencia",
   "singleDoseOn": "Dosis única el",
+  "time": "Time",
+  "timeFormat ": "Time Format",
   "vaccinationDate": "Fecha de vacunación",
+  "vaccinationDateRequired": "Vaccination date required",
   "vaccinationSaved": "Vacunación guardada exitosamente",
-  "vaccine": "Vacuna"
+  "vaccine": "Vacuna",
+  "vaccineRequired": "Vaccine required"
 }

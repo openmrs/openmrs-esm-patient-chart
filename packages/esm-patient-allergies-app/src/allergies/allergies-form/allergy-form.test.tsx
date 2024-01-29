@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { type FetchResponse, showSnackbar, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions } from '__mocks__';
 import { mockPatient } from 'tools';
 import { type NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
@@ -12,7 +12,6 @@ const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
 const mockUseAllergens = useAllergens as jest.Mock;
 const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
 
 jest.mock('./allergy-form.resource', () => {
   const originalModule = jest.requireActual('./allergy-form.resource');
@@ -208,7 +207,7 @@ describe('AllergyForm ', () => {
 
   it('renders a success notification after successful submission', async () => {
     mockSaveAllergy.mockClear();
-    mockShowToast.mockClear();
+    mockShowSnackbar.mockClear();
 
     renderAllergyForm();
 
@@ -226,12 +225,12 @@ describe('AllergyForm ', () => {
     await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
-      critical: true,
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
       kind: 'success',
       title: 'Allergy saved',
-      description: 'It is now visible on the Allergies page',
+      subtitle: 'It is now visible on the Allergies page',
     });
   });
 

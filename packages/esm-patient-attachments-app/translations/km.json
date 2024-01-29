@@ -37,6 +37,7 @@
   "imageDescription": "ការពិពណ៌នារូបភាព",
   "name": "ឈ្មោះ",
   "successfullyDeleted": "បានលុបចោលដោយជោគជ័យ",
+  "supportedFileTypes": "Supported file types are: JPEG, PNG, and WEBP",
   "type": "ប្រភេទ",
   "uploadComplete": "ការបង្ហោះបានបញ្ចប់",
   "uploadedSuccessfully": "បង្ហោះដោយជោគជ័យ",

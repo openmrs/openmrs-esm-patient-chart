@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showSnackbar, useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { List, Thumbnail_2, Add } from '@carbon/react/icons';
+import {
+  type UploadedFile,
+  type Attachment,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  UserHasAccess,
+  createAttachment,
+  deleteAttachmentPermanently,
+  useAttachments,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
-import { type UploadedFile, type Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';

@@ -1,10 +1,11 @@
 import React, { useContext, useCallback } from 'react';
 import { FileUploaderDropContainer } from '@carbon/react';
-import styles from './media-uploader.scss';
-import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
-import { readFileAsString } from '../utils';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { readFileAsString } from '../utils';
+import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import styles from './media-uploader.scss';
+
 const MediaUploaderComponent = () => {
   const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
@@ -58,13 +59,14 @@ const MediaUploaderComponent = () => {
   return (
     <div className="cds--file__container">
       <p className="cds--label-description">
-        {t('fileUploadSizeConstraints', 'File limit is {{fileSize}}MB', {
+        {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
           fileSize,
         })}
+        . {t('supportedFileTypes', 'Supported file types are: JPEG, PNG, and WEBP')}.
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions?.map((ext) =>  '.' + ext) || ['*']}
+          accept={allowedExtensions?.map((ext) => '.' + ext) || ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
