@@ -67,9 +67,8 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         </div>
       </div>
       <div className={styles.rightPanel}>
-        <h4 className={styles.productiveHeading02}>{attachmentToPreview.title}</h4>
-        {attachmentToPreview?.description ? (
-          <p className={classNames(styles.bodyLong01, styles.imageDescription)}>{attachmentToPreview.description}</p>
+        {attachmentToPreview?.title ? (
+          <p className={classNames(styles.bodyLong01, styles.imageDescription)}>{attachmentToPreview.title}</p>
         ) : null}
       </div>
     </div>
