@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { first } from 'rxjs/operators';
-import { z } from 'zod';
+import { promise, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   saveVisit,
@@ -248,67 +248,84 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [setError]);
 
   const handleVisitAttributes = useCallback(
-    async (visitAttributes: { [p: string]: string }, visitUuid: string) => {
+    (visitAttributes: { [p: string]: string }, visitUuid: string) => {
       const existingAttributes = visitToEdit?.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
       const attributes = Object.entries(visitAttributes).map(([key, value]) => ({
         attributeType: key,
         value: value as string,
       }));
 
+      const promises = [];
+
       for (const attribute of attributes) {
         if (attribute.attributeType && existingAttributes.includes(attribute.attributeType)) {
-          const attributeToEdit = visitToEdit.attributes.filter(
+          const attributeToEdit = visitToEdit.attributes.find(
             (attr) => attr.attributeType.uuid === attribute.attributeType,
-          )[0];
+          );
 
           if (attributeToEdit) {
             // continue to next attribute if the previous value is same as new value
-            if (attributeToEdit.value.display === attribute.value) continue;
+            if (typeof attributeToEdit.value === 'object') {
+              if (attributeToEdit.value.uuid === attribute.value) {
+                continue;
+              }
+            } else if (attributeToEdit.value === attribute.value) {
+              continue;
+            }
+
             if (attribute.value) {
               // Update attribute with updated value
-              await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
-                method: 'POST',
-                headers: { 'Content-type': 'application/json' },
-                body: { value: attribute.value },
-              }).catch((err) => {
-                showSnackbar({
-                  title: t('errorUpdatingVisitAttribute', 'Error on updating visit attribute'),
-                  kind: 'error',
-                  isLowContrast: false,
-                  subtitle: err?.message,
-                });
-              });
+              promises.push(
+                openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
+                  method: 'POST',
+                  headers: { 'Content-type': 'application/json' },
+                  body: { value: attribute.value },
+                }).catch((err) => {
+                  showSnackbar({
+                    title: t('errorUpdatingVisitAttribute', 'Error on updating visit attribute'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: err?.message,
+                  });
+                }),
+              );
             } else {
               // Delete attribute if the was no value provided
-              await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
-                method: 'DELETE',
-              }).catch((err) => {
-                showSnackbar({
-                  title: t('errorDeletingVisitAttribute', 'Error on deleting visit attribute'),
-                  kind: 'error',
-                  isLowContrast: false,
-                  subtitle: err?.message,
-                });
-              });
+              promises.push(
+                openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
+                  method: 'DELETE',
+                }).catch((err) => {
+                  showSnackbar({
+                    title: t('errorDeletingVisitAttribute', 'Error on deleting visit attribute'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: err?.message,
+                  });
+                }),
+              );
             }
           }
         } else {
           if (attribute.value) {
-            await openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
-              method: 'POST',
-              headers: { 'Content-type': 'application/json' },
-              body: attribute,
-            }).catch((err) => {
-              showSnackbar({
-                title: t('errorCreatingVisitAttribute', 'Error on creating visit attribute'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: err?.message,
-              });
-            });
+            promises.push(
+              openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: attribute,
+              }).catch((err) => {
+                showSnackbar({
+                  title: t('errorCreatingVisitAttribute', 'Error on creating visit attribute'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              }),
+            );
           }
         }
       }
+
+      return Promise.all(promises);
     },
     [visitToEdit],
   );
