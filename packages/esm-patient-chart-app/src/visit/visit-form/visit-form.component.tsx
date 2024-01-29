@@ -497,8 +497,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return [maxVisitStartDatetime, minVisitStopDatetime];
   }, [visitToEdit]);
 
-  const visitStartDateValue = getValues('visitStartDate');
-  const visitStartDate = visitStartDateValue !== undefined ? visitStartDateValue : new Date();
+  const visitStartDate = getValues('visitStartDate') ?? new Date();
+  minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
   const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
   minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
