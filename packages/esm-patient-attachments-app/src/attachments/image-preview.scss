@@ -26,14 +26,6 @@
   color: $ui-01;
 }
 
-.closePreviewButton  {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 .closePreviewButton > svg > path {
   fill: $ui-01 !important;
 }
@@ -70,4 +62,8 @@
 
 .imageDescription {
   margin-top: spacing.$spacing-03;
+}
+
+.menuItem {
+  max-width: none;
 }
