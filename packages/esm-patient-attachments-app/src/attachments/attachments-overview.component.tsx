@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 import {
   type UploadedFile,
   type Attachment,
