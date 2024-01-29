@@ -12,6 +12,7 @@ import {
   Row,
   Stack,
   Switch,
+  DatePicker,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
@@ -497,7 +498,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return [maxVisitStartDatetime, minVisitStopDatetime];
   }, [visitToEdit]);
 
-  const visitStartDate = getValues('visitStartDate') || new Date();
+  const visitStartDateValue = getValues('visitStartDate');
+  const visitStartDate = visitStartDateValue !== undefined ? visitStartDateValue : new Date();
   const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
   minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
