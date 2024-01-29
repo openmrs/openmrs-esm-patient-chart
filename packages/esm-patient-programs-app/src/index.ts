@@ -1,5 +1,5 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import programsOverviewComponent from './programs/programs-overview.component';
@@ -32,4 +32,9 @@ export const programsDashboardLink =
     options,
   );
 
-export const programsForm = getAsyncLifecycle(() => import('./programs/programs-form.component'), options);
+// t('programEnrollmentWorkspaceTitle', 'Record program enrollment')
+export const programsForm = registerWorkspace({
+  name: 'programs-form-workspace',
+  load: getAsyncLifecycle(() => import('./programs/programs-form.component'), options),
+  title: translateFrom(moduleName, 'programEnrollmentWorkspaceTitle', 'Record program enrollment'),
+});
