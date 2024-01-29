@@ -83,8 +83,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { mutateVisits } = useVisits(patientUuid);
   const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
   const { mutate } = useVisit(patientUuid);
-  const { mutate: mutateVisit } = useVisit(patientUuid);
-  const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
@@ -179,9 +177,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     handleSubmit,
     control,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
     setError,
   } = methods;
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const validateVisitStartStopDatetime = useCallback(() => {
     let visitStartDate = getValues('visitStartDate');
@@ -479,11 +481,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     ],
   );
 
-  const handleOnChange = () => {
-    setIgnoreChanges((prevState) => !prevState);
-    promptBeforeClosing(() => true);
-  };
-
   let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
     if (!visitToEdit?.encounters?.length) {
       return [null, null];
@@ -510,7 +507,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -664,7 +661,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}
           </Button>
           <Button
