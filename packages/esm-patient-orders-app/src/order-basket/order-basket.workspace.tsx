@@ -32,8 +32,8 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   useEffect(() => {
-    promptBeforeClosing(() => false);
-  }, [promptBeforeClosing]);
+    promptBeforeClosing(() => !!orders.length);
+  }, [orders]);
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
