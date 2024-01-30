@@ -17,7 +17,7 @@ const allowedExtensionsGlobalProperty: string = 'attachments.allowedFileExtensio
  * @returns String array containing the `allowedExtensions`, `isLoading` loading status, `error`
  */
 export const useAllowedExtensions = () => {
-  const customRepresentation = 'custom:(uuid,property,value)';
+  const customRepresentation = 'custom:(value)';
   const { data, error, isLoading } = useSWRImmutable<{ data: { results: Array<GlobalProperty> } }>(
     `/ws/rest/v1/systemsetting?&v=${customRepresentation}&q=${allowedExtensionsGlobalProperty}`,
     openmrsFetch,
@@ -25,7 +25,7 @@ export const useAllowedExtensions = () => {
 
   return {
     isLoading,
-    allowedExtensions: data?.data?.results?.length > 0 ? data?.data?.results[0].value?.split(',') : undefined,
+    allowedExtensions: data?.data?.results?.length > 0 ? data?.data?.results[0].value?.split(',') || undefined : undefined,
     error: error,
   };
 };
