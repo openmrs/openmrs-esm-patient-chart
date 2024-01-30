@@ -19,6 +19,7 @@ import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
+import { useAllowedExtensions } from './use-allowed-extensions';
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
   const isTablet = useLayoutType() === 'tablet';
+  const { allowedExtensions } = useAllowedExtensions();
 
   const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
@@ -46,15 +48,15 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
+      allowedExtensions: allowedExtensions,
       closeModal: () => {
         close();
       },
       onCompletion: () => mutate(),
       multipleFiles: true,
       collectDescription: true,
-      allowedExtensions: ['image/jpeg', 'image/png', 'image/webp'],
     });
-  }, [patientUuid, mutate]);
+  }, [patientUuid, mutate, allowedExtensions]);
 
   const deleteAttachment = useCallback(
     (attachment: Attachment) => {
