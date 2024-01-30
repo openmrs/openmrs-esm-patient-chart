@@ -2,9 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Camera } from '@carbon/react/icons';
-import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
+import { showModal, toOmrsIsoString, type UploadedFile } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
-import { type UploadedFile } from '../attachments-types';
 
 export interface CapturePhotoProps {
   onCapturePhoto(dataUri: string, photoDateTime: string): void;
