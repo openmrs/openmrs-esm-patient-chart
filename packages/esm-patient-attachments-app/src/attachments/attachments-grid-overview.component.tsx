@@ -33,6 +33,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
       {attachments.map((attachment, indx) => {
         const imageProps = {
           src: attachment.src,
+          title: attachment.title,
           style: {},
           onClick: () => {
             openAttachment(attachment);
@@ -47,6 +48,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
         return (
           <div key={indx}>
             <AttachmentThumbnail imageProps={imageProps} item={item} />
+            <p className={styles.bodyLong01}>{attachment.title}</p>
             <p className={classNames(styles.bodyLong01, styles.muted)}>{attachment.dateTime}</p>
           </div>
         );
