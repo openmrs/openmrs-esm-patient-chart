@@ -48,8 +48,8 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
         return (
           <div key={indx}>
             <AttachmentThumbnail imageProps={imageProps} item={item} />
-            <p className={styles.bodyLong01}>{attachment.title}</p>
-            <p className={classNames(styles.bodyLong01, styles.muted)}>{attachment.dateTime}</p>
+            <p className={styles.title}>{attachment.title}</p>
+            <p className={styles.muted}>{attachment.dateTime}</p>
           </div>
         );
       })}

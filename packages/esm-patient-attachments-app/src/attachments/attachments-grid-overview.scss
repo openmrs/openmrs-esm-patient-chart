@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '~@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/type';
 @import '../root.scss';
 
 .galleryContainer {
@@ -18,3 +19,14 @@
   object-fit: cover;
 }
 
+.muted {
+  color: $color-gray-70;
+  @include type.type-style("label-01");
+  margin: 0.25rem;
+}
+
+.title {
+  @extend .bodyLong01;
+  color: colors.$gray-100;
+  margin: 0.25rem;
+}
