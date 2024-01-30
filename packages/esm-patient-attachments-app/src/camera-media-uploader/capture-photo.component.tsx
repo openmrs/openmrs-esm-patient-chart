@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Camera } from '@carbon/react/icons';
-import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
+import { showModal, toOmrsIsoString, type UploadedFile } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
 
 export interface CapturePhotoProps {
@@ -16,10 +16,12 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile(dataUri: string) {
-        setDataUri(dataUri);
-        onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
-        close();
+      saveFile(file: UploadedFile) {
+        return Promise.resolve().then(() => {
+          setDataUri(file.base64Content);
+          onCapturePhoto(file.base64Content, toOmrsIsoString(new Date()));
+          close();
+        });
       },
       collectDescription: false,
       closeModal: () => {
