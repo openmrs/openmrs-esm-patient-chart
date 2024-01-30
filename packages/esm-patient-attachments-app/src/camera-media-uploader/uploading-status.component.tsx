@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import styles from './uploading-status.scss';
 import { FileUploaderItem, Button, ButtonSet, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import styles from './uploading-status.scss';
 
 interface UploadingStatusComponentProps {}
 

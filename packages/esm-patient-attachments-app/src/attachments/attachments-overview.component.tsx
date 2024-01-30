@@ -1,16 +1,24 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showSnackbar, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { List, Thumbnail_2, Add } from '@carbon/react/icons';
+import {
+  type UploadedFile,
+  type Attachment,
+  showModal,
+  showSnackbar,
+  useLayoutType,
+  UserHasAccess,
+  createAttachment,
+  deleteAttachmentPermanently,
+  useAttachments,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
-import { type UploadedFile, type Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
-import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -44,6 +52,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       onCompletion: () => mutate(),
       multipleFiles: true,
       collectDescription: true,
+      allowedExtensions: ['image/jpeg', 'image/png', 'image/webp'],
     });
   }, [patientUuid, mutate]);
 

@@ -5193,8 +5193,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 5.0.1-pre.363
-  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.363"
+  version: 5.0.1-pre.385
+  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.385"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -5215,7 +5215,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: d56a31608df25b8288251442b03eb89089d7164ead16c141d7191a8832c8dc46e32c7c05db32ef0462d3b7523df2ab2dfee47d137eb2a8f2515dc3a3f0f2539e
+  checksum: 6cd66c4fd38a184ca243176bdc1bce109b096cd976d84a1ed39d20c871bfafea69ab18414e3c18f1189bef33afa912facb7a5815f0a1bd02032b3106f4390961
   languageName: node
   linkType: hard
 
@@ -13491,12 +13491,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.15.0":
-  version: 1.15.3
-  resolution: "follow-redirects@npm:1.15.3"
+  version: 1.15.5
+  resolution: "follow-redirects@npm:1.15.5"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
+  checksum: 5ca49b5ce6f44338cbfc3546823357e7a70813cecc9b7b768158a1d32c1e62e7407c944402a918ea8c38ae2e78266312d617dc68783fac502cbb55e1047b34ec
   languageName: node
   linkType: hard
 
@@ -24285,9 +24285,9 @@ __metadata:
   linkType: hard
 
 "ua-parser-js@npm:^0.7.30":
-  version: 0.7.31
-  resolution: "ua-parser-js@npm:0.7.31"
-  checksum: e2f8324a83d1715601576af85b2b6c03890699aaa7272950fc77ea925c70c5e4f75060ae147dc92124e49f7f0e3d6dd2b0a91e7f40d267e92df8894be967ba8b
+  version: 0.7.37
+  resolution: "ua-parser-js@npm:0.7.37"
+  checksum: 9e91a66171aa16c74680cfac84af6ed7ecdeb508ff7c90a55222f56c63172da2d98d2478763e9469c940415fe29c45a56ae51fec1c19a498e7a3b293f7b3b874
   languageName: node
   linkType: hard
 

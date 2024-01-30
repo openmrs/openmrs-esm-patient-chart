@@ -139,15 +139,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
+              mutateVisits?.();
               showSnackbar({
+                isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
                 subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
-              mutateVisits?.();
             })
             .catch(() => {
               showSnackbar({
+                isLowContrast: false,
                 title: t('error', 'Error'),
                 subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',

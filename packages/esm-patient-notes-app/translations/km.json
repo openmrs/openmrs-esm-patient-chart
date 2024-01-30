@@ -1,8 +1,8 @@
 {
   "add": "បន្ថែម",
   "addImage": "បន្ថែមរូបភាព",
-  "addImageToVisit": "បន្ថែមរូបភាពមួយទៅកាន់ការមកពិនិត្យនេះ",
   "addVisitNote": "បន្ថែមកំណត់សម្គាល់នៃការមកពិនិត្យ",
+  "changeImage": "Change image",
   "clinicalNoteLabel": "សរសេរកំណត់ចំណាំរបស់អ្នក។",
   "clinicalNotePlaceholder": "សរសេរកំណត់ចំណាំណាមួយនៅទីនេះ",
   "date": "កាលបរិច្ឆេទ",
