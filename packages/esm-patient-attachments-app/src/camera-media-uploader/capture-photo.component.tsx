@@ -4,6 +4,7 @@ import { Button } from '@carbon/react';
 import { Camera } from '@carbon/react/icons';
 import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
+import { type UploadedFile } from '../attachments-types';
 
 export interface CapturePhotoProps {
   onCapturePhoto(dataUri: string, photoDateTime: string): void;
@@ -16,10 +17,12 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile(dataUri: string) {
-        setDataUri(dataUri);
-        onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
-        close();
+      saveFile(file: UploadedFile) {
+        return Promise.resolve().then(() => {
+          setDataUri(file.base64Content);
+          onCapturePhoto(file.base64Content, toOmrsIsoString(new Date()));
+          close();
+        });
       },
       collectDescription: false,
       closeModal: () => {
