@@ -25,7 +25,8 @@ export const useAllowedExtensions = () => {
 
   return {
     isLoading,
-    allowedExtensions: data?.data?.results?.length > 0 ? data?.data?.results[0].value?.split(',') || undefined : undefined,
+    allowedExtensions:
+      data?.data?.results?.length > 0 ? data?.data?.results[0].value?.toLowerCase().split(',') || undefined : undefined,
     error: error,
   };
 };

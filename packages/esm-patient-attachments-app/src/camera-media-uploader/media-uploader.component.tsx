@@ -53,7 +53,7 @@ const MediaUploaderComponent = () => {
       return true;
     }
     const fileExtension = fileName.split('.').pop();
-    return allowedExtensions?.includes(fileExtension);
+    return allowedExtensions?.includes(fileExtension.toLowerCase());
   };
 
   return (

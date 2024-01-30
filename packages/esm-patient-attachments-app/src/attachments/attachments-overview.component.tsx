@@ -7,7 +7,6 @@ import {
   type Attachment,
   showModal,
   showSnackbar,
-  useConfig,
   useLayoutType,
   UserHasAccess,
   createAttachment,
