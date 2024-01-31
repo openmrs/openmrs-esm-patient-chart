@@ -311,7 +311,6 @@ export function updateWorkspaceWindowState(value: WorkspaceWindowState) {
 function getUpdatedWorkspaceWindowState(workspaceAtTop: OpenWorkspace) {
   return workspaceAtTop?.preferredWindowSize ?? 'normal';
 }
-
 export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
   const store = getWorkspaceStore();
 
