@@ -69,6 +69,21 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
       retired: false,
     },
   })),
+  useVisitAttributeTypes: jest.fn(() => ({
+    isLoading: false,
+    error: null,
+    data: [
+      {
+        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+        name: 'Punctuality',
+        display: 'Punctuality',
+        datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
+        datatypeConfig: '',
+        preferredHandlerClassname: 'default',
+        retired: false,
+      },
+    ],
+  })),
   useConceptAnswersForVisitAttributeType: jest.fn(() => ({
     isLoading: false,
     error: null,
