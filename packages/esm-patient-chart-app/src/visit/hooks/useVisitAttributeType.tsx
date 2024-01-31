@@ -35,7 +35,7 @@ const visitAttributeTypeCustomRepresentation =
   'custom:(uuid,display,name,description,datatypeClassname,datatypeConfig)';
 
 export function useVisitAttributeTypes() {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<VisitAttributeType[]>, Error>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: VisitAttributeType[] }>, Error>(
     `/ws/rest/v1/visitattributetype?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
@@ -50,7 +50,7 @@ export function useVisitAttributeTypes() {
     return {
       isLoading,
       error: error,
-      data: data?.data,
+      data: data?.data.results,
     };
   }, [data, error, isLoading]);
 

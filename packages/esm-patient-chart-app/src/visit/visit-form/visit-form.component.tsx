@@ -281,7 +281,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   body: { value },
                 }).catch((err) => {
                   showSnackbar({
-                    title: t('errorUpdatingVisitAttribute', 'Could not update {attributeName} attribute', {
+                    title: t('errorUpdatingVisitAttribute', 'Could not update {{attributeName}} attribute', {
                       attributeName: attributeToEdit.attributeType.display,
                     }),
                     kind: 'error',
@@ -297,7 +297,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   method: 'DELETE',
                 }).catch((err) => {
                   showSnackbar({
-                    title: t('errorDeletingVisitAttribute', 'Could not delete {attributeName} attribute', {
+                    title: t('errorDeletingVisitAttribute', 'Could not delete {{attributeName}} attribute', {
                       attributeName: attributeToEdit.attributeType.display,
                     }),
                     kind: 'error',
@@ -317,7 +317,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 body: { attributeType, value },
               }).catch((err) => {
                 showSnackbar({
-                  title: t('errorCreatingVisitAttribute', 'Could not delete {attributeName} attribute', {
+                  title: t('errorCreatingVisitAttribute', 'Could not delete {{attributeName}} attribute', {
                     attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType).display,
                   }),
                   kind: 'error',
