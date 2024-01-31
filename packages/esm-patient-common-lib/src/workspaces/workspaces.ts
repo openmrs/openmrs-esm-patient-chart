@@ -312,14 +312,6 @@ function getUpdatedWorkspaceWindowState(workspaceAtTop: OpenWorkspace) {
   return workspaceAtTop?.preferredWindowSize ?? 'normal';
 }
 
-/**
- * @internal
- * Just for testing.
- */
-export function resetWorkspaceStore() {
-  getWorkspaceStore().setState(initialState);
-}
-
 export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
   const store = getWorkspaceStore();
 
@@ -388,4 +380,12 @@ export function showWorkspacePrompts(promptType: PromptType, onConfirmation: () 
       return;
     }
   }
+}
+
+/**
+ * @internal
+ * Just for testing.
+ */
+export function resetWorkspaceStore() {
+  getWorkspaceStore().setState(initialState);
 }
