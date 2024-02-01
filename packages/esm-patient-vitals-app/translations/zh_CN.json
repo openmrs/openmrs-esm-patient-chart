@@ -33,6 +33,7 @@
   "pulse": "脉搏",
   "recordBiometrics": "记录生物特征",
   "recordVitals": "记录生命体征",
+  "recordVitalsAndBiometrics": "Record Vitals and Biometrics",
   "respirationRate": "呼吸频率",
   "respiratoryRate": "呼吸频率",
   "saveAndClose": "保存并关闭",
