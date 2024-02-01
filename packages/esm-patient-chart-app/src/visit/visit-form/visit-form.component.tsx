@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { first } from 'rxjs/operators';
-import { promise, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   saveVisit,
@@ -264,10 +264,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
           if (attributeToEdit) {
             // continue to next attribute if the previous value is same as new value
-            if (typeof attributeToEdit.value === 'object') {
-              if (attributeToEdit.value.uuid === value) {
-                continue;
-              }
+            if (typeof attributeToEdit.value === 'object' && attributeToEdit.value.uuid === value) {
+              continue;
             } else if (attributeToEdit.value === value) {
               continue;
             }
@@ -407,7 +405,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         )
           .pipe(first())
           .subscribe(
-            async (response) => {
+            (response) => {
               if (response.status === 201) {
                 if (config.showServiceQueueFields) {
                   // retrieve values from queue extension
@@ -491,6 +489,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 .pipe(first())
                 .subscribe((attributesResponses) => {
                   setIsSubmitting(false);
+                  // Check for no undefined,
+                  // that if there was no failed requests on either creating, updating or deleting an attribute
+                  // then continue and close workspace
                   if (!attributesResponses.includes(undefined)) {
                     mutateCurrentVisit();
                     mutateVisits();
