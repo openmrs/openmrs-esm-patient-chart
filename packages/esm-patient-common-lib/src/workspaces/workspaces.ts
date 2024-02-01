@@ -156,7 +156,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     ...workspace,
     closeWorkspace: (options: CloseWorkspaceOptions = {}) =>
       closeWorkspace(name, {
-        workspaceTitle: workspace.title,
+        ignoreChanges: true,
         ...options,
       }),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
@@ -260,7 +260,7 @@ export function closeWorkspace(
   };
 
   if (!getWhetherWorkspaceCanBeClosed(name, options?.ignoreChanges)) {
-    const currentName = options?.workspaceTitle ?? name;
+    const currentName = getWorkspaceRegistration(name).title ?? name;
     showWorkspacePrompts('closing-workspace', updateStoreWithClosedWorkspace, currentName);
     return false;
   } else {
