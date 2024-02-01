@@ -41,25 +41,25 @@ export const configSchema = {
       _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
     },
   },
-  labTests: {
+  labTestsWithOrderReasons: {
     _type: Type.Array,
     _elements: {
       labTestUuid: {
         _type: Type.UUID,
-        _description: "UUID for the 'Lab' Test that require order reason",
+        _description: 'UUID of the lab test that requires a reason for ordering',
         _default: '',
       },
-      labTestOrderReasons: {
+      orderReasons: {
         _type: Type.Array,
         _elements: {
           uuid: {
             _type: Type.UUID,
-            _description: 'Concept UUID representing the order reason',
+            _description: 'Array of coded concepts that represent reasons for ordering a lab test',
           },
           label: {
             _type: Type.String,
             _default: null,
-            _description: 'The label for order reason',
+            _description: 'The label for the reason for ordering concept',
           },
         },
         _default: [],
@@ -81,7 +81,7 @@ export interface LabTestReason {
 }
 export interface OrderReason {
   labTestUuid: string;
-  labTestOrderReasons: Array<LabTestReason>;
+  orderReasons: Array<LabTestReason>;
 }
 export interface ConfigObject {
   concepts: Array<ObsTreeEntry>;
@@ -89,5 +89,5 @@ export interface ConfigObject {
   orders: {
     labOrderTypeUuid: string;
   };
-  labTests: Array<OrderReason>;
+  labTestsWithOrderReasons: Array<OrderReason>;
 }

@@ -73,8 +73,8 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   });
   const config = useConfig<ConfigObject>();
   const selectedLabTest =
-    config && config.labTests
-      ? config.labTests.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid)
+    config && config.labTestsWithOrderReasons
+      ? config.labTestsWithOrderReasons.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid)
       : null;
 
   const handleFormSubmission = useCallback(
@@ -202,7 +202,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                     id="orderReasonInput"
                     titleText={t('orderReason', 'Order reason')}
                     selectedItem={''}
-                    items={selectedLabTest.labTestOrderReasons}
+                    items={selectedLabTest.orderReasons}
                     itemToString={(item) => item?.label}
                   />
                 </InputWrapper>
