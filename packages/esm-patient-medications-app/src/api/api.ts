@@ -1,5 +1,5 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
@@ -84,7 +84,6 @@ export function prepMedicationOrderPostData(
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
-      dateActivated: toOmrsIsoString(new Date()),
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -113,7 +112,6 @@ export function prepMedicationOrderPostData(
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
-      dateActivated: toOmrsIsoString(new Date()),
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
