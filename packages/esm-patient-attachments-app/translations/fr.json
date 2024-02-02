@@ -10,6 +10,7 @@
   "Attachments": "Pièces jointes",
   "attachmentsInLowerCase": "attachments",
   "attachmentsInProperFormat": "Attachments",
+  "cameraAccessErrorMessage": "Please enable camera access in your browser settings and try again.",
   "cameraError": "Erreur avec l'appareil photo",
   "cancel": "Annuller",
   "changeImage": "Changer l'image",
