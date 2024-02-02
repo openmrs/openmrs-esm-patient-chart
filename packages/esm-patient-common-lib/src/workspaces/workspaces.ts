@@ -103,7 +103,7 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
   return ext.name;
 }
 
-function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges: boolean = false) {
+export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges: boolean = false) {
   const promptBeforeFn = getPromptBeforeClosingFcn(name);
   return ignoreChanges || !promptBeforeFn || !promptBeforeFn();
 }
