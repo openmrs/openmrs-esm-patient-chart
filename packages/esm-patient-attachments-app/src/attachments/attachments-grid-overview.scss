@@ -4,11 +4,12 @@
 @import '../root.scss';
 
 .galleryContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
+  display: grid;
+  grid-template-columns:
+  repeat(3, 1fr);
   grid-gap: spacing.$spacing-05;
-  padding: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+  padding: spacing.$spacing-05;
 }
 
 .attachmentThumbnailSkeleton {

@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { List, Thumbnail_2, Add } from '@carbon/react/icons';
+import { Button, ContentSwitcher, DataTableSkeleton, Loading, Switch } from '@carbon/react';
+import { Add, List, Thumbnail_2 } from '@carbon/react/icons';
 import {
-  type UploadedFile,
-  type Attachment,
-  showModal,
-  showSnackbar,
-  useLayoutType,
-  UserHasAccess,
   createAttachment,
   deleteAttachmentPermanently,
+  showModal,
+  showSnackbar,
   useAttachments,
+  useLayoutType,
+  UserHasAccess,
+  type Attachment,
+  type UploadedFile,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
+import { useAllowedExtensions } from './use-allowed-extensions';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
-import { useAllowedExtensions } from './use-allowed-extensions';
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     }
   }, [error, t]);
 
-  const showCam = useCallback(() => {
+  const showAttachmentModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
       allowedExtensions: allowedExtensions,
@@ -67,15 +67,15 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
           showSnackbar({
             title: t('fileDeleted', 'File deleted'),
-            subtitle: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
+            subtitle: `${attachment.filename} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
             isLowContrast: true,
           });
         })
-        .catch((error) => {
+        .catch(() => {
           showSnackbar({
             title: t('error', 'Error'),
-            subtitle: `${attachment.title} ${t('failedDeleting', "couldn't be deleted")}`,
+            subtitle: `${attachment.filename} ${t('failedDeleting', "couldn't be deleted")}`,
             kind: 'error',
           });
         });
@@ -104,26 +104,30 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       } else {
         const anchor = document.createElement('a');
         anchor.setAttribute('href', attachment.src);
-        anchor.setAttribute('download', attachment.title);
+        anchor.setAttribute('download', attachment.filename);
         anchor.click();
       }
     },
     [setAttachmentToPreview],
   );
 
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
   if (!attachments.length) {
     return (
       <EmptyState
         displayText={t('attachmentsInLowerCase', 'attachments')}
         headerTitle={t('attachmentsInProperFormat', 'Attachments')}
-        launchForm={showCam}
+        launchForm={showAttachmentModal}
       />
     );
   }
 
   return (
     <UserHasAccess privilege="View Attachments">
-      <div onDragOverCapture={showCam} className={styles.overview}>
+      <div onDragOverCapture={showAttachmentModal} className={styles.overview}>
         <div id="container">
           <CardHeader title={t('attachments', 'Attachments')}>
             <div className={styles.validatingDataIcon}>{isValidating && <Loading withOverlay={false} small />}</div>
@@ -137,7 +141,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
                 </Switch>
               </ContentSwitcher>
               <div className={styles.divider} />
-              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
+              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showAttachmentModal}>
                 {t('add', 'Add')}
               </Button>
             </div>

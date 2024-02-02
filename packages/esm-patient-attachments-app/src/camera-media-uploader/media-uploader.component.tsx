@@ -7,9 +7,9 @@ import CameraMediaUploaderContext from './camera-media-uploader-context.resource
 import styles from './media-uploader.scss';
 
 const MediaUploaderComponent = () => {
-  const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const { fileSize } = useConfig();
+  const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
 
   const upload = useCallback(
     (files: Array<File>) => {

@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 import { SkeletonPlaceholder } from '@carbon/react';
 import { type Attachment } from '@openmrs/esm-framework';
 import AttachmentThumbnail from './attachment-thumbnail.component';
@@ -33,7 +32,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
       {attachments.map((attachment, indx) => {
         const imageProps = {
           src: attachment.src,
-          title: attachment.title,
+          title: attachment.filename,
           style: {},
           onClick: () => {
             openAttachment(attachment);
@@ -48,7 +47,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
         return (
           <div key={indx}>
             <AttachmentThumbnail imageProps={imageProps} item={item} />
-            <p className={styles.title}>{attachment.title}</p>
+            <p className={styles.title}>{attachment.filename}</p>
             <p className={styles.muted}>{attachment.dateTime}</p>
           </div>
         );

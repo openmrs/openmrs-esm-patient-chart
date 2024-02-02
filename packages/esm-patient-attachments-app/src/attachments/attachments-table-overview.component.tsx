@@ -17,8 +17,8 @@ import { useTranslation } from 'react-i18next';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {
-  isLoading: boolean;
   attachments: Array<Attachment>;
+  isLoading: boolean;
   deleteAttachment: (attachment: Attachment) => void;
   openAttachment: (attachment: Attachment) => void;
 }
@@ -40,7 +40,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
         id: attachment.id,
         fileName: (
           <span role="button" tabIndex={0} className={styles.link} onClick={() => openAttachment(attachment)}>
-            {attachment.title}
+            {attachment.filename}
           </span>
         ),
         type: attachment.bytesContentFamily,

@@ -67,3 +67,10 @@
 .menuItem {
   max-width: none;
 }
+
+.title {
+  @extend .productiveHeading02;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

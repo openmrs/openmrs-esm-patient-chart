@@ -7,14 +7,14 @@ import { type Attachment, useLayoutType } from '@openmrs/esm-framework';
 import styles from './image-preview.scss';
 
 interface AttachmentPreviewProps {
-  closePreview: any;
   attachmentToPreview: Attachment;
+  closePreview: () => void;
   deleteAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
-  closePreview,
   attachmentToPreview,
+  closePreview,
   deleteAttachment,
 }) => {
   const { t } = useTranslation();
@@ -49,7 +49,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         />
         <div className={styles.attachmentImage}>
           {attachmentToPreview.bytesContentFamily === 'IMAGE' ? (
-            <img src={attachmentToPreview.src} alt={attachmentToPreview.title} />
+            <img src={attachmentToPreview.src} alt={attachmentToPreview.filename} />
           ) : attachmentToPreview.bytesContentFamily === 'PDF' ? (
             <iframe title="PDFViewer" className={styles.pdfViewer} src={attachmentToPreview.src} />
           ) : null}
@@ -67,8 +67,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         </div>
       </div>
       <div className={styles.rightPanel}>
-        {attachmentToPreview?.title ? (
-          <p className={classNames(styles.bodyLong01, styles.imageDescription)}>{attachmentToPreview.title}</p>
+        <h4 className={styles.title}>{attachmentToPreview.filename}</h4>
+        {attachmentToPreview?.description ? (
+          <p className={classNames(styles.bodyLong01, styles.imageDescription)}>{attachmentToPreview.description}</p>
         ) : null}
       </div>
     </div>

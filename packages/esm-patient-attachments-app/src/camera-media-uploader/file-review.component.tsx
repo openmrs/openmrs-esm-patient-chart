@@ -1,20 +1,28 @@
 import React, { type SyntheticEvent, useCallback, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, TextArea, TextInput, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
-import { type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
-import styles from './file-review.scss';
-import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, TextArea, TextInput } from '@carbon/react';
 import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
+import { type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
+import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import styles from './file-review.scss';
 
 export interface FileReviewContainerProps {
   onCompletion: () => void;
 }
 
+interface FilePreviewProps {
+  uploadedFile: UploadedFile;
+  collectDescription?: boolean;
+  onSaveFile: (dataUri: UploadedFile) => void;
+  clearData?(): void;
+  moveToNextFile: () => void;
+}
+
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
-  const { filesToUpload, clearData, setFilesToUpload, closeModal, collectDescription } =
-    useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
+  const { filesToUpload, clearData, setFilesToUpload, closeModal, collectDescription } =
+    useContext(CameraMediaUploaderContext);
 
   const moveToNextFile = useCallback(() => {
     if (currentFile < filesToUpload.length) {
@@ -26,9 +34,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
-      setFilesToUpload((filesToUpload) =>
-        filesToUpload.map((file, indx) => (indx === currentFile - 1 ? updatedFile : file)),
-      );
+      setFilesToUpload((filesToUpload) => filesToUpload.map((file, i) => (i === currentFile - 1 ? updatedFile : file)));
       moveToNextFile();
     },
     [moveToNextFile, setFilesToUpload, currentFile],
@@ -51,18 +57,10 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   );
 };
 
-interface FilePreviewProps {
-  uploadedFile: UploadedFile;
-  collectDescription?: boolean;
-  onSaveFile: (dataUri: UploadedFile) => void;
-  clearData?(): void;
-  moveToNextFile: () => void;
-}
-
 const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescription, onSaveFile, clearData }) => {
+  const { t } = useTranslation();
   const [fileName, setFileName] = useState('');
   const [fileDescription, setFileDescription] = useState('');
-  const { t } = useTranslation();
   const [emptyName, setEmptyName] = useState(false);
 
   useEffect(() => {
@@ -112,7 +110,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
   );
 
   return (
-    <form onSubmit={saveImageOrPdf}>
+    <Form onSubmit={saveImageOrPdf}>
       <ModalBody className={styles.overview}>
         {uploadedFile.fileType === 'image' ? (
           <img src={uploadedFile.base64Content} alt="placeholder" />
@@ -126,33 +124,35 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
           </div>
         )}
         <div className={styles.imageDetails}>
-          <div className={styles.captionFrame}>
-            <TextInput
-              id="caption"
-              labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
-                'name',
-                'name',
-              )}`}
-              autoComplete="off"
-              placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
-              onChange={updateFileName}
-              required
-              value={fileName}
-              invalid={emptyName}
-              autoFocus
-              invalidText={emptyName && t('fieldRequired', 'This field is required')}
-            />
-          </div>
-          {collectDescription && (
-            <TextArea
-              id="description"
-              labelText={t('imageDescription', 'Image description')}
-              autoComplete="off"
-              placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
-              value={fileDescription}
-              onChange={updateDescription}
-            />
-          )}
+          <Stack gap={5}>
+            <div className={styles.captionFrame}>
+              <TextInput
+                id="caption"
+                labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
+                  'name',
+                  'name',
+                )}`}
+                autoComplete="off"
+                placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
+                onChange={updateFileName}
+                required
+                value={fileName}
+                invalid={emptyName}
+                autoFocus
+                invalidText={emptyName && t('fieldRequired', 'This field is required')}
+              />
+            </div>
+            {collectDescription && (
+              <TextArea
+                id="description"
+                labelText={t('imageDescription', 'Image description')}
+                autoComplete="off"
+                placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
+                value={fileDescription}
+                onChange={updateDescription}
+              />
+            )}
+          </Stack>
         </div>
       </ModalBody>
       <ModalFooter>
@@ -165,7 +165,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
           </Button>
         </UserHasAccess>
       </ModalFooter>
-    </form>
+    </Form>
   );
 };
 
