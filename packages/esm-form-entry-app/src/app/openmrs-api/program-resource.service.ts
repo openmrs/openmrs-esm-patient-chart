@@ -3,13 +3,11 @@ import { HttpClient } from '@angular/common/http';
 
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
-import { MetaData, PatientProgram } from '../types';
+import { MetaData } from '../types';
 import { parseDate, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
-import moment from 'moment';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class ProgramResourceService {
@@ -24,22 +22,32 @@ export class ProgramResourceService {
     return `${this.windowRef.nativeWindow.openmrsBase}/ws/rest/v1/programenrollment`;
   }
 
-  public handlePatientCareProgram(form: Form, encounterUuid: string) {
-    const careProgramMeta: MetaData = form.schema.meta?.programs;
-    if (!careProgramMeta) return;
+  public handlePatientCareProgram(form: Form, encounterUuid: string): void {
+    const careProgramMeta: MetaData | undefined = form.schema.meta?.programs;
+    if (!careProgramMeta) {
+      return;
+    }
+
     const { uuid, isEnrollment, enrollmentDateQuestionId, discontinuationDateQuestionId } = careProgramMeta;
-
-    const getNodeValueById = (questionId) => form.searchNodeByQuestionId(questionId)?.[0]?.control.value;
-    const enrollmentDate =
-      isEnrollment && enrollmentDateQuestionId ? getNodeValueById(enrollmentDateQuestionId) : undefined;
-    const discontinuationDate =
-      isEnrollment && discontinuationDateQuestionId ? undefined : getNodeValueById(discontinuationDateQuestionId);
-
-    const locationUuid = form.dataSourcesContainer.dataSources['userLocation'].uuid;
+    const enrollmentDate = this.getProgramDate(form, isEnrollment, enrollmentDateQuestionId);
+    const discontinuationDate = this.getProgramDate(form, !isEnrollment, discontinuationDateQuestionId);
+    const locationUuid = this.getUserLocationUuid(form);
 
     isEnrollment
       ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounterUuid)
       : this.discontinuePatientFromCareProgram(discontinuationDate, encounterUuid);
+  }
+
+  private getProgramDate(form: Form, condition: boolean, questionId?: string): string | undefined {
+    return condition && questionId ? this.getNodeValueById(form, questionId) : undefined;
+  }
+
+  private getNodeValueById(form: Form, questionId: string): string | undefined {
+    return form.searchNodeByQuestionId(questionId)?.[0]?.control.value;
+  }
+
+  private getUserLocationUuid(form: Form): string {
+    return form.dataSourcesContainer.dataSources['userLocation'].uuid;
   }
 
   public enrollPatientToCareProgram(
@@ -50,7 +58,11 @@ export class ProgramResourceService {
   ) {
     const patientUuid = this.singleSpaService.getPropOrThrow('patientUuid');
     const enrolledDate = enrollmentDate ? enrollmentDate : new Date().toISOString();
-
+    const inEditModeEncounterUuid = this.singleSpaService.getProp('encounterUuid');
+    // Should not enroll patient if in edit mode
+    if (inEditModeEncounterUuid) {
+      return;
+    }
     const payload = {
       patient: patientUuid,
       program: programUuid,
@@ -59,30 +71,26 @@ export class ProgramResourceService {
       location: locationUuuid,
     };
 
-    this.isPatientEnrolled(patientUuid, programUuid).subscribe((result: boolean) => {
-      if (!result) {
-        this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
-          (response) => {
-            showSnackbar({
-              title: 'Program enrollment',
-              subtitle: 'Patient has been enrolled successfully',
-              kind: 'success',
-              isLowContrast: true,
-            });
-          },
-          (err) => {
-            // void created encounter to prevent enrollment missing an encounter
-            this.encounterResourceService.voidEncounter(encounterUuid);
-            showSnackbar({
-              title: 'Enrollment error',
-              subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
-              kind: 'error',
-              isLowContrast: false,
-            });
-          },
-        );
-      }
-    });
+    this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
+      () => {
+        showSnackbar({
+          title: 'Program enrollment',
+          subtitle: 'Patient has been enrolled successfully',
+          kind: 'success',
+          isLowContrast: true,
+        });
+      },
+      (err) => {
+        // void created encounter to prevent enrollment missing an encounter
+        this.encounterResourceService.voidEncounter(encounterUuid);
+        showSnackbar({
+          title: 'Enrollment error',
+          subtitle: 'An error occurred during care program enrollment, this encounter has been voided',
+          kind: 'error',
+          isLowContrast: false,
+        });
+      },
+    );
   }
 
   public discontinuePatientFromCareProgram(discontinuationDate: string, encounterUuid: string) {
@@ -93,14 +101,14 @@ export class ProgramResourceService {
     const minutes = currentDateTime.getMinutes();
     const seconds = currentDateTime.getSeconds();
 
-    const discontinuationDateTime = moment(discontinuationDate ?? new Date())
+    const discontinuationDateTime = dayjs(discontinuationDate ?? new Date())
       .set('hour', hour)
       .set('minute', minutes)
       .set('second', seconds)
       .toISOString();
     const payload = {
-      dateEnrolled: moment(enrollmentDetails.dateEnrolled).toISOString(),
-      dateCompleted: moment(discontinuationDateTime).toISOString(),
+      dateEnrolled: dayjs(enrollmentDetails.dateEnrolled).toISOString(),
+      dateCompleted: discontinuationDateTime,
     };
 
     this.httpClient.post(`${this.programEnrollmentUrl()}/${enrollmentDetails?.uuid}`, payload).subscribe(
@@ -110,6 +118,7 @@ export class ProgramResourceService {
           subtitle: 'Patient has been discontinued from care successfully',
           kind: 'success',
           isLowContrast: true,
+          timeoutInMs: 5000,
         });
       },
       (error) => {
@@ -120,22 +129,9 @@ export class ProgramResourceService {
           subtitle: 'An error occurred during care program discontinuation, this encounter has been voided',
           kind: 'error',
           isLowContrast: false,
+          timeoutInMs: 5000,
         });
       },
-    );
-  }
-
-  public isPatientEnrolled(patientUuid: string, programUuid: string): Observable<boolean> {
-    const url = this.programEnrollmentUrl() + `?patient=${patientUuid}&v=full`;
-    return this.httpClient.get(url).pipe(
-      map((response: any) => {
-        if (response && response.results) {
-          return !!response.results.find((patientProgram: PatientProgram) => {
-            return patientProgram.program.uuid === programUuid && patientProgram.dateCompleted === null;
-          });
-        }
-        return false;
-      }),
     );
   }
 }
