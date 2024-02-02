@@ -1,7 +1,14 @@
-import { OpenmrsResource, navigate } from '@openmrs/esm-framework';
-import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
+import { navigate } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+
+interface HtmlFormEntryForm {
+  formUuid: string;
+  formName: string;
+  formUiResource: string;
+  formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
+  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
+}
 
 export function launchFormEntryOrHtmlForms(
   htmlFormEntryForms: Array<HtmlFormEntryForm>,

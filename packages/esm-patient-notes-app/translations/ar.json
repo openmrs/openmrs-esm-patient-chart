@@ -1,8 +1,8 @@
 {
   "add": "أضف",
   "addImage": "أضف صورة",
-  "addImageToVisit": "أضف صورة لهذه الزيارة",
   "addVisitNote": "أضف ملاحظة للزيارة",
+  "changeImage": "Change image",
   "clinicalNoteLabel": "اكتب ملاحظاتك",
   "clinicalNotePlaceholder": "اكتب أي ملاحظات هنا",
   "date": "تاريخ",

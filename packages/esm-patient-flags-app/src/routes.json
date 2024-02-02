@@ -6,9 +6,12 @@
   "extensions": [
     {
       "name": "edit-flags-side-panel-form",
-      "component": "editFlagsSidePanel",
+      "component": "editPatientFlagsWorkspace",
       "meta": {
-        "title": "Edit patient flags"
+        "title": {
+          "key": "editPatientFlags",
+          "default":"Edit patient flags"
+        }
       },
       "featureFlag": "patientFlags"
     },

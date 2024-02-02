@@ -11,10 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { type Attachment, useLayoutType } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type Attachment } from '../attachments-types';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {

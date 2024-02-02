@@ -1,8 +1,8 @@
 {
   "add": "Add",
   "addImage": "Add image",
-  "addImageToVisit": "Add an image to this visit",
   "addVisitNote": "Add a visit note",
+  "changeImage": "Change image",
   "clinicalNoteLabel": "Write your notes",
   "clinicalNotePlaceholder": "Write any notes here",
   "date": "Date",

@@ -166,11 +166,11 @@ function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: Defau
             if (response.status === 201) {
               mutate();
               closeWorkspace();
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 kind: 'success',
                 title: t('allergySaved', 'Allergy saved'),
-                description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+                subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
               });
             }
           },
