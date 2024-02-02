@@ -62,7 +62,7 @@ const MediaUploaderComponent = () => {
         {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
           fileSize,
         })}
-        . {t('supportedFileTypes', 'Supported file types are: JPEG, PNG, and WEBP')}.
+        .
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
