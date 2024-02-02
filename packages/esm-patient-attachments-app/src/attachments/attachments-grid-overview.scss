@@ -4,7 +4,6 @@
 @import '../root.scss';
 
 .galleryContainer {
-  align-items: center;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: spacing.$spacing-05;
