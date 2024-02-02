@@ -269,12 +269,6 @@ export function closeWorkspace(
   }
 }
 
-export function closeAllWorkspaces() {
-  const store = getWorkspaceStore();
-  const state = store.getState();
-  store.setState({ ...state, openWorkspaces: [] });
-}
-
 /**
  * The set of workspaces is specific to a particular patient. This function
  * should be used when setting up workspaces for a new patient. If the current
@@ -306,6 +300,75 @@ export function updateWorkspaceWindowState(value: WorkspaceWindowState) {
 
 function getUpdatedWorkspaceWindowState(workspaceAtTop: OpenWorkspace) {
   return workspaceAtTop?.preferredWindowSize ?? 'normal';
+}
+export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
+  const store = getWorkspaceStore();
+
+  const canCloseAllWorkspaces = store.getState().openWorkspaces.every(({ name }) => {
+    const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+    return canCloseWorkspace;
+  });
+
+  const updateWorkspaceStore = () => {
+    resetWorkspaceStore();
+    onClosingWorkspaces?.();
+  };
+
+  if (!canCloseAllWorkspaces) {
+    showWorkspacePrompts('closing-all-workspaces', updateWorkspaceStore);
+  } else {
+    updateWorkspaceStore();
+  }
+}
+
+export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges = false) {
+  const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  return ignoreChanges || !promptCheckFcn || !promptCheckFcn();
+}
+
+type PromptType = 'closing-workspace' | 'closing-all-workspaces' | 'closing-workspace-launching-new-workspace';
+
+export function showWorkspacePrompts(promptType: PromptType, onConfirmation: () => void = () => {}) {
+  const store = getWorkspaceStore();
+
+  switch (promptType) {
+    case 'closing-all-workspaces': {
+      const workspacesNotClosed = store
+        .getState()
+        .openWorkspaces.filter(({ name }) => !getWhetherWorkspaceCanBeClosed(name))
+        .map(({ title }, indx) => `${indx + 1}. ${title}`);
+
+      const prompt: Prompt = {
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+        body: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'unsavedChangesInForms',
+          `There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}`,
+          {
+            workspaceNames: workspacesNotClosed.join(' '),
+          },
+        ),
+        onConfirm: () => {
+          onConfirmation?.();
+        },
+        confirmText: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'closeWorkspaces',
+          'Discard changes in {{count}} workspaces',
+          { count: workspacesNotClosed.length },
+        ),
+      };
+      store.setState((prevState) => ({
+        ...prevState,
+        prompt,
+      }));
+      return;
+    }
+    default: {
+      onConfirmation?.();
+      return;
+    }
+  }
 }
 
 /**
