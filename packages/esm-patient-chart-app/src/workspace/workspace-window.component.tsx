@@ -1,7 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { type OpenWorkspace, useWorkspaces, updateWorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import {
+  ExtensionSlot,
+  navigate,
+  translateFrom,
+  useBodyScrollLock,
+  useLayoutType,
+  usePatient,
+} from '@openmrs/esm-framework';
+import {
+  type OpenWorkspace,
+  useWorkspaces,
+  updateWorkspaceWindowState,
+  closeAllWorkspaces,
+  getWhetherWorkspaceCanBeClosed,
+  getWorkspaceStore,
+  resetWorkspaceStore,
+} from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalBar, HeaderName, HeaderMenuButton, HeaderGlobalAction, IconButton } from '@carbon/react';
 import { ArrowLeft, ArrowRight, Close, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +58,44 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
     width = 'narrow',
     closeWorkspace = () => {},
   } = useMemo(() => workspaces?.[0] ?? ({} as OpenWorkspace), [workspaces]);
+
+  useEffect(() => {
+    const handleRouting = (event) => {
+      const {
+        detail: { cancelNavigation, newUrl },
+      } = event as { detail: { cancelNavigation: () => void; newUrl: string } };
+
+      const regex = new RegExp(/\/patient\/([a-zA-Z0-9\-]+)\/?/);
+      const isNewUrlPatientChartUrl = regex.test(newUrl);
+      const canCloseAllWorkspaces = getWorkspaceStore()
+        .getState()
+        .openWorkspaces.every(({ name }) => {
+          const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+          return canCloseWorkspace;
+        });
+
+      if (!isNewUrlPatientChartUrl) {
+        if (!canCloseAllWorkspaces) {
+          cancelNavigation();
+          const navigateToNewUrl = () => {
+            function getUrlWithoutPrefix(url: string) {
+              return url.split(window['getOpenmrsSpaBase']())?.[1];
+            }
+            navigate({ to: `\${openmrsSpaBase}/${getUrlWithoutPrefix(newUrl)}` });
+          };
+
+          closeAllWorkspaces(navigateToNewUrl);
+        } else {
+          resetWorkspaceStore();
+        }
+      }
+    };
+    window.addEventListener('single-spa:before-routing-event', handleRouting);
+
+    return () => {
+      window.removeEventListener('single-spa:before-routing-event', handleRouting);
+    };
+  }, []);
 
   return (
     <aside
