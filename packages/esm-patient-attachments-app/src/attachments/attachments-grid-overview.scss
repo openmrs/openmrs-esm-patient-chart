@@ -6,8 +6,7 @@
 .galleryContainer {
   align-items: center;
   display: grid;
-  grid-template-columns:
-  repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-gap: spacing.$spacing-05;
   padding: spacing.$spacing-05;
 }
