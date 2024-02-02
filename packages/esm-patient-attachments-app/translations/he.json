@@ -10,6 +10,7 @@
   "Attachments": "קבצים מצורפים",
   "attachmentsInLowerCase": "קבצים מצורפים",
   "attachmentsInProperFormat": "קבצים מצורפים",
+  "cameraAccessErrorMessage": "Please enable camera access in your browser settings and try again.",
   "cameraError": "שגיאת מצלמה",
   "cancel": "ביטול",
   "changeImage": "שנה תמונה",

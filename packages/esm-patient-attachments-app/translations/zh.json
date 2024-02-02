@@ -10,6 +10,7 @@
   "Attachments": "附件",
   "attachmentsInLowerCase": "附件",
   "attachmentsInProperFormat": "附件",
+  "cameraAccessErrorMessage": "Please enable camera access in your browser settings and try again.",
   "cameraError": "相机错误",
   "cancel": "取消",
   "changeImage": "更改图像",

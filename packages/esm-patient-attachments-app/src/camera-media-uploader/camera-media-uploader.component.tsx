@@ -1,47 +1,36 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
-import { type UploadedFile, type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
-import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { useTranslation } from 'react-i18next';
+import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody, InlineNotification } from '@carbon/react';
+import { type FetchResponse, type UploadedFile } from '@openmrs/esm-framework';
 import CameraComponent from './camera.component';
-import styles from './camera-media-uploader.scss';
-import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody } from '@carbon/react';
-import MediaUploaderComponent from './media-uploader.component';
+import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import FileReviewContainer from './file-review.component';
+import MediaUploaderComponent from './media-uploader.component';
 import UploadingStatusComponent from './uploading-status.component';
+import styles from './camera-media-uploader.scss';
 
 interface CameraMediaUploaderModalProps {
-  multipleFiles?: boolean;
-  cameraOnly?: boolean;
-  collectDescription?: boolean;
-  saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
-  closeModal: () => void;
-  onCompletion?: () => void;
   allowedExtensions: Array<string> | null;
+  cameraOnly?: boolean;
+  closeModal: () => void;
+  collectDescription?: boolean;
+  multipleFiles?: boolean;
+  onCompletion?: () => void;
+  saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
-  cameraOnly,
-  multipleFiles,
-  collectDescription,
-  saveFile,
-  closeModal,
-  onCompletion,
   allowedExtensions,
+  cameraOnly,
+  closeModal,
+  collectDescription,
+  multipleFiles,
+  onCompletion,
+  saveFile,
 }) => {
-  const [error, setError] = useState<Error>(undefined);
+  const [error, setError] = useState<Error>(null);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
   const [uploadFilesToServer, setUploadFilesToServer] = useState(false);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (error) {
-      showSnackbar({
-        subtitle: error.message,
-        kind: 'error',
-        title: t('cameraError', 'Camera Error'),
-      });
-    }
-  }, [error, t]);
 
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
@@ -106,7 +95,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 const CameraMediaUploadTabs = () => {
   const { t } = useTranslation();
   const [view, setView] = useState('upload');
-  const { cameraOnly, closeModal } = useContext(CameraMediaUploaderContext);
+  const { cameraOnly, closeModal, error } = useContext(CameraMediaUploaderContext);
   const mediaStream = useRef<MediaStream | undefined>();
 
   const stopCameraStream = useCallback(() => {
@@ -134,6 +123,15 @@ const CameraMediaUploadTabs = () => {
           </TabList>
           <TabPanels>
             <TabPanel>
+              {error ? (
+                <InlineNotification
+                  subtitle={t(
+                    'cameraAccessErrorMessage',
+                    'Please enable camera access in your browser settings and try again.',
+                  )}
+                  title={t('cameraError', 'Camera error')}
+                />
+              ) : null}
               {view === 'camera' && <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />}
             </TabPanel>
             <TabPanel>
