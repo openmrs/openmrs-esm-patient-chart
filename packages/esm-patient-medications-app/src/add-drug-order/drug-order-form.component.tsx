@@ -166,6 +166,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     },
   });
 
+  const {
+    field: { onChange: dispensingUnitsOnChange },
+  } = useController<MedicationOrderFormData>({ name: 'quantityUnits', control });
+
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
   const dosage = watch('dosage');
@@ -368,6 +372,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                         control={control}
                         name="unit"
                         type="comboBox"
+                        dispensingUnitsOnChange={dispensingUnitsOnChange}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         items={drugDosingUnits}
@@ -732,16 +737,32 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       );
 
     if (type === 'comboBox')
-      return (
-        <ComboBox
-          selectedItem={value}
-          onChange={({ selectedItem }) => onChange(selectedItem)}
-          onBlur={onBlur}
-          ref={ref}
-          className={fieldState?.error?.message && styles.fieldError}
-          {...restProps}
-        />
-      );
+      if (name === 'unit') {
+        return (
+          <ComboBox
+            selectedItem={value}
+            onChange={({ selectedItem }) => {
+              onChange(selectedItem);
+              restProps.dispensingUnitsOnChange?.(selectedItem);
+            }}
+            onBlur={onBlur}
+            ref={ref}
+            className={fieldState?.error?.message && styles.fieldError}
+            {...restProps}
+          />
+        );
+      }
+
+    return (
+      <ComboBox
+        selectedItem={value}
+        onChange={({ selectedItem }) => onChange(selectedItem)}
+        onBlur={onBlur}
+        ref={ref}
+        className={fieldState?.error?.message && styles.fieldError}
+        {...restProps}
+      />
+    );
 
     return null;
   }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
