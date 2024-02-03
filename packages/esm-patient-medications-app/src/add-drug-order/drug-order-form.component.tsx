@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -169,6 +169,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
   const {
     field: { onChange: dispensingUnitsOnChange },
   } = useController<MedicationOrderFormData>({ name: 'quantityUnits', control });
+  const {
+    field: { value: dispensingQuantity },
+  } = useController<MedicationOrderFormData>({ name: 'pillsDispensed', control });
+
+  useEffect(() => {
+    if (dispensingQuantity && Number(dispensingQuantity) > 0) {
+      const currentDosageUnit = watch('unit');
+      dispensingUnitsOnChange(currentDosageUnit);
+    }
+  }, [dispensingQuantity]);
 
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
