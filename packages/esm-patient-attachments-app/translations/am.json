@@ -30,7 +30,7 @@
   "fileExtensionNotAllowedText": "File extension is not allowed",
   "fileName": "File name",
   "fileSizeInstructions": "Drag and drop files here or click to upload",
-  "fileSizeLimitExceeded": "exceeds the file size of",
+  "fileSizeLimitExceeded": "exceeds the size limit of",
   "fileSizeLimitExceededText": "File size limit exceeded",
   "fileUnsupported": "File uploaded is not supported",
   "fileUploadSizeConstraints": "File limit is {{fileSize}}MB",

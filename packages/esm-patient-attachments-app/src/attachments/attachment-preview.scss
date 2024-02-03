@@ -2,7 +2,7 @@
 @use '~@carbon/styles/scss/colors';
 @import "../root.scss";
 
-.attachmentPreview {
+.previewContainer {
   display: grid;
   grid-template-columns: 1fr 16rem;
   position: fixed;
@@ -26,15 +26,13 @@
   color: $ui-01;
 }
 
-.closePreviewButton > svg > path {
-  fill: $ui-01 !important;
+.closePreviewButton {
+  > svg {
+    fill: white !important;
+  }
 }
 
-.closePreviewButton:hover > svg > path {
-  fill: $ui-05 !important;
-}
-
-.attachmentImage {
+.attachmentPreview {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,13 +49,14 @@
   }
 }
 
-.overflowMenu button svg circle{
-  fill: $ui-01;
-}
+.overflowMenu {
+  &:hover {
+    background-color: hsla(0,0%,55%,.12) !important;
+  }
 
-.overflowMenu:hover button svg circle,
-.overflowMenu:focus button svg circle {
-  fill: $ui-05;
+  svg {
+    fill: white;
+  }
 }
 
 .imageDescription {

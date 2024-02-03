@@ -11,17 +11,18 @@ export interface FileReviewContainerProps {
 }
 
 interface FilePreviewProps {
-  uploadedFile: UploadedFile;
-  collectDescription?: boolean;
-  onSaveFile: (dataUri: UploadedFile) => void;
   clearData?(): void;
+  collectDescription?: boolean;
   moveToNextFile: () => void;
+  onSaveFile: (dataUri: UploadedFile) => void;
+  uploadedFile: UploadedFile;
 }
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
-  const { filesToUpload, clearData, setFilesToUpload, closeModal, collectDescription } =
+
+  const { clearData, closeModal, collectDescription, filesToUpload, setFilesToUpload } =
     useContext(CameraMediaUploaderContext);
 
   const moveToNextFile = useCallback(() => {
@@ -47,11 +48,12 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </ModalHeader>
       <FilePreview
-        uploadedFile={filesToUpload[currentFile - 1]}
+        key={filesToUpload[currentFile - 1]?.fileName}
         clearData={clearData}
-        onSaveFile={handleSave}
-        moveToNextFile={moveToNextFile}
         collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
+        moveToNextFile={moveToNextFile}
+        onSaveFile={handleSave}
+        uploadedFile={filesToUpload[currentFile - 1]}
       />
     </div>
   );
@@ -59,18 +61,13 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
 
 const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescription, onSaveFile, clearData }) => {
   const { t } = useTranslation();
-  const [fileName, setFileName] = useState('');
-  const [fileDescription, setFileDescription] = useState('');
+  const [fileName, setFileName] = useState(uploadedFile.fileName);
+  const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
   const [emptyName, setEmptyName] = useState(false);
 
-  useEffect(() => {
-    setFileName(uploadedFile.fileName);
-    setFileDescription(uploadedFile.fileDescription);
-  }, [uploadedFile]);
-
   const saveImageOrPdf = useCallback(
-    (e: SyntheticEvent) => {
-      e.preventDefault();
+    (event: SyntheticEvent) => {
+      event.preventDefault();
       onSaveFile?.({
         ...uploadedFile,
         fileName,
@@ -81,30 +78,32 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
   );
 
   const cancelCapture = useCallback(
-    (e: SyntheticEvent) => {
-      e.preventDefault();
+    (event: SyntheticEvent) => {
+      event.preventDefault();
       clearData?.();
     },
     [clearData],
   );
 
   const updateFileName = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      if (e.target.value === '') {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      event.preventDefault();
+
+      if (event.target.value === '') {
         setEmptyName(true);
       } else if (emptyName) {
         setEmptyName(false);
       }
-      setFileName(e.target.value);
+
+      setFileName(event.target.value);
     },
     [setEmptyName, setFileName, emptyName],
   );
 
   const updateDescription = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      e.preventDefault();
-      setFileDescription(e.target.value);
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      event.preventDefault();
+      setFileDescription(event.target.value);
     },
     [setFileDescription],
   );
@@ -127,29 +126,29 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
           <Stack gap={5}>
             <div className={styles.captionFrame}>
               <TextInput
+                autoComplete="off"
+                autoFocus
                 id="caption"
+                invalid={emptyName}
+                invalidText={emptyName && t('fieldRequired', 'This field is required')}
                 labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
                   'name',
                   'name',
                 )}`}
-                autoComplete="off"
-                placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
                 onChange={updateFileName}
+                placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
                 required
                 value={fileName}
-                invalid={emptyName}
-                autoFocus
-                invalidText={emptyName && t('fieldRequired', 'This field is required')}
               />
             </div>
             {collectDescription && (
               <TextArea
+                autoComplete="off"
                 id="description"
                 labelText={t('imageDescription', 'Image description')}
-                autoComplete="off"
+                onChange={updateDescription}
                 placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
                 value={fileDescription}
-                onChange={updateDescription}
               />
             )}
           </Stack>

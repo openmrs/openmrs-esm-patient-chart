@@ -6,7 +6,7 @@ import CameraComponent from './camera.component';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import FileReviewContainer from './file-review.component';
 import MediaUploaderComponent from './media-uploader.component';
-import UploadingStatusComponent from './uploading-status.component';
+import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
 
 interface CameraMediaUploaderModalProps {
@@ -57,7 +57,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   const returnComponent = useMemo(() => {
     // If the files are all set to upload, then filesUploader is visible on the screen.
     if (uploadFilesToServer) {
-      return <UploadingStatusComponent />;
+      return <UploadStatusComponent />;
     }
 
     if (filesToUpload.length) {
@@ -70,21 +70,21 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   return (
     <CameraMediaUploaderContext.Provider
       value={{
-        multipleFiles,
-        cameraOnly,
-        collectDescription,
-        saveFile,
-        closeModal,
-        onCompletion,
-        filesToUpload,
-        setFilesToUpload,
-        uploadFilesToServer,
-        setUploadFilesToServer,
-        clearData,
-        handleTakePhoto,
-        error,
-        setError,
         allowedExtensions,
+        cameraOnly,
+        clearData,
+        closeModal,
+        collectDescription,
+        error,
+        filesToUpload,
+        handleTakePhoto,
+        multipleFiles,
+        onCompletion,
+        saveFile,
+        setError,
+        setFilesToUpload,
+        setUploadFilesToServer,
+        uploadFilesToServer,
       }}
     >
       {returnComponent}
@@ -95,6 +95,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 const CameraMediaUploadTabs = () => {
   const { t } = useTranslation();
   const [view, setView] = useState('upload');
+
   const { cameraOnly, closeModal, error } = useContext(CameraMediaUploaderContext);
   const mediaStream = useRef<MediaStream | undefined>();
 

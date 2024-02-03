@@ -1,33 +1,37 @@
-import React, { useContext, useCallback } from 'react';
-import { FileUploaderDropContainer } from '@carbon/react';
+import React, { useCallback, useContext, useState } from 'react';
+import { FileUploaderDropContainer, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { readFileAsString } from '../utils';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './media-uploader.scss';
 
+interface ErrorNotification {
+  title: string;
+  subtitle: string;
+}
+
 const MediaUploaderComponent = () => {
   const { t } = useTranslation();
-  const { fileSize } = useConfig();
+  const { maxFileSize } = useConfig();
   const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
+  const [errorNotification, setErrorNotification] = useState<ErrorNotification>(null);
 
   const upload = useCallback(
     (files: Array<File>) => {
       files.forEach((file) => {
-        if (file.size > fileSize * 1024 * 1024) {
-          showSnackbar({
+        if (file.size > maxFileSize * 1024 * 1024) {
+          setErrorNotification({
             title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
-            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
-            kind: 'error',
+            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the size limit of')} ${maxFileSize} MB.`,
           });
         } else if (!isFileExtensionAllowed(file.name, allowedExtensions)) {
-          showSnackbar({
+          setErrorNotification({
             title: t('fileExtensionNotAllowedText', 'File extension is not allowed'),
-            subtitle: `${file.name} ${t('allowedExtensionsAre', 'Allowed extensions are:')} ${allowedExtensions}`,
-            kind: 'error',
+            subtitle: `${file.name} ${t('allowedExtensionsAre', 'Allowed extensions are: ')} ${allowedExtensions}.`,
           });
         } else {
-          // Changing MB to bytes
+          // Convert MBs to bytes
           readFileAsString(file).then((base64Content) => {
             setFilesToUpload((uriData) => [
               ...uriData,
@@ -45,7 +49,7 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, fileSize, t],
+    [setFilesToUpload, maxFileSize, t],
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
@@ -58,9 +62,20 @@ const MediaUploaderComponent = () => {
 
   return (
     <div className="cds--file__container">
+      {errorNotification && (
+        <div className={styles.errorContainer}>
+          <InlineNotification
+            aria-label="Upload error notification"
+            kind="error"
+            onClose={() => setErrorNotification(null)}
+            subtitle={errorNotification.subtitle}
+            title={errorNotification.title}
+          />
+        </div>
+      )}
       <p className="cds--label-description">
         {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
-          fileSize,
+          fileSize: maxFileSize,
         })}
         .
       </p>

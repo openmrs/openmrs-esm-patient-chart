@@ -1,4 +1,6 @@
+import React, { useMemo } from 'react';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
   OverflowMenu,
@@ -12,41 +14,46 @@ import {
   TableRow,
 } from '@carbon/react';
 import { type Attachment, useLayoutType } from '@openmrs/esm-framework';
-import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {
   attachments: Array<Attachment>;
   isLoading: boolean;
-  deleteAttachment: (attachment: Attachment) => void;
-  openAttachment: (attachment: Attachment) => void;
+  onDeleteAttachment: (attachment: Attachment) => void;
+  onOpenAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   attachments,
   isLoading,
-  deleteAttachment,
-  openAttachment,
+  onDeleteAttachment,
+  onOpenAttachment,
 }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const rows = useMemo(
     () =>
       attachments.map((attachment) => ({
         id: attachment.id,
         fileName: (
-          <span role="button" tabIndex={0} className={styles.link} onClick={() => openAttachment(attachment)}>
+          <Button
+            className={styles.link}
+            kind="ghost"
+            onClick={() => onOpenAttachment(attachment)}
+            size={responsiveSize}
+          >
             {attachment.filename}
-          </span>
+          </Button>
         ),
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
-    [attachments, openAttachment],
+    [attachments, onOpenAttachment],
   );
 
   const headers = useMemo(
@@ -80,7 +87,13 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
 
   return (
     <TableContainer>
-      <DataTable rows={rows} headers={headers} size={isTablet ? 'lg' : 'sm'} overflowMenuOnHover={isDesktop}>
+      <DataTable
+        rows={rows}
+        headers={headers}
+        overflowMenuOnHover={isDesktop}
+        // `xs` on desktop to account for the overflow menu
+        size={isTablet ? 'lg' : 'xs'}
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <Table {...getTableProps()} useZebraStyles>
             <TableHead>
@@ -105,11 +118,12 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
                   <TableCell className="cds--table-column-menu">
-                    <OverflowMenu size={isTablet ? 'lg' : 'sm'} flipped align="left">
+                    <OverflowMenu align="left" flipped size={responsiveSize}>
                       <OverflowMenuItem
+                        className={styles.menuItem}
                         itemText={t('delete', 'Delete')}
                         isDelete
-                        onClick={() => deleteAttachment(attachments[indx])}
+                        onClick={() => onDeleteAttachment(attachments[indx])}
                       />
                     </OverflowMenu>
                   </TableCell>
