@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, FileUploaderItem, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { FileUploaderItem, Button, ButtonSet, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
-import styles from './uploading-status.scss';
+import styles from './upload-status.scss';
 
-interface UploadingStatusComponentProps {}
-
-const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => {
+const UploadStatusComponent: React.FC = () => {
   const { t } = useTranslation();
   const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
@@ -47,9 +45,9 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
           })
           .catch((err) => {
             showSnackbar({
-              title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
-              subtitle: err,
               kind: 'error',
+              subtitle: err,
+              title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
             });
           }),
       ),
@@ -94,4 +92,4 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
   );
 };
 
-export default UploadingStatusComponent;
+export default UploadStatusComponent;
