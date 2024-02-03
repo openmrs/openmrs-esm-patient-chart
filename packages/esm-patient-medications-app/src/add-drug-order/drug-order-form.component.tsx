@@ -372,6 +372,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                         control={control}
                         name="unit"
                         type="comboBox"
+                        watch={watch}
                         dispensingUnitsOnChange={dispensingUnitsOnChange}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
@@ -743,7 +744,10 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
             selectedItem={value}
             onChange={({ selectedItem }) => {
               onChange(selectedItem);
-              restProps.dispensingUnitsOnChange?.(selectedItem);
+              const dispensingQuantity = restProps.watch?.('pillsDispensed');
+              if (dispensingQuantity && Number(dispensingQuantity) > 0) {
+                restProps.dispensingUnitsOnChange?.(selectedItem);
+              }
             }}
             onBlur={onBlur}
             ref={ref}
