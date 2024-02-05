@@ -56,7 +56,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
     canHide = false,
     canMaximize = false,
     width = 'narrow',
-    closeWorkspace = () => {},
+    closeWorkspace,
   } = useMemo(() => workspaces?.[0] ?? ({} as OpenWorkspace), [workspaces]);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                 <HeaderGlobalAction
                   align="bottom-right"
                   label={t('close', 'Close')}
-                  onClick={() => closeWorkspace?.()}
+                  onClick={() => closeWorkspace?.({ ignoreChanges: false })}
                   size="lg"
                 >
                   <Close />

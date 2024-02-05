@@ -24,7 +24,6 @@ export interface WorkspaceStoreState {
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
-  closeWorkspace(): boolean;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -103,9 +102,18 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
   return ext.name;
 }
 
+/**
+ *
+ * @param name Name of the workspace
+ * @param ignoreChanges Whether to forcefully ignore changes in the workspace
+ * @returns true if the workspace can be closed.
+ */
 export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges: boolean = false) {
+  if (ignoreChanges) {
+    return true;
+  }
   const promptBeforeFn = getPromptBeforeClosingFcn(name);
-  return ignoreChanges || !promptBeforeFn || !promptBeforeFn();
+  return !promptBeforeFn || !promptBeforeFn();
 }
 
 function promptBeforeLaunchingWorkspace(
@@ -116,12 +124,11 @@ function promptBeforeLaunchingWorkspace(
 
   const proceed = () => {
     workspace.closeWorkspace({
+      // Calling the launchPatientWorkspace again, since one of the `if` case
+      // might resolve, but we need to check all the cases before launching the form.
       onWorkspaceClose: () => launchPatientWorkspace(name, additionalProps),
     });
   };
-
-  // Calling the launchPatientWorkspace again, since one of the `if` case
-  // might resolve, but we need to check all the cases before launching the form.
 
   if (!getWhetherWorkspaceCanBeClosed(workspace.name)) {
     showWorkspacePrompts('closing-workspace-launching-new-workspace', proceed, workspace.title ?? workspace.name);
@@ -236,6 +243,12 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
+/**
+ * Function to close an opened workspace
+ * @param name Workspace registration name
+ * @param options Options to close workspace
+ * @returns
+ */
 export function closeWorkspace(
   name: string,
   options: CloseWorkspaceOptions = {
@@ -322,6 +335,14 @@ export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
 }
 
 type PromptType = 'closing-workspace' | 'closing-all-workspaces' | 'closing-workspace-launching-new-workspace';
+
+/**
+ * Which type of prompt should be shown to the user.
+ * @param promptType 'closing-workspace' | 'closing-all-workspaces' | 'closing-workspace-launching-new-workspace'
+ * @param onConfirmation Function to be called after the user confirms to close the workspace
+ * @param workspaceTitle Workspace title to be shown in the prompt
+ * @returns
+ */
 
 export function showWorkspacePrompts(
   promptType: PromptType,
