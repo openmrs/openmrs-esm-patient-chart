@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -194,6 +194,20 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     onSave(newBasketItems as DrugOrderBasketItem);
   };
 
+  const {
+    field: { onChange: dispensingUnitsOnChange },
+  } = useController<MedicationOrderFormData>({ name: 'quantityUnits', control });
+  const {
+    field: { value: dispensingQuantity },
+  } = useController<MedicationOrderFormData>({ name: 'pillsDispensed', control });
+
+  useEffect(() => {
+    if (dispensingQuantity && Number(dispensingQuantity) > 0) {
+      const currentDosageUnit = watch('unit');
+      dispensingUnitsOnChange(currentDosageUnit);
+    }
+  }, [dispensingQuantity]);
+
   const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
       orderConfigObject?.drugDosingUnits ?? [
@@ -368,6 +382,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                         control={control}
                         name="unit"
                         type="comboBox"
+                        watch={watch}
+                        dispensingUnitsOnChange={dispensingUnitsOnChange}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         items={drugDosingUnits}
@@ -732,18 +748,35 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       );
 
     if (type === 'comboBox')
-      return (
-        <ComboBox
-          selectedItem={value}
-          onChange={({ selectedItem }) => onChange(selectedItem)}
-          onBlur={onBlur}
-          ref={ref}
-          className={fieldState?.error?.message && styles.fieldError}
-          {...restProps}
-        />
-      );
+      if (name === 'unit') {
+        return (
+          <ComboBox
+            selectedItem={value}
+            onChange={({ selectedItem }) => {
+              onChange(selectedItem);
+              const dispensingQuantity = restProps.watch?.('pillsDispensed');
+              if (dispensingQuantity && Number(dispensingQuantity) > 0) {
+                restProps.dispensingUnitsOnChange?.(selectedItem);
+              }
+            }}
+            onBlur={onBlur}
+            ref={ref}
+            className={fieldState?.error?.message && styles.fieldError}
+            {...restProps}
+          />
+        );
+      }
 
-    return null;
+    return (
+      <ComboBox
+        selectedItem={value}
+        onChange={({ selectedItem }) => onChange(selectedItem)}
+        onBlur={onBlur}
+        ref={ref}
+        className={fieldState?.error?.message && styles.fieldError}
+        {...restProps}
+      />
+    );
   }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
 
   return (
