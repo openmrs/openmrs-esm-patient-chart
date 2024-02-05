@@ -1,5 +1,9 @@
 @import '../root.scss';
 
+.errorContainer {
+  margin: 1rem 0;
+}
+
 .uploadFile {
   color: $ui-02;
   width: 100%;

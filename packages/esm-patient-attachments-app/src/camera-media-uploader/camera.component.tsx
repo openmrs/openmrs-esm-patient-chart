@@ -25,11 +25,11 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ mediaStream, stopCame
   );
   return (
     <Camera
-      onTakePhoto={handleTakePhoto}
+      isDisplayStartCameraError={false}
+      onCameraError={setError}
       onCameraStart={setMediaStream}
       onCameraStop={stopCameraStream}
-      onCameraError={setError}
-      isDisplayStartCameraError={false}
+      onTakePhoto={handleTakePhoto}
     />
   );
 };
