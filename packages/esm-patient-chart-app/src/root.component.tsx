@@ -44,6 +44,13 @@ export default function Root() {
  * t('error', 'Error')
  * t('seeAll', 'See all')
  * t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
- * t('unsavedChangesInForms', 'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}')
- * t('closeWorkspaces', 'Discard changes in {{count}} workspaces', {count})
+
+ * t('unsavedChangesInOpenedWorkspace', 'You have unsaved changes in the opened workspace. Do you want to discard these changes?')
+ * t('unsavedChangesTitleText', 'Unsaved Changes')
+ * t('discard','Discard')
+ * t('closingAllWorkspacesPromptTitle','You have unsaved changes')
+ * t('closingAllWorkspacesPromptBody', 'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}')
+ * t('closeAllOpenedWorkspaces', 'Discard changes in {{count}} workspaces')
+ * t('unsavedChangesInWorkspace', 'There are unsaved changes in {{formName}}. Please save them before opening another workspace.')
+ * t('openAnyway', 'Open anyway')
  */

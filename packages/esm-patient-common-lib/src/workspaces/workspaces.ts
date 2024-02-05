@@ -357,8 +357,8 @@ export function showWorkspacePrompts(
         title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'unsavedChangeText',
-          `You have unsaved changes in the side panel. Do you want to discard these changes?`,
+          'unsavedChangesInOpenedWorkspace',
+          `You have unsaved changes in the opened workspace. Do you want to discard these changes?`,
         ),
         onConfirm: () => {
           onConfirmation?.();
@@ -377,13 +377,17 @@ export function showWorkspacePrompts(
         .map(({ title }, indx) => `${indx + 1}. ${title}`);
 
       const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+        title: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'closingAllWorkspacesPromptTitle',
+          'You have unsaved changes',
+        ),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'unsavedChangesInForms',
-          `There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}`,
+          'closingAllWorkspacesPromptBody',
+          'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}',
           {
-            workspaceNames: workspacesNotClosed.join(' '),
+            workspaceNames: workspacesNotClosed.join(','),
           },
         ),
         onConfirm: () => {
@@ -391,7 +395,7 @@ export function showWorkspacePrompts(
         },
         confirmText: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'closeWorkspaces',
+          'closeAllOpenedWorkspaces',
           'Discard changes in {{count}} workspaces',
           { count: workspacesNotClosed.length },
         ),
@@ -404,11 +408,11 @@ export function showWorkspacePrompts(
     }
     case 'closing-workspace-launching-new-workspace': {
       const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'unsavedChangesInForm',
-          'There are unsaved changes in {{formName}}. Please save them before opening another form.',
+          'unsavedChangesInWorkspace',
+          'There are unsaved changes in {{formName}}. Please save them before opening another workspace.',
           { formName: workspaceTitle },
         ),
         onConfirm: () => {
