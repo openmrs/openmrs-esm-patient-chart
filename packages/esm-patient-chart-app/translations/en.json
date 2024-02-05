@@ -161,8 +161,6 @@
   "type": "Type",
   "undo": "Undo",
   "unknown": "Unknown",
-  "unsavedChanges": "You have unsaved changes",
-  "unsavedChangesInForm": "There are unsaved changes in {{formName}}. Please save them before opening another form.",
   "unsavedChangesInOpenedWorkspace": "You have unsaved changes in the opened workspace. Do you want to discard these changes?",
   "unsavedChangesInWorkspace": "There are unsaved changes in {{formName}}. Please save them before opening another workspace.",
   "unsavedChangesTitleText": "Unsaved Changes",
