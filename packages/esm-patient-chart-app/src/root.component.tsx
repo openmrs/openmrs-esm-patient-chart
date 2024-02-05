@@ -51,6 +51,6 @@ export default function Root() {
  * t('closingAllWorkspacesPromptTitle','You have unsaved changes')
  * t('closingAllWorkspacesPromptBody', 'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}')
  * t('closeAllOpenedWorkspaces', 'Discard changes in {{count}} workspaces')
- * t('unsavedChangesInWorkspace', 'There are unsaved changes in {{formName}}. Please save them before opening another workspace.')
+ * t('unsavedChangesInWorkspace', 'There are unsaved changes in {{workspaceName}}. Please save them before opening another workspace.')
  * t('openAnyway', 'Open anyway')
  */

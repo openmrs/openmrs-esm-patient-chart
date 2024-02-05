@@ -412,8 +412,8 @@ export function showWorkspacePrompts(
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
           'unsavedChangesInWorkspace',
-          'There are unsaved changes in {{formName}}. Please save them before opening another workspace.',
-          { formName: workspaceTitle },
+          'There are unsaved changes in {{workspaceName}}. Please save them before opening another workspace.',
+          { workspaceName: workspaceTitle },
         ),
         onConfirm: () => {
           store.setState((prevState) => ({
