@@ -91,8 +91,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
   ]);
 
   const handleCancel = useCallback(() => {
-    clearOrders();
-    closeWorkspace();
+    closeWorkspace({ onWorkspaceClose: clearOrders });
   }, [clearOrders, closeWorkspace]);
 
   return (

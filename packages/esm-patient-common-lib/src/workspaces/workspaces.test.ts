@@ -70,11 +70,13 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces.length).toEqual(0);
     });
 
-    it('should show a modal when a workspace is already open and it cannot hide', () => {
+    it('should show a modal when a workspace is already open (with changes) and it cannot hide', () => {
       const store = getWorkspaceStore();
       registerWorkspace({ name: 'allergies', title: 'Allergies', load: jest.fn() });
       launchPatientWorkspace('allergies', { foo: true });
       expect(store.getState().openWorkspaces.length).toEqual(1);
+      const allergies = store.getState().openWorkspaces?.[0];
+      allergies.promptBeforeClosing(() => true);
       registerWorkspace({ name: 'conditions', title: 'Conditions', load: jest.fn() });
       launchPatientWorkspace('conditions', { foo: true });
       const prompt = store.getState().prompt;
@@ -223,6 +225,8 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions');
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces.map((w) => w.name)).toEqual(['conditions', 'attachments', 'allergies']);
+      const conditionsWorkspace = store.getState().openWorkspaces?.[0];
+      conditionsWorkspace.promptBeforeClosing(() => true);
       launchPatientWorkspace('vitals');
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces[0].name).toBe('conditions');
@@ -280,11 +284,11 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions');
       expect(store.getState().openWorkspaces.length).toBe(3);
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace();
       expect(store.getState().workspaceWindowState).toBe('normal');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace();
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace();
       expect(store.getState().workspaceWindowState).toBe('normal');
     });
   });
@@ -321,6 +325,8 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
     expect(store.getState().openWorkspaces[1].name).toBe('form-entry');
+    const formEntryWorkspace = store.getState().openWorkspaces[1];
+    formEntryWorkspace.promptBeforeClosing(() => true);
     // Test going through confirmation flow while order-meds is open
     // Changing the form workspace shouldn't destroy the order-meds workspace
     launchPatientWorkspace('conditions');
@@ -389,7 +395,7 @@ describe('workspace system', () => {
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
     launchPatientWorkspace('hiv');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
-    store.getState().openWorkspaces[0].closeWorkspace(false);
+    store.getState().openWorkspaces[0].closeWorkspace({ ignoreChanges: false });
     expect(store.getState().prompt.title).toBe('Unsaved Changes');
     expect(store.getState().prompt.body).toBe(
       'You have unsaved changes in the side panel. Do you want to discard these changes?',
