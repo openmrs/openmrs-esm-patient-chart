@@ -72,9 +72,8 @@ export const useBilling = (patientUuid) => {
   const flattendPayments = bills.flatMap((bill) => bill.payments);
 
   const totalBill = flattendBills.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const totalPayments = flattendPayments.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalPayments = flattendPayments.reduce((acc, curr) => acc + curr.amountTendered, 0);
   const patientBillBalance = totalBill - totalPayments;
-
   useEffect(() => {
     let isEffectActive = true; // Flag to track if effect is active
 
@@ -98,7 +97,6 @@ export const useBilling = (patientUuid) => {
         return () => {
           isEffectActive = false; // Mark effect as inactive
           if (dispose) {
-            console.log('Cleanup: Disposing resources');
             dispose();
           }
         };
