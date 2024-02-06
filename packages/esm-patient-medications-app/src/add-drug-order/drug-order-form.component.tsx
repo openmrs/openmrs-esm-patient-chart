@@ -267,28 +267,27 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
   );
 
   return (
-    <FormProvider {...methods}>
-      <div className={styles.container}>
-        {showStickyMedicationHeader && (
-          <div className={styles.stickyMedicationInfo}>
-            <MedicationInfoHeader
-              dosage={dosage}
-              orderBasketItem={initialOrderBasketItem}
-              routeValue={routeValue}
-              unitValue={unitValue}
-            />
-          </div>
-        )}
-        {isTablet && !isLoadingPatientDetails && (
-          <div className={styles.patientHeader}>
-            <span className={styles.bodyShort02}>{patientName}</span>
-            <span className={classNames(styles.text02, styles.bodyShort01)}>
-              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-            </span>
-          </div>
-        )}
-
+    <div className={styles.container}>
+      {showStickyMedicationHeader && (
+        <div className={styles.stickyMedicationInfo}>
+          <MedicationInfoHeader
+            dosage={dosage}
+            orderBasketItem={initialOrderBasketItem}
+            routeValue={routeValue}
+            unitValue={unitValue}
+          />
+        </div>
+      )}
+      {isTablet && !isLoadingPatientDetails && (
+        <div className={styles.patientHeader}>
+          <span className={styles.bodyShort02}>{patientName}</span>
+          <span className={classNames(styles.text02, styles.bodyShort01)}>
+            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+          </span>
+        </div>
+      )}
+      <FormProvider {...methods}>
         <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
           <div>
             {errorFetchingOrderConfig && (
@@ -642,8 +641,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
             </Button>
           </ButtonSet>
         </Form>
-      </div>
-    </FormProvider>
+      </FormProvider>
+    </div>
   );
 }
 
