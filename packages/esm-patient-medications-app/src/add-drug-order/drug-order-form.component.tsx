@@ -61,7 +61,13 @@ const schemaFields = {
   duration: z.number().nullable(),
   durationUnit: z.object({ ...comboSchema }).nullable(),
   pillsDispensed: z.number().nullable(),
-  quantityUnits: z.object({ ...comboSchema }).nullable(),
+  quantityUnits: z
+    .object({ ...comboSchema })
+    // .nullable is added intentionally, as not to show the
+    // following error to the user: "Expected Object, recieved null"
+    .nullable()
+    // .refine will handle the required nature of the quantity unit
+    .refine((val) => !!val, { message: 'Quantity unit is required' }),
   numRefills: z.number().nullable(),
   indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
   startDate: z.date(),
@@ -165,7 +171,13 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: defaultStartDate,
     },
   });
-  const { handleSubmit, control, watch, setValue } = methods;
+  const {
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = methods;
 
   const handleUnitAfterChange = (
     newValue: MedicationOrderFormData['unit'],
