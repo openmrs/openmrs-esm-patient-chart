@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -24,7 +24,7 @@ import {
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useController, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useController, useForm, useFormContext } from 'react-hook-form';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -143,7 +143,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
-  const { handleSubmit, control, watch, setValue } = useForm<MedicationOrderFormData>({
+  const methods = useForm<MedicationOrderFormData>({
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
     defaultValues: {
@@ -165,20 +165,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: defaultStartDate,
     },
   });
+  const { handleSubmit, control, watch, setValue } = methods;
 
-  const {
-    field: { onChange: dispensingUnitsOnChange },
-  } = useController<MedicationOrderFormData>({ name: 'quantityUnits', control });
-  const {
-    field: { value: dispensingQuantity },
-  } = useController<MedicationOrderFormData>({ name: 'pillsDispensed', control });
-
-  useEffect(() => {
-    if (dispensingQuantity && Number(dispensingQuantity) > 0) {
-      const currentDosageUnit = watch('unit');
-      dispensingUnitsOnChange(currentDosageUnit);
+  const handleUnitAfterChange = (
+    newValue: MedicationOrderFormData['unit'],
+    prevValue: MedicationOrderFormData['unit'],
+  ) => {
+    if (prevValue?.valueCoded === watch('quantityUnits')?.valueCoded) {
+      setValue('quantityUnits', newValue);
     }
-  }, [dispensingQuantity]);
+  };
 
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
@@ -271,54 +267,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
   );
 
   return (
-    <div className={styles.container}>
-      {showStickyMedicationHeader && (
-        <div className={styles.stickyMedicationInfo}>
-          <MedicationInfoHeader
-            dosage={dosage}
-            orderBasketItem={initialOrderBasketItem}
-            routeValue={routeValue}
-            unitValue={unitValue}
-          />
-        </div>
-      )}
-      {isTablet && !isLoadingPatientDetails && (
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
-      )}
-
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
-        <div>
-          {errorFetchingOrderConfig && (
-            <InlineNotification
-              kind="error"
-              lowContrast
-              className={styles.inlineNotification}
-              title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
-              subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-            />
-          )}
-          {!isTablet && (
-            <div className={styles.backButton}>
-              <Button
-                kind="ghost"
-                renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-                iconDescription="Return to order basket"
-                size="sm"
-                onClick={onCancel}
-              >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-              </Button>
-            </div>
-          )}
-
-          <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
-          <div ref={medicationInfoHeaderRef}>
+    <FormProvider {...methods}>
+      <div className={styles.container}>
+        {showStickyMedicationHeader && (
+          <div className={styles.stickyMedicationInfo}>
             <MedicationInfoHeader
               dosage={dosage}
               orderBasketItem={initialOrderBasketItem}
@@ -326,327 +278,372 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
               unitValue={unitValue}
             />
           </div>
-          <section className={styles.formSection}>
-            <Grid className={styles.gridRow}>
-              <Column lg={12} md={6} sm={4}>
-                <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
-              </Column>
-              <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
-                <ControlledFieldInput
-                  name="isFreeTextDosage"
-                  type="toggle"
-                  control={control}
+        )}
+        {isTablet && !isLoadingPatientDetails && (
+          <div className={styles.patientHeader}>
+            <span className={styles.bodyShort02}>{patientName}</span>
+            <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+            </span>
+          </div>
+        )}
+
+        <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+          <div>
+            {errorFetchingOrderConfig && (
+              <InlineNotification
+                kind="error"
+                lowContrast
+                className={styles.inlineNotification}
+                title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
+                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+              />
+            )}
+            {!isTablet && (
+              <div className={styles.backButton}>
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+                  iconDescription="Return to order basket"
                   size="sm"
-                  id="freeTextDosageToggle"
-                  aria-label={t('freeTextDosage', 'Free text dosage')}
-                  labelText={t('freeTextDosage', 'Free text dosage')}
-                />
-              </Column>
-            </Grid>
-            {watch('isFreeTextDosage') ? (
+                  onClick={onCancel}
+                >
+                  <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+                </Button>
+              </div>
+            )}
+
+            <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
+            <div ref={medicationInfoHeaderRef}>
+              <MedicationInfoHeader
+                dosage={dosage}
+                orderBasketItem={initialOrderBasketItem}
+                routeValue={routeValue}
+                unitValue={unitValue}
+              />
+            </div>
+            <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
-                <Column md={8}>
+                <Column lg={12} md={6} sm={4}>
+                  <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
+                </Column>
+                <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
                   <ControlledFieldInput
+                    name="isFreeTextDosage"
+                    type="toggle"
                     control={control}
-                    name="freeTextDosage"
-                    type="textArea"
+                    size="sm"
+                    id="freeTextDosageToggle"
+                    aria-label={t('freeTextDosage', 'Free text dosage')}
                     labelText={t('freeTextDosage', 'Free text dosage')}
-                    placeholder={t('freeTextDosage', 'Free text dosage')}
-                    maxLength={65535}
                   />
                 </Column>
               </Grid>
-            ) : (
-              <>
+              {watch('isFreeTextDosage') ? (
                 <Grid className={styles.gridRow}>
-                  <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
-                    <InputWrapper>
-                      <div className={styles.numberInput}>
-                        <ControlledFieldInput
-                          control={control}
-                          type="number"
-                          name="dosage"
-                          size={isTablet ? 'lg' : 'md'}
-                          id="doseSelection"
-                          placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                          label={t('editDoseComboBoxTitle', 'Dose')}
-                          min={0}
-                          hideSteppers={true}
-                        />
-                      </div>
-                    </InputWrapper>
-                  </Column>
-                  <Column lg={8} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="unit"
-                        type="comboBox"
-                        watch={watch}
-                        dispensingUnitsOnChange={dispensingUnitsOnChange}
-                        size={isTablet ? 'lg' : 'md'}
-                        id="dosingUnits"
-                        items={drugDosingUnits}
-                        placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
-                        titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                        itemToString={(item) => item?.value}
-                      />
-                    </InputWrapper>
+                  <Column md={8}>
+                    <ControlledFieldInput
+                      control={control}
+                      name="freeTextDosage"
+                      type="textArea"
+                      labelText={t('freeTextDosage', 'Free text dosage')}
+                      placeholder={t('freeTextDosage', 'Free text dosage')}
+                      maxLength={65535}
+                    />
                   </Column>
                 </Grid>
-                <Grid className={styles.gridRow}>
-                  <Column lg={8} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="route"
-                        type="comboBox"
-                        size={isTablet ? 'lg' : 'md'}
-                        id="editRoute"
-                        items={drugRoutes}
-                        placeholder={t('editRouteComboBoxTitle', 'Route')}
-                        titleText={t('editRouteComboBoxTitle', 'Route')}
-                        itemToString={(item) => item?.value}
-                      />
-                    </InputWrapper>
-                  </Column>
-                  <Column lg={8} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="frequency"
-                        type="comboBox"
-                        size={isTablet ? 'lg' : 'md'}
-                        id="editFrequency"
-                        items={orderFrequencies}
-                        placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
-                        titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                        itemToString={(item) => item?.value}
-                      />
-                    </InputWrapper>
-                  </Column>
-                </Grid>
-
-                <Grid className={styles.gridRow}>
-                  <Column lg={16} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="patientInstructions"
-                        type="textArea"
-                        labelText={t('patientInstructions', 'Patient instructions')}
-                        placeholder={t(
-                          'patientInstructionsPlaceholder',
-                          'Additional dosing instructions (e.g. "Take after eating")',
-                        )}
-                        maxLength={65535}
-                        rows={isTablet ? 6 : 4}
-                      />
-                    </InputWrapper>
-                  </Column>
-                  <Column lg={16} md={4} sm={4}>
-                    <Grid className={styles.gridRow}>
-                      <Column lg={6} md={8} sm={4}>
-                        <InputWrapper>
-                          <FormGroup legendText={t('prn', 'P.R.N.')}>
-                            <ControlledFieldInput
-                              control={control}
-                              name="asNeeded"
-                              type="checkbox"
-                              id="prn"
-                              labelText={t('takeAsNeeded', 'Take as needed')}
-                              size="lg"
-                            />
-                          </FormGroup>
-                        </InputWrapper>
-                      </Column>
-
-                      <Column lg={10} md={8} sm={4}>
-                        <InputWrapper>
+              ) : (
+                <>
+                  <Grid className={styles.gridRow}>
+                    <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
+                      <InputWrapper>
+                        <div className={styles.numberInput}>
                           <ControlledFieldInput
                             control={control}
-                            name="asNeededCondition"
-                            type="textArea"
-                            labelText={t('prnReason', 'P.R.N. reason')}
-                            placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
-                            rows={3}
-                            maxLength={255}
-                            disabled={!watch('asNeeded')}
+                            type="number"
+                            name="dosage"
+                            size={isTablet ? 'lg' : 'md'}
+                            id="doseSelection"
+                            placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                            label={t('editDoseComboBoxTitle', 'Dose')}
+                            min={0}
+                            hideSteppers={true}
                           />
-                        </InputWrapper>
-                      </Column>
-                    </Grid>
-                  </Column>
-                </Grid>
-              </>
-            )}
-          </section>
-          <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription duration')}</h3>
-            <Grid className={styles.gridRow}>
-              {/* TODO: This input does nothing */}
-              <Column lg={16} md={4} sm={4}>
-                <div className={styles.fullWidthDatePickerContainer}>
+                        </div>
+                      </InputWrapper>
+                    </Column>
+                    <Column lg={8} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="unit"
+                          type="comboBox"
+                          size={isTablet ? 'lg' : 'md'}
+                          id="dosingUnits"
+                          items={drugDosingUnits}
+                          placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                          titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                          itemToString={(item) => item?.value}
+                          handleAfterChange={handleUnitAfterChange}
+                        />
+                      </InputWrapper>
+                    </Column>
+                  </Grid>
+                  <Grid className={styles.gridRow}>
+                    <Column lg={8} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="route"
+                          type="comboBox"
+                          size={isTablet ? 'lg' : 'md'}
+                          id="editRoute"
+                          items={drugRoutes}
+                          placeholder={t('editRouteComboBoxTitle', 'Route')}
+                          titleText={t('editRouteComboBoxTitle', 'Route')}
+                          itemToString={(item) => item?.value}
+                        />
+                      </InputWrapper>
+                    </Column>
+                    <Column lg={8} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="frequency"
+                          type="comboBox"
+                          size={isTablet ? 'lg' : 'md'}
+                          id="editFrequency"
+                          items={orderFrequencies}
+                          placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
+                          titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
+                          itemToString={(item) => item?.value}
+                        />
+                      </InputWrapper>
+                    </Column>
+                  </Grid>
+
+                  <Grid className={styles.gridRow}>
+                    <Column lg={16} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="patientInstructions"
+                          type="textArea"
+                          labelText={t('patientInstructions', 'Patient instructions')}
+                          placeholder={t(
+                            'patientInstructionsPlaceholder',
+                            'Additional dosing instructions (e.g. "Take after eating")',
+                          )}
+                          maxLength={65535}
+                          rows={isTablet ? 6 : 4}
+                        />
+                      </InputWrapper>
+                    </Column>
+                    <Column lg={16} md={4} sm={4}>
+                      <Grid className={styles.gridRow}>
+                        <Column lg={6} md={8} sm={4}>
+                          <InputWrapper>
+                            <FormGroup legendText={t('prn', 'P.R.N.')}>
+                              <ControlledFieldInput
+                                control={control}
+                                name="asNeeded"
+                                type="checkbox"
+                                id="prn"
+                                labelText={t('takeAsNeeded', 'Take as needed')}
+                                size="lg"
+                              />
+                            </FormGroup>
+                          </InputWrapper>
+                        </Column>
+
+                        <Column lg={10} md={8} sm={4}>
+                          <InputWrapper>
+                            <ControlledFieldInput
+                              control={control}
+                              name="asNeededCondition"
+                              type="textArea"
+                              labelText={t('prnReason', 'P.R.N. reason')}
+                              placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
+                              rows={3}
+                              maxLength={255}
+                              disabled={!watch('asNeeded')}
+                            />
+                          </InputWrapper>
+                        </Column>
+                      </Grid>
+                    </Column>
+                  </Grid>
+                </>
+              )}
+            </section>
+            <section className={styles.formSection}>
+              <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription duration')}</h3>
+              <Grid className={styles.gridRow}>
+                {/* TODO: This input does nothing */}
+                <Column lg={16} md={4} sm={4}>
+                  <div className={styles.fullWidthDatePickerContainer}>
+                    <InputWrapper>
+                      <Controller
+                        name="startDate"
+                        control={control}
+                        render={({ field: { onBlur, value, onChange, ref } }) => (
+                          <DatePicker
+                            datePickerType="single"
+                            maxDate={new Date().toISOString()}
+                            value={value}
+                            onChange={([newStartDate]) => onChange(newStartDate)}
+                            onBlur={onBlur}
+                            ref={ref}
+                          >
+                            <DatePickerInput
+                              id="startDatePicker"
+                              placeholder="mm/dd/yyyy"
+                              labelText={t('startDate', 'Start date')}
+                              size="lg"
+                            />
+                          </DatePicker>
+                        )}
+                      />
+                    </InputWrapper>
+                  </div>
+                </Column>
+                <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
-                    <Controller
-                      name="startDate"
+                    {!isTablet ? (
+                      <ControlledFieldInput
+                        control={control}
+                        name="duration"
+                        type="number"
+                        size="lg"
+                        id="durationInput"
+                        label={t('duration', 'Duration')}
+                        min={0}
+                        step={1}
+                        max={maxDispenseDurationInDays}
+                        allowEmpty={true}
+                      />
+                    ) : (
+                      <CustomNumberInput
+                        control={control}
+                        setValue={setValue}
+                        name="duration"
+                        labelText={t('duration', 'Duration')}
+                      />
+                    )}
+                  </InputWrapper>
+                </Column>
+                <Column lg={8} md={2} sm={4}>
+                  <InputWrapper>
+                    <ControlledFieldInput
                       control={control}
-                      render={({ field: { onBlur, value, onChange, ref } }) => (
-                        <DatePicker
-                          datePickerType="single"
-                          maxDate={new Date().toISOString()}
-                          value={value}
-                          onChange={([newStartDate]) => onChange(newStartDate)}
-                          onBlur={onBlur}
-                          ref={ref}
-                        >
-                          <DatePickerInput
-                            id="startDatePicker"
-                            placeholder="mm/dd/yyyy"
-                            labelText={t('startDate', 'Start date')}
-                            size="lg"
-                          />
-                        </DatePicker>
-                      )}
+                      name="durationUnit"
+                      type="comboBox"
+                      size="lg"
+                      id="durationUnitPlaceholder"
+                      titleText={t('durationUnit', 'Duration unit')}
+                      items={durationUnits}
+                      itemToString={(item) => item?.value}
+                      placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
                     />
                   </InputWrapper>
-                </div>
-              </Column>
-              <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
-                <InputWrapper>
-                  {!isTablet ? (
+                </Column>
+              </Grid>
+            </section>
+            <section className={styles.formSection}>
+              <h3 className={styles.sectionHeader}>{t('dispensingInformation', '3. Dispensing instructions')}</h3>
+              <Grid className={styles.gridRow}>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
                     <ControlledFieldInput
                       control={control}
-                      name="duration"
+                      name="pillsDispensed"
                       type="number"
                       size="lg"
-                      id="durationInput"
-                      label={t('duration', 'Duration')}
+                      id="quantityDispensed"
+                      label={t('quantityToDispense', 'Quantity to dispense')}
                       min={0}
-                      step={1}
-                      max={maxDispenseDurationInDays}
-                      allowEmpty={true}
+                      hideSteppers
                     />
-                  ) : (
-                    <CustomNumberInput
-                      control={control}
-                      setValue={setValue}
-                      name="duration"
-                      labelText={t('duration', 'Duration')}
-                    />
-                  )}
-                </InputWrapper>
-              </Column>
-              <Column lg={8} md={2} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="durationUnit"
-                    type="comboBox"
-                    size="lg"
-                    id="durationUnitPlaceholder"
-                    titleText={t('durationUnit', 'Duration unit')}
-                    items={durationUnits}
-                    itemToString={(item) => item?.value}
-                    placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          </section>
-          <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('dispensingInformation', '3. Dispensing instructions')}</h3>
-            <Grid className={styles.gridRow}>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="pillsDispensed"
-                    type="number"
-                    size="lg"
-                    id="quantityDispensed"
-                    label={t('quantityToDispense', 'Quantity to dispense')}
-                    min={0}
-                    hideSteppers
-                  />
-                </InputWrapper>
-              </Column>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="quantityUnits"
-                    type="comboBox"
-                    size="lg"
-                    id="dispensingUnits"
-                    items={drugDispensingUnits}
-                    placeholder={t('editDispensingUnit', 'Quantity unit')}
-                    titleText={t('editDispensingUnit', 'Quantity unit')}
-                    itemToString={(item) => item?.value}
-                  />
-                </InputWrapper>
-              </Column>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  {!isTablet ? (
+                  </InputWrapper>
+                </Column>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
                     <ControlledFieldInput
                       control={control}
-                      name="numRefills"
-                      type="number"
+                      name="quantityUnits"
+                      type="comboBox"
                       size="lg"
-                      id="prescriptionRefills"
-                      min={0}
-                      label={t('prescriptionRefills', 'Prescription refills')}
-                      max={99}
+                      id="dispensingUnits"
+                      items={drugDispensingUnits}
+                      placeholder={t('editDispensingUnit', 'Quantity unit')}
+                      titleText={t('editDispensingUnit', 'Quantity unit')}
+                      itemToString={(item) => item?.value}
                     />
-                  ) : (
-                    <CustomNumberInput
+                  </InputWrapper>
+                </Column>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
+                    {!isTablet ? (
+                      <ControlledFieldInput
+                        control={control}
+                        name="numRefills"
+                        type="number"
+                        size="lg"
+                        id="prescriptionRefills"
+                        min={0}
+                        label={t('prescriptionRefills', 'Prescription refills')}
+                        max={99}
+                      />
+                    ) : (
+                      <CustomNumberInput
+                        control={control}
+                        setValue={setValue}
+                        name="numRefills"
+                        labelText={t('prescriptionRefills', 'Prescription refills')}
+                      />
+                    )}
+                  </InputWrapper>
+                </Column>
+              </Grid>
+              <Grid className={styles.gridRow}>
+                <Column lg={16} md={6} sm={4}>
+                  <InputWrapper>
+                    <ControlledFieldInput
                       control={control}
-                      setValue={setValue}
-                      name="numRefills"
-                      labelText={t('prescriptionRefills', 'Prescription refills')}
+                      name="indication"
+                      type="textInput"
+                      size="lg"
+                      id="indication"
+                      labelText={t('indication', 'Indication')}
+                      placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                      maxLength={150}
                     />
-                  )}
-                </InputWrapper>
-              </Column>
-            </Grid>
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={6} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="indication"
-                    type="textInput"
-                    size="lg"
-                    id="indication"
-                    labelText={t('indication', 'Indication')}
-                    placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                    maxLength={150}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          </section>
-        </div>
+                  </InputWrapper>
+                </Column>
+              </Grid>
+            </section>
+          </div>
 
-        <ButtonSet
-          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-        >
-          <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
-            {t('discard', 'Discard')}
-          </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            size="xl"
-            disabled={!!errorFetchingOrderConfig}
+          <ButtonSet
+            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
           >
-            {t('saveOrder', 'Save order')}
-          </Button>
-        </ButtonSet>
-      </Form>
-    </div>
+            <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+              {t('discard', 'Discard')}
+            </Button>
+            <Button
+              className={styles.button}
+              kind="primary"
+              type="submit"
+              size="xl"
+              disabled={!!errorFetchingOrderConfig}
+            >
+              {t('saveOrder', 'Save order')}
+            </Button>
+          </ButtonSet>
+        </Form>
+      </div>
+    </FormProvider>
   );
 }
 
@@ -691,11 +688,28 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
   );
 };
 
-const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
+interface ControlledFieldInputProps {
+  name: keyof MedicationOrderFormData;
+  type: 'toggle' | 'checkbox' | 'number' | 'textArea' | 'textInput' | 'comboBox';
+  handleAfterChange?: (
+    newValue: MedicationOrderFormData[keyof MedicationOrderFormData],
+    prevValue: MedicationOrderFormData[keyof MedicationOrderFormData],
+  ) => void;
+  [x: string]: any;
+}
+
+const ControlledFieldInput = ({ name, type, handleAfterChange, ...restProps }: ControlledFieldInputProps) => {
+  const { control, watch } = useFormContext<MedicationOrderFormData>();
   const {
     field: { onBlur, onChange, value, ref },
     fieldState,
   } = useController<MedicationOrderFormData>({ name: name, control });
+
+  const handleChange = (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
+    const prevValue = watch(name);
+    onChange(newValue);
+    handleAfterChange?.(newValue, prevValue);
+  };
 
   const component = useMemo(() => {
     if (type === 'toggle')
@@ -703,19 +717,19 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
         <Toggle
           toggled={value}
           onChange={() => {} /* Required by the typings, but we don't need it. */}
-          onToggle={(value) => onChange(value)}
+          onToggle={(value) => handleChange(value)}
           {...restProps}
         />
       );
 
     if (type === 'checkbox')
-      return <Checkbox checked={value} onChange={(e, { checked, id }) => onChange(checked)} {...restProps} />;
+      return <Checkbox checked={value} onChange={(e, { checked, id }) => handleChange(checked)} {...restProps} />;
 
     if (type === 'number')
       return (
         <NumberInput
           value={!!value ? value : 0}
-          onChange={(e, { value }) => onChange(parseFloat(value))}
+          onChange={(e, { value }) => handleChange(parseFloat(value))}
           className={fieldState?.error?.message && styles.fieldError}
           onBlur={onBlur}
           ref={ref}
@@ -727,7 +741,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       return (
         <TextArea
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
           className={fieldState?.error?.message && styles.fieldError}
@@ -739,7 +753,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       return (
         <TextInput
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           ref={ref}
           onBlur={onBlur}
           className={fieldState?.error?.message && styles.fieldError}
@@ -748,35 +762,16 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       );
 
     if (type === 'comboBox')
-      if (name === 'unit') {
-        return (
-          <ComboBox
-            selectedItem={value}
-            onChange={({ selectedItem }) => {
-              onChange(selectedItem);
-              const dispensingQuantity = restProps.watch?.('pillsDispensed');
-              if (dispensingQuantity && Number(dispensingQuantity) > 0) {
-                restProps.dispensingUnitsOnChange?.(selectedItem);
-              }
-            }}
-            onBlur={onBlur}
-            ref={ref}
-            className={fieldState?.error?.message && styles.fieldError}
-            {...restProps}
-          />
-        );
-      }
-
-    return (
-      <ComboBox
-        selectedItem={value}
-        onChange={({ selectedItem }) => onChange(selectedItem)}
-        onBlur={onBlur}
-        ref={ref}
-        className={fieldState?.error?.message && styles.fieldError}
-        {...restProps}
-      />
-    );
+      return (
+        <ComboBox
+          selectedItem={value}
+          onChange={({ selectedItem }) => handleChange(selectedItem)}
+          onBlur={onBlur}
+          ref={ref}
+          className={fieldState?.error?.message && styles.fieldError}
+          {...restProps}
+        />
+      );
 
     return null;
   }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
