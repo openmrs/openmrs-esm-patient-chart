@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useContext, type MutableRefObject } from 'react';
+import React, { useCallback, useEffect, useContext, type MutableRefObject } from 'react';
 import Camera from 'react-html5-camera-photo';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import 'react-html5-camera-photo/build/css/index.css';
@@ -25,10 +25,11 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ mediaStream, stopCame
   );
   return (
     <Camera
-      onTakePhoto={handleTakePhoto}
+      isDisplayStartCameraError={false}
+      onCameraError={setError}
       onCameraStart={setMediaStream}
       onCameraStop={stopCameraStream}
-      onCameraError={setError}
+      onTakePhoto={handleTakePhoto}
     />
   );
 };

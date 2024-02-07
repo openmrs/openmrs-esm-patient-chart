@@ -44,4 +44,6 @@ export default function Root() {
  * t('error', 'Error')
  * t('seeAll', 'See all')
  * t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
+ * t('unsavedChangesInForms', 'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}')
+ * t('closeWorkspaces', 'Discard changes in {{count}} workspaces', {count})
  */
