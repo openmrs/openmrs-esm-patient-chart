@@ -5,8 +5,8 @@ import { ConfigurableLink, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
-import styles from './contact-details.scss';
 import { type ConfigObject } from '../config-schema';
+import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -120,7 +120,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
 
   const contacts = useMemo(
     () => [
-      ...telecom?.map((contact) => [t(contact.system, contact.system), contact.value]),
+      ...telecom?.map((contact) => [t(contact.system, contact.system), contact.value, contact.id]),
       ...contactAttributes?.map((contact) => [
         t(contact.attributeType.display, contact.attributeType.display),
         contact.value,
@@ -137,9 +137,10 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
       ) : (
         <ul>
           {contacts.length ? (
-            contacts.map(([label, value], index) => (
-              <li key={`${label}-${value}-${index}`}>
-                {label}: {value}
+            contacts.map(([label, value, id]) => (
+              <li key={id}>
+                {label ? `${label}: ` : ''}
+                {value}
               </li>
             ))
           ) : (
