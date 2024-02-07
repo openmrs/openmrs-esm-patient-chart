@@ -12,14 +12,12 @@ interface PatientListDetailsWorkspaceProps extends DefaultWorkspaceProps {
   list: MappedList;
 }
 
-function PatientListDetailsWorkspace({ closeWorkspace, list }: PatientListDetailsWorkspaceProps) {
+function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps) {
   const { t } = useTranslation();
   const { listMembers, isLoading } = usePatientListMembers(list.id);
 
   const closeListDetailsWorkspace = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('patient-lists'),
-    });
+    launchPatientWorkspace('patient-lists');
   }, []);
 
   return (

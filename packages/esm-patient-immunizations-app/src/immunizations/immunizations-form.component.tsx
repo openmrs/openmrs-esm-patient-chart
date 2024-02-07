@@ -46,7 +46,11 @@ interface ResponsiveWrapperProps {
 
 const datePickerFormat = 'd/m/Y';
 
-const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  discardChangesAndCloseWorkspace,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { immunizationsConfig } = useConfig() as ConfigObject;
@@ -184,7 +188,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       ).then(
         () => {
           setIsSubmitting(false);
-          closeWorkspace();
+          discardChangesAndCloseWorkspace();
           mutate();
           showSnackbar({
             kind: 'success',
@@ -211,7 +215,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       currentVisit?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
-      closeWorkspace,
+      discardChangesAndCloseWorkspace,
       t,
     ],
   );
@@ -401,7 +405,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           </section>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+          <Button className={styles.button} kind="secondary" onClick={discardChangesAndCloseWorkspace}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">

@@ -25,7 +25,7 @@ const conditionSchema = z.object({
 export type ConditionFormData = z.infer<typeof conditionSchema>;
 
 const ConditionsForm: React.FC<ConditionFormProps> = ({
-  closeWorkspace,
+  discardChangesAndCloseWorkspace,
   condition,
   formContext,
   patientUuid,
@@ -77,7 +77,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
           patientUuid={patientUuid}
-          closeWorkspace={closeWorkspace}
+          discardChangesAndCloseWorkspace={discardChangesAndCloseWorkspace}
           conditionToEdit={condition}
           editing={formContext === 'editing'}
           setErrorCreating={setErrorCreating}
@@ -111,7 +111,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             </div>
           ) : null}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            <Button className={styles.button} kind="secondary" onClick={discardChangesAndCloseWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">

@@ -33,7 +33,7 @@ export const immunizationsDashboardLink =
   );
 
 // t('immunizationWorkspaceTitle', 'Immunization Form')
-export const immunizationsForm = registerWorkspace({
+registerWorkspace({
   name: 'immunization-form-workspace',
   load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
   title: translateFrom(moduleName, 'immunizationWorkspaceTitle', 'Immunization Form'),

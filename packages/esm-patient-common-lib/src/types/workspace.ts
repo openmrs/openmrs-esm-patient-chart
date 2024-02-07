@@ -23,16 +23,18 @@ export interface CloseWorkspaceOptions {
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {
   /**
-   * Call this function to close the workspace.
+   * Call this function to close the workspace. This function will prompt the user
+   * if there are any unsaved changes to workspace.
    *
-   * Whenever we close the workspace with `workspace.closeWorkspace()`, the `ignoreChanges`
-   * is set to true by default.
-   *
-   * Whenever you close the opened workspace outside the workspace window, always close the workspace as
-   * `closeWorkspace({ ignoreChanges: false })`, taking care to prompting the user if there
-   * are any pending changes in the workspace.
+   * You can pass `onWorkspaceClose` function to be called when the workspace is finally
+   * closed, given the user forcefully closes the workspace.
    */
   closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
+  /**
+   * Call this function to discard the changes in the workspace form
+   * and close the workspace.
+   */
+  discardChangesAndCloseWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
   /**
    * Call this with a no-args function that returns true if the user should be prompted before
    * this workspace is closed; e.g. if there is unsaved data.

@@ -22,7 +22,10 @@ export interface AddLabOrderWorkspaceAdditionalProps {
 export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
 
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
-export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspace }: AddLabOrderWorkspace) {
+export default function AddLabOrderWorkspace({
+  order: initialOrder,
+  discardChangesAndCloseWorkspace,
+}: AddLabOrderWorkspace) {
   const { t } = useTranslation();
 
   const { patient, isLoading: isLoadingPatient } = usePatient();
@@ -33,9 +36,10 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
 
   const cancelOrder = useCallback(() => {
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
-  }, [closeWorkspace]);
+    discardChangesAndCloseWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
+  }, [discardChangesAndCloseWorkspace]);
 
   return (
     <div className={styles.container}>
@@ -64,7 +68,10 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       {!currentLabOrder ? (
         <TestTypeSearch openLabForm={setCurrentLabOrder} />
       ) : (
-        <LabOrderForm initialOrder={currentLabOrder} closeWorkspace={closeWorkspace} />
+        <LabOrderForm
+          initialOrder={currentLabOrder}
+          discardChangesAndCloseWorkspace={discardChangesAndCloseWorkspace}
+        />
       )}
     </div>
   );

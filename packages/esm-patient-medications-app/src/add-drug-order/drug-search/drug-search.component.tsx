@@ -8,10 +8,9 @@ import styles from './order-basket-search.scss';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
-  promptBeforeClosing: (testFcn: () => boolean) => void;
 }
 
-export default function DrugSearch({ openOrderForm, promptBeforeClosing }: DrugSearchProps) {
+export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');

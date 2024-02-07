@@ -34,6 +34,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
   const props = useMemo(
     () =>
       workspace && {
+        discardChangesAndCloseWorkspace: workspace.discardChangesAndCloseWorkspace,
         closeWorkspace: workspace.closeWorkspace,
         promptBeforeClosing: workspace.promptBeforeClosing,
         patientUuid,

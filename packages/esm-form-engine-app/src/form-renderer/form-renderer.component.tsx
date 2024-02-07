@@ -6,16 +6,22 @@ import { type Visit } from '@openmrs/esm-framework';
 import useFormSchema from '../hooks/useFormSchema';
 import FormError from './form-error.component';
 import styles from './form-renderer.scss';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface FormRendererProps {
+interface FormRendererProps extends DefaultWorkspaceProps {
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
-  closeWorkspace: () => void;
   encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({
+  formUuid,
+  patientUuid,
+  visit,
+  discardChangesAndCloseWorkspace,
+  encounterUuid,
+}) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
 
@@ -30,7 +36,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visi
   if (error) {
     return (
       <div className={styles.errorContainer}>
-        <FormError closeWorkspace={closeWorkspace} />
+        <FormError closeWorkspace={discardChangesAndCloseWorkspace} />
       </div>
     );
   }
@@ -43,8 +49,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visi
           patientUUID={patientUuid}
           visit={visit}
           formJson={schema}
-          handleClose={closeWorkspace}
-          onSubmit={() => closeWorkspace()}
+          handleClose={discardChangesAndCloseWorkspace}
+          onSubmit={discardChangesAndCloseWorkspace}
         />
       )}
     </>

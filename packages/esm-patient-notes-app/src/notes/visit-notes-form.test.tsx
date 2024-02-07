@@ -18,6 +18,7 @@ const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),
+  discardChangesAndCloseWorkspace: jest.fn(),
 };
 
 const mockFetchConceptDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;

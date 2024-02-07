@@ -34,7 +34,7 @@ describe('workspace system', () => {
     const allergies = store.getState().openWorkspaces[0];
     expect(allergies.name).toBe('allergies');
     expect(allergies.additionalProps['foo']).toBe(true);
-    allergies.closeWorkspace();
+    allergies.discardChangesAndCloseWorkspace();
     expect(store.getState().openWorkspaces.length).toEqual(0);
   });
 
@@ -65,7 +65,7 @@ describe('workspace system', () => {
       expect(POCHIVForm.additionalProps['workspaceTitle']).toBe('POC HIV Form Updated');
       expect(store.getState().openWorkspaces.length).toEqual(1);
 
-      POCHIVForm.closeWorkspace();
+      POCHIVForm.discardChangesAndCloseWorkspace();
 
       expect(store.getState().openWorkspaces.length).toEqual(0);
     });
@@ -284,11 +284,11 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions');
       expect(store.getState().openWorkspaces.length).toBe(3);
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace();
+      store.getState().openWorkspaces[0].discardChangesAndCloseWorkspace();
       expect(store.getState().workspaceWindowState).toBe('normal');
-      store.getState().openWorkspaces[0].closeWorkspace();
+      store.getState().openWorkspaces[0].discardChangesAndCloseWorkspace();
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace();
+      store.getState().openWorkspaces[0].discardChangesAndCloseWorkspace();
       expect(store.getState().workspaceWindowState).toBe('normal');
     });
   });
@@ -344,7 +344,7 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
     expect(store.getState().openWorkspaces[1].name).toBe('order-meds');
-    store.getState().openWorkspaces[0].closeWorkspace();
+    store.getState().openWorkspaces[0].discardChangesAndCloseWorkspace();
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
   });

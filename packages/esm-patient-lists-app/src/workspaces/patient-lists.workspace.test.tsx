@@ -73,5 +73,5 @@ it('renders a tabular overview of the available patient lists', async () => {
 });
 
 function renderPatientListsWorkspace() {
-  render(<PatientListsWorkspace promptBeforeClosing={jest.fn()} closeWorkspace={jest.fn()} patientUuid="" />);
+  render(<PatientListsWorkspace />);
 }

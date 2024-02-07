@@ -11,7 +11,12 @@ interface FormEntryComponentProps extends DefaultWorkspaceProps {
   formInfo: FormEntryProps;
 }
 
-const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm, formInfo }) => {
+const FormEntry: React.FC<FormEntryComponentProps> = ({
+  patientUuid,
+  discardChangesAndCloseWorkspace,
+  mutateForm,
+  formInfo,
+}) => {
   const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid, additionalProps } =
     formInfo || {};
   const { patient } = usePatient(patientUuid);
@@ -32,7 +37,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       encounterUuid: encounterUuid ?? null,
       closeWorkspace: () => {
         typeof mutateForm === 'function' && mutateForm();
-        closeWorkspace();
+        discardChangesAndCloseWorkspace();
       },
       additionalProps,
     }),
@@ -51,7 +56,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       patient,
       isOnline,
       mutateForm,
-      closeWorkspace,
+      discardChangesAndCloseWorkspace,
     ],
   );
 

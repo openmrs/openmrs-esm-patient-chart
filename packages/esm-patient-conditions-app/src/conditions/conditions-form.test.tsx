@@ -32,6 +32,7 @@ const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   formContext: 'creating' as const,
+  discardChangesAndCloseWorkspace: jest.fn(),
 };
 
 const mockCreateCondition = createCondition as jest.Mock;
@@ -93,7 +94,7 @@ describe('Conditions Form', () => {
 
     await user.click(cancelButton);
 
-    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(testProps.discardChangesAndCloseWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('setting the status of a condition to "inactive" reveals an input for recording the end date', async () => {

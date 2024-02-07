@@ -63,7 +63,7 @@ interface StartVisitFormProps extends DefaultWorkspaceProps {
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
   patientUuid,
-  closeWorkspace,
+  discardChangesAndCloseWorkspace,
   promptBeforeClosing,
   visitToEdit,
   showVisitEndDateTimeFields,
@@ -405,7 +405,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               }
               mutateCurrentVisit();
               mutateVisits();
-              closeWorkspace();
+              discardChangesAndCloseWorkspace();
 
               showSnackbar({
                 isLowContrast: true,
@@ -444,7 +444,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           (offlineVisit) => {
             //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
-            closeWorkspace();
+            discardChangesAndCloseWorkspace();
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -467,7 +467,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
     },
     [
-      closeWorkspace,
+      discardChangesAndCloseWorkspace,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
@@ -661,7 +661,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+          <Button className={styles.button} kind="secondary" onClick={() => discardChangesAndCloseWorkspace()}>
             {t('discard', 'Discard')}
           </Button>
           <Button

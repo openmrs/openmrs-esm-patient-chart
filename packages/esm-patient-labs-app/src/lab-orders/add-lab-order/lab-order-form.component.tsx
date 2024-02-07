@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
 import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, InlineNotification, TextInput } from '@carbon/react';
@@ -11,13 +11,13 @@ import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
-  closeWorkspace: () => void;
+  discardChangesAndCloseWorkspace: DefaultWorkspaceProps['discardChangesAndCloseWorkspace'];
 }
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps) {
+export function LabOrderForm({ initialOrder, discardChangesAndCloseWorkspace }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -37,17 +37,19 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = inProgressLabOrder;
       setOrders(newOrders);
-      closeWorkspace();
-      launchPatientWorkspace('order-basket');
+      discardChangesAndCloseWorkspace({
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      });
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
+    [orders, setOrders, discardChangesAndCloseWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== inProgressLabOrder.testType.conceptUuid));
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
-  }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
+    discardChangesAndCloseWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
+  }, [discardChangesAndCloseWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
   return (
     <>

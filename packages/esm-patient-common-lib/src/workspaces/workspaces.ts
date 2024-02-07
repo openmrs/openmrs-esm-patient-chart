@@ -24,6 +24,7 @@ export interface WorkspaceStoreState {
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
+  discardChangesAndCloseWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -124,6 +125,7 @@ function promptBeforeLaunchingWorkspace(
 
   const proceed = () => {
     workspace.closeWorkspace({
+      ignoreChanges: true,
       // Calling the launchPatientWorkspace again, since one of the `if` case
       // might resolve, but we need to check all the cases before launching the form.
       onWorkspaceClose: () => launchPatientWorkspace(name, additionalProps),
@@ -161,11 +163,13 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
-    closeWorkspace: (options: CloseWorkspaceOptions = {}) =>
+    closeWorkspace: (options: CloseWorkspaceOptions = {}) => closeWorkspace(name, options),
+    discardChangesAndCloseWorkspace: (options: CloseWorkspaceOptions = {}) => {
       closeWorkspace(name, {
         ignoreChanges: true,
         ...options,
-      }),
+      });
+    },
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };

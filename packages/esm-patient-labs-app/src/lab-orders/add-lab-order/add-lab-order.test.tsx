@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, renderHook, screen, within } from '@testing-library/react';
+import { render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
 import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -35,11 +35,11 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-const mockCloseWorkspace = jest.fn();
+const mockDiscardChangesAndCloseWorkspace = jest.fn();
 const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  closeWorkspace: (...args) => mockCloseWorkspace(...args),
+  closeWorkspace: (...args) => mockDiscardChangesAndCloseWorkspace(...args),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
 }));
 
@@ -49,15 +49,19 @@ jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () =>
 
 function renderAddLabOrderWorkspace() {
   const mockCloseWorkspace = jest.fn();
+  const mockDiscardChangesAndCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
+    onWorkspaceClose();
+  });
   const mockPromptBeforeClosing = jest.fn();
   const renderResult = render(
     <AddLabOrderWorkspace
-      closeWorkspace={mockCloseWorkspace}
+      closeWorkspace={mockDiscardChangesAndCloseWorkspace}
+      discardChangesAndCloseWorkspace={mockDiscardChangesAndCloseWorkspace}
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
     />,
   );
-  return { mockCloseWorkspace, mockPromptBeforeClosing, ...renderResult };
+  return { mockCloseWorkspace, mockPromptBeforeClosing, mockDiscardChangesAndCloseWorkspace, ...renderResult };
 }
 
 describe('AddLabOrder', () => {
@@ -88,7 +92,7 @@ describe('AddLabOrder', () => {
   });
 
   test('happy path fill and submit form', async () => {
-    const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    const { mockDiscardChangesAndCloseWorkspace } = renderAddLabOrderWorkspace();
     await userEvent.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
@@ -114,7 +118,7 @@ describe('AddLabOrder', () => {
     expect(labsOrderBasket[0].testType.conceptUuid).toBe('test-lab-uuid-2');
     expect(labsOrderBasket[0].urgency).toBe('STAT');
     expect(labsOrderBasket[0].instructions).toBe('plz do it thx');
-    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(mockDiscardChangesAndCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
@@ -132,16 +136,16 @@ describe('AddLabOrder', () => {
       { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
     ]);
 
-    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(mockDiscardChangesAndCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
   test('back to order basket', async () => {
     const user = userEvent.setup();
-    const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    const { mockDiscardChangesAndCloseWorkspace } = renderAddLabOrderWorkspace();
     const back = screen.getByText('Back to order basket');
     expect(back).toBeInTheDocument();
     await user.click(back);
-    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(mockDiscardChangesAndCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 

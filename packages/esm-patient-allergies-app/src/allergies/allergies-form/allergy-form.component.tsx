@@ -66,7 +66,8 @@ type AllergyFormData = {
   comment: string;
 };
 
-function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: DefaultWorkspaceProps) {
+function AllergyForm(props: DefaultWorkspaceProps) {
+  const { discardChangesAndCloseWorkspace, patientUuid, promptBeforeClosing } = props;
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -165,7 +166,7 @@ function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: Defau
           (response: FetchResponse) => {
             if (response.status === 201) {
               mutate();
-              closeWorkspace();
+              discardChangesAndCloseWorkspace();
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
@@ -185,7 +186,7 @@ function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: Defau
         )
         .finally(() => abortController.abort());
     },
-    [otherConceptUuid, patientUuid, closeWorkspace, t, mutate],
+    [otherConceptUuid, patientUuid, discardChangesAndCloseWorkspace, t, mutate],
   );
 
   return (
@@ -344,7 +345,7 @@ function AllergyForm({ closeWorkspace, patientUuid, promptBeforeClosing }: Defau
         <ButtonSet
           className={classNames(isTablet ? styles.tabletButtons : styles.desktopButtons, styles.actionButtons)}
         >
-          <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
+          <Button className={styles.button} onClick={discardChangesAndCloseWorkspace} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button

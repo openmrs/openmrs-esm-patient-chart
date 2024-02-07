@@ -274,6 +274,7 @@ describe('AllergyForm ', () => {
 function renderAllergyForm() {
   const testProps = {
     closeWorkspace: () => {},
+    discardChangesAndCloseWorkspace: () => {},
     promptBeforeClosing: () => {},
     patient: mockPatient,
     patientUuid: mockPatient.id,

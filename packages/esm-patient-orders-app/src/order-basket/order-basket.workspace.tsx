@@ -14,7 +14,11 @@ import { type ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 
-const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  discardChangesAndCloseWorkspace,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -68,7 +72,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
     mutateOrders();
     if (erroredItems.length == 0) {
-      closeWorkspace();
+      discardChangesAndCloseWorkspace();
       showOrderSuccessToast(t, orders);
     } else {
       showOrderFailureToast(t);
@@ -79,7 +83,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
     activeVisit,
     activeVisitRequired,
     clearOrders,
-    closeWorkspace,
+    discardChangesAndCloseWorkspace,
     config,
     encounterUuid,
     mutateEncounterUuid,
@@ -91,8 +95,8 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorksp
   ]);
 
   const handleCancel = useCallback(() => {
-    closeWorkspace({ onWorkspaceClose: clearOrders });
-  }, [clearOrders, closeWorkspace]);
+    discardChangesAndCloseWorkspace({ onWorkspaceClose: clearOrders });
+  }, [clearOrders, discardChangesAndCloseWorkspace]);
 
   return (
     <>

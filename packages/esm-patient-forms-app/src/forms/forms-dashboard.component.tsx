@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
+const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ discardChangesAndCloseWorkspace }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
@@ -28,22 +28,18 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => 
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
-      closeWorkspace({
-        onWorkspaceClose: () => {
-          launchFormEntryOrHtmlForms(
-            htmlFormEntryForms,
-            patientUuid,
-            formUuid,
-            currentVisit.uuid,
-            encounterUuid,
-            formName,
-            currentVisit.visitType.uuid,
-            currentVisit.startDatetime,
-            currentVisit.stopDatetime,
-            mutateForms,
-          );
-        },
-      });
+      launchFormEntryOrHtmlForms(
+        htmlFormEntryForms,
+        patientUuid,
+        formUuid,
+        currentVisit.uuid,
+        encounterUuid,
+        formName,
+        currentVisit.visitType.uuid,
+        currentVisit.startDatetime,
+        currentVisit.stopDatetime,
+        mutateForms,
+      );
     },
     [currentVisit, htmlFormEntryForms, patient, mutateForms],
   );

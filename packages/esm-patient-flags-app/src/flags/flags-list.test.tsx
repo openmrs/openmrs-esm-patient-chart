@@ -40,5 +40,12 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
 });
 
 function renderFlagsList() {
-  return render(<FlagsList closeWorkspace={jest.fn()} patientUuid={mockPatient.id} promptBeforeClosing={jest.fn()} />);
+  return render(
+    <FlagsList
+      closeWorkspace={jest.fn()}
+      patientUuid={mockPatient.id}
+      promptBeforeClosing={jest.fn()}
+      discardChangesAndCloseWorkspace={jest.fn()}
+    />,
+  );
 }
