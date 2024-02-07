@@ -9,6 +9,27 @@ export function orderPriorityToColor(priority) {
   }
 }
 
+export function orderStatusColor(status) {
+  switch (status) {
+    case 'RECEIVED':
+      return '#e8daff';
+    case 'IN_PROGRESS':
+      return '#defbe6';
+    case 'ON_HOLD':
+      return '#fff8e1';
+    case 'EXCEPTION':
+      return '#d0e2ff';
+    case 'COMPLETED':
+      return '#a7f0ba';
+    case 'DISCONTINUED':
+      return '#ffd7d9';
+    case 'DECLINED':
+      return '#ffd7d9';
+    default:
+      return '#dde1e6';
+  }
+}
+
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
  * Requires the `<` and `>` operators to return something reasonable for the provided values.

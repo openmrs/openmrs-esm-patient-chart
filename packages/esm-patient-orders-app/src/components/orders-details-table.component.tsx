@@ -22,7 +22,6 @@ import {
   TableRow,
   Tooltip,
 } from '@carbon/react';
-import { Add, User, Printer } from '@carbon/react/icons';
 import {
   type Order,
   type OrderBasketItem,
@@ -34,12 +33,14 @@ import {
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
+  launchPatientWorkspace,
   usePatientOrders,
-} from '../../../esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
+import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
-import { compare, orderPriorityToColor } from '../utils/utils';
-import PrintComponent from '../print/print.component';
 import styles from './order-details-table.scss';
+import { compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
+import PrintComponent from '../print/print.component';
 
 interface OrderDetailsProps {
   title?: string;
@@ -116,8 +117,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     },
   ];
 
-  const tableRows = allOrders?.map((order, id) => ({
-    id: `${id}`,
+  const tableRows = allOrders?.map((order) => ({
+    id: order.uuid,
     startDate: {
       sortKey: dayjs(order.dateActivated).toDate(),
       content: (
@@ -131,16 +132,23 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     dateOfOrder: formatDate(new Date(order.dateActivated)),
     orderType: capitalize(order.orderType?.display ?? '--'),
     order: order.display,
-    // order: (
-    //   <div>{order.display.length > 20 ? <OrderDisplayTooltip orderDisplay={order.display} /> : order.display}</div>
-    // ),
     priority: (
       <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
         {capitalize(order.urgency)}
       </div>
     ),
     orderedBy: order.orderer?.display,
-    status: capitalize(order.fulfillerStatus ?? '--'),
+    status: (
+      <div
+        style={{
+          background: orderStatusColor(order.fulfillerStatus),
+          textAlign: 'center',
+          borderRadius: '1rem',
+        }}
+      >
+        {capitalize(order.fulfillerStatus ?? '--')}
+      </div>
+    ),
   }));
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
@@ -323,7 +331,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                         {!isPrinting && (
                           <TableCell className="cds--table-column-menu">
                             <OrderBasketItemActions
-                              orderItem={sortedData[rowIndex]}
+                              orderItem={allOrders.find((x) => x.uuid === row.id)}
                               items={orders}
                               setItems={setOrders}
                               openOrderBasket={launchOrderBasket}
@@ -408,8 +416,8 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm]);
 
   const handleCancelClick = useCallback(() => {
-    // setItems(items.filter((x) => x.uuid !== orderItem.uuid));
-  }, [items, orderItem, setItems]);
+    launchPatientWorkspace('patient-orders-form-workspace', { order: orderItem });
+  }, [items, orderItem]);
 
   return (
     <OverflowMenu
@@ -440,7 +448,7 @@ function OrderBasketItemActions({
         id="discontinue"
         itemText={t('cancelOrder', 'Cancel Order')}
         onClick={handleCancelClick}
-        disabled={alreadyInBasket}
+        disabled={orderItem.fulfillerStatus === 'DECLINED'}
         isDelete={true}
         hasDivider
       />

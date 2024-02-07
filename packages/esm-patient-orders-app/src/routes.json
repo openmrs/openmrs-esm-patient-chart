@@ -31,6 +31,16 @@
         "columnSpan": 4
       },
       "featureFlag": "ordersSummary"
+    },
+    {
+      "name": "patient-orders-form-workspace",
+      "component": "orderCancellationForm",
+      "meta": {
+        "title": {
+          "key": "orderCancellation",
+          "default": "Order cancellation"
+        }
+      }
     }
   ]
 }
