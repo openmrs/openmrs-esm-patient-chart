@@ -34,7 +34,7 @@
     },
     {
       "name": "patient-orders-form-workspace",
-      "component": "orderCancellationForm",
+      "component": "cancelOrderForm",
       "meta": {
         "title": {
           "key": "orderCancellation",

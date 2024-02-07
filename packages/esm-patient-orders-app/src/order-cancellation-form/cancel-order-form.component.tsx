@@ -14,9 +14,9 @@ import {
   DatePicker,
   DatePickerInput,
 } from '@carbon/react';
-import { showSnackbar, useLayoutType, useSession, usePatient, useVisit } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import styles from './order-cancellation-form.scss';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
+import styles from './cancel-order-form.scss';
 import { saveCancelOrderRequest } from './cancel-order.resource';
 import dayjs from 'dayjs';
 
@@ -30,12 +30,10 @@ interface OrderCancellationFormProps {
 const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSession();
-  const patient = usePatient(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
+  const { mutate } = usePatientOrders(patientUuid, 'ACTIVE');
 
   const cancelOrderSchema = useMemo(() => {
     return z.object({
@@ -59,7 +57,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
 
   const cancelOrderRequest = useCallback((data: CancelOrderFormData) => {
     const formData = data;
-    setShowErrorMessage(true);
     setShowErrorNotification(false);
     setIsSubmitting(true);
 
@@ -74,13 +71,16 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
       (res) => {
         setIsSubmitting(false);
         closeWorkspace();
+        mutate();
+
         showSnackbar({
           isLowContrast: true,
           title: t('cancelOrder', 'Cancel Order'),
           kind: 'success',
           subtitle: t(
             'successfullyCancelledOrder',
-            `You have successfully cancelled an order with OrderNumber ${order.orderNumber} `,
+            'You have successfully cancelled an order with OrderNumber {{orderNumber}}',
+            { orderNumber: order.orderNumber },
           ),
         });
       },

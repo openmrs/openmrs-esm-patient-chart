@@ -20,6 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
   Tooltip,
 } from '@carbon/react';
 import {
@@ -139,15 +140,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     ),
     orderedBy: order.orderer?.display,
     status: (
-      <div
-        style={{
-          background: orderStatusColor(order.fulfillerStatus),
-          textAlign: 'center',
-          borderRadius: '1rem',
-        }}
-      >
-        {capitalize(order.fulfillerStatus ?? '--')}
-      </div>
+      <Tag type={orderStatusColor(order.fulfillerStatus)} className={styles.singleLineText}>
+        {order.fulfillerStatus ?? '--'}
+      </Tag>
     ),
   }));
 

@@ -12,21 +12,21 @@ export function orderPriorityToColor(priority) {
 export function orderStatusColor(status) {
   switch (status) {
     case 'RECEIVED':
-      return '#e8daff';
+      return 'blue';
     case 'IN_PROGRESS':
-      return '#defbe6';
+      return 'cyan';
     case 'ON_HOLD':
-      return '#fff8e1';
+      return 'teal';
     case 'EXCEPTION':
-      return '#d0e2ff';
+      return 'magenta';
     case 'COMPLETED':
-      return '#a7f0ba';
+      return 'green';
     case 'DISCONTINUED':
-      return '#ffd7d9';
+      return 'red';
     case 'DECLINED':
-      return '#ffd7d9';
+      return 'red';
     default:
-      return '#dde1e6';
+      return 'gray';
   }
 }
 

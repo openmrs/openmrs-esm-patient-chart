@@ -10,7 +10,7 @@ import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
 import OrdersSummary from './orders-summary/orders-summary.component';
-import OrderCancellationForm from './order-cancellation-form/order-cancellation-form.component';
+import CancelOrderForm from './order-cancellation-form/cancel-order-form.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -54,4 +54,4 @@ export const ordersDashboardLink =
 
 export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);
 
-export const orderCancellationForm = getSyncLifecycle(OrderCancellationForm, options);
+export const cancelOrderForm = getSyncLifecycle(CancelOrderForm, options);
