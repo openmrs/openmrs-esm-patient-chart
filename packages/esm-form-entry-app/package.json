@@ -66,7 +66,6 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "rxjs": "6.x",
     "single-spa": "5.x"
   },
   "devDependencies": {
@@ -99,7 +98,7 @@
     "ngx-build-plus": "^16.0.0",
     "openmrs": "next",
     "protractor": "~7.0.0",
-    "rxjs": "~6.6.7",
+    "rxjs": "^7.8.0",
     "style-loader": "2.x",
     "webpack": "~5.89.0"
   }
