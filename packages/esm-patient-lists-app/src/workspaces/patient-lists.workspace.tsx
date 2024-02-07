@@ -29,7 +29,7 @@ import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
-function PatientListsWorkspace({ closeWorkspace }: DefaultWorkspaceProps) {
+function PatientListsWorkspace() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
@@ -38,9 +38,7 @@ function PatientListsWorkspace({ closeWorkspace }: DefaultWorkspaceProps) {
   const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name }),
-    });
+    launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 
   const tableHeaders: Array<typeof DataTableHeader> = [

@@ -18,10 +18,6 @@ export default function DrugSearch({ openOrderForm, promptBeforeClosing }: DrugS
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
 
-  useEffect(() => {
-    promptBeforeClosing(() => !!searchTerm);
-  }, [searchTerm]);
-
   const focusAndClearSearchInput = () => {
     setSearchTerm('');
     searchInputRef.current?.focus();
