@@ -105,7 +105,7 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
 /**
  *
  * @param name Name of the workspace
- * @param ignoreChanges Whether to forcefully ignore changes in the workspace
+ * @param ignoreChanges If set to true, the "unsaved changes" modal will never be shown, even if the `promptBeforeClosing` function returns true. The user will not be prompted before closing.
  * @returns true if the workspace can be closed.
  */
 export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges: boolean = false) {
