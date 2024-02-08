@@ -57,7 +57,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     defaultValues: {
       ...initialOrder,
       instructions: '',
-      labReferenceNumber: '',
+      labReferenceNumber: null,
     },
   });
 
