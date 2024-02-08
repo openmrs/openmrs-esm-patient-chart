@@ -158,7 +158,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       duration: initialOrderBasketItem?.duration,
       durationUnit: initialOrderBasketItem?.durationUnit,
       pillsDispensed: initialOrderBasketItem?.pillsDispensed,
-      quantityUnits: initialOrderBasketItem?.quantityUnits,
+      quantityUnits: initialOrderBasketItem?.quantityUnits ?? initialOrderBasketItem?.unit,
       numRefills: initialOrderBasketItem?.numRefills,
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
