@@ -1,18 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';
-import { type LabOrderBasketItem, careSettingUuid, prepLabOrderPostData } from '../api';
-import { Button, ButtonSet, Column, ComboBox, Form, Layer, Grid, InlineNotification, TextInput } from '@carbon/react';
+import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import {
+  Button,
+  ButtonSet,
+  Column,
+  ComboBox,
+  Form,
+  Layer,
+  Grid,
+  InlineNotification,
+  TextInput,
+  FormLabel,
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './lab-order';
-import { type TestType, useTestTypes } from './useTestTypes';
+import { useTestTypes } from './useTestTypes';
 import styles from './lab-order-form.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { t } from 'i18next';
-// import { z } from 'zod';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
@@ -20,19 +29,20 @@ export interface LabOrderFormProps {
 }
 
 const labOrderFormSchema = z.object({
-  labReferenceNumber: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
-  instructions: z.string({ required_error: t('labOrderInstructionsError', 'Additional instructions is required') }),
-  urgency: z.string({ required_error: t('labOrderUrgencyError', 'Priority is required') }),
+  urgency: z.string({ required_error: 'Priority is required', invalid_type_error: 'Priority is required' }),
+  instructions: z.string({
+    required_error: 'Additional instructions is required',
+    invalid_type_error: 'Additional instructions is required',
+  }),
+  labReferenceNumber: z.string({
+    required_error: 'Lab reference number is required',
+    invalid_type_error: 'Lab reference number is required',
+  }),
   testType: z.object(
-    {
-      label: z.string().refine((value) => !value && ''),
-      conceptUuid: z.string().refine((value) => !value && ''),
-    },
-    { required_error: t('labOrderTestTypeError', 'Test type is required') },
+    { label: z.string(), conceptUuid: z.string() },
+    { required_error: 'Test type is required', invalid_type_error: 'Test type is required' },
   ),
 });
-
-type LabOrderFormData = z.infer<typeof labOrderFormSchema>;
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
@@ -42,46 +52,36 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
-  const [inProgressLabOrder, setInProgressLabOrder] = useState(initialOrder as LabOrderBasketItem);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
 
-  const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<LabOrderFormData>({
-    mode: 'onSubmit',
+  const { control, handleSubmit, getValues, formState } = useForm<LabOrderBasketItem>({
+    mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
       ...initialOrder,
-      instructions: '',
     },
   });
 
   const handleFormSubmission = useCallback(
-    (e: Event) => {
-      e.preventDefault();
-      inProgressLabOrder.careSetting = careSettingUuid;
-      inProgressLabOrder.orderer = session.currentProvider.uuid;
+    (data: LabOrderBasketItem) => {
+      data.careSetting = careSettingUuid;
+      data.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
-      const existingOrder = orders.find(
-        (order) => order.testType.conceptUuid == inProgressLabOrder.testType.conceptUuid,
-      );
+      const existingOrder = orders.find((order) => order.testType.conceptUuid == data.testType.conceptUuid);
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
-      newOrders[orderIndex] = inProgressLabOrder;
+      newOrders[orderIndex] = data;
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid],
   );
 
   const cancelOrder = useCallback(() => {
-    setOrders(orders.filter((order) => order.testType.conceptUuid !== inProgressLabOrder.testType.conceptUuid));
+    setOrders(orders.filter((order) => order.testType.conceptUuid !== getValues().testType.conceptUuid));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
-  }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
-
-  // useEffect(() => {
-  //   getValues('testType');
-  //   // console.log(formState);
-  // }, [getValues, formState]);
+  }, [closeWorkspace, orders, setOrders]);
 
   return (
     <>
@@ -118,6 +118,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                     />
                   )}
                 />
+                <FormLabel className={styles.errorLabel}>{formState.errors.testType?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -133,11 +134,12 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       size="lg"
                       labelText={t('labReferenceNumber', 'Lab reference number')}
                       maxLength={150}
-                      value={inProgressLabOrder.labReferenceNumber}
+                      value={value}
                       onChange={onChange}
                     />
                   )}
                 />
+                <FormLabel className={styles.errorLabel}>{formState.errors.labReferenceNumber?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -152,13 +154,14 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       size="lg"
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
-                      selectedItem={value}
+                      selectedItem={priorityOptions.find((option) => option.value === value)}
                       items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem)}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || null)}
                     />
                   )}
                 />
+                <FormLabel className={styles.errorLabel}>{formState.errors.urgency?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -180,6 +183,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                     />
                   )}
                 />
+                <FormLabel className={styles.errorLabel}>{formState.errors.instructions?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -190,13 +194,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
           <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
             {t('discard', 'Discard')}
           </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            size="xl"
-            disabled={!inProgressLabOrder.testType}
-          >
+          <Button className={styles.button} kind="primary" type="submit" size="xl">
             {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
