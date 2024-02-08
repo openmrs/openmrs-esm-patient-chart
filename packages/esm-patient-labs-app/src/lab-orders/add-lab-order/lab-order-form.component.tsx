@@ -21,14 +21,14 @@ export interface LabOrderFormProps {
 
 const labOrderFormSchema = z.object({
   labReferenceNumber: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
-  instructions: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
-  urgency: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
+  instructions: z.string({ required_error: t('labOrderInstructionsError', 'Additional instructions is required') }),
+  urgency: z.string({ required_error: t('labOrderUrgencyError', 'Priority is required') }),
   testType: z.object(
     {
       label: z.string().refine((value) => !value && ''),
       conceptUuid: z.string().refine((value) => !value && ''),
     },
-    { required_error: t('labReferenceNumberError', 'Lab reference number is required') },
+    { required_error: t('labOrderTestTypeError', 'Test type is required') },
   ),
 });
 
@@ -50,6 +50,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
       ...initialOrder,
+      instructions: '',
     },
   });
 
@@ -77,9 +78,11 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
-  useEffect(() => {
-    getValues('testType');
-  }, [formState]);
+  // useEffect(() => {
+  //   getValues('testType');
+  //   // console.log(formState);
+  // }, [getValues, formState]);
+
   return (
     <>
       {errorLoadingTestTypes && (
@@ -95,7 +98,6 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
         <div>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
-              {getValues('testType')}
               <InputWrapper>
                 <Controller
                   name="testType"
@@ -105,41 +107,36 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       size="lg"
                       id="testTypeInput"
                       titleText={t('testType', 'Test type')}
-                      selectedItem={testTypes.find((t) => t.conceptUuid == inProgressLabOrder?.testType?.conceptUuid)}
+                      selectedItem={value}
                       items={testTypes}
-                      itemToString={(item: TestType) => item?.label}
                       placeholder={
                         isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
                       }
-                      required
-                      value={value}
                       onBlur={onBlur}
                       disabled={isLoadingTestTypes}
-                      onChange={(event) => {
-                        onChange(event);
-                      }}
+                      onChange={({ selectedItem }) => onChange(selectedItem)}
                     />
                   )}
                 />
-                {getValues}
               </InputWrapper>
             </Column>
           </Grid>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
-                <TextInput
-                  id="labReferenceNumberInput"
-                  size="lg"
-                  labelText={t('labReferenceNumber', 'Lab reference number')}
-                  maxLength={150}
-                  value={inProgressLabOrder.labReferenceNumber}
-                  onChange={(e) =>
-                    setInProgressLabOrder({
-                      ...inProgressLabOrder,
-                      labReferenceNumber: e.target.value,
-                    })
-                  }
+                <Controller
+                  name="labReferenceNumber"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      id="labReferenceNumberInput"
+                      size="lg"
+                      labelText={t('labReferenceNumber', 'Lab reference number')}
+                      maxLength={150}
+                      value={inProgressLabOrder.labReferenceNumber}
+                      onChange={onChange}
+                    />
+                  )}
                 />
               </InputWrapper>
             </Column>
@@ -147,19 +144,20 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
-                <ComboBox
-                  size="lg"
-                  id="priorityInput"
-                  titleText={t('priority', 'Priority')}
-                  selectedItem={priorityOptions.find((p) => p.value == inProgressLabOrder?.urgency)}
-                  items={priorityOptions}
-                  itemToString={(item) => item?.label}
-                  onChange={({ selectedItem }) =>
-                    setInProgressLabOrder({
-                      ...inProgressLabOrder,
-                      urgency: selectedItem?.value ?? priorityOptions[0],
-                    })
-                  }
+                <Controller
+                  name="urgency"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="priorityInput"
+                      titleText={t('priority', 'Priority')}
+                      selectedItem={value}
+                      items={priorityOptions}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem)}
+                    />
+                  )}
                 />
               </InputWrapper>
             </Column>
@@ -167,19 +165,20 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
-                <TextInput
-                  id="additionalInstructionsInput"
-                  size="lg"
-                  labelText={t('additionalInstructions', 'Additional instructions')}
-                  // placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                  value={inProgressLabOrder.instructions}
-                  onChange={(e) =>
-                    setInProgressLabOrder({
-                      ...inProgressLabOrder,
-                      instructions: e.target.value,
-                    })
-                  }
-                  maxLength={150}
+                <Controller
+                  name="instructions"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      id="additionalInstructionsInput"
+                      size="lg"
+                      labelText={t('additionalInstructions', 'Additional instructions')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxLength={150}
+                    />
+                  )}
                 />
               </InputWrapper>
             </Column>
