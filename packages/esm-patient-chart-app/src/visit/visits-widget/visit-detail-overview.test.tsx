@@ -22,7 +22,7 @@ jest.mock('@openmrs/esm-framework', () => {
     getVisitsForPatient: jest.fn(),
     createErrorHandler: jest.fn(),
     useLayoutType: jest.fn(),
-    // useConfig: jest.fn().mockImplementation(() => ({ showAllEncountersTab: true })),
+    useConfig: jest.fn().mockImplementation(() => ({ numberOfVisitsToLoad: 5 })),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
     useConnectedExtensions: jest.fn(() => []),
