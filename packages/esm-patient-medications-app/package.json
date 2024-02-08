@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-medications-app",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "license": "MPL-2.0",
   "description": "Patient medications microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-medications-app.js",
@@ -38,12 +38,12 @@
   },
   "dependencies": {
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^6.1.0",
+    "@openmrs/esm-patient-common-lib": "^7.0.0",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "6.x",
+    "@openmrs/esm-patient-common-lib": "7.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",
