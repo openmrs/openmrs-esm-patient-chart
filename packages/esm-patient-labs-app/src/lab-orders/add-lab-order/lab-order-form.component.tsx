@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -8,11 +8,31 @@ import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './lab-order';
 import { type TestType, useTestTypes } from './useTestTypes';
 import styles from './lab-order-form.scss';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { t } from 'i18next';
+// import { z } from 'zod';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
   closeWorkspace: () => void;
 }
+
+const labOrderFormSchema = z.object({
+  labReferenceNumber: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
+  instructions: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
+  urgency: z.string({ required_error: t('labReferenceNumberError', 'Lab reference number is required') }),
+  testType: z.object(
+    {
+      label: z.string().refine((value) => !value && ''),
+      conceptUuid: z.string().refine((value) => !value && ''),
+    },
+    { required_error: t('labReferenceNumberError', 'Lab reference number is required') },
+  ),
+});
+
+type LabOrderFormData = z.infer<typeof labOrderFormSchema>;
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
@@ -24,6 +44,14 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const [inProgressLabOrder, setInProgressLabOrder] = useState(initialOrder as LabOrderBasketItem);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
+
+  const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<LabOrderFormData>({
+    mode: 'onSubmit',
+    resolver: zodResolver(labOrderFormSchema),
+    defaultValues: {
+      ...initialOrder,
+    },
+  });
 
   const handleFormSubmission = useCallback(
     (e: Event) => {
@@ -49,6 +77,9 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
+  useEffect(() => {
+    getValues('testType');
+  }, [formState]);
   return (
     <>
       {errorLoadingTestTypes && (
@@ -60,31 +91,37 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
-      <Form className={styles.orderForm} onSubmit={handleFormSubmission} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
         <div>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
+              {getValues('testType')}
               <InputWrapper>
-                <ComboBox
-                  size="lg"
-                  id="testTypeInput"
-                  titleText={t('testType', 'Test type')}
-                  selectedItem={testTypes.find((t) => t.conceptUuid == inProgressLabOrder?.testType?.conceptUuid)}
-                  items={testTypes}
-                  itemToString={(item: TestType) => item?.label}
-                  placeholder={
-                    isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
-                  }
-                  required
-                  disabled={isLoadingTestTypes}
-                  onChange={({ selectedItem }: { selectedItem: TestType }) => {
-                    setInProgressLabOrder({
-                      ...inProgressLabOrder,
-                      display: selectedItem?.label,
-                      testType: selectedItem,
-                    });
-                  }}
+                <Controller
+                  name="testType"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="testTypeInput"
+                      titleText={t('testType', 'Test type')}
+                      selectedItem={testTypes.find((t) => t.conceptUuid == inProgressLabOrder?.testType?.conceptUuid)}
+                      items={testTypes}
+                      itemToString={(item: TestType) => item?.label}
+                      placeholder={
+                        isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                      }
+                      required
+                      value={value}
+                      onBlur={onBlur}
+                      disabled={isLoadingTestTypes}
+                      onChange={(event) => {
+                        onChange(event);
+                      }}
+                    />
+                  )}
                 />
+                {getValues}
               </InputWrapper>
             </Column>
           </Grid>
