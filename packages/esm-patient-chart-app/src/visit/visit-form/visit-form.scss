@@ -105,3 +105,28 @@
     }
   }
 }
+
+
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.desktopButtons {
+  margin-top: 2rem;
+}
+
+.tabletButtons {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.actionButtons {
+  position: sticky;
+  bottom: 0;
+}

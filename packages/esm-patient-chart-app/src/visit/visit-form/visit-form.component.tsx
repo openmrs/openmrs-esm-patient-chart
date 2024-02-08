@@ -55,6 +55,7 @@ import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import classNames from 'classnames';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit: Visit;
@@ -665,7 +666,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             )}
           </Stack>
         </div>
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <ButtonSet
+          className={classNames(isTablet ? styles.tabletButtons : styles.desktopButtons, styles.actionButtons)}
+        >
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
             {t('discard', 'Discard')}
           </Button>
