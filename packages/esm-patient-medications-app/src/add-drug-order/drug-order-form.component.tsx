@@ -177,8 +177,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     newValue: MedicationOrderFormData['unit'],
     prevValue: MedicationOrderFormData['unit'],
   ) => {
-    if (prevValue?.valueCoded === watch('quantityUnits')?.valueCoded) {
-      setValue('quantityUnits', newValue);
+    if (!watch('quantityUnits')) {
+      setValue('quantityUnits', newValue, { shouldValidate: true });
     }
   };
 
