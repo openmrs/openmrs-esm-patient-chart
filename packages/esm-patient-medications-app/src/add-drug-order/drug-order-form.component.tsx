@@ -61,28 +61,41 @@ const schemaFields = {
   duration: z.number().nullable(),
   durationUnit: z.object({ ...comboSchema }).nullable(),
   pillsDispensed: z.number().nullable(),
-  quantityUnits: z.object({ ...comboSchema }, { invalid_type_error: 'Please select quantity unit' }),
+  quantityUnits: z.object({ ...comboSchema }).nullable(),
   numRefills: z.number().nullable(),
   indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
   startDate: z.date(),
   frequency: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a frequency' }),
 };
 
-const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(false),
-    freeTextDosage: z.string().optional(),
-  }),
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(true),
-    dosage: z.number().nullable(),
-    unit: z.object({ ...comboSchema }).nullable(),
-    route: z.object({ ...comboSchema }).nullable(),
-    frequency: z.object({ ...comboSchema }).nullable(),
-  }),
-]);
+const medicationOrderFormSchema = z
+  .discriminatedUnion('isFreeTextDosage', [
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(false),
+      freeTextDosage: z.string().optional(),
+    }),
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(true),
+      dosage: z.number().nullable(),
+      unit: z.object({ ...comboSchema }).nullable(),
+      route: z.object({ ...comboSchema }).nullable(),
+      frequency: z.object({ ...comboSchema }).nullable(),
+    }),
+  ])
+  .refine(
+    (formValues) => {
+      if (formValues.pillsDispensed > 0) {
+        return formValues.quantityUnits;
+      }
+      return true;
+    },
+    {
+      message: 'Please select a qauntity unit',
+      path: ['quantityUnits'],
+    },
+  );
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
