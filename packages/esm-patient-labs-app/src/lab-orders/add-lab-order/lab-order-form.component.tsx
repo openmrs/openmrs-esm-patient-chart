@@ -30,10 +30,7 @@ export interface LabOrderFormProps {
 
 const labOrderFormSchema = z.object({
   urgency: z.string({ required_error: 'Priority is required', invalid_type_error: 'Priority is required' }),
-  instructions: z.string({
-    required_error: 'Additional instructions is required',
-    invalid_type_error: 'Additional instructions is required',
-  }),
+  instructions: z.string().optional(),
   labReferenceNumber: z.string({
     required_error: 'Lab reference number is required',
     invalid_type_error: 'Lab reference number is required',
@@ -59,6 +56,8 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
       ...initialOrder,
+      instructions: '',
+      labReferenceNumber: '',
     },
   });
 
