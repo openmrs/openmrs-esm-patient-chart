@@ -67,6 +67,9 @@
   .buttonSet {
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
   }
 
 }
