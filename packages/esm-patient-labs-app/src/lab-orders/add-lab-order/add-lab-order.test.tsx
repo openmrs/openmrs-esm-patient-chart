@@ -120,7 +120,7 @@ describe('AddLabOrder', () => {
     expect(submit).toBeInTheDocument();
     await user.click(submit);
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
         expect.objectContaining({
           urgency: 'STAT',
@@ -130,23 +130,24 @@ describe('AddLabOrder', () => {
           careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
           orderer: 'test-provider-uuid',
         }),
-      ]),
-    );
+      ]);
+    });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('from lab search, click add directly to order basket', async () => {
+    const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepFunction),
     );
     renderAddLabOrderWorkspace();
-    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
     const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Add to basket');
-    await userEvent.click(cd4OrderButton);
+    await user.click(cd4OrderButton);
     expect(hookResult.current.orders).toEqual([
       { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
     ]);
@@ -154,6 +155,7 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
+
   test('back to order basket', async () => {
     const user = userEvent.setup();
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();

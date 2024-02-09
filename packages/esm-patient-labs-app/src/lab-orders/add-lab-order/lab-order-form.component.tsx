@@ -18,11 +18,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './lab-order';
 import { useTestTypes } from './useTestTypes';
-import styles from './lab-order-form.scss';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
+import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
@@ -114,7 +114,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
         />
       )}
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
-        <div>
+        <div className={styles.form}>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
@@ -211,29 +211,29 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
               </InputWrapper>
             </Column>
           </Grid>
-          {showErrorNotification && (
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={8} sm={4}>
-                <InlineNotification
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-                  onClose={() => setShowErrorNotification(false)}
-                />
-              </Column>
-            </Grid>
-          )}
         </div>
-        <ButtonSet
-          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-        >
-          <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
-            {t('discard', 'Discard')}
-          </Button>
-          <Button className={styles.button} kind="primary" type="submit" size="xl">
-            {t('saveOrder', 'Save order')}
-          </Button>
-        </ButtonSet>
+        <div>
+          {showErrorNotification && (
+            <Column className={styles.errorContainer}>
+              <InlineNotification
+                lowContrast
+                title={t('error', 'Error')}
+                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
+                onClose={() => setShowErrorNotification(false)}
+              />
+            </Column>
+          )}
+          <ButtonSet
+            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+          >
+            <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
+              {t('discard', 'Discard')}
+            </Button>
+            <Button className={styles.button} kind="primary" type="submit" size="xl">
+              {t('saveOrder', 'Save order')}
+            </Button>
+          </ButtonSet>
+        </div>
       </Form>
     </>
   );
