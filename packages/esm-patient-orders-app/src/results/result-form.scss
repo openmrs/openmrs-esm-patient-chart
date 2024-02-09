@@ -1,0 +1,23 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+
+section {
+  margin: spacing.$spacing-03;
+}
+
+.sectionTitle {
+  margin-bottom: spacing.$spacing-04;
+}
+
+.modalBody {
+  padding-bottom: spacing.$spacing-05;
+}
+
+.textInput {
+  margin: 5px;
+}
+
+.errorDiv {
+  color: red;
+}

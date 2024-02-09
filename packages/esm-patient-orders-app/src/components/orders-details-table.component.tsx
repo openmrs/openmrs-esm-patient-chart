@@ -40,6 +40,8 @@ import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
 import { orderBy } from 'lodash-es';
 import { Tooltip } from '@carbon/react';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { testResultsFormWorkspace } from '../constants';
 interface OrderDetailsProps {
   title?: string;
   patientUuid: string;
@@ -76,6 +78,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+
+  const config = useConfig();
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -114,9 +118,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       isSortable: true,
     },
   ];
-
   const tableRows = allOrders?.map((order, id) => ({
-    id: `${id}`,
+    id: id,
     startDate: {
       sortKey: dayjs(order.dateActivated).toDate(),
       content: (
@@ -322,7 +325,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                         {!isPrinting && (
                           <TableCell className="cds--table-column-menu">
                             <OrderBasketItemActions
-                              orderItem={sortedData[rowIndex]}
+                              patientUuid={patientUuid}
+                              testOrderUuid={config.orders.testOrderTypeUuid}
+                              orderItem={allOrders[row.id]}
                               items={orders}
                               setItems={setOrders}
                               openOrderBasket={launchOrderBasket}
@@ -387,24 +392,30 @@ function OrderBasketItemActions({
   setItems,
   openOrderBasket,
   openOrderForm,
+  patientUuid,
+  testOrderUuid,
 }: {
   orderItem: Order;
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: OrderBasketItem }) => void;
+  patientUuid: string;
+  testOrderUuid?: string;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
+  //const ordersConfig = await getConfig(moduleName);
 
   const handleViewEditClick = useCallback(() => {
     // openOrderForm({ order: orderItem });
   }, [orderItem, openOrderForm]);
 
   const handleAddResultsClick = useCallback(() => {
-    // openOrderForm({ order: orderItem, addResults: true });
-  }, [orderItem, openOrderForm]);
+    //launchResultsForm();
+    launchPatientWorkspace(testResultsFormWorkspace, { order: orderItem });
+  }, []);
 
   const handleCancelClick = useCallback(() => {
     // setItems(items.filter((x) => x.uuid !== orderItem.uuid));
@@ -425,11 +436,15 @@ function OrderBasketItemActions({
         onClick={handleViewEditClick}
         disabled={alreadyInBasket}
       />
-      {!orderItem.fulfillerStatus && (
+      {orderItem.orderType.uuid === testOrderUuid && (
         <OverflowMenuItem
           className={styles.menuItem}
           id="reorder"
-          itemText={t('addResults', 'Add Results')}
+          itemText={
+            orderItem.fulfillerStatus === 'COMPLETED'
+              ? t('editResults', 'Edit Results')
+              : t('addResults', 'Add Results')
+          }
           onClick={handleAddResultsClick}
           disabled={alreadyInBasket}
         />

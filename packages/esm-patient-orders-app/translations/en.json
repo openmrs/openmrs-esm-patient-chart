@@ -1,11 +1,17 @@
 {
   "add": "Add",
   "addResults": "Add Results",
+  "cancel": "Cancel",
   "cancelOrder": "Cancel Order",
   "dateOfOrder": "Date of Order",
+  "editResults": "Edit Results",
+  "errorUpdatingEncounter', 'Error occurred while updating test results": "errorUpdatingEncounter', 'Error occurred while updating test results",
   "female": "Female",
+  "generateSuccessfully": "You have successfully updated test results",
+  "loadingInitialValues": "Loading Initial Values",
   "male": "Male",
   "onDate": "on",
+  "option": "Choose an Option",
   "order": "Order",
   "orderedBy": "Ordered By",
   "orderId": "Order ID",
@@ -16,7 +22,9 @@
   "print": "Print",
   "printedBy": "Printed by",
   "priority": "Priority",
+  "required": "Required",
   "status": "Status",
   "unknown": "Unknown",
+  "updateEncounter": "Update lab results",
   "viewEdit": "View/Edit Order"
 }

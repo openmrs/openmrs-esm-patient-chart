@@ -1,3 +1,6 @@
+import { testResultsFormWorkspace } from '../constants';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+
 export function orderPriorityToColor(priority) {
   switch (priority) {
     case 'URGENT':
