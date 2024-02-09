@@ -92,7 +92,7 @@ const medicationOrderFormSchema = z
       return true;
     },
     {
-      message: 'Please select a qauntity unit',
+      message: 'Please select Quantity unit',
       path: ['quantityUnits'],
     },
   );
