@@ -1,14 +1,15 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../../root";
+
 
 .orderForm {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
 
   :global(.cds--css-grid) {
     max-width: unset;
@@ -26,18 +27,17 @@
     padding-right: spacing.$spacing-05;
   }
 
-  :global(.cds--list-box) {
-    border: none;
-  }
-
   :global(.cds--number__control-btn) {
     border: 0;
   }
 }
 
+.form {
+  margin: spacing.$spacing-05;
+}
+
 .gridRow {
   padding: 0px;
-  margin-left: calc(spacing.$spacing-03 * -1);
 
   :global(.cds--number) {
     display: inline-block;
@@ -49,18 +49,24 @@
 }
 
 .buttonSet {
-  margin-left: calc(spacing.$spacing-05 * -1);
-
   :global(.cds--btn) {
     width: 50%;
     max-width: unset;
   }
 }
 
+.errorContainer {
+  margin: 1rem;
+}
+
+.errorNotification {
+  margin: 0.5rem 0;
+}
+
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: calc(100vh - 10rem);
+    height: calc(100vh - 6rem - var(--workspace-header-height));
     background-color: #ededed;
   }
 
@@ -72,4 +78,8 @@
     width: 100%;
   }
 
+  .errorContainer {
+    margin: 1rem;
+    margin-bottom: calc(var(--bottom-nav-height) + 1rem);
+  }
 }
