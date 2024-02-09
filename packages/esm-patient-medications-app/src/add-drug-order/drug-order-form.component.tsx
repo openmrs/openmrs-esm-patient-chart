@@ -156,7 +156,13 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
-  const methods = useForm<MedicationOrderFormData>({
+  const {
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<MedicationOrderFormData>({
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
     defaultValues: {
@@ -178,13 +184,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: defaultStartDate,
     },
   });
-  const {
-    handleSubmit,
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = methods;
 
   const handleUnitAfterChange = (
     newValue: MedicationOrderFormData['unit'],
