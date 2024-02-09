@@ -30,11 +30,10 @@ export interface LabOrderFormProps {
 }
 
 const labOrderFormSchema = z.object({
-  urgency: z.string({
-    required_error: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-    invalid_type_error: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-  }),
   instructions: z.string().optional(),
+  urgency: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+  }),
   labReferenceNumber: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
   }),
@@ -179,7 +178,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       selectedItem={priorityOptions.find((option) => option.value === value) || null}
                       items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || null)}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
                       invalid={errors.urgency?.message}
                       invalidText={errors.urgency?.message}
                     />
