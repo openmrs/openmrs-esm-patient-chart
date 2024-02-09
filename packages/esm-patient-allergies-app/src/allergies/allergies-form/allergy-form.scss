@@ -74,6 +74,12 @@
   margin: 1rem;
 }
 
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .form {
@@ -86,5 +92,4 @@
   .form {
     height: calc(100vh - 9rem);
   }
-
 }

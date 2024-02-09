@@ -52,5 +52,8 @@
   .buttonSet {
     padding: 1.5rem 1rem;
     background-color: $ui-02;
+    position: fixed;
+    bottom: 0rem;
+    width: 100%;
   }
 }

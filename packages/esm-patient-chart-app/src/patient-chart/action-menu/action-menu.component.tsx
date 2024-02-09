@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
 
@@ -7,10 +8,9 @@ interface ActionMenuInterface {
 }
 
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
-  const layout = useLayoutType();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const initialHeight = useRef(window.innerHeight);
-
+  const isTablet = useLayoutType() === 'tablet';
   useEffect(() => {
     const handleKeyboardVisibilityChange = () => {
       setKeyboardVisible(initialHeight.current > window.innerHeight);
@@ -22,12 +22,19 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     return () => window.removeEventListener('resize', handleKeyboardVisibilityChange);
   }, [initialHeight]);
 
+  if (open && isTablet) {
+    return null;
+  }
+
   return (
-    <aside className={`${styles.sideRail} ${keyboardVisible ? styles.hiddenSideRail : styles.showSideRail}`}>
+    <aside
+      className={classNames(styles.sideRail, {
+        [styles.hiddenSideRail]: keyboardVisible,
+        [styles.showSideRail]: !keyboardVisible,
+      })}
+    >
       <div className={styles.container}>
         <ExtensionSlot className={styles.chartExtensions} name={'action-menu-chart-items-slot'} />
-        {layout === 'small-desktop' || layout === 'large-desktop' ? <div className={styles.divider}></div> : null}
-        <ExtensionSlot className={styles.nonChartExtensions} name={'action-menu-non-chart-items-slot'} />
       </div>
     </aside>
   );
