@@ -196,8 +196,8 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextArea
+                      enableCounter
                       counterMode="character"
-                      enableCounter={true}
                       id="additionalInstructionsInput"
                       size="lg"
                       labelText={t('additionalInstructions', 'Additional instructions')}
