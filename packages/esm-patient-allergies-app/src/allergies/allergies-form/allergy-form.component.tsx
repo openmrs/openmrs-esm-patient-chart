@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -38,9 +39,8 @@ import {
   useAllergicReactions,
 } from './allergy-form.resource';
 import { useAllergies } from '../allergy-intolerance.resource';
-import styles from './allergy-form.scss';
 import { AllergenType } from '../../types';
-import classNames from 'classnames';
+import styles from './allergy-form.scss';
 
 const allergyFormSchema = z.object({
   allergen: z
