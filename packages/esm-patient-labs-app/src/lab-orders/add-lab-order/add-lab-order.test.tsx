@@ -1,14 +1,12 @@
 import React from 'react';
-import { fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
+import { render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
-import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
-import { type LabOrderBasketItem, type PostDataPrepLabOrderFunction, prepLabOrderPostData } from '../api';
+import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import { type PostDataPrepLabOrderFunction } from '../api';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
-import { getTemplateOrderBasketItem } from '@openmrs/esm-patient-medications-app/src/add-drug-order/drug-search/drug-search.resource';
-import { mockDrugOrderTemplateApiData, mockDrugSearchResultApiData } from '__mocks__';
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -90,15 +88,16 @@ describe('AddLabOrder', () => {
   });
 
   test('happy path fill and submit form', async () => {
+    const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
     );
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
-    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
     const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Order form');
-    await userEvent.click(cd4OrderButton);
+    await user.click(cd4OrderButton);
 
     const testType = screen.getByRole('combobox', { name: 'Test type' });
     expect(testType).toBeInTheDocument();
@@ -106,20 +105,20 @@ describe('AddLabOrder', () => {
 
     const labReferenceNumber = screen.getByRole('textbox', { name: 'Lab reference number' });
     expect(labReferenceNumber).toBeInTheDocument();
-    await userEvent.type(labReferenceNumber, 'lba-000124');
+    await user.type(labReferenceNumber, 'lba-000124');
 
     const priority = screen.getByRole('combobox', { name: 'Priority' });
     expect(priority).toBeInTheDocument();
-    await userEvent.click(priority);
-    await userEvent.click(screen.getByText(/Stat/i));
+    await user.click(priority);
+    await user.click(screen.getByText(/Stat/i));
 
     const additionalInstructions = screen.getByRole('textbox', { name: 'Additional instructions' });
     expect(additionalInstructions).toBeInTheDocument();
-    await userEvent.type(additionalInstructions, 'plz do it thx');
+    await user.type(additionalInstructions, 'plz do it thx');
     const submit = screen.getByRole('button', { name: 'Save order' });
 
     expect(submit).toBeInTheDocument();
-    fireEvent.click(submit);
+    await user.click(submit);
 
     await waitFor(() =>
       expect(hookResult.current.orders).toEqual([

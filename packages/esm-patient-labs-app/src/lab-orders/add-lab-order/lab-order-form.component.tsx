@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession } from '@openmrs/esm-framework';
+import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { translateFrom, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData } from '../api';
 import {
   Button,
@@ -13,15 +13,16 @@ import {
   Grid,
   InlineNotification,
   TextInput,
-  FormLabel,
+  TextArea,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './lab-order';
 import { useTestTypes } from './useTestTypes';
 import styles from './lab-order-form.scss';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
@@ -29,15 +30,20 @@ export interface LabOrderFormProps {
 }
 
 const labOrderFormSchema = z.object({
-  urgency: z.string({ required_error: 'Priority is required', invalid_type_error: 'Priority is required' }),
+  urgency: z.string({
+    required_error: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+    invalid_type_error: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+  }),
   instructions: z.string().optional(),
-  labReferenceNumber: z.string({
-    required_error: 'Lab reference number is required',
-    invalid_type_error: 'Lab reference number is required',
+  labReferenceNumber: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
   }),
   testType: z.object(
     { label: z.string(), conceptUuid: z.string() },
-    { required_error: 'Test type is required', invalid_type_error: 'Test type is required' },
+    {
+      required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
+      invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+    },
   ),
 });
 
@@ -50,14 +56,19 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
 
-  const { control, handleSubmit, getValues, formState } = useForm<LabOrderBasketItem>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, defaultValues, isDirty },
+  } = useForm<LabOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      ...initialOrder,
       instructions: '',
-      labReferenceNumber: null,
+      labReferenceNumber: '',
+      ...initialOrder,
     },
   });
 
@@ -66,21 +77,31 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
-      const existingOrder = orders.find((order) => order.testType.conceptUuid == data.testType.conceptUuid);
+      const existingOrder = orders.find((order) => order.testType.conceptUuid == defaultValues.testType.conceptUuid);
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = data;
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
   );
 
   const cancelOrder = useCallback(() => {
-    setOrders(orders.filter((order) => order.testType.conceptUuid !== getValues().testType.conceptUuid));
+    setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
-  }, [closeWorkspace, orders, setOrders]);
+  }, [closeWorkspace, orders, setOrders, defaultValues]);
+
+  const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
+    if (errors) {
+      setShowErrorNotification(true);
+    }
+  };
+
+  useEffect(() => {
+    promptBeforeClosing('add-lab-order', () => isDirty);
+  }, [isDirty]);
 
   return (
     <>
@@ -93,7 +114,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
@@ -114,10 +135,11 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       onBlur={onBlur}
                       disabled={isLoadingTestTypes}
                       onChange={({ selectedItem }) => onChange(selectedItem)}
+                      invalid={errors.testType?.message}
+                      invalidText={errors.testType?.message}
                     />
                   )}
                 />
-                <FormLabel className={styles.errorLabel}>{formState.errors.testType?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -135,10 +157,11 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       maxLength={150}
                       value={value}
                       onChange={onChange}
+                      invalid={errors.labReferenceNumber?.message}
+                      invalidText={errors.labReferenceNumber?.message}
                     />
                   )}
                 />
-                <FormLabel className={styles.errorLabel}>{formState.errors.labReferenceNumber?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -153,14 +176,15 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                       size="lg"
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
-                      selectedItem={priorityOptions.find((option) => option.value === value)}
+                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
                       items={priorityOptions}
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.value || null)}
+                      invalid={errors.urgency?.message}
+                      invalidText={errors.urgency?.message}
                     />
                   )}
                 />
-                <FormLabel className={styles.errorLabel}>{formState.errors.urgency?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
@@ -171,21 +195,36 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                   name="instructions"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
+                    <TextArea
+                      counterMode="character"
+                      enableCounter={true}
                       id="additionalInstructionsInput"
                       size="lg"
                       labelText={t('additionalInstructions', 'Additional instructions')}
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
-                      maxLength={150}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
                     />
                   )}
                 />
-                <FormLabel className={styles.errorLabel}>{formState.errors.instructions?.message}</FormLabel>
               </InputWrapper>
             </Column>
           </Grid>
+          {showErrorNotification && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InlineNotification
+                  lowContrast
+                  title={t('error', 'Error')}
+                  subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
+                  onClose={() => setShowErrorNotification(false)}
+                />
+              </Column>
+            </Grid>
+          )}
         </div>
         <ButtonSet
           className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
