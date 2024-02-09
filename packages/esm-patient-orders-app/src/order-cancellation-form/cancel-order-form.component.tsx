@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -13,38 +13,52 @@ import {
   Stack,
   DatePicker,
   DatePickerInput,
+  InlineLoading,
 } from '@carbon/react';
 import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './cancel-order-form.scss';
-import { saveCancelOrderRequest } from './cancel-order.resource';
+import { cancelOrder } from './cancel-order.resource';
 import dayjs from 'dayjs';
 
-interface OrderCancellationFormProps {
+interface OrderCancellationFormProps extends DefaultWorkspaceProps {
   order: Order;
-  patientUuid: string;
-  context?: string;
-  closeWorkspace: () => void;
 }
 
-const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, patientUuid, closeWorkspace }) => {
+const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
+  order,
+  patientUuid,
+  closeWorkspace,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-
-  const { mutate } = usePatientOrders(patientUuid, 'ACTIVE');
+  const { mutate } = usePatientOrders(patientUuid);
 
   const cancelOrderSchema = useMemo(() => {
     return z.object({
-      cancellationDate: z.date(),
-      reasonForCancellation: z.string(),
+      cancellationDate: z
+        .date({
+          required_error: t('requiredField', 'This field is required'),
+        })
+        .refine((date) => date >= dayjs().startOf('day').toDate(), {
+          message: t('dateCannotBeBeforeToday', 'Date cannot be before today'),
+        }),
+      reasonForCancellation: z.string({
+        required_error: t('requiredField', 'This field is required'),
+      }),
     });
   }, []);
 
   type CancelOrderFormData = z.infer<typeof cancelOrderSchema>;
 
-  const { control, handleSubmit, watch, setValue } = useForm<CancelOrderFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isDirty },
+  } = useForm<CancelOrderFormData>({
     mode: 'all',
     resolver: zodResolver(cancelOrderSchema),
   });
@@ -54,6 +68,10 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
       setShowErrorNotification(true);
     }
   }
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const cancelOrderRequest = useCallback((data: CancelOrderFormData) => {
     const formData = data;
@@ -67,7 +85,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
 
     const abortController = new AbortController();
 
-    saveCancelOrderRequest(order, payload, abortController).then(
+    cancelOrder(order, payload, abortController).then(
       (res) => {
         setIsSubmitting(false);
         closeWorkspace();
@@ -75,13 +93,11 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
 
         showSnackbar({
           isLowContrast: true,
-          title: t('cancelOrder', 'Cancel Order'),
+          title: t('orderCancelled', 'Order cancelled'),
           kind: 'success',
-          subtitle: t(
-            'successfullyCancelledOrder',
-            'You have successfully cancelled an order with OrderNumber {{orderNumber}}',
-            { orderNumber: order.orderNumber },
-          ),
+          subtitle: t('successfullyCancelledOrder', 'Order {{orderNumber}} has been cancelled successfully', {
+            orderNumber: order?.orderNumber,
+          }),
         });
       },
       (err) => {
@@ -101,7 +117,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
       <div className={styles.grid}>
         <Stack>
           <section>
-            <h4 style={{ marginBottom: '1rem' }}>{order.display}</h4>
+            <h4 className={styles.orderDisplay}>{order?.display}</h4>
           </section>
           <section>
             <Controller
@@ -110,9 +126,8 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
               render={({ field: { onChange, value } }) => (
                 <div className={styles.row}>
                   <DatePicker
-                    id="vaccinationExpiration"
-                    className="vaccinationExpiration"
-                    minDate={dayjs().startOf('day').format('DD/MM/YYYY')}
+                    id="cancellationDate"
+                    minDate={dayjs().startOf('day')}
                     dateFormat="d/m/Y"
                     datePickerType="single"
                     value={value}
@@ -124,6 +139,8 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
                       placeholder="dd/mm/yyyy"
                       labelText={t('cancellationDate', 'Cancellation date')}
                       type="text"
+                      invalid={!!errors['cancellationDate']}
+                      invalidText={!!errors['cancellationDate'] && errors['cancellationDate'].message}
                     />
                   </DatePicker>
                 </div>
@@ -142,6 +159,8 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
                     labelText={t('reasonForCancellation', 'Reason for cancellation')}
                     value={value}
                     onChange={(evt) => onChange(evt.target.value)}
+                    invalid={!!errors['reasonForCancellation']}
+                    invalidText={!!errors['reasonForCancellation'] && errors['reasonForCancellation'].message}
                   />
                 </div>
               )}
@@ -155,7 +174,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
           <InlineNotification
             lowContrast
             title={t('error', 'Error')}
-            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+            subtitle={t('pleaseFillRequiredFields', 'Please fill all the required fields') + '.'}
             onClose={() => setShowErrorNotification(false)}
           />
         </Column>
@@ -172,7 +191,11 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({ order, pa
           disabled={isSubmitting}
           type="submit"
         >
-          {t('saveAndClose', 'Save and close')}
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            t('saveAndClose', 'Save and close')
+          )}
         </Button>
       </ButtonSet>
     </Form>

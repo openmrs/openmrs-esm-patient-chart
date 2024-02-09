@@ -59,7 +59,7 @@ interface OrderHeaderProps {
 
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, showAddButton, showPrintButton }) => {
   const { t } = useTranslation();
-  const defaultPageSize = 5;
+  const defaultPageSize = 10;
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
@@ -78,7 +78,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     error: isError,
     isLoading,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+  } = usePatientOrders(patientUuid, selectedOrderTypeUuid);
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -118,33 +118,35 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     },
   ];
 
-  const tableRows = allOrders?.map((order) => ({
-    id: order.uuid,
-    startDate: {
-      sortKey: dayjs(order.dateActivated).toDate(),
-      content: (
-        <div className={styles.startDateColumn}>
-          <span>{formatDate(new Date(order.dateActivated))}</span>
-          {!isPrinting && <InfoTooltip orderer={order.orderer?.person?.display ?? '--'} />}
+  const tableRows = useMemo(() => {
+    return allOrders?.map((order) => ({
+      id: order.uuid,
+      startDate: {
+        sortKey: dayjs(order.dateActivated).toDate(),
+        content: (
+          <div className={styles.startDateColumn}>
+            <span>{formatDate(new Date(order.dateActivated))}</span>
+            {!isPrinting && <InfoTooltip orderer={order.orderer?.person?.display ?? '--'} />}
+          </div>
+        ),
+      },
+      orderId: order.orderNumber,
+      dateOfOrder: formatDate(new Date(order.dateActivated)),
+      orderType: capitalize(order.orderType?.display ?? '--'),
+      order: order.display,
+      priority: (
+        <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
+          {capitalize(order.urgency)}
         </div>
       ),
-    },
-    orderId: order.orderNumber,
-    dateOfOrder: formatDate(new Date(order.dateActivated)),
-    orderType: capitalize(order.orderType?.display ?? '--'),
-    order: order.display,
-    priority: (
-      <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
-        {capitalize(order.urgency)}
-      </div>
-    ),
-    orderedBy: order.orderer?.display,
-    status: (
-      <Tag type={orderStatusColor(order.fulfillerStatus)} className={styles.singleLineText}>
-        {order.fulfillerStatus ?? '--'}
-      </Tag>
-    ),
-  }));
+      orderedBy: order.orderer?.display,
+      status: (
+        <Tag type={orderStatusColor(order.fulfillerStatus)} className={styles.singleLineText}>
+          {order.fulfillerStatus ?? '--'}
+        </Tag>
+      ),
+    }));
+  }, [allOrders]);
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
     return sortDirection === sortStates.DESC

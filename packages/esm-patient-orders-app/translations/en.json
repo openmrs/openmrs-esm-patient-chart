@@ -25,7 +25,7 @@
   "reasonForCancellation": "Reason for cancellation",
   "saveAndClose": "Save and close",
   "status": "Status",
-  "successfullyCancelledOrder": "You have successfully cancelled an order with OrderNumber {{orderNumber}}",
+  "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
   "unknown": "Unknown",
   "viewEdit": "View/Edit Order"
 }

@@ -12,6 +12,10 @@
   margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
 }
 
+.orderDisplay {
+  margin-bottom: spacing.$spacing-05;
+}
+
 .danger {
   color: $danger;
 }
@@ -22,10 +26,18 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: 1.5rem spacing.$spacing-05;
   background-color: $ui-02;
 }
 
@@ -49,18 +61,18 @@
 }
 
 .grid {
-  margin: 1rem;
+  margin: spacing.$spacing-05;
 }
 
 .row {
-  margin: 0.5rem 0rem 0rem;
+  margin: spacing.$spacing-03 0rem 0rem;
   display: flex;
   flex-flow: row wrap;
-  gap: 1rem;
+  gap: spacing.$spacing-05;
 }
 
 .spacer {
-  margin-top: 1rem;
+  margin-top: spacing.$spacing-05;
 }
 
 .noteInput {
@@ -68,9 +80,9 @@
 }
 
 .errorNotification {
-  margin: 0.5rem 0;
+  margin: spacing.$spacing-03 0;
 }
 
 .errorContainer {
-  margin: 1rem;
+  margin: spacing.$spacing-05;
 }

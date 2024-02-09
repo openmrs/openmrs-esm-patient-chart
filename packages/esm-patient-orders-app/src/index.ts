@@ -10,7 +10,6 @@ import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
 import OrdersSummary from './orders-summary/orders-summary.component';
-import CancelOrderForm from './order-cancellation-form/cancel-order-form.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -23,6 +22,15 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+
+  registerWorkspace({
+    name: 'patient-orders-form-workspace',
+    // t('orderCancellation','Order cancellation')
+    title: translateFrom(moduleName, 'orderCancellation', 'Order cancellation'),
+    load: getAsyncLifecycle(() => import('./order-cancellation-form/cancel-order-form.component'), options),
+    type: 'order',
+    canHide: false,
+  });
 }
 
 // t('orderBasketWorkspaceTitle', 'Order Basket')
@@ -53,5 +61,3 @@ export const ordersDashboardLink =
   );
 
 export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);
-
-export const cancelOrderForm = getSyncLifecycle(CancelOrderForm, options);
