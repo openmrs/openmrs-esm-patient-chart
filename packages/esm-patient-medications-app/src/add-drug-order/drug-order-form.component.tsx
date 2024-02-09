@@ -160,6 +160,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     handleSubmit,
     control,
     watch,
+    getValues,
     setValue,
     formState: { errors },
   } = useForm<MedicationOrderFormData>({
@@ -185,14 +186,14 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     },
   });
 
-  const handleUnitAfterChange = (
-    newValue: MedicationOrderFormData['unit'],
-    prevValue: MedicationOrderFormData['unit'],
-  ) => {
-    if (prevValue?.valueCoded === watch('quantityUnits')?.valueCoded) {
-      setValue('quantityUnits', newValue, { shouldValidate: true });
-    }
-  };
+  const handleUnitAfterChange = useCallback(
+    (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
+      if (prevValue?.valueCoded === getValues('quantityUnits')?.valueCoded) {
+        setValue('quantityUnits', newValue, { shouldValidate: true });
+      }
+    },
+    [setValue],
+  );
 
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
@@ -395,7 +396,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                         control={control}
                         name="unit"
                         type="comboBox"
-                        watch={watch}
+                        getValues={getValues}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         items={drugDosingUnits}
@@ -719,7 +720,7 @@ const ControlledFieldInput = ({
   name,
   type,
   control,
-  watch,
+  getValues,
   handleAfterChange,
   ...restProps
 }: ControlledFieldInputProps) => {
@@ -728,11 +729,14 @@ const ControlledFieldInput = ({
     fieldState,
   } = useController<MedicationOrderFormData>({ name: name, control });
 
-  const handleChange = (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
-    const prevValue = watch?.(name);
-    onChange(newValue);
-    handleAfterChange?.(newValue, prevValue);
-  };
+  const handleChange = useCallback(
+    (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
+      const prevValue = getValues?.(name);
+      onChange(newValue);
+      handleAfterChange?.(newValue, prevValue);
+    },
+    [getValues, onChange, handleAfterChange],
+  );
 
   const component = useMemo(() => {
     if (type === 'toggle')
