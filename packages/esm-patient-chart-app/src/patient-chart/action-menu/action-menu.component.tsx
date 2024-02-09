@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
 
 interface ActionMenuInterface {
@@ -10,7 +10,7 @@ interface ActionMenuInterface {
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const initialHeight = useRef(window.innerHeight);
-
+  const isTablet = useLayoutType() === 'tablet';
   useEffect(() => {
     const handleKeyboardVisibilityChange = () => {
       setKeyboardVisible(initialHeight.current > window.innerHeight);
@@ -21,6 +21,10 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     window.addEventListener('resize', handleKeyboardVisibilityChange);
     return () => window.removeEventListener('resize', handleKeyboardVisibilityChange);
   }, [initialHeight]);
+
+  if (open && isTablet) {
+    return null;
+  }
 
   return (
     <aside
