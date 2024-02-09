@@ -104,7 +104,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
         setIsSubmitting(false);
         showSnackbar({
           isLowContrast: true,
-          title: t(`errorCancellingOrder', 'Error cancelling order`),
+          title: t('errorCancellingOrder', 'Error cancelling order'),
           kind: 'error',
           subtitle: err?.message,
         });
