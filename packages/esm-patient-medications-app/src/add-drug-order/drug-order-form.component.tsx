@@ -87,7 +87,7 @@ const medicationOrderFormSchema = z
   .refine(
     (formValues) => {
       if (formValues.pillsDispensed > 0) {
-        return formValues.quantityUnits;
+        return Boolean(formValues.quantityUnits);
       }
       return true;
     },
@@ -171,7 +171,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       duration: initialOrderBasketItem?.duration,
       durationUnit: initialOrderBasketItem?.durationUnit,
       pillsDispensed: initialOrderBasketItem?.pillsDispensed,
-      quantityUnits: initialOrderBasketItem?.quantityUnits ?? initialOrderBasketItem?.unit,
+      quantityUnits: initialOrderBasketItem?.quantityUnits,
       numRefills: initialOrderBasketItem?.numRefills,
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
@@ -190,7 +190,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     newValue: MedicationOrderFormData['unit'],
     prevValue: MedicationOrderFormData['unit'],
   ) => {
-    if (!watch('quantityUnits')) {
+    if (prevValue?.valueCoded === watch('quantityUnits')?.valueCoded) {
       setValue('quantityUnits', newValue, { shouldValidate: true });
     }
   };
