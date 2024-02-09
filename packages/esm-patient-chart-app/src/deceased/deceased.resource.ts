@@ -46,8 +46,8 @@ export function usePatientDeceased(patientUuid: string) {
   }
 
   return {
-    deathDate: patient.deceasedDateTime,
-    isDead: patient.deceasedBoolean ?? Boolean(patient.deceasedDateTime),
+    deathDate: patient?.deceasedDateTime,
+    isDead: patient?.deceasedBoolean ?? Boolean(patient?.deceasedDateTime),
     isLoading: isPatientLoading,
   };
 }
