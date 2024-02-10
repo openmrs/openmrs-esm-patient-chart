@@ -189,6 +189,16 @@
   align-items: center;
 }
 
+.loadMoreButton {
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .header {
@@ -199,4 +209,3 @@ html[dir='rtl'] {
     }
   }
 }
-

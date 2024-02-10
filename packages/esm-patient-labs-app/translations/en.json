@@ -26,6 +26,7 @@
   "ordered": "Ordered",
   "other": "Other",
   "panel": "Panel",
+  "pleaseRequiredFields": "Please fill all required fields",
   "print": "Print",
   "printedBy": "Printed by",
   "printTestResults": "Print test results",
