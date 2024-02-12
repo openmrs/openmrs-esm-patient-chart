@@ -46,7 +46,7 @@ export default function Root() {
  * t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
 
  * t('unsavedChangesInOpenedWorkspace', 'You have unsaved changes in the opened workspace. Do you want to discard these changes?')
- * t('unsavedChangesTitleText', 'Unsaved Changes')
+ * t('unsavedChangesTitleText', 'Unsaved changes')
  * t('discard','Discard')
  * t('closingAllWorkspacesPromptTitle','You have unsaved changes')
  * t('closingAllWorkspacesPromptBody', 'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}')
