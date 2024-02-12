@@ -3,8 +3,12 @@ export type WorkspaceWindowState = 'maximized' | 'hidden' | 'normal';
 
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {
-  closeWorkspace(ignoreChanges: boolean): void;
-  closeWorkspace(): void;
+  /**
+   * Call this function to close the workspace. If ignoreChanges is true, the user will not be
+   * prompted to save changes before closing, even if the `testFcn` passed to `promptBeforeClosing`
+   * returns `true`.
+   */
+  closeWorkspace(ignoreChanges?: boolean): void;
   /**
    * Call this with a no-args function that returns true if the user should be prompted before
    * this workspace is closed; e.g. if there is unsaved data.

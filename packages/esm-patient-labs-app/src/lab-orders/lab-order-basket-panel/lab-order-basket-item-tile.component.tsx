@@ -25,6 +25,10 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   // Hence, we manually prevent the handleClick callback from being invoked as soon as the button is pressed once.
   const shouldOnClickBeCalled = useRef(true);
 
+  const labelClassName = classNames(styles.orderActionNewLabel, {
+    [styles.orderActionIncompleteLabel]: orderBasketItem.isOrderIncomplete,
+  });
+
   return (
     <ClickableTile
       role="listitem"
@@ -36,7 +40,9 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
     >
       <div className={styles.orderBasketItemTile}>
         <div className={styles.clipTextWithEllipsis}>
-          <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>
+          <span className={labelClassName}>
+            {orderBasketItem.isOrderIncomplete ? t('incomplete', 'Incomplete') : t('orderActionNew', 'New')}
+          </span>
           <br />
           <>
             <span className={styles.name}>{orderBasketItem.testType?.label}</span>

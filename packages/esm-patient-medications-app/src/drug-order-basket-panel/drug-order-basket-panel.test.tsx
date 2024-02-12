@@ -1,11 +1,11 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData, patientUuid } from '../__mocks__/medication.mock';
-import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
-import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
+import { getByTextWithMarkup } from 'tools';
 import { type DrugOrderBasketItem } from '../types';
+import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData } from '__mocks__';
+import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
+import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
 
 const mockUseOrderBasket = jest.fn();
 

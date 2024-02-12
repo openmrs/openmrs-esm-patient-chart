@@ -3,13 +3,10 @@ import { of, throwError } from 'rxjs';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { mockLocations } from '../../__mocks__/location.mock';
-import { mockPatient } from '../../../../../tools/test-helpers';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
+import { mockLocations, mockVisitTypes } from '__mocks__';
+import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
-
-jest.setTimeout(10000);
 
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
@@ -232,6 +229,7 @@ describe('Visit Form', () => {
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
+      timeoutInMs: 5000,
     });
   });
 

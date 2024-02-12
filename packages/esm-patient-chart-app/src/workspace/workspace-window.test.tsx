@@ -3,7 +3,7 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isDesktop } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, registerWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockPatient } from 'tools';
 import WorkspaceWindow from './workspace-window.component';
 
 const mockExtensionRegistry = {};
@@ -19,10 +19,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     isDesktop: jest.fn(),
-    getExtensionRegistration: (name) => mockExtensionRegistry[name],
-    registerExtension: (ext) => {
-      mockExtensionRegistry[ext.name] = ext;
-    },
     translateFrom: (module, key, defaultValue, options) => defaultValue,
     useBodyScrollLock: jest.fn(),
   };

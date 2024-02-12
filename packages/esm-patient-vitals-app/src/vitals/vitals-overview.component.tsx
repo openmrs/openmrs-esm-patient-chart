@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Switch } from '@carbon/react';
+import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table, Printer } from '@carbon/react/icons';
 import {
   CardHeader,
@@ -39,6 +39,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, isError, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
+
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
@@ -155,12 +156,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                     onChange={(evt) => setChartView(evt.name === 'chartView')}
                     size={isTablet ? 'md' : 'sm'}
                   >
-                    <Switch name="tableView">
+                    <IconSwitch name="tableView" text="Table view">
                       <Table size={16} />
-                    </Switch>
-                    <Switch name="chartView">
+                    </IconSwitch>
+                    <IconSwitch name="chartView" text="Chart view">
                       <ChartLineSmooth size={16} />
-                    </Switch>
+                    </IconSwitch>
                   </ContentSwitcher>
                   <>
                     <span className={styles.divider}>|</span>

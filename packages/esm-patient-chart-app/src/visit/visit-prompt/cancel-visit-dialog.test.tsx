@@ -8,9 +8,8 @@ import {
   type FetchResponse,
   showActionableNotification,
 } from '@openmrs/esm-framework';
-import { mockCurrentVisit } from '../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../tools/test-helpers';
-import { mockVisitQueueEntries } from '../../__mocks__/visitQueueEntry.mock';
+import { mockCurrentVisit, mockVisitQueueEntries } from '__mocks__';
+import { mockPatient } from 'tools';
 import { type MappedVisitQueueEntry, useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import CancelVisitDialog from './cancel-visit-dialog.component';
@@ -18,7 +17,6 @@ import CancelVisitDialog from './cancel-visit-dialog.component';
 const mockedCloseModal = jest.fn();
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
-const mockedActionableNotification = jest.mocked(showActionableNotification);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
 const mockedUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
@@ -93,12 +91,11 @@ describe('Cancel visit', () => {
       method: 'DELETE',
     });
 
-    expect(mockedActionableNotification).toHaveBeenCalledWith(
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'success',
         title: 'Visit cancelled',
         subtitle: 'Active Facility Visit cancelled successfully',
-        actionButtonLabel: 'Undo',
       }),
     );
   });

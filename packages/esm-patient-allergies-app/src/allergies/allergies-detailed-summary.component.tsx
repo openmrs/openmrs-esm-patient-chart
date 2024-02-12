@@ -7,9 +7,9 @@ import {
   DataTableSkeleton,
   InlineLoading,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +20,7 @@ import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@ope
 import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
 import styles from './allergies-detailed-summary.scss';
+import { ReactionSeverity } from '../types';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -39,7 +40,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const tableHeaders = [
     { key: 'display', header: t('allergen', 'Allergen') },
     {
-      key: 'criticality',
+      key: 'reactionSeverity',
       header: t('severityandReaction', 'Severity'),
     },
     { key: 'reaction', header: t('reaction', 'Reaction') },
@@ -52,16 +53,20 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const tableRows = React.useMemo(() => {
     return allergies?.map((allergy) => ({
       ...allergy,
-      criticality: {
+      reactionSeverity: {
         content: (
           <span className={styles.allergyCriticality}>
-            {allergy.criticality === 'high' && (
+            {allergy.reactionSeverity === ReactionSeverity.SEVERE && (
               <svg className="omrs-icon omrs-margin-right-4" fill="rgba(181, 7, 6, 1)" style={{ height: '1.25rem' }}>
                 <use xlinkHref="#omrs-icon-important-notification" />
               </svg>
             )}
-            <span className={classNames({ [styles.allergySeverityHigh]: allergy.criticality === 'high' })}>
-              {allergy.criticality}
+            <span
+              className={classNames({
+                [styles.allergySeverityHigh]: allergy.reactionSeverity === ReactionSeverity.SEVERE,
+              })}
+            >
+              {allergy.reactionSeverity}
             </span>
           </span>
         ),

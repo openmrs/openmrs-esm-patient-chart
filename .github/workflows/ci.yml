@@ -17,15 +17,16 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       actions: read
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Cache dependencies
         id: cache
@@ -33,24 +34,23 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
+
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
-      
+
       - name: Setup a local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
-    
-      
+
       - name: Run lint, type checks and tests
         run: yarn verify
-      
+
       - name: Run build
         run: yarn turbo build --color --concurrency=5
-  
+
   pre_release:
     runs-on: ubuntu-latest
 
@@ -59,13 +59,13 @@ jobs:
     if: ${{ github.event_name == 'push' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
-          registry-url: "https://registry.npmjs.org"
-      
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -76,29 +76,29 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
-      
+
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
-      
+
       - name: Version
         run: yarn lerna version "$(node -e "console.log(require('semver').inc(require('./lerna.json').version, 'patch'))")-pre.${{ github.run_number }}" --no-git-tag-version --no-push --yes
-      
+
       - name: Build
         run: yarn turbo build --color --concurrency=5
-      
+
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
       - run: git add . && git commit -m "Prerelease version" --no-verify
-      
+
       - name: Pre-release
         run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: |
@@ -114,11 +114,12 @@ jobs:
     steps:
       - name: Trigger RefApp Build
         uses: fjogeleit/http-request-action@master
+        continue-on-error: true
         with:
-          url: https://ci.openmrs.org/rest/api/latest/queue/REFAPP-D3X
-          method: "POST"
+          url: https://ci.openmrs.org/rest/api/latest/queue/O3-BF
+          method: 'POST'
           customHeaders: '{ "Authorization": "Bearer ${{ secrets.BAMBOO_TOKEN }}" }'
-  
+
   release:
     runs-on: ubuntu-latest
 
@@ -127,13 +128,13 @@ jobs:
     if: ${{ github.event_name == 'release' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
-          registry-url: "https://registry.npmjs.org"
-      
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -144,7 +145,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
-      
+
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v2
         with:
@@ -153,7 +154,7 @@ jobs:
 
       - name: Build
         run: yarn turbo build --color --concurrency=5
-      
+
       - name: Publish
         run: yarn run ci:publish
         env:

@@ -2,11 +2,9 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, usePagination, userHasAccess } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr } from '../../../../../../../tools/test-helpers';
-import { mockEncounters } from '../../../../__mocks__/visits.mock';
+import { mockPatient, renderWithSwr } from 'tools';
+import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
-
-jest.setTimeout(10000);
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -47,8 +45,8 @@ describe('EncounterList', () => {
 
     renderVisitsTable();
 
-    await screen.findByText(/no encounters found/i);
-    expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
+    await screen.findByTitle(/empty data illustration/i);
+    expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
@@ -67,11 +65,11 @@ describe('EncounterList', () => {
 
     const filterDropdown = screen.getByRole('combobox', { name: /filter by encounter type/i });
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
-    const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /provider/];
+    const expectedColumnHeaders = [/date & time/, /visit type/, /Form name/, /encounter type/, /provider/];
     const expectedTableRows = [
-      /18-Jan-2022, 04:25\s+PM Facility Visit Admission/,
-      /03-Aug-2021, 12:47\s+AM Facility Visit Visit Note User One/,
-      /05-Jul-2021, 10:07\s+AM Facility Visit Consultation Dennis The Doctor/,
+      /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/,
+      /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/,
+      /05-Jul-2021, 10:07 AM Facility Visit Consultation Covid 19 Dennis The Doctor Options/,
     ];
 
     expectedColumnHeaders.forEach((header) => {
@@ -124,7 +122,9 @@ describe('Delete Encounter', () => {
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const row = screen.getByRole('row', { name: /18-Jan-2022, 04:25\s+PM Facility Visit Admission/i });
+    const row = screen.getByRole('row', {
+      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger Delete this encounter/i }));

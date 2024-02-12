@@ -2,9 +2,13 @@
 
 .attachmentTable > .cds--data-table-header {
   display: none;
-} 
+}
 
 .link {
   text-decoration: none;
   cursor: pointer;
+}
+
+.menuItem {
+  max-width: none;
 }

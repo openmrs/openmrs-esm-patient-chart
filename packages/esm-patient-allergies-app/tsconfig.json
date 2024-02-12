@@ -1,5 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "../../__mocks__/allergies.mock.ts"],
-  "exclude": ["src/**/*.test.tsx"]
+  "include": ["src/**/*", "../../tools/setup-tests.ts"],
 }

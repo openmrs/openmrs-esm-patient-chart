@@ -1,13 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockPatientImmunizationsSearchResponse, mockPaginatedImmunizations } from '../__mocks__/immunizations.mock';
-import {
-  mockPatient,
-  patientChartBasePath,
-  renderWithSwr,
-  waitForLoadingToFinish,
-} from '../../../../tools/test-helpers';
+import { mockPatientImmunizationsSearchResponse, mockPaginatedImmunizations } from '__mocks__';
+import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ImmunizationsOverview from './immunizations-overview.component';
 
 const testProps = {

@@ -5,7 +5,7 @@ import { FormDataSourceService } from '../form-data-source/form-data-source.serv
 import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
-import { Encounter, FormSchema, Identifier } from '../types';
+import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
 import { Session } from '@openmrs/esm-framework';
 import { isFunction } from 'lodash-es';
 
@@ -36,6 +36,11 @@ export interface CreateFormParams {
    * Patient identifiers
    */
   patientIdentifiers: Array<Identifier>;
+
+  /**
+   * Pre-filled questions
+   */
+  preFilledQuestions?: PreFilledQuestions;
 }
 
 const loadedCustomDataSources: Record<string, unknown> = {};
@@ -274,6 +279,15 @@ export class FormCreationService {
     const encounterProvider = form.searchNodeByQuestionId('provider', 'encounterProvider');
     if (encounterProvider.length > 0 && session?.currentProvider) {
       encounterProvider[0].control.setValue(session.currentProvider.uuid);
+    }
+
+    // Pre-filled questions.
+    const preFilledQuestions = this.singleSpaPropsService.getProp('preFilledQuestions');
+    if (preFilledQuestions) {
+      Object.entries(preFilledQuestions).forEach(([questionId, value]) => {
+        const question = form.searchNodeByQuestionId(questionId);
+        question[0]?.control?.setValue(value);
+      });
     }
   }
 

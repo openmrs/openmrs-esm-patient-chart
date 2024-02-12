@@ -8,6 +8,7 @@
   "discard": "تجاهل",
   "edit": "تعديل",
   "editFlags": "تعديل العلامات",
+  "editPatientFlags": "Edit patient flags",
   "enabledFlag": "تم تفعيل العلامة",
   "enablingFlag": "جارٍ تفعيل العلامة...",
   "flagCount_zero": "{{count}} علامة خطر",

@@ -2,15 +2,13 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { visitOverviewDetailMockData } from '../../__mocks__/visits.mock';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
-
-jest.setTimeout(5000);
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
@@ -24,7 +22,7 @@ jest.mock('@openmrs/esm-framework', () => {
     getVisitsForPatient: jest.fn(),
     createErrorHandler: jest.fn(),
     useLayoutType: jest.fn(),
-    // useConfig: jest.fn().mockImplementation(() => ({ showAllEncountersTab: true })),
+    useConfig: jest.fn().mockImplementation(() => ({ numberOfVisitsToLoad: 5 })),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
     ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
     useConnectedExtensions: jest.fn(() => []),
@@ -92,8 +90,8 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
     expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
 
     await user.click(allVisitsTab);
 
@@ -123,8 +121,8 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
     expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
-    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
   });
 });
 

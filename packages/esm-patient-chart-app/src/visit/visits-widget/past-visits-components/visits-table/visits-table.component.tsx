@@ -37,7 +37,7 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
@@ -93,7 +93,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   const tableHeaders = [
     {
-      id: 1,
       header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
@@ -101,7 +100,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   if (showAllEncounters) {
     tableHeaders.push({
-      id: 2,
       header: t('visitType', 'Visit type'),
       key: 'visitType',
     });
@@ -109,12 +107,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   tableHeaders.push(
     {
-      id: 3,
       header: t('encounterType', 'Encounter type'),
       key: 'encounterType',
     },
     {
-      id: 4,
+      header: t('form', 'Form name'),
+      key: 'formName',
+    },
+    {
       header: t('provider', 'Provider'),
       key: 'provider',
     },
@@ -123,6 +123,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const tableRows = useMemo(() => {
     return paginatedVisits?.map((encounter) => ({
       ...encounter,
+      formName: encounter.form?.display ?? '--',
       datetime: formatDatetime(parseDate(encounter.datetime)),
     }));
   }, [paginatedVisits]);
@@ -138,15 +139,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
+              mutateVisits?.();
               showSnackbar({
+                isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
                 subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
-              mutateVisits?.();
             })
             .catch(() => {
               showSnackbar({
+                isLowContrast: false,
                 title: t('error', 'Error'),
                 subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',
@@ -171,10 +174,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     );
   };
 
+  // All encounters tab in visits
   if (!visits?.length) {
-    return (
-      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
-    );
+    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('encounters', 'Encounters')} />;
   }
 
   return (
@@ -254,6 +256,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 aria-label="Encounter table actions menu"
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 flipped
+                                align="left"
                               >
                                 <OverflowMenuItem
                                   size={desktopLayout ? 'sm' : 'lg'}

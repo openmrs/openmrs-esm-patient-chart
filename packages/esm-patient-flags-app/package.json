@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-flags-app",
-  "version": "6.1.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient flags",
   "browser": "dist/openmrs-esm-patient-flags-app.js",
@@ -18,7 +18,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "verify": "turbo lint typescript coverage",
-    "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -42,7 +42,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "5.x",
+    "@openmrs/esm-patient-common-lib": "7.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

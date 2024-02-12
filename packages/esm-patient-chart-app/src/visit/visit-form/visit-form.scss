@@ -42,12 +42,6 @@
   margin: 0.5rem 1rem;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: calc(100vh - 6rem);
-}
 
 .button {
   height: 4rem;
@@ -58,8 +52,11 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: 1rem;
   background-color: $ui-02;
+  position: fixed;
+  bottom: 0rem;
+  width: 100%;
 }
 
 .desktop {
@@ -87,6 +84,17 @@
   color: $text-02;
 }
 
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
     & section {

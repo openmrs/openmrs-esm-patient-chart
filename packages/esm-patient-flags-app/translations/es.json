@@ -8,6 +8,7 @@
   "discard": "Descartar",
   "edit": "Editar",
   "editFlags": "Editar banderas",
+  "editPatientFlags": "Edit patient flags",
   "enabledFlag": "Bandera activada",
   "enablingFlag": "Activando bandera...",
   "flagCount_one": "{{count}} bandera de riesgo",

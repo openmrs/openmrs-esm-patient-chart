@@ -3,9 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { launchFormEntryOrHtmlForms, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { mockCurrentVisit } from '../__mocks__/visits.mock';
-import { mockForms } from '../__mocks__/forms.mock';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockCurrentVisit, mockForms } from '__mocks__';
+import { mockPatient } from 'tools';
 import FormView from './form-view.component';
 
 const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;

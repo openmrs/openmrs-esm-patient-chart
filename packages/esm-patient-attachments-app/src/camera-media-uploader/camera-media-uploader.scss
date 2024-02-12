@@ -16,7 +16,7 @@
 
 .uploadFile {
   color: $ui-02;
-  
+
   label {
     max-width: unset;
   }
@@ -37,6 +37,20 @@
 @media (max-width: $breakpoint-tablet-max){
   .frameContent {
     width: 65%;
-  }  
+  }
 }
 
+.tabList {
+  border-bottom: 2px solid $ui-03;
+
+  div {
+    position: absolute;
+    bottom: -2px;
+    height: 100%;
+    z-index: 1;
+
+    button > div {
+      align-items: center;
+    }
+  }
+}

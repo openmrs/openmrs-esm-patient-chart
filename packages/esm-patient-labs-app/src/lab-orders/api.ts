@@ -64,3 +64,9 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
     instructions: order.instructions,
   };
 }
+
+export type PostDataPrepLabOrderFunction = (
+  order: LabOrderBasketItem,
+  patientUuid: string,
+  encounterUuid: string,
+) => OrderPost;

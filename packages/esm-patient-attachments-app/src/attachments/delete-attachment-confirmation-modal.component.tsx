@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
-import { type Attachment } from '../attachments-types';
+import { type Attachment } from '@openmrs/esm-framework';
 import styles from './delete-attachment-confirmation-modal.scss';
 
 interface DeleteAttachmentConfirmationProps {
   attachment: Attachment;
-  close: Function;
-  onConfirmation: Function;
+  close: () => void;
+  onConfirmation: (attachment: Attachment) => void;
 }
 
 const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> = ({
@@ -20,7 +20,7 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
   return (
     <>
       <ModalHeader closeModal={close} className={styles.productiveHeading03}>
-        {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()} ?
+        {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()}?
       </ModalHeader>
       <ModalBody>
         <p className={styles.bodyLong01}>
@@ -37,7 +37,7 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
         <Button size="lg" kind="secondary" onClick={() => close()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button size="lg" kind="danger" onClick={() => onConfirmation?.(attachment)} autoFocus>
+        <Button autoFocus kind="danger" onClick={() => onConfirmation?.(attachment)} size="lg">
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>

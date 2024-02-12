@@ -77,23 +77,23 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getTableProps }) => (
           <TableContainer>
-            <Table aria-label="vitals" {...getTableProps()}>
+            <Table className={styles.table} aria-label="vitals" {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader>{header.header?.content ?? header.header}</TableHeader>
+                    <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
-                    {row?.cells?.map((cell, index) => {
+                    {row.cells.map((cell) => {
                       const vitalSignInterpretation =
                         paginatedVitals[row.id] && paginatedVitals[row.id][cell.id.substring(2) + 'Interpretation'];
 
                       return (
-                        <StyledTableCell key={`styled-${index}`} interpretation={vitalSignInterpretation}>
+                        <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={vitalSignInterpretation}>
                           {cell.value?.content ?? cell.value}
                         </StyledTableCell>
                       );

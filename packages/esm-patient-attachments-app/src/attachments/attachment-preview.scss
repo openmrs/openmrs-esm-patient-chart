@@ -1,0 +1,75 @@
+@use '@carbon/styles/scss/spacing';
+@use '~@carbon/styles/scss/colors';
+@import "../root.scss";
+
+.previewContainer {
+  display: grid;
+  grid-template-columns: 1fr 16rem;
+  position: fixed;
+  width: 100vw;
+  top: 3rem;
+  bottom: 0;
+  left: 0;
+  z-index: 5001;
+  background-color: colors.$gray-90;
+}
+
+.leftPanel {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+}
+
+.rightPanel {
+  background-color: colors.$gray-80;
+  padding: spacing.$spacing-05;
+  color: $ui-01;
+}
+
+.closePreviewButton {
+  > svg {
+    fill: white !important;
+  }
+}
+
+.attachmentPreview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  img {
+    max-width: 80%;
+    max-height: 80%;
+  }
+
+  .pdfViewer {
+    width: 90%;
+    height: 90%;
+  }
+}
+
+.overflowMenu {
+  &:hover {
+    background-color: hsla(0,0%,55%,.12) !important;
+  }
+
+  svg {
+    fill: white;
+  }
+}
+
+.imageDescription {
+  margin-top: spacing.$spacing-03;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.title {
+  @extend .productiveHeading02;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -19,7 +19,6 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
-    setOrders(orders.filter((order) => !ordersEqual(order, currentOrder)));
     closeWorkspace();
     launchPatientWorkspace('order-basket');
   }, [closeWorkspace, currentOrder, orders, setOrders]);
@@ -30,11 +29,10 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       if (existingOrder) {
         setCurrentOrder(existingOrder);
       } else {
-        setOrders([...orders, searchResult]);
         setCurrentOrder(searchResult);
       }
     },
-    [setOrders, orders],
+    [orders],
   );
 
   const saveDrugOrder = useCallback(
@@ -43,11 +41,15 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
-      newOrders[orders.indexOf(existingOrder)] = {
-        ...finalizedOrder,
-        // Incomplete orders should be marked completed on saving the form
-        isOrderIncomplete: false,
-      };
+      if (existingOrder) {
+        newOrders[orders.indexOf(existingOrder)] = {
+          ...finalizedOrder,
+          // Incomplete orders should be marked completed on saving the form
+          isOrderIncomplete: false,
+        };
+      } else {
+        newOrders.push(finalizedOrder);
+      }
       setOrders(newOrders);
       closeWorkspace();
       launchPatientWorkspace('order-basket');

@@ -2,14 +2,13 @@ import React from 'react';
 import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
+import { mockVisitTypes } from '__mocks__';
 import BaseVisitType from './base-visit-type.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const mockUsePagination = usePagination as jest.Mock;
 const mockUseVisitTypes = useVisitTypes as jest.Mock;
-const mockHandleChange = jest.fn();
 const mockGoToPage = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -77,8 +76,10 @@ describe('VisitTypeOverview', () => {
       goTo: mockGoToPage,
       currentPage: 1,
     });
+
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-    render(<BaseVisitType onChange={mockHandleChange} visitTypes={mockVisitTypes} patientUuid="some-patient-uuid" />);
+
+    render(<BaseVisitType visitTypes={mockVisitTypes} />);
   };
 
   it('should be able to search for a visit type', () => {

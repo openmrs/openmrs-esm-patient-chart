@@ -1,9 +1,11 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, cleanup } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { assessValue, getReferenceRangesForConcept } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
-
+import { isValueWithinReferenceRange } from './vitals-biometrics-form.utils';
+import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+const { conceptRanges, conceptMetadata: mockConceptMetadata } = useVitalsConceptMetadata();
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
   useFormContext: jest.fn().mockImplementation(() => ({
@@ -56,122 +58,120 @@ jest.mock('react-hook-form', () => ({
   }),
 }));
 
-const mockConceptMetadata = [
-  {
-    uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Systolic blood pressure',
-    hiNormal: 140,
-    hiAbsolute: 250,
-    hiCritical: 180,
-    lowNormal: 100,
-    lowAbsolute: 0,
-    lowCritical: 85,
-    units: 'mmHg',
-  },
-  {
-    uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Diastolic blood pressure',
-    hiNormal: 90,
-    hiAbsolute: 150,
-    hiCritical: 120,
-    lowNormal: 55,
-    lowAbsolute: 0,
-    lowCritical: 40,
-    units: 'mmHg',
-  },
-  {
-    uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Temperature (c)',
-    hiNormal: null,
-    hiAbsolute: 43,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: 25,
-    lowCritical: null,
-    units: 'DEG C',
-  },
-  {
-    uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Height (cm)',
-    hiNormal: null,
-    hiAbsolute: 272,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: 10,
-    lowCritical: null,
-    units: 'cm',
-  },
-  {
-    uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Weight (kg)',
-    hiNormal: null,
-    hiAbsolute: 250,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: 0,
-    lowCritical: null,
-    units: 'kg',
-  },
-  {
-    uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Pulse',
-    hiNormal: 100,
-    hiAbsolute: 230,
-    hiCritical: 130,
-    lowNormal: 55,
-    lowAbsolute: 0,
-    lowCritical: 49,
-    units: 'beats/min',
-  },
-  {
-    uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Arterial blood oxygen saturation (pulse oximeter)',
-    hiNormal: null,
-    hiAbsolute: 100,
-    hiCritical: null,
-    lowNormal: 95,
-    lowAbsolute: 0,
-    lowCritical: 90,
-    units: '%',
-  },
-  {
-    uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Mid-upper arm circumference',
-    hiNormal: null,
-    hiAbsolute: null,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: null,
-    lowCritical: null,
-    units: 'cm',
-  },
-  {
-    uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Respiratory rate',
-    hiNormal: 18,
-    hiAbsolute: 999,
-    hiCritical: 26,
-    lowNormal: 12,
-    lowAbsolute: 0,
-    lowCritical: 8,
-    units: 'breaths/min',
-  },
-  {
-    uuid: '5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Karnofsky performance score',
-    hiNormal: null,
-    hiAbsolute: null,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: null,
-    lowCritical: null,
-    units: '%',
-  },
-];
-
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
+  const mockConceptMetadata = [
+    {
+      uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Systolic blood pressure',
+      hiNormal: 140,
+      hiAbsolute: 250,
+      hiCritical: 180,
+      lowNormal: 100,
+      lowAbsolute: 0,
+      lowCritical: 85,
+      units: 'mmHg',
+    },
+    {
+      uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Diastolic blood pressure',
+      hiNormal: 90,
+      hiAbsolute: 150,
+      hiCritical: 120,
+      lowNormal: 55,
+      lowAbsolute: 0,
+      lowCritical: 40,
+      units: 'mmHg',
+    },
+    {
+      uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Temperature (c)',
+      hiNormal: null,
+      hiAbsolute: 43,
+      hiCritical: null,
+      lowNormal: null,
+      lowAbsolute: 25,
+      lowCritical: null,
+      units: 'DEG C',
+    },
+    {
+      uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Height (cm)',
+      hiNormal: null,
+      hiAbsolute: 272,
+      hiCritical: null,
+      lowNormal: null,
+      lowAbsolute: 10,
+      lowCritical: null,
+      units: 'cm',
+    },
+    {
+      uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Weight (kg)',
+      hiNormal: null,
+      hiAbsolute: 250,
+      hiCritical: null,
+      lowNormal: null,
+      lowAbsolute: 0,
+      lowCritical: null,
+      units: 'kg',
+    },
+    {
+      uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Pulse',
+      hiNormal: 100,
+      hiAbsolute: 230,
+      hiCritical: 130,
+      lowNormal: 55,
+      lowAbsolute: 0,
+      lowCritical: 49,
+      units: 'beats/min',
+    },
+    {
+      uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Arterial blood oxygen saturation (pulse oximeter)',
+      hiNormal: null,
+      hiAbsolute: 100,
+      hiCritical: null,
+      lowNormal: 95,
+      lowAbsolute: 0,
+      lowCritical: 90,
+      units: '%',
+    },
+    {
+      uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Mid-upper arm circumference',
+      hiNormal: null,
+      hiAbsolute: null,
+      hiCritical: null,
+      lowNormal: null,
+      lowAbsolute: null,
+      lowCritical: null,
+      units: 'cm',
+    },
+    {
+      uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Respiratory rate',
+      hiNormal: 18,
+      hiAbsolute: 999,
+      hiCritical: 26,
+      lowNormal: 12,
+      lowAbsolute: 0,
+      lowCritical: 8,
+      units: 'breaths/min',
+    },
+    {
+      uuid: '5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Karnofsky performance score',
+      hiNormal: null,
+      hiAbsolute: null,
+      hiCritical: null,
+      lowNormal: null,
+      lowAbsolute: null,
+      lowCritical: null,
+      units: '%',
+    },
+  ];
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
@@ -187,118 +187,18 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
         ['5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'breaths/min'],
         ['5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '%'],
       ]),
-      conceptMetadata: [
-        {
-          uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Systolic blood pressure',
-          hiNormal: 140,
-          hiAbsolute: 250,
-          hiCritical: 180,
-          lowNormal: 100,
-          lowAbsolute: 0,
-          lowCritical: 85,
-          units: 'mmHg',
-        },
-        {
-          uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Diastolic blood pressure',
-          hiNormal: 90,
-          hiAbsolute: 150,
-          hiCritical: 120,
-          lowNormal: 55,
-          lowAbsolute: 0,
-          lowCritical: 40,
-          units: 'mmHg',
-        },
-        {
-          uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Temperature (c)',
-          hiNormal: null,
-          hiAbsolute: 43,
-          hiCritical: null,
-          lowNormal: null,
-          lowAbsolute: 25,
-          lowCritical: null,
-          units: 'DEG C',
-        },
-        {
-          uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Height (cm)',
-          hiNormal: null,
-          hiAbsolute: 272,
-          hiCritical: null,
-          lowNormal: null,
-          lowAbsolute: 10,
-          lowCritical: null,
-          units: 'cm',
-        },
-        {
-          uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Weight (kg)',
-          hiNormal: null,
-          hiAbsolute: 250,
-          hiCritical: null,
-          lowNormal: null,
-          lowAbsolute: 0,
-          lowCritical: null,
-          units: 'kg',
-        },
-        {
-          uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Pulse',
-          hiNormal: 100,
-          hiAbsolute: 230,
-          hiCritical: 130,
-          lowNormal: 55,
-          lowAbsolute: 0,
-          lowCritical: 49,
-          units: 'beats/min',
-        },
-        {
-          uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Arterial blood oxygen saturation (pulse oximeter)',
-          hiNormal: null,
-          hiAbsolute: 100,
-          hiCritical: null,
-          lowNormal: 95,
-          lowAbsolute: 0,
-          lowCritical: 90,
-          units: '%',
-        },
-        {
-          uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Mid-upper arm circumference',
-          hiNormal: null,
-          hiAbsolute: null,
-          hiCritical: null,
-          lowNormal: null,
-          lowAbsolute: null,
-          lowCritical: null,
-          units: 'cm',
-        },
-        {
-          uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Respiratory rate',
-          hiNormal: 18,
-          hiAbsolute: 999,
-          hiCritical: 26,
-          lowNormal: 12,
-          lowAbsolute: 0,
-          lowCritical: 8,
-          units: 'breaths/min',
-        },
-        {
-          uuid: '5283AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Karnofsky performance score',
-          hiNormal: null,
-          hiAbsolute: null,
-          hiCritical: null,
-          lowNormal: null,
-          lowAbsolute: null,
-          lowCritical: null,
-          units: '%',
-        },
-      ],
+      conceptMetadata: mockConceptMetadata,
+      conceptRanges: mockConceptMetadata?.length
+        ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+            mockConceptMetadata.map((concept) => [
+              concept.uuid,
+              {
+                lowAbsolute: concept.lowAbsolute ?? null,
+                highAbsolute: concept.hiAbsolute ?? null,
+              },
+            ]),
+          )
+        : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]),
     })),
   };
 });
@@ -311,6 +211,8 @@ jest.mock('@openmrs/esm-framework', () => {
     useConfig: jest.fn().mockReturnValue({
       concepts: {
         pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        systoleUuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        diastoleUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       },
     }),
   };
@@ -318,12 +220,13 @@ jest.mock('@openmrs/esm-framework', () => {
 
 const testProps = {
   control: undefined,
-  isWithinNormalRange: true,
+  isValueWithinReferenceRange: true,
   fieldProperties: [],
   interpretation: undefined,
   placeholder: '',
   label: '',
   unitSymbol: '',
+  showErrorMessage: undefined,
 };
 
 describe('VitalsAndBiometricsInput', () => {
@@ -368,31 +271,62 @@ describe('VitalsAndBiometricsInput', () => {
 
   it('should validate the input based on the provided interpretation and reference range values', () => {
     const config = useConfig();
-
-    testProps.fieldProperties = [
+    const fieldsToTest = [
       {
         id: 'pulse',
         name: 'Heart rate',
-        min: 0,
-        max: 230,
+        min: conceptRanges.get(config.concepts.pulseUuid).lowAbsolute,
+        max: conceptRanges.get(config.concepts.pulseUuid).highAbsolute,
         type: 'number',
+        uuid: config.concepts.pulseUuid,
+        value: 300,
+        unitSymbol: 'bpm',
+        abnormalValueClass: 'critically-high',
+      },
+
+      {
+        id: 'systole',
+        name: 'Systolic blood pressure',
+        min: conceptRanges.get(config.concepts.systoleUuid).lowAbsolute,
+        max: conceptRanges.get(config.concepts.systoleUuid).highAbsolute,
+        type: 'number',
+        uuid: config.concepts.systoleUuid,
+        value: -1,
+        unitSymbol: 'mmHg',
+        abnormalValueClass: 'critically-low',
       },
     ];
-    testProps.interpretation = assessValue(
-      300,
-      getReferenceRangesForConcept(config.concepts.pulseUuid, mockConceptMetadata),
-    );
-    testProps.label = 'Heart rate';
-    testProps.unitSymbol = 'bpm';
 
-    renderVitalsBiometricsInput();
+    fieldsToTest.forEach((field, index) => {
+      testProps.fieldProperties = [fieldsToTest[index]];
+      testProps.isValueWithinReferenceRange = isValueWithinReferenceRange(mockConceptMetadata, field.uuid, field.value);
+      testProps.interpretation = assessValue(
+        field.value,
+        getReferenceRangesForConcept(field.uuid, mockConceptMetadata),
+      );
+      testProps.label = field.name;
+      testProps.unitSymbol = field.unitSymbol;
+      testProps.showErrorMessage = true;
 
-    screen.findByRole('spinbutton');
+      renderVitalsBiometricsInput();
 
-    expect(screen.getByRole('spinbutton', { name: /heart rate/i })).toBeInTheDocument();
-    const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
-    expect(abnormalValueFlag).toBeInTheDocument();
-    expect(abnormalValueFlag).toHaveClass('critically-high');
+      screen.findByRole('spinbutton');
+
+      expect(screen.getByRole('spinbutton', { name: new RegExp(`${field.name}`, 'i') })).toBeInTheDocument();
+      const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
+      expect(abnormalValueFlag).toBeInTheDocument();
+      expect(abnormalValueFlag).toHaveClass(field.abnormalValueClass);
+      expect(
+        screen.getByText(
+          new RegExp(
+            `Value must be between (${fieldsToTest[index].min}|{{min}}) and (${fieldsToTest[index].max}|{{max}})`,
+            'i',
+          ),
+        ),
+      ).toBeInTheDocument();
+
+      cleanup();
+    });
   });
 });
 

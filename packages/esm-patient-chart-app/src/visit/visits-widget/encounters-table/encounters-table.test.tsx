@@ -2,11 +2,9 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { usePagination } from '@openmrs/esm-framework';
-import { renderWithSwr } from '../../../../../../tools/test-helpers';
-import { mockEncounters2 } from '../../../__mocks__/visits.mock';
+import { renderWithSwr } from 'tools';
+import { mockEncounters2 } from '__mocks__';
 import EncountersTable from './encounters-table.component';
-
-jest.setTimeout(10000);
 
 const testProps = {
   showAllEncounters: true,

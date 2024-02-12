@@ -2,8 +2,8 @@ import React from 'react';
 import { getConfig } from '@openmrs/esm-framework';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '../../../__mocks__/visits.mock';
-import { mockPatient } from '../../../../../../tools/test-helpers';
+import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
+import { mockPatient } from 'tools';
 import VisitSummary from './visit-summary.component';
 
 const mockVisit = visitOverviewDetailMockData.data.results[0];
@@ -43,14 +43,14 @@ describe('VisitSummary', () => {
 
     await user.click(notesTab);
 
-    expect(screen.getByText(/^No notes found$/)).toBeInTheDocument();
+    expect(screen.getByText(/^There are no notes to display for this patient$/)).toBeInTheDocument();
 
     // should display medication panel
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
 
     await user.click(medicationTab);
 
-    expect(screen.getByText(/^No medications found$/)).toBeInTheDocument();
+    expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
 
     // should display tests panel with test panel extension
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
