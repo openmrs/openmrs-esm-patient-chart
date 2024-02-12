@@ -2,8 +2,8 @@ import React from 'react';
 import { of, throwError } from 'rxjs';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { saveVisit, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { mockLocations, mockVisitTypes } from '__mocks__';
+import { saveVisit, showSnackbar, useConfig, openmrsFetch, type Visit, updateVisit } from '@openmrs/esm-framework';
+import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
@@ -20,6 +20,8 @@ const testProps = {
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
+const mockUpdateVisit = updateVisit as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUseVisitAttributeType = useVisitAttributeType as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
@@ -34,10 +36,17 @@ jest.mock('@openmrs/esm-framework', () => {
       return mockGetStartedVisitGetter();
     },
     saveVisit: jest.fn(),
+    updateVisit: jest.fn(),
+    openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => ({
       visitAttributeTypes: [
         {
           uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
           required: false,
           displayInThePatientBanner: true,
         },
@@ -56,19 +65,36 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
-  useVisitAttributeType: jest.fn(() => ({
-    isLoading: false,
-    error: null,
-    data: {
-      uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
-      name: 'Punctuality',
-      display: 'Punctuality',
-      datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
-      datatypeConfig: '',
-      preferredHandlerClassname: 'default',
-      retired: false,
-    },
-  })),
+  useVisitAttributeType: jest.fn((attributeUuid) => {
+    if (attributeUuid === '57ea0cbb-064f-4d09-8cf4-e8228700491c') {
+      return {
+        isLoading: false,
+        error: null,
+        data: {
+          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          name: 'Punctuality',
+          display: 'Punctuality',
+          datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
+          datatypeConfig: '',
+          preferredHandlerClassname: 'default',
+          retired: false,
+        },
+      };
+    }
+    if (attributeUuid === 'aac48226-d143-4274-80e0-264db4e368ee') {
+      return {
+        isLoading: false,
+        error: null,
+        data: {
+          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          name: 'Insurance Policy Number',
+          display: 'Insurance Policy Number',
+          datatypeClassname: 'org.openmrs.customdatatype.datatype.FreeTextDatatype',
+          retired: false,
+        },
+      };
+    }
+  }),
   useVisitAttributeTypes: jest.fn(() => ({
     isLoading: false,
     error: null,
@@ -82,6 +108,13 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
         preferredHandlerClassname: 'default',
         retired: false,
       },
+      {
+        uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+        name: 'Insurance Policy Number',
+        display: 'Insurance Policy Number',
+        datatypeClassname: 'org.openmrs.customdatatype.datatype.FreeTextDatatype',
+        retired: false,
+      },
     ],
   })),
   useConceptAnswersForVisitAttributeType: jest.fn(() => ({
@@ -90,7 +123,7 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
     answers: [
       {
         uuid: '66cdc0a1-aa19-4676-af51-80f66d78d9eb',
-        name: 'On time',
+        display: 'On time',
         links: [
           {
             rel: 'self',
@@ -101,7 +134,7 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
       },
       {
         uuid: '66cdc0a1-aa19-4676-af51-80f66d78d9ec',
-        name: 'Late',
+        display: 'Late',
         links: [
           {
             rel: 'self',
@@ -248,6 +281,260 @@ describe('Visit Form', () => {
     });
   });
 
+  it('Start a new visit with attributes upon successful submission of the form', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm();
+
+    mockOpenmrsFetch.mockResolvedValue({});
+    mockedUseConfig.mockReturnValueOnce({
+      visitAttributeTypes: [
+        {
+          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          required: true,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+
+    const saveButton = screen.getByRole('button', { name: /Start visit/i });
+
+    // Set visit type
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    // Set location
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
+    await user.selectOptions(punctualityPicker, 'On time');
+
+    const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
+    await user.clear(insuranceNumberInput);
+    await user.type(insuranceNumberInput, '183299');
+
+    mockSaveVisit.mockReturnValue(
+      of({
+        status: 201,
+        data: {
+          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
+
+    await user.click(saveButton);
+
+    expect(mockSaveVisit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        location: mockLocations[1].uuid,
+        patient: mockPatient.id,
+        visitType: 'some-uuid1',
+      }),
+      new AbortController(),
+    );
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute', {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body: { attributeType: '57ea0cbb-064f-4d09-8cf4-e8228700491c', value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
+    });
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute', {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body: { attributeType: 'aac48226-d143-4274-80e0-264db4e368ee', value: '183299' },
+    });
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: expect.stringContaining('started successfully'),
+      kind: 'success',
+      title: 'Visit started',
+      timeoutInMs: 5000,
+    });
+  });
+
+  it('Update a visit attributes on an existing visit upon successful submission of the form', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm(mockVisitWithAttributes);
+
+    mockOpenmrsFetch.mockResolvedValue({});
+    mockedUseConfig.mockReturnValueOnce({
+      visitAttributeTypes: [
+        {
+          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          required: true,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+
+    const saveButton = screen.getByRole('button', { name: /Update visit/i });
+
+    // Set visit type
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    // Set location
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
+    await user.selectOptions(punctualityPicker, 'Late');
+
+    const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
+    await user.clear(insuranceNumberInput);
+    await user.type(insuranceNumberInput, '1873290');
+
+    mockUpdateVisit.mockReturnValue(
+      of({
+        status: 201,
+        data: {
+          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
+
+    await user.click(saveButton);
+
+    expect(mockUpdateVisit).toHaveBeenCalledWith(
+      mockVisitWithAttributes.uuid,
+      expect.objectContaining({
+        location: mockLocations[1].uuid,
+        visitType: 'some-uuid1',
+      }),
+      new AbortController(),
+    );
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: { value: '66cdc0a1-aa19-4676-af51-80f66d78d9ec' },
+      },
+    );
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/d6d7d26a-5975-4f03-8abb-db073c948897',
+      {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: { value: '1873290' },
+      },
+    );
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: 'Facility Visit updated successfully',
+      kind: 'success',
+      title: 'Visit details updated',
+      timeoutInMs: 5000,
+    });
+  });
+
+  it('Delete visit attributes on an existing visit upon successful submission of the form', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm(mockVisitWithAttributes);
+
+    mockOpenmrsFetch.mockResolvedValue({});
+    mockedUseConfig.mockReturnValueOnce({
+      visitAttributeTypes: [
+        {
+          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          required: true,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+
+    const saveButton = screen.getByRole('button', { name: /Update visit/i });
+
+    // Set visit type
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    // Set location
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await userEvent.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
+    await user.selectOptions(punctualityPicker, 'Select an option');
+
+    const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
+    await user.clear(insuranceNumberInput);
+
+    mockUpdateVisit.mockReturnValue(
+      of({
+        status: 201,
+        data: {
+          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
+
+    await user.click(saveButton);
+
+    expect(mockUpdateVisit).toHaveBeenCalledWith(
+      mockVisitWithAttributes.uuid,
+      expect.objectContaining({
+        location: mockLocations[1].uuid,
+        visitType: 'some-uuid1',
+      }),
+      new AbortController(),
+    );
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      { method: 'DELETE' },
+    );
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/d6d7d26a-5975-4f03-8abb-db073c948897',
+      { method: 'DELETE' },
+    );
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: 'Facility Visit updated successfully',
+      kind: 'success',
+      title: 'Visit details updated',
+      timeoutInMs: 5000,
+    });
+  });
+
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
 
@@ -379,6 +666,6 @@ describe('Visit Form', () => {
   });
 });
 
-function renderVisitForm() {
-  render(<StartVisitForm {...testProps} />);
+function renderVisitForm(visitToEdit?: Visit) {
+  render(<StartVisitForm {...{ ...testProps, visitToEdit }} />);
 }
