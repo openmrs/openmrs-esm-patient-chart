@@ -189,6 +189,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const openWorkspaces = store.getState().openWorkspaces;
   const workspaceIndexInOpenWorkspaces = openWorkspaces.findIndex((w) => w.name === name);
   const isWorkspaceAlreadyOpen = workspaceIndexInOpenWorkspaces >= 0;
+  const isEditingEncounter = newWorkspace?.additionalProps?.hasOwnProperty('formInfo');
   const openedWorkspaceWithSameType = openWorkspaces.find((w) => w.type == newWorkspace.type);
 
   if (openWorkspaces.length === 0) {
@@ -198,7 +199,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       name,
       additionalProps,
     });
-  } else if (isWorkspaceAlreadyOpen && !!openedWorkspaceWithSameType) {
+  } else if (isWorkspaceAlreadyOpen && !!openedWorkspaceWithSameType && isEditingEncounter) {
     const workspaceToApply: OpenWorkspace = {
       ...openedWorkspaceWithSameType,
       additionalProps: newWorkspace.additionalProps,

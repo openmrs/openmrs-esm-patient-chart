@@ -61,11 +61,7 @@ describe('workspace system', () => {
       expect(POCHIVForm.additionalProps['workspaceTitle']).toBe('POC HIV Form');
 
       launchPatientWorkspace('POC HIV Form', { workspaceTitle: 'POC HIV Form Updated' });
-      const prompt = store.getState().prompt;
 
-      expect(prompt).toBeTruthy();
-
-      prompt.onConfirm();
       const POCHIVFormUpdated = store.getState().openWorkspaces[0];
 
       expect(POCHIVFormUpdated.additionalProps['workspaceTitle']).toBe('POC HIV Form Updated');
