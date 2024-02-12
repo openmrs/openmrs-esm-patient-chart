@@ -122,7 +122,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             {medication.quantity ? (
               <span>
                 <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                {medication.quantity} {medication.quantityUnits.display}
+                {medication.quantity} {medication?.quantityUnits?.display}
               </span>
             ) : null}
             {medication.dateStopped ? (
