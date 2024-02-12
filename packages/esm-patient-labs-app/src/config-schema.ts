@@ -52,8 +52,8 @@ export const configSchema = {
       orderReasons: {
         _type: Type.Array,
         _elements: {
-          uuid: {
-            _type: Type.UUID,
+          concept: {
+            _type: Type.ConceptUuid,
             _description: 'Array of coded concepts that represent reasons for ordering a lab test',
           },
           label: {

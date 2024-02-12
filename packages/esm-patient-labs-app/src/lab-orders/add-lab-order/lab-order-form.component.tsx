@@ -45,6 +45,7 @@ const labOrderFormSchema = z.object({
       invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
     },
   ),
+  orderReason: z.string().optional(),
 });
 
 // Designs:
@@ -197,13 +198,21 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
                 <InputWrapper>
-                  <ComboBox
-                    size="lg"
-                    id="orderReasonInput"
-                    titleText={t('orderReason', 'Order reason')}
-                    selectedItem={''}
-                    items={selectedLabTest.orderReasons}
-                    itemToString={(item) => item?.label}
+                  <Controller
+                    name="orderReason"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <ComboBox
+                        size="lg"
+                        id="orderReasonInput"
+                        titleText={t('orderReason', 'Order reason')}
+                        selectedItem={''}
+                        itemToString={(item) => item?.label}
+                        items={selectedLabTest.orderReasons}
+                        onBlur={onBlur}
+                        onChange={({ selectedItem }) => onChange(selectedItem?.concept || '')}
+                      />
+                    )}
                   />
                 </InputWrapper>
               </Column>
