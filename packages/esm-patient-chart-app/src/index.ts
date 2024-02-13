@@ -8,11 +8,11 @@ import {
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
+import { moduleName, spaBasePath } from './constants';
+import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
-import { moduleName } from './constants';
-import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
-import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
@@ -30,6 +30,7 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
+import activeVisitDetailOverviewComponent from './visit/visits-widget/active-visits-summary.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -233,3 +234,8 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
 );
+
+export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {
+  featureName: 'active-visit-overview',
+  moduleName,
+});
