@@ -5,5 +5,6 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  [x: string]: any;
   visitNoteConfig: VisitNoteConfigObject;
 }

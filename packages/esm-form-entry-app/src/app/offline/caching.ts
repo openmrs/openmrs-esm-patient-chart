@@ -3,6 +3,7 @@ import {
   messageOmrsServiceWorker,
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
+  restBaseUrl,
   setupDynamicOfflineDataHandler,
   subscribePrecacheStaticDependencies,
 } from '@openmrs/esm-framework';
@@ -12,8 +13,8 @@ import type { FormSchema } from '../types';
 export function setupStaticDataOfflinePrecaching() {
   subscribePrecacheStaticDependencies(async () => {
     const urlsToCache = [
-      '/ws/rest/v1/location?q=&v=custom:(uuid,display)',
-      '/ws/rest/v1/provider?q=&v=custom:(uuid,display,person:(uuid))',
+      `${restBaseUrl}/location?q=&v=custom:(uuid,display)`,
+      `${restBaseUrl}/provider?q=&v=custom:(uuid,display,person:(uuid))`,
     ];
 
     await Promise.all(
@@ -66,7 +67,7 @@ export function setupDynamicOfflineFormDataHandler() {
 }
 
 async function getCacheableFormUrls(formUuid: string) {
-  const getFormRes = await openmrsFetch<FormSchema>(`/ws/rest/v1/o3/forms/${formUuid}`);
+  const getFormRes = await openmrsFetch<FormSchema>(`${restBaseUrl}/o3/forms/${formUuid}`);
   const form = getFormRes.data;
 
   if (!form) {
@@ -78,11 +79,11 @@ async function getCacheableFormUrls(formUuid: string) {
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/openmrs-api/form-resource.service.ts#L21
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/form-schema/form-schema.service.ts#L31
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/form-schema/form-schema.service.ts#L164
-    `/ws/rest/v1/form/${formUuid}?v=full`,
+    `${restBaseUrl}/form/${formUuid}?v=full`,
 
     // Required by:
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/openmrs-api/form-resource.service.ts#L10
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/form-schema/form-schema.service.ts#L167
-    `/ws/rest/v1/o3/forms/${formUuid}`,
+    `${restBaseUrl}/o3/forms/${formUuid}`,
   ].filter(Boolean);
 }

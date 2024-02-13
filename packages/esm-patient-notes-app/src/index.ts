@@ -3,6 +3,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  restBaseUrl,
   translateFrom,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
@@ -22,7 +23,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/encounter.+',
+    pattern: `.+${restBaseUrl}/encounter.+`,
   });
 
   defineConfigSchema(moduleName, configSchema);

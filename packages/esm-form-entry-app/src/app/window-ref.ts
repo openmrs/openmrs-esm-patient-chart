@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { restBaseUrl } from '@openmrs/esm-framework';
 
 function _window() {
   // return the global native browser window object
@@ -14,6 +15,6 @@ export class WindowRef {
   }
 
   get openmrsRestBase(): string {
-    return this.nativeWindow.openmrsBase + '/ws/rest/v1/';
+    return this.nativeWindow.openmrsBase + restBaseUrl;
   }
 }

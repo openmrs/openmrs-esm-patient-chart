@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import {
@@ -34,7 +34,7 @@ export function useOrderConfig(): {
   };
 } {
   const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
-    `/ws/rest/v1/orderentryconfig`,
+    `${restBaseUrl}/orderentryconfig`,
     openmrsFetch,
   );
 

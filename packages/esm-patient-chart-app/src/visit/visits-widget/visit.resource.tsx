@@ -1,6 +1,13 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useConfig, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  restBaseUrl,
+  useConfig,
+  type OpenmrsResource,
+  type Privilege,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { type ChartConfig } from '../../config-schema';
 
 export function useInfiniteVisits(patientUuid: string) {
@@ -15,7 +22,7 @@ export function useInfiniteVisits(patientUuid: string) {
       return null;
     }
 
-    let url = `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${pageSize}`;
+    let url = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${pageSize}`;
 
     if (pageIndex) {
       url += `&startIndex=${pageIndex * pageSize}`;
@@ -47,7 +54,7 @@ export function useVisits(patientUuid: string) {
     'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
   return {
@@ -60,7 +67,7 @@ export function useVisits(patientUuid: string) {
 }
 
 export function useEncounters(patientUuid: string) {
-  const endpointUrl = '/ws/rest/v1/encounter';
+  const endpointUrl = `${restBaseUrl}/encounter`;
   // setting this up to make it more generic and usable later
   const params = {
     patient: patientUuid,
@@ -99,7 +106,7 @@ export function usePastVisits(patientUuid: string) {
     'stopDatetime)';
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
 
@@ -112,13 +119,13 @@ export function usePastVisits(patientUuid: string) {
 }
 
 export function deleteVisit(visitUuid: string) {
-  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}`, {
     method: 'DELETE',
   });
 }
 
 export function restoreVisit(visitUuid: string) {
-  return openmrsFetch(`/ws/rest/v1/visit/${visitUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}`, {
     headers: {
       'content-type': 'application/json',
     },

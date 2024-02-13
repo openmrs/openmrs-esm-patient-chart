@@ -1,4 +1,4 @@
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -36,7 +36,7 @@ const visitAttributeTypeCustomRepresentation =
 
 export function useVisitAttributeType(uuid) {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<VisitAttributeType>, Error>(
-    `/ws/rest/v1/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,
+    `${restBaseUrl}/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
 
@@ -59,7 +59,7 @@ export function useVisitAttributeType(uuid) {
 
 export function useConceptAnswersForVisitAttributeType(conceptUuid) {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<Concept>, Error>(
-    conceptUuid ? `/ws/rest/v1/concept/${conceptUuid}` : null,
+    conceptUuid ? `${restBaseUrl}/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
 
