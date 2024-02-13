@@ -9,16 +9,15 @@
 }
 
 .orderForm {
-  flex-grow: 1;
+  flex-grow:1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: layout.$spacing-03 0 0 layout.$spacing-05;
 
-
   input[data-invalid]:focus {
-    outline: 2px solid colors.$red-60;
-    outline-offset: -2px;
+    outline: 2px solid  colors.$red-60;
+     outline-offset: -2px;
   }
 
   :global(.cds--css-grid) {
@@ -102,7 +101,7 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.pullColumnContentRight>div {
+.pullColumnContentRight > div {
   float: right;
 }
 
@@ -126,8 +125,8 @@
 
 .numberInput {
   :global(.cds--number__input-wrapper) input {
-    min-width: unset !important;
-    padding-right: layout.$spacing-05;
+  min-width: unset !important;
+  padding-right: layout.$spacing-05;
   }
 }
 
@@ -139,8 +138,7 @@
 
   button {
     display: flex;
-    padding-left: 0 !important;
-
+   padding-left: 0 !important;
     svg {
       order: 1;
       margin-right: layout.$spacing-03;
@@ -227,9 +225,6 @@
   .buttonSet {
     padding: layout.$spacing-06 layout.$spacing-05;
     background-color: colors.$white-0;
-    position: fixed;
-    bottom: 0rem;
-    width: 100%;
   }
 }
 
@@ -238,8 +233,7 @@
     outline: 2.5px solid colors.$red-60;
   }
 
-  input:focus,
-  textarea:focus {
+  input:focus, textarea:focus {
     outline: 2.5px solid colors.$red-60;
   }
 }
@@ -247,3 +241,4 @@
 .errorLabel {
   color: colors.$red-60;
 }
+
