@@ -2,7 +2,15 @@ import React from 'react';
 import styles from './visit-form.scss';
 import { Controller, useFormContext } from 'react-hook-form';
 import { type VisitFormData } from './visit-form.resource';
-import { DatePicker, DatePickerInput, Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import {
+  DatePicker,
+  DatePickerInput,
+  Layer,
+  SelectItem,
+  TimePicker,
+  TimePickerSelect,
+  InlineNotification,
+} from '@carbon/react';
 import classNames from 'classnames';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +38,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   const {
     control,
     formState: { errors },
+    setError,
   } = useFormContext<VisitFormData>();
 
   // Since we have the separate date and time fields, the final validation needs to be done at the form
@@ -63,7 +72,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                   placeholder="dd/mm/yyyy"
                   style={{ width: '100%' }}
                   invalid={errors[dateFieldName]?.message}
-                  invalidText={errors[dateFieldName]?.message}
                 />
               </DatePicker>
             </ResponsiveWrapper>
@@ -82,8 +90,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
                 value={value}
                 onBlur={onBlur}
-                invalid={errors[timeFieldName]?.message}
-                invalidText={errors[timeFieldName]?.message}
+                invalid={errors[dateFieldName]?.message}
               >
                 <Controller
                   name={timeFormatFieldName}
@@ -94,8 +101,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value}
                       aria-label={t('timeFormat ', 'Time Format')}
-                      invalid={errors[timeFormatFieldName]?.message}
-                      invalidText={errors[timeFormatFieldName]?.message}
+                      invalid={errors[dateFieldName]?.message}
                     >
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />
@@ -107,6 +113,17 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
           />
         </ResponsiveWrapper>
       </div>
+      {errors[dateFieldName]?.message && (
+        <InlineNotification
+          aria-label="Close notification"
+          kind="error"
+          onClose={() => setError(dateFieldName, null)}
+          statusIconDescription="notification"
+          subtitle={errors[dateFieldName]?.message}
+          title="Error"
+          lowContrast
+        />
+      )}
     </section>
   );
 };
