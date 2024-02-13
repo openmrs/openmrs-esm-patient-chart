@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-programs-app",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "Patient programs microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-programs-app.js",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^7.0.0",
+    "@openmrs/esm-patient-common-lib": "^7.0.1",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {

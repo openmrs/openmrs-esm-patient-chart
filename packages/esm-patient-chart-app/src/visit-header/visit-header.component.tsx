@@ -85,9 +85,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           label={
             <>
               <p className={styles.tooltipPatientName}>{name}</p>
-              <p className={styles.tooltipPatientInfo}>{`${parseInt(age(patient?.birthDate))}, ${getGender(
-                patient?.gender,
-              )}`}</p>
+              <p className={styles.tooltipPatientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</p>
             </>
           }
         >
@@ -98,9 +96,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       ) : (
         <span className={styles.patientName}>{name} </span>
       )}
-      <span className={styles.patientInfo}>
-        {parseInt(age(patient.birthDate))}, {getGender(patient.gender)}
-      </span>
+      <span className={styles.patientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</span>
       {queueEntry && (
         <>
           <div className={styles.navDivider} />

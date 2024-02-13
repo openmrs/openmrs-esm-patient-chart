@@ -25,7 +25,15 @@ import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
-import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import {
+  age,
+  formatDate,
+  parseDate,
+  translateFrom,
+  useConfig,
+  useLayoutType,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import type {
@@ -37,6 +45,7 @@ import type {
   QuantityUnit,
 } from '../types';
 import styles from './drug-order-form.scss';
+import { moduleName } from '../dashboard.meta';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -51,10 +60,32 @@ const comboSchema = {
 };
 
 const schemaFields = {
-  freeTextDosage: z.string().refine((value) => value !== '', { message: 'Add free dosage note' }),
-  dosage: z.number({ invalid_type_error: 'A dosage is required' }),
-  unit: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a unit' }),
-  route: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a route' }),
+  // t( 'freeDosageErrorMessage', 'Add free dosage note')
+  freeTextDosage: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'freeDosageErrorMessage', 'Add free dosage note'),
+  }),
+
+  // t( 'dosageRequiredErrorMessage', 'A dosage is required' )
+  dosage: z.number({
+    invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'A dosage is required'),
+  }),
+
+  // t( 'selectUnitErrorMessage', 'Please select a unit' )
+  unit: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectUnitErrorMessage', 'Please select a unit'),
+    },
+  ),
+
+  // t( 'selectRouteErrorMessage', 'Please select a route' )
+  route: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectRouteErrorMessage', 'Please select a route'),
+    },
+  ),
+
   patientInstructions: z.string().nullable(),
   asNeeded: z.boolean(),
   asNeededCondition: z.string().nullable(),
@@ -63,9 +94,17 @@ const schemaFields = {
   pillsDispensed: z.number().nullable(),
   quantityUnits: z.object({ ...comboSchema }).nullable(),
   numRefills: z.number().nullable(),
-  indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
+  indication: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
+  }),
   startDate: z.date(),
-  frequency: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a frequency' }),
+  // t( 'selectFrequencyErrorMessage', 'Please select a frequency' )
+  frequency: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectFrequencyErrorMessage', 'Please select a frequency'),
+    },
+  ),
 };
 
 const medicationOrderFormSchema = z
@@ -92,7 +131,7 @@ const medicationOrderFormSchema = z
       return true;
     },
     {
-      message: 'Please select Quantity unit',
+      message: 'Please select quantity unit',
       path: ['quantityUnits'],
     },
   );
