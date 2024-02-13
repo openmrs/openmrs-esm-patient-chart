@@ -170,6 +170,17 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     );
   };
 
+  const isDiagnosisNotSelected = (diagnosis: Concept) => {
+    const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
+      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+    );
+    const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
+      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+    );
+
+    return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
+  };
+
   const createDiagnosis = (concept: Concept) => {
     return {
       patient: patientUuid,
@@ -408,13 +419,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                     return (
                       <ul className={styles.diagnosisList}>
                         {searchPrimaryResults.map((diagnosis, index) => {
-                          const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
-                            (selectedDiagnosis) => diagnosis.display === selectedDiagnosis.display,
-                          );
-                          const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
-                            (selectedDiagnosis) => diagnosis.display === selectedDiagnosis.display,
-                          );
-                          if (!isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected) {
+                          if (isDiagnosisNotSelected(diagnosis)) {
                             return (
                               <li
                                 role="menuitem"
@@ -486,13 +491,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                     return (
                       <ul className={styles.diagnosisList}>
                         {searchSecondaryResults.map((diagnosis, index) => {
-                          const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
-                            (selectedDiagnosis) => diagnosis.display === selectedDiagnosis.display,
-                          );
-                          const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
-                            (selectedDiagnosis) => diagnosis.display === selectedDiagnosis.display,
-                          );
-                          if (!isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected) {
+                          if (isDiagnosisNotSelected(diagnosis)) {
                             return (
                               <li
                                 role="menuitem"
