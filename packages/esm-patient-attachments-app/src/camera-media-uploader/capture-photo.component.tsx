@@ -27,7 +27,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
       closeModal: () => {
         close();
       },
-      cameraOnly: true,
+      cameraOnly: false,
     });
   }, [onCapturePhoto]);
 
