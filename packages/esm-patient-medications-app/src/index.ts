@@ -1,13 +1,11 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
+import { dashboardMeta, moduleName } from './dashboard.meta';
 import medicationsSummaryComponent from './medications-summary/medications-summary.component';
 import activeMedicationsComponent from './active-medications/active-medications.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-const moduleName = '@openmrs/esm-patient-medications-app';
 
 const options = {
   featureName: 'patient-medications',
