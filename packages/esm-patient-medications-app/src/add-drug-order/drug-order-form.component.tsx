@@ -131,7 +131,8 @@ const medicationOrderFormSchema = z
       return true;
     },
     {
-      message: 'Please select quantity unit',
+      // t('selectQuantityUnitsErrorMessage', 'Please select quantity unit')
+      message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit'),
       path: ['quantityUnits'],
     },
   );

@@ -76,6 +76,7 @@
   "searchResultsMatchesForTerm_one": "{{count}} result for \"{{searchTerm}}\"",
   "searchResultsMatchesForTerm_other": "{{count}} results for \"{{searchTerm}}\"",
   "selectFrequencyErrorMessage": "Please select a frequency",
+  "selectQuantityUnitsErrorMessage": "Please select quantity unit",
   "selectRouteErrorMessage": "Please select a route",
   "selectUnitErrorMessage": "Please select a unit",
   "startDate": "Start date",
