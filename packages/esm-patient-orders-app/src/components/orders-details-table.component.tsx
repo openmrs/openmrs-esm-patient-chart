@@ -36,12 +36,15 @@ import {
   useOrderTypes,
   launchPatientWorkspace,
   usePatientOrders,
+  type DrugOrderBasketItem,
+  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
 import styles from './order-details-table.scss';
-import { compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
+import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
+import { labsOrderBasket, medicationsOrderBasket } from '../constants';
 
 interface OrderDetailsProps {
   title?: string;
@@ -57,6 +60,8 @@ interface OrderHeaderProps {
   isVisible?: boolean;
 }
 
+type MutableOrderBasketItem = OrderBasketItem | LabOrderBasketItem | DrugOrderBasketItem;
+
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, showAddButton, showPrintButton }) => {
   const { t } = useTranslation();
   const defaultPageSize = 10;
@@ -68,8 +73,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+  const [orderBasketName, setOrderBasketName] = useState('');
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderBasketName);
 
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>('order-basket');
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
 
@@ -236,125 +242,124 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   }
 
   return (
-    <>
-      <div className={styles.widgetCard}>
-        <CardHeader title={title}>
-          {isValidating ? (
-            <span>
-              <InlineLoading />
-            </span>
-          ) : null}
-          <div className={styles.buttons}>
-            {orderTypes && orderTypes?.length > 0 && (
-              <Dropdown
-                id="orderTypeDropdown"
-                titleText="Select order type"
-                label="All"
-                type="inline"
-                items={[...[{ display: 'All' }], ...orderTypes]}
-                selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
-                itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-                onChange={(e) => {
-                  if (e.selectedItem.display === 'All') {
-                    setSelectedOrderTypeUuid(null);
-                    return;
-                  }
-                  setSelectedOrderTypeUuid(e.selectedItem.uuid);
-                }}
-              />
-            )}
-
-            {showPrintButton && (
-              <Button
-                kind="ghost"
-                renderIcon={Printer}
-                iconDescription="Add vitals"
-                className={styles.printButton}
-                onClick={handlePrint}
-              >
-                {t('print', 'Print')}
-              </Button>
-            )}
-            {showAddButton ?? true ? (
-              <Button
-                kind="ghost"
-                renderIcon={(props) => <Add size={16} {...props} />}
-                iconDescription="Launch order basket"
-                onClick={launchOrderBasket}
-              >
-                {t('add', 'Add')}
-              </Button>
-            ) : null}
-          </div>
-        </CardHeader>
-        <div ref={contentToPrintRef}>
-          <PrintComponent subheader={title} patientDetails={patientDetails} />
-          <DataTable
-            data-floating-menu-container
-            size="sm"
-            headers={tableHeaders}
-            rows={paginatedOrders}
-            isSortable
-            sortRow={sortRow}
-            overflowMenuOnHover={false}
-            useZebraStyles
-          >
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}
-                        >
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                      <TableHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, rowIndex) => (
-                      <TableRow className={styles.row} {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell className={styles.tableCell} key={cell.id}>
-                            <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
-                          </TableCell>
-                        ))}
-                        {!isPrinting && (
-                          <TableCell className="cds--table-column-menu">
-                            <OrderBasketItemActions
-                              orderItem={allOrders.find((x) => x.uuid === row.id)}
-                              items={orders}
-                              setItems={setOrders}
-                              openOrderBasket={launchOrderBasket}
-                              openOrderForm={launchOrderBasket}
-                            />
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-          {!isPrinting && (
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={tableRows?.length}
-              currentItems={paginatedOrders?.length}
-              pageSize={defaultPageSize}
-              onPageNumberChange={({ page }) => goTo(page)}
+    <div className={styles.widgetCard}>
+      <CardHeader title={title}>
+        {isValidating ? (
+          <span>
+            <InlineLoading />
+          </span>
+        ) : null}
+        <div className={styles.buttons}>
+          {orderTypes && orderTypes?.length > 0 && (
+            <Dropdown
+              id="orderTypeDropdown"
+              titleText="Select order type"
+              label="All"
+              type="inline"
+              items={[...[{ display: 'All' }], ...orderTypes]}
+              selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
+              itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+              onChange={(e) => {
+                if (e.selectedItem.display === 'All') {
+                  setSelectedOrderTypeUuid(null);
+                  return;
+                }
+                setSelectedOrderTypeUuid(e.selectedItem.uuid);
+              }}
             />
           )}
+
+          {showPrintButton && (
+            <Button
+              kind="ghost"
+              renderIcon={Printer}
+              iconDescription="Add vitals"
+              className={styles.printButton}
+              onClick={handlePrint}
+            >
+              {t('print', 'Print')}
+            </Button>
+          )}
+          {showAddButton ?? true ? (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Launch order basket"
+              onClick={launchOrderBasket}
+            >
+              {t('add', 'Add')}
+            </Button>
+          ) : null}
         </div>
+      </CardHeader>
+      <div ref={contentToPrintRef}>
+        <PrintComponent subheader={title} patientDetails={patientDetails} />
+        <DataTable
+          data-floating-menu-container
+          size="sm"
+          headers={tableHeaders}
+          rows={paginatedOrders}
+          isSortable
+          sortRow={sortRow}
+          overflowMenuOnHover={false}
+          useZebraStyles
+        >
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                      >
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                    <TableHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
+                        </TableCell>
+                      ))}
+                      {!isPrinting && (
+                        <TableCell className="cds--table-column-menu">
+                          <OrderBasketItemActions
+                            orderItem={allOrders.find((x) => x.uuid === row.id)}
+                            items={orders}
+                            setItems={setOrders}
+                            openOrderBasket={launchOrderBasket}
+                            openOrderForm={launchOrderBasket}
+                            setOrderBasketName={setOrderBasketName}
+                          />
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        {!isPrinting && (
+          <PatientChartPagination
+            pageNumber={currentPage}
+            totalItems={tableRows?.length}
+            currentItems={paginatedOrders?.length}
+            pageSize={defaultPageSize}
+            onPageNumberChange={({ page }) => goTo(page)}
+          />
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -393,12 +398,14 @@ function OrderBasketItemActions({
   setItems,
   openOrderBasket,
   openOrderForm,
+  setOrderBasketName,
 }: {
   orderItem: Order;
-  items: Array<OrderBasketItem>;
-  setItems: (items: Array<OrderBasketItem>) => void;
+  items: Array<MutableOrderBasketItem>;
+  setItems: (items: Array<MutableOrderBasketItem>) => void;
   openOrderBasket: () => void;
-  openOrderForm: (additionalProps?: { order: OrderBasketItem }) => void;
+  openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
+  setOrderBasketName: (orderType: string) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -413,8 +420,16 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm]);
 
   const handleCancelClick = useCallback(() => {
-    launchPatientWorkspace('patient-orders-form-workspace', { order: orderItem });
-  }, [items, orderItem]);
+    if (orderItem.type === 'drugorder') {
+      setOrderBasketName(medicationsOrderBasket);
+      setItems([...items, buildMedicationOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    } else {
+      setOrderBasketName(labsOrderBasket);
+      setItems([...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    }
+  }, [orderItem, items, setItems, openOrderBasket]);
 
   return (
     <OverflowMenu
@@ -445,7 +460,7 @@ function OrderBasketItemActions({
         id="discontinue"
         itemText={t('cancelOrder', 'Cancel Order')}
         onClick={handleCancelClick}
-        disabled={orderItem.fulfillerStatus === 'DECLINED'}
+        disabled={orderItem.action === 'DISCONTINUE'}
         isDelete={true}
         hasDivider
       />

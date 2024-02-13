@@ -15,7 +15,7 @@ import {
   DatePickerInput,
   InlineLoading,
 } from '@carbon/react';
-import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './cancel-order-form.scss';
 import { cancelOrder } from './cancel-order.resource';
@@ -83,7 +83,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
       fulfillerComment: formData.reasonForCancellation,
     };
 
-    const abortController = new AbortController();
+    const abortController = useAbortController();
 
     cancelOrder(order, payload, abortController).then(
       (res) => {
