@@ -69,7 +69,7 @@ describe('VisitDetailOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: true }));
+    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: true, showCurrentVisitTab: false }));
 
     renderVisitDetailOverview();
 
@@ -102,7 +102,7 @@ describe('VisitDetailOverview', () => {
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false }));
+    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false, showCurrentVisitTab: false }));
 
     renderVisitDetailOverview();
 
