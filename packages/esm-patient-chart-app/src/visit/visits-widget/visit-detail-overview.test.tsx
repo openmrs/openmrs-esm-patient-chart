@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { openmrsFetch, getConfig, useConfig, userHasAccess, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import { openmrsFetch, getConfig, useConfig, userHasAccess, getDefaultsFromConfigSchema, useFeatureFlag } from '@openmrs/esm-framework';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
@@ -14,6 +14,7 @@ const testProps = {
 const mockGetConfig = getConfig as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockedUseFeatureFlag = useFeatureFlag as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -70,6 +71,7 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
 
     renderVisitDetailOverview();
 
@@ -106,6 +108,7 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
 
     renderVisitDetailOverview();
 
