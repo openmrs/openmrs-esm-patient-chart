@@ -67,7 +67,7 @@ const schemaFields = {
 
   // t( 'dosageRequiredErrorMessage', 'A dosage is required' )
   dosage: z.number({
-    invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'A dosage is required'),
+    invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'Please select a dosage'),
   }),
 
   // t( 'selectUnitErrorMessage', 'Please select a unit' )
