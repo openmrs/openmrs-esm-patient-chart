@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
@@ -12,6 +12,7 @@ import {
   useConnectedExtensions,
   useLayoutType,
   type Visit,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   type Order,
@@ -22,12 +23,12 @@ import {
   type Diagnosis,
   mapEncounters,
 } from '../visit.resource';
-import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-summary.scss';
+import VisitsTable from './visits-table';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -112,6 +113,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     };
   }, [visit?.encounters]);
 
+  const isactiveVisitSummaryTabEnabled = useFeatureFlag('activeVisitSummaryTab');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(null);
+
+  const handleTabChange = (evt) => {
+    setSelectedTab(visit.encounters[evt.selectedIndex - 3]?.uuid || ''); // Assuming the first 3 tabs are predefined
+    setSelectedIndex(evt.selectedIndex);
+  };
+
   return (
     <div className={styles.summaryContainer}>
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
@@ -128,7 +138,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <Tabs className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}>
+      <Tabs
+        onChange={handleTabChange}
+        selected={selectedIndex}
+        className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}
+      >
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab
             className={classNames(styles.tab, styles.bodyLong01)}
@@ -147,13 +161,24 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          <Tab
-            className={styles.tab}
-            id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
-          >
-            {t('encounters_title', 'Encounters')}
-          </Tab>
+          {!isactiveVisitSummaryTabEnabled ? (
+            <Tab
+              className={styles.tab}
+              id="encounters-tab"
+              disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            >
+              {t('encounters_title', 'Encounters')}
+            </Tab>
+          ) : (
+            visit?.encounters?.length > 0 &&
+            visit?.encounters
+              .filter((enc) => !!enc.form)
+              .map((enc, ind) => (
+                <Tab i id={'tab-' + ind} key={ind} className={classNames(styles.tab, styles.bodyLong01)}>
+                  {enc?.form?.name ? enc?.form?.name : enc?.form?.display}
+                </Tab>
+              ))
+          )}
           {extensions.map((extension, index) => (
             <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
               {t(extension.meta.title, {
@@ -173,9 +198,31 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          <TabPanel>
-            <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
-          </TabPanel>
+          {!isactiveVisitSummaryTabEnabled ? (
+            <TabPanel>
+              <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
+            </TabPanel>
+          ) : (
+            visit?.encounters?.length > 0 &&
+            visit?.encounters
+              .filter((enc) => !!enc.form)
+              .map((enc, ind) => (
+                <TabPanel key={ind}>
+                  {selectedTab === enc.uuid && (
+                    <ExtensionSlot
+                      name="form-widget-slot"
+                      state={{
+                        additionalProps: { mode: 'embedded-view' },
+                        formUuid: enc.form?.uuid,
+                        encounterUuid: enc.uuid,
+                        patientUuid: patientUuid,
+                        promptBeforeClosing: () => {},
+                      }}
+                    />
+                  )}
+                </TabPanel>
+              ))
+          )}
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
               <Extension state={{ patientUuid, visit }} />

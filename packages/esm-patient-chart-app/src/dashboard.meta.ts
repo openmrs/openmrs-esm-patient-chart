@@ -9,3 +9,10 @@ export const encountersDashboardMeta = {
   path: 'Visits',
   title: 'Visits',
 };
+
+export const activeVisitDashboardMeta = {
+  slot: 'patient-chart-active-visit-dashboard-slot',
+  columns: 1,
+  path: 'Active Visit',
+  title: 'Active Visit',
+};
