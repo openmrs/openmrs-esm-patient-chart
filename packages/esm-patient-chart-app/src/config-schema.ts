@@ -34,10 +34,10 @@ export const esmPatientChartSchema = {
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
     _default: true,
   },
-  showCurrentVisitTab: {
+  showActiveVisitTab: {
     _type: Type.Boolean,
-    _description: 'Shows the current visit tab of Patient Visits section in Patient Chart',
-    _default: false,
+    _description: 'Shows the active visit summary tile section in Patient Chart Visits Dashboard',
+    _default: true,
   },
   visitAttributeTypes: {
     _type: Type.Array,
@@ -148,7 +148,7 @@ export interface ChartConfig {
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
   showAllEncountersTab: boolean;
-  showCurrentVisitTab: boolean;
+  showActiveVisitTab: boolean;
   defaultFacilityUrl: string;
   showUpcomingAppointments: boolean;
   logo: {

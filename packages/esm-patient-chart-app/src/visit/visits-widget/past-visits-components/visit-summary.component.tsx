@@ -50,7 +50,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
-  const { showCurrentVisitTab } = useConfig<ChartConfig>();
+  const { showActiveVisitTab } = useConfig<ChartConfig>();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -170,8 +170,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          {showCurrentVisitTab ? (
-            uniqueFormNames.length > 0 &&
+          {showActiveVisitTab ? (
+            uniqueFormNames?.length > 0 &&
             uniqueFormNames?.map((val: any, ind) => {
               return (
                 <Tab
@@ -214,10 +214,12 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {showCurrentVisitTab ? (
+          {showActiveVisitTab ? (
             groupedEncounters[selectedTab]?.map((val: any, ind) =>
               val?.form && ind + 3 === selectedIndex ? (
-                <OHRIForm patientUUID={patientUuid} formUUID={val.form?.uuid} encounterUUID={val.uuid} mode="view" />
+                <TabPanel>
+                  <OHRIForm patientUUID={patientUuid} formUUID={val.form?.uuid} encounterUUID={val.uuid} mode="view" />
+                </TabPanel>
               ) : (
                 <></>
               ),

@@ -1,4 +1,4 @@
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { useLaunchWorkspaceRequiringVisit, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import styles from './current-visit-actions.scss';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ const CurrentVisitActions: React.FC<CurrentVisitActionsInterface> = ({ visit }) 
   const launchForm = useCallback(
     (workspace) => {
       if (visit) {
-        launchPatientWorkspace(workspace);
+        useLaunchWorkspaceRequiringVisit(workspace);
       } else {
         launchStartVisitPrompt();
       }

@@ -18,7 +18,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const { t } = useTranslation();
   const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
     useInfiniteVisits(patientUuid);
-  const { showAllEncountersTab, showCurrentVisitTab } = useConfig<ChartConfig>();
+  const { showAllEncountersTab, showActiveVisitTab } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
   const { currentVisit, isLoading: isLoadingCurrentVisit, error: isError } = useVisit(patientUuid);
 
@@ -32,9 +32,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     <div className={styles.tabs}>
       <Tabs>
         <TabList aria-label="Visit detail tabs" contained>
-          {showCurrentVisitTab && (
-            <Tab className={styles.tab} id="visit-summaries-tab">
-              {t('currentVisit', 'Current visit')}
+          {showActiveVisitTab && (
+            <Tab className={styles.tab} id="active-visit-tab">
+              {t('activeVisit', 'Active visit')}
             </Tab>
           )}
           <Tab className={styles.tab} id="visit-summaries-tab">
@@ -71,7 +71,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                         ) : null}
                       </div>
                     </div>
-                    {visits?.length && <CurrentVisitActions visit={currentVisit} />}
+                    <CurrentVisitActions visit={currentVisit} />
                   </div>
                 </div>
                 <VisitSummary visit={currentVisit} patientUuid={patientUuid} />
