@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { type Patient, generateRandomPatient } from '../commands';
+import { type Patient, generateRandomPatient, deletePatient } from '../commands';
 import { ChartPage } from '../pages';
 
 let patient: Patient;
@@ -52,4 +52,8 @@ test('Start a visit', async ({ page, api }) => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
     await chartPage.page.getByRole('button', { name: /end visit/i }).click();
   });
+});
+
+test.afterEach(async ({ api }) => {
+  await deletePatient(api, patient.uuid);
 });
