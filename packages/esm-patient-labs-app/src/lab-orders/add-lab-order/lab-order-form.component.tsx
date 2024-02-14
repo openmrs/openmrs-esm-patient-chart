@@ -73,10 +73,9 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     },
   });
   const config = useConfig<ConfigObject>();
-  const selectedLabTest =
-    config && config.labTestsWithOrderReasons
-      ? config.labTestsWithOrderReasons.find((p) => p.labTestUuid === defaultValues?.testType?.conceptUuid)
-      : null;
+  const orderReasons =
+    (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
+      .orderReasons || [];
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
@@ -194,7 +193,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
               </InputWrapper>
             </Column>
           </Grid>
-          {selectedLabTest && (
+          {orderReasons.length > 0 && (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
                 <InputWrapper>
@@ -208,7 +207,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                         titleText={t('orderReason', 'Order reason')}
                         selectedItem={''}
                         itemToString={(item) => item?.label}
-                        items={selectedLabTest.orderReasons}
+                        items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.concept || '')}
                       />
