@@ -36,8 +36,11 @@ test('Start a visit', async ({ page, api }) => {
     await expect(chartPage.page.locator('form').getByRole('button', { name: /start a visit/i })).toBeVisible();
   });
 
-  await test.step('And if I select a visit type and then I click the `Start a visit` button', async () => {
+  await test.step('When I select the visit type: `OPD Visit`', async () => {
     await chartPage.page.getByText(/opd visit/i).click();
+  });
+
+  await test.step('And I click the `Start Visit` button', async () => {
     await chartPage.page
       .locator('form')
       .getByRole('button', { name: /start a visit/i })
@@ -50,7 +53,22 @@ test('Start a visit', async ({ page, api }) => {
 
   await test.step('And I should see the Active Visit tag on the patient header', async () => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
+  });
+
+  await test.step('When I click the `End Visit` button', async () => {
     await chartPage.page.getByRole('button', { name: /end visit/i }).click();
+  });
+
+  await test.step('Then I should see a confirmation modal', async () => {
+    await expect(chartPage.page.getByText(/are you sure you want to end this active visit?/i)).toBeVisible();
+  });
+
+  await test.step('When I click the `End Visit` button to confirm', async () => {
+    await chartPage.page.getByRole('button', { name: 'danger End Visit' }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(chartPage.page.getByText(/ended current visit successfully/i)).toBeVisible();
   });
 });
 
