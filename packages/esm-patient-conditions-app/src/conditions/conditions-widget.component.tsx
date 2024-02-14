@@ -1,5 +1,6 @@
 import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import {
@@ -219,7 +220,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       id="conditionsSearch"
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
-                      className={`${errors?.search && styles.conditionsError} `}
+                      className={classNames({
+                        [styles.conditionsError]: errors?.search,
+                      })}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
@@ -244,6 +247,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 )}
               />
               {errors?.search && <p className={styles.errorMessage}>{errors?.search?.message}</p>}
+              {isSubmittingForm && !selectedCondition && (
+                <p className={styles.errorMessage}>Please choose a condition</p>
+              )}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
