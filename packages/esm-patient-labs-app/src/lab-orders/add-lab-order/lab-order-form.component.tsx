@@ -23,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import styles from './lab-order-form.scss';
+import { Tile } from '@carbon/react';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
@@ -74,7 +75,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
       data.careSetting = careSettingUuid;
-      data.orderer = session.currentProvider.uuid;
+      data.orderer = session?.currentProvider?.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => order.testType.conceptUuid == defaultValues.testType.conceptUuid);
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
@@ -85,7 +86,20 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     },
     [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
   );
-
+  if (session.currentProvider == null) {
+    return (
+      <div className={styles.tileContainer}>
+        <Tile className={styles.tile}>
+          <div className={styles.tileContent}>
+            <p className={styles.content}>
+              {t('providerNotAllowed', 'User provider is not allowed to perform this action')}
+            </p>
+            <p className={styles.helper}>{t('providerMessage', 'consult administrator for assist')}</p>
+          </div>
+        </Tile>
+      </div>
+    );
+  }
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace();

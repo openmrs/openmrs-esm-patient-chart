@@ -7,7 +7,24 @@
   display: flex;
   flex-direction: column;
 }
-
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+.tileContainer {
+  background-color: colors.$gray-10;
+  border-top: layout.$spacing-05;
+  padding: 5rem 0;
+}
+.content {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: 0.5rem;
+}
 .orderForm {
   flex-grow: 1;
   display: flex;
