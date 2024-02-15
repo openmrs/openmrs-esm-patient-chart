@@ -164,6 +164,9 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               <Switch name="full" text={t('full', 'Full')} disabled={loading} />
             </ContentSwitcher>
           </div>
+          <Button kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={() => window.location.reload()}>
+            {t('refresh', 'Refresh Data')}
+          </Button>
         </div>
       </div>
       <div className={styles.flex}>
