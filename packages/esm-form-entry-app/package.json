@@ -66,7 +66,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "single-spa": "5.x"
+    "single-spa": "6.x"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.11",
