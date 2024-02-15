@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -73,9 +73,10 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     },
   });
   const config = useConfig<ConfigObject>();
-  const orderReasons =
+  const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
+  const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
@@ -206,10 +207,10 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
                         id="orderReasonInput"
                         titleText={t('orderReason', 'Order reason')}
                         selectedItem={''}
-                        itemToString={(item) => item?.label}
+                        itemToString={(item) => item?.display}
                         items={orderReasons}
                         onBlur={onBlur}
-                        onChange={({ selectedItem }) => onChange(selectedItem?.concept || '')}
+                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
                       />
                     )}
                   />

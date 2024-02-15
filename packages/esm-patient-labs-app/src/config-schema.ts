@@ -52,15 +52,8 @@ export const configSchema = {
       orderReasons: {
         _type: Type.Array,
         _elements: {
-          concept: {
-            _type: Type.ConceptUuid,
-            _description: 'Array of coded concepts that represent reasons for ordering a lab test',
-          },
-          label: {
-            _type: Type.String,
-            _default: null,
-            _description: 'The label for the reason for ordering concept',
-          },
+          _type: Type.ConceptUuid,
+          _description: 'Array of coded concepts that represent reasons for ordering a lab test',
         },
         _default: [],
         _description: 'Coded Lab test order reason options',
@@ -81,7 +74,7 @@ export interface LabTestReason {
 }
 export interface OrderReason {
   labTestUuid: string;
-  orderReasons: Array<LabTestReason>;
+  orderReasons: Array<string>;
 }
 export interface ConfigObject {
   concepts: Array<ObsTreeEntry>;
