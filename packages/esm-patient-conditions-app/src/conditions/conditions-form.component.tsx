@@ -19,8 +19,11 @@ interface ConditionFormProps {
 const conditionSchema = z.object({
   clinicalStatus: z.string(),
   endDate: z.date().optional(),
-  onsetDateTime: z.date().nullable(),
-  search: z.string({ required_error: 'A condition is required' }),
+  onsetDateTime: z.date({
+    required_error: 'Please select a date',
+    invalid_type_error: 'Please select a date!',
+  }),
+  conditionSearch: z.string({ required_error: 'A condition is required' }),
 });
 
 export type ConditionFormData = z.infer<typeof conditionSchema>;
@@ -46,7 +49,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
             : null
           : null,
       clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
-      search: '',
     },
   });
 

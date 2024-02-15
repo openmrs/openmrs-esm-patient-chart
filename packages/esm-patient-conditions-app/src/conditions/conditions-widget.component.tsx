@@ -185,7 +185,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
   useEffect(() => {
-    if (errors?.search) {
+    if (errors?.conditionSearch) {
       searchInputFocus();
     }
     if (isSubmittingForm) {
@@ -207,7 +207,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           ) : (
             <>
               <Controller
-                name="search"
+                name="conditionSearch"
                 control={control}
                 render={({ field: { onChange, value, onBlur } }) => (
                   <ResponsiveWrapper isTablet={isTablet}>
@@ -215,15 +215,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       autoFocus
                       ref={searchInputRef}
                       size="md"
-                      id="conditionsSearch"
+                      id="conditionSearch"
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
-                      className={errors?.search && styles.conditionsError}
+                      className={errors?.conditionSearch && styles.errorOutline}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
                       }}
-                      renderIcon={errors?.search && <WarningFilled />}
                       onBlur={onBlur}
                       onClear={() => {
                         setSearchTerm('');
@@ -242,7 +241,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.search && <p className={styles.errorMessage}>{errors?.search?.message}</p>}
+              {errors?.conditionSearch && <p className={styles.errorMessage}>{errors?.conditionSearch?.message}</p>}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
@@ -287,6 +286,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   id="onsetDate"
                   datePickerType="single"
                   dateFormat="d/m/Y"
+                  className={errors?.onsetDateTime && styles.errorOutline}
                   maxDate={dayjs().utc().format()}
                   placeholder="dd/mm/yyyy"
                   onChange={([date]) => onChange(date)}
@@ -298,6 +298,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               </ResponsiveWrapper>
             )}
           />
+          {errors?.onsetDateTime && <p className={styles.errorMessage}>{errors?.onsetDateTime?.message}</p>}
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
           <Controller
