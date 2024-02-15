@@ -58,6 +58,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     control,
     watch,
     getValues,
+    setValue,
     formState: { errors },
   } = useFormContext<ConditionFormData>();
   const isTablet = useLayoutType() === 'tablet';
@@ -65,6 +66,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const searchInputRef = useRef(null);
   const currentStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
+
+  if (matchingCondition) {
+    setValue('conditionSearch', matchingCondition.display);
+  }
 
   const getFieldValue = (
     tableCells: Array<{
@@ -286,7 +291,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   id="onsetDate"
                   datePickerType="single"
                   dateFormat="d/m/Y"
-                  className={errors?.onsetDateTime && styles.errorOutline}
                   maxDate={dayjs().utc().format()}
                   placeholder="dd/mm/yyyy"
                   onChange={([date]) => onChange(date)}
@@ -298,7 +302,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               </ResponsiveWrapper>
             )}
           />
-          {errors?.onsetDateTime && <p className={styles.errorMessage}>{errors?.onsetDateTime?.message}</p>}
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
           <Controller

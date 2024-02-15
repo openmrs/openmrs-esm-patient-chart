@@ -19,10 +19,7 @@ interface ConditionFormProps {
 const conditionSchema = z.object({
   clinicalStatus: z.string(),
   endDate: z.date().optional(),
-  onsetDateTime: z.date({
-    required_error: 'Please select a date',
-    invalid_type_error: 'Please select a date!',
-  }),
+  onsetDateTime: z.date().nullable(),
   conditionSearch: z.string({ required_error: 'A condition is required' }),
 });
 
