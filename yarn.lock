@@ -4583,7 +4583,7 @@ __metadata:
     zone.js: ~0.13.3
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    single-spa: 5.x
+    single-spa: 6.x
   languageName: unknown
   linkType: soft
 
@@ -4778,8 +4778,8 @@ __metadata:
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
-    single-spa: 5.x
-    single-spa-react: 5.x
+    single-spa: 6.x
+    single-spa-react: 6.x
     swr: 2.x
   languageName: unknown
   linkType: soft
@@ -4858,7 +4858,7 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 5.x
     react: 18.x
-    single-spa: 5.x
+    single-spa: 6.x
   languageName: unknown
   linkType: soft
 
