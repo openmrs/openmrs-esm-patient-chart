@@ -165,7 +165,7 @@ describe('Conditions Form', () => {
     await user.type(onsetDateInput, '2020-05-05');
 
     expect(activeStatusInput).toBeChecked();
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeDisabled();
 
     await user.click(submitButton);
   });

@@ -69,6 +69,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     if (data.search) {
       setIsSubmittingForm(methods.formState.isSubmitting);
     }
+    console.error(data);
   };
 
   const onError = (error) => {
