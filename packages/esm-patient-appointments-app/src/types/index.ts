@@ -43,28 +43,3 @@ export interface AppointmentService {
   uuid: string;
   serviceTypes: Array<ServiceTypes>;
 }
-
-export interface AppointmentPayload {
-  providerUuid: string;
-  patientUuid: string;
-  serviceUuid: string;
-  startDateTime: string;
-  endDateTime: string;
-  appointmentKind: string;
-  providers: Array<{ uuid: string; response?: string }>;
-  locationUuid: string;
-  comments: string;
-  uuid?: string;
-}
-
-export interface RecurringPattern {
-  type: 'DAY' | 'WEEK';
-  period: number;
-  endDate: string;
-  daysOfWeek?: Array<string>; //'MONDAY' | 'TUESDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'>;
-}
-
-export interface RecurringAppointmentsPayload {
-  appointmentRequest: AppointmentPayload;
-  recurringPattern: RecurringPattern;
-}

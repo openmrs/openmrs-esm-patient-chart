@@ -27,12 +27,6 @@ export const appointmentsSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
   options,
 );
-
-export const appointmentsFormWorkspace = getAsyncLifecycle(
-  () => import('./appointments/appointments-form/appointments-form.component'),
-  options,
-);
-
 export const appointmentsCancelConfirmationDialog = getAsyncLifecycle(
   () => import('./appointments/appointments-cancel-modal.component'),
   options,
