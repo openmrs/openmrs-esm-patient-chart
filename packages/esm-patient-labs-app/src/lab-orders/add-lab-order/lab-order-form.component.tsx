@@ -25,8 +25,10 @@ import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultWorkspaceProps {
+export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
 const labOrderFormSchema = z.object({
