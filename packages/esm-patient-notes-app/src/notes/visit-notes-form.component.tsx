@@ -20,6 +20,7 @@ import {
   Tag,
   TextArea,
   Tile,
+  Layer,
 } from '@carbon/react';
 import { Add, Edit, WarningFilled } from '@carbon/react/icons';
 import {
