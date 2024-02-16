@@ -50,7 +50,6 @@ import {
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../config-schema';
-import { type VisitFormData } from './visit-form.resource';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
@@ -63,6 +62,7 @@ import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
+import { getDateTimeFormat, type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
 
@@ -140,49 +140,124 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       {},
     );
 
-    return z.object({
-      visitStartDate: z.date().refine(
-        (value) => {
-          const today = dayjs();
-          const startDate = dayjs(value);
-          return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
+    let maxVisitStartDatetime: Date = null,
+      minVisitStopDatetime: Date = null;
+
+    if (visitToEdit?.encounters?.length) {
+      const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
+        Date.parse(encounterDatetime),
+      );
+      maxVisitStartDatetime = new Date(Math.min(...allEncountersDateTime));
+      minVisitStopDatetime = new Date(Math.max(...allEncountersDateTime));
+    }
+
+    const dateTimeSchema = z
+      .object({
+        date: z.date().max(new Date()),
+        time: z
+          .string()
+          .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
+        timeFormat: z.enum(['PM', 'AM']),
+      })
+      .refine(
+        ({ date, time, timeFormat }) => {
+          const [visitStartHours, visitStartMinutes] = convertTime12to24(time, timeFormat);
+          const visitStartDatetime = dayjs(date).hour(visitStartHours).minute(visitStartMinutes);
+          return visitStartDatetime.isBefore(new Date());
         },
-        t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: formatDatetime(new Date()),
-          interpolation: {
-            escapeValue: false,
-          },
+        t('dateInFuture', 'Date cannot be in future'),
+      );
+
+    const visitStartDatetimeSchema = dateTimeSchema.refine(
+      ({ date, time, timeFormat }) => {
+        if (!maxVisitStartDatetime) {
+          return true;
+        }
+        const [visitStartHours, visitStartMinutes] = convertTime12to24(time, timeFormat);
+        const visitStartDatetime = dayjs(date).hour(visitStartHours).minute(visitStartMinutes);
+        return visitStartDatetime.isBefore(maxVisitStartDatetime);
+      },
+      {
+        message: t('invalidVisitStartDate', 'Start date needs to be before {{firstEncounterDatetime}}', {
+          firstEncounterDatetime: maxVisitStartDatetime ? formatDatetime(maxVisitStartDatetime) : '',
         }),
-      ),
-      visitStartTime: z
-        .string()
-        .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
-      visitStartTimeFormat: z.enum(['PM', 'AM']),
-      visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
-      visitStopTime: displayVisitStopDateTimeFields
-        ? z
-            .string()
-            .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
-        : z.string().optional(),
-      visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
-      programType: z.string().optional(),
-      visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
-      visitLocation: z.object({
-        display: z.string(),
-        uuid: z.string(),
-      }),
-      visitAttributes: z.object(visitAttributes),
-    });
-  }, [t, config, displayVisitStopDateTimeFields]);
+      },
+    );
+
+    const visitStopDatetimeSchema = dateTimeSchema.refine(
+      ({ date, time, timeFormat }) => {
+        if (!minVisitStopDatetime || !date || !time || !timeFormat) {
+          return true;
+        }
+
+        const [hours, minutes] = convertTime12to24(time, timeFormat);
+
+        const visitStopDatetime = dayjs(date).hour(hours).minute(minutes);
+
+        return visitStopDatetime.isAfter(minVisitStopDatetime);
+      },
+      {
+        message: t(
+          'visitStopDateMustBeAfterMostRecentEncounter',
+          'Stop date needs to be after {{lastEncounterDatetime}}',
+          {
+            lastEncounterDatetime: minVisitStopDatetime ? formatDatetime(minVisitStopDatetime) : '',
+          },
+        ),
+      },
+    );
+
+    return z
+      .object({
+        visitStartDatetime: visitStartDatetimeSchema,
+        visitStopDatetime: displayVisitStopDateTimeFields ? visitStopDatetimeSchema : visitStopDatetimeSchema.nullish(),
+        programType: z.string().optional(),
+        visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
+        visitLocation: z.object({
+          display: z.string(),
+          uuid: z.string(),
+        }),
+        visitAttributes: z.object(visitAttributes),
+      })
+      .refine(
+        ({ visitStartDatetime, visitStopDatetime }) => {
+          if (!visitStopDatetime) {
+            return true;
+          }
+          const [visitStartHours, visitStartMinutes] = convertTime12to24(
+            visitStartDatetime.time,
+            visitStartDatetime.timeFormat,
+          );
+
+          const startDatetime = dayjs(visitStartDatetime.date).hour(visitStartHours).minute(visitStartMinutes);
+
+          const [visitStopHours, visitStopMinutes] = convertTime12to24(
+            visitStopDatetime.time,
+            visitStopDatetime.timeFormat,
+          );
+
+          const stopDatetime = dayjs(visitStopDatetime.date).hour(visitStopHours).minute(visitStopMinutes);
+          return startDatetime.isBefore(stopDatetime);
+        },
+        {
+          message: t('invalidVisitStopDate', 'Visit stop date time must be after visit start date time'),
+          path: ['visitStopDatetime'],
+        },
+      );
+  }, [t, config, displayVisitStopDateTimeFields, visitToEdit]);
 
   const defaultValues = useMemo(() => {
-    const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
-    const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
-    let defaultValues: Partial<VisitFormData> = {
-      visitStartDate,
-      visitStartTime: dayjs(visitStartDate).format('hh:mm'),
-      visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
+    const [visitStartDate, visitStartTime, visitStartTimeFormat] = getDateTimeFormat(
+      visitToEdit?.startDatetime ?? new Date(),
+    );
 
+    let defaultValues: Partial<VisitFormData> = {
+      // Setting the date to the start of the day
+      visitStartDatetime: {
+        date: visitStartDate,
+        time: visitStartTime,
+        timeFormat: visitStartTimeFormat,
+      },
       visitType: visitToEdit?.visitType?.uuid,
       visitLocation: visitToEdit?.location ?? sessionLocation ?? {},
       visitAttributes:
@@ -195,12 +270,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ) ?? {},
     };
 
-    if (visitStopDate) {
+    if (visitToEdit?.stopDatetime) {
+      const [visitStopDate, visitStopTime, visitStopTimeFormat] = getDateTimeFormat(visitToEdit?.stopDatetime);
       defaultValues = {
         ...defaultValues,
-        visitStopDate,
-        visitStopTime: dayjs(visitStopDate).format('hh:mm'),
-        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
+        visitStopDatetime: {
+          date: visitStopDate,
+          time: visitStopTime,
+          timeFormat: visitStopTimeFormat,
+        },
       };
     }
 
@@ -218,86 +296,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     control,
     getValues,
     formState: { errors, isDirty },
-    setError,
   } = methods;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
-
-  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
-    if (!visitToEdit?.encounters?.length) {
-      return [null, null];
-    }
-
-    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
-      Date.parse(encounterDatetime),
-    );
-    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
-    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
-    return [maxVisitStartDatetime, minVisitStopDatetime];
-  }, [visitToEdit]);
-
-  const validateVisitStartStopDatetime = useCallback(() => {
-    let visitStartDate = getValues('visitStartDate');
-    const visitStartTime = getValues('visitStartTime');
-    const visitStartTimeFormat = getValues('visitStartTimeFormat');
-
-    const [visitStartHours, visitStartMinutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
-
-    const visitStartDatetime = visitStartDate.setHours(visitStartHours, visitStartMinutes);
-
-    let validSubmission = true;
-
-    if (maxVisitStartDatetime && visitStartDatetime >= maxVisitStartDatetime) {
-      validSubmission = false;
-      setError('visitStartDate', {
-        message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
-          },
-        }),
-      });
-    }
-
-    if (!displayVisitStopDateTimeFields) {
-      return validSubmission;
-    }
-
-    let visitStopDate = getValues('visitStopDate');
-    const visitStopTime = getValues('visitStopTime');
-    const visitStopTimeFormat = getValues('visitStopTimeFormat');
-
-    const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
-
-    const visitStopDatetime = visitStopDate.setHours(visitStopHours, visitStopMinutes);
-
-    if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
-      validSubmission = false;
-      setError('visitStopDate', {
-        message: t(
-          'visitStopDateMustBeAfterMostRecentEncounter',
-          'Stop date needs to be on or after {{lastEncounterDatetime}}',
-          {
-            lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-            interpolation: {
-              escapeValue: false,
-            },
-          },
-        ),
-      });
-    }
-
-    if (visitStartDatetime >= visitStopDatetime) {
-      validSubmission = false;
-      setError('visitStopDate', {
-        message: t('invalidVisitStopDate', 'Visit stop date time cannot be on or before visit start date time'),
-      });
-    }
-
-    return validSubmission;
-  }, [displayVisitStopDateTimeFields, getValues, maxVisitStartDatetime, minVisitStopDatetime, setError, t]);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -383,23 +386,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     },
     [visitToEdit, t, visitAttributeTypes],
   );
-
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
-      if (visitToEdit && !validateVisitStartStopDatetime()) {
-        return;
-      }
-
       const {
-        visitStartTimeFormat,
-        visitStartDate,
+        visitStartDatetime: { date: visitStartDate, time: visitStartTime, timeFormat: visitStartTimeFormat },
         visitLocation,
-        visitStartTime,
         visitType,
         visitAttributes,
-        visitStopDate,
-        visitStopTime,
-        visitStopTimeFormat,
       } = data;
 
       setIsSubmitting(true);
@@ -429,6 +422,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       if (displayVisitStopDateTimeFields) {
+        const { date: visitStopDate, time: visitStopTime, timeFormat: visitStopTimeFormat } = data.visitStopDatetime;
         const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
 
         payload.stopDatetime = toDateObjectStrict(
@@ -636,16 +630,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       status,
       t,
       upcomingAppointment,
-      validateVisitStartStopDatetime,
       visitQueueNumberAttributeUuid,
       visitToEdit,
     ],
   );
-
-  const visitStartDate = getValues('visitStartDate') ?? new Date();
-  minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
-  const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
-  minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
   useEffect(() => {
     if (errorFetchingLocations) {
@@ -690,17 +678,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
               visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
-              dateFieldName="visitStartDate"
-              timeFieldName="visitStartTime"
-              timeFormatFieldName="visitStartTimeFormat"
+              datetimeFieldName="visitStartDatetime"
             />
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
                 visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
-                dateFieldName="visitStopDate"
-                timeFieldName="visitStopTime"
-                timeFormatFieldName="visitStopTimeFormat"
+                datetimeFieldName="visitStopDatetime"
               />
             )}
 
