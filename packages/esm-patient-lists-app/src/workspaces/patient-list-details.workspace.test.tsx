@@ -8,7 +8,6 @@ const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const testProps = {
   patientUuid: '',
   promptBeforeClosing: jest.fn(),
-  discardChangesAndCloseWorkspace: jest.fn(),
   closeWorkspace: jest.fn(),
   list: {
     attributes: [],

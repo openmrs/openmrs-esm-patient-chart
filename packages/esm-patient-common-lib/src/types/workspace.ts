@@ -31,11 +31,6 @@ export interface DefaultWorkspaceProps {
    */
   closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
   /**
-   * Call this function to discard the changes in the workspace form
-   * and close the workspace.
-   */
-  discardChangesAndCloseWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
-  /**
    * Call this with a no-args function that returns true if the user should be prompted before
    * this workspace is closed; e.g. if there is unsaved data.
    */

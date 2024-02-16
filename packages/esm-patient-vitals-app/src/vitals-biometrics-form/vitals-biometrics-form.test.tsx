@@ -9,7 +9,6 @@ import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
 const testProps = {
   closeWorkspace: () => {},
-  discardChangesAndCloseWorkspace: () => {},
   patientUuid: mockPatient.id,
   promptBeforeClosing: () => {},
 };

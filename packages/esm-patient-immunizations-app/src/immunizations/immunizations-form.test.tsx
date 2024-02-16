@@ -84,7 +84,6 @@ jest.mock('./immunizations.resource', () => ({
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: mockCloseWorkspace,
-  discardChangesAndCloseWorkspace: mockDiscardAndCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
 };
 

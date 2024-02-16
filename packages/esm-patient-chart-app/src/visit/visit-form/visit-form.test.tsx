@@ -9,13 +9,11 @@ import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
 const mockCloseWorkspace = jest.fn();
-const mockDiscardChangesAndCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: mockCloseWorkspace,
-  discardChangesAndCloseWorkspace: mockDiscardChangesAndCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
   visitToEdit: undefined,
   showVisitEndDateTimeFields: false,
@@ -270,7 +268,7 @@ describe('Visit Form', () => {
 
     await user.click(closeButton);
 
-    expect(mockDiscardChangesAndCloseWorkspace).toHaveBeenCalled();
+    expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
   it('should not submit the form if the visit attributes type is required and throw the error', async () => {

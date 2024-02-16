@@ -12,7 +12,6 @@ const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
-  discardChangesAndCloseWorkspace: jest.fn(),
 };
 
 const mockCreateAppointment = saveAppointment as jest.Mock;
@@ -130,7 +129,7 @@ describe('AppointmentForm', () => {
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     await user.click(cancelButton);
 
-    expect(testProps.discardChangesAndCloseWorkspace).toHaveBeenCalledTimes(1);
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('renders a success snackbar  upon successfully scheduling an appointment', async () => {

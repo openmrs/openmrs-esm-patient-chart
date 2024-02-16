@@ -15,7 +15,7 @@ export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrd
 
 export default function AddDrugOrderWorkspace({
   order: initialOrder,
-  discardChangesAndCloseWorkspace,
+  closeWorkspace,
   promptBeforeClosing,
 }: AddDrugOrderWorkspace) {
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
@@ -23,10 +23,10 @@ export default function AddDrugOrderWorkspace({
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
-    discardChangesAndCloseWorkspace({
+    closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
-  }, [discardChangesAndCloseWorkspace, currentOrder, orders, setOrders]);
+  }, [closeWorkspace, currentOrder, orders, setOrders]);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -56,11 +56,12 @@ export default function AddDrugOrderWorkspace({
         newOrders.push(finalizedOrder);
       }
       setOrders(newOrders);
-      discardChangesAndCloseWorkspace({
+      closeWorkspace({
+        ignoreChanges: true,
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, discardChangesAndCloseWorkspace, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
   );
 
   if (!currentOrder) {

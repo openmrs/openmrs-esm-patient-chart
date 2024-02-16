@@ -141,7 +141,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
                 <HeaderGlobalAction
                   align="bottom-right"
                   label={t('close', 'Close')}
-                  onClick={() => closeWorkspace?.({ ignoreChanges: false })}
+                  onClick={() => closeWorkspace?.()}
                   size="lg"
                 >
                   <Close />

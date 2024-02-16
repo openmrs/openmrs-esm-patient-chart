@@ -11,13 +11,13 @@ import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
-  discardChangesAndCloseWorkspace: DefaultWorkspaceProps['discardChangesAndCloseWorkspace'];
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, discardChangesAndCloseWorkspace }: LabOrderFormProps) {
+export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -37,19 +37,20 @@ export function LabOrderForm({ initialOrder, discardChangesAndCloseWorkspace }: 
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = inProgressLabOrder;
       setOrders(newOrders);
-      discardChangesAndCloseWorkspace({
+      closeWorkspace({
+        ignoreChanges: true,
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, discardChangesAndCloseWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, inProgressLabOrder],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== inProgressLabOrder.testType.conceptUuid));
-    discardChangesAndCloseWorkspace({
+    closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
-  }, [discardChangesAndCloseWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
+  }, [closeWorkspace, inProgressLabOrder?.testType?.conceptUuid, orders, setOrders]);
 
   return (
     <>

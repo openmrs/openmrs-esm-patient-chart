@@ -13,7 +13,6 @@ const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
-  discardChangesAndCloseWorkspace: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;

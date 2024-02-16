@@ -7,7 +7,6 @@ import PastVisitOverview from './past-visit-overview.component';
 
 const testProps = {
   closeWorkspace: jest.fn(),
-  discardChangesAndCloseWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
 };

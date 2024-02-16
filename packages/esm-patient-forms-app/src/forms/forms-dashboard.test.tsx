@@ -52,12 +52,5 @@ describe('FormsDashboard', () => {
 });
 
 function renderFormDashboard() {
-  render(
-    <FormsDashboard
-      discardChangesAndCloseWorkspace={jest.fn()}
-      promptBeforeClosing={jest.fn()}
-      closeWorkspace={jest.fn()}
-      patientUuid=""
-    />,
-  );
+  render(<FormsDashboard promptBeforeClosing={jest.fn()} closeWorkspace={jest.fn()} patientUuid="" />);
 }

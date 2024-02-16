@@ -15,13 +15,7 @@ interface FormRendererProps extends DefaultWorkspaceProps {
   encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({
-  formUuid,
-  patientUuid,
-  visit,
-  discardChangesAndCloseWorkspace,
-  encounterUuid,
-}) => {
+const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
 
@@ -36,7 +30,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   if (error) {
     return (
       <div className={styles.errorContainer}>
-        <FormError closeWorkspace={discardChangesAndCloseWorkspace} />
+        <FormError closeWorkspace={closeWorkspace} />
       </div>
     );
   }
@@ -49,8 +43,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           patientUUID={patientUuid}
           visit={visit}
           formJson={schema}
-          handleClose={discardChangesAndCloseWorkspace}
-          onSubmit={discardChangesAndCloseWorkspace}
+          handleClose={closeWorkspace}
+          onSubmit={() => closeWorkspace({ ignoreChanges: true })}
         />
       )}
     </>

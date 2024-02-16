@@ -71,7 +71,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   recurringPattern,
   patientUuid,
   context,
-  discardChangesAndCloseWorkspace,
+  closeWorkspace,
   promptBeforeClosing,
 }) => {
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
@@ -198,7 +198,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       ({ status }) => {
         if (status === 200) {
           setIsSubmitting(false);
-          discardChangesAndCloseWorkspace();
+          closeWorkspace({ ignoreChanges: true });
           mutate();
 
           showSnackbar({
@@ -591,7 +591,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} onClick={discardChangesAndCloseWorkspace} kind="secondary">
+        <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} disabled={isSubmitting} onClick={handleSubmit(handleSaveAppointment)}>

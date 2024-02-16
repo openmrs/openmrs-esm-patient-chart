@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ discardChangesAndCloseWorkspace }) => {
+const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
