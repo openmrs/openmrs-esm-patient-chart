@@ -18,18 +18,14 @@ import { type amPm } from '@openmrs/esm-patient-common-lib';
 
 interface VisitDateTimeFieldProps {
   visitDatetimeLabel: string;
-  dateFieldName: 'visitStartDate' | 'visitStopDate';
-  timeFieldName: 'visitStartTime' | 'visitStopTime';
-  timeFormatFieldName: 'visitStartTimeFormat' | 'visitStopTimeFormat';
+  datetimeFieldName: 'visitStartDatetime' | 'visitStopDatetime';
   minDate?: number;
   maxDate?: number;
 }
 
 const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   visitDatetimeLabel,
-  dateFieldName,
-  timeFieldName,
-  timeFormatFieldName,
+  datetimeFieldName,
   minDate,
   maxDate,
 }) => {
@@ -40,6 +36,12 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
     formState: { errors },
     setError,
   } = useFormContext<VisitFormData>();
+
+  const dateFieldName: 'visitStartDatetime.date' | 'visitStopDatetime.date' = `${datetimeFieldName}.date`;
+  const timeFieldName: 'visitStartDatetime.time' | 'visitStopDatetime.time' = `${datetimeFieldName}.time`;
+  const timeFormatFieldName:
+    | 'visitStartDatetime.timeFormat'
+    | 'visitStopDatetime.timeFormat' = `${datetimeFieldName}.timeFormat`;
 
   // Since we have the separate date and time fields, the final validation needs to be done at the form
   // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
@@ -54,24 +56,25 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         <Controller
           name={dateFieldName}
           control={control}
-          render={({ field: { onBlur, onChange, value } }) => (
+          render={({ field: dateField }) => (
             <ResponsiveWrapper isTablet={isTablet}>
               <DatePicker
+                {...dateField}
                 dateFormat="d/m/Y"
                 datePickerType="single"
                 id={dateFieldName}
                 style={{ paddingBottom: '1rem' }}
                 minDate={minDate}
                 maxDate={maxDate}
-                onChange={([date]) => onChange(date)}
-                value={value}
+                onChange={([date]) => dateField.onChange(date)}
+                invalid={errors?.[datetimeFieldName]?.date?.message}
+                invalidText={errors?.[datetimeFieldName]?.date?.message}
               >
                 <DatePickerInput
                   id={`${dateFieldName}Input`}
                   labelText={t('date', 'Date')}
                   placeholder="dd/mm/yyyy"
                   style={{ width: '100%' }}
-                  invalid={errors[dateFieldName]?.message}
                 />
               </DatePicker>
             </ResponsiveWrapper>
@@ -81,30 +84,31 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
           <Controller
             name={timeFieldName}
             control={control}
-            render={({ field: { onBlur, onChange, value } }) => (
+            render={({ field: timeField }) => (
               <TimePicker
+                {...timeField}
                 id={timeFieldName}
                 labelText={t('time', 'Time')}
-                onChange={(event) => onChange(event.target.value as amPm)}
+                onChange={(event) => timeField.onChange(event.target.value as amPm)}
                 pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
-                value={value}
-                onBlur={onBlur}
-                invalid={errors[dateFieldName]?.message}
+                invalid={errors?.[datetimeFieldName]?.time?.message}
+                invalidText={errors?.[datetimeFieldName]?.time?.message}
               >
                 <Controller
                   name={timeFormatFieldName}
                   control={control}
-                  render={({ field: { onChange, value } }) => (
+                  render={({ field: timeFormatField }) => (
                     <TimePickerSelect
+                      {...timeFormatField}
                       id={`${timeFormatFieldName}Input`}
-                      onChange={(event) => onChange(event.target.value as amPm)}
-                      value={value}
+                      onChange={(event) => timeFormatField.onChange(event.target.value as amPm)}
                       aria-label={t('timeFormat ', 'Time Format')}
-                      invalid={errors[dateFieldName]?.message}
+                      invalid={errors?.[datetimeFieldName]?.timeFormat?.message}
+                      invalidText={errors?.[datetimeFieldName]?.timeFormat?.message}
                     >
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
+                      <SelectItem value="AM" text={t('AM', 'AM')} />
+                      <SelectItem value="PM" text={t('PM', 'PM')} />
                     </TimePickerSelect>
                   )}
                 />
@@ -113,14 +117,14 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
           />
         </ResponsiveWrapper>
       </div>
-      {errors[dateFieldName]?.message && (
+      {errors?.[datetimeFieldName]?.root && (
         <InlineNotification
           aria-label="Close notification"
           kind="error"
-          onClose={() => setError(dateFieldName, null)}
+          onClose={() => setError(datetimeFieldName, null)}
           statusIconDescription="notification"
-          subtitle={errors[dateFieldName]?.message}
-          title="Error"
+          subtitle={errors?.[datetimeFieldName]?.root?.message}
+          title={t('datetimeOutOfRange', 'Selected time is out of range')}
           lowContrast
         />
       )}
