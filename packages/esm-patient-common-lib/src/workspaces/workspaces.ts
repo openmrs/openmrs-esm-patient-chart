@@ -259,6 +259,8 @@ export function closeWorkspace(
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name != name);
 
+    // promptBeforeClosing function should be removed if the workspace is closed.
+    promptBeforeClosing(name, null);
     store.setState({
       ...state,
       prompt: null,
