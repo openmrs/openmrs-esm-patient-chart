@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import {
@@ -40,6 +40,7 @@ import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
 import { orderBy } from 'lodash-es';
 import { Tooltip } from '@carbon/react';
+
 interface OrderDetailsProps {
   title?: string;
   patientUuid: string;
@@ -60,11 +61,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const contentToPrintRef = useRef(null);
+  const contentToPrintRef = React.useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>('order-basket');
   const { data: orderTypes } = useOrderTypes();
@@ -129,10 +131,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     orderId: order.orderNumber,
     dateOfOrder: formatDate(new Date(order.dateActivated)),
     orderType: capitalize(order.orderType?.display ?? '--'),
-    order: order.display,
-    // order: (
-    //   <div>{order.display.length > 20 ? <OrderDisplayTooltip orderDisplay={order.display} /> : order.display}</div>
-    // ),
+    order: {
+      action: order.action as 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW',
+      display: order.display,
+      uuid: order.uuid,
+      orderer: order.orderer?.display,
+      careSetting: order.careSetting?.display,
+      orderError: order.orderer?.responseBody?.error?.detail,
+      isOrderIncomplete: order.isOrderIncomplete,
+    },
     priority: (
       <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
         {capitalize(order.urgency)}
@@ -141,6 +148,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     orderedBy: order.orderer?.display,
     status: capitalize(order.fulfillerStatus ?? '--'),
   }));
+
+  if (!allOrders || allOrders.length === 0) {
+    return <EmptyState displayText={t('noOrders', 'No orders to display')} headerTitle={headerTitle} />;
+  }
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
     return sortDirection === sortStates.DESC
@@ -163,7 +174,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
 
   const { results: paginatedOrders, goTo, currentPage } = usePagination(sortedData, defaultPageSize);
 
-  const patientDetails = useMemo(() => {
+  const patientDetails = React.useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
         case 'male':
@@ -193,26 +204,17 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
-  const onBeforeGetContentResolve = useRef(null);
-
-  useEffect(() => {
-    if (isPrinting && onBeforeGetContentResolve.current) {
-      onBeforeGetContentResolve.current();
-    }
-  }, [isPrinting, onBeforeGetContentResolve]);
-
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
         if (patient && patient.patient && title) {
-          onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
+          setTimeout(resolve, 500); // Simulating async operation
         }
       }),
     onAfterPrint: () => {
-      onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
   });
@@ -231,123 +233,121 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
 
   return (
     <>
-      <div className={styles.widgetCard}>
-        <CardHeader title={title}>
-          {isValidating ? (
-            <span>
-              <InlineLoading />
-            </span>
-          ) : null}
-          <div className={styles.buttons}>
-            {orderTypes && orderTypes?.length > 0 && (
-              <Dropdown
-                id="orderTypeDropdown"
-                titleText="Select order type"
-                label="All"
-                type="inline"
-                items={[...[{ display: 'All' }], ...orderTypes]}
-                selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
-                itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-                onChange={(e) => {
-                  if (e.selectedItem.display === 'All') {
-                    setSelectedOrderTypeUuid(null);
-                    return;
-                  }
-                  setSelectedOrderTypeUuid(e.selectedItem.uuid);
-                }}
-              />
-            )}
-
-            {showPrintButton && (
-              <Button
-                kind="ghost"
-                renderIcon={Printer}
-                iconDescription="Add vitals"
-                className={styles.printButton}
-                onClick={handlePrint}
-              >
-                {t('print', 'Print')}
-              </Button>
-            )}
-            {showAddButton ?? true ? (
-              <Button
-                kind="ghost"
-                renderIcon={(props) => <Add size={16} {...props} />}
-                iconDescription="Launch order basket"
-                onClick={launchOrderBasket}
-              >
-                {t('add', 'Add')}
-              </Button>
-            ) : null}
-          </div>
-        </CardHeader>
-        <div ref={contentToPrintRef}>
-          <PrintComponent subheader={title} patientDetails={patientDetails} />
-          <DataTable
-            data-floating-menu-container
-            size="sm"
-            headers={tableHeaders}
-            rows={paginatedOrders}
-            isSortable
-            sortRow={sortRow}
-            overflowMenuOnHover={false}
-            useZebraStyles
-          >
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}
-                        >
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                      <TableHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, rowIndex) => (
-                      <TableRow className={styles.row} {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell className={styles.tableCell} key={cell.id}>
-                            <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
-                          </TableCell>
-                        ))}
-                        {!isPrinting && (
-                          <TableCell className="cds--table-column-menu">
-                            <OrderBasketItemActions
-                              orderItem={sortedData[rowIndex]}
-                              items={orders}
-                              setItems={setOrders}
-                              openOrderBasket={launchOrderBasket}
-                              openOrderForm={launchOrderBasket}
-                            />
-                          </TableCell>
-                        )}
-                      </TableRow>
+      <div ref={contentToPrintRef}>
+        <PrintComponent subheader={title} patientDetails={patientDetails} />
+        <DataTable
+          data-floating-menu-container
+          size="sm"
+          headers={tableHeaders}
+          rows={paginatedOrders}
+          isSortable
+          sortRow={sortRow}
+          overflowMenuOnHover={false}
+          useZebraStyles
+        >
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                      >
+                        {header.header}
+                      </TableHeader>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-          {!isPrinting && (
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={tableRows?.length}
-              currentItems={paginatedOrders?.length}
-              pageSize={defaultPageSize}
-              onPageNumberChange={({ page }) => goTo(page)}
+                    <TableHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
+                        </TableCell>
+                      ))}
+                      {!isPrinting && (
+                        <TableCell className="cds--table-column-menu">
+                          <OrderBasketItemActions
+                            orderItem={sortedData[rowIndex]}
+                            items={orders}
+                            setItems={setOrders}
+                            openOrderBasket={launchOrderBasket}
+                            openOrderForm={setSelectedOrder}
+                          />
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        {!isPrinting && (
+          <PatientChartPagination
+            pageNumber={currentPage}
+            totalItems={tableRows?.length}
+            currentItems={paginatedOrders?.length}
+            pageSize={defaultPageSize}
+            onPageNumberChange={({ page }) => goTo(page)}
+          />
+        )}
+      </div>
+      <CardHeader title={title}>
+        {isValidating ? (
+          <span>
+            <InlineLoading />
+          </span>
+        ) : null}
+        <div className={styles.buttons}>
+          {orderTypes && orderTypes?.length > 0 && (
+            <Dropdown
+              id="orderTypeDropdown"
+              titleText="Select order type"
+              label="All"
+              type="inline"
+              items={[...[{ display: 'All' }], ...orderTypes]}
+              selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
+              itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+              onChange={(e) => {
+                if (e.selectedItem.display === 'All') {
+                  setSelectedOrderTypeUuid(null);
+                  return;
+                }
+                setSelectedOrderTypeUuid(e.selectedItem.uuid);
+              }}
             />
           )}
+
+          {showPrintButton && (
+            <Button
+              kind="ghost"
+              renderIcon={Printer}
+              iconDescription="Add vitals"
+              className={styles.printButton}
+              onClick={handlePrint}
+            >
+              {t('print', 'Print')}
+            </Button>
+          )}
+          {showAddButton ?? true ? (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Launch order basket"
+              onClick={launchOrderBasket}
+            >
+              {t('add', 'Add')}
+            </Button>
+          ) : null}
         </div>
-      </div>
+      </CardHeader>
     </>
   );
 };
@@ -392,22 +392,22 @@ function OrderBasketItemActions({
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
   openOrderBasket: () => void;
-  openOrderForm: (additionalProps?: { order: OrderBasketItem }) => void;
+  openOrderForm: (order: Order | null) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
-  const handleViewEditClick = useCallback(() => {
-    // openOrderForm({ order: orderItem });
+  const handleViewEditClick = React.useCallback(() => {
+    openOrderForm(orderItem);
   }, [orderItem, openOrderForm]);
 
-  const handleAddResultsClick = useCallback(() => {
-    // openOrderForm({ order: orderItem, addResults: true });
+  const handleAddResultsClick = React.useCallback(() => {
+    openOrderForm(orderItem);
   }, [orderItem, openOrderForm]);
 
-  const handleCancelClick = useCallback(() => {
-    // setItems(items.filter((x) => x.uuid !== orderItem.uuid));
+  const handleCancelClick = React.useCallback(() => {
+    setItems(items.filter((x) => x.uuid !== orderItem.uuid));
   }, [items, orderItem, setItems]);
 
   return (
@@ -423,7 +423,6 @@ function OrderBasketItemActions({
         id="modify"
         itemText={t('viewEdit', 'View/Edit Order')}
         onClick={handleViewEditClick}
-        disabled={alreadyInBasket}
       />
       {!orderItem.fulfillerStatus && (
         <OverflowMenuItem

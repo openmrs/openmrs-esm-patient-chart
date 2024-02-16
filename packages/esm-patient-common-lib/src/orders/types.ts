@@ -51,6 +51,7 @@ export interface PatientOrderFetchResponse {
 }
 
 export interface Order {
+  isOrderIncomplete: any;
   uuid: string;
   action: string;
   asNeeded: boolean;
@@ -87,6 +88,7 @@ export interface Order {
     uuid: string;
   };
   orderer: {
+    responseBody: any;
     display: string;
     person: {
       display: string;
