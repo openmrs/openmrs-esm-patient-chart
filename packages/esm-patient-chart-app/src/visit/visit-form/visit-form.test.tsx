@@ -8,8 +8,6 @@ import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
-jest.setTimeout(10000);
-
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
@@ -231,6 +229,7 @@ describe('Visit Form', () => {
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
+      timeoutInMs: 5000,
     });
   });
 

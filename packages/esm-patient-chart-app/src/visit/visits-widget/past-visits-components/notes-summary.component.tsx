@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { Note } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 interface NotesSummaryProps {
   notes: Array<Note>;
@@ -24,7 +25,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
           </div>
         ))
       ) : (
-        <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noNotesFound', 'No notes found')}</p>
+        <EmptyState displayText={t('notes', 'notes')} headerTitle="Notes"></EmptyState>
       )}
     </>
   );

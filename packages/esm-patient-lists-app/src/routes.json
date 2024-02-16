@@ -7,7 +7,7 @@
     {
       "name": "patient-lists-action-menu",
       "component": "patientListsActionMenu",
-      "slot": "action-menu-non-chart-items-slot"
+      "slot": "action-menu-chart-items-slot"
     }
   ]
 }

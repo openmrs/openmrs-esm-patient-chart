@@ -6,8 +6,6 @@ import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
-jest.setTimeout(10000);
-
 const testProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
@@ -47,8 +45,8 @@ describe('EncounterList', () => {
 
     renderVisitsTable();
 
-    await screen.findByText(/no encounters found/i);
-    expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
+    await screen.findByTitle(/empty data illustration/i);
+    expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {

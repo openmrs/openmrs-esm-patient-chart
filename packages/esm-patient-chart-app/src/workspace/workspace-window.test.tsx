@@ -19,10 +19,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     isDesktop: jest.fn(),
-    getExtensionRegistration: (name) => mockExtensionRegistry[name],
-    registerExtension: (ext) => {
-      mockExtensionRegistry[ext.name] = ext;
-    },
     translateFrom: (module, key, defaultValue, options) => defaultValue,
     useBodyScrollLock: jest.fn(),
   };

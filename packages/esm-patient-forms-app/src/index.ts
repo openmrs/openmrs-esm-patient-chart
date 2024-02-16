@@ -5,6 +5,7 @@ import {
   registerBreadcrumbs,
   subscribePrecacheStaticDependencies,
   syncAllDynamicOfflineData,
+  translateFrom,
 } from '@openmrs/esm-framework';
 import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
@@ -38,14 +39,24 @@ export function startupApp() {
   setupDynamicFormDataHandler();
   subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 
+  // t('clinicalForm', 'Clinical Form')
   registerWorkspace({
     name: 'patient-form-entry-workspace',
-    title: 'Clinical Form',
+    title: translateFrom('@openmrs/esm-patient-forms-app', 'clinicalForm', 'Clinical Form'),
     load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
     canMaximize: true,
     canHide: true,
     width: 'wider',
     type: 'clinical-form',
+  });
+
+  // t('clinicalForms', 'Clinical Forms')
+  registerWorkspace({
+    name: 'clinical-forms-workspace',
+    title: translateFrom('@openmrs/esm-patient-forms-app', 'clinicalForms', 'Clinical Forms'),
+    load: getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options),
+    type: 'clinical-form',
+    width: 'wider',
   });
 }
 
@@ -59,5 +70,3 @@ export const offlineFormsNavLink = getSyncLifecycle(
 );
 
 export const offlineForms = getSyncLifecycle(offlineFormsComponent, options);
-
-export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options);

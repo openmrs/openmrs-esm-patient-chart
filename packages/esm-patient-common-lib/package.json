@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-common-lib",
-  "version": "6.1.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "Library for common patient chart components",
   "browser": "dist/openmrs-esm-patient-common-lib.js",
@@ -36,6 +36,6 @@
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
     "react": "18.x",
-    "single-spa": "5.x"
+    "single-spa": "6.x"
   }
 }

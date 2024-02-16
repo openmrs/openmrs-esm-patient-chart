@@ -43,6 +43,7 @@ export interface OrderPost {
   previousOrder?: string;
   asNeededCondition?: string;
   orderReasonNonCoded?: string;
+  orderReason?: string;
   instructions?: string;
 }
 

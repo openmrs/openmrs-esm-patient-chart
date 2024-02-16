@@ -45,6 +45,18 @@
   color: $text-02;
 }
 
+.imgThumbnailContainer {
+  height: 5rem;
+  width: 6rem;
+  margin-top: spacing.$spacing-04;
+}
+
+.imgThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .button {
   height: 4rem;
   display: flex;
@@ -54,8 +66,11 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: 1rem 1rem;
   background-color: $ui-02;
+  position: fixed;
+  bottom: 0rem;
+  width: 100%;
 }
 
 .desktop {
@@ -81,7 +96,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: var(--desktop-workspace-window-height);
+  // height: var(--desktop-workspace-window-height);
 }
 
 .grid {

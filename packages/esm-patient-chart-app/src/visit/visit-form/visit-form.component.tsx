@@ -407,6 +407,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
               showSnackbar({
                 isLowContrast: true,
+                timeoutInMs: 5000,
                 kind: 'success',
                 subtitle: !visitToEdit
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
@@ -496,8 +497,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return [maxVisitStartDatetime, minVisitStopDatetime];
   }, [visitToEdit]);
 
-  const visitStartDate = getValues('visitStartDate');
+  const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
+  const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
+  minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
   useEffect(() => {
     if (errorFetchingLocations) {

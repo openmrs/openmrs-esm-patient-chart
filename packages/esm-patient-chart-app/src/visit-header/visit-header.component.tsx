@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Header, HeaderGlobalAction, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
-import { CloseFilled } from '@carbon/react/icons';
+import { Button, Header, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import {
   age,
   ConfigurableLink,
@@ -9,7 +8,6 @@ import {
   useLayoutType,
   usePatient,
   useVisit,
-  navigate,
   useConfig,
   showModal,
   ExtensionSlot,
@@ -21,6 +19,7 @@ import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component'
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 import RetrospectiveVisitLabel from './retrospective-visit-label.component';
+import { CloseButton } from './close-button.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -59,15 +58,10 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const priority = queueEntry?.priority ?? '';
 
   const getServiceString = useCallback(() => {
-    switch (queueEntry?.status?.toLowerCase()) {
-      case 'waiting':
-        return `Waiting for ${queueEntry.service}`;
-      case 'in service':
-        return `Attending ${queueEntry.service}`;
-      case 'finished service':
-        return `Finished ${queueEntry.service}`;
-      default:
-        return '';
+    if (queueEntry?.status && queueEntry.service) {
+      return `${t(queueEntry.status)} - ${t(queueEntry.service)}`;
+    } else {
+      return '';
     }
   }, [queueEntry]);
 
@@ -91,9 +85,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           label={
             <>
               <p className={styles.tooltipPatientName}>{name}</p>
-              <p className={styles.tooltipPatientInfo}>{`${parseInt(age(patient?.birthDate))}, ${getGender(
-                patient?.gender,
-              )}`}</p>
+              <p className={styles.tooltipPatientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</p>
             </>
           }
         >
@@ -104,9 +96,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       ) : (
         <span className={styles.patientName}>{name} </span>
       )}
-      <span className={styles.patientInfo}>
-        {parseInt(age(patient.birthDate))}, {getGender(patient.gender)}
-      </span>
+      <span className={styles.patientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</span>
       {queueEntry && (
         <>
           <div className={styles.navDivider} />
@@ -143,10 +133,6 @@ const VisitHeader: React.FC = () => {
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
-
-  const onClosePatientChart = useCallback(() => {
-    document.referrer === '' ? navigate({ to: `${window.spaBase}/home` }) : window.history.back();
-  }, []);
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {
@@ -203,13 +189,7 @@ const VisitHeader: React.FC = () => {
             )}
           </>
         )}
-        <HeaderGlobalAction
-          className={styles.headerGlobalBarCloseButton}
-          aria-label={t('close', 'Close')}
-          onClick={onClosePatientChart}
-        >
-          <CloseFilled size={20} />
-        </HeaderGlobalAction>
+        <CloseButton />
       </HeaderGlobalBar>
       <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
     </Header>

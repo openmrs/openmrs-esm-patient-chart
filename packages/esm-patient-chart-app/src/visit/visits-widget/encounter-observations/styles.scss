@@ -4,11 +4,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: spacing.$spacing-03;
-  margin: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05 0;
+  margin-block: spacing.$spacing-05;
+  margin-inline: 0 spacing.$spacing-05;
 }
 
 .observation > span {
   align-self: center;
+  justify-self: start;
 }
 
 .parentConcept {
@@ -16,5 +18,5 @@
 }
 
 .childConcept {
-  padding-left: 0.8rem;
+  padding-inline-start: 0.8rem;
 }

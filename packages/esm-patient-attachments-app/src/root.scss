@@ -14,10 +14,6 @@
   @include type.type-style("body-long-01");
 }
 
-.muted {
-  color: $text-02;
-}
-
 .bodyShort01 {
   @include type.type-style("body-compact-01");
 }

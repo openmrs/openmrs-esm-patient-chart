@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-entry-app",
-  "version": "6.1.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "Form engine entry capabilities for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-entry-app.js",
@@ -66,8 +66,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "rxjs": "6.x",
-    "single-spa": "5.x"
+    "single-spa": "6.x"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.11",
@@ -99,7 +98,7 @@
     "ngx-build-plus": "^16.0.0",
     "openmrs": "next",
     "protractor": "~7.0.0",
-    "rxjs": "~6.6.7",
+    "rxjs": "^7.8.0",
     "style-loader": "2.x",
     "webpack": "~5.89.0"
   }
