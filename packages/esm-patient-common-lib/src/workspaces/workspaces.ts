@@ -108,7 +108,7 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
  * @param ignoreChanges If set to true, the "unsaved changes" modal will never be shown, even if the `promptBeforeClosing` function returns true. The user will not be prompted before closing.
  * @returns true if the workspace can be closed.
  */
-export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges: boolean = false) {
+export function canCloseWorkspaceWithoutPrompting(name: string, ignoreChanges: boolean = false) {
   if (ignoreChanges) {
     return true;
   }
@@ -131,7 +131,7 @@ function promptBeforeLaunchingWorkspace(
     });
   };
 
-  if (!getWhetherWorkspaceCanBeClosed(workspace.name)) {
+  if (!canCloseWorkspaceWithoutPrompting(workspace.name)) {
     showWorkspacePrompts('closing-workspace-launching-new-workspace', proceed, workspace.title ?? workspace.name);
   } else {
     proceed();
@@ -271,7 +271,7 @@ export function closeWorkspace(
     options?.onWorkspaceClose?.();
   };
 
-  if (!getWhetherWorkspaceCanBeClosed(name, options?.ignoreChanges)) {
+  if (!canCloseWorkspaceWithoutPrompting(name, options?.ignoreChanges)) {
     const currentName = getWorkspaceRegistration(name).title ?? name;
     showWorkspacePrompts('closing-workspace', updateStoreWithClosedWorkspace, currentName);
     return false;
@@ -317,7 +317,7 @@ export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
   const store = getWorkspaceStore();
 
   const canCloseAllWorkspaces = store.getState().openWorkspaces.every(({ name }) => {
-    const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+    const canCloseWorkspace = canCloseWorkspaceWithoutPrompting(name);
     return canCloseWorkspace;
   });
 
@@ -372,7 +372,7 @@ export function showWorkspacePrompts(
     case 'closing-all-workspaces': {
       const workspacesNotClosed = store
         .getState()
-        .openWorkspaces.filter(({ name }) => !getWhetherWorkspaceCanBeClosed(name))
+        .openWorkspaces.filter(({ name }) => !canCloseWorkspaceWithoutPrompting(name))
         .map(({ title }, indx) => `${indx + 1}. ${title}`);
 
       const prompt: Prompt = {

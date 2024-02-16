@@ -442,7 +442,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           (offlineVisit) => {
-            //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({

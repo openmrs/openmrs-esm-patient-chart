@@ -13,7 +13,7 @@ import {
   useWorkspaces,
   updateWorkspaceWindowState,
   closeAllWorkspaces,
-  getWhetherWorkspaceCanBeClosed,
+  canCloseWorkspaceWithoutPrompting,
   getWorkspaceStore,
   resetWorkspaceStore,
 } from '@openmrs/esm-patient-common-lib';
@@ -70,7 +70,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
       const canCloseAllWorkspaces = getWorkspaceStore()
         .getState()
         .openWorkspaces.every(({ name }) => {
-          const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+          const canCloseWorkspace = canCloseWorkspaceWithoutPrompting(name);
           return canCloseWorkspace;
         });
 
