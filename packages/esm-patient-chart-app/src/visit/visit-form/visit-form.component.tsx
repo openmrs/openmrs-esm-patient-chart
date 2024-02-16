@@ -677,13 +677,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           )}
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
-              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
+              visitDatetimeLabel={t('visitStartDatetime', 'Visit start')}
               datetimeFieldName="visitStartDatetime"
             />
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
-                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
+                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop')}
                 datetimeFieldName="visitStopDatetime"
               />
             )}
