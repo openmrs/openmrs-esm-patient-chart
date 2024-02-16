@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
@@ -64,12 +64,14 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const onSubmit = (data) => {
-    setIsSubmittingForm(true);
+  
+  const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
+    if (data.search) {
+      setIsSubmittingForm(methods.formState.isSubmitting);
+    }
   };
 
   const onError = (error) => {
-    setIsSubmittingForm(false);
     console.error(error);
   };
 
@@ -85,6 +87,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
           setErrorUpdating={setErrorUpdating}
           isSubmittingForm={isSubmittingForm}
           setIsSubmittingForm={setIsSubmittingForm}
+          register={methods.register}
         />
         <div>
           {errorCreating ? (
@@ -115,7 +118,12 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
+            <Button
+              className={styles.button}
+              disabled={methods.formState.isSubmitting || isSubmittingForm || !methods.formState.isDirty}
+              kind="primary"
+              type="submit"
+            >
               {isSubmittingForm ? (
                 <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
               ) : (
