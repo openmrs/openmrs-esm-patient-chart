@@ -49,29 +49,11 @@ $actionPanelOffset: 3rem;
 
   .chartExtensions {
     background-color: $ui-02;
-    flex-basis: 0.75%;
-    flex-grow: 3;
     display: flex;
     width: 100%;
 
     & > div {
       flex: 1;
-      cursor: pointer;
-    }
-  }
-
-  .nonChartExtensions {
-    background-color: $ui-02;
-    flex-basis: 0.25%;
-    flex-grow: 1;
-    display: flex;
-
-    & > div {
-      flex: 1 1 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       cursor: pointer;
     }
   }

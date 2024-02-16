@@ -176,6 +176,17 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     );
   };
 
+  const isDiagnosisNotSelected = (diagnosis: Concept) => {
+    const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
+      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+    );
+    const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
+      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+    );
+
+    return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
+  };
+
   const createDiagnosis = (concept: Concept) => {
     return {
       patient: patientUuid,
@@ -413,16 +424,20 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                   if (!loadingPrimary && searchPrimaryResults && searchPrimaryResults.length > 0) {
                     return (
                       <ul className={styles.diagnosisList}>
-                        {searchPrimaryResults.map((diagnosis, index) => (
-                          <li
-                            role="menuitem"
-                            className={styles.diagnosis}
-                            key={index}
-                            onClick={() => handleAddDiagnosis(diagnosis, 'primaryDiagnosisSearch')}
-                          >
-                            {diagnosis.display}
-                          </li>
-                        ))}
+                        {searchPrimaryResults.map((diagnosis, index) => {
+                          if (isDiagnosisNotSelected(diagnosis)) {
+                            return (
+                              <li
+                                role="menuitem"
+                                className={styles.diagnosis}
+                                key={index}
+                                onClick={() => handleAddDiagnosis(diagnosis, 'primaryDiagnosisSearch')}
+                              >
+                                {diagnosis.display}
+                              </li>
+                            );
+                          }
+                        })}
                       </ul>
                     );
                   }
@@ -481,16 +496,20 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                   if (!loadingSecondary && searchSecondaryResults && searchSecondaryResults.length > 0)
                     return (
                       <ul className={styles.diagnosisList}>
-                        {searchSecondaryResults.map((diagnosis, index) => (
-                          <li
-                            role="menuitem"
-                            className={styles.diagnosis}
-                            key={index}
-                            onClick={() => handleAddDiagnosis(diagnosis, 'secondaryDiagnosisSearch')}
-                          >
-                            {diagnosis.display}
-                          </li>
-                        ))}
+                        {searchSecondaryResults.map((diagnosis, index) => {
+                          if (isDiagnosisNotSelected(diagnosis)) {
+                            return (
+                              <li
+                                role="menuitem"
+                                className={styles.diagnosis}
+                                key={index}
+                                onClick={() => handleAddDiagnosis(diagnosis, 'secondaryDiagnosisSearch')}
+                              >
+                                {diagnosis.display}
+                              </li>
+                            );
+                          }
+                        })}
                       </ul>
                     );
                   return (
