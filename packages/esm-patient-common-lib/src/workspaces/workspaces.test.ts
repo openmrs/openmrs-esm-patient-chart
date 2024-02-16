@@ -139,6 +139,8 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces.length).toEqual(2);
       expect(store.getState().openWorkspaces[0].name).toBe('conditions');
       expect(store.getState().openWorkspaces[1].name).toBe('allergies');
+      const allergies = store.getState().openWorkspaces[1];
+      allergies.promptBeforeClosing(() => true);
       launchPatientWorkspace('vitals');
       expect(store.getState().openWorkspaces.length).toEqual(2);
       expect(store.getState().openWorkspaces[0].name).toBe('allergies');
@@ -226,7 +228,9 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces.map((w) => w.name)).toEqual(['conditions', 'attachments', 'allergies']);
       const conditionsWorkspace = store.getState().openWorkspaces?.[0];
+      const allergiesWorkspace = store.getState().openWorkspaces?.[2];
       conditionsWorkspace.promptBeforeClosing(() => true);
+      allergiesWorkspace.promptBeforeClosing(() => true);
       launchPatientWorkspace('vitals');
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces[0].name).toBe('conditions');
@@ -310,6 +314,8 @@ describe('workspace system', () => {
     launchPatientWorkspace('conditions');
     launchPatientWorkspace('conditions');
     expect(store.getState().openWorkspaces.length).toEqual(1);
+    const conditionsWorkspace = store.getState().openWorkspaces[0];
+    conditionsWorkspace.promptBeforeClosing(() => true);
     // Test opening a workspace of the same type--should require confirmation and then replace
     launchPatientWorkspace('form-entry', { foo: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
