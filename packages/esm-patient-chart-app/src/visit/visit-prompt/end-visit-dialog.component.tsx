@@ -44,7 +44,9 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
-                subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+                subtitle: t('visitEndSuccessfully', '{{visitType}} ended successfully', {
+                  visitType: response?.data?.visitType?.display ?? 'Visit',
+                }),
                 title: t('visitEnded', 'Visit ended'),
               });
             }
