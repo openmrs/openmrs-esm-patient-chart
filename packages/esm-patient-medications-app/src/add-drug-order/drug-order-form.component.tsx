@@ -92,8 +92,13 @@ const schemaFields = {
   asNeededCondition: z.string().nullable(),
   duration: z.number().nullable(),
   durationUnit: z.object({ ...comboSchema }).nullable(),
-  pillsDispensed: z.number().nullable(),
-  quantityUnits: z.object({ ...comboSchema }).nullable(),
+  pillsDispensed: z.number({
+    invalid_type_error: translateFrom(moduleName, 'pillDispensedErrorMessage', 'The quantity to dispense is required'),
+  }),
+  quantityUnits: z.object(
+    { ...comboSchema },
+    { invalid_type_error: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit') },
+  ),
   numRefills: z.number().nullable(),
   indication: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
@@ -108,35 +113,21 @@ const schemaFields = {
   ),
 };
 
-const medicationOrderFormSchema = z
-  .discriminatedUnion('isFreeTextDosage', [
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(false),
-      freeTextDosage: z.string().optional(),
-    }),
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(true),
-      dosage: z.number().nullable(),
-      unit: z.object({ ...comboSchema }).nullable(),
-      route: z.object({ ...comboSchema }).nullable(),
-      frequency: z.object({ ...comboSchema }).nullable(),
-    }),
-  ])
-  .refine(
-    (formValues) => {
-      if (formValues.pillsDispensed > 0) {
-        return Boolean(formValues.quantityUnits);
-      }
-      return true;
-    },
-    {
-      // t('selectQuantityUnitsErrorMessage', 'Please select quantity unit')
-      message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit'),
-      path: ['quantityUnits'],
-    },
-  );
+const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(false),
+    freeTextDosage: z.string().optional(),
+  }),
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(true),
+    dosage: z.number().nullable(),
+    unit: z.object({ ...comboSchema }).nullable(),
+    route: z.object({ ...comboSchema }).nullable(),
+    frequency: z.object({ ...comboSchema }).nullable(),
+  }),
+]);
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
