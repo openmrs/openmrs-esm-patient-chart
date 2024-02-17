@@ -26,6 +26,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
   const session = useSession();
   const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
+  const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
     activeVisitRequired,
     isLoading: isLoadingEncounterUuid,
@@ -76,7 +77,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
       closeWorkspaceWithSavedChanges();
       showOrderSuccessToast(t, orders);
     } else {
-      showOrderFailureToast(t);
+      setOrdersWithErrors(erroredItems);
     }
 
     return () => abortController.abort();
@@ -122,6 +123,16 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
               inline
             />
           )}
+          {ordersWithErrors.map((order) => (
+            <InlineNotification
+              kind="error"
+              title={t('saveDugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
+              subtitle={order.extractedOrderError?.fieldErrors?.join(', ')}
+              lowContrast={true}
+              className={styles.inlineNotification}
+              inline
+            />
+          ))}
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.bottomButton} kind="secondary" onClick={handleCancel}>
               {t('cancel', 'Cancel')}

@@ -17,6 +17,7 @@ export interface OrderBasketItem {
       };
     };
   };
+  extractedOrderError?: { message: string; fieldErrors: string[]; globalErrors: string[] };
   isOrderIncomplete?: boolean;
 }
 

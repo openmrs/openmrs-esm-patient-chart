@@ -18,6 +18,7 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
         erroredItems.push({
           ...order,
           orderError: error,
+          extractedOrderError: extractErrorDetails(error),
         });
       });
     }
@@ -32,4 +33,23 @@ function postOrder(body: OrderPost, abortController?: AbortController) {
     headers: { 'Content-Type': 'application/json' },
     body,
   });
+}
+
+function extractErrorDetails(errorObject) {
+  const errorDetails = {
+    message: errorObject.responseBody.error.message,
+    fieldErrors: [],
+    globalErrors: errorObject.responseBody.error.globalErrors,
+  };
+
+  if (errorObject.responseBody.error.fieldErrors) {
+    const fieldErrors = errorObject.responseBody.error.fieldErrors;
+    for (const fieldName in fieldErrors) {
+      fieldErrors[fieldName].forEach((error) => {
+        errorDetails.fieldErrors.push(error.message);
+      });
+    }
+  }
+
+  return errorDetails;
 }
