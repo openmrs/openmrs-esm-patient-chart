@@ -195,13 +195,4 @@ function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[
   });
 }
 
-function showOrderFailureToast(t: TFunction) {
-  showSnackbar({
-    isLowContrast: false,
-    kind: 'error',
-    title: t('error', 'Error'),
-    subtitle: t('errorSavingOrder', 'There were errors saving some orders.'),
-  });
-}
-
 export default OrderBasket;
