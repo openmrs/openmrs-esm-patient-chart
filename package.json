@@ -73,7 +73,8 @@
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "@openmrs/esm-styleguide": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-styleguide"
   },
   "packageManager": "yarn@4.1.1",
   "dependencies": {

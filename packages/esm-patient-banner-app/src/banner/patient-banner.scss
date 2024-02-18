@@ -12,6 +12,13 @@
   background-color: $ui-01;
 }
 
+.buttonCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
 .deceasedPatientContainer {
   background-color: colors.$gray-80;
 
@@ -30,10 +37,6 @@
   &:focus, &:hover {
     background-color: colors.$gray-90;
   }
-}
-
-.overflowMenuContainer {
-  margin: -0.75rem 0;
 }
 
 .patientBanner {
