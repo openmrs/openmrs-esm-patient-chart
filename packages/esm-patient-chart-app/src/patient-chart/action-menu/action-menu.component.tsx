@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
+import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
 
-interface ActionMenuInterface {
-  open: boolean;
-}
+interface ActionMenuInterface {}
 
-export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
+export const ActionMenu: React.FC<ActionMenuInterface> = () => {
+  const { active, workspaceWindowState } = useWorkspaces();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const initialHeight = useRef(window.innerHeight);
   const isTablet = useLayoutType() === 'tablet';
@@ -22,7 +22,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     return () => window.removeEventListener('resize', handleKeyboardVisibilityChange);
   }, [initialHeight]);
 
-  if (open && isTablet) {
+  if (active && workspaceWindowState !== 'hidden' && isTablet) {
     return null;
   }
 
