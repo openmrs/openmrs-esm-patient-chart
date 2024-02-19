@@ -164,11 +164,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         if (!minVisitStopDatetime || !date || !time || !timeFormat) {
           return true;
         }
-
         const [hours, minutes] = convertTime12to24(time, timeFormat);
-
         const visitStopDatetime = dayjs(date).hour(hours).minute(minutes);
-
         return visitStopDatetime.isAfter(minVisitStopDatetime);
       },
       {
@@ -203,14 +200,12 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             visitStartDatetime.time,
             visitStartDatetime.timeFormat,
           );
-
           const startDatetime = dayjs(visitStartDatetime.date).hour(visitStartHours).minute(visitStartMinutes);
 
           const [visitStopHours, visitStopMinutes] = convertTime12to24(
             visitStopDatetime.time,
             visitStopDatetime.timeFormat,
           );
-
           const stopDatetime = dayjs(visitStopDatetime.date).hour(visitStopHours).minute(visitStopMinutes);
           return startDatetime.isBefore(stopDatetime);
         },
