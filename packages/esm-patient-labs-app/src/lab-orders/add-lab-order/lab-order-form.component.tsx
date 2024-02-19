@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
+import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -22,6 +22,7 @@ import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
+import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
@@ -44,6 +45,7 @@ const labOrderFormSchema = z.object({
       invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
     },
   ),
+  orderReason: z.string().optional(),
 });
 
 // Designs:
@@ -70,6 +72,11 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       ...initialOrder,
     },
   });
+  const config = useConfig<ConfigObject>();
+  const orderReasonUuids =
+    (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
+      .orderReasons || [];
+  const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
@@ -187,6 +194,30 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
               </InputWrapper>
             </Column>
           </Grid>
+          {orderReasons.length > 0 && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="orderReason"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <ComboBox
+                        size="lg"
+                        id="orderReasonInput"
+                        titleText={t('orderReason', 'Order reason')}
+                        selectedItem={''}
+                        itemToString={(item) => item?.display}
+                        items={orderReasons}
+                        onBlur={onBlur}
+                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
