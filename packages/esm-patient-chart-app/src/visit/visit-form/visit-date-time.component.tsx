@@ -20,17 +20,9 @@ import dayjs from 'dayjs';
 interface VisitDateTimeFieldProps {
   visitDatetimeLabel: string;
   datetimeFieldName: 'visitStartDatetime' | 'visitStopDatetime';
-  minDate?: number;
-  /** maxDate: Milliseconds since Jan 1 1970. */
-  maxDate?: number;
 }
 
-const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
-  visitDatetimeLabel,
-  datetimeFieldName,
-  minDate,
-  maxDate,
-}) => {
+const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({ visitDatetimeLabel, datetimeFieldName }) => {
   const { t } = useTranslation();
   const {
     control,
@@ -43,12 +35,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   const timeFormatFieldName:
     | 'visitStartDatetime.timeFormat'
     | 'visitStopDatetime.timeFormat' = `${datetimeFieldName}.timeFormat`;
-
-  // Since we have the separate date and time fields, the final validation needs to be done at the form
-  // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
-  // last second of the day. We want to just compare dates and not time.
-  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)).format('DD/MM/YYYY') : null;
-  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)).format('DD/MM/YYYY') : null;
 
   return (
     <section>
@@ -65,8 +51,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 datePickerType="single"
                 id={dateFieldName}
                 style={{ paddingBottom: '1rem' }}
-                minDate={minDate}
-                maxDate={maxDate}
                 onChange={([date]) => dateField.onChange(date)}
                 invalid={errors?.[datetimeFieldName]?.date?.message}
                 invalidText={errors?.[datetimeFieldName]?.date?.message}
