@@ -242,6 +242,34 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "active-visit-summary-dashboard",
+      "component": "activeVisitDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "slot": "patient-chart-active visit-dashboard-slot",
+        "columns": 1,
+        "path": "Active visit",
+        "hideDashboardTitle": true
+      },
+      "featureFlag": "activeVisit",
+      "order": 10,
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "active-visit-overview",
+      "component": "activeVisitDetailOverview",
+      "slot": "patient-chart-active visit-dashboard-slot",
+      "order": 1,
+      "meta": {
+        "title": "Active visit",
+        "view": "Active Visit"
+      },
+      "featureFlag": "activeVisit",
+      "online": true,
+      "offline": false
     }
   ],
   "pages": [

@@ -10,7 +10,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
-import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { summaryDashboardMeta, encountersDashboardMeta, activeVisitDashboardMeta } from './dashboard.meta';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
@@ -30,10 +30,17 @@ import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-t
 import genericNavGroupComponent from './side-nav/generic-nav-group.component';
 import genericDashboardComponent from './side-nav/generic-dashboard.component';
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
+import activeVisitDetailOverviewComponent from './visit/visits-widget/active-visits-summary.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
 window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
+
+registerFeatureFlag(
+  'activeVisit',
+  'Active visit',
+  'This feature introduces a navigation on the patient chart left nav called active visit and shows the active visit details within patient chart',
+);
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -268,3 +275,16 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
 );
+
+export const activeVisitDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...activeVisitDashboardMeta,
+    moduleName,
+  }),
+  { featureName: 'active-visit', moduleName },
+);
+
+export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {
+  featureName: 'active-visit-overview',
+  moduleName,
+});

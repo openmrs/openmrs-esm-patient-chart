@@ -8,7 +8,6 @@ import { mapEncounters, useInfiniteVisits } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
-import CurrentVisitActions from './current-visit-actions/current-visit-actions.component';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -18,7 +17,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const { t } = useTranslation();
   const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
     useInfiniteVisits(patientUuid);
-  const { showAllEncountersTab, showActiveVisitTab } = useConfig<ChartConfig>();
+  const { showAllEncountersTab, showFilledFormsInTabs } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
   const { currentVisit, isLoading: isLoadingCurrentVisit, error: isError } = useVisit(patientUuid);
 
@@ -32,11 +31,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     <div className={styles.tabs}>
       <Tabs>
         <TabList aria-label="Visit detail tabs" contained>
-          {showActiveVisitTab && (
-            <Tab className={styles.tab} id="active-visit-tab">
-              {t('activeVisit', 'Active visit')}
-            </Tab>
-          )}
           <Tab className={styles.tab} id="visit-summaries-tab">
             {t('visitSummaries', 'Visit summaries')}
           </Tab>
@@ -71,20 +65,19 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                         ) : null}
                       </div>
                     </div>
-                    <CurrentVisitActions visit={currentVisit} />
                   </div>
                 </div>
                 <VisitSummary visit={currentVisit} patientUuid={patientUuid} />
               </div>
             ) : (
-              <EmptyState headerTitle={t('visit', 'visit')} displayText={t('Visit', 'Visit')} />
+              <EmptyState headerTitle={t('visit', 'Visit')} displayText={t('visit', 'Visit')} />
             )}
           </TabPanel>
           <TabPanel>
             {isLoading ? (
               <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
             ) : error ? (
-              <ErrorState headerTitle={t('visits', 'visits')} error={error} />
+              <ErrorState headerTitle={t('visits', 'Visits')} error={error} />
             ) : visits?.length ? (
               <>
                 {visits.map((visit, i) => (

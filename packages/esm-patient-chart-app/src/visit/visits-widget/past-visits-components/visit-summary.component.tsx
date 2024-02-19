@@ -28,10 +28,8 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-summary.scss';
-import getUniqueFormNames from '../../utils';
 import { type ChartConfig } from '../../../config-schema';
 import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
-import groupBy from 'lodash/groupBy';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -50,7 +48,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
-  const { showActiveVisitTab } = useConfig<ChartConfig>();
+  const { showFilledFormsInTabs } = useConfig<ChartConfig>();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -117,20 +115,14 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     };
   }, [visit?.encounters]);
 
-  const uniqueFormNames = getUniqueFormNames(visit);
-  const groupedEncounters = groupBy(visit.encounters, 'encounterType.uuid');
-  const [selectedTab, setSelectedTab] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(null);
+  const foundEncounter = visit.encounters.find((enc) => enc.uuid === selectedTab);
 
   const handleTabChange = (evt) => {
+    setSelectedTab(visit.encounters[evt.selectedIndex - 3]?.uuid || ''); // Assuming the first 3 tabs are predefined
     setSelectedIndex(evt.selectedIndex);
   };
-
-  useEffect(() => {
-    if (!selectedTab && Object.keys(groupedEncounters)?.length > 0) {
-      setSelectedTab(Object.keys(groupedEncounters)[0]);
-    }
-  }, [selectedTab]);
 
   return (
     <div className={styles.summaryContainer}>
@@ -150,6 +142,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       </div>
       <Tabs
         onChange={handleTabChange}
+        selected={selectedIndex}
         className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}
       >
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
@@ -170,22 +163,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          {showActiveVisitTab ? (
-            uniqueFormNames?.length > 0 &&
-            uniqueFormNames?.map((val: any, ind) => {
-              return (
-                <Tab
-                  id={'tab-' + ind}
-                  key={ind}
-                  className={classNames(styles.tab, styles.bodyLong01)}
-                  onClick={() => {
-                    setSelectedTab(val.uuid);
-                  }}
-                >
-                  {val.name}
-                </Tab>
-              );
-            })
+          {showFilledFormsInTabs ? (
+            visit?.encounters?.length > 0 &&
+            visit?.encounters.map((enc, ind) => (
+              <Tab id={'tab-' + ind} key={ind} className={classNames(styles.tab, styles.bodyLong01)}>
+                {enc?.form?.display}
+              </Tab>
+            ))
           ) : (
             <Tab
               className={styles.tab}
@@ -214,15 +198,20 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {showActiveVisitTab ? (
-            groupedEncounters[selectedTab]?.map((val: any, ind) =>
-              val?.form && ind + 3 === selectedIndex ? (
-                <TabPanel>
-                  <OHRIForm patientUUID={patientUuid} formUUID={val.form?.uuid} encounterUUID={val.uuid} mode="view" />
-                </TabPanel>
-              ) : (
+          {showFilledFormsInTabs ? (
+            visit?.encounters?.length > 0 && foundEncounter ? (
+              <TabPanel key={selectedIndex}>
+                <OHRIForm
+                  patientUUID={patientUuid}
+                  formUUID={foundEncounter.form?.uuid}
+                  encounterUUID={foundEncounter.uuid}
+                  mode="view"
+                />
+              </TabPanel>
+            ) : (
+              <TabPanel key={selectedIndex}>
                 <></>
-              ),
+              </TabPanel>
             )
           ) : (
             <TabPanel>
