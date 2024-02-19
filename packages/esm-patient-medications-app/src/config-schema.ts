@@ -41,3 +41,11 @@ export interface ConfigObject {
   showPrintButton: boolean;
   maxDispenseDurationInDays: number;
 }
+
+export default {
+  debounceTime: {
+    type: 'integer',
+    default: 300,
+    description: 'Debounce time for medication search input in milliseconds',
+  },
+};

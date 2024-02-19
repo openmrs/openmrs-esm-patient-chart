@@ -1,20 +1,20 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search } from '@carbon/react';
-import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '../../types';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
-  debounceTime?: number;
 }
 
-export default function DrugSearch({ openOrderForm, debounceTime = 300 }: DrugSearchProps) {
+export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
+  const { debounceTime } = useConfig();
   const debouncedSearchTerm = useDebounce(searchTerm, debounceTime);
   const searchInputRef = useRef(null);
 
