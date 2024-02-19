@@ -45,7 +45,7 @@ export interface ConfigObject {
 export default {
   debounceTime: {
     type: 'integer',
-    default: 300,
+    default: 500,
     description: 'Debounce time for medication search input in milliseconds',
   },
 };
