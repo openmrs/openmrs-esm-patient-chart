@@ -17,7 +17,7 @@
 
   input[data-invalid]:focus {
     outline: 2px solid  colors.$red-60;
-     outline-offset: -2px;
+    outline-offset: -2px;
   }
 
   :global(.cds--css-grid) {
