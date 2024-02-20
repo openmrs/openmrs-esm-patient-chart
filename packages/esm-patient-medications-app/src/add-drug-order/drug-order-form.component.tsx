@@ -97,7 +97,13 @@ const schemaFields = {
   }),
   quantityUnits: z.object(
     { ...comboSchema },
-    { invalid_type_error: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit') },
+    {
+      invalid_type_error: translateFrom(
+        moduleName,
+        'selectQuantityUnitsErrorMessage',
+        'Please select the quantity unit required for dispensing',
+      ),
+    },
   ),
   numRefills: z.number().nullable(),
   indication: z.string().refine((value) => value !== '', {
