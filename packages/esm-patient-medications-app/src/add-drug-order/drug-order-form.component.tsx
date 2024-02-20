@@ -24,8 +24,16 @@ import {
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useController, useForm } from 'react-hook-form';
-import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { type Control, Controller, useController, useForm } from 'react-hook-form';
+import {
+  age,
+  formatDate,
+  parseDate,
+  translateFrom,
+  useConfig,
+  useLayoutType,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import type {
@@ -37,6 +45,7 @@ import type {
   QuantityUnit,
 } from '../types';
 import styles from './drug-order-form.scss';
+import { moduleName } from '../dashboard.meta';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -51,10 +60,32 @@ const comboSchema = {
 };
 
 const schemaFields = {
-  freeTextDosage: z.string().refine((value) => value !== '', { message: 'Add free dosage note' }),
-  dosage: z.number({ invalid_type_error: 'A dosage is required' }),
-  unit: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a unit' }),
-  route: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a route' }),
+  // t( 'freeDosageErrorMessage', 'Add free dosage note')
+  freeTextDosage: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'freeDosageErrorMessage', 'Add free dosage note'),
+  }),
+
+  // t( 'dosageRequiredErrorMessage', 'A dosage is required' )
+  dosage: z.number({
+    invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'A dosage is required'),
+  }),
+
+  // t( 'selectUnitErrorMessage', 'Please select a unit' )
+  unit: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectUnitErrorMessage', 'Please select a unit'),
+    },
+  ),
+
+  // t( 'selectRouteErrorMessage', 'Please select a route' )
+  route: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectRouteErrorMessage', 'Please select a route'),
+    },
+  ),
+
   patientInstructions: z.string().nullable(),
   asNeeded: z.boolean(),
   asNeededCondition: z.string().nullable(),
@@ -63,26 +94,48 @@ const schemaFields = {
   pillsDispensed: z.number().nullable(),
   quantityUnits: z.object({ ...comboSchema }).nullable(),
   numRefills: z.number().nullable(),
-  indication: z.string().refine((value) => value !== '', { message: 'Please add an indication' }),
+  indication: z.string().refine((value) => value !== '', {
+    message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
+  }),
   startDate: z.date(),
-  frequency: z.object({ ...comboSchema }, { invalid_type_error: 'Please select a frequency' }),
+  // t( 'selectFrequencyErrorMessage', 'Please select a frequency' )
+  frequency: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(moduleName, 'selectFrequencyErrorMessage', 'Please select a frequency'),
+    },
+  ),
 };
 
-const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(false),
-    freeTextDosage: z.string().optional(),
-  }),
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(true),
-    dosage: z.number().nullable(),
-    unit: z.object({ ...comboSchema }).nullable(),
-    route: z.object({ ...comboSchema }).nullable(),
-    frequency: z.object({ ...comboSchema }).nullable(),
-  }),
-]);
+const medicationOrderFormSchema = z
+  .discriminatedUnion('isFreeTextDosage', [
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(false),
+      freeTextDosage: z.string().optional(),
+    }),
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(true),
+      dosage: z.number().nullable(),
+      unit: z.object({ ...comboSchema }).nullable(),
+      route: z.object({ ...comboSchema }).nullable(),
+      frequency: z.object({ ...comboSchema }).nullable(),
+    }),
+  ])
+  .refine(
+    (formValues) => {
+      if (formValues.pillsDispensed > 0) {
+        return Boolean(formValues.quantityUnits);
+      }
+      return true;
+    },
+    {
+      // t('selectQuantityUnitsErrorMessage', 'Please select quantity unit')
+      message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit'),
+      path: ['quantityUnits'],
+    },
+  );
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
@@ -143,7 +196,14 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
-  const { handleSubmit, control, watch, setValue } = useForm<MedicationOrderFormData>({
+  const {
+    handleSubmit,
+    control,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm<MedicationOrderFormData>({
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
     defaultValues: {
@@ -165,6 +225,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: defaultStartDate,
     },
   });
+
+  const handleUnitAfterChange = useCallback(
+    (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
+      if (prevValue?.valueCoded === getValues('quantityUnits')?.valueCoded) {
+        setValue('quantityUnits', newValue, { shouldValidate: true });
+      }
+    },
+    [setValue],
+  );
 
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
@@ -277,7 +346,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
           </span>
         </div>
       )}
-
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
         <div>
           {errorFetchingOrderConfig && (
@@ -368,12 +436,14 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
                         control={control}
                         name="unit"
                         type="comboBox"
+                        getValues={getValues}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         items={drugDosingUnits}
                         placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                         titleText={t('editDosageUnitsTitle', 'Dose unit')}
                         itemToString={(item) => item?.value}
+                        handleAfterChange={handleUnitAfterChange}
                       />
                     </InputWrapper>
                   </Column>
@@ -675,11 +745,38 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
   );
 };
 
-const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
+interface ControlledFieldInputProps {
+  name: keyof MedicationOrderFormData;
+  type: 'toggle' | 'checkbox' | 'number' | 'textArea' | 'textInput' | 'comboBox';
+  handleAfterChange?: (
+    newValue: MedicationOrderFormData[keyof MedicationOrderFormData],
+    prevValue: MedicationOrderFormData[keyof MedicationOrderFormData],
+  ) => void;
+  control: Control<MedicationOrderFormData>;
+  [x: string]: any;
+}
+
+const ControlledFieldInput = ({
+  name,
+  type,
+  control,
+  getValues,
+  handleAfterChange,
+  ...restProps
+}: ControlledFieldInputProps) => {
   const {
     field: { onBlur, onChange, value, ref },
     fieldState,
   } = useController<MedicationOrderFormData>({ name: name, control });
+
+  const handleChange = useCallback(
+    (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
+      const prevValue = getValues?.(name);
+      onChange(newValue);
+      handleAfterChange?.(newValue, prevValue);
+    },
+    [getValues, onChange, handleAfterChange],
+  );
 
   const component = useMemo(() => {
     if (type === 'toggle')
@@ -687,19 +784,19 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
         <Toggle
           toggled={value}
           onChange={() => {} /* Required by the typings, but we don't need it. */}
-          onToggle={(value) => onChange(value)}
+          onToggle={(value) => handleChange(value)}
           {...restProps}
         />
       );
 
     if (type === 'checkbox')
-      return <Checkbox checked={value} onChange={(e, { checked, id }) => onChange(checked)} {...restProps} />;
+      return <Checkbox checked={value} onChange={(e, { checked, id }) => handleChange(checked)} {...restProps} />;
 
     if (type === 'number')
       return (
         <NumberInput
           value={!!value ? value : 0}
-          onChange={(e, { value }) => onChange(parseFloat(value))}
+          onChange={(e, { value }) => handleChange(parseFloat(value))}
           className={fieldState?.error?.message && styles.fieldError}
           onBlur={onBlur}
           ref={ref}
@@ -711,7 +808,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       return (
         <TextArea
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
           className={fieldState?.error?.message && styles.fieldError}
@@ -723,7 +820,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       return (
         <TextInput
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           ref={ref}
           onBlur={onBlur}
           className={fieldState?.error?.message && styles.fieldError}
@@ -735,7 +832,7 @@ const ControlledFieldInput = ({ name, control, type, ...restProps }) => {
       return (
         <ComboBox
           selectedItem={value}
-          onChange={({ selectedItem }) => onChange(selectedItem)}
+          onChange={({ selectedItem }) => handleChange(selectedItem)}
           onBlur={onBlur}
           ref={ref}
           className={fieldState?.error?.message && styles.fieldError}

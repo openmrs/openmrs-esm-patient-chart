@@ -1,5 +1,46 @@
 import useSWR from 'swr';
-import { openmrsFetch, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
+import useSWRInfinite from 'swr/infinite';
+import { openmrsFetch, useConfig, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
+import { type ChartConfig } from '../../config-schema';
+
+export function useInfiniteVisits(patientUuid: string) {
+  const config = useConfig<ChartConfig>();
+  const customRepresentation =
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+
+  const getKey = (pageIndex, previousPageData) => {
+    const pageSize = config.numberOfVisitsToLoad;
+
+    if (previousPageData && !previousPageData?.data?.links.some((link) => link.rel === 'next')) {
+      return null;
+    }
+
+    let url = `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${pageSize}`;
+
+    if (pageIndex) {
+      url += `&startIndex=${pageIndex * pageSize}`;
+    }
+
+    return url;
+  };
+
+  const { data, error, isLoading, isValidating, mutate, size, setSize } = useSWRInfinite(
+    patientUuid ? getKey : null,
+    openmrsFetch,
+    { parallel: true },
+  );
+
+  return {
+    visits: data ? [].concat(data?.flatMap((page) => page.data.results)) : null,
+    error,
+    hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
+    isLoading,
+    isValidating,
+    mutateVisits: mutate,
+    setSize,
+    size,
+  };
+}
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
@@ -11,12 +52,13 @@ export function useVisits(patientUuid: string) {
   );
   return {
     visits: data ? data?.data?.results : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutateVisits: mutate,
   };
 }
+
 export function useEncounters(patientUuid: string) {
   const endpointUrl = '/ws/rest/v1/encounter';
   // setting this up to make it more generic and usable later
@@ -244,6 +286,7 @@ export interface OrderItem {
     role: string;
   };
 }
+
 export interface Diagnosis {
   certainty: string;
   display: string;

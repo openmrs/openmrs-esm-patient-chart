@@ -160,6 +160,7 @@
   "unknown": "未知",
   "unsavedChanges": "您有未保存的更改",
   "unsavedChangesInForm": "There are unsaved changes in {{formName}}. Please save them before opening another form.",
+  "unsavedChangesInForms": "There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}",
   "updateError": "更新即将到来的预约时出现错误",
   "updateVisitDetails": "更新就诊详情",
   "visit": "就诊",

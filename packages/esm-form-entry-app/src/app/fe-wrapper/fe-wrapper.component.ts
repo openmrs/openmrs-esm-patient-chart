@@ -209,7 +209,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           isLowContrast: false,
         });
       } else {
-        const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
         this.formSubmissionService.submitPayload(this.form).subscribe(
           ({ encounter }) => {
             this.onPostResponse(encounter);
@@ -234,6 +233,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               kind: 'success',
               subtitle: this.translateService.instant('formSubmittedSuccessfully'),
               title: this.form.schema.display ?? this.form.schema.name,
+              timeoutInMs: 5000,
             });
 
             this.closeForm();
