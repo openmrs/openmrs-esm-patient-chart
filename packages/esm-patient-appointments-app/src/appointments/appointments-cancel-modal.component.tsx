@@ -20,10 +20,9 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCancel = async () => {
-    const abortController = new AbortController();
     setIsSubmitting(true);
 
-    cancelAppointment('Cancelled', appointmentUuid, abortController)
+    cancelAppointment('Cancelled', appointmentUuid)
       .then(({ status }) => {
         if (status === 200) {
           mutate();
