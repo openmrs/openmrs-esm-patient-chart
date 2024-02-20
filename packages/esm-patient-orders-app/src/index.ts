@@ -10,6 +10,7 @@ import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
 import OrdersSummary from './orders-summary/orders-summary.component';
+import { testResultsFormWorkspace } from './constants';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -39,6 +40,13 @@ registerWorkspace({
   title: translateFrom(moduleName, 'orderBasketWorkspaceTitle', 'Order Basket'),
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
+  canHide: true,
+});
+registerWorkspace({
+  name: testResultsFormWorkspace,
+  title: 'Enter Test Results',
+  load: getAsyncLifecycle(() => import('../src/results/result-form.component'), options),
+  type: 'results',
   canHide: true,
 });
 

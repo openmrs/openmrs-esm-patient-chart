@@ -33,6 +33,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
+  launchPatientWorkspace,
   PatientChartPagination,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
@@ -86,6 +87,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+
+  const config = useConfig();
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -428,14 +431,16 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
+  //const ordersConfig = await getConfig(moduleName);
 
   const handleViewEditClick = useCallback(() => {
     // openOrderForm({ order: orderItem });
   }, [orderItem, openOrderForm]);
 
   const handleAddResultsClick = useCallback(() => {
-    // openOrderForm({ order: orderItem, addResults: true });
-  }, [orderItem, openOrderForm]);
+    //launchResultsForm();
+    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
+  }, []);
 
   const handleCancelClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
@@ -465,11 +470,15 @@ function OrderBasketItemActions({
         onClick={handleViewEditClick}
         disabled={alreadyInBasket}
       />
-      {!orderItem.fulfillerStatus && (
+      {orderItem.type === 'testorder' && (
         <OverflowMenuItem
           className={styles.menuItem}
           id="reorder"
-          itemText={t('addResults', 'Add Results')}
+          itemText={
+            orderItem.fulfillerStatus === 'COMPLETED'
+              ? t('editResults', 'Edit Results')
+              : t('addResults', 'Add Results')
+          }
           onClick={handleAddResultsClick}
           disabled={alreadyInBasket}
         />

@@ -1,9 +1,4 @@
-import {
-  LabOrderBasketItem,
-  type DrugOrderBasketItem,
-  type Order,
-  type OrderAction,
-} from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem, type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
 
 export function orderPriorityToColor(priority) {
   switch (priority) {
