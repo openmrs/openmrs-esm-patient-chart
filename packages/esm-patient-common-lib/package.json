@@ -7,7 +7,7 @@
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
+    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
     "typescript": "tsc"
   },
