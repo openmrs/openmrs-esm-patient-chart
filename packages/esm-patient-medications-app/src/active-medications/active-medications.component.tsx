@@ -15,27 +15,32 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) =>
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
-
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  const renderSkeleton = () => <DataTableSkeleton role="progressbar" />;
+  const renderErrorState = () => <ErrorState error={error} headerTitle={headerTitle} />;
+  const renderMedicationsTable = () => (
+    <MedicationsDetailsTable
+      isValidating={isValidating}
+      title={t('activeMedicationsTableTitle', 'Active Medications')}
+      medications={activePatientOrders}
+      showDiscontinueButton={true}
+      showModifyButton={true}
+      showReorderButton={false}
+      patientUuid={patientUuid}
+    />
+  );
+  const renderEmptyState = () => (
+    <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />
+  );
 
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
-
-  if (activePatientOrders?.length) {
-    return (
-      <MedicationsDetailsTable
-        isValidating={isValidating}
-        title={t('activeMedicationsTableTitle', 'Active Medications')}
-        medications={activePatientOrders}
-        showDiscontinueButton={true}
-        showModifyButton={true}
-        showReorderButton={false}
-        patientUuid={patientUuid}
-      />
-    );
-  }
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
+  return isLoading
+    ? renderSkeleton()
+    : error
+    ? renderErrorState()
+    : activePatientOrders?.length
+    ? renderMedicationsTable()
+    : renderEmptyState();
 };
 
 export default ActiveMedications;
