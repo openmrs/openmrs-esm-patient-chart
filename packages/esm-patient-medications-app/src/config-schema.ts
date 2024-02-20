@@ -31,10 +31,10 @@ export const configSchema = {
     _description: 'The maximum number of days for medication dispensing.',
   },
   debounceDelayInMs: {
-    _type: 'integer',
+    _type: Type.Number,
     _description:
-      'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 500ms by default',
-    _default: 500,
+      'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
+    _default: 300,
   },
 };
 
