@@ -1,9 +1,9 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { useTestTypes } from './useTestTypes';
-import { defineConfigSchema, getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject, configSchema } from '../../config-schema';
-import useSWRImmutable from 'swr/immutable';
 import { useEffect, useRef, useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
+import { renderHook, waitFor } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { useTestTypes } from './useTestTypes';
+import { configSchema } from '../../config-schema';
 
 jest.mock('swr/immutable');
 
