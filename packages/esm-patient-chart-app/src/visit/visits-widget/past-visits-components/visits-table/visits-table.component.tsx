@@ -37,7 +37,7 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
@@ -139,15 +139,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
+              mutateVisits?.();
               showSnackbar({
+                isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
                 subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
-              mutateVisits?.();
             })
             .catch(() => {
               showSnackbar({
+                isLowContrast: false,
                 title: t('error', 'Error'),
                 subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
                 kind: 'error',
@@ -172,10 +174,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     );
   };
 
+  // All encounters tab in visits
   if (!visits?.length) {
-    return (
-      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
-    );
+    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('encounters', 'Encounters')} />;
   }
 
   return (

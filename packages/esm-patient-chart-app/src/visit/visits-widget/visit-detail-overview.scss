@@ -91,7 +91,7 @@
 
 .encounterEmptyState {
   text-align: center;
-  margin: 0 1rem 1rem 1rem; 
+  margin: 0 1rem 1rem 1rem;
 }
 
 .observation {
@@ -129,10 +129,12 @@
 
 .medicationRecord {
   display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  @include type.type-style('body-01');
-  color: $text-02;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .bodyLong01 {
+    margin: 0.25rem 0;
+  }
 }
 
 .medicationContainer {
@@ -166,7 +168,7 @@
 .metadata {
   @include type.type-style('label-01');
   color: $text-02;
-  margin: spacing.$spacing-02 0;
+  margin: spacing.$spacing-03 0 spacing.$spacing-05;
 }
 
 .observationsEmptyState {
@@ -187,6 +189,16 @@
   align-items: center;
 }
 
+.loadMoreButton {
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .header {
@@ -197,4 +209,3 @@ html[dir='rtl'] {
     }
   }
 }
-

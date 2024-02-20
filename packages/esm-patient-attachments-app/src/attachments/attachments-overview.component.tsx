@@ -1,51 +1,61 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showSnackbar, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, Loading } from '@carbon/react';
+import { Add, List, Thumbnail_2 } from '@carbon/react/icons';
+import {
+  createAttachment,
+  deleteAttachmentPermanently,
+  showModal,
+  showSnackbar,
+  useAttachments,
+  useLayoutType,
+  UserHasAccess,
+  type Attachment,
+  type UploadedFile,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
-import { type UploadedFile, type Attachment } from '../attachments-types';
+import { useAllowedExtensions } from './use-allowed-extensions';
+import AttachmentPreview from './attachment-preview.component';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
-import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
-import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 
-const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+interface AttachmentsOverviewProps {
+  patientUuid: string;
+}
+
+interface SwitchEventHandlersParams {
+  index?: number;
+  name?: string | number;
+  text?: string;
+  key?: string | number;
+}
+
+type ViewType = 'grid' | 'table';
+
+const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }) => {
+  const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
+  const { allowedExtensions } = useAllowedExtensions();
+
   const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
+  const [hasUploadError, setHasUploadError] = useState(false);
+  const [view, setView] = useState<ViewType>('grid');
+
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
-  const [error, setError] = useState(false);
-  const [view, setView] = useState('grid');
-  const isTablet = useLayoutType() === 'tablet';
+  const closeImageOrPdfPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
-  const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
-
-  useEffect(() => {
-    if (error === true) {
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'error',
-        subtitle: t('fileUnsupported', 'File uploaded is not supported'),
-        title: t('errorUploading', 'Error uploading a file'),
-      });
-      setError(false);
-    }
-  }, [error, t]);
-
-  const showCam = useCallback(() => {
-    const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
-      closeModal: () => {
-        close();
-      },
-      onCompletion: () => mutate(),
-      multipleFiles: true,
-      collectDescription: true,
+  if (hasUploadError) {
+    showSnackbar({
+      isLowContrast: true,
+      kind: 'error',
+      subtitle: t('unsupportedFileType', 'Unsupported file type'),
+      title: t('uploadError', 'Error uploading file'),
     });
-  }, [patientUuid, mutate]);
+    setHasUploadError(false);
+  }
 
   const deleteAttachment = useCallback(
     (attachment: Attachment) => {
@@ -56,15 +66,15 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
           showSnackbar({
             title: t('fileDeleted', 'File deleted'),
-            subtitle: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
+            subtitle: `${attachment.filename} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
             isLowContrast: true,
           });
         })
-        .catch((error) => {
+        .catch(() => {
           showSnackbar({
             title: t('error', 'Error'),
-            subtitle: `${attachment.title} ${t('failedDeleting', "couldn't be deleted")}`,
+            subtitle: `${attachment.filename} ${t('failedDeleting', "couldn't be deleted")}`,
             kind: 'error',
           });
         });
@@ -72,7 +82,32 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     [mutate, t, setAttachmentToPreview],
   );
 
-  const deleteAttachmentModal = useCallback(
+  const openAttachment = useCallback(
+    (attachment: Attachment) => {
+      if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
+        setAttachmentToPreview(attachment);
+      } else {
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', attachment.src);
+        anchor.setAttribute('download', attachment.filename);
+        anchor.click();
+      }
+    },
+    [setAttachmentToPreview],
+  );
+
+  const showAddAttachmentModal = useCallback(() => {
+    const close = showModal('capture-photo-modal', {
+      saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
+      allowedExtensions: allowedExtensions,
+      closeModal: () => close(),
+      onCompletion: () => mutate(),
+      multipleFiles: true,
+      collectDescription: true,
+    });
+  }, [patientUuid, mutate, allowedExtensions]);
+
+  const showDeleteAttachmentModal = useCallback(
     (attachment: Attachment) => {
       const close = showModal('delete-attachment-modal', {
         attachment: attachment,
@@ -86,73 +121,66 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     [deleteAttachment],
   );
 
-  const openAttachment = useCallback(
-    (attachment: Attachment) => {
-      if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
-        setAttachmentToPreview(attachment);
-      } else {
-        const anchor = document.createElement('a');
-        anchor.setAttribute('href', attachment.src);
-        anchor.setAttribute('download', attachment.title);
-        anchor.click();
-      }
-    },
-    [setAttachmentToPreview],
-  );
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
   if (!attachments.length) {
     return (
       <EmptyState
         displayText={t('attachmentsInLowerCase', 'attachments')}
         headerTitle={t('attachmentsInProperFormat', 'Attachments')}
-        launchForm={showCam}
+        launchForm={showAddAttachmentModal}
       />
     );
   }
 
   return (
     <UserHasAccess privilege="View Attachments">
-      <div onDragOverCapture={showCam} className={styles.overview}>
-        <div id="container">
+      <div onDragOverCapture={showAddAttachmentModal} className={styles.overview}>
+        <>
           <CardHeader title={t('attachments', 'Attachments')}>
             <div className={styles.validatingDataIcon}>{isValidating && <Loading withOverlay={false} small />}</div>
             <div className={styles.attachmentHeaderActionItems}>
-              <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)} size={isTablet ? 'md' : 'sm'}>
-                <Switch name="grid">
+              <ContentSwitcher
+                onChange={(event: SwitchEventHandlersParams) => setView(event.name.toString() as ViewType)}
+                size={isTablet ? 'md' : 'sm'}
+              >
+                <IconSwitch name="grid" text={t('gridView', 'Grid view')}>
                   <Thumbnail_2 size={16} />
-                </Switch>
-                <Switch name="tabular">
+                </IconSwitch>
+                <IconSwitch name="tabular" text={t('tableView', 'Table view')}>
                   <List size={16} />
-                </Switch>
+                </IconSwitch>
               </ContentSwitcher>
               <div className={styles.divider} />
-              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
+              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showAddAttachmentModal}>
                 {t('add', 'Add')}
               </Button>
             </div>
           </CardHeader>
           {view === 'grid' ? (
             <AttachmentsGridOverview
-              openAttachment={openAttachment}
-              deleteAttachment={deleteAttachmentModal}
-              isLoading={isLoading}
               attachments={attachments}
+              isLoading={isLoading}
+              onOpenAttachment={openAttachment}
             />
           ) : (
             <AttachmentsTableOverview
-              openAttachment={openAttachment}
-              deleteAttachment={deleteAttachmentModal}
-              isLoading={isLoading}
               attachments={attachments}
+              isLoading={isLoading}
+              onDeleteAttachment={showDeleteAttachmentModal}
+              onOpenAttachment={openAttachment}
             />
           )}
-        </div>
+        </>
       </div>
       {attachmentToPreview && (
         <AttachmentPreview
-          closePreview={closeImagePDFPreview}
+          key={attachmentToPreview.id}
           attachmentToPreview={attachmentToPreview}
-          deleteAttachment={deleteAttachmentModal}
+          onClosePreview={closeImageOrPdfPreview}
+          onDeleteAttachment={showDeleteAttachmentModal}
         />
       )}
     </UserHasAccess>

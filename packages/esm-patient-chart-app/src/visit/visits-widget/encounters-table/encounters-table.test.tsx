@@ -6,8 +6,6 @@ import { renderWithSwr } from 'tools';
 import { mockEncounters2 } from '__mocks__';
 import EncountersTable from './encounters-table.component';
 
-jest.setTimeout(10000);
-
 const testProps = {
   showAllEncounters: true,
   encounters: mockEncounters2,

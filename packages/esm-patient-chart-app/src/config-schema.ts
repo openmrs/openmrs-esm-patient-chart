@@ -118,8 +118,12 @@ export const esmPatientChartSchema = {
       "Whether the visit location field in the Start Visit form should be view-only. If so, the visit location will always be set to the user's login location.",
     _default: false,
   },
+  numberOfVisitsToLoad: {
+    _type: Type.Number,
+    _description: 'The number of visits to load initially in the Visits Summary tab. Defaults to 5',
+    _default: 5,
+  },
 };
-
 export interface ChartConfig {
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
@@ -141,17 +145,5 @@ export interface ChartConfig {
     name: string;
   };
   disableChangingVisitLocation: boolean;
-}
-
-export const configSchema = {
-  contactAttributeType: {
-    _type: Type.UUID,
-    _description:
-      'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
-    _default: [],
-  },
-};
-
-export interface ConfigObject {
-  contactAttributeType: Array<string>;
+  numberOfVisitsToLoad: number;
 }

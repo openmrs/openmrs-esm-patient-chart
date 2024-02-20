@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-orders-app",
-  "version": "6.1.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "Microfrontend for the OpenMRS SPA providing the order basket for the patient chart",
   "browser": "dist/openmrs-esm-patient-orders-app.js",
@@ -12,7 +12,7 @@
     "debug": "npm run serve",
     "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
+    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
@@ -38,12 +38,12 @@
   },
   "dependencies": {
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^6.1.0",
+    "@openmrs/esm-patient-common-lib": "^7.0.1",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "5.x",
+    "@openmrs/esm-patient-common-lib": "7.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

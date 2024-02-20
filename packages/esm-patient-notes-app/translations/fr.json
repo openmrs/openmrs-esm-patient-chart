@@ -1,8 +1,8 @@
 {
   "add": "Ajouter",
   "addImage": "Ajouter une image",
-  "addImageToVisit": "Ajoutez une image à cette visite",
   "addVisitNote": "Ajouter une note de visite",
+  "changeImage": "Change image",
   "clinicalNoteLabel": "Ajouter une note additionnelle",
   "clinicalNotePlaceholder": "Ajouter les points additionnels ici",
   "date": "Date",

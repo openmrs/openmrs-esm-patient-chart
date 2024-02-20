@@ -1,21 +1,19 @@
 import React from 'react';
-import classNames from 'classnames';
 import { SkeletonPlaceholder } from '@carbon/react';
-import { type Attachment } from '../attachments-types';
+import { type Attachment } from '@openmrs/esm-framework';
 import AttachmentThumbnail from './attachment-thumbnail.component';
 import styles from './attachments-grid-overview.scss';
 
 interface AttachmentsGridOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
-  deleteAttachment: (attachment: Attachment) => void;
-  openAttachment: (attachment: Attachment) => void;
+  onOpenAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
   attachments,
   isLoading,
-  openAttachment,
+  onOpenAttachment: openAttachment,
 }) => {
   if (isLoading) {
     return (
@@ -30,26 +28,22 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
 
   return (
     <div className={styles.galleryContainer}>
-      {attachments.map((attachment, indx) => {
+      {attachments.map((attachment, i) => {
         const imageProps = {
           src: attachment.src,
-          title: attachment.title,
+          title: attachment.filename,
           style: {},
-          onClick: () => {
-            openAttachment(attachment);
-          },
+          onClick: () => openAttachment(attachment),
         };
-        const item = {
-          id: attachment.id,
-          dateTime: attachment.dateTime,
-          bytesMimeType: attachment.bytesMimeType,
-          bytesContentFamily: attachment.bytesContentFamily,
-        };
+
+        const { id, dateTime, bytesMimeType, bytesContentFamily } = attachment;
+        const item = { id, dateTime, bytesMimeType, bytesContentFamily };
+
         return (
-          <div key={indx}>
+          <div key={i}>
             <AttachmentThumbnail imageProps={imageProps} item={item} />
-            <p className={styles.bodyLong01}>{attachment.title}</p>
-            <p className={classNames(styles.bodyLong01, styles.muted)}>{attachment.dateTime}</p>
+            <p className={styles.title}>{attachment.filename}</p>
+            <p className={styles.muted}>{attachment.dateTime}</p>
           </div>
         );
       })}

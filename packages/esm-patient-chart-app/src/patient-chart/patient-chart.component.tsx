@@ -77,7 +77,7 @@ const PatientChart: React.FC = () => {
             </>
           )}
         </div>
-        <ActionMenu open={false} />
+        <ActionMenu />
       </>
     </main>
   );

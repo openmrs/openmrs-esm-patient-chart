@@ -18,6 +18,7 @@ import patientChartPageComponent from './root.component';
 import markPatientAliveActionButtonComponent from './actions-buttons/mark-patient-alive.component';
 import markPatientDeceasedActionButtonComponent from './actions-buttons/mark-patient-deceased.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
+import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
@@ -132,7 +133,7 @@ export const addPastVisitActionButton = getSyncLifecycle(addPastVisitActionButto
   moduleName,
 });
 
-export const startVisitPatientSearchActionButton = getSyncLifecycle(startVisitActionButtonComponent, {
+export const startVisitPatientSearchActionButton = getSyncLifecycle(startVisitActionButtonOnPatientSearch, {
   featureName: 'start-visit-button-patient-search',
   moduleName,
 });

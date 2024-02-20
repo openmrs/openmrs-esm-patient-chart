@@ -7,8 +7,6 @@ import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import NotesOverview from './notes-overview.component';
 import { useVisitNotes } from './visit-notes.resource';
 
-jest.setTimeout(20000);
-
 const testProps = {
   basePath: patientChartBasePath,
   patient: mockPatient,

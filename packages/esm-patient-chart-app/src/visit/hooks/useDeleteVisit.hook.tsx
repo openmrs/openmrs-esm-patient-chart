@@ -36,30 +36,35 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
   const initiateDeletingVisit = () => {
     setIsDeletingVisit(true);
-    const isCurrentVisitDeleted = !visit?.stopDatetime;
+    const isCurrentVisitDeleted = !visit?.stopDatetime; // True if it's an active visit
 
     deleteVisit(visit?.uuid)
       .then(() => {
         mutateVisits();
         mutateCurrentVisit();
         // TODO: Needs to be replaced with Actionable Snackbar when Actionable
-        showActionableNotification({
-          title: !isCurrentVisitDeleted
-            ? t('visitDeleted', '{{visit}} deleted', {
-                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-              })
-            : t('visitCancelled', 'Visit cancelled'),
-          kind: 'success',
-          subtitle: !isCurrentVisitDeleted
-            ? t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
-                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-              })
-            : t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
-                visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-              }),
-          actionButtonLabel: t('undo', 'Undo'),
-          onActionButtonClick: restoreDeletedVisit,
-        });
+        if (!isCurrentVisitDeleted) {
+          showActionableNotification({
+            title: t('visitDeleted', '{{visit}} deleted', {
+              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            }),
+            subtitle: t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
+              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            }),
+            kind: 'success',
+            actionButtonLabel: t('undo', 'Undo'),
+            onActionButtonClick: restoreDeletedVisit,
+          });
+        } else {
+          showSnackbar({
+            title: t('visitCancelled', 'Visit cancelled'),
+            subtitle: t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
+              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            }),
+            isLowContrast: true,
+            kind: 'success',
+          });
+        }
         onVisitDelete?.();
       })
       .catch(() => {

@@ -45,6 +45,18 @@
   color: $text-02;
 }
 
+.imgThumbnailContainer {
+  height: 5rem;
+  width: 6rem;
+  margin-top: spacing.$spacing-04;
+}
+
+.imgThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .button {
   height: 4rem;
   display: flex;

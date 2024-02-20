@@ -1,14 +1,12 @@
 import React from 'react';
-import { render, renderHook, screen, within } from '@testing-library/react';
+import { render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
-import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
-import { type LabOrderBasketItem } from '../api';
+import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import { type PostDataPrepLabOrderFunction } from '../api';
 import { age, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
-
-jest.setTimeout(10000);
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -90,46 +88,66 @@ describe('AddLabOrder', () => {
   });
 
   test('happy path fill and submit form', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
-    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
     const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Order form');
-    await userEvent.click(cd4OrderButton);
+    await user.click(cd4OrderButton);
 
     const testType = screen.getByRole('combobox', { name: 'Test type' });
     expect(testType).toBeInTheDocument();
     expect(testType).toHaveValue('CD4 COUNT');
 
+    const labReferenceNumber = screen.getByRole('textbox', { name: 'Lab reference number' });
+    expect(labReferenceNumber).toBeInTheDocument();
+    await user.type(labReferenceNumber, 'lba-000124');
+
     const priority = screen.getByRole('combobox', { name: 'Priority' });
     expect(priority).toBeInTheDocument();
-    await userEvent.click(priority);
-    await userEvent.click(screen.getByText(/Stat/i));
+    await user.click(priority);
+    await user.click(screen.getByText(/Stat/i));
+
     const additionalInstructions = screen.getByRole('textbox', { name: 'Additional instructions' });
     expect(additionalInstructions).toBeInTheDocument();
-    await userEvent.type(additionalInstructions, 'plz do it thx');
+    await user.type(additionalInstructions, 'plz do it thx');
     const submit = screen.getByRole('button', { name: 'Save order' });
+
     expect(submit).toBeInTheDocument();
-    await userEvent.click(submit);
-    const labsOrderBasket = orderBasketStore.getState().items[ptUuid]['labs'] as Array<LabOrderBasketItem>;
-    expect(labsOrderBasket.length).toBe(1);
-    expect(labsOrderBasket[0].testType.conceptUuid).toBe('test-lab-uuid-2');
-    expect(labsOrderBasket[0].urgency).toBe('STAT');
-    expect(labsOrderBasket[0].instructions).toBe('plz do it thx');
+    await user.click(submit);
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([
+        expect.objectContaining({
+          urgency: 'STAT',
+          instructions: 'plz do it thx',
+          labReferenceNumber: 'lba-000124',
+          testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
+          careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
+          orderer: 'test-provider-uuid',
+        }),
+      ]);
+    });
+
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('from lab search, click add directly to order basket', async () => {
+    const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepFunction),
     );
     renderAddLabOrderWorkspace();
-    await userEvent.type(screen.getByRole('searchbox'), 'cd4');
+    await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
     const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Add to basket');
-    await userEvent.click(cd4OrderButton);
+    await user.click(cd4OrderButton);
     expect(hookResult.current.orders).toEqual([
       { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
     ]);
@@ -137,6 +155,7 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
+
   test('back to order basket', async () => {
     const user = userEvent.setup();
     const { mockCloseWorkspace } = renderAddLabOrderWorkspace();

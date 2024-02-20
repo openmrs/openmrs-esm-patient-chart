@@ -159,6 +159,10 @@ export interface FormSchemaAndTranslations extends FormSchema {
   translations?: Record<string, string>;
 }
 
+export interface PreFilledQuestions {
+  [key: string]: string;
+}
+
 interface Sections {
   isExpanded: boolean;
   label: string;

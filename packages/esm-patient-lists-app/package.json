@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-lists-app",
-  "version": "6.1.0",
+  "version": "7.0.1",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient lists in the Patient Chart",
   "browser": "dist/openmrs-esm-patient-lists-app.js",
@@ -11,7 +11,7 @@
     "serve": "webpack serve --mode=development",
     "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "TIMING=1 eslint src --ext js,jsx,ts,tsx",
+    "lint": "cross-env eslint src --ext js,jsx,ts,tsx --fix --max-warnings=0",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
@@ -42,7 +42,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "5.x",
+    "@openmrs/esm-patient-common-lib": "7.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

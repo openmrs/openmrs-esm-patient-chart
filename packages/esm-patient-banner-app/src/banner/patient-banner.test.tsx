@@ -1,9 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { useConnectedExtensions } from '@openmrs/esm-framework';
-import { mockPatient } from 'tools';
 import PatientBanner from './patient-banner.component';
+import { mockPatient } from 'tools';
+import { defineConfigSchema, useConnectedExtensions } from '@openmrs/esm-framework';
+import { configSchema } from '../config-schema';
+
+defineConfigSchema('@openmrs/esm-patient-banner-app', configSchema);
 
 class ResizeObserverMock {
   callback: any;
@@ -27,17 +30,10 @@ const testProps = {
 const mockNavigateTo = jest.fn();
 const mockUseConnectedExtensions = useConnectedExtensions as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  useVisit: jest.fn(),
-  age: jest.fn(),
-  Breakpoint: { TABLET_MAX: 1023 },
-  useConnectedExtensions: jest.fn(() => [{}, {}]),
-}));
-
 describe('PatientBanner: ', () => {
   it('renders information about a patient in a banner above the patient chart', () => {
     window.ResizeObserver = ResizeObserverMock;
+    mockUseConnectedExtensions.mockReturnValue([{ id: 'Some action extension' }]);
 
     renderPatientBanner();
 
@@ -53,7 +49,7 @@ describe('PatientBanner: ', () => {
     expect(screen.getByRole('button', { name: /^Show details$/i })).toBeInTheDocument();
   });
 
-  it('shoulld not render actions menu if no actions connected', () => {
+  it('should not render actions menu if no actions connected', () => {
     window.ResizeObserver = ResizeObserverMock;
     mockUseConnectedExtensions.mockReturnValue([]); // override the default mock to one that returns an empty array
 

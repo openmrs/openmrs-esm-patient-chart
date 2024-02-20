@@ -14,8 +14,6 @@ import {
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.component';
 
-jest.setTimeout(10000);
-
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),

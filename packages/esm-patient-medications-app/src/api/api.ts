@@ -84,7 +84,6 @@ export function prepMedicationOrderPostData(
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
-      dateActivated: toOmrsIsoString(new Date()),
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -113,7 +112,6 @@ export function prepMedicationOrderPostData(
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
-      dateActivated: toOmrsIsoString(new Date()),
     };
   } else if (order.action === 'DISCONTINUE') {
     return {

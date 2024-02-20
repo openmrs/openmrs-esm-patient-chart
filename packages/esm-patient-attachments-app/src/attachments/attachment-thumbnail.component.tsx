@@ -1,6 +1,25 @@
 import React from 'react';
-import styles from './attachment-thumbnail.scss';
 import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
+import styles from './attachment-thumbnail.scss';
+
+type AttachmentThumbnailProps = {
+  imageProps: ImageProps;
+  item: ItemProps;
+};
+
+type ImageProps = {
+  src: string;
+  title: string;
+  style: Object;
+  onClick?: () => void;
+};
+
+type ItemProps = {
+  id: string;
+  dateTime: string;
+  bytesMimeType: string;
+  bytesContentFamily: string;
+};
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
   return (
@@ -52,22 +71,3 @@ function Thumbnail(props: AttachmentThumbnailProps) {
     return <OtherThumbnail {...imageProps} />;
   }
 }
-
-type AttachmentThumbnailProps = {
-  imageProps: ImageProps;
-  item: ItemProps;
-};
-
-type ImageProps = {
-  src: string;
-  title: string;
-  style: Object;
-  onClick?: () => void;
-};
-
-type ItemProps = {
-  id: string;
-  dateTime: string;
-  bytesMimeType: string;
-  bytesContentFamily: string;
-};
