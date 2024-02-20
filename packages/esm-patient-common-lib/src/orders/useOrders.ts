@@ -1,4 +1,4 @@
-import useSWR, { mutate, useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useCallback, useMemo } from 'react';
 import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
@@ -7,7 +7,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', orderType?: string) {
   const { mutate } = useSWRConfig();
-  const baseOrdersUrl = `${restBaseUrl}/order?patient=${patientUuid}&v=full&careSetting=${careSettingUuid}&status=${status}`;
+  const baseOrdersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderType=${orderType}` : baseOrdersUrl;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
@@ -53,4 +53,16 @@ export function useOrderTypes() {
     isLoading,
     isValidating,
   };
+}
+
+export function getDrugOrderByUuid(orderUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
+    'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
+    'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+    'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
+    'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
+    'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+
+  return openmrsFetch(`/ws/rest/v1/order/${orderUuid}?v=${customRepresentation}`);
 }

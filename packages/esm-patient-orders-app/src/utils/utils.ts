@@ -1,4 +1,9 @@
-import { type DrugOrderBasketItem, type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
+import {
+  LabOrderBasketItem,
+  type DrugOrderBasketItem,
+  type Order,
+  type OrderAction,
+} from '@openmrs/esm-patient-common-lib';
 
 export function orderPriorityToColor(priority) {
   switch (priority) {
@@ -105,15 +110,21 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
 export function buildLabOrder(order: Order, action?: OrderAction) {
   return {
     uuid: order.uuid,
+    action: action,
     display: order.display,
     previousOrder: null,
-    action: action,
-    asNeeded: order.asNeeded,
-    asNeededCondition: order.asNeededCondition,
-    concept: order.concept,
-    startDate: order.dateActivated,
     orderer: order.orderer.uuid,
     careSetting: order.careSetting.uuid,
+    instructions: order.instructions,
+    urgency: order.urgency,
+    labReferenceNumber: order.labReferenceNumber,
+    testType: {
+      label: order.concept.display,
+      conceptUuid: order.concept.uuid,
+    },
     orderNumber: order.orderNumber,
+    concept: order.concept.uuid,
+    orderType: order.orderType.uuid,
+    specimenSource: null,
   };
 }

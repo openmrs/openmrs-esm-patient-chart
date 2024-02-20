@@ -124,6 +124,7 @@ export interface Order {
   clinicalHistory: string;
   numberOfRepeats: string;
   type: string;
+  labReferenceNumber?: string;
 }
 
 export interface OrderTypeFetchResponse {
@@ -173,10 +174,13 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
 }
 
 export interface LabOrderBasketItem extends OrderBasketItem {
-  display: string;
-  previousOrder: string;
-  asNeeded: boolean;
-  asNeededCondition: string;
-  startDate: Date | string;
-  orderNumber: string;
+  testType?: {
+    label: string;
+    conceptUuid: string;
+  };
+  labReferenceNumber?: string;
+  urgency?: string;
+  instructions?: string;
+  previousOrder?: string;
+  orderReason?: string;
 }

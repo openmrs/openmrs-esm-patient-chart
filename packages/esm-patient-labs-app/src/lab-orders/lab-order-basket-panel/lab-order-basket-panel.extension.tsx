@@ -9,6 +9,7 @@ import {
   type OrderBasketItem,
   useOrderBasket,
   closeWorkspace,
+  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepLabOrderPostData } from '../api';
@@ -21,7 +22,7 @@ import styles from './lab-order-basket-panel.scss';
 export default function LabOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
 
   const openNewLabForm = useCallback(() => {

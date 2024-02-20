@@ -34,10 +34,10 @@ import {
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
-  launchPatientWorkspace,
   usePatientOrders,
   type DrugOrderBasketItem,
   type LabOrderBasketItem,
+  getDrugOrderByUuid,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
@@ -73,8 +73,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
-  const [orderBasketName, setOrderBasketName] = useState('');
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderBasketName);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
 
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
@@ -84,7 +83,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     error: isError,
     isLoading,
     isValidating,
-  } = usePatientOrders(patientUuid, selectedOrderTypeUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -333,12 +332,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                       {!isPrinting && (
                         <TableCell className="cds--table-column-menu">
                           <OrderBasketItemActions
-                            orderItem={allOrders.find((x) => x.uuid === row.id)}
+                            orderItem={allOrders[rowIndex]}
                             items={orders}
-                            setItems={setOrders}
+                            setOrderItems={setOrders}
                             openOrderBasket={launchOrderBasket}
                             openOrderForm={launchOrderBasket}
-                            setOrderBasketName={setOrderBasketName}
                           />
                         </TableCell>
                       )}
@@ -395,17 +393,15 @@ function InfoTooltip({ orderer }: { orderer: string }) {
 function OrderBasketItemActions({
   orderItem,
   items,
-  setItems,
+  setOrderItems,
   openOrderBasket,
   openOrderForm,
-  setOrderBasketName,
 }: {
   orderItem: Order;
   items: Array<MutableOrderBasketItem>;
-  setItems: (items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (orderType: 'labs' | 'medications', items: Array<MutableOrderBasketItem>) => void;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
-  setOrderBasketName: (orderType: string) => void;
 }) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -421,15 +417,16 @@ function OrderBasketItemActions({
 
   const handleCancelClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
-      setOrderBasketName(medicationsOrderBasket);
-      setItems([...items, buildMedicationOrder(orderItem, 'DISCONTINUE')]);
-      openOrderBasket();
+      getDrugOrderByUuid(orderItem.uuid).then((res) => {
+        let medicationOrder = res.data;
+        setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
+        openOrderBasket();
+      });
     } else {
-      setOrderBasketName(labsOrderBasket);
-      setItems([...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     }
-  }, [orderItem, items, setItems, openOrderBasket]);
+  }, [orderItem, items, setOrderItems, openOrderBasket]);
 
   return (
     <OverflowMenu
@@ -460,7 +457,7 @@ function OrderBasketItemActions({
         id="discontinue"
         itemText={t('cancelOrder', 'Cancel Order')}
         onClick={handleCancelClick}
-        disabled={orderItem.action === 'DISCONTINUE'}
+        disabled={alreadyInBasket || orderItem.action === 'DISCONTINUE'}
         isDelete={true}
         hasDivider
       />

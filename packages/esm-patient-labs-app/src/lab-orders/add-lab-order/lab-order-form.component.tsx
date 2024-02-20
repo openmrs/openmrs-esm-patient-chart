@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  type LabOrderBasketItem,
+  type DefaultWorkspaceProps,
+  launchPatientWorkspace,
+  promptBeforeClosing,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -37,9 +43,7 @@ const labOrderFormSchema = z.object({
   urgency: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
   }),
-  labReferenceNumber: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
-  }),
+  labReferenceNumber: z.string().optional(),
   testType: z.object(
     { label: z.string(), conceptUuid: z.string() },
     {

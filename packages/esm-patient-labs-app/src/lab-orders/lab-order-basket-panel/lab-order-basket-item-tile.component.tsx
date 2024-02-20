@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { type LabOrderBasketItem } from '../api';
 import styles from './lab-order-basket-item-tile.scss';
+import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: LabOrderBasketItem;
@@ -40,9 +40,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
     >
       <div className={styles.orderBasketItemTile}>
         <div className={styles.clipTextWithEllipsis}>
-          <span className={labelClassName}>
-            {orderBasketItem.isOrderIncomplete ? t('incomplete', 'Incomplete') : t('orderActionNew', 'New')}
-          </span>
+          <OrderActionLabel orderBasketItem={orderBasketItem} />
           <br />
           <>
             <span className={styles.name}>{orderBasketItem.testType?.label}</span>
@@ -75,4 +73,25 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
       </div>
     </ClickableTile>
   );
+}
+
+function OrderActionLabel({ orderBasketItem }: { orderBasketItem: LabOrderBasketItem }) {
+  const { t } = useTranslation();
+
+  if (orderBasketItem.isOrderIncomplete) {
+    return <span className={styles.orderActionIncompleteLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
+  }
+
+  switch (orderBasketItem.action) {
+    case 'NEW':
+      return <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;
+    case 'RENEW':
+      return <span className={styles.orderActionRenewLabel}>{t('orderActionRenew', 'Renew')}</span>;
+    case 'REVISE':
+      return <span className={styles.orderActionRevisedLabel}>{t('orderActionRevise', 'Modify')}</span>;
+    case 'DISCONTINUE':
+      return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionDiscontinue', 'Discontinue')}</span>;
+    default:
+      return <></>;
+  }
 }
