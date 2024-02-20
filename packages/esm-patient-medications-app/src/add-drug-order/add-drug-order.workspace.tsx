@@ -6,6 +6,9 @@ import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import type { DrugOrderBasketItem } from '../types';
 import { ordersEqual } from './drug-search/helpers';
+import { Tile } from '@carbon/react';
+import styles from './drug-order-form.scss';
+import { useTranslation } from 'react-i18next';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
@@ -17,6 +20,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
+  const { t } = useTranslation();
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace();
@@ -38,7 +42,7 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
       finalizedOrder.careSetting = careSettingUuid;
-      finalizedOrder.orderer = session.currentProvider.uuid;
+      finalizedOrder.orderer = session?.currentProvider?.uuid;
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       if (existingOrder) {
@@ -54,8 +58,23 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
       closeWorkspace();
       launchPatientWorkspace('order-basket');
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid],
   );
+
+  if (session.currentProvider == null) {
+    return (
+      <div className={styles.tileContainer}>
+        <Tile className={styles.tile}>
+          <div className={styles.tileContent}>
+            <p className={styles.content}>
+              {t('providerNotAllowed', 'User provider is not allowed to perform this action')}
+            </p>
+            <p className={styles.helper}>{t('providerMessage', 'consult administrator for assist')}</p>
+          </div>
+        </Tile>
+      </div>
+    );
+  }
 
   if (!currentOrder) {
     return <DrugSearch openOrderForm={openOrderForm} />;
