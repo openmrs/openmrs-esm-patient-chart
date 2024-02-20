@@ -10,12 +10,12 @@ export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
-export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
+const DrugSearch: React.FC<DrugSearchProps> = ({ openOrderForm }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const searchInputRef = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const focusAndClearSearchInput = () => {
     setSearchTerm('');
@@ -27,29 +27,34 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   };
 
   return (
-    <>
-      <div className={styles.searchPopupContainer}>
-        <ResponsiveWrapper isTablet={isTablet}>
-          <Search
-            autoFocus
-            size="lg"
-            placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-            labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-            onChange={handleSearchTermChange}
-            ref={searchInputRef}
-            value={searchTerm}
-          />
-        </ResponsiveWrapper>
-        <OrderBasketSearchResults
-          searchTerm={debouncedSearchTerm}
-          openOrderForm={openOrderForm}
-          focusAndClearSearchInput={focusAndClearSearchInput}
+    <div className={styles.searchPopupContainer}>
+      <ResponsiveWrapper isTablet={isTablet}>
+        <Search
+          autoFocus
+          size="lg"
+          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          onChange={handleSearchTermChange}
+          ref={searchInputRef}
+          value={searchTerm}
         />
-      </div>
-    </>
+      </ResponsiveWrapper>
+      <OrderBasketSearchResults
+        searchTerm={debouncedSearchTerm}
+        openOrderForm={openOrderForm}
+        focusAndClearSearchInput={focusAndClearSearchInput}
+      />
+    </div>
   );
+};
+
+interface ResponsiveWrapperProps {
+  children: React.ReactNode;
+  isTablet: boolean;
 }
 
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
+const ResponsiveWrapper: React.FC<ResponsiveWrapperProps> = ({ children, isTablet }) => {
+  return isTablet ? <Layer>{children}</Layer> : <>{children}</>;
+};
+
+export default DrugSearch;
