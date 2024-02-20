@@ -5,6 +5,7 @@ import { useConfig, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '../../types';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
+import { type ConfigObject } from '../../config-schema';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
@@ -14,8 +15,8 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
-  const { debounceTime } = useConfig();
-  const debouncedSearchTerm = useDebounce(searchTerm, debounceTime);
+  const { debounceDelayInMs } = useConfig<ConfigObject>();
+  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ? debounceDelayInMs : 300);
   const searchInputRef = useRef(null);
 
   const focusAndClearSearchInput = () => {
