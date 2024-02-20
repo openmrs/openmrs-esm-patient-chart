@@ -35,15 +35,30 @@ function postOrder(body: OrderPost, abortController?: AbortController) {
   });
 }
 
-function extractErrorDetails(errorObject) {
+interface IErrorObject {
+  responseBody?: {
+    error?: {
+      message?: string;
+      fieldErrors?: {
+        [fieldName: string]: {
+          message: string;
+          [key: string]: string;
+        }[];
+      };
+      globalErrors?: string[];
+    };
+  };
+}
+
+function extractErrorDetails(errorObject: IErrorObject) {
   const errorDetails = {
-    message: errorObject.responseBody.error.message,
+    message: errorObject.responseBody?.error?.message,
     fieldErrors: [],
-    globalErrors: errorObject.responseBody.error.globalErrors,
+    globalErrors: errorObject.responseBody?.error?.globalErrors,
   };
 
-  if (errorObject.responseBody.error.fieldErrors) {
-    const fieldErrors = errorObject.responseBody.error.fieldErrors;
+  if (errorObject.responseBody?.error?.fieldErrors) {
+    const fieldErrors = errorObject.responseBody?.error?.fieldErrors;
     for (const fieldName in fieldErrors) {
       fieldErrors[fieldName].forEach((error) => {
         errorDetails.fieldErrors.push(error.message);
