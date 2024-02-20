@@ -16,7 +16,7 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
   const { debounceDelayInMs } = useConfig<ConfigObject>();
-  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ? debounceDelayInMs : 300);
+  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
   const focusAndClearSearchInput = () => {
