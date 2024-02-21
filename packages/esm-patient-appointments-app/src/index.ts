@@ -34,10 +34,3 @@ export const appointmentsCancelConfirmationDialog = getAsyncLifecycle(
 );
 
 export const upcomingAppointmentsWidget = getSyncLifecycle(upcomingAppointmentsWidgetComponent, options);
-
-// t('scheduleAppointment', 'Schedule appointment');
-registerWorkspace({
-  name: 'appointments-form-workspace',
-  load: getAsyncLifecycle(() => import('./appointments/appointments-form/appointments-form.component'), options),
-  title: translateFrom(moduleName, 'scheduleAppointment', 'Schedule appointment'),
-});
