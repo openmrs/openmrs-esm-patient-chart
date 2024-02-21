@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .widgetCard {
   border: 1px solid $ui-03;
@@ -8,7 +8,7 @@
 
 .allergyCriticality {
   display: flex;
-  align-items: center; 
+  align-items: center;
   text-transform: uppercase;
 }
 

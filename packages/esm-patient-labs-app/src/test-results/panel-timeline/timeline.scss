@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .grid {
   width: fit-content;
@@ -133,7 +133,7 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-    
+
   }
 }
 

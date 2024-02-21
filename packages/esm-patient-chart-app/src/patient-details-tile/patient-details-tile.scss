@@ -1,5 +1,5 @@
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .container:after {
 	content: '';
@@ -20,5 +20,5 @@
 
 .name {
 	@include type.type-style('body-compact-02');
-	
+
 }

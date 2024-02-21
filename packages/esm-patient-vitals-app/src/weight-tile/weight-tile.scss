@@ -1,5 +1,5 @@
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .label {
 	@include type.type-style('label-01');
@@ -14,5 +14,5 @@
 
 .value {
 	@include type.type-style('body-compact-01');
-	
+
 }
