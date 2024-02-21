@@ -52,5 +52,5 @@ describe('FormsDashboard', () => {
 });
 
 function renderFormDashboard() {
-  render(<FormsDashboard />);
+  render(<FormsDashboard promptBeforeClosing={jest.fn()} closeWorkspace={jest.fn()} patientUuid="" />);
 }

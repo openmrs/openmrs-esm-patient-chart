@@ -33,6 +33,7 @@
   "pulse": "نبض",
   "recordBiometrics": "تسجيل القياسات البيومترية",
   "recordVitals": "تسجيل العلامات الحيوية",
+  "recordVitalsAndBiometrics": "Record Vitals and Biometrics",
   "respirationRate": "معدل التنفس",
   "respiratoryRate": "معدل التنفس",
   "saveAndClose": "حفظ وإغلاق",

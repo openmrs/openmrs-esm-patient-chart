@@ -8,6 +8,7 @@ import { immunizationFormSub } from './utils';
 import { showSnackbar } from '@openmrs/esm-framework';
 
 const mockCloseWorkspace = jest.fn();
+const mockDiscardAndCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 

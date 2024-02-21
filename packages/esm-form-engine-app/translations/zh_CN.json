@@ -1,8 +1,8 @@
 {
-  "closeThisPanel": "Close this panel",
-  "errorTitle": "There was an error with this form",
-  "loading": "Loading",
-  "or": "or",
-  "thisList": "this list",
-  "tryAgainMessage": "Try opening another form from"
+  "closeThisPanel": "关闭此面板",
+  "errorTitle": "此表单出现错误",
+  "loading": "加载中",
+  "or": "或",
+  "thisList": "这个列表",
+  "tryAgainMessage": "尝试打开另一个表单 "
 }

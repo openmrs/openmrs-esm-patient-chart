@@ -33,6 +33,7 @@
   "pulse": "Pulse",
   "recordBiometrics": "Record biometrics",
   "recordVitals": "Record vitals",
+  "recordVitalsAndBiometrics": "Record Vitals and Biometrics",
   "respirationRate": "Respiration rate",
   "respiratoryRate": "R. rate",
   "saveAndClose": "Save and close",

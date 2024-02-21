@@ -1,10 +1,10 @@
 {
   "add": "添加",
-  "addImage": "添加图像",
+  "addImage": "Add image",
   "addImageToVisit": "Add an image to this visit",
-  "addVisitNote": "Add a Visit Note",
-  "clinicalNoteLabel": "Write an additional note",
-  "clinicalNotePlaceholder": "Write any additional points here",
+  "addVisitNote": "Add a visit note",
+  "clinicalNoteLabel": "Write your notes",
+  "clinicalNotePlaceholder": "Write any notes here",
   "date": "日期",
   "diagnoses": "诊断",
   "discard": "放弃",
@@ -19,8 +19,8 @@
   "primaryDiagnosis": "Primary diagnosis",
   "primaryDiagnosisInputPlaceholder": "Choose a primary diagnosis",
   "saveAndClose": "保存并关闭",
-  "searchForPrimaryDiagnosis": "Search for a Primary diagnosis",
-  "searchForSecondaryDiagnosis": "Search for a Secondary diagnosis",
+  "searchForPrimaryDiagnosis": "Search for a primary diagnosis",
+  "searchForSecondaryDiagnosis": "Search for a secondary diagnosis",
   "secondaryDiagnosis": "Secondary diagnosis",
   "secondaryDiagnosisInputPlaceholder": "Choose a secondary diagnosis",
   "seeAll": "查看全部",
@@ -29,5 +29,6 @@
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved successfully",
-  "visitNoteSaveError": "Error saving visit note"
+  "visitNoteSaveError": "Error saving visit note",
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

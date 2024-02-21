@@ -22,6 +22,7 @@
   "noProgramsConfigured": "Aucun programme configuré",
   "programEnrollments": "Enregistrement dans les programmes",
   "programEnrollmentSaveError": "Erreur d'enregistrement dans le programme",
+  "programEnrollmentWorkspaceTitle": "Record program enrollment",
   "programName": "Nom du programme",
   "programs": "programmes",
   "Programs": "Programs",

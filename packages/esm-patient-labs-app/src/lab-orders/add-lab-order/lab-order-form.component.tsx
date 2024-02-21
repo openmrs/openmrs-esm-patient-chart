@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
 import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
@@ -27,7 +27,8 @@ import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
-  closeWorkspace: () => void;
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
 const labOrderFormSchema = z.object({
@@ -51,7 +52,7 @@ const labOrderFormSchema = z.object({
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps) {
+export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -87,16 +88,19 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = data;
       setOrders(newOrders);
-      closeWorkspace();
-      launchPatientWorkspace('order-basket');
+      closeWorkspace({
+        ignoreChanges: true,
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      });
     },
     [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
+    closeWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
   const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
@@ -106,7 +110,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   };
 
   useEffect(() => {
-    promptBeforeClosing('add-lab-order', () => isDirty);
+    promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
   return (

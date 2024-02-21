@@ -4,7 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  launchPatientWorkspace,
+  type OrderBasketItem,
+  useOrderBasket,
+  closeWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepLabOrderPostData } from '../api';
 import LabIcon from './lab-icon.component';
@@ -20,11 +25,17 @@ export default function LabOrderBasketPanelExtension() {
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
 
   const openNewLabForm = useCallback(() => {
-    launchPatientWorkspace('add-lab-order');
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order'),
+    });
   }, []);
 
   const openEditLabForm = useCallback((order: OrderBasketItem) => {
-    launchPatientWorkspace('add-lab-order', { order });
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
+    });
   }, []);
 
   const removeOrder = useCallback(

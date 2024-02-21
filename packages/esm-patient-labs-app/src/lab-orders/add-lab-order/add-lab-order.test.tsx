@@ -35,7 +35,9 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-const mockCloseWorkspace = jest.fn();
+const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
+  onWorkspaceClose?.();
+});
 const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -48,7 +50,9 @@ jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () =>
 }));
 
 function renderAddLabOrderWorkspace() {
-  const mockCloseWorkspace = jest.fn();
+  const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
+    onWorkspaceClose();
+  });
   const mockPromptBeforeClosing = jest.fn();
   const renderResult = render(
     <AddLabOrderWorkspace

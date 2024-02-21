@@ -2,8 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
 import {
+  type DefaultWorkspaceProps,
   EmptyDataIllustration,
-  closeWorkspace,
   launchFormEntryOrHtmlForms,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard = () => {
+const FormsDashboard: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
@@ -28,7 +28,6 @@ const FormsDashboard = () => {
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
-      closeWorkspace('clinical-forms-workspace', true);
       launchFormEntryOrHtmlForms(
         htmlFormEntryForms,
         patientUuid,
