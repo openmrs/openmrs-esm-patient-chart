@@ -101,7 +101,7 @@ const schemaFields = {
       invalid_type_error: translateFrom(
         moduleName,
         'selectQuantityUnitsErrorMessage',
-        'Please select the quantity unit required for dispensing',
+        'Dispensing requires a quantity unit',
       ),
     },
   ),
