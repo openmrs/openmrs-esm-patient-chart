@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
@@ -50,7 +50,12 @@ const programsFormSchema = z.object({
 
 export type ProgramsFormData = z.infer<typeof programsFormSchema>;
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
+const ProgramsForm: React.FC<ProgramsFormProps> = ({
+  closeWorkspace,
+  patientUuid,
+  programEnrollmentId,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -77,7 +82,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
     return currentEnrollment?.location.uuid ?? null;
   };
 
-  const { control, handleSubmit, watch } = useForm<ProgramsFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { isDirty },
+  } = useForm<ProgramsFormData>({
     mode: 'all',
     resolver: zodResolver(programsFormSchema),
     defaultValues: {
@@ -87,6 +97,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       enrollmentLocation: getLocationUuid() ?? '',
     },
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const onSubmit = React.useCallback(
     (data: ProgramsFormData) => {

@@ -88,10 +88,7 @@ function ConditionsDetailedSummary({ patient }) {
       : compare(cellA.sortKey, cellB.sortKey);
   };
 
-  const launchConditionsForm = useCallback(
-    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
-    [],
-  );
+  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 

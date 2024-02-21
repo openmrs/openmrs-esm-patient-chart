@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -51,6 +51,7 @@ export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
+  promptBeforeClosing: (testFcn: () => boolean) => void;
 }
 
 const comboSchema = {
@@ -184,7 +185,7 @@ function InputWrapper({ children }) {
   );
 }
 
-export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: DrugOrderFormProps) {
+export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
@@ -200,9 +201,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
     handleSubmit,
     control,
     watch,
-    getValues,
     setValue,
-    formState: { errors },
+    formState: { isDirty, errors },
+    getValues,
   } = useForm<MedicationOrderFormData>({
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
@@ -225,6 +226,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel }: Drug
       startDate: defaultStartDate,
     },
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {

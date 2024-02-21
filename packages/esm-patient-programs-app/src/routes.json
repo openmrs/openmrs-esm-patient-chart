@@ -31,13 +31,6 @@
         "path": "Programs"  
       },
       "order": 10
-    },
-    {
-      "name": "programs-form-workspace",
-      "component": "programsForm",
-      "meta": {
-        "title": "Record program enrollment"
-      }
     }
   ],
   "pages": []

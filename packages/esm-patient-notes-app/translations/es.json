@@ -29,5 +29,6 @@
   "visitNoteNowVisible": "Ahora es visible en la página de Encuentros",
   "visitNotes": "Notas de visita",
   "visitNoteSaved": "Nota de visita guardada",
-  "visitNoteSaveError": "Error al guardar la nota de visita"
+  "visitNoteSaveError": "Error al guardar la nota de visita",
+  "visitNoteWorkspaceTitle": "Nota de visita"
 }

@@ -6,12 +6,12 @@ import { type Visit } from '@openmrs/esm-framework';
 import useFormSchema from '../hooks/useFormSchema';
 import FormError from './form-error.component';
 import styles from './form-renderer.scss';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface FormRendererProps {
+interface FormRendererProps extends DefaultWorkspaceProps {
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
-  closeWorkspace: () => void;
   encounterUuid?: string;
   mode?: SessionMode;
 }
@@ -52,7 +52,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
-          onSubmit={() => closeWorkspace()}
+          onSubmit={() => closeWorkspace({ ignoreChanges: true })}
           mode={mode}
         />
       )}

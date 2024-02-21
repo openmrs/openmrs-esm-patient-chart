@@ -13,14 +13,19 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
 
 export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
 
-export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorkspace }: AddDrugOrderWorkspace) {
+export default function AddDrugOrderWorkspace({
+  order: initialOrder,
+  closeWorkspace,
+  promptBeforeClosing,
+}: AddDrugOrderWorkspace) {
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
+    closeWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
   }, [closeWorkspace, currentOrder, orders, setOrders]);
 
   const openOrderForm = useCallback(
@@ -51,8 +56,10 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
         newOrders.push(finalizedOrder);
       }
       setOrders(newOrders);
-      closeWorkspace();
-      launchPatientWorkspace('order-basket');
+      closeWorkspace({
+        ignoreChanges: true,
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      });
     },
     [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
   );
@@ -60,6 +67,13 @@ export default function AddDrugOrderWorkspace({ order: initialOrder, closeWorksp
   if (!currentOrder) {
     return <DrugSearch openOrderForm={openOrderForm} />;
   } else {
-    return <DrugOrderForm initialOrderBasketItem={currentOrder} onSave={saveDrugOrder} onCancel={cancelDrugOrder} />;
+    return (
+      <DrugOrderForm
+        initialOrderBasketItem={currentOrder}
+        onSave={saveDrugOrder}
+        onCancel={cancelDrugOrder}
+        promptBeforeClosing={promptBeforeClosing}
+      />
+    );
   }
 }

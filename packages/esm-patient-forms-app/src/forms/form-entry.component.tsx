@@ -32,7 +32,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       encounterUuid: encounterUuid ?? null,
       closeWorkspace: () => {
         typeof mutateForm === 'function' && mutateForm();
-        closeWorkspace();
+        closeWorkspace({ ignoreChanges: true });
       },
       additionalProps,
     }),

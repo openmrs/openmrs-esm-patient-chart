@@ -70,7 +70,11 @@ const VitalsAndBiometricFormSchema = z
 
 export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
 
-const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -87,10 +91,20 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  const { control, handleSubmit, watch, setValue } = useForm<VitalsBiometricsFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isDirty },
+  } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
     resolver: zodResolver(VitalsAndBiometricFormSchema),
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
     ?.uuid;

@@ -30,13 +30,6 @@
         "path": "Immunizations"
       },
       "order": 8
-    },
-    {
-      "name": "immunization-form-workspace",
-      "component": "immunizationsForm",
-      "meta": {
-        "title": "Immunization Form"
-      }
     }
   ],
   "pages": []

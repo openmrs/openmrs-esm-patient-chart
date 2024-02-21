@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,12 +8,11 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import { type ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface ConditionFormProps {
-  closeWorkspace: () => void;
+interface ConditionFormProps extends DefaultWorkspaceProps {
   condition?: ConditionDataTableRow;
   formContext: 'creating' | 'editing';
-  patientUuid?: string;
 }
 
 const conditionSchema = z.object({
@@ -25,7 +24,13 @@ const conditionSchema = z.object({
 
 export type ConditionFormData = z.infer<typeof conditionSchema>;
 
-const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, condition, formContext, patientUuid }) => {
+const ConditionsForm: React.FC<ConditionFormProps> = ({
+  closeWorkspace,
+  condition,
+  formContext,
+  patientUuid,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { conditions } = useConditions(patientUuid);
@@ -49,6 +54,14 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
       search: '',
     },
   });
+
+  const {
+    formState: { isDirty },
+  } = methods;
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const onSubmit = (data) => {
     setIsSubmittingForm(true);
@@ -98,7 +111,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, conditio
             </div>
           ) : null}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
