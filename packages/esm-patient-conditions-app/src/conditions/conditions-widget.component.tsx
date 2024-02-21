@@ -224,6 +224,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
                       className={errors?.conditionSearch && styles.errorOutline}
+                      renderIcon={errors?.conditionSearch && ((props) => <WarningFilled fill="red" {...props} />)}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
