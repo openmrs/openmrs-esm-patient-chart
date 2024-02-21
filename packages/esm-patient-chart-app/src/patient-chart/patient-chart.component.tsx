@@ -19,7 +19,6 @@ import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
-import { useBilling } from './useBilling';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -28,7 +27,6 @@ const PatientChart: React.FC = () => {
   const { workspaceWindowState, active } = useWorkspaces();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
-  const { patientBillBalance } = useBilling(patientUuid);
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.

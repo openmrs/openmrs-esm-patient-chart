@@ -316,7 +316,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-      if (config.showBillingSlot) {
+      if (config.extraVisitAttribute) {
         const { handleCreateBill, attributes } = billingInfo ?? {};
         payload.attributes = attributes;
         handleCreateBill && handleCreateBill();
@@ -658,7 +658,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
-            {config.showBillingSlot && (
+            {config.extraVisitAttribute && (
               <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="billing-checkin-slot" />
             )}
 
