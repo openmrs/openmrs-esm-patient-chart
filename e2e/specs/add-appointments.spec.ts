@@ -11,16 +11,17 @@ test.beforeEach(async ({ api }) => {
 
 test('Add appointment for a patient, edit the added appointment and cancel it', async ({ page, api }) => {
   const appointmentsPage = new AppointmentsPage(page);
-  await test.step('When I click on appointment tab', async () => {
+
+  await test.step('When I go to the appointment tab in the patient chart', async () => {
     await appointmentsPage.goto(patient.uuid);
   });
-  //test to add appointment
+
   await test.step('And I click on the “Add” button', async () => {
-    await page.click('button:has-text("Add")');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
 
-  await test.step('When I select Mobile Clinic location', async () => {
-    await page.locator('#location').selectOption('8d9045ad-50f0-45b8-93c8-3ed4bce19dbf');
+  await test.step('And I select Mobile Clinic location', async () => {
+    await page.getByLabel('Location').selectOption('Mobile Clinic');
   });
 
   await test.step('And I select “Outpatient Department” service', async () => {
@@ -35,7 +36,7 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
     await page.locator('#datePickerInput').fill('18/02/2024');
   });
 
-  await test.step('And I set the “Duration”', async () => {
+  await test.step('And I set the “Duration” to 60', async () => {
     await page.locator('#duration').fill('60');
   });
 
@@ -50,14 +51,21 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText(/Appointment scheduled/i)).toBeVisible();
   });
-  // test for editing the appointment
-  await test.step('And I choose the "Edit" option from the popup menu', async () => {
+
+  await test.step('When I click the options kebab menu in the appointment', async () => {
     await page.getByRole('button', { name: 'Options' }).click();
+  });
+
+  await test.step('And I choose the "Edit" option from the popup menu', async () => {
     await page.getByRole('menuitem', { name: 'Edit' }).click();
   });
 
+  await test.step('Then I should see the Edit an appointment workspace', async () => {
+    await expect(page.getByText(/Edit an appointment/i)).toBeVisible();
+  });
+
   await test.step('When I change to “Inpatient ward” location', async () => {
-    await page.locator('#location').selectOption('ba685651-ed3b-4e63-9b35-78893060758a');
+    await page.getByLabel('Location').selectOption('Inpatient ward');
   });
 
   await test.step('And I change to “General Medicine” Service', async () => {
@@ -88,13 +96,15 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
     await expect(page.getByText(/Appointment edited/i)).toBeVisible();
   });
 
-  //test to cancel the appointment
-  await test.step('When I click on “Cancel” button ', async () => {
+  await test.step('When I click the options kebab menu in the appointment', async () => {
     await page.getByRole('button', { name: 'Options' }).click();
+  });
+
+  await test.step('And I choose the "Cancel" option ', async () => {
     await page.getByRole('menuitem', { name: 'Cancel' }).click();
   });
 
-  await test.step('And I cancel the appointmen', async () => {
+  await test.step('When I click the "Cancel appointment" button to confirm', async () => {
     await page.getByRole('button', { name: 'danger Cancel appointment' }).click();
   });
 
