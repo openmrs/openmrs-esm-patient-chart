@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
+import { OHRIForm, type SessionMode } from '@openmrs/openmrs-form-engine-lib';
 import { type Visit } from '@openmrs/esm-framework';
 import useFormSchema from '../hooks/useFormSchema';
 import FormError from './form-error.component';
@@ -13,9 +13,17 @@ interface FormRendererProps extends DefaultWorkspaceProps {
   patientUuid: string;
   visit?: Visit;
   encounterUuid?: string;
+  mode?: SessionMode;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({
+  formUuid,
+  patientUuid,
+  visit,
+  closeWorkspace,
+  encounterUuid,
+  mode,
+}) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
 
@@ -45,6 +53,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visi
           formJson={schema}
           handleClose={closeWorkspace}
           onSubmit={() => closeWorkspace({ ignoreChanges: true })}
+          mode={mode}
         />
       )}
     </>
