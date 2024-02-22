@@ -122,6 +122,11 @@ export const esmPatientChartSchema = {
     _type: Type.Number,
     _description: 'The number of visits to load initially in the Visits Summary tab. Defaults to 5',
     _default: 5,
+    showBillingSlot: {
+      _type: Type.Boolean,
+      _description: 'Whether on start visit form to show billing extension and enable billing functionality',
+      _default: false,
+    },
   },
 };
 export interface ChartConfig {
@@ -139,6 +144,7 @@ export interface ChartConfig {
   showAllEncountersTab: boolean;
   defaultFacilityUrl: string;
   showUpcomingAppointments: boolean;
+  showBillingSlot: boolean;
   logo: {
     src: string;
     alt: string;
