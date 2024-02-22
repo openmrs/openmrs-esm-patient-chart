@@ -29,7 +29,6 @@ export function orderStatusColor(status) {
     case 'COMPLETED':
       return 'green';
     case 'DISCONTINUED':
-      return 'red';
     case 'DECLINED':
       return 'red';
     default:

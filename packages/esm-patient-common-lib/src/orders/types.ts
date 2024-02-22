@@ -1,9 +1,9 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 
-export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | undefined;
+export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
 export interface OrderBasketItem {
-  action: OrderAction;
+  action?: OrderAction;
   display: string;
   uuid?: string;
   orderer?: string;

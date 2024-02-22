@@ -74,7 +74,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const [isPrinting, setIsPrinting] = useState(false);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
-
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
 

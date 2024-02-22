@@ -78,8 +78,6 @@ export function LabOrderForm({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      instructions: '',
-      labReferenceNumber: '',
       ...initialOrder,
     },
   });
@@ -91,6 +89,7 @@ export function LabOrderForm({
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
+      data.action = 'NEW';
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];

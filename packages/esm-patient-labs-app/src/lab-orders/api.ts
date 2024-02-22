@@ -71,17 +71,45 @@ export function useOrderReasons(conceptUuids: Array<string>) {
 }
 
 export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
-  return {
-    action: 'NEW',
-    patient: patientUuid,
-    type: 'testorder',
-    careSetting: careSettingUuid,
-    orderer: order.orderer,
-    encounter: encounterUuid,
-    concept: order.testType.conceptUuid,
-    instructions: order.instructions,
-    orderReason: order.orderReason,
-  };
+  if (order.action === 'NEW' || order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      patient: patientUuid,
+      type: 'testorder',
+      careSetting: careSettingUuid,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+    };
+  } else if (order.action === 'REVISE') {
+    return {
+      action: 'REVISE',
+      patient: patientUuid,
+      type: 'testorder',
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      previousOrder: order.uuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+    };
+  } else if (order.action === 'DISCONTINUE') {
+    return {
+      action: 'DISCONTINUE',
+      patient: patientUuid,
+      type: 'testorder',
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      previousOrder: order.previousOrder,
+      orderReason: order.orderReason,
+    };
+  } else {
+    throw new Error(`Unknown order action: ${order.action}.`);
+  }
 }
 const chunkSize = 10;
 export function getConceptReferenceUrls(conceptUuids: Array<string>) {

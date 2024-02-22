@@ -41,13 +41,13 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
     return z.object({
       cancellationDate: z
         .date({
-          required_error: t('requiredField', 'This field is required'),
+          required_error: t('cancellationDateRequired', 'Cancellation date is required'),
         })
         .refine((date) => date >= dayjs().startOf('day').toDate(), {
           message: t('dateCannotBeBeforeToday', 'Date cannot be before today'),
         }),
       reasonForCancellation: z.string({
-        required_error: t('requiredField', 'This field is required'),
+        required_error: t('reasonForCancellationRequired', 'Reason for cancellation is required'),
       }),
     });
   }, []);
@@ -92,7 +92,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
         mutate();
 
         showSnackbar({
-          isLowContrast: true,
           title: t('orderCancelled', 'Order cancelled'),
           kind: 'success',
           subtitle: t('successfullyCancelledOrder', 'Order {{orderNumber}} has been cancelled successfully', {
@@ -181,7 +180,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
       )}
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button
