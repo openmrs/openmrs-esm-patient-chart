@@ -119,7 +119,7 @@ If you notice that your local version of the application is not working or that 
 
 ```bash
 # Upgrade core libraries
-yarn up openmrs @openmrs/esm-framework
+yarn up openmrs@next @openmrs/esm-framework@next
 
 # Reset version specifiers to `next`. Don't commit actual version numbers.
 git checkout package.json
