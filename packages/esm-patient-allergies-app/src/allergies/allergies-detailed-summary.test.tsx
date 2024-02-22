@@ -60,7 +60,7 @@ describe('AllergiesDetailedSummary: ', () => {
     const expectedAllergies = [
       /ACE inhibitors moderate Anaphylaxis/i,
       /Fish mild Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
-      /Penicillins severe Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
+      /Penicillins severe Mental status change, Angioedema, Cough, Diarrhea, Musculoskeletal pain Patient allergies have been noted down/i,
       /Morphine severe Mental status change Comments/i,
       /Aspirin severe Mental status change Comments/i,
     ];
@@ -72,6 +72,18 @@ describe('AllergiesDetailedSummary: ', () => {
     expectedAllergies.forEach((allergy) =>
       expect(screen.getByRole('row', { name: new RegExp(allergy) })).toBeInTheDocument(),
     );
+  });
+
+  it("renders non-coded allergen name and non-coded allergic reaction name in the detailed summary of the patient's allergies", async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    renderAllergiesDetailedSummary();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
+
+    const expectedNonCodedAllergy = /non-coded allergen severe non-coded allergic reaction non coded allergic note/i;
+    expect(screen.getByRole('row', { name: new RegExp(expectedNonCodedAllergy) })).toBeInTheDocument();
   });
 });
 
