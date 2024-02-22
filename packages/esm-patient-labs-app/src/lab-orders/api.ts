@@ -74,8 +74,8 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
-      patient: patientUuid,
       type: 'testorder',
+      patient: patientUuid,
       careSetting: careSettingUuid,
       orderer: order.orderer,
       encounter: encounterUuid,
@@ -86,26 +86,27 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
   } else if (order.action === 'REVISE') {
     return {
       action: 'REVISE',
-      patient: patientUuid,
       type: 'testorder',
+      patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,
       encounter: encounterUuid,
-      previousOrder: order.uuid,
       concept: order.testType.conceptUuid,
       instructions: order.instructions,
       orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
       action: 'DISCONTINUE',
-      patient: patientUuid,
       type: 'testorder',
+      patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,
       encounter: encounterUuid,
-      previousOrder: order.previousOrder,
+      concept: order.testType.conceptUuid,
       orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);

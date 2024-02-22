@@ -107,11 +107,15 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
  * Builds lab order object from the given order object
  */
 export function buildLabOrder(order: Order, action?: OrderAction) {
+  let previousOrder = null;
+  if (action === 'REVISE' || action === 'DISCONTINUE') {
+    previousOrder = order.uuid;
+  }
   return {
     uuid: order.uuid,
     action: action,
     display: order.display,
-    previousOrder: null,
+    previousOrder: previousOrder,
     orderer: order.orderer.uuid,
     careSetting: order.careSetting.uuid,
     instructions: order.instructions,
