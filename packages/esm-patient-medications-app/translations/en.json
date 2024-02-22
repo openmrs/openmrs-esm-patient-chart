@@ -79,6 +79,7 @@
   "selectFrequencyErrorMessage": "Please select a frequency",
   "selectRouteErrorMessage": "Please select a route",
   "selectUnitErrorMessage": "Please select a unit",
+  "selectQuantityUnitsErrorMessage": "Dispensing requires a quantity unit",
   "startDate": "Start date",
   "takeAsNeeded": "Take as needed",
   "tryReopeningTheForm": "Please try launching the form again",
