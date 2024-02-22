@@ -69,7 +69,12 @@ interface DiagnosisSearchProps {
   error?: Object;
 }
 
-const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, promptBeforeClosing }) => {
+const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  patientUuid,
+  promptBeforeClosing,
+}) => {
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -273,7 +278,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           if (data.image) {
             mutateAttachments();
           }
-          closeWorkspace();
+          closeWorkspaceWithSavedChanges();
 
           showSnackbar({
             isLowContrast: true,
@@ -308,7 +313,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       encounterNoteTextConceptUuid,
       combinedDiagnoses,
       mutateVisitNotes,
-      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
       t,
     ],
   );

@@ -58,6 +58,7 @@ describe('FormEntry', () => {
 function renderFormEntry() {
   const testProps = {
     closeWorkspace: jest.fn(),
+    closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
     patientUuid: mockPatient.id,
     formInfo: { formUuid: 'some-form-uuid' },

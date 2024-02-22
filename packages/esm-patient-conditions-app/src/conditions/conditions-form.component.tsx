@@ -26,6 +26,7 @@ export type ConditionFormData = z.infer<typeof conditionSchema>;
 
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   condition,
   formContext,
   patientUuid,
@@ -77,7 +78,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
           patientUuid={patientUuid}
-          closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           conditionToEdit={condition}
           editing={formContext === 'editing'}
           setErrorCreating={setErrorCreating}

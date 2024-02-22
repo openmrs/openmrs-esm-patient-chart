@@ -12,7 +12,11 @@ import styles from './flags-list.scss';
 
 type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
 
-const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const FlagsList: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+}) => {
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
@@ -198,7 +202,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button
@@ -206,7 +210,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
           disabled={isEnabling || isDisabling}
           kind="primary"
           type="submit"
-          onClick={() => closeWorkspace()}
+          onClick={closeWorkspaceWithSavedChanges}
         >
           {(() => {
             if (isEnabling) return t('enablingFlag', 'Enabling flag...');

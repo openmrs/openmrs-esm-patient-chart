@@ -17,6 +17,7 @@ import VisitNotesForm from './visit-notes-form.component';
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
 };
 

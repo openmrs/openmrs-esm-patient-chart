@@ -53,15 +53,19 @@ function renderAddLabOrderWorkspace() {
   const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
     onWorkspaceClose();
   });
+  const mockCloseWorkspaceWithSavedChanges = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
+    onWorkspaceClose();
+  });
   const mockPromptBeforeClosing = jest.fn();
   const renderResult = render(
     <AddLabOrderWorkspace
       closeWorkspace={mockCloseWorkspace}
+      closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
     />,
   );
-  return { mockCloseWorkspace, mockPromptBeforeClosing, ...renderResult };
+  return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...renderResult };
 }
 
 describe('AddLabOrder', () => {
@@ -96,7 +100,7 @@ describe('AddLabOrder', () => {
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
     );
-    const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    const { mockCloseWorkspaceWithSavedChanges } = renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
@@ -137,7 +141,7 @@ describe('AddLabOrder', () => {
       ]);
     });
 
-    expect(mockCloseWorkspace).toHaveBeenCalled();
+    expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
