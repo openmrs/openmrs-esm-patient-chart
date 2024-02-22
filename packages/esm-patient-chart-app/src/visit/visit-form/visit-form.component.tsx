@@ -91,7 +91,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
-  const [billingInfo, setBillingInfo] = useState(null);
 
   const displayVisitStopDateTimeFields = useMemo(
     () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
@@ -317,11 +316,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-      if (config.showBillingSlot) {
-        const { handleCreateBill, attributes } = billingInfo ?? {};
-        payload.attributes = attributes;
-        handleCreateBill && handleCreateBill();
-      }
 
       if (isOnline) {
         (visitToEdit?.uuid
@@ -648,9 +642,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
-            {config.showBillingSlot && (
-              <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="extra-visit-attribute-slot" />
-            )}
+            <ExtensionSlot state={{ patientUuid }} name="extra-visit-attribute-slot" />
 
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
