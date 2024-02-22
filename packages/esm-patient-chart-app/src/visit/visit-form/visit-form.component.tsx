@@ -316,7 +316,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
-      if (config.extraVisitAttribute) {
+      if (config.showBillingSlot) {
         const { handleCreateBill, attributes } = billingInfo ?? {};
         payload.attributes = attributes;
         handleCreateBill && handleCreateBill();
@@ -658,8 +658,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
-            {config.extraVisitAttribute && (
-              <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="billing-checkin-slot" />
+            {config.showBillingSlot && (
+              <ExtensionSlot state={{ patientUuid, setBillingInfo }} name="extra-visit-attribute-slot" />
             )}
 
             {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}

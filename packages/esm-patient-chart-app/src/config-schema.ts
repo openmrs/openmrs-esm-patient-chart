@@ -118,7 +118,7 @@ export const esmPatientChartSchema = {
       "Whether the visit location field in the Start Visit form should be view-only. If so, the visit location will always be set to the user's login location.",
     _default: false,
   },
-  extraVisitAttribute: {
+  showBillingSlot: {
     _type: Type.Boolean,
     _description: 'Whether on start visit form to show billing extension and enable billing functionality',
     _default: false,
@@ -139,7 +139,7 @@ export interface ChartConfig {
   showAllEncountersTab: boolean;
   defaultFacilityUrl: string;
   showUpcomingAppointments: boolean;
-  extraVisitAttribute: boolean;
+  showBillingSlot: boolean;
   logo: {
     src: string;
     alt: string;
