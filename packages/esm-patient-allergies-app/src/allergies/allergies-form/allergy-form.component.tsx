@@ -67,7 +67,7 @@ type AllergyFormData = {
 };
 
 function AllergyForm(props: DefaultWorkspaceProps) {
-  const { closeWorkspace, patientUuid, promptBeforeClosing } = props;
+  const { closeWorkspace, patientUuid, promptBeforeClosing, closeWorkspaceWithSavedChanges } = props;
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -166,7 +166,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
           (response: FetchResponse) => {
             if (response.status === 201) {
               mutate();
-              closeWorkspace({ ignoreChanges: true });
+              closeWorkspaceWithSavedChanges();
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
@@ -186,7 +186,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
         )
         .finally(() => abortController.abort());
     },
-    [otherConceptUuid, patientUuid, closeWorkspace, t, mutate],
+    [otherConceptUuid, patientUuid, closeWorkspaceWithSavedChanges, t, mutate],
   );
 
   return (

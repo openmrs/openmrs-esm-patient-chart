@@ -24,6 +24,7 @@ export interface WorkspaceStoreState {
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
+  closeWorkspaceWithSavedChanges(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -163,6 +164,8 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const newWorkspace = {
     ...workspace,
     closeWorkspace: (options: CloseWorkspaceOptions = {}) => closeWorkspace(name, options),
+    closeWorkspaceWithSavedChanges: (options: CloseWorkspaceOptions) =>
+      closeWorkspace(name, { ignoreChanges: true, ...options }),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
