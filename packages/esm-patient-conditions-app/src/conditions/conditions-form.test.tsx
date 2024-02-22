@@ -30,6 +30,7 @@ dayjs.extend(utc);
 
 const testProps = {
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
   formContext: 'creating' as const,
 };

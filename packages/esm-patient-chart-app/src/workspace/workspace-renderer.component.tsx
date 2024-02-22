@@ -35,6 +35,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
     () =>
       workspace && {
         closeWorkspace: workspace.closeWorkspace,
+        closeWorkspaceWithSavedChanges: workspace.closeWorkspaceWithSavedChanges,
         promptBeforeClosing: workspace.promptBeforeClosing,
         patientUuid,
         ...workspace.additionalProps,

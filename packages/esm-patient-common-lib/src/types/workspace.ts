@@ -1,5 +1,3 @@
-import { closeWorkspace } from '../workspaces';
-
 /* The possible states a workspace window can be opened in. */
 export type WorkspaceWindowState = 'maximized' | 'hidden' | 'normal';
 
@@ -35,6 +33,11 @@ export interface DefaultWorkspaceProps {
    * this workspace is closed; e.g. if there is unsaved data.
    */
   promptBeforeClosing(testFcn: () => boolean): void;
+  /**
+   * Call this function to close the workspace after the form is saved. This function
+   * will directly close the workspace without any prompt
+   */
+  closeWorkspaceWithSavedChanges(closeWorkspaceOptions?: CloseWorkspaceOptions): void;
   patientUuid: string;
   handlePostResponse?(): void;
 }

@@ -57,7 +57,7 @@ import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
-  visitToEdit: Visit;
+  visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
 }
 
