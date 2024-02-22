@@ -52,6 +52,7 @@ export type ProgramsFormData = z.infer<typeof programsFormSchema>;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   patientUuid,
   programEnrollmentId,
   promptBeforeClosing,
@@ -120,7 +121,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             (response) => {
               if (response.status === 200) {
                 mutateEnrollments();
-                closeWorkspace();
+                closeWorkspaceWithSavedChanges();
 
                 showSnackbar({
                   isLowContrast: true,
@@ -148,7 +149,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             (response) => {
               if (response.status === 201) {
                 mutateEnrollments();
-                closeWorkspace();
+                closeWorkspaceWithSavedChanges();
 
                 showSnackbar({
                   isLowContrast: true,
@@ -173,7 +174,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         sub.unsubscribe();
       };
     },
-    [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspace, t],
+    [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspaceWithSavedChanges, t],
   );
 
   const programSelect = (
@@ -312,7 +313,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         ))}
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

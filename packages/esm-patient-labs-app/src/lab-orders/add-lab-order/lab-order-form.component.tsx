@@ -28,6 +28,7 @@ import styles from './lab-order-form.scss';
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
@@ -52,7 +53,12 @@ const labOrderFormSchema = z.object({
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing }: LabOrderFormProps) {
+export function LabOrderForm({
+  initialOrder,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -88,8 +94,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = data;
       setOrders(newOrders);
-      closeWorkspace({
-        ignoreChanges: true,
+      closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
