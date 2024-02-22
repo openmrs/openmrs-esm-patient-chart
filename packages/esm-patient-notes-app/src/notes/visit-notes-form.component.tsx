@@ -46,7 +46,7 @@ import {
 import styles from './visit-notes-form.scss';
 import { mutate } from 'swr';
 
-const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
