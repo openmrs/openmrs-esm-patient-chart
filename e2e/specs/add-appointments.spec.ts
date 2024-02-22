@@ -21,19 +21,19 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I select Mobile Clinic location', async () => {
-    await page.getByLabel('Location').selectOption('Mobile Clinic');
+    await page.getByLabel('Select location').selectOption('Mobile Clinic');
   });
 
   await test.step('And I select “Outpatient Department” service', async () => {
-    await page.locator('#service').selectOption('Outpatient Department');
+    await page.getByLabel('Select a service').selectOption('Outpatient Department');
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
-    await page.locator('#appointmentType').selectOption('Scheduled');
+    await page.getByLabel('Select an appointment type').selectOption('Scheduled');
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    await page.locator('#datePickerInput').fill('18/02/2024');
+    await page.fill('input[placeholder="dd/mm/yyyy"]', '30/03/2024');
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -65,19 +65,15 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('When I change to “Inpatient ward” location', async () => {
-    await page.getByLabel('Location').selectOption('Inpatient ward');
+    await page.getByLabel('Select location').selectOption('Inpatient Ward');
   });
 
   await test.step('And I change to “General Medicine” Service', async () => {
-    await page.locator('#service').selectOption('General Medicine service');
-  });
-
-  await test.step('And I change appointment as “WalkIn”', async () => {
-    await page.locator('#appointmentType').selectOption('WalkIn');
+    await page.getByLabel('Select a service').selectOption('General Medicine service');
   });
 
   await test.step('And I change the date to Today', async () => {
-    await page.locator('#datePickerInput').fill('17/02/2024');
+    await page.fill('input[placeholder="dd/mm/yyyy"]', '28/03/2024');
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
@@ -109,6 +105,6 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/Appointment cancelled/i)).toBeVisible();
+    await expect(page.getByText(/Appointment cancelled successfully/i)).toBeVisible();
   });
 });
