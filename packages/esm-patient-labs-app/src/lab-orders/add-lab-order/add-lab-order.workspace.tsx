@@ -25,6 +25,7 @@ export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrder
 export default function AddLabOrderWorkspace({
   order: initialOrder,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
@@ -73,6 +74,7 @@ export default function AddLabOrderWorkspace({
         <LabOrderForm
           initialOrder={currentLabOrder}
           closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
         />
       )}

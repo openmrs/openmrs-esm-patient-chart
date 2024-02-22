@@ -73,6 +73,7 @@ export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSche
 const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
@@ -191,7 +192,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
         .then((response) => {
           if (response.status === 201) {
             invalidateCachedVitalsAndBiometrics();
-            closeWorkspace();
+            closeWorkspaceWithSavedChanges();
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -230,7 +231,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,
-          closeWorkspace,
+          closeWorkspaceWithSavedChanges,
         }}
       />
     );
@@ -581,7 +582,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
       )}
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button

@@ -49,6 +49,7 @@ function renderDrugSearch() {
     <AddDrugOrderWorkspace
       order={undefined as any}
       closeWorkspace={jest.fn()}
+      closeWorkspaceWithSavedChanges={jest.fn()}
       promptBeforeClosing={() => false}
       patientUuid={'mock-patient-uuid'}
     />,

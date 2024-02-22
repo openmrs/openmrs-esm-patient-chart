@@ -14,8 +14,8 @@ const mockPromptBeforeClosing = jest.fn();
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: mockCloseWorkspace,
+  closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
-  visitToEdit: undefined,
   showVisitEndDateTimeFields: false,
 };
 

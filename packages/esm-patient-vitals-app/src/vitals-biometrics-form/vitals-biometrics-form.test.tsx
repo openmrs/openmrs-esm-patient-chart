@@ -9,6 +9,7 @@ import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
 const testProps = {
   closeWorkspace: () => {},
+  closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: () => {},
 };
