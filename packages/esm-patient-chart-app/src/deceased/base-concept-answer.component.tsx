@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Layer, RadioButton, RadioButtonGroup, Search } from '@carbon/react';
+import { RadioButton, RadioButtonGroup, Search } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, ResponsiveWrapper } from '@openmrs/esm-framework';
 import type { ConceptAnswer } from './deceased.resource';
 import styles from './deceased-form.scss';
 
@@ -41,7 +41,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop,
       )}
     >
-      <ResponsiveWrapper isTablet={isTablet}>
+      <ResponsiveWrapper>
         <Search
           onChange={(event) => handleSearch(event.target.value)}
           placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
@@ -82,9 +82,5 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
     </div>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default BaseConceptAnswer;

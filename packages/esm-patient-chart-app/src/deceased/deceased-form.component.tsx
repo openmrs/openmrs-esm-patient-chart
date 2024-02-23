@@ -7,14 +7,13 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
-  Layer,
   Row,
   DatePickerSkeleton,
   DataTableSkeleton,
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, useLayoutType, showSnackbar, showModal } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, showSnackbar, showModal, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
 
@@ -85,7 +84,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             {!conceptAnswers ? (
               <DatePickerSkeleton />
             ) : (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   dateFormat="d/m/Y"
                   datePickerType="single"
@@ -140,9 +139,5 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     </Form>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default MarkPatientDeceasedForm;

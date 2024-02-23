@@ -1,5 +1,5 @@
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
 .overviewCard {
@@ -10,7 +10,7 @@
     @extend .productiveHeading01;
     color: $text-02;
   }
-  
+
   .headerContainer {
     display: flex;
     justify-content: space-between;

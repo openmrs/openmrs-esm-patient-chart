@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .timelineHeader {
   position: sticky;
@@ -147,7 +147,7 @@
 
   div {
     @include type.type-style('heading-compact-01');
-    
+
     left: 0;
     width: 100%;
     word-wrap: normal;
@@ -178,7 +178,7 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-    
+
   }
 }
 

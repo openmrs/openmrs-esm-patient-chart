@@ -13,7 +13,6 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
-  Layer,
   Row,
   Search,
   SkeletonText,
@@ -21,6 +20,7 @@ import {
   Tag,
   TextArea,
   Tile,
+  Layer,
 } from '@carbon/react';
 import { Add, Edit, WarningFilled } from '@carbon/react/icons';
 import {
@@ -33,6 +33,7 @@ import {
   useLayoutType,
   useSession,
   createAttachment,
+  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -338,7 +339,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               name="noteDate"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <DatePicker
                     dateFormat="d/m/Y"
                     datePickerType="single"
@@ -518,7 +519,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
                       </ul>
                     );
                   return (
-                    <ResponsiveWrapper isTablet={isTablet}>
+                    <ResponsiveWrapper>
                       <Tile className={styles.emptyResults}>
                         <span>
                           {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
@@ -541,7 +542,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               name="clinicalNote"
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <TextArea
                     id="additionalNote"
                     rows={rows}
@@ -638,7 +639,7 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
       control={control}
       render={({ field: { value, onChange, onBlur }, fieldState }) => (
         <>
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <Search
               ref={inputRef}
               size={isTablet ? 'lg' : 'md'}
@@ -660,8 +661,4 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
       )}
     />
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }

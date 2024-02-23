@@ -1,13 +1,13 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .editStatusBtn {
-    margin-left: spacing.$spacing-04;
-    border: none;
+  margin-left: spacing.$spacing-04;
+  border: none;
 }
 
 .editStatusIcon {
-    fill: white;
-    color: white;
+  fill: white;
+  color: white;
 }
