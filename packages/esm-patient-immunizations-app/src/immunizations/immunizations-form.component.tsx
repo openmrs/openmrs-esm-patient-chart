@@ -46,7 +46,12 @@ interface ResponsiveWrapperProps {
 
 const datePickerFormat = 'd/m/Y';
 
-const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { immunizationsConfig } = useConfig() as ConfigObject;
@@ -184,7 +189,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       ).then(
         () => {
           setIsSubmitting(false);
-          closeWorkspace({ ignoreChanges: true });
+          closeWorkspaceWithSavedChanges();
           mutate();
           showSnackbar({
             kind: 'success',
@@ -211,7 +216,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       currentVisit?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
-      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
       t,
     ],
   );

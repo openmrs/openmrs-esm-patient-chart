@@ -9,6 +9,7 @@ const testProps = {
   patientUuid: '',
   promptBeforeClosing: jest.fn(),
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   list: {
     attributes: [],
     description:

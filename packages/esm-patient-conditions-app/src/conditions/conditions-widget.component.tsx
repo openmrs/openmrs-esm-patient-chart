@@ -32,7 +32,7 @@ import styles from './conditions-form.scss';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 interface ConditionsWidgetProps {
-  closeWorkspace?: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
   patientUuid: string;
@@ -44,7 +44,7 @@ interface ConditionsWidgetProps {
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
-  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
   patientUuid,
@@ -115,14 +115,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionSaved', 'Condition saved'),
         });
 
-        closeWorkspace?.({ ignoreChanges: true });
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     getValues,
     mutate,
     patientUuid,
@@ -157,14 +157,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionUpdated', 'Condition updated'),
         });
 
-        closeWorkspace({ ignoreChanges: true });
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,

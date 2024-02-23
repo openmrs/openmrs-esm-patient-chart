@@ -21,6 +21,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   patientUuid,
   visit,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   encounterUuid,
   mode,
 }) => {
@@ -52,7 +53,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
-          onSubmit={() => closeWorkspace({ ignoreChanges: true })}
+          onSubmit={closeWorkspaceWithSavedChanges}
           mode={mode}
         />
       )}
