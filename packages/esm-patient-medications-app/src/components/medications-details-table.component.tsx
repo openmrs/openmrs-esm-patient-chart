@@ -80,6 +80,14 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     },
   ];
 
+  const isMedicationDiscontinued = (medication) => {
+    return medication.dateStopped != null;
+  };
+
+  const isMedicationModified = (medication) => {
+    return medication.modified;
+  };
+
   const tableRows = medications?.map((medication, id) => ({
     id: `${id}`,
     details: {
@@ -135,6 +143,9 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                 {formatDate(new Date(medication.dateStopped))}
               </span>
             ) : null}
+            {isMedicationDiscontinued(medication) && !isMedicationModified(medication) && (
+              <span className={styles.label01}> &mdash; {t('discontinued', 'Discontinued').toUpperCase()}</span>
+            )}
           </p>
         </div>
       ),
