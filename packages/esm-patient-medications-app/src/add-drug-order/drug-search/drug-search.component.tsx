@@ -23,9 +23,8 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
     searchInputRef.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setSearchTerm(event.target.value ?? '');
-  };
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -40,11 +39,6 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
           value={searchTerm}
         />
       </ResponsiveWrapper>
-      <OrderBasketSearchResults
-        searchTerm={debouncedSearchTerm}
-        openOrderForm={openOrderForm}
-        focusAndClearSearchInput={focusAndClearSearchInput}
-      />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
