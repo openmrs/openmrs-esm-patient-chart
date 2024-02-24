@@ -15,6 +15,6 @@ export class WindowRef {
   }
 
   get openmrsRestBase(): string {
-    return this.nativeWindow.openmrsBase + restBaseUrl;
+    return this.nativeWindow.openmrsBase + restBaseUrl + '/';
   }
 }

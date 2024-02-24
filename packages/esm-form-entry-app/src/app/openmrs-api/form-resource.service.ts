@@ -18,7 +18,7 @@ export class FormResourceService {
   }
 
   public getFormMetaDataByUuid(uuid: string, v: string = null) {
-    const url = `${this.windowRef.openmrsRestBase}form/${uuid}`;
+    const url = `${this.windowRef.openmrsRestBase}/form/${uuid}`;
     const params: HttpParams = new HttpParams().set('v', v && v.length > 0 ? v : 'full');
     return this.http.get<FormMetadataObject>(url, { params });
   }

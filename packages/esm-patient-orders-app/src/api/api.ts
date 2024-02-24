@@ -76,7 +76,7 @@ export function createEmptyEncounter(
     obs: [],
   };
 
-  return openmrsFetch<OpenmrsResource>('${restBaseUrl}/encounter', {
+  return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
     },
