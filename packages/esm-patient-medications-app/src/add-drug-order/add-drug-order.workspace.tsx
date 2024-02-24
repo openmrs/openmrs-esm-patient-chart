@@ -4,8 +4,8 @@ import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } fr
 import { DrugOrderForm } from './drug-order-form.component';
 import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
-import type { DrugOrderBasketItem } from '../types';
 import { ordersEqual } from './drug-search/helpers';
+import type { DrugOrderBasketItem } from '../types';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;

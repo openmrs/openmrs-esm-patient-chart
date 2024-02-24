@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type FHIRCondition, type FHIRConditionResponse } from '../types';
 
 export type Condition = {
@@ -106,7 +106,7 @@ export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
 
-  const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+  const conditionsSearchUrl = `${restBaseUrl}/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
     conditionToLookup ? conditionsSearchUrl : null,

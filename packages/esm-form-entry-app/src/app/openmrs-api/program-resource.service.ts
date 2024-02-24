@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
 import { MetaData } from '../types';
-import { parseDate, showSnackbar } from '@openmrs/esm-framework';
+import { parseDate, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import dayjs from 'dayjs';
@@ -19,7 +19,7 @@ export class ProgramResourceService {
   ) {}
 
   private programEnrollmentUrl(): string {
-    return `${this.windowRef.nativeWindow.openmrsBase}/ws/rest/v1/programenrollment`;
+    return `${this.windowRef.nativeWindow.openmrsBase}${restBaseUrl}/programenrollment`;
   }
 
   public handlePatientCareProgram(form: Form, encounterUuid: string): void {

@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import fuzzy from 'fuzzy';
-import { DataTableSkeleton, Tile } from '@carbon/react';
+import { DataTableSkeleton } from '@carbon/react';
 import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import type { CompletedFormInfo } from '../types';
 import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
-import type { CompletedFormInfo } from '../types';
 
 export type FormsListProps = {
   completedForms?: Array<CompletedFormInfo>;
