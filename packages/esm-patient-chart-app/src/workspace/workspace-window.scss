@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
 $container-width: calc(100% - 3rem);

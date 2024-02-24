@@ -1,18 +1,17 @@
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .label {
-	@include type.type-style('label-01');
-	color: $text-02;
+  @include type.type-style('label-01');
+  color: $text-02;
 }
 
 .content {
-	@include type.type-style('body-compact-01');
-	color: $text-02;
-	margin-top: 5px;
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-top: 5px;
 }
 
 .value {
-	@include type.type-style('body-compact-01');
-	
+  @include type.type-style('body-compact-01');
 }

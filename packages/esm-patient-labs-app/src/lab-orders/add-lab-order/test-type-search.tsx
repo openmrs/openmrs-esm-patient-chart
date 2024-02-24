@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, Layer, Search, SkeletonText, Tile } from '@carbon/react';
+import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
-import { useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type LabOrderBasketItem, prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
@@ -32,7 +32,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
 
   return (
     <>
-      <ResponsiveWrapper isTablet={isTablet}>
+      <ResponsiveWrapper>
         <Search
           autoFocus
           size="lg"
@@ -50,10 +50,6 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
       />
     </>
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 interface TestTypeSearchResultsProps {

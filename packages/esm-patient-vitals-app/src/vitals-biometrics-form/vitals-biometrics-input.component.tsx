@@ -1,10 +1,10 @@
 import React, { Fragment, useId, useState } from 'react';
 import classNames from 'classnames';
 import { type Control, Controller } from 'react-hook-form';
-import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
+import { FormLabel, NumberInput, TextArea } from '@carbon/react';
 import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
 import { type VitalsBiometricsFormData } from './vitals-biometrics-form.component';
 import styles from './vitals-biometrics-input.scss';
@@ -133,7 +133,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
 
                 return (
                   <Fragment key={fieldProperty.id}>
-                    <ResponsiveWrapper isTablet={isTablet}>
+                    <ResponsiveWrapper>
                       <Controller
                         name={fieldProperty.id}
                         control={control}
@@ -173,7 +173,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
 
               if (fieldProperty.type === 'textarea') {
                 return (
-                  <ResponsiveWrapper key={fieldProperty.id} isTablet={isTablet}>
+                  <ResponsiveWrapper key={fieldProperty.id}>
                     <Controller
                       name={fieldProperty.id}
                       control={control}
@@ -216,9 +216,5 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
     </>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: ResponsiveWrapperProps) {
-  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <Fragment>{children}</Fragment>;
-}
 
 export default VitalsAndBiometricsInput;
