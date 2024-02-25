@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
+import { useForm, FormProvider, type SubmitHandler, SubmitErrorHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
@@ -40,6 +40,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const methods = useForm<ConditionFormData>({
     mode: 'all',
@@ -65,15 +66,34 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   }, [isDirty]);
 
   
-  const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
-    if (data.search) {
-      setIsSubmittingForm(methods.formState.isSubmitting);
+  const { watch, setValue, setError } = methods;
+  const search = watch('search');
+  const onsetDateTime = watch('onsetDateTime');
+
+  useEffect(() => {
+    if (search || onsetDateTime) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
     }
+  }, [onsetDateTime, setValue, search, watch]);
+
+  const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
+    setIsSubmittingForm(true);
+    if (!data.search.trim()) {
+      setError('search', {
+        type: 'manual',
+        message: t('conditionRequired', 'A condition is required'),
+      });
+      setIsSubmittingForm(false);
+      return;
+    }
+    setIsSubmittingForm(true);
     console.error(data);
   };
 
   const onError = (error) => {
-    console.error(error);
+    setIsSubmittingForm(false);
   };
 
   return (
@@ -88,7 +108,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
           setErrorUpdating={setErrorUpdating}
           isSubmittingForm={isSubmittingForm}
           setIsSubmittingForm={setIsSubmittingForm}
-          register={methods.register}
         />
         <div>
           {errorCreating ? (
@@ -119,12 +138,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button
-              className={styles.button}
-              disabled={methods.formState.isSubmitting || isSubmittingForm || !methods.formState.isDirty}
-              kind="primary"
-              type="submit"
-            >
+            <Button className={styles.button} disabled={isSubmittingForm || isDisabled} kind="primary" type="submit">
               {isSubmittingForm ? (
                 <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
               ) : (

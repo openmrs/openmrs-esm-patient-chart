@@ -41,7 +41,6 @@ interface ConditionsWidgetProps {
   setErrorUpdating?: (error: Error) => void;
   isSubmittingForm: boolean;
   setIsSubmittingForm: Dispatch<boolean>;
-  register?: (name: string, options?: any) => void;
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
@@ -53,7 +52,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   setIsSubmittingForm,
   setErrorCreating,
   setErrorUpdating,
-  register,
 }) => {
   const { t } = useTranslation();
   const { conditions, mutate } = useConditions(patientUuid);
@@ -215,19 +213,18 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 render={({ field: { onChange, value, onBlur } }) => (
                   <ResponsiveWrapper>
                     <Search
-                      {...(register('search', { required: t('conditionRequired', 'A condition is required') }) as any)}
                       autoFocus
                       ref={searchInputRef}
                       size="md"
                       id="conditionsSearch"
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
-                      className={errors?.search && styles.conditionsError}
+                      className={`${errors?.search && styles.conditionsError} `}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
                       }}
-                      renderIcon={errors?.search && <WarningFilled />}
+                      renderIcon={errors?.search && ((props) => <WarningFilled fill="red" {...props} />)}
                       onBlur={onBlur}
                       onClear={() => {
                         setSearchTerm('');
