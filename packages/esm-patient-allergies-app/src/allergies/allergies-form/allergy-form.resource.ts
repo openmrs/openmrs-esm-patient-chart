@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import type { OpenMRSResource } from '../../types';
 import { AllergenType } from '../../types';
 import useSWR from 'swr';
@@ -54,7 +54,7 @@ export interface AllergicReaction {
 export function useAllergicReactions() {
   const allergyReactionUuid = useConfig().concepts.allergyReactionUuid;
   const { data: allergicReactionsData, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }>(
-    `/ws/rest/v1/concept/${allergyReactionUuid}?v=full`,
+    `${restBaseUrl}/concept/${allergyReactionUuid}?v=full`,
     openmrsFetch,
   );
 
@@ -74,15 +74,15 @@ export function useAllergens() {
   } = useConfig();
 
   const { data: drugAllergenData } = useSWRImmutable<{ data: ConceptFetchResponse }>(
-    `/ws/rest/v1/concept/${drugAllergenUuid}?v=full`,
+    `${restBaseUrl}/concept/${drugAllergenUuid}?v=full`,
     openmrsFetch,
   );
   const { data: environmentalAllergenData } = useSWRImmutable<{ data: ConceptFetchResponse }>(
-    `/ws/rest/v1/concept/${environmentalAllergenUuid}?v=full`,
+    `${restBaseUrl}/concept/${environmentalAllergenUuid}?v=full`,
     openmrsFetch,
   );
   const { data: foodAllergenData } = useSWRImmutable<{ data: ConceptFetchResponse }>(
-    `/ws/rest/v1/concept/${foodAllergenUuid}?v=full`,
+    `${restBaseUrl}/concept/${foodAllergenUuid}?v=full`,
     openmrsFetch,
   );
 
@@ -119,7 +119,7 @@ export function useAllergens() {
 export function useAllergenSearch(allergenToLookup: string) {
   const allergenConceptClassUuid = useConfig()?.concepts.allergenUuid;
 
-  const searchURL = `/ws/rest/v1/conceptsearch?conceptClasses=${allergenConceptClassUuid}&q=${allergenToLookup}`;
+  const searchURL = `${restBaseUrl}/conceptsearch?conceptClasses=${allergenConceptClassUuid}&q=${allergenToLookup}`;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedAllergen> } }, Error>(
     allergenToLookup ? searchURL : null,
@@ -134,7 +134,7 @@ export function useAllergenSearch(allergenToLookup: string) {
 }
 
 export function saveAllergy(payload: NewAllergy, patientUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy`, {
     headers: {
       'Content-Type': 'application/json',
     },

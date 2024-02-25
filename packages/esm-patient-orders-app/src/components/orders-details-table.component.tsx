@@ -1,9 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
+import orderBy from 'lodash-es/orderBy';
+import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
 import {
-  DataTable,
   Button,
+  DataTable,
+  DataTableSkeleton,
+  Dropdown,
   IconButton,
   InlineLoading,
   OverflowMenu,
@@ -15,31 +20,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Dropdown,
-  DataTableSkeleton,
+  Tooltip,
 } from '@carbon/react';
+import { Add, User, Printer } from '@carbon/react/icons';
 import {
-  CardHeader,
   type Order,
   type OrderBasketItem,
-  PatientChartPagination,
-  useOrderBasket,
-  useLaunchWorkspaceRequiringVisit,
   type OrderType,
+  CardHeader,
   EmptyState,
   ErrorState,
-  usePatientOrders,
+  PatientChartPagination,
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
   useOrderTypes,
+  usePatientOrders,
 } from '../../../esm-patient-common-lib';
-import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import styles from './order-details-table.scss';
-import { useReactToPrint } from 'react-to-print';
 import { compare, orderPriorityToColor } from '../utils/utils';
 import PrintComponent from '../print/print.component';
-import { orderBy } from 'lodash-es';
-import { Tooltip } from '@carbon/react';
+import styles from './order-details-table.scss';
+
 interface OrderDetailsProps {
   title?: string;
   patientUuid: string;

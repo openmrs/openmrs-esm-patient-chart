@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 
 /**
@@ -10,7 +10,7 @@ import { type OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
  * @returns An object containing the form schema, error, and loading state
  */
 const useFormSchema = (formUuid: string) => {
-  const url = formUuid ? `/ws/rest/v1/o3/forms/${formUuid}` : null;
+  const url = formUuid ? `${restBaseUrl}/o3/forms/${formUuid}` : null;
 
   const { data, error, isLoading } = useSWR<{ data: OHRIFormSchema }>(url, openmrsFetch);
 

@@ -1,13 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  useVisit,
-  openmrsFetch,
-  showSnackbar,
-  type FetchResponse,
-  showActionableNotification,
-} from '@openmrs/esm-framework';
+import { useVisit, openmrsFetch, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit, mockVisitQueueEntries } from '__mocks__';
 import { mockPatient } from 'tools';
 import { type MappedVisitQueueEntry, useVisitQueueEntry } from '../queue-entry/queue.resource';
@@ -28,6 +22,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     useVisit: jest.fn(),
     openmrsFetch: jest.fn(),
+    restBaseUrl: '/ws/rest/v1',
   };
 });
 

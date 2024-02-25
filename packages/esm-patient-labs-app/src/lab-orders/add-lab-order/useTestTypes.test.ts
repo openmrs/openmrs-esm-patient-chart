@@ -7,6 +7,11 @@ import { configSchema } from '../../config-schema';
 
 jest.mock('swr/immutable');
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  restBaseUrl: '/ws/rest/v1',
+}));
+
 const mockOpenrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSWRImmutable = useSWRImmutable as jest.Mock;

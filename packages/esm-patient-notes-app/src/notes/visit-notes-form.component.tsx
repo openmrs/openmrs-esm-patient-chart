@@ -33,6 +33,7 @@ import {
   useLayoutType,
   useSession,
   createAttachment,
+  restBaseUrl,
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -110,7 +111,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   const currentImage = watch('image');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const mutateAttachments = () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/attachment`));
+  const mutateAttachments = () =>
+    mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
 

@@ -1,5 +1,5 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, useConfig, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
 import { type OrderBasketItem, type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
@@ -14,7 +14,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  */
 export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
   const { labOrderTypeUuid: labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
-  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -22,7 +22,7 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)),
+    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
     [patientUuid],
   );
 
@@ -47,7 +47,7 @@ export function useOrderReasons(conceptUuids: Array<string>) {
   const shouldFetch = conceptUuids && conceptUuids.length > 0;
   const url = shouldFetch ? getConceptReferenceUrls(conceptUuids) : null;
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
-    shouldFetch ? `/ws/rest/v1/${url[0]}` : null,
+    shouldFetch ? `${restBaseUrl}/${url[0]}` : null,
     openmrsFetch,
   );
 

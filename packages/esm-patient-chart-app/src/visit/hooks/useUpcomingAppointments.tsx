@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface AppointmentPayload {
   patientUuid: string;
@@ -18,7 +18,7 @@ export interface AppointmentPayload {
 }
 
 export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
+  return openmrsFetch(`${restBaseUrl}/appointment`, {
     method: 'POST',
     signal: abortController.signal,
     headers: {
