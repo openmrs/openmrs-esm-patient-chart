@@ -50,6 +50,7 @@
   "required": "Required",
   "status": "Status",
   "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
+  "testResultsFormWorkspace": "Enter Test Results",
   "unknown": "Unknown",
   "unknownOrderType": "Unknown Order Type",
   "updateEncounter": "Update lab results",

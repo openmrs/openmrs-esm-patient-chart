@@ -10,7 +10,6 @@ import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
 import OrdersSummary from './orders-summary/orders-summary.component';
-import { testResultsFormWorkspace } from './constants';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -24,12 +23,21 @@ const options = {
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
+  // t('orderCancellation','Order cancellation')
   registerWorkspace({
     name: 'patient-orders-form-workspace',
-    // t('orderCancellation','Order cancellation')
     title: translateFrom(moduleName, 'orderCancellation', 'Order cancellation'),
     load: getAsyncLifecycle(() => import('./order-cancellation-form/cancel-order-form.component'), options),
     type: 'order',
+    canHide: false,
+  });
+
+  // t('testResultsFormWorkspace', 'Enter Test Results')
+  registerWorkspace({
+    name: 'test-results-form-workspace',
+    title: translateFrom(moduleName, 'enterTestResults', 'Enter Test Results'),
+    load: getAsyncLifecycle(() => import('./results/result-form.component'), options),
+    type: 'results',
     canHide: false,
   });
 }
@@ -40,13 +48,6 @@ registerWorkspace({
   title: translateFrom(moduleName, 'orderBasketWorkspaceTitle', 'Order Basket'),
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
-  canHide: true,
-});
-registerWorkspace({
-  name: testResultsFormWorkspace,
-  title: 'Enter Test Results',
-  load: getAsyncLifecycle(() => import('../src/results/result-form.component'), options),
-  type: 'results',
   canHide: true,
 });
 

@@ -1,13 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './result-form.scss';
 import { Button, InlineLoading, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showNotification, showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
+import { showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { useGetOrderConceptByUuid, UpdateOrderResult, fetchEncounter, fetchObservation } from './result-form.resource';
 import ResultFormField from './result-form-field.component';
 import { useForm } from 'react-hook-form';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { init } from 'i18next';
 
 export interface AddResultsWorkspaceAdditionalProps {
   order: Order;
@@ -20,6 +19,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   closeWorkspace,
   promptBeforeClosing,
 }: AddResultsWorkspace) => {
+  // console.log('ResultForm order', order);
   const [inEditMode, setInEditMode] = useState(false);
   const [obsUuid, setObsUuid] = useState('');
   const [initialValues, setInitialValues] = useState(null);
@@ -28,6 +28,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   const config = useConfig();
   const { t } = useTranslation();
   const { concept, isLoading: isLoadingConcepts } = useGetOrderConceptByUuid(order.concept.uuid);
+  // console.log('ResultForm concept', concept);
   const {
     control,
     register,
@@ -151,36 +152,34 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   };
   return (
     <>
-      <div className="">
-        <ModalBody>
-          {/* // we need to display test name for test panels */}
-          {concept.setMembers.length > 0 && <div>{concept.display}</div>}
-          {concept && (
-            <section className={styles.section}>
-              {!isLoadingInitialValues ? (
-                <form>
-                  <ResultFormField
-                    defaultValue={initialValues}
-                    register={register}
-                    concept={concept}
-                    control={control}
-                    errors={errors}
-                  />
-                </form>
-              ) : (
-                <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
-              )}
-            </section>
-          )}
-        </ModalBody>
+      <ModalBody>
+        {/* // we need to display test name for test panels */}
+        {concept.setMembers.length > 0 && <div>{concept.display}</div>}
+        {concept && (
+          <section className={styles.section}>
+            {!isLoadingInitialValues ? (
+              <form>
+                <ResultFormField
+                  defaultValue={initialValues}
+                  register={register}
+                  concept={concept}
+                  control={control}
+                  errors={errors}
+                />
+              </form>
+            ) : (
+              <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
+            )}
+          </section>
+        )}
+      </ModalBody>
 
-        <ModalFooter>
-          <Button disabled={isSubmitting} onClick={cancelResults} kind="secondary">
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Save Test Results</Button>
-        </ModalFooter>
-      </div>
+      <ModalFooter>
+        <Button disabled={isSubmitting} onClick={cancelResults} kind="secondary">
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button onClick={handleSubmit(onSubmit)}>Save Test Results</Button>
+      </ModalFooter>
     </>
   );
 };
