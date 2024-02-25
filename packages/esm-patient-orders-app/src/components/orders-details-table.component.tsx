@@ -271,7 +271,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
             <Button
               kind="ghost"
               renderIcon={Printer}
-              iconDescription="Add vitals"
+              iconDescription="Print"
               className={styles.printButton}
               onClick={handlePrint}
             >
