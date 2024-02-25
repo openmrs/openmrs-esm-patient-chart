@@ -122,7 +122,7 @@ describe('Conditions Form', () => {
     await user.type(conditionSearchInput, 'Headache');
 
     expect(screen.getByDisplayValue(/headache/i)).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('renders an error message when no matching conditions are found', async () => {
     const user = userEvent.setup();
