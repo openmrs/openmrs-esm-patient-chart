@@ -2,7 +2,7 @@ import useSWR, { mutate } from 'swr';
 import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { type OrderBasketItem, type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import useSWRImmutable from 'swr/immutable';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -69,29 +69,48 @@ export function useOrderReasons(conceptUuids: Array<string>) {
 
   return { orderReasons: orderReasons, isLoading };
 }
-export interface LabOrderBasketItem extends OrderBasketItem {
-  testType?: {
-    label: string;
-    conceptUuid: string;
-  };
-  labReferenceNumber?: string;
-  urgency?: string;
-  instructions?: string;
-  orderReason?: string;
-}
 
 export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
-  return {
-    action: 'NEW',
-    patient: patientUuid,
-    type: 'testorder',
-    careSetting: careSettingUuid,
-    orderer: order.orderer,
-    encounter: encounterUuid,
-    concept: order.testType.conceptUuid,
-    instructions: order.instructions,
-    orderReason: order.orderReason,
-  };
+  if (order.action === 'NEW' || order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: careSettingUuid,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+    };
+  } else if (order.action === 'REVISE') {
+    return {
+      action: 'REVISE',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
+    };
+  } else if (order.action === 'DISCONTINUE') {
+    return {
+      action: 'DISCONTINUE',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
+    };
+  } else {
+    throw new Error(`Unknown order action: ${order.action}.`);
+  }
 }
 const chunkSize = 10;
 export function getConceptReferenceUrls(conceptUuids: Array<string>) {

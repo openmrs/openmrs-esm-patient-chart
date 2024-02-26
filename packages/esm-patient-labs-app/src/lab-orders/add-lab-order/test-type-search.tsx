@@ -4,8 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import {
+  type LabOrderBasketItem,
+  closeWorkspace,
+  launchPatientWorkspace,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
+import { prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './lab-order';
 import styles from './test-type-search.scss';
