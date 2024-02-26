@@ -1,0 +1,14 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import "../root";
+
+.testOrder {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: spacing.$spacing-05;
+  border: 1px solid colors.$gray-20;
+  border-bottom: none;
+  margin-bottom: spacing.$spacing-05;
+}
