@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { map as rxjsMap } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, openmrsObservableFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type PatientProgram, type Program, type ProgramsFetchResponse } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
 import filter from 'lodash-es/filter';
@@ -10,7 +10,7 @@ import map from 'lodash-es/map';
 export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
 
 export function useEnrollments(patientUuid: string) {
-  const enrollmentsUrl = `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
+  const enrollmentsUrl = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: ProgramsFetchResponse }, Error>(
     patientUuid ? enrollmentsUrl : null,
     openmrsFetch,
@@ -35,7 +35,7 @@ export function useEnrollments(patientUuid: string) {
 
 export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Program> } }, Error>(
-    `/ws/rest/v1/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
+    `${restBaseUrl}/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
     openmrsFetch,
   );
 
@@ -55,7 +55,7 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
 }
 
 export function getPatientProgramByUuid(programUuid: string) {
-  return openmrsObservableFetch<PatientProgram>(`/ws/rest/v1/programenrollment/${programUuid}`).pipe(
+  return openmrsObservableFetch<PatientProgram>(`${restBaseUrl}/programenrollment/${programUuid}`).pipe(
     rxjsMap(({ data }) => data),
   );
 }
@@ -65,7 +65,7 @@ export function createProgramEnrollment(payload, abortController) {
     return null;
   }
   const { program, patient, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`/ws/rest/v1/programenrollment`, {
+  return openmrsObservableFetch(`${restBaseUrl}/programenrollment`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
     return null;
   }
   const { program, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`/ws/rest/v1/programenrollment/${programEnrollmentUuid}`, {
+  return openmrsObservableFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

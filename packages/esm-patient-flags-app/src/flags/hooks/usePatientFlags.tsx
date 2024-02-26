@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 
 interface FlagFetchResponse {
   uuid: string;
@@ -23,7 +23,7 @@ interface FlagsFetchResponse {
  * @returns An array of patient identifiers
  */
 export function usePatientFlags(patientUuid: string) {
-  const url = `/ws/rest/v1/patientflags/patientflag?patient=${patientUuid}&v=full`;
+  const url = `${restBaseUrl}/patientflags/patientflag?patient=${patientUuid}&v=full`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(
     patientUuid ? url : null,
@@ -64,7 +64,7 @@ export function useCurrentPath(): string {
 
 export function enablePatientFlag(flagUuid: string) {
   const controller = new AbortController();
-  const url = `/ws/rest/v1/patientflags/patientflag/${flagUuid}`;
+  const url = `${restBaseUrl}/patientflags/patientflag/${flagUuid}`;
 
   return openmrsFetch(url, {
     headers: {
@@ -78,7 +78,7 @@ export function enablePatientFlag(flagUuid: string) {
 
 export function disablePatientFlag(flagUuid: string) {
   const controller = new AbortController();
-  const url = `/ws/rest/v1/patientflags/patientflag/${flagUuid}`;
+  const url = `${restBaseUrl}/patientflags/patientflag/${flagUuid}`;
 
   return openmrsFetch(url, {
     headers: {

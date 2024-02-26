@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, messageOmrsServiceWorker, restBaseUrl } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import visitTagComponent from './banner-tags/visit-tag.component';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.component';
@@ -16,7 +16,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/relationship.+',
+    pattern: `.+${restBaseUrl}/relationship.+`,
   });
 
   defineConfigSchema(moduleName, configSchema);

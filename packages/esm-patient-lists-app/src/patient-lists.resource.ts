@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { formatDate, openmrsFetch, parseDate } from '@openmrs/esm-framework';
+import { formatDate, openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
 
 /**
  * Represents a cohort object returned by the OpenMRS Cohort resource https://github.com/openmrs/openmrs-module-cohort#readme.
@@ -80,7 +80,7 @@ export function usePatientLists() {
   // Custom representation of the cohort object to fetch only the required properties.
   const customRepresentation = `custom:(uuid,name,description,display,size,attributes,cohortType,startDate,endDate)`;
 
-  const listsUrl = `/ws/rest/v1/cohortm/cohort?`;
+  const listsUrl = `${restBaseUrl}/cohortm/cohort?`;
 
   const urlSearchParams = new URLSearchParams({
     v: customRepresentation,
@@ -121,7 +121,7 @@ export function usePatientLists() {
  * @returns An object containing the members of the patient list, loading state, and error state.
  */
 export function usePatientListMembers(listUuid: string, searchQuery = '', startIndex = '', pageSize = '') {
-  const listMembersUrl = `/ws/rest/v1/cohortm/cohortmember?`;
+  const listMembersUrl = `${restBaseUrl}/cohortm/cohortmember?`;
 
   const urlSearchParams = new URLSearchParams({
     cohort: listUuid,

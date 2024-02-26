@@ -4,6 +4,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  restBaseUrl,
   translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -32,7 +33,7 @@ export function startupApp() {
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: `.+/ws/rest/v1/concept.+`,
+    pattern: `.+${restBaseUrl}/concept.+`,
   });
 
   defineConfigSchema(moduleName, configSchema);

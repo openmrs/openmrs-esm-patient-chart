@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .tableContainer :global(.cds--data-table-header) {
   padding: 0.75rem 1rem 0.25rem 1rem;
@@ -46,7 +46,7 @@ tr {
       content: " ↓↓";
     }
   }
-  
+
   &.critically-high {
     td:nth-child(2)::after {
       content: " ↑↑";

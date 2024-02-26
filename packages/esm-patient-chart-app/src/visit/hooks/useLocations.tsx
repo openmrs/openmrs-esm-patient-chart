@@ -1,9 +1,9 @@
-import { type FetchResponse, type Location, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, type Location, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 
 export function useLocations(searchString?: string) {
-  let url = '/ws/rest/v1/location';
+  let url = `${restBaseUrl}/location`;
 
   if (searchString) {
     url += `?q=${searchString}`;

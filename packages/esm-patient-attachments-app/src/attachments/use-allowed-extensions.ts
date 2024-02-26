@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 export interface GlobalProperty {
   uuid: string;
@@ -15,7 +15,7 @@ export const useAllowedExtensions = () => {
   // Global property from the attachments backend module https://github.com/openmrs/openmrs-module-attachments/blob/master/api/src/main/java/org/openmrs/module/attachments/AttachmentsConstants.java that contains the allowed file extensions
   const allowedExtensionsGlobalProperty: string = 'attachments.allowedFileExtensions';
   const customRepresentation = 'custom:(value)';
-  const url = `/ws/rest/v1/systemsetting?&v=${customRepresentation}&q=${allowedExtensionsGlobalProperty}`;
+  const url = `${restBaseUrl}/systemsetting?&v=${customRepresentation}&q=${allowedExtensionsGlobalProperty}`;
 
   const { data, error, isLoading } = useSWRImmutable<{ data: { results: Array<GlobalProperty> } }>(url, openmrsFetch);
 

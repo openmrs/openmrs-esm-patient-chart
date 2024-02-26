@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .heading {
   @include type.type-style("heading-03");
@@ -136,7 +136,7 @@
   .form {
     height: var(--tablet-workspace-window-height);
   }
-  
+
   .row {
     display: flex;
     gap: 4rem;

@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type FHIRResource, type FetchResponse, fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import {
+  type FHIRResource,
+  type FetchResponse,
+  fhirBaseUrl,
+  restBaseUrl,
+  openmrsFetch,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { type ObsRecord, useVitalsConceptMetadata, type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { type KeyedMutator } from 'swr';
 import useSWRInfinite from 'swr/infinite';
@@ -222,7 +229,7 @@ export function saveVitalsAndBiometrics(
   abortController: AbortController,
   location: string,
 ) {
-  return openmrsFetch<unknown>(`/ws/rest/v1/encounter`, {
+  return openmrsFetch<unknown>(`${restBaseUrl}/encounter`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -248,7 +255,7 @@ export function updateVitalsAndBiometrics(
   encounterUuid: string,
   location: string,
 ) {
-  return openmrsFetch(`/ws/rest/v1/encounter/${encounterUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

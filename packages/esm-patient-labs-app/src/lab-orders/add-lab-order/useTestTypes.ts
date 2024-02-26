@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import fuzzy from 'fuzzy';
-import { type FetchResponse, openmrsFetch, useConfig, reportError } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, reportError } from '@openmrs/esm-framework';
 import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 
@@ -30,8 +30,8 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts
-        ? labOrderableConcepts.map((c) => `/ws/rest/v1/concept/${c}`)
-        : `/ws/rest/v1/concept?class=Test`,
+        ? labOrderableConcepts.map((c) => `${restBaseUrl}/concept/${c}`)
+        : `${restBaseUrl}/concept?class=Test`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {

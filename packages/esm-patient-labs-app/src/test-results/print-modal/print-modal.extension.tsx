@@ -6,7 +6,6 @@ import {
   DataTable,
   DatePicker,
   DatePickerInput,
-  Layer,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -19,7 +18,15 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
-import { age, formatDate, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import {
+  age,
+  formatDate,
+  useConfig,
+  useLayoutType,
+  usePatient,
+  useSession,
+  ResponsiveWrapper,
+} from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import styles from './print-modal.scss';
 
@@ -94,7 +101,7 @@ function PrintModal({ patientUuid, closeDialog }) {
     <div>
       <ModalHeader closeModal={closeDialog} title={t('printTestResults', 'Print test results')} />
       <ModalBody className={styles.modalBody}>
-        <ResponsiveWrapper isTablet={isTablet}>
+        <ResponsiveWrapper>
           <DatePicker
             className={styles.datePickers}
             datePickerType="range"
@@ -200,10 +207,6 @@ function PrintModal({ patientUuid, closeDialog }) {
       ) : null}
     </div>
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 export default PrintModal;

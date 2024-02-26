@@ -2,9 +2,9 @@ import React from 'react';
 import styles from './visit-form.scss';
 import { Controller, useFormContext } from 'react-hook-form';
 import { type VisitFormData } from './visit-form.resource';
-import { DatePicker, DatePickerInput, Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import classNames from 'classnames';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 
@@ -46,7 +46,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
           name={dateFieldName}
           control={control}
           render={({ field: { onBlur, onChange, value } }) => (
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <DatePicker
                 dateFormat="d/m/Y"
                 datePickerType="single"
@@ -69,7 +69,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             </ResponsiveWrapper>
           )}
         />
-        <ResponsiveWrapper isTablet={isTablet}>
+        <ResponsiveWrapper>
           <Controller
             name={timeFieldName}
             control={control}
@@ -112,7 +112,3 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
 };
 
 export default VisitDateTimeField;
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}

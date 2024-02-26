@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, usePatient } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, usePatient } from '@openmrs/esm-framework';
 
 interface CauseOfDeathFetchResponse {
   uuid: string;
@@ -53,7 +53,7 @@ export function usePatientDeceased(patientUuid: string) {
 }
 
 const changePatientDeathStatus = (personUuid: string, payload: DeathPayload, abortController: AbortController) => {
-  return openmrsFetch(`/ws/rest/v1/person/${personUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/person/${personUuid}`, {
     headers: {
       'Content-type': 'application/json',
     },
@@ -97,7 +97,7 @@ export function markPatientAlive(personUuid: string, abortController: AbortContr
 
 export function useConceptAnswers(conceptUuid: string) {
   const { data, error, isLoading, isValidating } = useSWR<{ data: ConceptAnswersResponse }, Error>(
-    `/ws/rest/v1/concept/${conceptUuid}`,
+    `${restBaseUrl}/concept/${conceptUuid}`,
     (url) => (conceptUuid ? openmrsFetch(url) : undefined),
     {
       shouldRetryOnError(err) {
@@ -116,7 +116,7 @@ export function useConceptAnswers(conceptUuid: string) {
 
 export function useCauseOfDeathConcept() {
   const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
-    `/ws/rest/v1/systemsetting/concept.causeOfDeath`,
+    `${restBaseUrl}/systemsetting/concept.causeOfDeath`,
     openmrsFetch,
     {
       shouldRetryOnError(err) {

@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
@@ -211,7 +211,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 name="search"
                 control={control}
                 render={({ field: { onChange, value, onBlur } }) => (
-                  <ResponsiveWrapper isTablet={isTablet}>
+                  <ResponsiveWrapper>
                     <Search
                       autoFocus
                       ref={searchInputRef}
@@ -283,7 +283,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="onsetDateTime"
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   id="onsetDate"
                   datePickerType="single"
@@ -324,7 +324,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="endDate"
             control={control}
             render={({ field: { onBlur, onChange, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   id="endDate"
                   datePickerType="single"
@@ -346,9 +346,5 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     </div>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default ConditionsWidget;
