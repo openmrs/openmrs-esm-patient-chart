@@ -251,8 +251,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           {orderTypes && orderTypes?.length > 0 && (
             <Dropdown
               id="orderTypeDropdown"
-              titleText="Select order type"
-              label="All"
+              titleText={t('selectOrderType', 'Select order type')}
+              label={t('all', 'All')}
               type="inline"
               items={[...[{ display: 'All' }], ...orderTypes]}
               selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
@@ -270,8 +270,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           {showPrintButton && (
             <Button
               kind="ghost"
-              renderIcon={Printer}
-              iconDescription="Print"
+              renderIcon={(props) => <Printer size={16} {...props} />}
+              iconDescription={t('print', 'Print')}
               className={styles.printButton}
               onClick={handlePrint}
             >
@@ -282,7 +282,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription="Launch order basket"
+              iconDescription={t('launchOrderBasket', 'Launch order basket')}
               onClick={launchOrderBasket}
             >
               {t('add', 'Add')}

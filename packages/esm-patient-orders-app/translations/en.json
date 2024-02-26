@@ -1,6 +1,7 @@
 {
   "add": "Add",
   "addResults": "Add Results",
+  "all": "All",
   "cancellationDate": "Cancellation date",
   "cancellationDateRequired": "Cancellation date is required",
   "cancelOrder": "Cancel Order",
@@ -10,6 +11,7 @@
   "error": "Error",
   "errorCancellingOrder": "Error cancelling order",
   "female": "Female",
+  "launchOrderBasket": "Launch order basket",
   "male": "Male",
   "onDate": "on",
   "order": "Order",
@@ -30,6 +32,7 @@
   "reasonForCancellationRequired": "Reason for cancellation is required",
   "saveAndClose": "Save and close",
   "saving": "Saving",
+  "selectOrderType": "Select order type",
   "status": "Status",
   "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
   "unknown": "Unknown",

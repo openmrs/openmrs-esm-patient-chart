@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -15,11 +16,10 @@ import {
   DatePickerInput,
   InlineLoading,
 } from '@carbon/react';
-import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
-import styles from './cancel-order-form.scss';
 import { cancelOrder } from './cancel-order.resource';
-import dayjs from 'dayjs';
+import styles from './cancel-order-form.scss';
 
 interface OrderCancellationFormProps extends DefaultWorkspaceProps {
   order: Order;
@@ -83,9 +83,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
       fulfillerComment: formData.reasonForCancellation,
     };
 
-    const abortController = useAbortController();
-
-    cancelOrder(order, payload, abortController).then(
+    cancelOrder(order, payload).then(
       (res) => {
         setIsSubmitting(false);
         closeWorkspace();

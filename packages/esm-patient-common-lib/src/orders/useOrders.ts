@@ -64,5 +64,5 @@ export function useOrderTypes() {
 }
 
 export function getDrugOrderByUuid(orderUuid: string) {
-  return openmrsFetch(`/ws/rest/v1/order/${orderUuid}?v=${drugCustomRepresentation}`);
+  return openmrsFetch(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
 }
