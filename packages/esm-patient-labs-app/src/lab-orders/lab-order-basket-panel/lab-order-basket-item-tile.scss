@@ -40,6 +40,21 @@
   padding: 0 0.25rem;
 }
 
+.orderActionRenewLabel {
+  @extend .label;
+  color: $support-02;
+}
+
+.orderActionRevisedLabel {
+  @extend .label;
+  color: #943d00;
+}
+
+.orderActionDiscontinueLabel {
+  @extend .label;
+  color: $danger;
+}
+
 .orderErrorText {
   color: $danger;
   display: flex;
