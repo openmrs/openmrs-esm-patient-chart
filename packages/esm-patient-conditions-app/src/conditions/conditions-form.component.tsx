@@ -89,7 +89,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       return;
     }
     setIsSubmittingForm(true);
-    console.error(data);
   };
 
   const onError = (error) => {

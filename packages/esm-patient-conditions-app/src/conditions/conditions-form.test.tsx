@@ -119,6 +119,13 @@ describe('Conditions Form', () => {
     expect(screen.queryByRole('menuitem', { name: /Headache/i })).not.toBeInTheDocument();
     expect(screen.queryByDisplayValue('Headache')).not.toBeInTheDocument();
 
+    const mockedSearchedCondition = [{ id: '1', display: 'Headache' }];
+    mockUseConditionsSearch.mockReturnValue({
+      conditions: mockedSearchedCondition, // Update conditions to include 'Headache'
+      error: null,
+      isSearching: false,
+    });
+
     await user.type(conditionSearchInput, 'Headache');
 
     expect(screen.getByDisplayValue(/headache/i)).toBeInTheDocument();
@@ -165,7 +172,7 @@ describe('Conditions Form', () => {
     await user.type(onsetDateInput, '2020-05-05');
 
     expect(activeStatusInput).toBeChecked();
-    expect(submitButton).toBeDisabled();
+    expect(submitButton).not.toBeDisabled();
 
     await user.click(submitButton);
   });
