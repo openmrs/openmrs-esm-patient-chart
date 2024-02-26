@@ -37,7 +37,7 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
-    await page.locator('#duration').fill('60');
+    await page.getByLabel('Duration (minutes)').fill('60');
   });
 
   await test.step('And I add a note', async () => {
@@ -77,7 +77,7 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
-    await page.locator('#duration').fill('80');
+    await page.getByLabel('Duration (minutes)').fill('80');
   });
 
   await test.step('And I change the note', async () => {
