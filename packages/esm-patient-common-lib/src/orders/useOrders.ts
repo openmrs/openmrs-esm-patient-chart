@@ -26,7 +26,7 @@ export function usePatientOrders(patientUuid: string, status?: 'ACTIVE' | 'any',
   const mutateOrders = useCallback(
     () =>
       mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`);
+        return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
       }, data),
     [patientUuid],
   );
