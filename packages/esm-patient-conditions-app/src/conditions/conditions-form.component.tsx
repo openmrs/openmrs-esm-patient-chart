@@ -65,7 +65,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  
   const { watch, setValue, setError } = methods;
   const search = watch('search');
   const onsetDateTime = watch('onsetDateTime');
