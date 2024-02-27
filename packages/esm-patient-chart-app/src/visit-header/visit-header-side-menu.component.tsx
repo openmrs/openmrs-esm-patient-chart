@@ -3,15 +3,15 @@ import { LeftNavMenu, useOnClickOutside } from '@openmrs/esm-framework';
 
 interface VisitHeaderSideMenu {
   isExpanded: boolean;
-  toggleSideMenu: () => void;
+  toggleSideMenu: (state?: boolean) => void;
 }
 
 const VisitHeaderSideMenu: React.FC<VisitHeaderSideMenu> = ({ isExpanded, toggleSideMenu }) => {
-  const menuRef = useOnClickOutside(toggleSideMenu, isExpanded);
+  const menuRef = useOnClickOutside(() => toggleSideMenu(), isExpanded);
 
   React.useEffect(() => {
-    window.addEventListener('popstate', toggleSideMenu);
-    return window.addEventListener('popstate', toggleSideMenu);
+    window.addEventListener('single-spa:before-no-app-change', () => toggleSideMenu(false));
+    return window.addEventListener('single-spa:before-no-app-change', () => toggleSideMenu(false));
   }, [toggleSideMenu]);
 
   return isExpanded ? <LeftNavMenu ref={menuRef} /> : null;

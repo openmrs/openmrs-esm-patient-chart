@@ -132,7 +132,10 @@ const VisitHeader: React.FC = () => {
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
-  const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
+  const toggleSideMenu = useCallback(
+    (state?: boolean) => setIsSideMenuExpanded((prevState) => (state !== undefined ? state : !prevState)),
+    [],
+  );
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {
