@@ -32,20 +32,8 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
             />
             <MenuItem
               kind="ghost"
-              label={t('addPrescription', 'Add prescription')}
+              label={t('addLabOrPrescription', 'Add lab or prescription')}
               onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
-              renderIcon={Add}
-            />
-            <MenuItem
-              kind="ghost"
-              label={t('addOrder', 'Add order')}
-              onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
-              renderIcon={Add}
-            />
-            <MenuItem
-              kind="ghost"
-              label={t('addVitals', 'Add vitals')}
-              onClick={useLaunchWorkspaceRequiringVisit('patient-vitals-biometrics-form-workspace')}
               renderIcon={Add}
             />
             <MenuItem
@@ -93,18 +81,10 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
           <Button
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add prescription"
+            iconDescription="Add lab or prescription"
             onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
           >
-            {t('addPrescription', 'Add prescription')}
-          </Button>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add order"
-            onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
-          >
-            {t('addOrder', 'Add order')}
+            {t('addLabOrPrescription', 'Add lab or prescription')}
           </Button>
 
           <VisitActionsComponent patientUuid={patientUuid} />
