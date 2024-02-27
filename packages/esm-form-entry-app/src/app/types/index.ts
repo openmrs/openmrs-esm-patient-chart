@@ -460,3 +460,16 @@ export interface IdentifierPayload {
   newIdentifiers: Array<any>;
   currentIdentifiers: Array<any>;
 }
+
+type FieldError = {
+  [key: string]: Array<{ code: string; message: string }>;
+};
+export type ErrorObject = {
+  error: {
+    code: string;
+    message: string;
+    detail: string;
+    fieldErrors?: FieldError;
+    globalErrors?: FieldError;
+  };
+};

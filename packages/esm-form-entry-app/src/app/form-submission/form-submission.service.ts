@@ -8,7 +8,7 @@ import { EncounterResourceService } from '../openmrs-api/encounter-resource.serv
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Person, PersonUpdate, EncounterCreate, Encounter, IdentifierPayload, Identifier } from '../types';
+import { Person, PersonUpdate, EncounterCreate, Encounter, IdentifierPayload, Identifier, ErrorObject } from '../types';
 import {
   findQueuedPatientFormSyncItemByContentId,
   PatientFormSyncItemContent,
@@ -22,7 +22,7 @@ import { v4 } from 'uuid';
 import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
-
+import { TranslateService } from '@ngx-translate/core';
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
  */
@@ -44,6 +44,7 @@ export class FormSubmissionService {
     private readonly visitResourceService: VisitResourceService,
     private readonly patientResourceService: PatientResourceService,
     private readonly configResourceService: ConfigResourceService,
+    private readonly translateService: TranslateService,
   ) {}
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
@@ -249,18 +250,37 @@ export class FormSubmissionService {
 
   // TODO: Should this function be extracted?
   // This type of general HTTP/REST API error handling is most likely also useful elsewhere.
-  private throwUserFriendlyError(error: string | HttpErrorResponse): never {
-    if (typeof error === 'object') {
-      const fieldErrors: Array<any> = Object.values(error.error?.error?.fieldErrors ?? {});
-      const fieldErrorMessages = fieldErrors
-        .flatMap((fieldErrors) => fieldErrors)
-        .map((fieldError) => fieldError.message);
-      const message = fieldErrorMessages.length > 0 ? fieldErrorMessages.join(' ') : error.message;
-      throw new Error(message);
-    } else if (typeof error === 'string') {
-      throw new Error(error);
-    } else {
-      throw new Error(`An unknown error occured: ${error}.`);
+  private throwUserFriendlyError(error: HttpErrorResponse): never {
+    const errorMessage = this.extractErrorMessagesFromResponse(error?.error ?? error);
+    throw new Error(errorMessage);
+  }
+
+  /**
+   * Extracts error messages from a given error response object.
+   * If fieldErrors are present, it extracts the error messages from each field.
+   * If globalErrors are present, it extracts the error messages from each global error.
+   * Otherwise, it returns the top-level error message.
+   *
+   * @param {ErrorObject} errorObject - The error response object.
+   * @returns {string[]} An array of error messages.
+   */
+  private extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+    const {
+      error: { fieldErrors, globalErrors, message, code },
+    } = errorObject ?? {};
+
+    if (fieldErrors) {
+      return Object.values(fieldErrors)
+        .flatMap((errors) => errors.map((error) => error.message))
+        .join('\n');
     }
+
+    if (globalErrors) {
+      return Object.values(globalErrors)
+        .flatMap((errors) => errors.map((error) => error.message))
+        .join('\n');
+    }
+
+    return message ?? code ?? this.translateService.instant('unknownError');
   }
 }
