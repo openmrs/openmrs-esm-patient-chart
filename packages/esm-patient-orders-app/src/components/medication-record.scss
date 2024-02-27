@@ -3,6 +3,14 @@
 @use '@carbon/styles/scss/type';
 @import "../root";
 
+.medicationContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: spacing.$spacing-05;
+  border-bottom: none;
+}
+
 .widgetCard {
   border: 1px solid colors.$gray-20;
   border-bottom: none;
@@ -32,6 +40,7 @@
   justify-content: space-between;
   min-height: spacing.$spacing-11;
   padding-bottom: spacing.$spacing-02;
+  margin-right: spacing.$spacing-07;
 
   span {
     margin: 0rem;

@@ -48,6 +48,8 @@ import styles from './order-details-table.scss';
 import PrintComponent from '../print/print.component';
 import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
 import { labsOrderBasket, medicationsOrderBasket } from '../constants';
+import MedicationRecord from './medication-record.component';
+import TestOrder from './test-order.component';
 
 interface OrderDetailsProps {
   title?: string;
@@ -346,18 +348,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                           row,
                         })}
                       >
-                        {/* {console.log(row)} */}
-                        {/* Pick orderItem from actions key */}
-                        {row.cells.map((cell) => cell.info.header === 'actions' && cell.value) && (
-                          <div>
-                            {row.cells
-                              .map((cell) => cell.info.header === 'actions' && cell.value)
-                              .map((orderItem) => {
-                                // console.log('orderItem', orderItem);
-                                return orderItem;
-                              })}
-                          </div>
-                        )}
+                        <ExpandedOrderView row={row} />
                       </TableExpandedRow>
                     </React.Fragment>
                   ))}
@@ -407,6 +398,24 @@ function InfoTooltip({ orderer }: { orderer: string }) {
       size="sm"
     />
   );
+}
+
+function ExpandedOrderView({ row }: { row: any }) {
+  const { t } = useTranslation();
+  let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
+  let orderItem = orderActions.value?.props?.orderItem;
+
+  if (orderItem.type == 'drugorder') {
+    return <MedicationRecord medication={orderItem} />;
+  } else if (orderItem.type == 'testorder') {
+    return <TestOrder testOrder={orderItem} />;
+  } else {
+    return (
+      <div>
+        <p>{t('unknownOrderType', 'Unknown Order Type')}</p>
+      </div>
+    );
+  }
 }
 
 function OrderBasketItemActions({

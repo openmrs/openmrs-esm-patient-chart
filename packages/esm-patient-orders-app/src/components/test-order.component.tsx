@@ -10,7 +10,6 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   return (
     <div className={styles.testOrder}>
       <p>{testOrder.concept.display}</p>
-      <p>{testOrder.action}</p>
     </div>
   );
 };

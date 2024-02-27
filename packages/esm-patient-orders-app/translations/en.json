@@ -43,5 +43,6 @@
   "status": "Status",
   "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
   "unknown": "Unknown",
+  "unknownOrderType": "Unknown Order Type",
   "viewEdit": "View/Edit Order"
 }
