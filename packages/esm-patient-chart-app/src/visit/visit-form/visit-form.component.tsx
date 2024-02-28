@@ -642,6 +642,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
+            <ExtensionSlot state={{ patientUuid }} name="extra-visit-attribute-slot" />
+
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
               <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
