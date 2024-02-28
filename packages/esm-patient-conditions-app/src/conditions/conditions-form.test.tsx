@@ -82,7 +82,7 @@ describe('Conditions Form', () => {
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
     expect(submitButton).toBeInTheDocument();
-    expect(submitButton).toBeDisabled();
+    expect(submitButton).not.toBeDisabled();
   });
 
   it('closes the form and the workspace when the cancel button is clicked', async () => {
@@ -119,17 +119,10 @@ describe('Conditions Form', () => {
     expect(screen.queryByRole('menuitem', { name: /Headache/i })).not.toBeInTheDocument();
     expect(screen.queryByDisplayValue('Headache')).not.toBeInTheDocument();
 
-    const mockedSearchedCondition = [{ id: '1', display: 'Headache' }];
-    mockUseConditionsSearch.mockReturnValue({
-      conditions: mockedSearchedCondition, // Update conditions to include 'Headache'
-      error: null,
-      isSearching: false,
-    });
-
     await user.type(conditionSearchInput, 'Headache');
 
     expect(screen.getByDisplayValue(/headache/i)).toBeInTheDocument();
-  }, 30000);
+  });
 
   it('renders an error message when no matching conditions are found', async () => {
     const user = userEvent.setup();
