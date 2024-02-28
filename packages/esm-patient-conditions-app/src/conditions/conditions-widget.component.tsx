@@ -247,9 +247,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 )}
               />
               {errors?.search && <p className={styles.errorMessage}>{errors?.search?.message}</p>}
-              {isSubmittingForm && !selectedCondition && (
-                <p className={styles.errorMessage}>Please choose a condition</p>
-              )}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)

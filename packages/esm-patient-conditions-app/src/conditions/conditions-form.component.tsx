@@ -40,7 +40,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
-  const [isDisabled, setIsDisabled] = useState(true);
 
   const methods = useForm<ConditionFormData>({
     mode: 'all',
@@ -58,24 +57,13 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   });
 
   const {
-    formState: { isDirty },
+    setError,
+    formState: { isDirty, errors },
   } = methods;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
-
-  const { watch, setValue, setError } = methods;
-  const search = watch('search');
-  const onsetDateTime = watch('onsetDateTime');
-
-  useEffect(() => {
-    if (search || onsetDateTime) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [onsetDateTime, setValue, search, watch]);
 
   const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
     setIsSubmittingForm(true);
@@ -136,7 +124,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button className={styles.button} disabled={isSubmittingForm || isDisabled} kind="primary" type="submit">
+            <Button className={styles.button} disabled={isSubmittingForm || !isDirty} kind="primary" type="submit">
               {isSubmittingForm ? (
                 <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
               ) : (
