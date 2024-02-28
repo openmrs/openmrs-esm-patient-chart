@@ -33,7 +33,9 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    await page.fill('input[placeholder="dd/mm/yyyy"]', '30/03/2024');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    await page.fill('input[placeholder="dd/mm/yyyy"]', tomorrow.toLocaleDateString('en-GB'));
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -73,7 +75,9 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I change the date to Today', async () => {
-    await page.fill('input[placeholder="dd/mm/yyyy"]', '28/03/2024');
+    const today = new Date();
+    today.setDate(today.getDate());
+    await page.fill('input[placeholder="dd/mm/yyyy"]', today.toLocaleDateString('en-GB'));
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
