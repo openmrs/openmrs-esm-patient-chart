@@ -17,6 +17,9 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -45,6 +48,8 @@ import styles from './order-details-table.scss';
 import PrintComponent from '../print/print.component';
 import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
 import { labsOrderBasket, medicationsOrderBasket } from '../constants';
+import MedicationRecord from './medication-record.component';
+import TestOrder from './test-order.component';
 
 interface OrderDetailsProps {
   title?: string;
@@ -86,8 +91,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
-      key: 'orderId',
-      header: t('orderId', 'Order ID'),
+      key: 'orderNumber',
+      header: t('orderNumber', 'Order number'),
       isSortable: true,
     },
     {
@@ -120,22 +125,18 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       header: t('status', 'Status'),
       isSortable: true,
     },
+    {
+      key: 'actions',
+      header: '',
+      isSortable: false,
+    },
   ];
 
   const tableRows = useMemo(() => {
     return allOrders?.map((order) => ({
       id: order.uuid,
-      startDate: {
-        sortKey: dayjs(order.dateActivated).toDate(),
-        content: (
-          <div className={styles.startDateColumn}>
-            <span>{formatDate(new Date(order.dateActivated))}</span>
-            {!isPrinting && <InfoTooltip orderer={order.orderer?.person?.display ?? '--'} />}
-          </div>
-        ),
-      },
-      orderId: order.orderNumber,
-      dateOfOrder: formatDate(new Date(order.dateActivated)),
+      orderNumber: order.orderNumber,
+      dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
       orderType: capitalize(order.orderType?.display ?? '--'),
       order: order.display,
       priority: (
@@ -148,6 +149,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         <Tag type={orderStatusColor(order.fulfillerStatus)} className={styles.singleLineText}>
           {order.fulfillerStatus ?? '--'}
         </Tag>
+      ),
+      actions: !isPrinting && (
+        <OrderBasketItemActions
+          orderItem={allOrders.find((x) => x.uuid === order.uuid)}
+          items={orders}
+          setOrderItems={setOrders}
+          openOrderBasket={launchOrderBasket}
+          openOrderForm={launchOrderBasket}
+        />
       ),
     }));
   }, [allOrders]);
@@ -302,44 +312,45 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           overflowMenuOnHover={false}
           useZebraStyles
         >
-          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <TableContainer>
+          {({
+            rows,
+            headers,
+            getTableProps,
+            getHeaderProps,
+            getRowProps,
+            getExpandedRowProps,
+            getTableContainerProps,
+          }) => (
+            <TableContainer {...getTableContainerProps}>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
+                    <TableExpandHeader />
                     {headers.map((header) => (
-                      <TableHeader
-                        {...getHeaderProps({
-                          header,
-                          isSortable: header.isSortable,
-                        })}
-                      >
-                        {header.header}
-                      </TableHeader>
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
-                    <TableHeader />
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, rowIndex) => (
-                    <TableRow className={styles.row} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell className={styles.tableCell} key={cell.id}>
-                          <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
-                        </TableCell>
-                      ))}
-                      {!isPrinting && (
-                        <TableCell className="cds--table-column-menu">
-                          <OrderBasketItemActions
-                            orderItem={allOrders[rowIndex]}
-                            items={orders}
-                            setOrderItems={setOrders}
-                            openOrderBasket={launchOrderBasket}
-                            openOrderForm={launchOrderBasket}
-                          />
-                        </TableCell>
-                      )}
-                    </TableRow>
+                  {rows.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell className={styles.tableCell} key={cell.id}>
+                            <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
+                          </TableCell>
+                        ))}
+                      </TableExpandRow>
+                      <TableExpandedRow
+                        colSpan={headers.length + 1}
+                        className="demo-expanded-td"
+                        {...getExpandedRowProps({
+                          row,
+                        })}
+                      >
+                        <ExpandedRowView row={row} />
+                      </TableExpandedRow>
+                    </React.Fragment>
                   ))}
                 </TableBody>
               </Table>
@@ -387,6 +398,24 @@ function InfoTooltip({ orderer }: { orderer: string }) {
       size="sm"
     />
   );
+}
+
+function ExpandedRowView({ row }: { row: any }) {
+  const { t } = useTranslation();
+  let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
+  let orderItem = orderActions.value?.props?.orderItem;
+
+  if (orderItem.type == 'drugorder') {
+    return <MedicationRecord medication={orderItem} />;
+  } else if (orderItem.type == 'testorder') {
+    return <TestOrder testOrder={orderItem} />;
+  } else {
+    return (
+      <div>
+        <p>{t('unknownOrderType', 'Unknown Order Type')}</p>
+      </div>
+    );
+  }
 }
 
 function OrderBasketItemActions({
