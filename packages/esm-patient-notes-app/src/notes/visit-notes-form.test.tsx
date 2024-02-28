@@ -56,9 +56,6 @@ jest.mock('./visit-notes.resource', () => ({
   useInfiniteVisits: jest.fn().mockImplementation(() => ({
     mutateVisits: jest.fn(),
   })),
-  use: jest.fn().mockImplementation(() => ({
-    mutateVisitNotes: jest.fn(),
-  })),
 }));
 
 test('renders the visit notes form with all the relevant fields and values', () => {
