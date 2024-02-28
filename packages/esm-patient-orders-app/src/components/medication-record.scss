@@ -50,15 +50,3 @@
 .dosage {
   @include type.type-style("heading-compact-01");
 }
-
-.tooltip {
-  margin: 0rem -0.5rem -0.625rem;
-}
-
-.menuItem {
-  max-width: none;
-}
-
-.buttons {
-  justify-content: flex-end;
-}

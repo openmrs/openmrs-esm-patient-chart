@@ -348,7 +348,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                           row,
                         })}
                       >
-                        <ExpandedOrderView row={row} />
+                        <ExpandedRowView row={row} />
                       </TableExpandedRow>
                     </React.Fragment>
                   ))}
@@ -400,7 +400,7 @@ function InfoTooltip({ orderer }: { orderer: string }) {
   );
 }
 
-function ExpandedOrderView({ row }: { row: any }) {
+function ExpandedRowView({ row }: { row: any }) {
   const { t } = useTranslation();
   let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
   let orderItem = orderActions.value?.props?.orderItem;

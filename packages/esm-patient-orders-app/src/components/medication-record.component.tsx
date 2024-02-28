@@ -4,7 +4,7 @@ import { formatDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './medication-record.scss';
-import { IconButton } from '@carbon/react';
+import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { User } from '@carbon/react/icons';
 
 interface MedicationRecordProps {
@@ -13,12 +13,11 @@ interface MedicationRecordProps {
 
 const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
   const { t } = useTranslation();
-
   return (
     <div className={styles.medicationContainer}>
       <div className={styles.startDateColumn}>
         <span>{formatDate(new Date(medication.dateActivated))}</span>
-        <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
+        <InfoTooltip orderer={medication.orderer?.display ?? '--'} />
       </div>
       <div className={styles.medicationRecord}>
         <div>
@@ -74,19 +73,18 @@ const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
   );
 };
 
-export default MedicationRecord;
-
-function InfoTooltip({ orderer }: { orderer: string }) {
+function InfoTooltip({ orderer }: { orderer: any }) {
+  const { t } = useTranslation();
   return (
-    <IconButton
-      className={styles.tooltip}
-      align="top-left"
-      direction="top"
-      label={orderer}
-      renderIcon={(props) => <User size={16} {...props} />}
-      iconDescription={orderer}
-      kind="ghost"
-      size="sm"
-    />
+    <Toggletip align="top-left">
+      <ToggletipButton label={t('ordererInformation', 'Orderer information')}>
+        <User size={16} />
+      </ToggletipButton>
+      <ToggletipContent>
+        <p>{orderer}</p>
+      </ToggletipContent>
+    </Toggletip>
   );
 }
+
+export default MedicationRecord;
