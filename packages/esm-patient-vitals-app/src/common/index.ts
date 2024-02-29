@@ -1,8 +1,11 @@
 export {
   invalidateCachedVitalsAndBiometrics,
   useVitalsAndBiometrics,
+  useVitalsConceptMetadata,
   updateVitalsAndBiometrics,
   saveVitalsAndBiometrics,
+  withUnit,
+  type ConceptMetadata,
 } from './data.resource';
 export {
   assessValue,

@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { withUnit } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { type PatientVitals } from '../common';
+import { withUnit, type PatientVitals } from '../common';
 import styles from './vitals-chart.scss';
 
 enum ScaleTypes {

@@ -3,17 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  useVitalsConceptMetadata,
-  withUnit,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics } from '../common';
+import { useVitalsConceptMetadata, withUnit } from '../common';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
@@ -34,7 +28,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
 
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
-  const { data: biometrics, isLoading, isError, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
+  const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
@@ -71,7 +65,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   );
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (biometrics?.length) {
     return (
       <div className={styles.widgetCard}>

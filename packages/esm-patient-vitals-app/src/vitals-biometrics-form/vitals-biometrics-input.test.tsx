@@ -1,11 +1,12 @@
 import React from 'react';
 import { screen, render, cleanup } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { assessValue, getReferenceRangesForConcept } from '../common';
-import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
+import { assessValue, getReferenceRangesForConcept, useVitalsConceptMetadata } from '../common';
 import { isValueWithinReferenceRange } from './vitals-biometrics-form.utils';
-import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
+
 const { conceptRanges, conceptMetadata: mockConceptMetadata } = useVitalsConceptMetadata();
+
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
   useFormContext: jest.fn().mockImplementation(() => ({
