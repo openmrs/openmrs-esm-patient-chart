@@ -13,9 +13,9 @@ export const encountersDashboardMeta = {
 };
 
 export const activeVisitDashboardMeta = {
-  slot: 'patient-chart-active visit-dashboard-slot',
+  slot: 'patient-chart-active-visit-dashboard-slot',
   columns: 1,
-  path: 'Active visit',
-  title: 'Active visit',
+  path: 'Active Visits',
+  title: 'Active Visits',
   hideDashboardTitle: true,
 };

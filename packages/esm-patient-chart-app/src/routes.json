@@ -248,12 +248,12 @@
       "component": "activeVisitDashboardLink",
       "slot": "patient-chart-dashboard-slot",
       "meta": {
-        "slot": "patient-chart-active visit-dashboard-slot",
+        "slot": "patient-chart-active-visit-dashboard-slot",
         "columns": 1,
-        "path": "Active visit",
+        "path": "Active Visits",
         "hideDashboardTitle": true
       },
-      "featureFlag": "activeVisit",
+      "featureFlag": "activeVisitsSummaryTab",
       "order": 10,
       "online": true,
       "offline": false
@@ -261,13 +261,13 @@
     {
       "name": "active-visit-overview",
       "component": "activeVisitDetailOverview",
-      "slot": "patient-chart-active visit-dashboard-slot",
+      "slot": "patient-chart-active-visit-dashboard-slot",
       "order": 1,
       "meta": {
-        "title": "Active visit",
-        "view": "Active Visit"
+        "title": "Active Visits",
+        "view": "Active Visits"
       },
-      "featureFlag": "activeVisit",
+      "featureFlag": "activeVisitsSummaryTab",
       "online": true,
       "offline": false
     }

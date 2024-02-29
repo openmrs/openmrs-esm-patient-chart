@@ -12,6 +12,7 @@ import {
   useConnectedExtensions,
   useLayoutType,
   type Visit,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   type Order,
@@ -28,7 +29,6 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-summary.scss';
-import { type ChartConfig } from '../../../config-schema';
 import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
 
 interface DiagnosisItem {
@@ -48,7 +48,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
-  const { showFilledFormsInTabs } = useConfig<ChartConfig>();
+  const isActiveVisitSummaryTabEnabled = useFeatureFlag('activeVisitsSummaryTab');
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -163,13 +163,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          {showFilledFormsInTabs ? (
+          {isActiveVisitSummaryTabEnabled ? (
             visit?.encounters?.length > 0 &&
-            visit?.encounters.map((enc, ind) => (
-              <Tab id={'tab-' + ind} key={ind} className={classNames(styles.tab, styles.bodyLong01)}>
-                {enc?.form?.display}
-              </Tab>
-            ))
+            visit?.encounters
+              .filter((enc) => !!enc.form)
+              .map((enc, ind) => (
+                <Tab id={'tab-' + ind} key={ind} className={classNames(styles.tab, styles.bodyLong01)}>
+                  {enc?.form?.display}
+                </Tab>
+              ))
           ) : (
             <Tab
               className={styles.tab}
@@ -198,8 +200,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {showFilledFormsInTabs ? (
-            visit?.encounters?.length > 0 && foundEncounter ? (
+          {isActiveVisitSummaryTabEnabled ? (
+            visit?.encounters?.length > 0 &&
+            foundEncounter && (
               <TabPanel key={selectedIndex}>
                 <OHRIForm
                   patientUUID={patientUuid}
@@ -207,10 +210,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
                   encounterUUID={foundEncounter.uuid}
                   mode="view"
                 />
-              </TabPanel>
-            ) : (
-              <TabPanel key={selectedIndex}>
-                <></>
               </TabPanel>
             )
           ) : (

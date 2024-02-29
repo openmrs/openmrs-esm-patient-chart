@@ -17,7 +17,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const { t } = useTranslation();
   const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
     useInfiniteVisits(patientUuid);
-  const { showAllEncountersTab, showFilledFormsInTabs } = useConfig<ChartConfig>();
+  const { showAllEncountersTab } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
   const { currentVisit, isLoading: isLoadingCurrentVisit, error: isError } = useVisit(patientUuid);
 

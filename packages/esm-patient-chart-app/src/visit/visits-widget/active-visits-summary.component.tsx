@@ -27,7 +27,7 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
     );
   }
 
-  if (!!error) {
+  if (error) {
     return <ErrorState headerTitle={t('failedToLoadActiveVisits', 'Failed loading active visits')} error={error} />;
   }
 
@@ -37,18 +37,14 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
         <TabList aria-label="Active visit tabs" contained>
           {activeVisits?.map((visit, index) => (
             <Tab label={visit?.visitType?.name} key={index} id={`${index}-id}`}>
-              {visit?.visitType?.name} {t('visit', 'Visit')}
+              {t('activeVisitType', '{{visitType}} Visit', { visitType: visit?.visitType?.name })}
             </Tab>
           ))}
         </TabList>
         <TabPanels>
           {activeVisits?.map((visit, index) => (
             <TabPanel key={index}>
-              {isLoading ? (
-                <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-              ) : error ? (
-                <ErrorState headerTitle={t('activeVisit', 'Active visit')} error={error} />
-              ) : visit ? (
+              {visit && (
                 <div className={styles.container}>
                   <div className={styles.header}>
                     <div className={styles.visitInfo}>
@@ -69,8 +65,6 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
                   </div>
                   <VisitSummary visit={visit} patientUuid={patientUuid} />
                 </div>
-              ) : (
-                <EmptyState headerTitle={t('visit', 'Visit')} displayText={t('visit', 'Visit')} />
               )}
             </TabPanel>
           ))}

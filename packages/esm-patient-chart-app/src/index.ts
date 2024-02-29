@@ -37,8 +37,8 @@ import activeVisitDetailOverviewComponent from './visit/visits-widget/active-vis
 window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
 
 registerFeatureFlag(
-  'activeVisit',
-  'Active visit',
+  'activeVisitsSummaryTab',
+  'Active visits summary',
   'This feature introduces a navigation on the patient chart left nav called active visit and shows the active visit details within patient chart',
 );
 

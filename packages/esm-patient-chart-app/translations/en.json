@@ -1,5 +1,6 @@
 {
   "activeVisit": "Active visit",
+  "activeVisitType": "{{visitType}} Visit",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
