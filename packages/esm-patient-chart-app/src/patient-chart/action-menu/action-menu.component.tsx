@@ -10,7 +10,10 @@ export const ActionMenu: React.FC<ActionMenuInterface> = () => {
   const { active, workspaceWindowState } = useWorkspaces();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const initialHeight = useRef(window.innerHeight);
+
   const isTablet = useLayoutType() === 'tablet';
+  const isPhone = useLayoutType() === 'phone';
+
   useEffect(() => {
     const handleKeyboardVisibilityChange = () => {
       setKeyboardVisible(initialHeight.current > window.innerHeight);
@@ -22,7 +25,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = () => {
     return () => window.removeEventListener('resize', handleKeyboardVisibilityChange);
   }, [initialHeight]);
 
-  if (active && workspaceWindowState !== 'hidden' && isTablet) {
+  if (active && workspaceWindowState !== 'hidden' && (isTablet || isPhone)) {
     return null;
   }
 
