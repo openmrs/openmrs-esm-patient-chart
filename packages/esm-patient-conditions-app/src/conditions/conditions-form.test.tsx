@@ -82,7 +82,7 @@ describe('Conditions Form', () => {
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
     expect(submitButton).toBeInTheDocument();
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeDisabled();
   });
 
   it('closes the form and the workspace when the cancel button is clicked', async () => {
