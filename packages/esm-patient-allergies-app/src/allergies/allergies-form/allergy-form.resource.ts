@@ -143,3 +143,19 @@ export function saveAllergy(payload: NewAllergy, patientUuid: string, abortContr
     signal: abortController.signal,
   });
 }
+
+export function updatePatientAllergy(
+  payload: NewAllergy,
+  patientUuid: string,
+  allergenUuid: string,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy/${allergenUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: payload,
+    signal: abortController.signal,
+  });
+}

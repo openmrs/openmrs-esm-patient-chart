@@ -4,14 +4,22 @@ import { screen, render, within } from '@testing-library/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions } from '__mocks__';
 import { mockPatient } from 'tools';
-import { type NewAllergy, saveAllergy, useAllergens, useAllergicReactions } from './allergy-form.resource';
+import {
+  type NewAllergy,
+  saveAllergy,
+  useAllergens,
+  useAllergicReactions,
+  updatePatientAllergy,
+} from './allergy-form.resource';
 import AllergyForm from './allergy-form.component';
-import { AllergenType } from '../../types';
+import { AllergenType, ReactionSeverity } from '../../types';
+import { mockAllergy } from '__mocks__';
 
 const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
 const mockUseAllergens = useAllergens as jest.Mock;
 const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
+const mockUpdatePatientAllergy = updatePatientAllergy as jest.Mock;
 
 jest.mock('./allergy-form.resource', () => {
   const originalModule = jest.requireActual('./allergy-form.resource');
@@ -19,6 +27,7 @@ jest.mock('./allergy-form.resource', () => {
   return {
     ...originalModule,
     saveAllergy: jest.fn(() => Promise.resolve({ data: {}, status: 201, statusText: 'Created' })),
+    updatePatientAllergy: jest.fn(() => Promise.resolve({ data: {}, status: 200, statusText: 'Updated' })),
     useAllergens: jest.fn(),
     useAllergicReactions: jest.fn(),
   };
@@ -269,6 +278,45 @@ describe('AllergyForm ', () => {
       kind: 'error',
     });
   });
+  it('Edit Allergy should call the saveAllergy function with updated payload', async () => {
+    mockSaveAllergy.mockClear();
+    renderEditAllergyForm();
+
+    const user = userEvent.setup();
+    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
+    const commentInput = screen.getByLabelText(/Date of onset and comments/i);
+
+    const allergen = mockAllergens[2];
+    const reaction = mockAllergicReactions[0];
+    const comment = 'new comment';
+
+    await user.click(allergenInput);
+    await user.click(screen.getByText(allergen.display));
+    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
+    await user.click(screen.getByRole('radio', { name: /moderate/i }));
+    await user.clear(commentInput);
+    await user.type(commentInput, comment);
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockUpdatePatientAllergy).toHaveBeenCalledTimes(1);
+
+    const expectedPayload: NewAllergy = {
+      allergen: {
+        allergenType: allergen.type,
+        codedAllergen: { uuid: allergen.uuid },
+      },
+      comment,
+      reactions: [
+        { reaction: { uuid: reaction.uuid } },
+        { reaction: { uuid: mockAllergicReactions[2].uuid } },
+        { reaction: { uuid: mockAllergicReactions[3].uuid } },
+      ],
+      severity: { uuid: mockConcepts.moderateReactionUuid },
+    };
+
+    expect(mockUpdatePatientAllergy.mock.calls[0][0]).toEqual(expectedPayload);
+    expect(mockAllergy).not.toEqual(expectedPayload);
+  });
 });
 
 function renderAllergyForm() {
@@ -276,6 +324,22 @@ function renderAllergyForm() {
     closeWorkspace: () => {},
     closeWorkspaceWithSavedChanges: () => {},
     promptBeforeClosing: () => {},
+    allergy: null,
+    formContext: 'creating' as 'creating' | 'editing',
+    patient: mockPatient,
+    patientUuid: mockPatient.id,
+  };
+
+  render(<AllergyForm {...testProps} />);
+}
+
+function renderEditAllergyForm() {
+  const testProps = {
+    closeWorkspace: () => {},
+    closeWorkspaceWithSavedChanges: () => {},
+    promptBeforeClosing: () => {},
+    allergy: mockAllergy,
+    formContext: 'editing' as 'creating' | 'editing',
     patient: mockPatient,
     patientUuid: mockPatient.id,
   };

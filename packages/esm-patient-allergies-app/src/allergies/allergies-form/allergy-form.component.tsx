@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -19,7 +19,7 @@ import {
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type Control, Controller, useForm, type UseFormSetValue } from 'react-hook-form';
+import { type Control, Controller, useForm, type UseFormSetValue, type UseFormGetValues } from 'react-hook-form';
 import {
   ExtensionSlot,
   type FetchResponse,
@@ -36,8 +36,9 @@ import {
   saveAllergy,
   useAllergens,
   useAllergicReactions,
+  updatePatientAllergy,
 } from './allergy-form.resource';
-import { useAllergies } from '../allergy-intolerance.resource';
+import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
 import { AllergenType } from '../../types';
 import styles from './allergy-form.scss';
 
@@ -65,8 +66,14 @@ type AllergyFormData = {
   comment: string;
 };
 
-function AllergyForm(props: DefaultWorkspaceProps) {
-  const { closeWorkspace, patientUuid, promptBeforeClosing, closeWorkspaceWithSavedChanges } = props;
+interface AllergyFormProps extends DefaultWorkspaceProps {
+  allergy?: Allergy;
+  formContext: 'creating' | 'editing';
+}
+
+function AllergyForm(props: AllergyFormProps) {
+  const { closeWorkspace, patientUuid, allergy, formContext, promptBeforeClosing, closeWorkspaceWithSavedChanges } =
+    props;
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -82,23 +89,63 @@ function AllergyForm(props: DefaultWorkspaceProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { mutate } = useAllergies(patientUuid);
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { isDirty },
-  } = useForm<AllergyFormData>({
-    mode: 'all',
-    resolver: zodResolver(allergyFormSchema),
-    defaultValues: {
+  const getDefaultAllergy = (allergy: Allergy, formContext) => {
+    const defaultAllergy = {
       allergen: null,
       nonCodedAllergen: '',
       allergicReactions: [],
       nonCodedAllergicReaction: '',
       severityOfWorstReaction: null,
       comment: '',
-    },
+    };
+    if (formContext === 'editing') {
+      defaultAllergy.allergen = allergens?.find((a) => allergy?.display === a?.display);
+      defaultAllergy.allergicReactions = allergicReactions?.map((reaction) => {
+        return allergy?.reactionManifestations?.includes(reaction.display) ? reaction.uuid : '';
+      });
+      switch (allergy?.reactionSeverity) {
+        case 'mild':
+          defaultAllergy.severityOfWorstReaction = mildReactionUuid;
+          break;
+        case 'moderate':
+          defaultAllergy.severityOfWorstReaction = moderateReactionUuid;
+          break;
+        case 'severe':
+          defaultAllergy.severityOfWorstReaction = severeReactionUuid;
+          break;
+        default:
+          defaultAllergy.severityOfWorstReaction = null;
+      }
+      defaultAllergy.comment = allergy?.note !== '--' ? allergy?.note : '';
+
+      const codedAllergenDisplays = allergens?.map((allergen) => allergen?.display);
+
+      if (!codedAllergenDisplays?.includes(allergy?.display)) {
+        defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType?.OTHER };
+        defaultAllergy.nonCodedAllergen = allergy?.display;
+      }
+
+      const allergicReactionDisplays = allergicReactions?.map((reaction) => reaction?.display);
+      allergy?.reactionManifestations?.forEach((reaction) => {
+        if (!allergicReactionDisplays?.includes(reaction)) {
+          defaultAllergy.nonCodedAllergicReaction = reaction;
+          defaultAllergy.allergicReactions?.splice(defaultAllergy.allergicReactions?.length - 1, 1, otherConceptUuid);
+        }
+      });
+    }
+    return defaultAllergy;
+  };
+  const {
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { isDirty },
+  } = useForm<AllergyFormData>({
+    mode: 'all',
+    resolver: zodResolver(allergyFormSchema),
+    values: getDefaultAllergy(allergy, formContext),
   });
 
   useEffect(() => {
@@ -110,8 +157,8 @@ function AllergyForm(props: DefaultWorkspaceProps) {
   const selectedSeverityOfWorstReaction = watch('severityOfWorstReaction');
   const selectednonCodedAllergen = watch('nonCodedAllergen');
   const selectedNonCodedAllergicReaction = watch('nonCodedAllergicReaction');
+  const reactionsValidation = selectedAllergicReactions?.some((item) => item !== '');
 
-  const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
   useEffect(() => {
     if (!!selectedAllergen && reactionsValidation && !!selectedSeverityOfWorstReaction) setIsDisabled(false);
     else setIsDisabled(true);
@@ -137,7 +184,8 @@ function AllergyForm(props: DefaultWorkspaceProps) {
       } = data;
 
       const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
-      let payload: NewAllergy = {
+
+      let patientAllergy: NewAllergy = {
         allergen:
           allergen.uuid == otherConceptUuid
             ? {
@@ -160,30 +208,55 @@ function AllergyForm(props: DefaultWorkspaceProps) {
         }),
       };
       const abortController = new AbortController();
-      saveAllergy(payload, patientUuid, abortController)
-        .then(
-          (response: FetchResponse) => {
-            if (response.status === 201) {
-              mutate();
-              closeWorkspaceWithSavedChanges();
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                title: t('allergySaved', 'Allergy saved'),
-                subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
-              });
-            }
-          },
-          (err) => {
-            showSnackbar({
-              title: t('allergySaveError', 'Error saving allergy'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: err?.message,
-            });
-          },
-        )
-        .finally(() => abortController.abort());
+      formContext === 'editing'
+        ? updatePatientAllergy(patientAllergy, patientUuid, allergy?.id, abortController)
+            .then(
+              (response: FetchResponse) => {
+                if (response.status === 200) {
+                  mutate();
+                  closeWorkspace({ ignoreChanges: true });
+                  showSnackbar({
+                    isLowContrast: true,
+                    kind: 'success',
+                    title: t('allergySaved', 'Allergy saved'),
+                    subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+                  });
+                }
+              },
+              (err) => {
+                showSnackbar({
+                  title: t('allergySaveError', 'Error saving allergy'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              },
+            )
+            .finally(() => abortController.abort())
+        : saveAllergy(patientAllergy, patientUuid, abortController)
+            .then(
+              (response: FetchResponse) => {
+                if (response.status === 201) {
+                  mutate();
+                  closeWorkspace({ ignoreChanges: true });
+                  showSnackbar({
+                    isLowContrast: true,
+                    kind: 'success',
+                    title: t('allergySaved', 'Allergy saved'),
+                    subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+                  });
+                }
+              },
+              (err) => {
+                showSnackbar({
+                  title: t('allergySaveError', 'Error saving allergy'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              },
+            )
+            .finally(() => abortController.abort());
     },
     [otherConceptUuid, patientUuid, closeWorkspaceWithSavedChanges, t, mutate],
   );
@@ -370,7 +443,10 @@ function AllergicReactionsField({
   methods: { control, setValue },
 }: {
   allergicReactions: AllergicReaction[];
-  methods: { control: Control<AllergyFormData>; setValue: UseFormSetValue<AllergyFormData> };
+  methods: {
+    control: Control<AllergyFormData>;
+    setValue: UseFormSetValue<AllergyFormData>;
+  };
 }) {
   const handleAllergicReactionChange = useCallback(
     (onChange, checked, id, index) => {
