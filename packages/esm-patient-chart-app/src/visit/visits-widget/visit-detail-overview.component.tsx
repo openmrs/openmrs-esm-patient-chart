@@ -78,20 +78,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                     <VisitSummary visit={visit} patientUuid={patientUuid} />
                   </div>
                 ))}
-
-                {hasMore ? (
-                  <Button
-                    className={styles.loadMoreButton}
-                    disabled={isValidating && shouldLoadMore}
-                    onClick={() => setSize(size + 1)}
-                  >
-                    {isValidating && shouldLoadMore ? (
-                      <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-                    ) : (
-                      t('loadMore', 'Load more')
-                    )}
-                  </Button>
-                ) : null}
               </>
             ) : (
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
@@ -117,6 +103,20 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
           )}
         </TabPanels>
       </Tabs>
+
+      {hasMore ? (
+        <Button
+          className={styles.loadMoreButton}
+          disabled={isValidating && shouldLoadMore}
+          onClick={() => setSize(size + 1)}
+        >
+          {isValidating && shouldLoadMore ? (
+            <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+          ) : (
+            t('loadMore', 'Load more')
+          )}
+        </Button>
+      ) : null}
     </div>
   );
 }
