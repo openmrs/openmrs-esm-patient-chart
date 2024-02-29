@@ -9,8 +9,8 @@ import {
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   type OrderBasketItem,
+  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem } from '../api';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
