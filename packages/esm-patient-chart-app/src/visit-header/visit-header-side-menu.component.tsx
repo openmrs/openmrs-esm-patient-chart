@@ -10,8 +10,8 @@ const VisitHeaderSideMenu: React.FC<VisitHeaderSideMenu> = ({ isExpanded, toggle
   const menuRef = useOnClickOutside(() => toggleSideMenu(), isExpanded);
 
   React.useEffect(() => {
-    window.addEventListener('single-spa:before-no-app-change', () => toggleSideMenu(false));
-    return () => window.addEventListener('single-spa:before-no-app-change', () => toggleSideMenu(false));
+    window.addEventListener('popstate', () => toggleSideMenu(false));
+    return () => window.addEventListener('popstate', () => toggleSideMenu(false));
   }, [toggleSideMenu]);
 
   return isExpanded ? <LeftNavMenu ref={menuRef} /> : null;
