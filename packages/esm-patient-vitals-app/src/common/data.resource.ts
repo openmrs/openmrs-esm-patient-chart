@@ -7,13 +7,13 @@ import {
   openmrsFetch,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
-import { type KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
+import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
+import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
-import type { FHIRSearchBundleResponse, MappedVitals, PatientVitals, VitalsResponse } from './types';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
+import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.component';
 
 const pageSize = 100;
@@ -175,7 +175,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     }
   };
 
-  const formattedObs: Array<PatientVitals> = useMemo(() => {
+  const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
     const vitalsHashTable = data?.[0]?.data?.entry
       ?.map((entry) => entry.resource)
       .filter(Boolean)
@@ -198,7 +198,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         }
 
         return vitalsHashTable;
-      }, new Map<string, Partial<PatientVitals>>());
+      }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
 
     return Array.from(vitalsHashTable ?? []).map(([date, vitalSigns], index) => {
       const result = {

@@ -207,7 +207,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
 
       {showInvalidInputError && (
         <FormLabel className={styles.invalidInputError}>
-          {t('validationInputError', `Value must be between {{min}} and {{max}}`, {
+          {t('validationInputError', `Value must be between {{max}} and {{max}}`, {
             min: fieldProperties[0].min,
             max: fieldProperties[0].max,
           })}

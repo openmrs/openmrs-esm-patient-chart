@@ -1,22 +1,21 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { type ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics } from '../common';
-import { useVitalsConceptMetadata, withUnit } from '../common';
+import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../common';
+import { type ConfigObject } from '../config-schema';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
 
 interface BiometricsBaseProps {
-  patientUuid: string;
   pageSize: number;
-  urlLabel: string;
   pageUrl: string;
+  patientUuid: string;
+  urlLabel: string;
 }
 
 const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
@@ -26,13 +25,13 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
 
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchBiometricsForm = React.useCallback(
+  const launchBiometricsForm = useCallback(
     () => launchVitalsAndBiometricsForm(currentVisit, config),
     [config, currentVisit],
   );

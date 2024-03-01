@@ -14,4 +14,4 @@ export {
   generatePlaceholder,
   interpretBloodPressure,
 } from './helpers';
-export type { ObservationInterpretation, PatientVitals } from './types';
+export type { ObservationInterpretation, PatientVitalsAndBiometrics } from './types';

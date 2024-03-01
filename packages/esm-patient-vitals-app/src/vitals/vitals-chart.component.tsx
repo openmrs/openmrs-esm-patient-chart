@@ -5,7 +5,7 @@ import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { withUnit, type PatientVitals } from '../common';
+import { withUnit, type PatientVitalsAndBiometrics } from '../common';
 import styles from './vitals-chart.scss';
 
 enum ScaleTypes {
@@ -19,7 +19,7 @@ enum ScaleTypes {
 interface VitalsChartProps {
   conceptUnits: Map<string, string>;
   config: ConfigObject;
-  patientVitals: Array<PatientVitals>;
+  patientVitals: Array<PatientVitalsAndBiometrics>;
 }
 
 interface VitalsChartData {

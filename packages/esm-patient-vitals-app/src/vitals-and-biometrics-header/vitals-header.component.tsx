@@ -8,9 +8,6 @@ import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { type ConfigObject } from '../config-schema';
-import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
-import VitalsHeaderItem from './vitals-header-item.component';
 import {
   assessValue,
   getReferenceRangesForConcept,
@@ -18,6 +15,9 @@ import {
   useVitalsAndBiometrics,
   useVitalsConceptMetadata,
 } from '../common';
+import { type ConfigObject } from '../config-schema';
+import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
+import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
 
 interface VitalsHeaderProps {
