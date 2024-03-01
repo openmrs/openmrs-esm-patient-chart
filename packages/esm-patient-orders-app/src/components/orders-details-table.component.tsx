@@ -9,6 +9,7 @@ import {
   DataTable,
   DataTableSkeleton,
   Dropdown,
+  Layer,
   IconButton,
   InlineLoading,
   OverflowMenu,
@@ -24,6 +25,7 @@ import {
   TableHeader,
   TableRow,
   Tag,
+  Tile,
   Tooltip,
 } from '@carbon/react';
 import {
@@ -41,6 +43,7 @@ import {
   type DrugOrderBasketItem,
   type LabOrderBasketItem,
   getDrugOrderByUuid,
+  EmptyDataIllustration,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
@@ -245,10 +248,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     return <ErrorState error={isError} headerTitle={title} />;
   }
 
-  if (!tableRows?.length) {
-    return <EmptyState displayText={headerTitle} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
-  }
-
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={title}>
@@ -302,69 +301,85 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       </CardHeader>
       <div ref={contentToPrintRef}>
         <PrintComponent subheader={title} patientDetails={patientDetails} />
-        <DataTable
-          data-floating-menu-container
-          size="sm"
-          headers={tableHeaders}
-          rows={paginatedOrders}
-          isSortable
-          sortRow={sortRow}
-          overflowMenuOnHover={false}
-          useZebraStyles
-        >
-          {({
-            rows,
-            headers,
-            getTableProps,
-            getHeaderProps,
-            getRowProps,
-            getExpandedRowProps,
-            getTableContainerProps,
-          }) => (
-            <TableContainer {...getTableContainerProps}>
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader />
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow className={styles.row} {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell className={styles.tableCell} key={cell.id}>
-                            <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
-                          </TableCell>
+        {!tableRows?.length ? (
+          <Layer>
+            <Tile className={styles.tile}>
+              <EmptyDataIllustration />
+              <p className={styles.message}>There are no orders to display for this patient</p>
+              <p className={styles.action}>
+                <Button onClick={launchOrderBasket} kind="ghost" size={isTablet ? 'lg' : 'sm'}>
+                  Record Orders
+                </Button>
+              </p>
+            </Tile>
+          </Layer>
+        ) : (
+          <>
+            <DataTable
+              data-floating-menu-container
+              size="sm"
+              headers={tableHeaders}
+              rows={paginatedOrders}
+              isSortable
+              sortRow={sortRow}
+              overflowMenuOnHover={false}
+              useZebraStyles
+            >
+              {({
+                rows,
+                headers,
+                getTableProps,
+                getHeaderProps,
+                getRowProps,
+                getExpandedRowProps,
+                getTableContainerProps,
+              }) => (
+                <TableContainer {...getTableContainerProps}>
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      <TableRow>
+                        <TableExpandHeader />
+                        {headers.map((header) => (
+                          <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                         ))}
-                      </TableExpandRow>
-                      <TableExpandedRow
-                        colSpan={headers.length + 1}
-                        className="demo-expanded-td"
-                        {...getExpandedRowProps({
-                          row,
-                        })}
-                      >
-                        <ExpandedRowView row={row} />
-                      </TableExpandedRow>
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-        {!isPrinting && (
-          <PatientChartPagination
-            pageNumber={currentPage}
-            totalItems={tableRows?.length}
-            currentItems={paginatedOrders?.length}
-            pageSize={defaultPageSize}
-            onPageNumberChange={({ page }) => goTo(page)}
-          />
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <React.Fragment key={row.id}>
+                          <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                            {row.cells.map((cell) => (
+                              <TableCell className={styles.tableCell} key={cell.id}>
+                                <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
+                              </TableCell>
+                            ))}
+                          </TableExpandRow>
+                          <TableExpandedRow
+                            colSpan={headers.length + 1}
+                            className="demo-expanded-td"
+                            {...getExpandedRowProps({
+                              row,
+                            })}
+                          >
+                            <ExpandedRowView row={row} />
+                          </TableExpandedRow>
+                        </React.Fragment>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </DataTable>
+            {!isPrinting && (
+              <PatientChartPagination
+                pageNumber={currentPage}
+                totalItems={tableRows?.length}
+                currentItems={paginatedOrders?.length}
+                pageSize={defaultPageSize}
+                onPageNumberChange={({ page }) => goTo(page)}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
