@@ -59,7 +59,8 @@ import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit?: Visit;
-  showVisitEndDateTimeFields: boolean;
+  isCreatingVisit?: boolean;
+  showVisitEndDateTimeFields?: boolean;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
@@ -67,7 +68,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   closeWorkspace,
   promptBeforeClosing,
   visitToEdit,
-  showVisitEndDateTimeFields,
+  isCreatingVisit,
+  showVisitEndDateTimeFields = isCreatingVisit,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -428,21 +430,29 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 timeoutInMs: 5000,
                 kind: 'success',
                 subtitle: !visitToEdit
-                  ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                    })
+                  ? !isCreatingVisit
+                    ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                        visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                      })
+                    : t('pastVisitCreatedSuccessfully', '{{visit}} created successfully', {
+                        visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                      })
                   : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
                       visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
                     }),
                 title: !visitToEdit
-                  ? t('visitStarted', 'Visit started')
+                  ? !isCreatingVisit
+                    ? t('visitStarted', 'Visit started')
+                    : t('createdVisit', 'Visit created')
                   : t('visitDetailsUpdated', 'Visit details updated'),
               });
             },
             (error) => {
               showSnackbar({
                 title: !visitToEdit
-                  ? t('startVisitError', 'Error starting visit')
+                  ? !isCreatingVisit
+                    ? t('startVisitError', 'Error starting visit')
+                    : t('visitCreationError', 'Error creating visit')
                   : t('errorUpdatingVisitDetails', 'Error updating visit details'),
                 kind: 'error',
                 isLowContrast: false,
@@ -462,11 +472,24 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
+              timeoutInMs: 5000,
               kind: 'success',
-              subtitle: t('visitStartedSuccessfully', '{visit} started successfully', {
-                visit: t('offlineVisit', 'Offline Visit'),
-              }),
-              title: t('visitStarted', 'Visit started'),
+              subtitle: !visitToEdit
+                ? !isCreatingVisit
+                  ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                      visit: t('offlineVisit', 'Offline Visit'),
+                    })
+                  : t('pastVisitCreatedSuccessfully', '{{visit}} created successfully', {
+                      visit: t('offlineVisit', 'Offline Visit'),
+                    })
+                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                    visit: t('offlineVisit', 'Offline Visit'),
+                  }),
+              title: !visitToEdit
+                ? !isCreatingVisit
+                  ? t('visitStarted', 'Visit started')
+                  : t('createdVisit', 'Visit created')
+                : t('visitDetailsUpdated', 'Visit details updated'),
             });
           },
           (error) => {
@@ -665,7 +688,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             kind="primary"
             type="submit"
           >
-            {!visitToEdit ? t('startVisit', 'Start visit') : t('updateVisitDetails', 'Update visit details')}
+            {!visitToEdit
+              ? !showVisitEndDateTimeFields
+                ? t('startVisit', 'Start visit')
+                : t('createVisit', 'Create visit')
+              : t('updateVisitDetails', 'Update visit details')}
           </Button>
         </ButtonSet>
       </Form>
