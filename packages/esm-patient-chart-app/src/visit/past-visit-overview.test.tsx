@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, setCurrentVisit } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import PastVisitOverview from './past-visit-overview.component';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   closeWorkspace: jest.fn(),
@@ -11,6 +12,15 @@ const testProps = {
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
 };
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
+  };
+});
 
 const mockPastVisits = {
   data: {
@@ -45,6 +55,7 @@ const mockPastVisits = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockSetCurrentVisit = setCurrentVisit as jest.Mock;
+const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
 
 describe('PastVisitOverview', () => {
   beforeEach(() => {
@@ -83,11 +94,40 @@ describe('PastVisitOverview', () => {
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
     renderPastVisitOverview();
     await waitForLoadingToFinish();
+    const startRetrospectiveEntryButtons = screen.queryAllByLabelText('Start retrospective entry');
+    expect(startRetrospectiveEntryButtons.length).toBe(2);
+    await user.click(startRetrospectiveEntryButtons[1]);
+
+    expect(mockSetCurrentVisit).toBeCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+  });
+
+  it(`will open visit form to edit a specific visit`, async () => {
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
+    renderPastVisitOverview();
+    await waitForLoadingToFinish();
     const editButtons = screen.queryAllByLabelText('Edit this visit');
     expect(editButtons.length).toBe(2);
     await user.click(editButtons[1]);
 
-    expect(mockSetCurrentVisit).toBeCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      workspaceTitle: 'Edit visit details',
+      visitToEdit: {
+        attributes: [],
+        encounters: [],
+        location: {
+          display: 'Registration Desk',
+          name: 'Registration Desk',
+          uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',
+        },
+        patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+        startDatetime: '2021-09-03T06:38:21.000+0000',
+        stopDatetime: '2021-09-03T06:38:27.000+0000',
+        uuid: '2fcf6cbc-99e0-4b6a-9ecc-a66b455bff15',
+        visitType: { display: 'Facility Visit', name: 'Facility Visit', uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed' },
+      },
+    });
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });

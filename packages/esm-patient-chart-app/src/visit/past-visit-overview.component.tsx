@@ -59,6 +59,7 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const editVisitDetails = useCallback(
     (visitUuid: string) => {
       const visitToEdit = pastVisits.find((visit) => visit.uuid === visitUuid);
+      closeWorkspace();
       launchPatientWorkspace('start-visit-workspace-form', {
         workspaceTitle: t('editVisitDetails', 'Edit visit details'),
         visitToEdit,
