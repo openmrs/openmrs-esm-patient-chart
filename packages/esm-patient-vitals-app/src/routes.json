@@ -48,16 +48,6 @@
       }
     },
     {
-      "name": "patient-vitals-biometrics-form-workspace",
-      "component": "vitalsAndBiometricsForm",
-      "meta": {
-        "title": {
-          "key": "recordVitalsAndBiometrics",
-          "default": "Record Vitals and Biometrics"
-        }
-      }
-    },
-    {
       "name": "results-summary-dashboard",
       "component": "vitalsAndBiometricsDashboardLink",
       "slot": "patient-chart-dashboard-slot",

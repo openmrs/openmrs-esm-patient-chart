@@ -5,14 +5,13 @@ import { type VisitFormData } from './visit-form.resource';
 import {
   DatePicker,
   DatePickerInput,
-  Layer,
   SelectItem,
   TimePicker,
   TimePickerSelect,
   InlineNotification,
 } from '@carbon/react';
 import classNames from 'classnames';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 
@@ -44,7 +43,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({ visitDatetimeLa
           name={dateFieldName}
           control={control}
           render={({ field: dateField }) => (
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <DatePicker
                 {...dateField}
                 dateFormat="d/m/Y"
@@ -65,7 +64,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({ visitDatetimeLa
             </ResponsiveWrapper>
           )}
         />
-        <ResponsiveWrapper isTablet={isTablet}>
+        <ResponsiveWrapper>
           <Controller
             name={timeFieldName}
             control={control}
@@ -118,7 +117,3 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({ visitDatetimeLa
 };
 
 export default VisitDateTimeField;
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}

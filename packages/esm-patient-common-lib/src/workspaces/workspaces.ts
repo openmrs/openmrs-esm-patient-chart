@@ -2,7 +2,7 @@ import { type ExtensionRegistration, getGlobalStore, navigate, translateFrom } f
 // FIXME We should not rely on internals here
 import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
-import { type WorkspaceWindowState } from '../types/workspace';
+import { type WorkspaceWindowState, type CloseWorkspaceOptions } from '../types/workspace';
 
 export interface Prompt {
   title: string;
@@ -23,8 +23,8 @@ export interface WorkspaceStoreState {
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
-  closeWorkspace(promptBeforeClosing?: boolean): void;
-  closeWorkspace(): void;
+  closeWorkspace(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
+  closeWorkspaceWithSavedChanges(closeWorkspaceOptions?: CloseWorkspaceOptions): boolean;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
 
@@ -103,40 +103,37 @@ function getTitleFromExtension(ext: ExtensionRegistration) {
   return ext.name;
 }
 
+/**
+ *
+ * @param name Name of the workspace
+ * @param ignoreChanges If set to true, the "unsaved changes" modal will never be shown, even if the `promptBeforeClosing` function returns true. The user will not be prompted before closing.
+ * @returns true if the workspace can be closed.
+ */
+export function canCloseWorkspaceWithoutPrompting(name: string, ignoreChanges: boolean = false) {
+  if (ignoreChanges) {
+    return true;
+  }
+  const promptBeforeFn = getPromptBeforeClosingFcn(name);
+  return !promptBeforeFn || !promptBeforeFn();
+}
+
 function promptBeforeLaunchingWorkspace(
   workspace: OpenWorkspace,
   newWorkspaceDetails: { name: string; additionalProps?: object },
 ) {
-  const store = getWorkspaceStore();
   const { name, additionalProps } = newWorkspaceDetails;
-  const promptCheckFcn = getPromptBeforeClosingFcn(workspace.name);
 
   const proceed = () => {
-    workspace.closeWorkspace();
-    // Calling the launchPatientWorkspace again, since one of the `if` case
-    // might resolve, but we need to check all the cases before launching the form.
-    launchPatientWorkspace(name, additionalProps);
+    workspace.closeWorkspace({
+      ignoreChanges: true,
+      // Calling the launchPatientWorkspace again, since one of the `if` case
+      // might resolve, but we need to check all the cases before launching the form.
+      onWorkspaceClose: () => launchPatientWorkspace(name, additionalProps),
+    });
   };
 
-  if (!promptCheckFcn || promptCheckFcn()) {
-    const currentName = workspace.title ?? workspace.name;
-    const prompt: Prompt = {
-      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
-      body: translateFrom(
-        '@openmrs/esm-patient-chart-app',
-        'unsavedChangesInForm',
-        'There are unsaved changes in {{formName}}. Please save them before opening another form.',
-        { formName: currentName },
-      ),
-      onConfirm: () => {
-        store.setState({
-          prompt: null,
-        });
-        proceed();
-      },
-      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
-    };
-    store.setState((state) => ({ ...state, prompt }));
+  if (!canCloseWorkspaceWithoutPrompting(workspace.name)) {
+    showWorkspacePrompts('closing-workspace-launching-new-workspace', proceed, workspace.title ?? workspace.name);
   } else {
     proceed();
   }
@@ -166,7 +163,9 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
-    closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges),
+    closeWorkspace: (options: CloseWorkspaceOptions = {}) => closeWorkspace(name, options),
+    closeWorkspaceWithSavedChanges: (options: CloseWorkspaceOptions) =>
+      closeWorkspace(name, { ignoreChanges: true, ...options }),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
@@ -244,38 +243,44 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
-export function closeWorkspace(name: string, ignoreChanges: boolean) {
+/**
+ * Function to close an opened workspace
+ * @param name Workspace registration name
+ * @param options Options to close workspace
+ * @returns
+ */
+export function closeWorkspace(
+  name: string,
+  options: CloseWorkspaceOptions = {
+    ignoreChanges: false,
+    onWorkspaceClose: () => {},
+  },
+): boolean {
   const store = getWorkspaceStore();
-  const promptCheckFcn = getPromptBeforeClosingFcn(name);
 
   const updateStoreWithClosedWorkspace = () => {
     const state = store.getState();
     const newOpenWorkspaces = state.openWorkspaces.filter((w) => w.name != name);
 
+    // promptBeforeClosing function should be removed if the workspace is closed.
+    promptBeforeClosing(name, null);
     store.setState({
       ...state,
       prompt: null,
       openWorkspaces: newOpenWorkspaces,
       workspaceWindowState: getUpdatedWorkspaceWindowState(newOpenWorkspaces?.[0]),
     });
+
+    options?.onWorkspaceClose?.();
   };
 
-  if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
-    const prompt: Prompt = {
-      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
-      body: translateFrom(
-        '@openmrs/esm-patient-chart-app',
-        'unsavedChangeText',
-        `You have unsaved changes in the side panel. Do you want to discard these changes?`,
-      ),
-      onConfirm: () => {
-        updateStoreWithClosedWorkspace();
-      },
-      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
-    };
-    store.setState({ ...store.getState(), prompt });
+  if (!canCloseWorkspaceWithoutPrompting(name, options?.ignoreChanges)) {
+    const currentName = getWorkspaceRegistration(name).title ?? name;
+    showWorkspacePrompts('closing-workspace', updateStoreWithClosedWorkspace, currentName);
+    return false;
   } else {
     updateStoreWithClosedWorkspace();
+    return true;
   }
 }
 
@@ -315,7 +320,7 @@ export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
   const store = getWorkspaceStore();
 
   const canCloseAllWorkspaces = store.getState().openWorkspaces.every(({ name }) => {
-    const canCloseWorkspace = getWhetherWorkspaceCanBeClosed(name);
+    const canCloseWorkspace = canCloseWorkspaceWithoutPrompting(name);
     return canCloseWorkspace;
   });
 
@@ -331,31 +336,60 @@ export function closeAllWorkspaces(onClosingWorkspaces: () => void = () => {}) {
   }
 }
 
-export function getWhetherWorkspaceCanBeClosed(name: string, ignoreChanges = false) {
-  const promptCheckFcn = getPromptBeforeClosingFcn(name);
-  return ignoreChanges || !promptCheckFcn || !promptCheckFcn();
-}
-
 type PromptType = 'closing-workspace' | 'closing-all-workspaces' | 'closing-workspace-launching-new-workspace';
 
-export function showWorkspacePrompts(promptType: PromptType, onConfirmation: () => void = () => {}) {
+/**
+ * Which type of prompt should be shown to the user.
+ * @param promptType 'closing-workspace' | 'closing-all-workspaces' | 'closing-workspace-launching-new-workspace'
+ * @param onConfirmation Function to be called after the user confirms to close the workspace
+ * @param workspaceTitle Workspace title to be shown in the prompt
+ * @returns
+ */
+
+export function showWorkspacePrompts(
+  promptType: PromptType,
+  onConfirmation: () => void = () => {},
+  workspaceTitle: string = '',
+) {
   const store = getWorkspaceStore();
 
   switch (promptType) {
+    case 'closing-workspace': {
+      const prompt: Prompt = {
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
+        body: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'unsavedChangesInOpenedWorkspace',
+          `You have unsaved changes in the opened workspace. Do you want to discard these changes?`,
+        ),
+        onConfirm: () => {
+          onConfirmation?.();
+        },
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
+      };
+      store.setState({ ...store.getState(), prompt });
+      store.setState((prevState) => ({ ...prevState, prompt }));
+      return;
+    }
+
     case 'closing-all-workspaces': {
       const workspacesNotClosed = store
         .getState()
-        .openWorkspaces.filter(({ name }) => !getWhetherWorkspaceCanBeClosed(name))
+        .openWorkspaces.filter(({ name }) => !canCloseWorkspaceWithoutPrompting(name))
         .map(({ title }, indx) => `${indx + 1}. ${title}`);
 
       const prompt: Prompt = {
-        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChanges', 'You have unsaved changes'),
+        title: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'closingAllWorkspacesPromptTitle',
+          'You have unsaved changes',
+        ),
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'unsavedChangesInForms',
-          `There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}`,
+          'closingAllWorkspacesPromptBody',
+          'There are unsaved changes in the following workspaces. Do you want to discard changes in the following workspaces? {{workspaceNames}}',
           {
-            workspaceNames: workspacesNotClosed.join(' '),
+            workspaceNames: workspacesNotClosed.join(','),
           },
         ),
         onConfirm: () => {
@@ -363,10 +397,34 @@ export function showWorkspacePrompts(promptType: PromptType, onConfirmation: () 
         },
         confirmText: translateFrom(
           '@openmrs/esm-patient-chart-app',
-          'closeWorkspaces',
+          'closeAllOpenedWorkspaces',
           'Discard changes in {{count}} workspaces',
           { count: workspacesNotClosed.length },
         ),
+      };
+      store.setState((prevState) => ({
+        ...prevState,
+        prompt,
+      }));
+      return;
+    }
+    case 'closing-workspace-launching-new-workspace': {
+      const prompt: Prompt = {
+        title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
+        body: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'unsavedChangesInWorkspace',
+          'There are unsaved changes in {{workspaceName}}. Please save them before opening another workspace.',
+          { workspaceName: workspaceTitle },
+        ),
+        onConfirm: () => {
+          store.setState((prevState) => ({
+            ...prevState,
+            prompt: null,
+          }));
+          onConfirmation?.();
+        },
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
       };
       store.setState((prevState) => ({
         ...prevState,

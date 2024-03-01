@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
@@ -50,7 +50,13 @@ const programsFormSchema = z.object({
 
 export type ProgramsFormData = z.infer<typeof programsFormSchema>;
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
+const ProgramsForm: React.FC<ProgramsFormProps> = ({
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  patientUuid,
+  programEnrollmentId,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -77,7 +83,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
     return currentEnrollment?.location.uuid ?? null;
   };
 
-  const { control, handleSubmit, watch } = useForm<ProgramsFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { isDirty },
+  } = useForm<ProgramsFormData>({
     mode: 'all',
     resolver: zodResolver(programsFormSchema),
     defaultValues: {
@@ -87,6 +98,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       enrollmentLocation: getLocationUuid() ?? '',
     },
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const onSubmit = React.useCallback(
     (data: ProgramsFormData) => {
@@ -106,7 +121,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             (response) => {
               if (response.status === 200) {
                 mutateEnrollments();
-                closeWorkspace();
+                closeWorkspaceWithSavedChanges();
 
                 showSnackbar({
                   isLowContrast: true,
@@ -134,7 +149,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             (response) => {
               if (response.status === 201) {
                 mutateEnrollments();
-                closeWorkspace();
+                closeWorkspaceWithSavedChanges();
 
                 showSnackbar({
                   isLowContrast: true,
@@ -159,7 +174,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         sub.unsubscribe();
       };
     },
-    [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspace, t],
+    [patientUuid, currentEnrollment, mutateEnrollments, closeWorkspaceWithSavedChanges, t],
   );
 
   const programSelect = (
@@ -298,7 +313,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         ))}
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

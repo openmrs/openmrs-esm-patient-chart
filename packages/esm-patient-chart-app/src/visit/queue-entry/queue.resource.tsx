@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, type Visit } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -71,7 +71,7 @@ interface UseVisitQueueEntries {
 }
 
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?patient=${patientUuid}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,

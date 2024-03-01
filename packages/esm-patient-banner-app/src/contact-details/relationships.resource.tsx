@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 const customRepresentation =
   'custom:(display,uuid,personA:(uuid,age,display),personB:(uuid,age,display),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
 export function useRelationships(patientUuid: string) {
-  const url = patientUuid ? `/ws/rest/v1/relationship?person=${patientUuid}&v=${customRepresentation}` : null;
+  const url = patientUuid ? `${restBaseUrl}/relationship?person=${patientUuid}&v=${customRepresentation}` : null;
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
     url,
     openmrsFetch,

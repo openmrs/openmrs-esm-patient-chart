@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
 .tile {
@@ -39,7 +39,7 @@
   text-align: left;
   text-transform: capitalize;
   margin-bottom: spacing.$spacing-05;
-  
+
   h4:after {
     content: "";
     display: block;

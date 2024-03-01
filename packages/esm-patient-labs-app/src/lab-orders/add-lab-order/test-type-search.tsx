@@ -1,11 +1,16 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, Layer, Search, SkeletonText, Tile } from '@carbon/react';
+import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
-import { useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem, prepLabOrderPostData } from '../api';
+import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import {
+  type LabOrderBasketItem,
+  closeWorkspace,
+  launchPatientWorkspace,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
+import { prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './lab-order';
 import styles from './test-type-search.scss';
@@ -32,7 +37,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
 
   return (
     <>
-      <ResponsiveWrapper isTablet={isTablet}>
+      <ResponsiveWrapper>
         <Search
           autoFocus
           size="lg"
@@ -50,10 +55,6 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
       />
     </>
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 interface TestTypeSearchResultsProps {
@@ -161,8 +162,10 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
     const labOrder = createLabOrder(testType);
     labOrder.isOrderIncomplete = true;
     setOrders([...orders, labOrder]);
-    closeWorkspace('add-lab-order', true);
-    launchPatientWorkspace('order-basket');
+    closeWorkspace('add-lab-order', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
   }, [orders, setOrders, createLabOrder, testType]);
 
   const removeFromBasket = useCallback(() => {

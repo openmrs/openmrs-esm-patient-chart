@@ -58,7 +58,7 @@ import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
-  visitToEdit: Visit;
+  visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
 }
 
@@ -84,8 +84,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { mutateVisits } = useVisits(patientUuid);
   const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
   const { mutate } = useVisit(patientUuid);
-  const { mutate: mutateVisit } = useVisit(patientUuid);
-  const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
@@ -265,8 +263,12 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     handleSubmit,
     control,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = methods;
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
@@ -419,7 +421,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               }
               mutateCurrentVisit();
               mutateVisits();
-              closeWorkspace();
+              closeWorkspace({ ignoreChanges: true });
 
               showSnackbar({
                 isLowContrast: true,
@@ -456,9 +458,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           (offlineVisit) => {
-            //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
-            closeWorkspace();
+            closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -495,11 +496,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     ],
   );
 
-  const handleOnChange = () => {
-    setIgnoreChanges((prevState) => !prevState);
-    promptBeforeClosing(() => true);
-  };
-
   useEffect(() => {
     if (errorFetchingLocations) {
       setErrorFetchingResources((prev) => ({
@@ -510,7 +506,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -638,6 +634,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
+            <ExtensionSlot state={{ patientUuid }} name="extra-visit-attribute-slot" />
+
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
               <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
@@ -658,7 +656,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
           <Button

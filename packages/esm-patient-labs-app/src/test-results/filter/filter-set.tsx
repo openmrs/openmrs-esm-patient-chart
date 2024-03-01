@@ -90,7 +90,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
         {treeDataFiltered?.length > 0 ? (
           treeDataFiltered?.map((root, index) => (
             <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-              <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+              <FilterNode root={root} level={0} open={config.resultsViewerConcepts[index].defaultOpen} />
             </div>
           ))
         ) : (

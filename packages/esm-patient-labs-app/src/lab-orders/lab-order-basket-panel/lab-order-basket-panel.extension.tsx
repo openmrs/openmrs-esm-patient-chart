@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  launchPatientWorkspace,
+  type OrderBasketItem,
+  useOrderBasket,
+  closeWorkspace,
+  type LabOrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepLabOrderPostData } from '../api';
 import LabIcon from './lab-icon.component';
@@ -16,19 +22,60 @@ import styles from './lab-order-basket-panel.scss';
 export default function LabOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
+  const {
+    incompleteOrderBasketItems,
+    newOrderBasketItems,
+    renewedOrderBasketItems,
+    revisedOrderBasketItems,
+    discontinuedOrderBasketItems,
+  } = useMemo(() => {
+    const incompleteOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const newOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const renewedOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const revisedOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const discontinuedOrderBasketItems: Array<LabOrderBasketItem> = [];
+
+    orders.forEach((order) => {
+      if (order?.isOrderIncomplete) {
+        incompleteOrderBasketItems.push(order);
+      } else if (order.action === 'NEW') {
+        newOrderBasketItems.push(order);
+      } else if (order.action === 'RENEW') {
+        renewedOrderBasketItems.push(order);
+      } else if (order.action === 'REVISE') {
+        revisedOrderBasketItems.push(order);
+      } else if (order.action === 'DISCONTINUE') {
+        discontinuedOrderBasketItems.push(order);
+      }
+    });
+
+    return {
+      incompleteOrderBasketItems,
+      newOrderBasketItems,
+      renewedOrderBasketItems,
+      revisedOrderBasketItems,
+      discontinuedOrderBasketItems,
+    };
+  }, [orders]);
 
   const openNewLabForm = useCallback(() => {
-    launchPatientWorkspace('add-lab-order');
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order'),
+    });
   }, []);
 
   const openEditLabForm = useCallback((order: OrderBasketItem) => {
-    launchPatientWorkspace('add-lab-order', { order });
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
+    });
   }, []);
 
-  const removeOrder = useCallback(
-    (order: OrderBasketItem) => {
+  const removeLabOrder = useCallback(
+    (order: LabOrderBasketItem) => {
       const newOrders = [...orders];
       newOrders.splice(orders.indexOf(order), 1);
       setOrders(newOrders);
@@ -78,14 +125,69 @@ export default function LabOrderBasketPanelExtension() {
         <>
           {orders.length > 0 && (
             <>
-              {orders.map((order, index) => (
-                <LabOrderBasketItemTile
-                  key={index}
-                  orderBasketItem={order}
-                  onItemClick={() => openEditLabForm(order)}
-                  onRemoveClick={() => removeOrder(order)}
-                />
-              ))}
+              {incompleteOrderBasketItems.length > 0 && (
+                <>
+                  {incompleteOrderBasketItems.map((order) => (
+                    <LabOrderBasketItemTile
+                      key={order.uuid}
+                      orderBasketItem={order}
+                      onItemClick={() => openEditLabForm(order)}
+                      onRemoveClick={() => removeLabOrder(order)}
+                    />
+                  ))}
+                </>
+              )}
+              {newOrderBasketItems.length > 0 && (
+                <>
+                  {newOrderBasketItems.map((order) => (
+                    <LabOrderBasketItemTile
+                      key={order.uuid}
+                      orderBasketItem={order}
+                      onItemClick={() => openEditLabForm(order)}
+                      onRemoveClick={() => removeLabOrder(order)}
+                    />
+                  ))}
+                </>
+              )}
+
+              {renewedOrderBasketItems.length > 0 && (
+                <>
+                  {renewedOrderBasketItems.map((order) => (
+                    <LabOrderBasketItemTile
+                      key={order.uuid}
+                      orderBasketItem={order}
+                      onItemClick={() => openEditLabForm(order)}
+                      onRemoveClick={() => removeLabOrder(order)}
+                    />
+                  ))}
+                </>
+              )}
+
+              {revisedOrderBasketItems.length > 0 && (
+                <>
+                  {revisedOrderBasketItems.map((order) => (
+                    <LabOrderBasketItemTile
+                      key={order.uuid}
+                      orderBasketItem={order}
+                      onItemClick={() => openEditLabForm(order)}
+                      onRemoveClick={() => removeLabOrder(order)}
+                    />
+                  ))}
+                </>
+              )}
+
+              {discontinuedOrderBasketItems.length > 0 && (
+                <>
+                  {discontinuedOrderBasketItems.map((order) => (
+                    <LabOrderBasketItemTile
+                      key={order.uuid}
+                      orderBasketItem={order}
+                      onItemClick={() => openEditLabForm(order)}
+                      onRemoveClick={() => removeLabOrder(order)}
+                    />
+                  ))}
+                </>
+              )}
             </>
           )}
         </>

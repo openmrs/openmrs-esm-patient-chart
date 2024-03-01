@@ -4,8 +4,10 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  restBaseUrl,
+  translateFrom,
 } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import dashboardMeta from './dashboard.meta';
 import { configSchema } from './config-schema';
 import vitalsSummaryComponent from './vitals/vitals-summary.component';
@@ -31,7 +33,7 @@ export function startupApp() {
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: `.+/ws/rest/v1/concept.+`,
+    pattern: `.+${restBaseUrl}/concept.+`,
   });
 
   defineConfigSchema(moduleName, configSchema);
@@ -47,11 +49,6 @@ export const biometricsOverview = getSyncLifecycle(biometricsOverviewComponent, 
 
 export const biometricsDetailedSummary = getSyncLifecycle(biometricsDetailedSummaryComponent, options);
 
-export const vitalsAndBiometricsForm = getAsyncLifecycle(
-  () => import('./vitals-biometrics-form/vitals-biometrics-form.component'),
-  options,
-);
-
 export const vitalsAndBiometricsDashboardLink =
   // t('Vitals & Biometrics', 'Vitals & Biometrics')
   getSyncLifecycle(
@@ -63,3 +60,10 @@ export const vitalsAndBiometricsDashboardLink =
   );
 
 export const weightTile = getAsyncLifecycle(() => import('./weight-tile/weight-tile.component'), options);
+
+// t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
+registerWorkspace({
+  name: 'patient-vitals-biometrics-form-workspace',
+  load: getAsyncLifecycle(() => import('./vitals-biometrics-form/vitals-biometrics-form.component'), options),
+  title: translateFrom(moduleName, 'recordVitalsAndBiometrics', 'Record Vitals and Biometrics'),
+});

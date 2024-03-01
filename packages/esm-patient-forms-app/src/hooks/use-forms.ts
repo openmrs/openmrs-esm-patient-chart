@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import {
   getDynamicOfflineDataEntries,
   openmrsFetch,
+  restBaseUrl,
   useConfig,
   userHasAccess,
   useSession,
@@ -43,7 +44,7 @@ export function useEncountersWithFormRef(
   endDate: Date = dayjs(new Date()).endOf('day').toDate(),
 ) {
   const url = patientUuid
-    ? `/ws/rest/v1/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`
+    ? `${restBaseUrl}/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`
     : null;
   return useSWR(url, openmrsFetch<ListResponse<EncounterWithFormRef>>);
 }

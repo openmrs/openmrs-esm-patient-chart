@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
@@ -29,9 +29,10 @@ import {
 } from './conditions.resource';
 import { type ConditionFormData } from './conditions-form.component';
 import styles from './conditions-form.scss';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 interface ConditionsWidgetProps {
-  closeWorkspace?: () => void;
+  closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
   patientUuid: string;
@@ -43,7 +44,7 @@ interface ConditionsWidgetProps {
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
-  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
   patientUuid,
@@ -114,14 +115,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionSaved', 'Condition saved'),
         });
 
-        closeWorkspace?.();
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     getValues,
     mutate,
     patientUuid,
@@ -156,14 +157,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionUpdated', 'Condition updated'),
         });
 
-        closeWorkspace();
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
@@ -210,7 +211,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 name="search"
                 control={control}
                 render={({ field: { onChange, value, onBlur } }) => (
-                  <ResponsiveWrapper isTablet={isTablet}>
+                  <ResponsiveWrapper>
                     <Search
                       autoFocus
                       ref={searchInputRef}
@@ -282,7 +283,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="onsetDateTime"
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   id="onsetDate"
                   datePickerType="single"
@@ -323,7 +324,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="endDate"
             control={control}
             render={({ field: { onBlur, onChange, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   id="endDate"
                   datePickerType="single"
@@ -345,9 +346,5 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     </div>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default ConditionsWidget;

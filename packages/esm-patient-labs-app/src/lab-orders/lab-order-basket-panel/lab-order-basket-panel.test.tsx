@@ -2,8 +2,7 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
-import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem } from '../api';
+import { type LabOrderBasketItem, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 const mockUseOrderBasket = jest.fn();
 

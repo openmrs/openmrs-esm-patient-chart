@@ -10,7 +10,6 @@ import {
   FormGroup,
   InlineLoading,
   InlineNotification,
-  Layer,
   RadioButton,
   RadioButtonGroup,
   Row,
@@ -25,9 +24,9 @@ import {
   ExtensionSlot,
   type FetchResponse,
   showSnackbar,
-  showToast,
   useConfig,
   useLayoutType,
+  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -66,7 +65,8 @@ type AllergyFormData = {
   comment: string;
 };
 
-function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
+function AllergyForm(props: DefaultWorkspaceProps) {
+  const { closeWorkspace, patientUuid, promptBeforeClosing, closeWorkspaceWithSavedChanges } = props;
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -82,7 +82,13 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { mutate } = useAllergies(patientUuid);
 
-  const { control, handleSubmit, watch, getValues, setValue } = useForm<AllergyFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isDirty },
+  } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema),
     defaultValues: {
@@ -95,14 +101,18 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
     },
   });
 
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
+
   const selectedAllergen = watch('allergen');
   const selectedAllergicReactions = watch('allergicReactions');
   const selectedSeverityOfWorstReaction = watch('severityOfWorstReaction');
   const selectednonCodedAllergen = watch('nonCodedAllergen');
   const selectedNonCodedAllergicReaction = watch('nonCodedAllergicReaction');
 
+  const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
   useEffect(() => {
-    const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
     if (!!selectedAllergen && reactionsValidation && !!selectedSeverityOfWorstReaction) setIsDisabled(false);
     else setIsDisabled(true);
   }, [
@@ -112,6 +122,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
     selectedSeverityOfWorstReaction,
     otherConceptUuid,
     selectednonCodedAllergen,
+    reactionsValidation,
   ]);
 
   const onSubmit = useCallback(
@@ -154,7 +165,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
           (response: FetchResponse) => {
             if (response.status === 201) {
               mutate();
-              closeWorkspace();
+              closeWorkspaceWithSavedChanges();
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
@@ -174,7 +185,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
         )
         .finally(() => abortController.abort());
     },
-    [otherConceptUuid, patientUuid, closeWorkspace, t, mutate],
+    [otherConceptUuid, patientUuid, closeWorkspaceWithSavedChanges, t, mutate],
   );
 
   return (
@@ -199,7 +210,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
               )}
             />
           )}
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
               <Controller
                 name="allergen"
@@ -221,7 +232,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             </FormGroup>
           </ResponsiveWrapper>
           {selectedAllergen?.uuid === otherConceptUuid && (
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="nonCodedAllergen"
                 control={control}
@@ -253,7 +264,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             </div>
             {selectedAllergicReactions?.includes(otherConceptUuid) ? (
               <div className={styles.input}>
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="nonCodedAllergicReaction"
                     control={control}
@@ -310,7 +321,7 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
             </FormGroup>
           </div>
           <div>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="comment"
                 control={control}
@@ -352,10 +363,6 @@ function AllergyForm({ closeWorkspace, patientUuid }: DefaultWorkspaceProps) {
       </div>
     </Form>
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 function AllergicReactionsField({

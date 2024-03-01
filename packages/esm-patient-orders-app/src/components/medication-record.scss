@@ -1,0 +1,52 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import "../root";
+
+.medicationContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: spacing.$spacing-05;
+  border-bottom: none;
+}
+
+.widgetCard {
+  border: 1px solid colors.$gray-20;
+  border-bottom: none;
+}
+
+.row {
+  span {
+    margin: auto;
+  }
+
+  p {
+    padding: spacing.$spacing-02 0;
+  }
+}
+
+.medicationRecord {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.startDateColumn {
+  @include type.type-style("body-compact-01");
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: spacing.$spacing-11;
+  padding-bottom: spacing.$spacing-02;
+  margin-right: spacing.$spacing-07;
+
+  span {
+    margin: 0rem;
+  }
+}
+
+.dosage {
+  @include type.type-style("heading-compact-01");
+}

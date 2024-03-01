@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../../root";
 
 
@@ -73,9 +73,6 @@
   .buttonSet {
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
   }
 
   .errorContainer {

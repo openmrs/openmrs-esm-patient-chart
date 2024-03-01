@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import capitalize from 'lodash-es/capitalize';
-import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type FHIRAllergy, type FHIRAllergyResponse, type ReactionSeverity } from '../types';
 
 export type Allergy = {
@@ -85,7 +85,7 @@ export function saveAllergy(patientAllergy: any, patientUuid: string, abortContr
     };
   });
 
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -121,7 +121,7 @@ export function updatePatientAllergy(
     };
   });
 
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -144,7 +144,7 @@ export function updatePatientAllergy(
 }
 
 export function deletePatientAllergy(patientUuid: string, allergyUuid: any, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,
   });

@@ -1,9 +1,16 @@
-import { defineConfigSchema, fhirBaseUrl, getSyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import {
+  defineConfigSchema,
+  fhirBaseUrl,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+  restBaseUrl,
+  translateFrom,
+} from '@openmrs/esm-framework';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import allergiesDetailedSummaryComponent from './allergies/allergies-detailed-summary.component';
-import allergyFormComponent from './allergies/allergies-form/allergy-form.component';
 import allergyTileComponent from './allergies/allergies-tile.component';
 
 const moduleName = '@openmrs/esm-patient-allergies-app';
@@ -18,12 +25,12 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/concept.+',
+    pattern: `.+${restBaseUrl}/concept.+`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/patient/.+/allergy.+',
+    pattern: `.+${restBaseUrl}/patient/.+/allergy.+`,
   });
 
   messageOmrsServiceWorker({
@@ -45,6 +52,12 @@ export const allergiesDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const allergiesForm = getSyncLifecycle(allergyFormComponent, options);
+// t('recordNewAllergy', "Record a new allergy")
+registerWorkspace({
+  name: 'patient-allergy-form-workspace',
+  title: translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy'),
+  load: getAsyncLifecycle(() => import('./allergies/allergies-form/allergy-form.component'), options),
+  type: 'form',
+});
 
 export const allergyTile = getSyncLifecycle(allergyTileComponent, options);

@@ -3,16 +3,20 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Dropdown, Form, InlineLoading, Layer, Search, Tile, Toggle, Stack } from '@carbon/react';
+import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, showSnackbar, parseDate, formatDate } from '@openmrs/esm-framework';
+import { useLayoutType, showSnackbar, parseDate, formatDate, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
 import { getFlagType } from './utils';
 import styles from './flags-list.scss';
 
 type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
 
-const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const FlagsList: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+}) => {
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
@@ -106,7 +110,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     <Form className={styles.formWrapper}>
       {/* The <div> below is required to maintain the page layout styling */}
       <div>
-        <ResponsiveWrapper isTablet={isTablet}>
+        <ResponsiveWrapper>
           <Search
             labelText={t('searchForAFlag', 'Search for a flag')}
             placeholder={t('searchForAFlag', 'Search for a flag')}
@@ -198,7 +202,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button
@@ -206,7 +210,7 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
           disabled={isEnabling || isDisabling}
           kind="primary"
           type="submit"
-          onClick={() => closeWorkspace()}
+          onClick={closeWorkspaceWithSavedChanges}
         >
           {(() => {
             if (isEnabling) return t('enablingFlag', 'Enabling flag...');
@@ -218,9 +222,5 @@ const FlagsList: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     </Form>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 export default FlagsList;

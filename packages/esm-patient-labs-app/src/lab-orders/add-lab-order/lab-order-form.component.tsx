@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { launchPatientWorkspace, promptBeforeClosing, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  type LabOrderBasketItem,
+  type DefaultWorkspaceProps,
+  launchPatientWorkspace,
+  promptBeforeClosing,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -27,7 +33,9 @@ import styles from './lab-order-form.scss';
 
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
-  closeWorkspace: () => void;
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
+  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
 const labOrderFormSchema = z.object({
@@ -35,9 +43,7 @@ const labOrderFormSchema = z.object({
   urgency: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
   }),
-  labReferenceNumber: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
-  }),
+  labReferenceNumber: z.string().optional(),
   testType: z.object(
     { label: z.string(), conceptUuid: z.string() },
     {
@@ -51,7 +57,12 @@ const labOrderFormSchema = z.object({
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps) {
+export function LabOrderForm({
+  initialOrder,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -67,8 +78,6 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      instructions: '',
-      labReferenceNumber: '',
       ...initialOrder,
     },
   });
@@ -80,6 +89,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
+      data.action = 'NEW';
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
@@ -87,16 +97,18 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = data;
       setOrders(newOrders);
-      closeWorkspace();
-      launchPatientWorkspace('order-basket');
+      closeWorkspaceWithSavedChanges({
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      });
     },
     [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
+    closeWorkspace({
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
   const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
@@ -106,7 +118,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace }: LabOrderFormProps
   };
 
   useEffect(() => {
-    promptBeforeClosing('add-lab-order', () => isDirty);
+    promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
   return (

@@ -18,18 +18,6 @@
       "component": "visitNotesActionButton",
       "slot": "action-menu-chart-items-slot",
       "order": 1
-    },
-    {
-      "name": "visit-notes-form-workspace",
-      "component": "visitNotesForm",
-      "meta": {
-        "title": {
-          "key": "visitNote",
-          "default": "Visit Note"
-        },
-        "type": "visit-note",
-        "canHide": true
-      }
     }
   ]
 }
