@@ -11,7 +11,7 @@
     "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",
     "release": "lerna version --no-git-tag-version",
     "verify": "turbo lint typescript test --color --concurrency=5",
-    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
+    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\" --list-different",
     "postinstall": "husky install",
     "test-e2e": "playwright test"
   },
