@@ -238,8 +238,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ) ?? {},
     };
 
-    if (visitToEdit?.stopDatetime) {
-      const [visitStopDate, visitStopTime, visitStopTimeFormat] = getDateTimeFormat(visitToEdit?.stopDatetime);
+    if (displayVisitStopDateTimeFields) {
+      const [visitStopDate, visitStopTime, visitStopTimeFormat] = getDateTimeFormat(
+        visitToEdit?.stopDatetime ?? new Date(),
+      );
       defaultValues = {
         ...defaultValues,
         visitStopDatetime: {
