@@ -22,6 +22,7 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
+import viewPastVisitsActionButtonComponent from './actions-buttons/view-past-visits.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
 import pastVisitsDetailOverviewComponent from './visit/past-visit-overview.component';
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
@@ -130,6 +131,11 @@ export const cancelVisitActionButton = getSyncLifecycle(cancelVisitActionButtonC
 
 export const addPastVisitActionButton = getSyncLifecycle(addPastVisitActionButtonComponent, {
   featureName: 'patient-actions-slot-add-past-visit-button',
+  moduleName,
+});
+
+export const viewPastVisitsActionButton = getSyncLifecycle(viewPastVisitsActionButtonComponent, {
+  featureName: 'patient-actions-slot-view-past-visits-button',
   moduleName,
 });
 

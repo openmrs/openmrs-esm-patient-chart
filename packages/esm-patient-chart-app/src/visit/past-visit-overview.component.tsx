@@ -12,10 +12,10 @@ import {
   TableCell,
   type DataTableHeader,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
+import { Edit, Run } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { setCurrentVisit } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
 
@@ -48,12 +48,23 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     }));
   }, [locale, pastVisits]);
 
-  const handleSelectVisit = useCallback(
+  const startRetrospectiveEntry = useCallback(
     (visitUuid: string) => {
       closeWorkspace();
       setCurrentVisit(patientUuid, visitUuid);
     },
     [closeWorkspace, patientUuid],
+  );
+
+  const editVisitDetails = useCallback(
+    (visitUuid: string) => {
+      const visitToEdit = pastVisits.find((visit) => visit.uuid === visitUuid);
+      launchPatientWorkspace('start-visit-workspace-form', {
+        workspaceTitle: t('editVisitDetails', 'Edit visit details'),
+        visitToEdit,
+      });
+    },
+    [pastVisits, t],
   );
 
   if (isLoading) {
@@ -97,7 +108,15 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                           kind="ghost"
                           iconDescription={t('editThisVisit', 'Edit this visit')}
                           tooltipPosition="left"
-                          onClick={() => handleSelectVisit(row.id)}
+                          onClick={() => editVisitDetails(row.id)}
+                        />
+                        <Button
+                          renderIcon={Run}
+                          hasIconOnly
+                          kind="ghost"
+                          iconDescription={t('startRetrospectiveEntry', 'Start retrospective entry')}
+                          tooltipPosition="left"
+                          onClick={() => startRetrospectiveEntry(row.id)}
                         />
                       </TableCell>
                     </TableRow>

@@ -102,7 +102,7 @@ export function usePastVisits(patientUuid: string) {
     'form:(uuid,name),location:ref,' +
     'encounterType:ref,encounterProviders:(uuid,display,' +
     'provider:(uuid,display))),patient:(uuid,uuid),' +
-    'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
+    'visitType:(uuid,name,display),attributes:(uuid,display,attributeType,value),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
