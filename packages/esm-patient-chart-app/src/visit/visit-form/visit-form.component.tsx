@@ -434,7 +434,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
                         visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
                       })
-                    : t('pastVisitCreatedSuccessfully', '{{visit}} created successfully', {
+                    : t('visitCreatedSuccessfully', '{{visit}} created successfully', {
                         visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
                       })
                   : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
@@ -479,7 +479,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
                       visit: t('offlineVisit', 'Offline Visit'),
                     })
-                  : t('pastVisitCreatedSuccessfully', '{{visit}} created successfully', {
+                  : t('visitCreatedSuccessfully', '{{visit}} created successfully', {
                       visit: t('offlineVisit', 'Offline Visit'),
                     })
                 : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
