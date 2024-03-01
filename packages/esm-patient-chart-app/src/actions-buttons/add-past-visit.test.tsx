@@ -2,13 +2,13 @@ import React from 'react';
 import AddPastVisitOverflowMenuItem from './add-past-visit.component';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
-const mockShowModal = showModal as jest.Mock;
+const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return { originalModule, showModal: jest.fn() };
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+  return { originalModule, launchPatientWorkspace: jest.fn() };
 });
 
 describe('AddPastVisitOverflowMenuItem', () => {
@@ -23,6 +23,9 @@ describe('AddPastVisitOverflowMenuItem', () => {
     // should launch the form
     await user.click(addPastVisitButton);
 
-    expect(mockShowModal).toHaveBeenCalled();
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      isCreatingVisit: true,
+      workspaceTitle: 'Add past visit',
+    });
   });
 });
