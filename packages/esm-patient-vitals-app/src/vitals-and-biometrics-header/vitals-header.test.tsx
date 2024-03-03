@@ -114,7 +114,7 @@ describe('VitalsHeader: ', () => {
     expect(screen.queryByTitle(/abnormal value/i)).not.toBeInTheDocument();
   });
 
-  it.only('flags abnormal values that lie outside of the provided reference ranges', async () => {
+  it('flags abnormal values that lie outside of the provided reference ranges', async () => {
     const abnormalVitals = [
       {
         id: '6f4ed885-2bc1-4ed4-92e5-3dddb9180f30',

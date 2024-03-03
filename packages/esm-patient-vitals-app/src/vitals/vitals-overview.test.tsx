@@ -80,7 +80,7 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.findByRole('heading', { name: /biometrics/i }));
+    expect(screen.findByRole('heading', { name: /vitals/i }));
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
@@ -110,7 +110,6 @@ describe('VitalsOverview', () => {
     renderVitalsOverview();
 
     await waitForLoadingToFinish();
-
     expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
 
     const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/];
@@ -119,7 +118,6 @@ describe('VitalsOverview', () => {
     );
 
     const expectedTableRows = [/37 76 12/, /37 66 45 90/, /36.5 78 65/];
-
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
@@ -153,7 +151,6 @@ describe('VitalsOverview', () => {
     });
 
     await user.click(chartViewButton);
-
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bp/i })).toBeInTheDocument();
