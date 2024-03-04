@@ -10,7 +10,6 @@ import {
   FormGroup,
   InlineLoading,
   InlineNotification,
-  Layer,
   RadioButton,
   RadioButtonGroup,
   Row,
@@ -25,9 +24,9 @@ import {
   ExtensionSlot,
   type FetchResponse,
   showSnackbar,
-  showToast,
   useConfig,
   useLayoutType,
+  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -87,7 +86,6 @@ function AllergyForm(props: DefaultWorkspaceProps) {
     control,
     handleSubmit,
     watch,
-    getValues,
     setValue,
     formState: { isDirty },
   } = useForm<AllergyFormData>({
@@ -113,8 +111,8 @@ function AllergyForm(props: DefaultWorkspaceProps) {
   const selectednonCodedAllergen = watch('nonCodedAllergen');
   const selectedNonCodedAllergicReaction = watch('nonCodedAllergicReaction');
 
+  const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
   useEffect(() => {
-    const reactionsValidation = selectedAllergicReactions.some((item) => item !== '');
     if (!!selectedAllergen && reactionsValidation && !!selectedSeverityOfWorstReaction) setIsDisabled(false);
     else setIsDisabled(true);
   }, [
@@ -124,6 +122,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
     selectedSeverityOfWorstReaction,
     otherConceptUuid,
     selectednonCodedAllergen,
+    reactionsValidation,
   ]);
 
   const onSubmit = useCallback(
@@ -211,7 +210,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
               )}
             />
           )}
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
               <Controller
                 name="allergen"
@@ -233,7 +232,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
             </FormGroup>
           </ResponsiveWrapper>
           {selectedAllergen?.uuid === otherConceptUuid && (
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="nonCodedAllergen"
                 control={control}
@@ -265,7 +264,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
             </div>
             {selectedAllergicReactions?.includes(otherConceptUuid) ? (
               <div className={styles.input}>
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="nonCodedAllergicReaction"
                     control={control}
@@ -322,7 +321,7 @@ function AllergyForm(props: DefaultWorkspaceProps) {
             </FormGroup>
           </div>
           <div>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="comment"
                 control={control}
@@ -364,10 +363,6 @@ function AllergyForm(props: DefaultWorkspaceProps) {
       </div>
     </Form>
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
 function AllergicReactionsField({

@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 
-const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
   /*
@@ -62,7 +62,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
   const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',

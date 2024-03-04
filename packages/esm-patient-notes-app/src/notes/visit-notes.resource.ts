@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, openmrsObservableFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import {
   type EncountersFetchResponse,
   type RESTPatientNote,
@@ -29,7 +29,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
+  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
@@ -65,12 +65,12 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 
 export function fetchConceptDiagnosisByName(searchTerm: string) {
   return openmrsObservableFetch<Array<Concept>>(
-    `/ws/rest/v1/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
+    `${restBaseUrl}/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
   ).pipe(map(({ data }) => data['results']));
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {
-  return openmrsFetch(`/ws/rest/v1/encounter`, {
+  return openmrsFetch(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -81,7 +81,7 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
 }
 
 export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
-  return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
+  return openmrsFetch(`${restBaseUrl}/patientdiagnoses`, {
     headers: {
       'Content-Type': 'application/json',
     },

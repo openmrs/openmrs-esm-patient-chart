@@ -91,6 +91,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
+  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
   const displayVisitStopDateTimeFields = useMemo(
     () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
@@ -316,6 +317,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
+      if (config.showExtraVisitAttributesSlot) {
+        const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
+        payload.attributes.push(...attributes);
+        handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
+      }
 
       if (isOnline) {
         (visitToEdit?.uuid
@@ -641,6 +647,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 </div>
               </section>
             )}
+
+            <ExtensionSlot state={{ patientUuid, setExtraVisitInfo }} name="extra-visit-attribute-slot" />
 
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>

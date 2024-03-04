@@ -1,3 +1,4 @@
+import { restBaseUrl } from '@openmrs/esm-framework';
 import {
   type PatientData,
   type ObsRecord,
@@ -127,7 +128,7 @@ export function loadPresentConcepts(entries: Array<ObsRecord>): Promise<Array<Co
     [...new Set(entries.map(getEntryConceptClassUuid))].map(
       (conceptUuid) =>
         conceptCache[conceptUuid] ||
-        (conceptCache[conceptUuid] = fetch(`${window.openmrsBase}/ws/rest/v1/concept/${conceptUuid}?v=full`).then(
+        (conceptCache[conceptUuid] = fetch(`${window.openmrsBase}${restBaseUrl}/concept/${conceptUuid}?v=full`).then(
           (res) => res.json(),
         )),
     ),

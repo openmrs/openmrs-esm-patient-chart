@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../../root";
 
 .clickableTileDesktop {
@@ -38,6 +38,21 @@
   color: white;
   background-color: $danger;
   padding: 0 0.25rem;
+}
+
+.orderActionRenewLabel {
+  @extend .label;
+  color: $support-02;
+}
+
+.orderActionRevisedLabel {
+  @extend .label;
+  color: #943d00;
+}
+
+.orderActionDiscontinueLabel {
+  @extend .label;
+  color: $danger;
 }
 
 .orderErrorText {

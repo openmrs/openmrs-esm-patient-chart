@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import { type PatientProgram } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
@@ -7,7 +7,7 @@ const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateComp
 
 export const useActivePatientEnrollment = (patientUuid: string) => {
   const { data, error, isLoading } = useSWR<{ data: { results: Array<PatientProgram> } }>(
-    `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
+    `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
 

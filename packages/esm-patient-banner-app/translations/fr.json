@@ -20,7 +20,6 @@
   "postalCode": "Postal code",
   "relationships": "Relations",
   "seeMoreLists_one": "See {{count}} more list",
-  "seeMoreLists_many": "See {{count}} more lists",
   "seeMoreLists_other": "See {{count}} more lists",
   "showDetails": "Afficher les détails",
   "started": "A commencé",

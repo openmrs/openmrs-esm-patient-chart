@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .bodyShort01 {
   @include type.type-style("body-compact-01");
@@ -30,8 +30,8 @@
 
 .tablet :global(.cds--pagination) {
   min-height: 0rem;
-  height: 3rem; 
-  width: auto;   
+  height: 3rem;
+  width: auto;
   border: none;
 
   & :global(.cds--select-input), :global(.cds--btn), :global(.cds--pagination__right) {
