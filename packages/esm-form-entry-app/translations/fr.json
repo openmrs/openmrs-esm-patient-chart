@@ -33,7 +33,7 @@
   "loadingComponent": "Chargement du composant...",
   "max": "La valeur maximale doit être {max}",
   "maxDate": "La date maximale doit être {maxDate}",
-  "maxEntries":"Vous ne pouvez pas avoir plus de {max} entrées",
+  "maxEntries": "Vous ne pouvez pas avoir plus de {max} entrées",
   "maxLength": "La longueur maximale doit être {maxLength}",
   "min": "La valeur minimale doit être {min}",
   "minDate": "La date minimale doit être {minDate}",

@@ -23,7 +23,7 @@
   "errorLoadingForm": "Error loading form",
   "errorWithForm": "There was an error with this form",
   "fix": "Fix",
-  "formSubmissionFailed": "An error occurred while processing your form submission. Kindly notify the system administrator and reference the following error : {error}",
+  "formSubmissionFailed": "An error has occurred while submitting the form. Error: {error}",
   "formSubmittedSuccessfully": "The form has been submitted successfully.",
   "from": "From",
   "futureDateRestriction": "Future date is not allowed!",

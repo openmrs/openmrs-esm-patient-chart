@@ -1,7 +1,7 @@
 {
   "add": "Add",
   "cancel": "Cancel",
-  "doseNumber": "Dose Number",
+  "doseNumber": "Dose number within series",
   "edit": "Edit",
   "error": "Error",
   "errorSaving": "Error saving vaccination",
