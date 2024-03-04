@@ -121,7 +121,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   });
 
   const displayVisitStopDateTimeFields = useMemo(
-    () => Boolean(visitToEdit?.stopDatetime || showVisitEndDateTimeFields),
+    () => Boolean(visitToEdit?.uuid || visitToEdit?.stopDatetime || showVisitEndDateTimeFields),
     [visitToEdit?.stopDatetime, showVisitEndDateTimeFields],
   );
 
