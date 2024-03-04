@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .label01 {
@@ -12,20 +12,20 @@
 
 .vitalsChartContainer {
   display: flex;
-  margin: 0rem spacing.$spacing-05;
+  margin: 0rem layout.$spacing-05;
   flex-direction: row;
   justify-content: space-between;
 }
 
 .vitalSignsArea {
   flex-grow: 1;
-  margin: spacing.$spacing-03 0;
-  padding-right: spacing.$spacing-05;
+  margin: layout.$spacing-03 0;
+  padding-right: layout.$spacing-05;
 }
 
 .vitalsChartArea {
   flex-grow: 4;
-  padding: 0 spacing.$spacing-05 spacing.$spacing-09;
+  padding: 0 layout.$spacing-05 layout.$spacing-09;
 
   :global(.cds--cc--layout-row) {
     height: 0;
