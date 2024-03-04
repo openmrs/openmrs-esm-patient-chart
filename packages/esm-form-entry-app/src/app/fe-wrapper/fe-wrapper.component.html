@@ -38,8 +38,12 @@
             (click)="onSubmit()"
             type="submit"
           >
-            <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}</span>
-            <loader *ngIf="formState === 'submitting'" [loadingMessage]="'submitting' | translate"></loader>
+            <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}...</span>
+            <loader
+              class="spinner"
+              *ngIf="formState === 'submitting'"
+              [loadingMessage]="'submitting' | translate"
+            ></loader>
           </button>
           <button class="cds--btn cds--btn--secondary" (click)="closeForm()" type="button">
             {{ 'discardButton' | translate }}
