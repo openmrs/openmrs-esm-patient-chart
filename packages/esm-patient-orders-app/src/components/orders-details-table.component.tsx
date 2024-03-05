@@ -269,7 +269,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         />
       )}
       {!tableRows.length ? (
-        <EmptyState headerTitle={headerTitle} displayText={headerTitle} />
+        <EmptyState
+          headerTitle={headerTitle}
+          displayText={
+            selectedOrderTypeUuid === null
+              ? t('orders', 'Orders')
+              : (orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).display + 's'
+          }
+        />
       ) : (
         <div className={styles.widgetCard}>
           <CardHeader title={title}>
