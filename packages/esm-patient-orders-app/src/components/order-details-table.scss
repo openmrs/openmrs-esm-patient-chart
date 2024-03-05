@@ -45,3 +45,9 @@
     color: $text-02;
   }
 }
+
+.table {
+  td:after {
+    display: none;
+  }
+}
