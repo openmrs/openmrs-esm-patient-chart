@@ -82,7 +82,6 @@ describe('Conditions Form', () => {
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
     expect(submitButton).toBeInTheDocument();
-    expect(submitButton).toBeDisabled();
   });
 
   it('closes the form and the workspace when the cancel button is clicked', async () => {
@@ -158,14 +157,12 @@ describe('Conditions Form', () => {
     const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
 
     expect(cancelButton).not.toBeDisabled();
-    expect(submitButton).toBeDisabled();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.type(onsetDateInput, '2020-05-05');
 
     expect(activeStatusInput).toBeChecked();
-    expect(submitButton).not.toBeDisabled();
 
     await user.click(submitButton);
   });

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm, FormProvider, type SubmitHandler, SubmitErrorHandler } from 'react-hook-form';
+import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 interface ConditionFormProps extends DefaultWorkspaceProps {
   condition?: ConditionDataTableRow;
@@ -124,7 +124,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button className={styles.button} disabled={isSubmittingForm || !isDirty} kind="primary" type="submit">
+            <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
               {isSubmittingForm ? (
                 <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
               ) : (

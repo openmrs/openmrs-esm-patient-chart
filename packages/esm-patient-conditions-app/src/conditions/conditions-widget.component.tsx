@@ -19,6 +19,7 @@ import {
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
 import { showSnackbar, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
@@ -30,7 +31,6 @@ import {
 } from './conditions.resource';
 import { type ConditionFormData } from './conditions-form.component';
 import styles from './conditions-form.scss';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
@@ -203,7 +203,18 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
-        <FormGroup legendText={t('condition', 'Condition')}>
+        <FormGroup
+          legendText={
+            <>
+              <span>{t('condition', 'Condition')}</span>
+              {!editing && (
+                <span title={t('required', 'Required')} className={styles.required}>
+                  *
+                </span>
+              )}
+            </>
+          }
+        >
           {editing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
