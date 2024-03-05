@@ -12,7 +12,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Record, edit and delete a lab order', async ({ page }) => {
+test('Record, edit and discontinue a lab order', async ({ page }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -43,7 +43,8 @@ test('Record, edit and delete a lab order', async ({ page }) => {
     await page.locator('#tab select').selectOption('857AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   });
 
-  await test.step('And I click `Save and close` button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
+    await expect(page.getByRole('button', { name: /save and close/i })).toBeVisible();
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -66,12 +67,12 @@ test('Record, edit and delete a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('And if I launch the overflow menu and click the `Options` button', async () => {
+  await test.step('And if I launch the overflow menu and click on the `Options` button', async () => {
     await expect(visitsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
     await page.getByRole('button', { name: /options/i }).click();
   });
 
-  await test.step('And I click `Edit` button', async () => {
+  await test.step('And I click on the `Edit` button', async () => {
     await expect(visitsPage.page.getByText(/edit this encounter/i)).toBeVisible();
     await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
@@ -81,6 +82,7 @@ test('Record, edit and delete a lab order', async ({ page }) => {
   });
 
   await test.step('And I save the form', async () => {
+    await expect(page.getByRole('button', { name: /save and close/i })).toBeVisible();
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -96,12 +98,12 @@ test('Record, edit and delete a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('Then if I click on the overflow menu and click the `Options` button', async () => {
+  await test.step('Then if I launch the overflow menu and click on the `Options` button', async () => {
     await expect(visitsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
     await page.getByRole('button', { name: /options/i }).click();
   });
 
-  await test.step('And I click `Delete` button', async () => {
+  await test.step('And I click on the `Delete` button', async () => {
     await expect(visitsPage.page.getByText(/delete this encounter/i)).toBeVisible();
     await page.getByRole('menuitem', { name: /delete this encounter/i }).click();
     await page.getByRole('button', { name: /delete/i }).click();
