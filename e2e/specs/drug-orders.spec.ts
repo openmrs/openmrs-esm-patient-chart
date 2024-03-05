@@ -23,11 +23,11 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByText(/record active medications/i).click();
   });
 
-  await test.step('And I search for the drug in the search bar', async () => {
+  await test.step('And I search for `Aspirin` in the search bar', async () => {
     await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
   });
 
-  await test.step('And I click on the `Add to basket` button', async () => {
+  await test.step('And I add `Aspirin 81mg` to the basket', async () => {
     await page
       .getByRole('listitem')
       .filter({ hasText: /aspirin 81mg — 81mg — tablet/i })
@@ -35,7 +35,11 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
       .click();
   });
 
-  await test.step('And I click on the drug order form link', async () => {
+  await test.step('Then I should see `Aspirin 81mg` under drug order', async () => {
+    await expect(page.getByText('Aspirin 81mg')).toBeVisible();
+  });
+
+  await test.step('When I click on the created drug order', async () => {
     await page
       .getByRole('listitem')
       .filter({ hasText: /incomplete/i })
@@ -46,33 +50,41 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/order form/i)).toBeVisible();
   });
 
-  await test.step('When I set the does to `1` tablet', async () => {
-    await medicationsPage.page.getByLabel(/^dose$/i).clear();
-    await medicationsPage.page.getByLabel(/^dose$/i).fill('1');
+  await test.step('When I set the dose to `1` tablet', async () => {
+    await page.getByLabel(/^dose$/i).clear();
+    await page.getByLabel(/^dose$/i).fill('1');
   });
 
   await test.step('And I set the route to `Oral`', async () => {
-    await medicationsPage.page.getByPlaceholder(/route/i).click();
-    await medicationsPage.page.getByText('Oral', { exact: true }).click();
+    await page.getByPlaceholder(/route/i).click();
+    await page.getByText('Oral', { exact: true }).click();
   });
 
   await test.step('And I set the frequency to `Once daily`', async () => {
-    await medicationsPage.page.getByPlaceholder(/frequency/i).click();
-    await medicationsPage.page.getByText('Once daily', { exact: true }).click();
+    await page.getByPlaceholder(/frequency/i).click();
+    await page.getByText('Once daily', { exact: true }).click();
   });
 
   await test.step('And I set duration to `3` days', async () => {
-    await medicationsPage.page.getByLabel(/^duration$/i).clear();
-    await medicationsPage.page.getByLabel(/^duration$/i).fill('3');
+    await page.getByLabel(/^duration$/i).clear();
+    await page.getByLabel(/^duration$/i).fill('3');
   });
 
   await test.step('And I set the indication to `Headache`', async () => {
-    await medicationsPage.page.getByLabel(/indication/i).clear();
-    await medicationsPage.page.getByLabel(/indication/i).fill('Headache');
+    await page.getByLabel(/indication/i).clear();
+    await page.getByLabel(/indication/i).fill('Headache');
   });
 
-  await test.step('And I save the form', async () => {
+  await test.step('And I click on the "Save Order" button', async () => {
     await page.getByRole('button', { name: /save order/i }).click();
+  });
+
+  await test.step('Then the order status should be changed to `New`', async () => {
+    await expect(page.getByText(/incomplete/i)).not.toBeVisible();
+    await expect(page.getByText(/new/i)).toBeVisible();
+  });
+
+  await test.step('When I click on the "Sign and close" button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
@@ -80,7 +92,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
   });
 
-  await test.step('And I should see the newly added order in the list', async () => {
+  await test.step('And I should see the newly added order in the active medications list', async () => {
     const headerRow = medicationsPage.medicationsTable().locator('thead > tr');
     const dataRow = medicationsPage.medicationsTable().locator('tbody > tr');
 
@@ -94,41 +106,56 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(dataRow).toContainText(/indication headache/i);
   });
 
-  await test.step('When I launch the overflow menu', async () => {
-    await page.getByRole('button', { name: /options/i }).click();
+  await test.step('When I click the overflow menu of the created medication', async () => {
+    await page
+      .getByRole('button', { name: /options/i })
+      .nth(0)
+      .click();
   });
 
   await test.step('And I click on the `Modify` button', async () => {
     await page.getByRole('menuitem', { name: /modify/i }).click();
   });
 
-  await test.step('And I change the dose to `2` tablets', async () => {
-    await medicationsPage.page.getByLabel(/^dose$/i).clear();
-    await medicationsPage.page.getByLabel(/^dose$/i).fill('2');
+  await test.step('Then I should be redirected to the order form of the created medication`', async () => {
+    await expect(page.getByText('Aspirin 81mg (81mg)')).toBeVisible();
+  });
+
+  await test.step('When I change the dose to `2` tablets', async () => {
+    await page.getByLabel(/^dose$/i).clear();
+    await page.getByLabel(/^dose$/i).fill('2');
   });
 
   await test.step('And I change the duration to `5` days', async () => {
-    await medicationsPage.page.getByLabel(/^duration$/i).clear();
-    await medicationsPage.page.getByLabel(/^duration$/i).fill('5');
+    await page.getByLabel(/^duration$/i).clear();
+    await page.getByLabel(/^duration$/i).fill('5');
   });
 
   await test.step('And I change the route to `Inhalation`', async () => {
-    await medicationsPage.page.getByPlaceholder(/route/i).click();
-    await medicationsPage.page.getByText('Inhalation', { exact: true }).click();
+    await page.getByPlaceholder(/route/i).click();
+    await page.getByText('Inhalation', { exact: true }).click();
   });
 
   await test.step('And I change the frequency to `Twice daily`', async () => {
-    await medicationsPage.page.getByPlaceholder(/frequency/i).click();
-    await medicationsPage.page.getByText('Twice daily', { exact: true }).click();
+    await page.getByPlaceholder(/frequency/i).click();
+    await page.getByText('Twice daily', { exact: true }).click();
   });
 
   await test.step('And I change the indication to `Hypertension`', async () => {
-    await medicationsPage.page.getByLabel(/indication/i).clear();
-    await medicationsPage.page.getByLabel(/indication/i).fill('Hypertension');
+    await page.getByLabel(/indication/i).clear();
+    await page.getByLabel(/indication/i).fill('Hypertension');
   });
 
-  await test.step('And I save the form', async () => {
+  await test.step('And I click on the "Save Order" button', async () => {
     await page.getByRole('button', { name: /save order/i }).click();
+  });
+
+  await test.step('Then the order status should be changed to `Modify`', async () => {
+    await expect(page.getByText(/new/i)).not.toBeVisible();
+    await expect(page.getByText(/modify/i)).toBeVisible();
+  });
+
+  await test.step('When I click on the "Sign and close" button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
@@ -136,7 +163,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
   });
 
-  await test.step('And I should see the updated order in the list', async () => {
+  await test.step('And I should see the updated order in the list in Active Medications table', async () => {
     const headerRow = medicationsPage.medicationsTable().locator('thead > tr');
     const dataRow = medicationsPage.medicationsTable().locator('tbody > tr');
 
@@ -155,7 +182,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(dataRow.nth(0)).toContainText(/indication hypertension/i);
   });
 
-  await test.step('When I launch the overflow menu', async () => {
+  await test.step('When I click the overflow menu of the created medication', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -164,6 +191,10 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
 
   await test.step('And I click on the `Discontinue` button', async () => {
     await page.getByRole('menuitem', { name: /discontinue/i }).click();
+  });
+
+  await test.step('Then the order status should be changed to `Discontinue`', async () => {
+    await expect(page.getByText(/discontinue/i)).toBeVisible();
   });
 
   await test.step('And I save the form', async () => {
