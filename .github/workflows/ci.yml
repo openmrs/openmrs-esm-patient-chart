@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - name: Trigger RefApp Build
-        uses: fjogeleit/http-request-action@master
+        uses: fjogeleit/http-request-action@v1
         continue-on-error: true
         with:
           url: https://ci.openmrs.org/rest/api/latest/queue/O3-BF
