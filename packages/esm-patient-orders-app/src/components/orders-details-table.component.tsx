@@ -9,7 +9,6 @@ import {
   DataTable,
   DataTableSkeleton,
   Dropdown,
-  Layer,
   IconButton,
   InlineLoading,
   OverflowMenu,
@@ -25,7 +24,6 @@ import {
   TableHeader,
   TableRow,
   Tag,
-  Tile,
   Tooltip,
 } from '@carbon/react';
 import {
@@ -43,7 +41,6 @@ import {
   type DrugOrderBasketItem,
   type LabOrderBasketItem,
   getDrugOrderByUuid,
-  EmptyDataIllustration,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
