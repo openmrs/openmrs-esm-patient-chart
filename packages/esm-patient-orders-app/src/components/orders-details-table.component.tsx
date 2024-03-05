@@ -249,72 +249,61 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   }
 
   return (
-    <div className={styles.widgetCard}>
-      <CardHeader title={title}>
-        {isValidating ? (
-          <span>
-            <InlineLoading />
-          </span>
-        ) : null}
-        <div className={styles.buttons}>
-          {orderTypes && orderTypes?.length > 0 && (
-            <Dropdown
-              id="orderTypeDropdown"
-              titleText={t('selectOrderType', 'Select order type')}
-              label={t('all', 'All')}
-              type="inline"
-              items={[...[{ display: 'All' }], ...orderTypes]}
-              selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
-              itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-              onChange={(e) => {
-                if (e.selectedItem.display === 'All') {
-                  setSelectedOrderTypeUuid(null);
-                  return;
-                }
-                setSelectedOrderTypeUuid(e.selectedItem.uuid);
-              }}
-            />
-          )}
-
-          {showPrintButton && (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Printer size={16} {...props} />}
-              iconDescription={t('print', 'Print')}
-              className={styles.printButton}
-              onClick={handlePrint}
-            >
-              {t('print', 'Print')}
-            </Button>
-          )}
-          {showAddButton ?? true ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription={t('launchOrderBasket', 'Launch order basket')}
-              onClick={launchOrderBasket}
-            >
-              {t('add', 'Add')}
-            </Button>
-          ) : null}
-        </div>
-      </CardHeader>
-      <div ref={contentToPrintRef}>
-        <PrintComponent subheader={title} patientDetails={patientDetails} />
-        {!tableRows?.length ? (
-          <Layer>
-            <Tile className={styles.tile}>
-              <EmptyDataIllustration />
-              <p className={styles.message}>There are no orders to display for this patient</p>
-              <p className={styles.action}>
-                <Button onClick={launchOrderBasket} kind="ghost" size={isTablet ? 'lg' : 'sm'}>
-                  Record Orders
+    <>
+      {orderTypes && orderTypes?.length > 0 && (
+        <Dropdown
+          id="orderTypeDropdown"
+          titleText={t('selectOrderType', 'Select order type')}
+          label={t('all', 'All')}
+          type="inline"
+          items={[...[{ display: 'All' }], ...orderTypes]}
+          selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
+          itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+          onChange={(e) => {
+            if (e.selectedItem.display === 'All') {
+              setSelectedOrderTypeUuid(null);
+              return;
+            }
+            setSelectedOrderTypeUuid(e.selectedItem.uuid);
+          }}
+        />
+      )}
+      {!tableRows.length ? (
+        <EmptyState headerTitle={headerTitle} displayText={headerTitle} />
+      ) : (
+        <div className={styles.widgetCard}>
+          <CardHeader title={title}>
+            {isValidating ? (
+              <span>
+                <InlineLoading />
+              </span>
+            ) : null}
+            <div className={styles.buttons}>
+              {showPrintButton && (
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <Printer size={16} {...props} />}
+                  iconDescription={t('print', 'Print')}
+                  className={styles.printButton}
+                  onClick={handlePrint}
+                >
+                  {t('print', 'Print')}
                 </Button>
-              </p>
-            </Tile>
-          </Layer>
-        ) : (
-          <>
+              )}
+              {showAddButton ?? true ? (
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <Add size={16} {...props} />}
+                  iconDescription={t('launchOrderBasket', 'Launch order basket')}
+                  onClick={launchOrderBasket}
+                >
+                  {t('add', 'Add')}
+                </Button>
+              ) : null}
+            </div>
+          </CardHeader>
+          <div ref={contentToPrintRef}>
+            <PrintComponent subheader={title} patientDetails={patientDetails} />
             <DataTable
               data-floating-menu-container
               size="sm"
@@ -379,10 +368,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                 onPageNumberChange={({ page }) => goTo(page)}
               />
             )}
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
