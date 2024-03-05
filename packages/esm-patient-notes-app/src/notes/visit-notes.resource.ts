@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { map } from 'rxjs/operators';
 import { openmrsFetch, openmrsObservableFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import {
@@ -60,6 +61,45 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     isLoading,
     isValidating,
     mutateVisitNotes: mutate,
+  };
+}
+
+export function useInfiniteVisits(patientUuid: string) {
+  const config = useConfig();
+  const customRepresentation =
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+
+  const getKey = (pageIndex, previousPageData) => {
+    const pageSize = config.numberOfVisitsToLoad;
+
+    if (previousPageData && !previousPageData?.data?.links.some((link) => link.rel === 'next')) {
+      return null;
+    }
+
+    let url = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${pageSize}`;
+
+    if (pageIndex) {
+      url += `&startIndex=${pageIndex * pageSize}`;
+    }
+
+    return url;
+  };
+
+  const { data, error, isLoading, isValidating, mutate, size, setSize } = useSWRInfinite(
+    patientUuid ? getKey : null,
+    openmrsFetch,
+    { parallel: true },
+  );
+
+  return {
+    visits: data ? [].concat(data?.flatMap((page) => page.data.results)) : null,
+    error,
+    hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
+    isLoading,
+    isValidating,
+    mutateVisits: mutate,
+    setSize,
+    size,
   };
 }
 
