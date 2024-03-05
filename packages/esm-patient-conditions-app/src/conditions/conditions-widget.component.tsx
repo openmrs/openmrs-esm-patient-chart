@@ -181,7 +181,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   ]);
 
   const searchInputFocus = () => {
-    searchInputRef.current.focus();
+    searchInputRef?.current?.focus();
   };
 
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
