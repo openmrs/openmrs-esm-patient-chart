@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
@@ -62,7 +62,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     getValues,
     formState: { errors },
   } = useFormContext<ConditionFormData>();
-  const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const searchInputRef = useRef(null);
   const currentStatus = watch('clinicalStatus');
@@ -180,7 +179,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     t,
   ]);
 
-  const searchInputFocus = () => {
+  const focusOnSearchInput = () => {
     searchInputRef?.current?.focus();
   };
 
@@ -188,7 +187,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   useEffect(() => {
     if (errors?.search) {
-      searchInputFocus();
+      focusOnSearchInput();
     }
     if (isSubmittingForm) {
       if (Object.keys(errors).length > 0) {

@@ -67,7 +67,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
 
   const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
     setIsSubmittingForm(true);
-    if (!data.search.trim()) {
+    if (formContext === 'creating' && !data.search.trim()) {
       setError('search', {
         type: 'manual',
         message: t('conditionRequired', 'A condition is required'),
