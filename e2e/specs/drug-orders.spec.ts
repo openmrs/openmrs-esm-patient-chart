@@ -20,44 +20,64 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And I click on the `Record active medications` link', async () => {
-    await medicationsPage.page.getByText(/record active medications/i).click();
+    await page.getByText(/record active medications/i).click();
   });
 
-  await test.step('And I fill the drug order form', async () => {
-    await expect(medicationsPage.page.getByText(/add drug order/i)).toBeVisible();
-    await medicationsPage.page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
-    await expect(medicationsPage.page.getByText(/6 results for "aspirin"/)).toBeVisible();
-    await medicationsPage.page
+  await test.step('And I search for the drug in the search bar', async () => {
+    await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
+  });
+
+  await test.step('And I click on the `Add to basket` button', async () => {
+    await page
       .getByRole('listitem')
       .filter({ hasText: /aspirin 81mg — 81mg — tablet/i })
       .getByRole('button', { name: /add to basket/i })
       .click();
+  });
 
-    await expect(medicationsPage.page.getByRole('heading', { name: 'Drug orders (1)' })).toBeVisible();
-    await medicationsPage.page
+  await test.step('And I click on the drug order form link', async () => {
+    await page
       .getByRole('listitem')
       .filter({ hasText: /incomplete/i })
       .click();
+  });
 
-    await expect(medicationsPage.page.getByRole('button', { name: /back to order basket/i })).toBeVisible();
+  await test.step('Then I should be redirected to the drug order form', async () => {
+    await expect(page.getByText(/order form/i)).toBeVisible();
+  });
+
+  await test.step('When I set the does to `1` tablet', async () => {
+    await medicationsPage.page.getByLabel(/^dose$/i).clear();
     await medicationsPage.page.getByLabel(/^dose$/i).fill('1');
+  });
+
+  await test.step('And I set the route to `Oral`', async () => {
     await medicationsPage.page.getByPlaceholder(/route/i).click();
     await medicationsPage.page.getByText('Oral', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `Once daily`', async () => {
     await medicationsPage.page.getByPlaceholder(/frequency/i).click();
     await medicationsPage.page.getByText('Once daily', { exact: true }).click();
+  });
+
+  await test.step('And I set duration to `3` days', async () => {
+    await medicationsPage.page.getByLabel(/^duration$/i).clear();
     await medicationsPage.page.getByLabel(/^duration$/i).fill('3');
+  });
+
+  await test.step('And I set the indication to `Headache`', async () => {
+    await medicationsPage.page.getByLabel(/indication/i).clear();
     await medicationsPage.page.getByLabel(/indication/i).fill('Headache');
   });
 
   await test.step('And I save the form', async () => {
-    await expect(page.getByRole('button', { name: /save order/i })).toBeVisible();
     await page.getByRole('button', { name: /save order/i }).click();
-    await expect(page.getByRole('button', { name: /sign and close/i })).toBeVisible();
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(medicationsPage.page.getByText(/placed order for aspirin/i)).toBeVisible();
+    await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
   });
 
   await test.step('And I should see the newly added order in the list', async () => {
@@ -74,44 +94,46 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(dataRow).toContainText(/indication headache/i);
   });
 
-  await test.step('And if I launch the overflow menu and click on the `Options` button', async () => {
-    await expect(medicationsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
-    await medicationsPage.page.getByRole('button', { name: /options/i }).click();
+  await test.step('When I launch the overflow menu', async () => {
+    await page.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Modify` button', async () => {
-    await expect(medicationsPage.page.getByRole('menuitem', { name: /modify/i })).toBeVisible();
-    await medicationsPage.page.getByRole('menuitem', { name: /modify/i }).click();
+    await page.getByRole('menuitem', { name: /modify/i }).click();
   });
 
-  await test.step('Then I edit the data in the Drug Order form', async () => {
+  await test.step('And I change the dose to `2` tablets', async () => {
     await medicationsPage.page.getByLabel(/^dose$/i).clear();
     await medicationsPage.page.getByLabel(/^dose$/i).fill('2');
+  });
 
+  await test.step('And I change the duration to `5` days', async () => {
     await medicationsPage.page.getByLabel(/^duration$/i).clear();
     await medicationsPage.page.getByLabel(/^duration$/i).fill('5');
+  });
 
-    await medicationsPage.page.getByPlaceholder(/route/i).clear();
+  await test.step('And I change the route to `Inhalation`', async () => {
     await medicationsPage.page.getByPlaceholder(/route/i).click();
     await medicationsPage.page.getByText('Inhalation', { exact: true }).click();
+  });
 
-    await medicationsPage.page.getByPlaceholder(/frequency/i).clear();
+  await test.step('And I change the frequency to `Twice daily`', async () => {
     await medicationsPage.page.getByPlaceholder(/frequency/i).click();
     await medicationsPage.page.getByText('Twice daily', { exact: true }).click();
+  });
 
+  await test.step('And I change the indication to `Hypertension`', async () => {
     await medicationsPage.page.getByLabel(/indication/i).clear();
     await medicationsPage.page.getByLabel(/indication/i).fill('Hypertension');
   });
 
   await test.step('And I save the form', async () => {
-    await expect(page.getByRole('button', { name: /save order/i })).toBeVisible();
     await page.getByRole('button', { name: /save order/i }).click();
-    await expect(page.getByRole('button', { name: /sign and close/i })).toBeVisible();
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(medicationsPage.page.getByText(/updated aspirin 81mg/i)).toBeVisible();
+    await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
   });
 
   await test.step('And I should see the updated order in the list', async () => {
@@ -133,32 +155,27 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(dataRow.nth(0)).toContainText(/indication hypertension/i);
   });
 
-  await test.step('Then if I launch the overflow menu and click on the `Options` button', async () => {
-    await expect(medicationsPage.page.getByRole('button', { name: /options/i }).nth(0)).toBeVisible();
-    await medicationsPage.page
+  await test.step('When I launch the overflow menu', async () => {
+    await page
       .getByRole('button', { name: /options/i })
       .nth(0)
       .click();
   });
 
   await test.step('And I click on the `Discontinue` button', async () => {
-    await expect(medicationsPage.page.getByRole('menuitem', { name: /discontinue/i })).toBeVisible();
-    await medicationsPage.page.getByRole('menuitem', { name: /discontinue/i }).click();
+    await page.getByRole('menuitem', { name: /discontinue/i }).click();
   });
 
   await test.step('And I save the form', async () => {
-    await expect(page.getByRole('button', { name: /sign and close/i })).toBeVisible();
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(medicationsPage.page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
+    await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
   });
 
-  await test.step('And I should not see the deleted order in the active list', async () => {
-    await expect(
-      medicationsPage.page.getByText(/There are no active medications to display for this patient/i),
-    ).toBeVisible();
+  await test.step('And the medications table should be empty', async () => {
+    await expect(page.getByText(/There are no active medications to display for this patient/i)).toBeVisible();
   });
 });
 

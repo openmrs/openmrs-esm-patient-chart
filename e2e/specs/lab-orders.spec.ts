@@ -30,30 +30,31 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     await expect(chartPage.page.getByPlaceholder(/search this list/i)).toBeVisible();
     await expect(headerRow).toContainText(/form name \(a-z\)/i);
     await expect(headerRow).toContainText(/last completed/i);
-
     await expect(chartPage.page.getByRole('cell', { name: /laboratory test orders/i })).toBeVisible();
   });
 
-  await test.step('And I launch the `Laboratory Test Orders` form', async () => {
+  await test.step('When I launch the `Laboratory Test Orders` form', async () => {
     await page.getByText(/laboratory test orders/i).click();
   });
 
-  await test.step('And I fill the `Laboratory Test Orders` form', async () => {
+  await test.step('And I click on the `Add` button', async () => {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
+  });
+
+  await test.step('And I set the lab test to `Blood urea nitrogen`', async () => {
     await page.locator('#tab select').selectOption('857AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
-    await expect(page.getByRole('button', { name: /save and close/i })).toBeVisible();
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(chartPage.page.getByText('Lab order(s) generated')).toBeVisible();
-    await expect(chartPage.page.getByText(/blood urea nitrogen/i)).toBeVisible();
+    await expect(page.getByText('Lab order(s) generated')).toBeVisible();
+    await expect(page.getByText(/blood urea nitrogen/i)).toBeVisible();
   });
 
-  await test.step('And if I navigate to the visits dashboard', async () => {
+  await test.step('When I navigate to the visits dashboard', async () => {
     await visitsPage.goTo(patient.uuid);
   });
 
@@ -63,59 +64,54 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
 
   await test.step('Then I should see the newly added lab order in the list', async () => {
     await expect(
-      visitsPage.page.getByRole('cell', { name: /laboratory test orders/i }).getByText('Laboratory Test Orders'),
+      page.getByRole('cell', { name: /laboratory test orders/i }).getByText('Laboratory Test Orders'),
     ).toBeVisible();
   });
 
-  await test.step('And if I launch the overflow menu and click on the `Options` button', async () => {
-    await expect(visitsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
+  await test.step('When I launch the overflow menu', async () => {
     await page.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Edit` button', async () => {
-    await expect(visitsPage.page.getByText(/edit this encounter/i)).toBeVisible();
     await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
 
-  await test.step('Then I edit the data in the Laboratory Test form', async () => {
+  await test.step('And I change the lab test to `Hepatitis c test - qualitative`', async () => {
     await page.locator('#tab select').selectOption('1325AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   });
 
   await test.step('And I save the form', async () => {
-    await expect(page.getByRole('button', { name: /save and close/i })).toBeVisible();
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(chartPage.page.getByText('Lab order(s) generated')).toBeVisible();
-    await expect(chartPage.page.getByText(/blood urea nitrogen/i)).not.toBeVisible();
-    await expect(chartPage.page.getByText(/hepatitis c test - qualitative/i)).toBeVisible();
+    await expect(page.getByText('Lab order(s) generated')).toBeVisible();
+    await expect(page.getByText(/blood urea nitrogen/i)).not.toBeVisible();
+    await expect(page.getByText(/hepatitis c test - qualitative/i)).toBeVisible();
   });
 
   await test.step('And I should see the updated Laboratory Test Order in the list', async () => {
     await expect(
-      visitsPage.page.getByRole('cell', { name: /laboratory test orders/i }).getByText('Laboratory Test Orders'),
+      page.getByRole('cell', { name: /laboratory test orders/i }).getByText('Laboratory Test Orders'),
     ).toBeVisible();
   });
 
-  await test.step('Then if I launch the overflow menu and click on the `Options` button', async () => {
-    await expect(visitsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
+  await test.step('When I launch the overflow menu', async () => {
     await page.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {
-    await expect(visitsPage.page.getByText(/delete this encounter/i)).toBeVisible();
     await page.getByRole('menuitem', { name: /delete this encounter/i }).click();
     await page.getByRole('button', { name: /delete/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(visitsPage.page.getByText(/encounter successfully deleted/i)).toBeVisible();
+    await expect(page.getByText(/encounter successfully deleted/i)).toBeVisible();
   });
 
-  await test.step('And I should not see the deleted order in the list', async () => {
+  await test.step('And the encounters table should be empty', async () => {
     await expect(
-      visitsPage.page.getByLabel(/all encounters/i).getByText(/There are no encounters to display for this patient/i),
+      page.getByLabel(/all encounters/i).getByText(/There are no encounters to display for this patient/i),
     ).toBeVisible();
   });
 });
