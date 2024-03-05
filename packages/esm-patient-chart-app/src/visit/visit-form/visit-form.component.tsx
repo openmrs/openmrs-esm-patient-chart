@@ -113,10 +113,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       {},
     );
 
-    const visitStopDateValidation = visitToEdit?.stopDatetime
-      ? z.date().refine((value) => !!value, t('fieldRequired', 'This field is required'))
-      : z.date().optional();
-
     const visitStopTimeValidation = z
       .string()
       .refine(
@@ -130,8 +126,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         .string()
         .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
       visitStartTimeFormat: z.enum(['PM', 'AM']),
-      visitStopDate: visitStopDateValidation,
-      visitStopTime: visitStopTimeValidation,
+      visitStopDate: visitToEdit?.stopDatetime ? z.date() : z.date().optional(),
+      visitStopTime: visitToEdit?.stopDatetime ? visitStopTimeValidation : visitStopTimeValidation.optional(),
       visitStopTimeFormat: visitToEdit?.stopDatetime ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
       programType: z.string().optional(),
       visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
