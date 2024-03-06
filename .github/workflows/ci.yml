@@ -103,6 +103,7 @@ jobs:
           name: packages
           path: |
             packages/**/dist
+          overwrite: true
 
   deploy_patient_chart:
     runs-on: ubuntu-latest

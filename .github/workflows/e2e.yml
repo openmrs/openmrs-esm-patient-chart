@@ -61,6 +61,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+          overwrite: true
 
       - name: Capture Server Logs
         if: '!cancelled()'
@@ -75,3 +76,4 @@ jobs:
           name: server-logs
           path: './logs'
           retention-days: 2
+          overwrite: true
