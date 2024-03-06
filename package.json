@@ -75,7 +75,7 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@3.6.3",
+  "packageManager": "yarn@4.1.1",
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
     "classnames": "^2.3.2",
