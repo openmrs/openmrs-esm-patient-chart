@@ -4,15 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
 import { MetaData } from '../types';
-import { parseDate, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
 dayjs.extend(utc);
-dayjs.extend(timezone);
 
 @Injectable()
 export class ProgramResourceService {
@@ -28,8 +25,6 @@ export class ProgramResourceService {
   }
 
   public handlePatientCareProgram(form: Form, encounterUuid: string): void {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    dayjs.tz.setDefault(timeZone);
     const careProgramMeta: MetaData | undefined = form.schema.meta?.programs;
     if (!careProgramMeta) {
       return;
@@ -39,22 +34,11 @@ export class ProgramResourceService {
     const enrollmentDate = this.getProgramDate(form, isEnrollment, enrollmentDateQuestionId);
     const discontinuationDate = this.getProgramDate(form, !isEnrollment, discontinuationDateQuestionId);
     const locationUuid = this.getUserLocationUuid(form);
+    const utcOffset = form.valueProcessingInfo.utcOffset ?? '+0300';
 
     isEnrollment
-      ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounterUuid)
-      : this.discontinuePatientFromCareProgram(discontinuationDate, encounterUuid);
-  }
-
-  private getProgramDate(form: Form, condition: boolean, questionId?: string): string | undefined {
-    return condition && questionId ? this.getNodeValueById(form, questionId) : undefined;
-  }
-
-  private getNodeValueById(form: Form, questionId: string): string | undefined {
-    return form.searchNodeByQuestionId(questionId)?.[0]?.control.value;
-  }
-
-  private getUserLocationUuid(form: Form): string {
-    return form.dataSourcesContainer.dataSources['userLocation'].uuid;
+      ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounterUuid, utcOffset)
+      : this.discontinuePatientFromCareProgram(discontinuationDate, encounterUuid, utcOffset);
   }
 
   public enrollPatientToCareProgram(
@@ -62,9 +46,10 @@ export class ProgramResourceService {
     programUuid: string,
     locationUuid: string,
     encounterUuid: string,
+    utcOffset: string,
   ) {
     const patientUuid = this.singleSpaService.getPropOrThrow('patientUuid');
-    const enrolledDate = enrollmentDate ? enrollmentDate : dayjs();
+    const enrolledDate = enrollmentDate ? enrollmentDate : dayjs(new Date()).utcOffset(utcOffset).format();
     const inEditModeEncounterUuid = this.singleSpaService.getProp('encounterUuid');
     // Should not enroll patient if in edit mode
     if (inEditModeEncounterUuid) {
@@ -100,9 +85,8 @@ export class ProgramResourceService {
     );
   }
 
-  public discontinuePatientFromCareProgram(discontinuationDate: string, encounterUuid: string) {
+  public discontinuePatientFromCareProgram(discontinuationDate: string, encounterUuid: string, utcOffset: string) {
     const { enrollmentDetails } = this.singleSpaService.getPropOrThrow('additionalProps');
-
     const currentDateTime = new Date();
     const hour = currentDateTime.getHours();
     const minutes = currentDateTime.getMinutes();
@@ -113,8 +97,8 @@ export class ProgramResourceService {
       .set('minute', minutes)
       .set('second', seconds);
     const payload = {
-      dateEnrolled: dayjs(enrollmentDetails.dateEnrolled),
-      dateCompleted: discontinuationDateTime,
+      dateEnrolled: dayjs(enrollmentDetails.dateEnrolled).utcOffset(utcOffset).format(),
+      dateCompleted: discontinuationDateTime.utcOffset(utcOffset).format(),
     };
 
     this.httpClient.post(`${this.programEnrollmentUrl()}/${enrollmentDetails?.uuid}`, payload).subscribe(
@@ -139,5 +123,17 @@ export class ProgramResourceService {
         });
       },
     );
+  }
+
+  private getProgramDate(form: Form, condition: boolean, questionId?: string): string | undefined {
+    return condition && questionId ? this.getNodeValueById(form, questionId) : undefined;
+  }
+
+  private getNodeValueById(form: Form, questionId: string): string | undefined {
+    return form.searchNodeByQuestionId(questionId)?.[0]?.control.value;
+  }
+
+  private getUserLocationUuid(form: Form): string {
+    return form.dataSourcesContainer.dataSources['userLocation'].uuid;
   }
 }
