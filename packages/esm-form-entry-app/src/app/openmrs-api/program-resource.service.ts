@@ -8,6 +8,11 @@ import { parseDate, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Injectable()
 export class ProgramResourceService {
@@ -23,6 +28,8 @@ export class ProgramResourceService {
   }
 
   public handlePatientCareProgram(form: Form, encounterUuid: string): void {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    dayjs.tz.setDefault(timeZone);
     const careProgramMeta: MetaData | undefined = form.schema.meta?.programs;
     if (!careProgramMeta) {
       return;
@@ -53,11 +60,11 @@ export class ProgramResourceService {
   public enrollPatientToCareProgram(
     enrollmentDate: string,
     programUuid: string,
-    locationUuuid: string,
+    locationUuid: string,
     encounterUuid: string,
   ) {
     const patientUuid = this.singleSpaService.getPropOrThrow('patientUuid');
-    const enrolledDate = enrollmentDate ? enrollmentDate : new Date().toISOString();
+    const enrolledDate = enrollmentDate ? enrollmentDate : dayjs();
     const inEditModeEncounterUuid = this.singleSpaService.getProp('encounterUuid');
     // Should not enroll patient if in edit mode
     if (inEditModeEncounterUuid) {
@@ -66,9 +73,9 @@ export class ProgramResourceService {
     const payload = {
       patient: patientUuid,
       program: programUuid,
-      dateEnrolled: parseDate(enrolledDate),
+      dateEnrolled: enrolledDate,
       dateCompleted: null,
-      location: locationUuuid,
+      location: locationUuid,
     };
 
     this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
@@ -94,7 +101,7 @@ export class ProgramResourceService {
   }
 
   public discontinuePatientFromCareProgram(discontinuationDate: string, encounterUuid: string) {
-    const { enrollmenrDetails: enrollmentDetails } = this.singleSpaService.getPropOrThrow('additionalProps');
+    const { enrollmentDetails } = this.singleSpaService.getPropOrThrow('additionalProps');
 
     const currentDateTime = new Date();
     const hour = currentDateTime.getHours();
@@ -104,10 +111,9 @@ export class ProgramResourceService {
     const discontinuationDateTime = dayjs(discontinuationDate ?? new Date())
       .set('hour', hour)
       .set('minute', minutes)
-      .set('second', seconds)
-      .toISOString();
+      .set('second', seconds);
     const payload = {
-      dateEnrolled: dayjs(enrollmentDetails.dateEnrolled).toISOString(),
+      dateEnrolled: dayjs(enrollmentDetails.dateEnrolled),
       dateCompleted: discontinuationDateTime,
     };
 
