@@ -71,7 +71,7 @@ test('Add and edit a program enrollment', async ({ page, api }) => {
   await test.step('Then I should see the updated program enrollment in the list', async () => {
     await expect(dataRow).toContainText(/hiv care and treatment/i);
     await expect(dataRow).toContainText(/03-Jul-2023/i);
-    await expect(dataRow).toContainText(/completed on 04-Jul-2023/i);
+    await expect(dataRow).toContainText(/completed on 04-Jul-2023/i); //
     await expect(dataRow).toContainText(/community outreach/i);
   });
 });
