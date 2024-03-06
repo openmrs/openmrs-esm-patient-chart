@@ -1,15 +1,18 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
+import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
+import { type Visit } from '@openmrs/esm-framework';
 
 let patient: Patient;
+let visit: Visit;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
+  visit = await startVisit(api, patient.uuid);
 });
 
-test('Add appointment for a patient, edit the added appointment and cancel it', async ({ page, api }) => {
+test('Add, edit and cancel an appointment', async ({ page, api }) => {
   const appointmentsPage = new AppointmentsPage(page);
 
   await test.step('When I go to the appointment tab in the patient chart', async () => {
@@ -111,4 +114,9 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText(/Appointment cancelled successfully/i)).toBeVisible();
   });
+});
+
+test.afterEach(async ({ api }) => {
+  await endVisit(api, visit.uuid);
+  await deletePatient(api, patient.uuid);
 });
