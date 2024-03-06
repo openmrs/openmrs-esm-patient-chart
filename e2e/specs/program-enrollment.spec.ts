@@ -54,7 +54,9 @@ test('Add and edit a program enrollment', async ({ page, api }) => {
   });
 
   await test.step('And I edit the program enrollment', async () => {
+    await programsPage.page.locator('#enrollmentDateInput').clear();
     await programsPage.page.locator('#enrollmentDateInput').fill('03/07/2023');
+    await programsPage.page.locator('#completionDateInput').clear()
     await programsPage.page.locator('#completionDateInput').fill('04/07/2023');
     await programsPage.page.locator('#completionDateInput').press('Tab');
     await programsPage.page.locator('#location').selectOption('1ce1b7d4-c865-4178-82b0-5932e51503d6');
@@ -71,7 +73,7 @@ test('Add and edit a program enrollment', async ({ page, api }) => {
   await test.step('Then I should see the updated program enrollment in the list', async () => {
     await expect(dataRow).toContainText(/hiv care and treatment/i);
     await expect(dataRow).toContainText(/03-Jul-2023/i);
-    await expect(dataRow).toContainText(/completed on 05-Jul-2023/i);
+    await expect(dataRow).toContainText(/completed on 04-Jul-2023/i);
     await expect(dataRow).toContainText(/community outreach/i);
   });
 });
