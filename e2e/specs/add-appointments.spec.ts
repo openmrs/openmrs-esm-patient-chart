@@ -25,7 +25,7 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('And I select “Outpatient Department” service', async () => {
-    await page.getByLabel('Select a service').selectOption('Outpatient Department');
+    await page.selectOption('select#service', { label: 'Outpatient Department' });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -67,7 +67,7 @@ test('Add appointment for a patient, edit the added appointment and cancel it', 
   });
 
   await test.step('When I change to “Inpatient ward” location', async () => {
-    await page.getByLabel('Select location').selectOption('Inpatient Ward');
+    await page.selectOption('select#service', { label: 'General Medicine service' });
   });
 
   await test.step('And I change to “General Medicine” Service', async () => {
