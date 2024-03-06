@@ -19,6 +19,7 @@
   "patientLists": "បញ្ជីអ្នកជំងឺ",
   "postalCode": "លេខកូដតំបន់",
   "relationships": "ទំនាក់ទំនង",
+  "seeMoreLists_one": "See {{count}} more list",
   "seeMoreLists_other": "មើលបញ្ជី {{count}} ទៀត",
   "showDetails": "បង្ហាញលម្អិត",
   "started": "បានចាប់ផ្តើម",
