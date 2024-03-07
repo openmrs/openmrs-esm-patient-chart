@@ -163,7 +163,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          {isActiveVisitSummaryTabEnabled ? (
+          {isActiveVisitSummaryTabEnabled === true ? (
             visit?.encounters?.length > 0 &&
             visit?.encounters
               .filter((enc) => !!enc.form)
@@ -200,7 +200,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {isActiveVisitSummaryTabEnabled ? (
+          {isActiveVisitSummaryTabEnabled === true ? (
             visit?.encounters?.length > 0 &&
             foundEncounter && (
               <TabPanel key={selectedIndex}>
@@ -210,6 +210,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
                   encounterUUID={foundEncounter.uuid}
                   mode="view"
                 />
+                <p>Test</p>
               </TabPanel>
             )
           ) : (

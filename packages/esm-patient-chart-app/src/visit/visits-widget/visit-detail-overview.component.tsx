@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate, useConfig, ExtensionSlot, useVisit } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
 import { mapEncounters, useInfiniteVisits } from './visit.resource';
@@ -19,7 +19,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     useInfiniteVisits(patientUuid);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
-  const { currentVisit, isLoading: isLoadingCurrentVisit, error: isError } = useVisit(patientUuid);
 
   const visitsWithEncounters = visits
     ?.filter((visit) => visit?.encounters?.length)
@@ -44,40 +43,10 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         </TabList>
         <TabPanels>
           <TabPanel>
-            {isLoadingCurrentVisit ? (
-              <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-            ) : isError ? (
-              <ErrorState headerTitle={t('activeVisit', 'Active visit')} error={isError} />
-            ) : currentVisit ? (
-              <div className={styles.container}>
-                <div className={styles.header}>
-                  <div className={styles.visitInfo}>
-                    <div>
-                      <h4 className={styles.visitType}>{currentVisit.visitType?.display}</h4>
-                      <div className={styles.displayFlex}>
-                        <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
-                        <span className={styles.date}>{formatDatetime(parseDate(currentVisit.startDatetime))}</span>
-                        {currentVisit.stopDatetime ? (
-                          <>
-                            <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
-                            <span className={styles.date}>{formatDatetime(parseDate(currentVisit.stopDatetime))}</span>
-                          </>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <VisitSummary visit={currentVisit} patientUuid={patientUuid} />
-              </div>
-            ) : (
-              <EmptyState headerTitle={t('visit', 'Visit')} displayText={t('visit', 'Visit')} />
-            )}
-          </TabPanel>
-          <TabPanel>
             {isLoading ? (
               <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
             ) : error ? (
-              <ErrorState headerTitle={t('visits', 'Visits')} error={error} />
+              <ErrorState headerTitle={t('visits', 'visits')} error={error} />
             ) : visits?.length ? (
               <>
                 {visits.map((visit, i) => (

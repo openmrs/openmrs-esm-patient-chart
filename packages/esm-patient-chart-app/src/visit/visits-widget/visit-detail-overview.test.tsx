@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, getConfig, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
@@ -13,6 +13,13 @@ const testProps = {
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
+const mockUseFeatureFlag = useFeatureFlag as jest.Mock;
+
+jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
+  OHRIForm: jest
+    .fn()
+    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
+}));
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -70,6 +77,7 @@ describe('VisitDetailOverview', () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: true }));
+    mockUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
 
     renderVisitDetailOverview();
 
@@ -103,6 +111,7 @@ describe('VisitDetailOverview', () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false }));
+    mockUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
 
     renderVisitDetailOverview();
 

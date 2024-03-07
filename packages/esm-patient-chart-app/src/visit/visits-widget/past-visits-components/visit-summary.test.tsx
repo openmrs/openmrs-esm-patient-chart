@@ -9,6 +9,12 @@ import VisitSummary from './visit-summary.component';
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 const mockGetConfig = getConfig as jest.Mock;
 
+jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
+  OHRIForm: jest
+    .fn()
+    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
+}));
+
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 

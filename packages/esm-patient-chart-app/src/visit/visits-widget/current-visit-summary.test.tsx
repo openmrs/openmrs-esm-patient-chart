@@ -1,10 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { useVisit, getConfig } from '@openmrs/esm-framework';
+import { useVisit, getConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockUseVisits = useVisit as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
+const mockUseFeatureFlag = useFeatureFlag as jest.Mock;
+
+jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
+  OHRIForm: jest
+    .fn()
+    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
+}));
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework/mock'),
@@ -64,6 +71,7 @@ describe('CurrentVisitSummary', () => {
       isValidating: false,
       error: null,
     });
+    mockUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
 
