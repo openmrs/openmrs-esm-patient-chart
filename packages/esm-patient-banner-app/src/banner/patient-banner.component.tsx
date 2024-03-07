@@ -1,4 +1,4 @@
-import React, { type useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
@@ -69,7 +69,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     >
       <div className={styles.patientBanner}>
         {patientAvatar}
-        <PatientBannerPatientInfo />
+        <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
           {!hideActionsOverflow && patientActions.length > 0 ? (
             <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
