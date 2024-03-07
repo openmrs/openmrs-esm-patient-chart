@@ -53,17 +53,17 @@ export function useAllergies(patientUuid: string): UseAllergies {
 }
 
 function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
-  const manifestations = allergy?.reaction[0]?.manifestation?.map((coding) => coding.coding[0]?.display);
+  const manifestations = allergy?.reaction[0]?.manifestation?.map((coding) => coding?.text);
   return {
     id: allergy?.id,
     clinicalStatus: allergy?.clinicalStatus?.coding[0]?.display,
     criticality: allergy?.criticality,
-    display: allergy?.code?.coding[0]?.display,
+    display: allergy?.code?.text,
     recordedDate: allergy?.recordedDate,
     recordedBy: allergy?.recorder?.display,
     recorderType: allergy?.recorder?.type,
     note: allergy?.note?.[0]?.text,
-    reactionToSubstance: allergy?.reaction[0]?.substance?.coding[1]?.display,
+    reactionToSubstance: allergy?.reaction[0]?.substance?.text,
     reactionManifestations: manifestations,
     reactionSeverity: allergy?.reaction[0]?.severity,
     lastUpdated: allergy?.meta?.lastUpdated,

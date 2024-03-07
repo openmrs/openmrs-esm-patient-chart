@@ -19,6 +19,7 @@ export interface FHIRAllergy {
   };
   code: {
     coding: Array<CodingData>;
+    text: string;
   };
   criticality: string;
   id: string;
@@ -64,10 +65,12 @@ export interface ExtensionData {
 export interface AllergicReaction {
   manifestation: Array<{
     coding: CodingData;
+    text: string;
   }>;
   severity: ReactionSeverity;
   substance: {
     coding: Array<CodingData>;
+    text: string;
   };
 }
 

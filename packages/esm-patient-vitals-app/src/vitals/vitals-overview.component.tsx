@@ -3,18 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table, Printer } from '@carbon/react/icons';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  useVisitOrOfflineVisit,
-  useVitalsConceptMetadata,
-  withUnit,
-} from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics } from '../common';
+import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
@@ -37,9 +30,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const [isPrinting, setIsPrinting] = useState(false);
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
-  const { excludePatientIdentifierCodeTypes } = useConfig();
-  const { data: vitals, isError, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
 
+  const { excludePatientIdentifierCodeTypes } = useConfig();
+  const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
@@ -143,7 +136,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-        if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
         if (vitals?.length) {
           return (
             <div className={styles.widgetCard}>

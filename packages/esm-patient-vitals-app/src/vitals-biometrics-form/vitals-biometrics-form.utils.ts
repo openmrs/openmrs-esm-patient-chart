@@ -1,5 +1,5 @@
 import isNumber from 'lodash/isNumber';
-import { type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type ConceptMetadata } from '../common';
 
 export function calculateBodyMassIndex(weight: number, height: number): number {
   if (!weight || !height) return;

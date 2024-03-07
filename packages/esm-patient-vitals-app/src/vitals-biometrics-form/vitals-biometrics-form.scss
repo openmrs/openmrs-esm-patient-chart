@@ -1,6 +1,6 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading03 {
@@ -9,7 +9,7 @@
 
 .title {
   @extend .productiveHeading03;
-  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
+  margin: 0 layout.$spacing-03 layout.$spacing-03 0;
 }
 
 .danger {

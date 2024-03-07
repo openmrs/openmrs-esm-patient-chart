@@ -38,22 +38,6 @@ export interface LabOrderFormProps {
   promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
-const labOrderFormSchema = z.object({
-  instructions: z.string().optional(),
-  urgency: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-  }),
-  labReferenceNumber: z.string().optional(),
-  testType: z.object(
-    { label: z.string(), conceptUuid: z.string() },
-    {
-      required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-      invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
-    },
-  ),
-  orderReason: z.string().optional(),
-});
-
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
@@ -69,6 +53,34 @@ export function LabOrderForm({
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const config = useConfig<ConfigObject>();
+  const orderReasonRequired = (
+    config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
+  ).required;
+  const labOrderFormSchema = z.object({
+    instructions: z.string().optional(),
+    urgency: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+    }),
+    labReferenceNumber: z.string().optional(),
+    testType: z.object(
+      { label: z.string(), conceptUuid: z.string() },
+      {
+        required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
+        invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+      },
+    ),
+    orderReason: orderReasonRequired
+      ? z
+          .string({
+            required_error: translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          })
+          .refine(
+            (value) => !!value,
+            translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          )
+      : z.string().optional(),
+  });
 
   const {
     control,
@@ -81,7 +93,6 @@ export function LabOrderForm({
       ...initialOrder,
     },
   });
-  const config = useConfig<ConfigObject>();
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
@@ -223,6 +234,8 @@ export function LabOrderForm({
                         items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                        invalid={errors.orderReason?.message}
+                        invalidText={errors.orderReason?.message}
                       />
                     )}
                   />

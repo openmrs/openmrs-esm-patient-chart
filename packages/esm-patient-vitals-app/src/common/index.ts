@@ -1,8 +1,11 @@
 export {
   invalidateCachedVitalsAndBiometrics,
   useVitalsAndBiometrics,
+  useVitalsConceptMetadata,
   updateVitalsAndBiometrics,
   saveVitalsAndBiometrics,
+  withUnit,
+  type ConceptMetadata,
 } from './data.resource';
 export {
   assessValue,
@@ -11,4 +14,4 @@ export {
   generatePlaceholder,
   interpretBloodPressure,
 } from './helpers';
-export type { ObservationInterpretation, PatientVitals } from './types';
+export type { ObservationInterpretation, PatientVitalsAndBiometrics } from './types';

@@ -43,12 +43,13 @@ import {
   fetchConceptDiagnosisByName,
   savePatientDiagnosis,
   saveVisitNote,
+  useInfiniteVisits,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 import { mutate } from 'swr';
 
-const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -111,6 +112,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   const currentImage = watch('image');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
+  const { mutateVisits } = useInfiniteVisits(patientUuid);
+
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
   const locationUuid = session?.sessionLocation?.uuid;
@@ -278,6 +281,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
         })
         .then(() => {
           mutateVisitNotes();
+          mutateVisits();
           if (data.image) {
             mutateAttachments();
           }

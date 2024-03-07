@@ -25,7 +25,7 @@ export type MappedVitals = {
   value: number;
 };
 
-export interface PatientVitals {
+export interface PatientVitalsAndBiometrics {
   id: string;
   date: string;
   systolic?: number;

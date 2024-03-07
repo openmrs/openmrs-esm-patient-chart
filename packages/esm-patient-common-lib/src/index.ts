@@ -18,7 +18,6 @@ export * from './time-helper';
 export * from './types';
 export * from './useLaunchWorkspaceRequiringVisit';
 export * from './useSystemVisitSetting';
-export * from './useVitalsConceptMetadata';
 export * from './workspaces';
 export * from './siderail-nav-button';
 export * from './form-entry-interop';

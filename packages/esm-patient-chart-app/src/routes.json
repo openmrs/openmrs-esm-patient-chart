@@ -234,6 +234,14 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "active-visit-action-button",
+      "slot": "active-visit-actions",
+      "component": "activeVisitActionsComponent",
+      "online": true,
+      "offline": true,
+      "order": 1
     }
   ],
   "pages": [

@@ -1,197 +1,72 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsResponse, mockConceptMetadata } from '__mocks__';
+import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig, usePagination } from '@openmrs/esm-framework';
+import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
+import { configSchema } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
 
-const testProps = {
-  basePath: patientChartBasePath,
-  patientUuid: mockPatient.id,
-};
+defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
+const mockedUseConfig = jest.mocked(useConfig);
+const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUsePagination = jest.mocked(usePagination);
 
-const mockVitalsSignsConcepts = {
-  data: {
-    results: [
-      {
-        setMembers: [
-          {
-            uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Systolic blood pressure',
-            hiNormal: 120,
-            hiAbsolute: 250.0,
-            hiCritical: null,
-            lowNormal: 80,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'mmHg',
-          },
-          {
-            uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Diastolic blood pressure',
-            hiNormal: 80,
-            hiAbsolute: 150.0,
-            hiCritical: null,
-            lowNormal: 70,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'mmHg',
-          },
-          {
-            uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Temperature (C)',
-            hiNormal: 37.5,
-            hiAbsolute: 43.0,
-            hiCritical: null,
-            lowNormal: 36.5,
-            lowAbsolute: 25.0,
-            lowCritical: null,
-            units: 'DEG C',
-          },
-          {
-            uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Height (cm)',
-            hiNormal: null,
-            hiAbsolute: 272.0,
-            hiCritical: null,
-            lowNormal: null,
-            lowAbsolute: 10.0,
-            lowCritical: null,
-            units: 'cm',
-          },
-          {
-            uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Weight (kg)',
-            hiNormal: null,
-            hiAbsolute: 250.0,
-            hiCritical: null,
-            lowNormal: null,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'kg',
-          },
-          {
-            uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Pulse',
-            hiNormal: 70,
-            hiAbsolute: 230.0,
-            hiCritical: null,
-            lowNormal: 30,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'beats/min',
-          },
-          {
-            uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Blood oxygen saturation',
-            hiNormal: 100,
-            hiAbsolute: 100.0,
-            hiCritical: null,
-            lowNormal: 95,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: '%',
-          },
-          {
-            uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'MID-UPPER ARM CIRCUMFERENCE',
-            hiNormal: 25,
-            hiAbsolute: null,
-            hiCritical: null,
-            lowNormal: 23,
-            lowAbsolute: null,
-            lowCritical: null,
-            units: 'cm',
-          },
-          {
-            uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Respiratory rate',
-            hiNormal: 70.0,
-            hiAbsolute: 999.0,
-            hiCritical: 120.0,
-            lowNormal: null,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'breaths/min',
-          },
-        ],
-      },
-    ],
-  },
-};
-
-const mockConceptUnits = new Map<string, string>(
-  mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
-);
-
-const mockBiometricsConfig = {
-  biometrics: { bmiUnit: 'kg / m²' },
-  concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-};
-
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockImplementation(() => mockBiometricsConfig),
-    useVisitOrOfflineVisit: jest.fn(),
-    useConnectivity: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
-  };
-});
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+jest.mock('../common', () => {
+  const originalModule = jest.requireActual('../common');
 
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,
+      isLoading: false,
     })),
+    useVitalsAndBiometrics: jest.fn(),
   };
 });
 
 describe('BiometricsOverview: ', () => {
+  beforeEach(() => {
+    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockBiometricsConfig });
+    jest.clearAllMocks();
+  });
+
   it('renders an empty state view if biometrics data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockedUseVitalsAndBiometrics.mockReturnValue({
+      data: [],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderBiometricsOverview();
 
     await waitForLoadingToFinish();
 
+    await screen.findByRole('heading', { name: /biometrics/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
     expect(screen.getByText(/There are no biometrics to display for this patient/i)).toBeInTheDocument();
     expect(screen.getByText(/Record biometrics/i)).toBeInTheDocument();
   });
 
   it('renders an error state view if there is a problem fetching biometrics data', async () => {
-    const error = {
-      message: 'You are not logged in',
+    const mockError = {
+      message: '401 Unauthorized',
       response: {
         status: 401,
         statusText: 'Unauthorized',
       },
-    };
+    } as unknown as Error;
 
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockedUseVitalsAndBiometrics.mockReturnValue({
+      error: mockError,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderBiometricsOverview();
 
     await waitForLoadingToFinish();
 
+    expect(screen.findByRole('heading', { name: /biometrics/i }));
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -201,53 +76,64 @@ describe('BiometricsOverview: ', () => {
   });
 
   it("renders a tabular overview of the patient's biometrics data when available", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
-    mockUsePagination.mockReturnValueOnce({
+    mockedUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    mockUsePagination.mockReturnValue({
       currentPage: 1,
       goTo: () => {},
       results: formattedBiometrics.slice(0, 5),
+      totalPages: formattedBiometrics.length / 5,
+      paginated: true,
+      showNextButton: true,
+      showPreviousButton: false,
+      goToNext: () => {},
+      goToPrevious: () => {},
     });
 
     renderBiometricsOverview();
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
+    await screen.findByRole('heading', { name: /biometrics/i });
+    await screen.findByRole('table', { name: /biometrics/i });
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/];
-
+    const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [
-      /12 - Aug - 2021, 01:23 90 186 26.0 17/,
-      /18 - Jun - 2021, 12:02 80 198 20.4 23/,
-      /10 - Jun - 2021, 04:40 50/,
-      /26 - May - 2021, 06:21 61 160 23.8/,
-      /10 - May - 2021, 09:41 90 198 23.0 25/,
-    ];
-
+    const expectedTableRows = [/90 186 26.0 17/, /80 198 20.4 23/, /50/, /61 160 23.8/, /90 198 23.0 25/];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
-    mockUsePagination.mockReturnValueOnce({
+    mockedUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics.slice(0, 2),
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    mockUsePagination.mockReturnValue({
       currentPage: 1,
       goTo: () => {},
       results: formattedBiometrics.slice(0, 5),
+      totalPages: formattedBiometrics.length / 5,
+      paginated: true,
+      showNextButton: true,
+      showPreviousButton: false,
+      goToNext: undefined,
+      goToPrevious: undefined,
     });
 
     renderBiometricsOverview();
 
     await waitForLoadingToFinish();
-
-    expect(screen.getByRole('table', { name: /biometrics/i })).toBeInTheDocument();
+    await screen.findByRole('table', { name: /biometrics/i });
 
     const chartViewButton = screen.getByRole('tab', {
       name: /chart view/i,
@@ -264,5 +150,10 @@ describe('BiometricsOverview: ', () => {
 });
 
 function renderBiometricsOverview() {
+  const testProps = {
+    basePath: patientChartBasePath,
+    patientUuid: mockPatient.id,
+  };
+
   renderWithSwr(<BiometricsOverview {...testProps} />);
 }

@@ -3400,7 +3400,7 @@ export const mockBiometricsResponse = {
 export const formattedBiometrics = [
   {
     id: '0',
-    date: '12 - Aug - 2021, 01:23',
+    date: '2021-08-12T00:00:00.000Z',
     weight: 90,
     height: 186,
     bmi: '26.0',
@@ -3408,7 +3408,7 @@ export const formattedBiometrics = [
   },
   {
     id: '1',
-    date: '18 - Jun - 2021, 12:02',
+    date: '2021-06-18T00:00:00.000Z',
     weight: 80,
     height: 198,
     bmi: '20.4',
@@ -3416,20 +3416,20 @@ export const formattedBiometrics = [
   },
   {
     id: '2',
-    date: '10 - Jun - 2021, 04:40',
+    date: '2021-06-10T00:00:00.000Z',
     weight: 50,
     bmi: null,
   },
   {
     id: '3',
-    date: '26 - May - 2021, 06:21',
+    date: '2021-05-26T00:00:00.000Z',
     weight: 61,
     height: 160,
     bmi: '23.8',
   },
   {
     id: '4',
-    date: '10 - May - 2021, 09:41',
+    date: '2021-05-10T00:00:00.000Z',
     weight: 90,
     height: 198,
     bmi: '23.0',
@@ -3437,21 +3437,21 @@ export const formattedBiometrics = [
   },
   {
     id: '5',
-    date: '08 - Apr - 2021, 05:44',
+    date: '2021-04-08T00:00:00.000Z',
     weight: 67,
     height: 172,
     bmi: '22.6',
   },
   {
     id: '6',
-    date: '30 - Mar - 2021, 01:49',
+    date: '2021-03-30T00:00:00.000Z',
     weight: 87,
     height: 185,
     bmi: '25.4',
   },
   {
     id: '7',
-    date: '23 - Mar - 2021, 09:39',
+    date: '2021-03-23T00:00:00.000Z',
     weight: 99,
     height: 198,
     bmi: '25.3',
@@ -3459,7 +3459,7 @@ export const formattedBiometrics = [
   },
   {
     id: '8',
-    date: '18 - Mar - 2021, 01:42',
+    date: '2021-03-18T00:00:00.000Z',
     weight: 90,
     height: 180,
     bmi: '27.8',
@@ -3467,7 +3467,7 @@ export const formattedBiometrics = [
   },
   {
     id: '9',
-    date: '17 - Mar - 2021, 09:34',
+    date: '2021-03-17T00:00:00.000Z',
     weight: 77,
     height: 176,
     bmi: '24.9',
@@ -3475,7 +3475,7 @@ export const formattedBiometrics = [
   },
   {
     id: '10',
-    date: '16 - Mar - 2021, 11:17',
+    date: '2021-03-16T00:00:00.000Z',
     weight: 198,
     height: 180,
     bmi: '61.1',
@@ -3483,20 +3483,20 @@ export const formattedBiometrics = [
   },
   {
     id: '11',
-    date: '14 - Mar - 2021, 12:37',
+    date: '2021-03-14T00:00:00.000Z',
     weight: 88,
     height: 88,
     bmi: '113.6',
   },
   {
     id: '12',
-    date: '10 - Mar - 2021, 04:44',
+    date: '2021-03-10T00:00:00.000Z',
     height: 10,
     bmi: null,
   },
   {
     id: '13',
-    date: '08 - Mar - 2021, 04:40',
+    date: '2021-03-08T00:00:00.000Z',
     weight: 110,
     height: 198,
     bmi: '28.1',
@@ -3504,35 +3504,35 @@ export const formattedBiometrics = [
   },
   {
     id: '14',
-    date: '21 - Feb - 2021, 02:00',
+    date: '2021-02-21T00:00:00.000Z',
     weight: 75,
     height: 185,
     bmi: '21.9',
   },
   {
     id: '15',
-    date: '19 - Feb - 2021, 03:37',
+    date: '2021-02-19T00:00:00.000Z',
     weight: 65,
     height: 189,
     bmi: '18.2',
   },
   {
     id: '16',
-    date: '18 - Feb - 2021, 12:10',
+    date: '2021-02-18T00:00:00.000Z',
     weight: 10,
     height: 10,
     bmi: '1000.0',
   },
   {
     id: '17',
-    date: '11 - Feb - 2021, 09:41',
+    date: '2021-02-11T00:00:00.000Z',
     weight: 75,
     height: 175,
     bmi: '24.5',
   },
   {
     id: '18',
-    date: '20 - Jan - 2021, 12:58',
+    date: '2021-01-20T00:00:00.000Z',
     weight: 104,
     height: 198,
     bmi: '26.5',
@@ -3540,13 +3540,13 @@ export const formattedBiometrics = [
   },
   {
     id: '19',
-    date: '19 - Jan - 2021, 02:21',
+    date: '2021-01-19T00:00:00.000Z',
     weight: 70,
     bmi: null,
   },
   {
     id: '20',
-    date: '04 - Jan - 2021, 03:36',
+    date: '2021-01-04T00:00:00.000Z',
     weight: 75,
     height: 165,
     bmi: '27.5',
@@ -3554,7 +3554,7 @@ export const formattedBiometrics = [
   },
   {
     id: '21',
-    date: '10 - Dec - 2020, 01:07',
+    date: '2020-12-10T00:00:00.000Z',
     weight: 75,
     height: 165,
     bmi: '27.5',
@@ -3562,7 +3562,7 @@ export const formattedBiometrics = [
   },
   {
     id: '22',
-    date: '09 - Dec - 2020, 04:25',
+    date: '2020-12-09T00:00:00.000Z',
     weight: 90,
     height: 199,
     bmi: '22.7',
@@ -3570,7 +3570,7 @@ export const formattedBiometrics = [
   },
   {
     id: '23',
-    date: '08 - Dec - 2020, 07:57',
+    date: '2020-12-08T00:00:00.000Z',
     weight: 65,
     height: 175,
     bmi: '21.2',
@@ -3578,21 +3578,21 @@ export const formattedBiometrics = [
   },
   {
     id: '24',
-    date: '08 - Dec - 2020, 02:46',
+    date: '2020-12-08T00:00:00.000Z',
     weight: 73,
     height: 185,
     bmi: '21.3',
   },
   {
     id: '25',
-    date: '08 - Dec - 2020, 08:34',
+    date: '2020-12-08T00:00:00.000Z',
     weight: 75,
     height: 165,
     bmi: '27.5',
   },
   {
     id: '26',
-    date: '08 - Dec - 2020, 08:32',
+    date: '2020-12-08T00:00:00.000Z',
     weight: 75,
     height: 165,
     bmi: '27.5',
@@ -3613,7 +3613,7 @@ export const mockConceptMetadata = [
   },
 ];
 
-export const mockVitalData = [
+export const mockVitalsData = [
   {
     id: 'e8a96dcc-5bb6-4975-be3b-214440e34fa4',
     date: '2016-05-16T06:13:36.000+00:00',
@@ -3904,9 +3904,9 @@ export const mockVitalData = [
   },
 ];
 
-export const mockVitalSigns = mockVitalData[0];
+export const mockVitalSigns = mockVitalsData[0];
 
-export const mockVitalsSignsConcept = {
+export const mockVitalsSignsConcepts = {
   data: {
     results: [
       {
@@ -3914,23 +3914,23 @@ export const mockVitalsSignsConcept = {
           {
             uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
             display: 'Systolic blood pressure',
-            hiNormal: 120,
+            hiNormal: 140,
             hiAbsolute: 250.0,
-            hiCritical: null,
-            lowNormal: 80,
-            lowAbsolute: 0.0,
-            lowCritical: null,
+            hiCritical: 180,
+            lowNormal: 100,
+            lowAbsolute: 0,
+            lowCritical: 85,
             units: 'mmHg',
           },
           {
             uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
             display: 'Diastolic blood pressure',
-            hiNormal: 80,
-            hiAbsolute: 150.0,
-            hiCritical: null,
-            lowNormal: 70,
-            lowAbsolute: 0.0,
-            lowCritical: null,
+            hiNormal: 90,
+            hiAbsolute: 150,
+            hiCritical: 120,
+            lowNormal: 55,
+            lowAbsolute: 0,
+            lowCritical: 40,
             units: 'mmHg',
           },
           {
@@ -3969,12 +3969,12 @@ export const mockVitalsSignsConcept = {
           {
             uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
             display: 'Pulse',
-            hiNormal: 70,
-            hiAbsolute: 230.0,
-            hiCritical: null,
-            lowNormal: 30,
-            lowAbsolute: 0.0,
-            lowCritical: null,
+            hiNormal: 100,
+            hiAbsolute: 230,
+            hiCritical: 130,
+            lowNormal: 55,
+            lowAbsolute: 0,
+            lowCritical: 49,
             units: 'beats/min',
           },
           {
@@ -4046,7 +4046,7 @@ export const mockVitalsChartData = [
 ];
 
 export const mockVitalsConceptsUnits = {
-  vitalsSignsConceptMetadata: mockVitalsSignsConcept.data.results,
+  vitalsSignsConceptMetadata: mockVitalsSignsConcepts.data.results,
   conceptsUnits: ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', '/ min'],
 };
 
@@ -5984,6 +5984,11 @@ export const mockFhirVitalsResponse = {
   ],
 };
 
+export const mockBiometricsConfig = {
+  biometrics: { bmiUnit: 'kg / m²' },
+  concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+};
+
 export const mockVitalsConfig = {
   biometrics: { bmiUnit: 'kg / m²' },
   concepts: {
@@ -6007,34 +6012,60 @@ export const mockVitalsConfig = {
 
 export const formattedVitals = [
   {
-    id: '6f4ed885-2bc1-4ed4-92e5-3dddb9180f30',
-    date: '19 - May - 2021, 07:26',
-    bloodPressure: '125 / 93',
+    id: '0',
+    date: '2021-05-19T04:26:51.000Z',
     pulse: 76,
-    spo2: undefined,
     temperature: 37,
     respiratoryRate: 12,
+    diastolic: 89,
+    systolic: 121,
+    bmi: null,
+    bloodPressureInterpretation: 'normal',
   },
   {
-    id: 'dab186be-0058-41c6-9c8e-ceeff09ef162',
-    date: '10 - May - 2021, 09:41',
-    bloodPressure: '120 / 85',
-    pulse: 66,
-    spo2: 90,
-    temperature: 37,
+    id: '1',
+    date: '2021-05-10T06:41:46.000Z',
     respiratoryRate: 45,
+    systolic: 120,
+    height: 198,
+    diastolic: 90,
+    pulse: 66,
+    weight: 90,
+    temperature: 37,
+    spo2: 90,
+    bmi: 23,
+    bloodPressureInterpretation: 'normal',
   },
   {
-    id: 'fd4a9e7b-4bb4-4a41-b8c5-44393097df6c',
-    date: '07 - May - 2021, 12:04',
-    bloodPressure: '107 / 90',
-    pulse: undefined,
-    spo2: undefined,
-    temperature: undefined,
-    respiratoryRate: undefined,
+    id: '2',
+    date: '2021-05-07T09:04:51.000Z',
+    diastolic: 80,
+    systolic: 120,
+    bmi: null,
+    bloodPressureInterpretation: 'normal',
+  },
+  {
+    id: '3',
+    date: '2021-04-08T14:44:24.000Z',
+    height: 172,
+    weight: 67,
+    temperature: 36.5,
+    pulse: 78,
+    respiratoryRate: 65,
+    bmi: 22.6,
+    bloodPressureInterpretation: 'normal',
   },
 ];
 
-export const mockConceptUnits = ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', 'breaths/min'];
+export const mockVitalsConceptMetadata = mockVitalsSignsConcepts.data.results[0].setMembers;
 
-export const mockVitalsConceptMetadata = mockVitalsSignsConcept.data.results[0].setMembers;
+export const mockConceptUnits = new Map<string, string>(
+  mockVitalsConceptMetadata.map((concept) => [concept.uuid, concept.units]),
+);
+
+export const mockConceptRanges = new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+  mockVitalsConceptMetadata.map((concept) => [
+    concept.uuid,
+    { lowAbsolute: concept.lowAbsolute ?? null, highAbsolute: concept.hiAbsolute ?? null },
+  ]),
+);

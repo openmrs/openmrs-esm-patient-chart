@@ -1,4 +1,5 @@
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/type';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .condition {
@@ -91,4 +92,9 @@
   &:global(.cds--inline-loading) {
     min-height: 1rem;
   }
+}
+
+.required {
+  color: colors.$red-60;
+  margin-left: 0.125rem;
 }

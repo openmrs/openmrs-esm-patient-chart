@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .widgetCard {
   background-color: colors.$white;
@@ -9,9 +9,9 @@
 
 .divider {
   width: 1px;
-  height: spacing.$spacing-05;
+  height: layout.$spacing-05;
   color: colors.$gray-20;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .vitalsHeaderActionItems {
@@ -24,7 +24,7 @@
     max-width: max-content;
 
     :global(.cds--content-switcher__label) {
-      height: spacing.$spacing-05;
+      height: layout.$spacing-05;
     }
   }
 }

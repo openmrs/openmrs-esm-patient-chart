@@ -20,34 +20,32 @@ const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
         <InfoTooltip orderer={medication.orderer?.display ?? '--'} />
       </div>
       <div className={styles.medicationRecord}>
-        <div>
-          <p className={styles.bodyLong01}>
-            <strong>{capitalize(medication.drug?.display)}</strong>{' '}
-            {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
-            {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
-          </p>
-          <p className={styles.bodyLong01}>
-            <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-            <span className={styles.dosage}>
-              {medication.dose} {medication.doseUnits?.display.toLowerCase()}
-            </span>{' '}
-            {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-            {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
-            {!medication.duration
-              ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-              : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
-                  duration: medication.duration,
-                  durationUnit: medication.durationUnits?.display.toLowerCase(),
-                })}{' '}
-            {medication.numRefills !== 0 && (
-              <span>
-                <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-                {medication.numRefills}
-              </span>
-            )}
-            {medication.dosingInstructions && <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>}
-          </p>
-        </div>
+        <p className={styles.bodyLong01}>
+          <strong>{capitalize(medication.drug?.display)}</strong>{' '}
+          {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
+          {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
+        </p>
+        <p className={styles.bodyLong01}>
+          <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+          <span className={styles.dosage}>
+            {medication.dose} {medication.doseUnits?.display.toLowerCase()}
+          </span>{' '}
+          {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
+          {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
+          {!medication.duration
+            ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
+            : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                duration: medication.duration,
+                durationUnit: medication.durationUnits?.display.toLowerCase(),
+              })}{' '}
+          {medication.numRefills !== 0 && (
+            <span>
+              <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+              {medication.numRefills}
+            </span>
+          )}
+          {medication.dosingInstructions && <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>}
+        </p>
         <p className={styles.bodyLong01}>
           {medication.orderReasonNonCoded ? (
             <span>
@@ -73,7 +71,7 @@ const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
   );
 };
 
-function InfoTooltip({ orderer }: { orderer: any }) {
+function InfoTooltip({ orderer }: { orderer: string }) {
   const { t } = useTranslation();
   return (
     <Toggletip align="top-left">
