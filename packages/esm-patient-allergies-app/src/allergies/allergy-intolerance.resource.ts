@@ -144,7 +144,7 @@ export function updatePatientAllergy(
 }
 
 export function deletePatientAllergy(patientUuid: string, allergyUuid: any, abortController: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergyUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,
   });
