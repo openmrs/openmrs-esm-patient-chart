@@ -26,8 +26,8 @@ jest.mock('./allergy-form.resource', () => {
 
   return {
     ...originalModule,
-    saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' });
-    updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' });
+    saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
+    updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
     useAllergens: jest.fn(),
     useAllergicReactions: jest.fn(),
   };
