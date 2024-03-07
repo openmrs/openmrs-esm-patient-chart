@@ -84,7 +84,7 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: Version
-        run: yarn workspaces foreach --worktree --topological version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
       - name: Build
         run: yarn turbo build --color --concurrency=5
