@@ -218,7 +218,7 @@ function AllergyForm(props: AllergyFormProps) {
                   showSnackbar({
                     isLowContrast: true,
                     kind: 'success',
-                    title: t('allergySaved', 'Allergy saved'),
+                    title: t('allergyUpdated', 'Allergy updated'),
                     subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
                   });
                 }
