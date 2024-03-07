@@ -74,7 +74,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const eligiblePrograms = currentProgram
     ? [currentProgram]
-    : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
+    : filter(
+        availablePrograms,
+        (program) =>
+          !includes(map(enrollments, 'program.uuid'), program.uuid) ||
+          enrollments.some(
+            (enrollment) => enrollment.program.uuid === program.uuid && enrollment.dateCompleted !== null,
+          ),
+      );
 
   const getLocationUuid = () => {
     if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
