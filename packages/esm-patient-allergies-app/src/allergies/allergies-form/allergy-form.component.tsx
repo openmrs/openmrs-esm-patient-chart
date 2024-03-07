@@ -89,6 +89,43 @@ function AllergyForm(props: AllergyFormProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { mutate } = useAllergies(patientUuid);
 
+  const getDefaultSeverityUUID = (severity) => {
+    switch (severity) {
+      case 'mild':
+        return mildReactionUuid;
+      case 'moderate':
+        return moderateReactionUuid;
+      case 'severe':
+        return severeReactionUuid;
+      default:
+        return null;
+    }
+  };
+
+  const getDefaultAllergicReactions = () => {
+    return allergicReactions?.map((reaction) => {
+      return allergy?.reactionManifestations?.includes(reaction.display) ? reaction.uuid : '';
+    });
+  };
+
+  const setDefaultNonCodedAllergen = (defaultAllergy) => {
+    const codedAllergenDisplays = allergens?.map((allergen) => allergen?.display);
+    if (!codedAllergenDisplays?.includes(allergy?.display)) {
+      defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType?.OTHER };
+      defaultAllergy.nonCodedAllergen = allergy?.display;
+    }
+  };
+
+  const setDefaultNonCodedReactions = (defaultAllergy) => {
+    const allergicReactionDisplays = allergicReactions?.map((reaction) => reaction?.display);
+    allergy?.reactionManifestations?.forEach((reaction) => {
+      if (!allergicReactionDisplays?.includes(reaction)) {
+        defaultAllergy.nonCodedAllergicReaction = reaction;
+        defaultAllergy.allergicReactions?.splice(defaultAllergy.allergicReactions?.length - 1, 1, otherConceptUuid);
+      }
+    });
+  };
+
   const getDefaultAllergy = (allergy: Allergy, formContext) => {
     const defaultAllergy = {
       allergen: null,
@@ -100,38 +137,11 @@ function AllergyForm(props: AllergyFormProps) {
     };
     if (formContext === 'editing') {
       defaultAllergy.allergen = allergens?.find((a) => allergy?.display === a?.display);
-      defaultAllergy.allergicReactions = allergicReactions?.map((reaction) => {
-        return allergy?.reactionManifestations?.includes(reaction.display) ? reaction.uuid : '';
-      });
-      switch (allergy?.reactionSeverity) {
-        case 'mild':
-          defaultAllergy.severityOfWorstReaction = mildReactionUuid;
-          break;
-        case 'moderate':
-          defaultAllergy.severityOfWorstReaction = moderateReactionUuid;
-          break;
-        case 'severe':
-          defaultAllergy.severityOfWorstReaction = severeReactionUuid;
-          break;
-        default:
-          defaultAllergy.severityOfWorstReaction = null;
-      }
+      defaultAllergy.allergicReactions = getDefaultAllergicReactions();
+      defaultAllergy.severityOfWorstReaction = getDefaultSeverityUUID(allergy?.reactionSeverity);
       defaultAllergy.comment = allergy?.note !== '--' ? allergy?.note : '';
-
-      const codedAllergenDisplays = allergens?.map((allergen) => allergen?.display);
-
-      if (!codedAllergenDisplays?.includes(allergy?.display)) {
-        defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType?.OTHER };
-        defaultAllergy.nonCodedAllergen = allergy?.display;
-      }
-
-      const allergicReactionDisplays = allergicReactions?.map((reaction) => reaction?.display);
-      allergy?.reactionManifestations?.forEach((reaction) => {
-        if (!allergicReactionDisplays?.includes(reaction)) {
-          defaultAllergy.nonCodedAllergicReaction = reaction;
-          defaultAllergy.allergicReactions?.splice(defaultAllergy.allergicReactions?.length - 1, 1, otherConceptUuid);
-        }
-      });
+      setDefaultNonCodedAllergen(defaultAllergy);
+      setDefaultNonCodedReactions(defaultAllergy);
     }
     return defaultAllergy;
   };
