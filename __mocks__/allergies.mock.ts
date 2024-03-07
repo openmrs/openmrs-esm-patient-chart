@@ -827,3 +827,18 @@ export const mockAllergies = [
     reactionSeverity: 'Severe',
   },
 ];
+
+export const mockAllergy = {
+  clinicalStatus: 'Active',
+  criticality: 'high',
+  display: 'ACE inhibitors',
+  id: 'acf497ae-1f75-436c-ad27-b8a0dec390cd',
+  lastUpdated: '2024-02-28T11:41:58.000+00:00',
+  note: 'sample allergy note',
+  reactionManifestations: ['Anaphylaxis', 'Headache'],
+  reactionSeverity: undefined,
+  reactionToSubstance: undefined,
+  recordedBy: 'Super User',
+  recordedDate: '2024-02-23T13:45:08+00:00',
+  recorderType: 'Practitioner',
+};
