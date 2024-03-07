@@ -9,14 +9,14 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Start a visit', async ({ page, api }) => {
+test('Start and end a visit', async ({ page }) => {
   const chartPage = new ChartPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
     await chartPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click the `Start a visit` button ', async () => {
+  await test.step('And I click on the `Start a visit` button ', async () => {
     await chartPage.page.getByRole('button', { name: /start a visit/i }).click();
   });
 
@@ -40,7 +40,7 @@ test('Start a visit', async ({ page, api }) => {
     await chartPage.page.getByText(/opd visit/i).click();
   });
 
-  await test.step('And I click the `Start Visit` button', async () => {
+  await test.step('And I click on the `Start Visit` button', async () => {
     await chartPage.page
       .locator('form')
       .getByRole('button', { name: /start a visit/i })
@@ -55,7 +55,7 @@ test('Start a visit', async ({ page, api }) => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
   });
 
-  await test.step('When I click the `End Visit` button', async () => {
+  await test.step('When I click on the `End Visit` button', async () => {
     await chartPage.page.getByRole('button', { name: /end visit/i }).click();
   });
 
@@ -63,7 +63,7 @@ test('Start a visit', async ({ page, api }) => {
     await expect(chartPage.page.getByText(/are you sure you want to end this active visit?/i)).toBeVisible();
   });
 
-  await test.step('When I click the `End Visit` button to confirm', async () => {
+  await test.step('When I click on the `End Visit` button to confirm', async () => {
     await chartPage.page.getByRole('button', { name: 'danger End Visit' }).click();
   });
 

@@ -84,7 +84,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/new/i)).toBeVisible();
   });
 
-  await test.step('When I click on the "Sign and close" button', async () => {
+  await test.step('When I click on the `Sign and close` button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
@@ -146,7 +146,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByLabel(/indication/i).fill('Hypertension');
   });
 
-  await test.step('And I click on the "Save Order" button', async () => {
+  await test.step('And I click on the `Save Order` button', async () => {
     await page.getByRole('button', { name: /save order/i }).click();
   });
 
@@ -155,7 +155,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/modify/i)).toBeVisible();
   });
 
-  await test.step('When I click on the "Sign and close" button', async () => {
+  await test.step('When I click on the `Sign and close` button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
