@@ -150,7 +150,7 @@ export function updatePatientAllergy(
   allergenUuid: string,
   abortController: AbortController,
 ) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy/${allergenUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergenUuid}`, {
     headers: {
       'Content-Type': 'application/json',
     },
