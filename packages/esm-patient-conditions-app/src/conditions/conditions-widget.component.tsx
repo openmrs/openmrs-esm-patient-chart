@@ -190,6 +190,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       focusOnSearchInput();
     }
     if (isSubmittingForm) {
+      if (!selectedCondition) {
+        errors.search = {
+          type: 'manual',
+          message: t('selectCondition', 'Select a condition'),
+        };
+      }
       if (Object.keys(errors).length > 0) {
         setIsSubmittingForm(false);
         Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
