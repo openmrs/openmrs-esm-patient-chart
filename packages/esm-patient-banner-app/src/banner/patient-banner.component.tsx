@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
-import { ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { PatientBannerActionsMenu, PatientBannerPatientInfo, PatientPhoto } from '@openmrs/esm-framework';
-import ContactDetails from '../contact-details/contact-details.component';
+import {
+  PatientBannerActionsMenu,
+  PatientBannerContactDetails,
+  PatientBannerPatientInfo,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
+} from '@openmrs/esm-framework';
 import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
@@ -14,7 +16,6 @@ interface PatientBannerProps {
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
-  const { t } = useTranslation();
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
 
@@ -63,28 +64,21 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               isDeceased={patient.deceasedBoolean}
             />
           ) : null}
-          <Button
+          <PatientBannerToggleContactDetailsButton
             className={styles.toggleContactDetailsButton}
-            kind="ghost"
-            renderIcon={(props) =>
-              showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
-            }
-            iconDescription="Toggle contact details"
-            onClick={toggleContactDetails}
-            style={{ marginTop: '-0.25rem' }}
-          >
-            {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
-          </Button>
+            toggleContactDetails={toggleContactDetails}
+            showContactDetails={showContactDetails}
+          />
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails
-          isTabletViewport={isTabletViewport}
-          address={patient?.address ?? []}
-          telecom={patient?.telecom ?? []}
-          patientId={patient?.id}
-          deceased={isDeceased}
-        />
+        <div
+          className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
+            styles[isTabletViewport && 'tabletContactDetails']
+          }`}
+        >
+          <PatientBannerContactDetails patientId={patient?.id} deceased={isDeceased} />
+        </div>
       )}
     </header>
   );
