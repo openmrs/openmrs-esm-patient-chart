@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, PatientBannerPatientInfo, PatientPhoto, useConnectedExtensions } from '@openmrs/esm-framework';
+import { ChevronDown, ChevronUp } from '@carbon/react/icons';
+import { PatientBannerActionsMenu, PatientBannerPatientInfo, PatientPhoto } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
-import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
@@ -16,10 +15,8 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const { t } = useTranslation();
-  const overflowMenuRef = useRef(null);
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
-  const patientActions = useConnectedExtensions('patient-actions-slot');
 
   useEffect(() => {
     const currentRef = patientBannerRef.current;
@@ -36,8 +33,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     };
   }, [patientBannerRef, setIsTabletViewport]);
 
-  const patientActionsSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
-
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
@@ -46,11 +41,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
-
-  const [showDropdown, setShowDropdown] = useState(false);
-  const closeDropdownMenu = useCallback(() => {
-    setShowDropdown((value) => !value);
-  }, []);
 
   return (
     <header
@@ -66,27 +56,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         </div>
         <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow && patientActions.length > 0 ? (
-            <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
-              <CustomOverflowMenuComponent
-                deceased={isDeceased}
-                menuTitle={
-                  <>
-                    <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem', fill: '#78A9FF' }} />
-                  </>
-                }
-                dropDownMenu={showDropdown}
-              >
-                <ExtensionSlot
-                  onClick={closeDropdownMenu}
-                  name="patient-actions-slot"
-                  key="patient-actions-slot"
-                  className={styles.overflowMenuItemList}
-                  state={patientActionsSlotState}
-                />
-              </CustomOverflowMenuComponent>
-            </div>
+          {!hideActionsOverflow ? (
+            <PatientBannerActionsMenu
+              patientUuid={patientUuid}
+              actionsSlotName={'patient-actions-slot'}
+              isDeceased={patient.deceasedBoolean}
+            />
           ) : null}
           <Button
             className={styles.toggleContactDetailsButton}
