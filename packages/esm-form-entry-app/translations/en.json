@@ -49,6 +49,7 @@
   "nextYear": "Next year",
   "patientIdentifierDuplication": "Patient identifier duplication",
   "patientIdentifierDuplicationDescription": "The identifier provided is already associated with an existing patient. Please check the identifier and try again.",
+  "orderNumber": "Order number",
   "previous": "Previous",
   "previous21Years": "Previous 21 years",
   "previousMonth": "Previous month",

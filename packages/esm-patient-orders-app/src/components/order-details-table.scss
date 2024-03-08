@@ -35,3 +35,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+
+  .message {
+    @include type.type-style("heading-compact-01");
+    color: $text-02;
+  }
+}
+
+.table {
+  td:after {
+    display: none;
+  }
+}

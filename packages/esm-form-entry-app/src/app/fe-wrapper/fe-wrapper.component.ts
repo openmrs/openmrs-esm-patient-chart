@@ -213,7 +213,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           ({ encounter }) => {
             this.onPostResponse(encounter);
             const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-            this.changeState('submitted');
 
             if (!isOffline && encounter?.uuid) {
               this.encounterResourceService
@@ -235,7 +234,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               title: this.form.schema.display ?? this.form.schema.name,
               timeoutInMs: 5000,
             });
-
+            this.changeState('submitted');
             this.closeForm();
           },
           (error: Error) => {
