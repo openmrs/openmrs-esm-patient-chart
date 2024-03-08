@@ -11,11 +11,8 @@
   "countyDistrict": "District",
   "deceased": "Deceased",
   "district": "District",
-  "female": "Female",
   "hideDetails": "Hide details",
   "loading": "Loading",
-  "male": "Male",
-  "other": "Other",
   "patientLists": "Patient Lists",
   "postalCode": "Postal code",
   "relationships": "Relationships",
@@ -24,6 +21,5 @@
   "showDetails": "Show details",
   "started": "Started",
   "state": "State",
-  "stateProvince": "State",
-  "unknown": "Unknown"
+  "stateProvince": "State"
 }

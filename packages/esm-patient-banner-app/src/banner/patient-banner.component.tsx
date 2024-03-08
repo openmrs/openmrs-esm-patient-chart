@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, PatientBannerPatientInfo, useConnectedExtensions } from '@openmrs/esm-framework';
+import { ExtensionSlot, PatientBannerPatientInfo, PatientPhoto, useConnectedExtensions } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -39,7 +39,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const patientActionsSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
 
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
   const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
@@ -47,12 +46,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
-
-  const patientAvatar = (
-    <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
-    </div>
-  );
 
   const [showDropdown, setShowDropdown] = useState(false);
   const closeDropdownMenu = useCallback(() => {
@@ -68,7 +61,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
       ref={patientBannerRef}
     >
       <div className={styles.patientBanner}>
-        {patientAvatar}
+        <div className={styles.patientAvatar} role="img">
+          <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+        </div>
         <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
           {!hideActionsOverflow && patientActions.length > 0 ? (
