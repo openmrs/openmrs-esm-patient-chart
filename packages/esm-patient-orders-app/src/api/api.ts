@@ -8,7 +8,14 @@ import {
   type Visit,
   restBaseUrl,
 } from '@openmrs/esm-framework';
-import { type OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderPost,
+  useVisitOrOfflineVisit,
+  useSystemVisitSetting,
+  getPatientUuidFromUrl,
+  type OrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
+import { orderBasketStore, type OrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -67,6 +74,19 @@ export function createEmptyEncounter(
     );
     visitStartDate;
   }
+
+  const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
+  const patientItems = items[patientUuid];
+
+  const orders: Array<OrderPost> = [];
+  for (let grouping in patientItems) {
+    const groupOrders = patientItems[grouping];
+    for (let i = 0; i < groupOrders.length; i++) {
+      const order = groupOrders[i];
+      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null));
+    }
+  }
+
   const emptyEncounter = {
     patient: patientUuid,
     location: sessionLocationUuid,
@@ -74,6 +94,7 @@ export function createEmptyEncounter(
     encounterDatetime: encounterDate,
     visit: activeVisit?.uuid,
     obs: [],
+    orders,
   };
 
   return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
