@@ -28,7 +28,7 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
 }
 
 function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/order`, {
+  return openmrsFetch(`${restBaseUrl}/orderrr`, {
     method: 'POST',
     signal: abortController?.signal,
     headers: { 'Content-Type': 'application/json' },
