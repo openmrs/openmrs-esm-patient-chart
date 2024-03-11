@@ -32,12 +32,12 @@ export function startupApp() {
     canHide: false,
   });
 
-  // t('testResultsFormWorkspace', 'Enter Test Results')
+  // t('enterTestResults', 'Enter test results')
   registerWorkspace({
     name: 'test-results-form-workspace',
-    title: translateFrom(moduleName, 'enterTestResults', 'Enter Test Results'),
-    load: getAsyncLifecycle(() => import('./results/result-form.component'), options),
-    type: 'results',
+    title: translateFrom(moduleName, 'enterTestResults', 'Enter test results'),
+    load: getAsyncLifecycle(() => import('./test-results-form/result-form.component'), options),
+    type: 'lab-results',
     canHide: false,
   });
 }

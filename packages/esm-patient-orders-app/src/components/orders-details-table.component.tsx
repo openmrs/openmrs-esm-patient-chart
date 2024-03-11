@@ -44,7 +44,6 @@ import {
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
 import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
-import { labsOrderBasket, medicationsOrderBasket } from '../constants';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
@@ -65,6 +64,9 @@ interface OrderHeaderProps {
 }
 
 type MutableOrderBasketItem = OrderBasketItem | LabOrderBasketItem | DrugOrderBasketItem;
+
+const medicationsOrderBasket = 'medications';
+const labsOrderBasket = 'labs';
 
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, showAddButton, showPrintButton }) => {
   const { t } = useTranslation();
@@ -87,8 +89,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
-
-  const config = useConfig();
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -229,7 +229,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
-        if (patient && patient.patient && title) {
+        if (patient && patient?.patient && title) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
@@ -241,7 +241,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   });
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+    return <DataTableSkeleton role="progress" compact={!isTablet} zebra />;
   }
 
   if (isError) {
@@ -383,7 +383,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   );
 };
 
-function FormatCellDisplay({ rowDisplay }: { rowDisplay: string }) {
+function FormatCellDisplay({ rowDisplay }: { readonly rowDisplay: string }) {
   return (
     <>
       {typeof rowDisplay === 'string' && rowDisplay.length > 20 ? (
@@ -397,7 +397,7 @@ function FormatCellDisplay({ rowDisplay }: { rowDisplay: string }) {
   );
 }
 
-function ExpandedRowView({ row }: { row: any }) {
+function ExpandedRowView({ row }: { readonly row: any }) {
   const { t } = useTranslation();
   let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
   let orderItem = orderActions.value?.props?.orderItem;
@@ -431,16 +431,23 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
-  //const ordersConfig = await getConfig(moduleName);
 
   const handleViewEditClick = useCallback(() => {
-    // openOrderForm({ order: orderItem });
+    if (orderItem.type === 'drugorder') {
+      getDrugOrderByUuid(orderItem.uuid).then((res) => {
+        let medicationOrder = res.data;
+        setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'REVISE')]);
+        openOrderBasket();
+      });
+    } else {
+      setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'REVISE')]);
+      openOrderBasket();
+    }
   }, [orderItem, openOrderForm]);
 
   const handleAddResultsClick = useCallback(() => {
-    //launchResultsForm();
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
-  }, []);
+  }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {

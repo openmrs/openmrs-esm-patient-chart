@@ -3,7 +3,7 @@ import styles from './result-form.scss';
 import { Button, InlineLoading, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { useGetOrderConceptByUuid, UpdateOrderResult, fetchEncounter, fetchObservation } from './result-form.resource';
+import { useOrderConceptByUuid, UpdateOrderResult, fetchEncounter, fetchObservation } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import { useForm } from 'react-hook-form';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
@@ -19,7 +19,6 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   closeWorkspace,
   promptBeforeClosing,
 }: AddResultsWorkspace) => {
-  // console.log('ResultForm order', order);
   const [inEditMode, setInEditMode] = useState(false);
   const [obsUuid, setObsUuid] = useState('');
   const [initialValues, setInitialValues] = useState(null);
@@ -27,8 +26,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
 
   const config = useConfig();
   const { t } = useTranslation();
-  const { concept, isLoading: isLoadingConcepts } = useGetOrderConceptByUuid(order.concept.uuid);
-  // console.log('ResultForm concept', concept);
+  const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const {
     control,
     register,
@@ -42,6 +40,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   const cancelResults = () => {
     closeWorkspace();
   };
+
   useEffect(() => {
     fetchEncounter(order.encounter.uuid).then((data) => {
       const observation = data?.obs;
@@ -150,6 +149,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
       },
     );
   };
+
   return (
     <>
       <ModalBody>
