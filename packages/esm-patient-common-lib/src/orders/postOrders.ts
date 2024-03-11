@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import { type OrderBasketItem, type OrderPost } from './types';
@@ -26,7 +26,7 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
 }
 
 function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/order`, {
+  return openmrsFetch(`${restBaseUrl}/order`, {
     method: 'POST',
     signal: abortController?.signal,
     headers: { 'Content-Type': 'application/json' },

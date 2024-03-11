@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  type LabOrderBasketItem,
+  type DefaultWorkspaceProps,
+  launchPatientWorkspace,
+  promptBeforeClosing,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -28,37 +34,53 @@ import styles from './lab-order-form.scss';
 export interface LabOrderFormProps {
   initialOrder: LabOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
-
-const labOrderFormSchema = z.object({
-  instructions: z.string().optional(),
-  urgency: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-  }),
-  labReferenceNumber: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
-  }),
-  testType: z.object(
-    { label: z.string(), conceptUuid: z.string() },
-    {
-      required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-      invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
-    },
-  ),
-  orderReason: z.string().optional(),
-});
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing }: LabOrderFormProps) {
+export function LabOrderForm({
+  initialOrder,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const config = useConfig<ConfigObject>();
+  const orderReasonRequired = (
+    config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
+  ).required;
+  const labOrderFormSchema = z.object({
+    instructions: z.string().optional(),
+    urgency: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+    }),
+    labReferenceNumber: z.string().optional(),
+    testType: z.object(
+      { label: z.string(), conceptUuid: z.string() },
+      {
+        required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
+        invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+      },
+    ),
+    orderReason: orderReasonRequired
+      ? z
+          .string({
+            required_error: translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          })
+          .refine(
+            (value) => !!value,
+            translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          )
+      : z.string().optional(),
+  });
 
   const {
     control,
@@ -68,12 +90,9 @@ export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      instructions: '',
-      labReferenceNumber: '',
       ...initialOrder,
     },
   });
-  const config = useConfig<ConfigObject>();
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
@@ -81,6 +100,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
+      data.action = 'NEW';
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
@@ -88,8 +108,7 @@ export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing
       const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
       newOrders[orderIndex] = data;
       setOrders(newOrders);
-      closeWorkspace({
-        ignoreChanges: true,
+      closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
@@ -215,6 +234,8 @@ export function LabOrderForm({ initialOrder, closeWorkspace, promptBeforeClosing
                         items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                        invalid={errors.orderReason?.message}
+                        invalidText={errors.orderReason?.message}
                       />
                     )}
                   />

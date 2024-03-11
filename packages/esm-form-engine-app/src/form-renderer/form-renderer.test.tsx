@@ -21,6 +21,7 @@ describe('FormRenderer', () => {
     formUuid: 'test-form-uuid',
     patientUuid: 'test-patient-uuid',
     closeWorkspace: jest.fn(),
+    closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
   };
 

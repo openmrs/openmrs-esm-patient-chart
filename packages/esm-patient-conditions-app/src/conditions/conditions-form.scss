@@ -1,5 +1,6 @@
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .condition {
   padding: 1rem 0.75rem;
@@ -91,4 +92,9 @@
   &:global(.cds--inline-loading) {
     min-height: 1rem;
   }
+}
+
+.required {
+  color: colors.$red-60;
+  margin-left: 0.125rem;
 }

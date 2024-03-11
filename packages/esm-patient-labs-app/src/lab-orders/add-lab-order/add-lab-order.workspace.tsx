@@ -9,8 +9,8 @@ import {
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   type OrderBasketItem,
+  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem } from '../api';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
@@ -25,6 +25,7 @@ export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrder
 export default function AddLabOrderWorkspace({
   order: initialOrder,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
@@ -73,6 +74,7 @@ export default function AddLabOrderWorkspace({
         <LabOrderForm
           initialOrder={currentLabOrder}
           closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
         />
       )}

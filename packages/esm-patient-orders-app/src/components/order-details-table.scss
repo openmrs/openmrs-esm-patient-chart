@@ -18,30 +18,6 @@
   }
 }
 
-.medicationRecord {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.startDateColumn {
-  @include type.type-style("body-compact-01");
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  min-height: spacing.$spacing-11;
-  padding-bottom: spacing.$spacing-02;
-
-  span {
-    margin: 0rem;
-  }
-}
-
-.dosage {
-  @include type.type-style("heading-compact-01");
-}
-
 .tooltip {
   margin: 0rem -0.5rem -0.625rem;
 }
@@ -52,4 +28,26 @@
 
 .buttons {
   justify-content: flex-end;
+}
+
+.singleLineText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+
+  .message {
+    @include type.type-style("heading-compact-01");
+    color: $text-02;
+  }
+}
+
+.table {
+  td:after {
+    display: none;
+  }
 }

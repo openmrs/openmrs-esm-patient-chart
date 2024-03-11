@@ -1,6 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .container {
   border-top: 0.063rem solid $ui-03;
@@ -18,11 +18,11 @@
   .patientName {
     color: $ui-01;
   }
-  
+
   .demographics, .row, .identifierTag, .identifier, .contactDetails .heading {
     color: $ui-02;
   }
-  
+
   .toggleContactDetailsButton, .toggleContactDetailsButton > svg, .actionsButtonText {
     color: colors.$blue-40;
   }

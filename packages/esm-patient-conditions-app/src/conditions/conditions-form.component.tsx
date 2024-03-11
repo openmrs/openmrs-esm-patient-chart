@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConditionDataTableRow, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 interface ConditionFormProps extends DefaultWorkspaceProps {
   condition?: ConditionDataTableRow;
@@ -26,6 +26,7 @@ export type ConditionFormData = z.infer<typeof conditionSchema>;
 
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   condition,
   formContext,
   patientUuid,
@@ -56,20 +57,29 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   });
 
   const {
-    formState: { isDirty },
+    setError,
+    formState: { isDirty, errors },
   } = methods;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const onSubmit = (data) => {
+  const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
+    setIsSubmittingForm(true);
+    if (formContext === 'creating' && !data.search.trim()) {
+      setError('search', {
+        type: 'manual',
+        message: t('conditionRequired', 'A condition is required'),
+      });
+      setIsSubmittingForm(false);
+      return;
+    }
     setIsSubmittingForm(true);
   };
 
   const onError = (error) => {
     setIsSubmittingForm(false);
-    console.error(error);
   };
 
   return (
@@ -77,7 +87,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
           patientUuid={patientUuid}
-          closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           conditionToEdit={condition}
           editing={formContext === 'editing'}
           setErrorCreating={setErrorCreating}

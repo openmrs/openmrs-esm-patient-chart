@@ -17,6 +17,7 @@ import VisitNotesForm from './visit-notes-form.component';
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
 };
 
@@ -51,6 +52,9 @@ jest.mock('./visit-notes.resource', () => ({
   saveVisitNote: jest.fn(),
   useVisitNotes: jest.fn().mockImplementation(() => ({
     mutateVisitNotes: jest.fn(),
+  })),
+  useInfiniteVisits: jest.fn().mockImplementation(() => ({
+    mutateVisits: jest.fn(),
   })),
 }));
 

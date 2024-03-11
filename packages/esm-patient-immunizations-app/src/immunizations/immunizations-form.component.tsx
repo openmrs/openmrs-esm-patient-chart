@@ -8,7 +8,6 @@ import {
   Dropdown,
   Form,
   InlineNotification,
-  Layer,
   SelectItem,
   Stack,
   TextInput,
@@ -23,6 +22,7 @@ import {
   toOmrsIsoString,
   toDateObjectStrict,
   showSnackbar,
+  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,7 +46,12 @@ interface ResponsiveWrapperProps {
 
 const datePickerFormat = 'd/m/Y';
 
-const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
+const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { immunizationsConfig } = useConfig() as ConfigObject;
@@ -184,7 +189,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       ).then(
         () => {
           setIsSubmitting(false);
-          closeWorkspace({ ignoreChanges: true });
+          closeWorkspaceWithSavedChanges();
           mutate();
           showSnackbar({
             kind: 'success',
@@ -211,7 +216,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       currentVisit?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
-      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
       t,
     ],
   );
@@ -222,7 +227,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         <Stack gap={1} className={styles.container}>
           <section className={` ${styles.row}`}>
             <div className={styles.dateTimeSection}>
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <Controller
                   name="vaccinationDate"
                   control={control}
@@ -249,7 +254,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                   )}
                 />
               </ResponsiveWrapper>
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <Controller
                   name="vaccinationTime"
                   control={control}
@@ -285,7 +290,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             </div>
           </section>
           <section>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="vaccineUuid"
                 control={control}
@@ -324,7 +329,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
           )}
           {vaccineUuid && (
             <section>
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DoseInput
                   vaccine={vaccineUuid}
                   sequences={immunizationsConfig.sequenceDefinitions}
@@ -334,7 +339,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             </section>
           )}
           <section>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="manufacturer"
                 control={control}
@@ -353,7 +358,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             </ResponsiveWrapper>
           </section>
           <section>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="lotNumber"
                 control={control}
@@ -372,7 +377,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             </ResponsiveWrapper>
           </section>
           <section>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="expirationDate"
                 control={control}
@@ -412,9 +417,5 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     </FormProvider>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: ResponsiveWrapperProps) {
-  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <Fragment>{children}</Fragment>;
-}
 
 export default ImmunizationsForm;

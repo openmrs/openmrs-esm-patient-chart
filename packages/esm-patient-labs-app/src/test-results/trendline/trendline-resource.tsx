@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { assessValue } from '../loadPatientTestData/helpers';
 import { useMemo } from 'react';
-import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { type TreeNode } from '../filter/filter-types';
 
 function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
@@ -35,7 +35,7 @@ export function useObstreeData(
   isValidating: boolean;
 } {
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<TreeNode>, Error>(
-    `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
+    `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
     openmrsFetch,
   );
   if (error) {

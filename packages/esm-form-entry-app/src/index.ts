@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import 'zone.js';
-import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { defineConfigSchema, fhirBaseUrl, messageOmrsServiceWorker, restBaseUrl } from '@openmrs/esm-framework';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 import { configSchema } from './config-schema';
 
@@ -22,42 +22,42 @@ export function startupApp() {
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/fhir2/R4/Observation.+',
+    pattern: `.+${fhirBaseUrl}/Observation.+`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/obs.+',
+    pattern: `.+${restBaseUrl}/obs.+`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/session.*',
+    pattern: `.+${restBaseUrl}/session.*`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/provider.*',
+    pattern: `.+${restBaseUrl}/provider.*`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/location.*',
+    pattern: `.+${restBaseUrl}/location.*`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/person.*',
+    pattern: `.+${restBaseUrl}/person.*`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/form.*',
+    pattern: `.+${restBaseUrl}/form.*`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/o3/forms.*',
+    pattern: `.+${restBaseUrl}/o3/forms.*`,
   });
 
   defineConfigSchema(moduleName, configSchema);

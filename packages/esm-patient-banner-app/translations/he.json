@@ -20,8 +20,6 @@
   "postalCode": "מיקוד",
   "relationships": "יחסים",
   "seeMoreLists_one": "עוד רשימות {{count}} ראה",
-  "seeMoreLists_two": "עוד רשימות {{count}} ראה",
-  "seeMoreLists_many": "עוד רשימות {{count}} ראה",
   "seeMoreLists_other": "עוד רשימות {{count}} ראה",
   "showDetails": "הצג פרטים",
   "started": "התחיל",

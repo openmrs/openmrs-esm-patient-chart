@@ -3,6 +3,7 @@ import {
   messageOmrsServiceWorker,
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
+  restBaseUrl,
   setupDynamicOfflineDataHandler,
   setupOfflineSync,
   type SyncProcessOptions,
@@ -68,7 +69,7 @@ async function syncEncounter(associatedOfflineVisit: Visit, encounter?: Encounte
     encounterDatetime: encounter.encounterDatetime ?? associatedOfflineVisit?.stopDatetime,
   };
 
-  await openmrsFetch('/ws/rest/v1/encounter', {
+  await openmrsFetch(`${restBaseUrl}/encounter`, {
     headers: { 'Content-Type': 'application/json' },
     method: 'POST',
     body,
@@ -80,7 +81,7 @@ async function syncPersonUpdate(personUuid?: string, personUpdate?: any) {
     return;
   }
 
-  await openmrsFetch(`/ws/rest/v1/person/${personUuid}`, {
+  await openmrsFetch(`${restBaseUrl}/person/${personUuid}`, {
     headers: { 'Content-Type': 'application/json' },
     method: 'POST',
     body: personUpdate,
@@ -125,7 +126,7 @@ export async function setupDynamicFormDataHandler() {
 }
 
 async function getCacheableFormUrls(formUuid: string) {
-  const getFormRes = await openmrsFetch<Form>(`/ws/rest/v1/form/${formUuid}?v=full`);
+  const getFormRes = await openmrsFetch<Form>(`${restBaseUrl}/form/${formUuid}?v=full`);
   const form = getFormRes.data;
 
   if (!form) {

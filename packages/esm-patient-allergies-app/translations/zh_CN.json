@@ -1,7 +1,7 @@
 {
   "add": "添加",
   "allergen": "过敏原",
-  "allergies": "过敏信息",
+  "allergies": "过敏",
   "Allergies": "过敏",
   "allergyIntolerances": "过敏不耐受",
   "allergyNowVisible": "现在在过敏信息页面上可见",
@@ -22,7 +22,7 @@
   "otherNonCodedAllergicReaction": "其他非编码过敏反应",
   "reaction": "反应",
   "reactions": "反应",
-  "recordNewAllergy": "Record a new allergy",
+  "recordNewAllergy": "记录一个新的过敏信息",
   "saveAndClose": "保存并关闭",
   "seeAll": "查看全部",
   "selectAllergen": "选择过敏原",

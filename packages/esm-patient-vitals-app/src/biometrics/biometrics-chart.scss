@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .label01 {
   @include type.type-style("label-01");
@@ -12,33 +12,33 @@
 
 .biometricChartContainer {
   display: flex;
-  margin: 0rem spacing.$spacing-05;
+  margin: 0rem layout.$spacing-05;
   flex-direction: row;
   justify-content: space-between;
 }
 
 .biometricsArea {
   flex-grow: 1;
-  margin: spacing.$spacing-03 0;
-  padding-right: spacing.$spacing-05;
+  margin: layout.$spacing-03 0;
+  padding-right: layout.$spacing-05;
 }
 
 .biometricsChartArea {
   flex-grow: 4;
-  padding: 0 spacing.$spacing-05 spacing.$spacing-09;
+  padding: 0 layout.$spacing-05 layout.$spacing-09;
 
   :global(.cds--cc--layout-row) {
     height: 0;
   }
 
   :global(.layout-child) {
-    margin-top: spacing.$spacing-03;
+    margin-top: layout.$spacing-03;
   }
 }
 
 .biometricLabel {
   @extend .label01;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
   display: inline-block;
 }
 
@@ -63,7 +63,7 @@
 .tab {
   outline: 0;
   outline-offset: 0;
-  min-height: spacing.$spacing-07;
+  min-height: layout.$spacing-07;
 
   &:active, &:focus {
     outline: 2px solid var(--brand-03) !important;

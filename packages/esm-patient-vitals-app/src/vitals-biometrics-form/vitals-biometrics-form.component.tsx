@@ -25,7 +25,7 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -39,6 +39,7 @@ import {
   interpretBloodPressure,
   invalidateCachedVitalsAndBiometrics,
   saveVitalsAndBiometrics as savePatientVitals,
+  useVitalsConceptMetadata,
 } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
@@ -73,6 +74,7 @@ export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSche
 const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
@@ -84,7 +86,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading, isError } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
@@ -191,7 +193,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
         .then((response) => {
           if (response.status === 201) {
             invalidateCachedVitalsAndBiometrics();
-            closeWorkspace();
+            closeWorkspaceWithSavedChanges();
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -230,7 +232,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,
-          closeWorkspace,
+          closeWorkspaceWithSavedChanges,
         }}
       />
     );
@@ -581,7 +583,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
       )}
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button

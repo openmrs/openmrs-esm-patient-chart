@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/grid/_flexbox';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .resultsContainer {
   padding: 0;
@@ -66,7 +66,7 @@
   min-width: 2.5rem;
 }
 
-.leftHeaderActions > :global(.cds--content-switcher), 
+.leftHeaderActions > :global(.cds--content-switcher),
 .viewOptsContentSwitcherContainer :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;

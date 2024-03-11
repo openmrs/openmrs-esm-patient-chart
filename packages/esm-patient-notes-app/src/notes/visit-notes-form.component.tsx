@@ -13,7 +13,6 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
-  Layer,
   Row,
   Search,
   SkeletonText,
@@ -21,6 +20,7 @@ import {
   Tag,
   TextArea,
   Tile,
+  Layer,
 } from '@carbon/react';
 import { Add, Edit, WarningFilled } from '@carbon/react/icons';
 import {
@@ -33,6 +33,8 @@ import {
   useLayoutType,
   useSession,
   createAttachment,
+  restBaseUrl,
+  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -41,12 +43,13 @@ import {
   fetchConceptDiagnosisByName,
   savePatientDiagnosis,
   saveVisitNote,
+  useInfiniteVisits,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 import { mutate } from 'swr';
 
-const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -69,7 +72,12 @@ interface DiagnosisSearchProps {
   error?: Object;
 }
 
-const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, promptBeforeClosing }) => {
+const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  patientUuid,
+  promptBeforeClosing,
+}) => {
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -104,7 +112,10 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
 
   const currentImage = watch('image');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const mutateAttachments = () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/attachment`));
+  const { mutateVisits } = useInfiniteVisits(patientUuid);
+
+  const mutateAttachments = () =>
+    mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
 
@@ -270,10 +281,11 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         })
         .then(() => {
           mutateVisitNotes();
+          mutateVisits();
           if (data.image) {
             mutateAttachments();
           }
-          closeWorkspace();
+          closeWorkspaceWithSavedChanges();
 
           showSnackbar({
             isLowContrast: true,
@@ -308,7 +320,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       encounterNoteTextConceptUuid,
       combinedDiagnoses,
       mutateVisitNotes,
-      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
       t,
     ],
   );
@@ -333,7 +345,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               name="noteDate"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <DatePicker
                     dateFormat="d/m/Y"
                     datePickerType="single"
@@ -513,7 +525,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                       </ul>
                     );
                   return (
-                    <ResponsiveWrapper isTablet={isTablet}>
+                    <ResponsiveWrapper>
                       <Tile className={styles.emptyResults}>
                         <span>
                           {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
@@ -536,7 +548,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               name="clinicalNote"
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <TextArea
                     id="additionalNote"
                     rows={rows}
@@ -633,7 +645,7 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
       control={control}
       render={({ field: { value, onChange, onBlur }, fieldState }) => (
         <>
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <Search
               ref={inputRef}
               size={isTablet ? 'lg' : 'md'}
@@ -655,8 +667,4 @@ function DiagnosisSearch({ name, control, labelText, placeholder, handleSearch, 
       )}
     />
   );
-}
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }

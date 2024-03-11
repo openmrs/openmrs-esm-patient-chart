@@ -85,6 +85,7 @@
   "invalidVisitStopDate": "Visit stop date time cannot be on or before visit start date time",
   "loading": "Loading",
   "loadingVisit": "Loading current visit...",
+  "loadMore": "Load more",
   "location": "Location",
   "male": "Male",
   "markAlive": "Mark alive",

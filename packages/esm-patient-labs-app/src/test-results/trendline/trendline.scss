@@ -1,13 +1,13 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import "~@carbon/charts/styles.css";
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .container {
   :global(.cds--cc--area path.area) {
     stroke: none;
     fill: #a7f0ba;
-  }  
+  }
 }
 
 .ui-shell-header-modal-bar-default {
@@ -62,7 +62,7 @@
     svg {
       order: 1;
       margin-right: 0.5rem;
-    }  
+    }
 
     span {
       order: 2;

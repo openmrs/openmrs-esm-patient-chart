@@ -4,6 +4,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  restBaseUrl,
   translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -24,12 +25,12 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/concept.+',
+    pattern: `.+${restBaseUrl}/concept.+`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/patient/.+/allergy.+',
+    pattern: `.+${restBaseUrl}/patient/.+/allergy.+`,
   });
 
   messageOmrsServiceWorker({
@@ -60,3 +61,8 @@ registerWorkspace({
 });
 
 export const allergyTile = getSyncLifecycle(allergyTileComponent, options);
+
+export const allergyDeleteConfirmationDialog = getAsyncLifecycle(
+  () => import('./allergies/delete-allergy-modal.component'),
+  options,
+);

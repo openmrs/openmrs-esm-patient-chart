@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars'; 
+@import '@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading01 {
   @include type.type-style("heading-compact-01");
@@ -62,6 +62,6 @@
   white-space: nowrap;
 }
 
-.text02 { 
+.text02 {
   color: $text-02;
 }
