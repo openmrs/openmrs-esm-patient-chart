@@ -8,6 +8,31 @@ import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
+const visitUuid = 'test_visit_uuid';
+
+const visitAttributes = {
+  punctuality: {
+    uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+    name: 'Punctuality',
+    display: 'Punctuality',
+    datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
+    datatypeConfig: '',
+    preferredHandlerClassname: 'default',
+    description: '',
+    retired: false,
+  },
+  insurancePolicyNumber: {
+    uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+    name: 'Insurance Policy Number',
+    display: 'Insurance Policy Number',
+    datatypeConfig: '',
+    datatypeClassname: 'org.openmrs.customdatatype.datatype.FreeTextDatatype',
+    description: '',
+    preferredHandlerClassname: 'default',
+    retired: false,
+  },
+};
+
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
@@ -41,7 +66,7 @@ jest.mock('@openmrs/esm-framework', () => {
     useConfig: jest.fn(() => ({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: false,
           displayInThePatientBanner: true,
         },
@@ -66,56 +91,25 @@ jest.mock('@openmrs/esm-framework', () => {
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
   useVisitAttributeType: jest.fn((attributeUuid) => {
-    if (attributeUuid === '57ea0cbb-064f-4d09-8cf4-e8228700491c') {
+    if (attributeUuid === visitAttributes.punctuality.uuid) {
       return {
         isLoading: false,
         error: null,
-        data: {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
-          name: 'Punctuality',
-          display: 'Punctuality',
-          datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
-          datatypeConfig: '',
-          preferredHandlerClassname: 'default',
-          retired: false,
-        },
+        data: visitAttributes.punctuality,
       };
     }
-    if (attributeUuid === 'aac48226-d143-4274-80e0-264db4e368ee') {
+    if (attributeUuid === visitAttributes.insurancePolicyNumber.uuid) {
       return {
         isLoading: false,
         error: null,
-        data: {
-          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
-          name: 'Insurance Policy Number',
-          display: 'Insurance Policy Number',
-          datatypeClassname: 'org.openmrs.customdatatype.datatype.FreeTextDatatype',
-          retired: false,
-        },
+        data: visitAttributes.insurancePolicyNumber,
       };
     }
   }),
   useVisitAttributeTypes: jest.fn(() => ({
     isLoading: false,
     error: null,
-    data: [
-      {
-        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
-        name: 'Punctuality',
-        display: 'Punctuality',
-        datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
-        datatypeConfig: '',
-        preferredHandlerClassname: 'default',
-        retired: false,
-      },
-      {
-        uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
-        name: 'Insurance Policy Number',
-        display: 'Insurance Policy Number',
-        datatypeClassname: 'org.openmrs.customdatatype.datatype.FreeTextDatatype',
-        retired: false,
-      },
-    ],
+    data: [visitAttributes.punctuality, visitAttributes.insurancePolicyNumber],
   })),
   useConceptAnswersForVisitAttributeType: jest.fn(() => ({
     isLoading: false,
@@ -286,7 +280,7 @@ describe('Visit Form', () => {
     mockedUseConfig.mockReturnValueOnce({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: true,
           displayInThePatientBanner: true,
         },
@@ -319,7 +313,7 @@ describe('Visit Form', () => {
       of({
         status: 201,
         data: {
-          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          uuid: visitUuid,
           visitType: {
             display: 'Facility Visit',
           },
@@ -338,13 +332,13 @@ describe('Visit Form', () => {
       new AbortController(),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute', {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
-      body: { attributeType: '57ea0cbb-064f-4d09-8cf4-e8228700491c', value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
+      body: { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute', {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: 'aac48226-d143-4274-80e0-264db4e368ee', value: '183299' },
@@ -370,7 +364,7 @@ describe('Visit Form', () => {
     mockedUseConfig.mockReturnValueOnce({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: true,
           displayInThePatientBanner: true,
         },
@@ -403,7 +397,7 @@ describe('Visit Form', () => {
       of({
         status: 201,
         data: {
-          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          uuid: visitUuid,
           visitType: {
             display: 'Facility Visit',
           },
@@ -423,7 +417,7 @@ describe('Visit Form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -432,7 +426,7 @@ describe('Visit Form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/d6d7d26a-5975-4f03-8abb-db073c948897',
+      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -459,7 +453,7 @@ describe('Visit Form', () => {
     mockedUseConfig.mockReturnValueOnce({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: true,
           displayInThePatientBanner: true,
         },
@@ -491,7 +485,7 @@ describe('Visit Form', () => {
       of({
         status: 201,
         data: {
-          uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+          uuid: visitUuid,
           visitType: {
             display: 'Facility Visit',
           },
@@ -511,12 +505,12 @@ describe('Visit Form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       { method: 'DELETE' },
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      '/ws/rest/v1/visit/15dd49ba-4283-472f-bce3-05401f85c0d3/attribute/d6d7d26a-5975-4f03-8abb-db073c948897',
+      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       { method: 'DELETE' },
     );
 
@@ -588,7 +582,7 @@ describe('Visit Form', () => {
     mockedUseConfig.mockReturnValueOnce({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: true,
           displayInThePatientBanner: true,
         },
@@ -615,15 +609,7 @@ describe('Visit Form', () => {
     mockedUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
-      data: {
-        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
-        name: 'Punctuality',
-        display: 'Punctuality',
-        datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
-        datatypeConfig: '',
-        preferredHandlerClassname: 'default',
-        retired: false,
-      },
+      data: visitAttributes.punctuality,
     });
     renderVisitForm();
     expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
@@ -635,20 +621,12 @@ describe('Visit Form', () => {
     mockedUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
-      data: {
-        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
-        name: 'Punctuality',
-        display: 'Punctuality',
-        datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
-        datatypeConfig: '',
-        preferredHandlerClassname: 'default',
-        retired: false,
-      },
+      data: visitAttributes.punctuality,
     });
     mockedUseConfig.mockReturnValue({
       visitAttributeTypes: [
         {
-          uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+          uuid: visitAttributes.punctuality.uuid,
           required: true,
           displayInThePatientBanner: true,
         },
