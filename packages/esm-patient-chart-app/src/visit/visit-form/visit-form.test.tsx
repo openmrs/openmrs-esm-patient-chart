@@ -277,7 +277,7 @@ describe('Visit Form', () => {
     });
   });
 
-  it('Start a new visit with attributes upon successful submission of the form', async () => {
+  it('starts a new visit with attributes upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -361,7 +361,7 @@ describe('Visit Form', () => {
     });
   });
 
-  it('Update a visit attributes on an existing visit upon successful submission of the form', async () => {
+  it('Updates visit attributes on an existing visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
     renderVisitForm(mockVisitWithAttributes);
@@ -450,7 +450,7 @@ describe('Visit Form', () => {
     });
   });
 
-  it('Delete visit attributes on an existing visit upon successful submission of the form', async () => {
+  it('deletes visit attributes on an existing visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
     renderVisitForm(mockVisitWithAttributes);
