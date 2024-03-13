@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './result-form.scss';
 import { TextInput, Select, SelectItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type LabOrderConcept } from './lab-results.resource';
 import { Controller } from 'react-hook-form';
+import { type LabOrderConcept } from './lab-results.resource';
+import styles from './lab-results-form.scss';
 
 interface ResultFormFieldProps {
   defaultValue: any;
@@ -22,7 +22,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ defaultValue, registe
     if (concept?.datatype?.display === 'Numeric') {
       const maxVal = Math.max(concept?.hiAbsolute, concept?.hiCritical, concept?.hiNormal);
       const minVal = Math.min(concept?.lowAbsolute, concept?.lowCritical, concept?.lowNormal);
-      return ` (${minVal ?? 0} - ${maxVal > 0 ? maxVal : '--'} ${concept?.units ?? ''})`;
+      return `(${minVal ?? 0} - ${maxVal > 0 ? maxVal : '--'} ${concept?.units ?? ''})`;
     }
     return '';
   };

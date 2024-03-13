@@ -36,7 +36,7 @@ export function startupApp() {
   registerWorkspace({
     name: 'test-results-form-workspace',
     title: translateFrom(moduleName, 'enterTestResults', 'Enter test results'),
-    load: getAsyncLifecycle(() => import('./test-results-form/result-form.component'), options),
+    load: getAsyncLifecycle(() => import('./lab-results/lab-results-form.component'), options),
     type: 'lab-results',
     canHide: false,
   });

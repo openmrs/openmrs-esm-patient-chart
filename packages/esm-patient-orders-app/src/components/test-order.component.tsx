@@ -12,8 +12,9 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useOrderConceptByUuid } from '../test-results-form/lab-results.resource';
+import { useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { TableContainer } from '@carbon/react';
 
 interface TestOrderProps {
   testOrder: Order;
@@ -24,7 +25,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder.concept.uuid);
 
-  const headers: Array<{ key: string; header: string }> = [
+  const tableHeaders: Array<{ key: string; header: string }> = [
     {
       key: 'testType',
       header: t('testType', 'Test type'),
@@ -50,41 +51,49 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         },
       ];
     } else if (concept && concept.setMembers.length > 0) {
-      return concept?.setMembers.map((concept) => ({
-        testType: concept.display,
+      return concept?.setMembers.map((memberConcept) => ({
+        id: memberConcept.uuid,
+        testType: memberConcept.display,
         result: 'TBD',
-        normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+        normalRange:
+          memberConcept.hiNormal && memberConcept.lowNormal
+            ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
+            : 'N/A',
       }));
     } else {
       return [];
     }
-  }, [testOrder]);
+  }, [concept]);
 
   return (
     <div className={styles.testOrder}>
       {isLoadingTestConcepts ? (
-        <DataTableSkeleton headers={headers} compact={!isTablet} />
+        <DataTableSkeleton role="progressbar" compact={isTablet} zebra />
       ) : (
-        <DataTable rows={testRows} headers={headers} useZebraStyles size="lg">
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <Table {...getTableProps()} aria-label="testorders">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+        <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+            <TableContainer {...getTableContainerProps()}>
+              <Table {...getTableProps()} aria-label="testorders">
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id} className={styles.testCell}>
+                          {cell.value}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </DataTable>
       )}

@@ -1,45 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import styles from './result-form.scss';
-import { Button, InlineLoading, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { useForm } from 'react-hook-form';
+import { showNotification, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
+import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { useOrderConceptByUuid, UpdateOrderResult, fetchEncounter, fetchObservation } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
-import { useForm } from 'react-hook-form';
-import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import styles from './lab-results-form.scss';
 
-export interface AddResultsWorkspaceAdditionalProps {
+export interface LabResultsFormProps extends DefaultWorkspaceProps {
   order: Order;
 }
-export interface AddResultsWorkspace extends DefaultWorkspaceProps, AddResultsWorkspaceAdditionalProps {}
 
-const ResultForm: React.FC<AddResultsWorkspace> = ({
-  order,
-  patientUuid,
-  closeWorkspace,
-  promptBeforeClosing,
-}: AddResultsWorkspace) => {
+const LabResultsForm: React.FC<LabResultsFormProps> = ({ order, closeWorkspace, promptBeforeClosing }) => {
+  const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [inEditMode, setInEditMode] = useState(false);
   const [obsUuid, setObsUuid] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
-
-  const config = useConfig();
-  const { t } = useTranslation();
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
+
   const {
     control,
     register,
-    formState: { isSubmitting, errors, isDirty },
+    formState: { errors, isDirty },
     getValues,
     handleSubmit,
   } = useForm<{ testResult: any }>({
     defaultValues: {},
   });
-
-  const cancelResults = () => {
-    closeWorkspace();
-  };
 
   useEffect(() => {
     fetchEncounter(order.encounter.uuid).then((data) => {
@@ -50,6 +41,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
       }
     });
   }, []);
+
   useEffect(() => {
     if (inEditMode) {
       setIsLoadingInitialValues(true);
@@ -70,10 +62,13 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
     return <InlineLoading iconDescription="Loading" description="Loading test details" status="active" />;
   }
 
-  const onSubmit = (data, e) => {
+  const saveLabResults = (data, e) => {
+    setIsSubmitting(true);
     e.preventDefault();
-
+    // assign result to test order
+    const documentedValues = getValues();
     let obsValue = [];
+
     if (concept.set && concept.setMembers.length > 0) {
       let groupMembers = [];
       concept.setMembers.forEach((member) => {
@@ -88,7 +83,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
         const groupMember = {
           concept: { uuid: member.uuid },
           value: value,
-          status: inEditMode ? config.obsStatuses.amended : config.obsStatuses.preliminary,
+          status: 'FINAL',
           order: { uuid: order.uuid },
         };
         groupMembers.push(groupMember);
@@ -96,7 +91,7 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
 
       obsValue.push({
         concept: { uuid: order.concept.uuid },
-        status: inEditMode ? config.obsStatuses.amended : config.obsStatuses.preliminary,
+        status: 'FINAL',
         order: { uuid: order.uuid },
         groupMembers: groupMembers,
       });
@@ -112,36 +107,38 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
 
       obsValue.push({
         concept: { uuid: order.concept.uuid },
-        status: inEditMode ? config.obsStatuses.amended : config.obsStatuses.preliminary,
+        status: 'FINAL',
         order: { uuid: order.uuid },
         value: value,
       });
     }
 
-    const obsPayload = inEditMode
-      ? obsValue[0]
-      : {
-          obs: obsValue,
-        };
+    const obsPayload = { obs: obsValue };
 
     const resultsStatusPayload = {
-      fulfillerStatus: config.fulfillerStatuses.completed,
+      fulfillerStatus: 'COMPLETED',
       fulfillerComment: 'Test Results Entered',
     };
 
     UpdateOrderResult(order.uuid, order.encounter.uuid, obsUuid, obsPayload, resultsStatusPayload).then(
       () => {
+        setIsSubmitting(false);
+        closeWorkspace();
+        // mutate(`/encounter/${order.encounter.uuid}`);
+
         showSnackbar({
           isLowContrast: true,
-          title: t('updateEncounter', 'Update lab results'),
+          title: t('saveLabResults', 'Save lab results'),
           kind: 'success',
-          subtitle: t('generateSuccessfully', 'You have successfully updated test results'),
+          subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+            orderNumber: order?.orderNumber,
+          }),
         });
-        closeWorkspace();
       },
       (err) => {
+        setIsSubmitting(false);
         showNotification({
-          title: t(`errorUpdatingEncounter', 'Error occurred while updating test results`),
+          title: t('errorSavingLabResults', 'Error saving lab results'),
           kind: 'error',
           critical: true,
           description: err?.message,
@@ -151,14 +148,17 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
   };
 
   return (
-    <>
-      <ModalBody>
-        {/* // we need to display test name for test panels */}
-        {concept.setMembers.length > 0 && <div>{concept.display}</div>}
-        {concept && (
-          <section className={styles.section}>
-            {!isLoadingInitialValues ? (
-              <form>
+    <Form className={styles.form}>
+      <div className={styles.grid}>
+        <Stack>
+          <section>
+            <h4 className={styles.orderDisplay}>{order?.display}</h4>
+            <hr />
+          </section>
+          {concept.setMembers.length > 0 && <div>{concept.display}</div>}
+          {concept && (
+            <section className={styles.section}>
+              {!isLoadingInitialValues ? (
                 <ResultFormField
                   defaultValue={initialValues}
                   register={register}
@@ -166,22 +166,34 @@ const ResultForm: React.FC<AddResultsWorkspace> = ({
                   control={control}
                   errors={errors}
                 />
-              </form>
-            ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
-            )}
-          </section>
-        )}
-      </ModalBody>
+              ) : (
+                <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
+              )}
+            </section>
+          )}
+        </Stack>
+      </div>
 
-      <ModalFooter>
-        <Button disabled={isSubmitting} onClick={cancelResults} kind="secondary">
-          {t('cancel', 'Cancel')}
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
         </Button>
-        <Button onClick={handleSubmit(onSubmit)}>Save Test Results</Button>
-      </ModalFooter>
-    </>
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={handleSubmit(saveLabResults)}
+          disabled={isSubmitting}
+          type="submit"
+        >
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            t('saveAndClose', 'Save and close')
+          )}
+        </Button>
+      </ButtonSet>
+    </Form>
   );
 };
 
-export default ResultForm;
+export default LabResultsForm;
