@@ -68,6 +68,7 @@ type EditPayload = CreatePayload & {
 };
 
 export type FormFields = {
+  currentStatus: string;
   clinicalStatus: string;
   conceptId: string;
   display: string;

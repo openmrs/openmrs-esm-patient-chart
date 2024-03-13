@@ -31,6 +31,7 @@ import {
 } from './conditions.resource';
 import { type ConditionFormData } from './conditions-form.component';
 import styles from './conditions-form.scss';
+import { Select, SelectItem } from '@carbon/react';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
@@ -64,7 +65,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   } = useFormContext<ConditionFormData>();
   const session = useSession();
   const searchInputRef = useRef(null);
-  const currentStatus = watch('clinicalStatus');
+  const currentStatus = watch('currentStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
   const getFieldValue = (
@@ -78,7 +79,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   ): string => tableCells?.find((cell) => cell?.info?.header === fieldName)?.value;
 
   const displayName = getFieldValue(conditionToEdit?.cells, 'display');
-  const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
+  const editablecurrentStatus = getFieldValue(conditionToEdit?.cells, 'currentStatus');
+  const editableclinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -93,6 +95,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     }
 
     const payload: FormFields = {
+      currentStatus: getValues('currentStatus'),
       clinicalStatus: getValues('clinicalStatus'),
       conceptId: selectedCondition?.concept?.uuid,
       display: selectedCondition?.concept?.display,
@@ -135,7 +138,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const handleUpdate = useCallback(async () => {
     const payload: FormFields = {
-      clinicalStatus: editing ? getValues('clinicalStatus') : editableClinicalStatus,
+      currentStatus: editing ? getValues('currentStatus') : editablecurrentStatus,
+      clinicalStatus: editing ? getValues('clinicalStatus') : editableclinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
       endDate: getValues('endDate') ? dayjs(getValues('endDate')).format() : null,
@@ -167,7 +171,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
     displayName,
-    editableClinicalStatus,
+    editablecurrentStatus,
     editing,
     getValues,
     matchingCondition?.conceptId,
@@ -190,12 +194,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       focusOnSearchInput();
     }
     if (isSubmittingForm) {
-      if (!selectedCondition) {
-        errors.search = {
-          type: 'manual',
-          message: t('selectCondition', 'Select a condition'),
-        };
-      }
       if (Object.keys(errors).length > 0) {
         setIsSubmittingForm(false);
         Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
@@ -297,6 +295,46 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             </>
           )}
         </FormGroup>
+        <FormGroup
+          legendText={
+            <>
+              <span>{t('clinicalStatus', 'Clinical Status')}</span>
+              {!editing && (
+                <span title={t('required', 'Required')} className={styles.required}>
+                  *
+                </span>
+              )}
+            </>
+          }
+        >
+          <Controller
+            name="clinicalStatus"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <ResponsiveWrapper>
+                <Select
+                  id="clinicalStatus"
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  labelText=""
+                  className={classNames({
+                    [styles.conditionsError]: errors?.search,
+                  })}
+                >
+                  <SelectItem value="" text="" />
+                  <SelectItem value="active" text="Active" />
+                  <SelectItem value="recurrence" text="Recurrence" />
+                  <SelectItem value="replapse" text="Replapse" />
+                  <SelectItem value="inactive" text="Inactive" />
+                  <SelectItem value="remission" text="Remission" />
+                  <SelectItem value="resolved" text="Resolved" />
+                  <SelectItem value="unknown" text="Unknown" />
+                </Select>
+              </ResponsiveWrapper>
+            )}
+          />
+          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
+        </FormGroup>
         <FormGroup legendText="">
           <Controller
             name="onsetDateTime"
@@ -319,18 +357,27 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             )}
           />
         </FormGroup>
-        <FormGroup legendText={t('currentStatus', 'Current status')}>
+        <FormGroup
+          legendText={
+            <>
+              <span> {t('currentStatus', 'Current status')}</span>
+              <span title={t('required', 'Required')} className={styles.required}>
+                *
+              </span>
+            </>
+          }
+        >
           <Controller
-            name="clinicalStatus"
+            name="currentStatus"
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                valueSelected={value.toLowerCase()}
-                name="clinicalStatus"
+                name="currentStatus"
                 orientation="vertical"
                 onChange={onChange}
                 onBlur={onBlur}
+                valueSelected={value.toLowerCase()}
               >
                 <RadioButton id="active" labelText="Active" value="active" />
                 <RadioButton id="inactive" labelText="Inactive" value="inactive" />
