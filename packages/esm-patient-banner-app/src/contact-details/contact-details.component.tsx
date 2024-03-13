@@ -104,7 +104,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
               )}
           </React.Fragment>
         ) : (
-          '--'
+          <li>--</li>
         )}
       </ul>
     </>
