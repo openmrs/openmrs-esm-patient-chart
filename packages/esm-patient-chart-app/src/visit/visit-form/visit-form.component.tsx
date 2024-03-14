@@ -44,7 +44,7 @@ import {
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { type ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -375,32 +375,18 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  const appointmentPayload: AppointmentPayload = {
-                    appointmentKind: upcomingAppointment?.appointmentKind,
-                    serviceUuid: upcomingAppointment?.service.uuid,
-                    startDateTime: upcomingAppointment?.startDateTime,
-                    endDateTime: upcomingAppointment?.endDateTime,
-                    locationUuid: visitLocation?.uuid,
-                    patientUuid: patientUuid,
-                    uuid: upcomingAppointment?.uuid,
-                    dateHonored: dayjs(visitStartDate).format(),
-                  };
-                  saveAppointment(appointmentPayload, abortController).then(
-                    ({ status }) => {
-                      if (status === 201) {
-                        mutateCurrentVisit();
-                        mutateVisits();
-                        showSnackbar({
-                          isLowContrast: true,
-                          kind: 'success',
-                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                          title: t('appointmentEdited', 'Appointment edited'),
-                        });
-                      }
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid).then(
+                    (resp) => {
+                      showSnackbar({
+                        title: t('appointmentUpdated', 'Appointment updated'),
+                        subtitle: t('appointmentMarkedChecked', 'Appointments have been marked as Checked In'),
+                        timeoutInMs: 5000,
+                        isLowContrast: true,
+                      });
                     },
                     (error) => {
                       showSnackbar({
-                        title: t('updateError', 'Error updating upcoming appointment'),
+                        title: t('appointmentUpdated', 'Appointment updated'),
                         kind: 'error',
                         isLowContrast: false,
                         subtitle: error?.message,

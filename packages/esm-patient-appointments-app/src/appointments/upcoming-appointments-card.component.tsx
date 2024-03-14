@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
-
 import {
   Checkbox,
   InlineLoading,
@@ -25,7 +23,7 @@ interface UpcomingAppointmentsProps {
 
 const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patientUuid, setUpcomingAppointment }) => {
   const { t } = useTranslation();
-  const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+  const startDate = dayjs(new Date().setHours(0, 0, 0)).toISOString();
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
@@ -36,10 +34,14 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
     ? appointmentsData?.upcomingAppointments
     : [];
-  const appointments = todaysAppointments.concat(futureAppointments);
-  const upcomingAppointment = !isEmpty(appointments)
-    ? appointments?.filter(({ dateHonored }) => dateHonored === null)
-    : [];
+  const appointments = todaysAppointments.concat(futureAppointments)?.filter(({ status }) => status === 'Scheduled');
+
+  useEffect(() => {
+    if (appointments.length > 0) {
+      setUpcomingAppointment(appointments[0]);
+    }
+  }, [appointments.length]);
+
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
@@ -49,9 +51,9 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
     </span>;
   }
 
-  if (upcomingAppointment?.length) {
+  if (appointments?.length) {
     const structuredListBodyRowGenerator = () => {
-      return upcomingAppointment.map((appointment, i) => (
+      return appointments.map((appointment, i) => (
         <StructuredListRow label key={`row-${i}`} className={styles.structuredList}>
           <StructuredListCell>{formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}</StructuredListCell>
           <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
@@ -60,7 +62,7 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
               className={styles.checkbox}
               key={i}
               labelText=""
-              defaultChecked={dayjs(new Date(appointment.startDateTime).toISOString()).isToday()}
+              defaultChecked={dayjs(new Date(appointment.startDateTime).toISOString()).isToday() && i === 0}
               id={appointment.uuid}
               onChange={(e) => (e.target.checked ? setUpcomingAppointment(appointment) : '')}
             />
@@ -74,7 +76,7 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
         <div>
           <p className={styles.sectionTitle}>{headerTitle}</p>
           <span className={styles.headerLabel}>
-            {t('appointmentToFulfill', 'Select appointment(s) to fulfill')}
+            {t('appointmentToCheckIn', 'Select appointment(s) to check in')}
           </span>{' '}
         </div>
 

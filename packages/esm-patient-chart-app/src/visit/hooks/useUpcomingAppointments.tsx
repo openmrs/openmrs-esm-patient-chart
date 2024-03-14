@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
+import { omrsDateFormat } from '../../constants';
 
 export interface AppointmentPayload {
   patientUuid: string;
@@ -27,3 +28,16 @@ export function saveAppointment(appointment: AppointmentPayload, abortController
     body: appointment,
   });
 }
+
+export const updateAppointmentStatus = async (toStatus: string, appointmentUuid: string) => {
+  const abortController = new AbortController();
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
+  return await openmrsFetch(url, {
+    body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: abortController.signal,
+  });
+};
