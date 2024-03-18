@@ -14,10 +14,10 @@
 
 .diagnosis {
   padding: 0.75rem;
+  border-top: 0.0625rem solid $grey-2;
 }
 
 .diagnosisList {
-  margin-top: 0.25rem;
   background-color: $ui-02;
   max-height: 14rem;
   overflow-y: auto;
@@ -129,7 +129,6 @@
 .errorMessage {
   @include type.type-style("label-02");
   color: $danger;
-  margin-top: 0.5rem;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
