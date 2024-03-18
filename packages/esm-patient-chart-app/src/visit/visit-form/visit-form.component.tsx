@@ -379,7 +379,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     (resp) => {
                       showSnackbar({
                         title: t('appointmentUpdated', 'Appointment updated'),
-                        subtitle: t('appointmentMarkedChecked', 'Appointments have been marked as Checked In'),
+                        subtitle: t('appointmentMarkedChecked', 'Appointment(s) marked as Checked In'),
                         timeoutInMs: 5000,
                         isLowContrast: true,
                       });
