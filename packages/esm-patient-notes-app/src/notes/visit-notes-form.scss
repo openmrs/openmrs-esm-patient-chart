@@ -39,6 +39,7 @@
 .diagnosesText {
   @include type.type-style("body-compact-01");
   color: $text-02;
+  margin-bottom: 1rem;
 }
 
 .emptyResults {
@@ -109,7 +110,7 @@
 }
 
 .row {
-  margin: 0.5rem 0rem 2.75rem;
+  margin: 0.5rem 0rem 2.5rem;
 }
 
 .skeleton {
@@ -165,4 +166,17 @@
   .skeleton {
     height: 2.5rem;
   }
+}
+
+.errorNotification {
+  margin-top: 0.25rem;
+}
+
+.tag {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+.uploadButton {
+  margin-top: 1rem;
 }

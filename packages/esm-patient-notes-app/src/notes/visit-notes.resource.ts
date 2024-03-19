@@ -1,7 +1,13 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { map } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  openmrsObservableFetch,
+  restBaseUrl,
+  useAbortController,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import {
   type EncountersFetchResponse,
@@ -104,10 +110,11 @@ export function useInfiniteVisits(patientUuid: string) {
   };
 }
 
-export function fetchConceptDiagnosisByName(searchTerm: string, diagnosisConceptClass: string) {
-  return openmrsObservableFetch<Array<Concept>>(
-    `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=custom:(uuid,display)`,
-  ).pipe(map(({ data }) => data['results']));
+export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConceptClass: string) {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=${customRepresentation}`;
+
+  return openmrsFetch<Array<Concept>>(url).then(({ data }) => Promise.resolve(data['results']));
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {
