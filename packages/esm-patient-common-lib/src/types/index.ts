@@ -11,6 +11,7 @@ export interface DashboardLinkConfig {
   path: string;
   title: string;
   moduleName: string;
+  renderIcon?: React.ComponentType<any>;
 }
 
 export interface DashboardConfig extends DashboardLinkConfig {
