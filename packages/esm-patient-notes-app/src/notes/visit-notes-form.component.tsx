@@ -82,7 +82,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -135,7 +135,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
           } else if (fieldName === 'secondaryDiagnosisSearch') {
             setLoadingSecondary(true);
           }
-          const sub = fetchConceptDiagnosisByName(fieldQuery).subscribe(
+          const sub = fetchConceptDiagnosisByName(fieldQuery, config.diagnosisConceptClass).subscribe(
             (matchingConceptDiagnoses: Array<Concept>) => {
               if (fieldName == 'primaryDiagnosisSearch') {
                 setSearchPrimaryResults(matchingConceptDiagnoses);
