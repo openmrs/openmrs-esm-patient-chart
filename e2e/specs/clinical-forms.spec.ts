@@ -55,7 +55,7 @@ test('Fill a clinical form', async ({ page, api }) => {
     await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill(subjectiveFindings);
   });
 
-  await test.step('And I fill the objective findings', async () => {
+  await test.step('And I fill the `Objective findings` question', async () => {
     await chartPage.page.locator('#SOAPObjectiveFindingsid').fill(objectiveFindings);
   });
 
@@ -63,7 +63,7 @@ test('Fill a clinical form', async ({ page, api }) => {
     await chartPage.page.locator('#SOAPAssessmentid').fill(assessment);
   });
 
-  await test.step('And I fill the plan', async () => {
+  await test.step('And I fill the `Plan` question', async () => {
     await chartPage.page.locator('#SOAPPlanid').fill(plan);
   });
 

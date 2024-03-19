@@ -67,7 +67,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await conditionsPage.page.getByRole('menuitem', { name: /edit/i }).click();
   });
 
-  await test.step('Then I should see the conditons form of the created condition launch in the workspace`', async () => {
+  await test.step('Then I should see the Conditions form launch in the workspace in edit mode`', async () => {
     await expect(page.getByRole('cell', { name: /mental status change/i })).toBeVisible();
   });
 

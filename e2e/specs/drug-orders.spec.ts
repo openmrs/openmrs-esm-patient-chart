@@ -117,7 +117,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('menuitem', { name: /modify/i }).click();
   });
 
-  await test.step('Then I should see the order form of the created medication` launch in the workspace', async () => {
+  await test.step('Then I should see the medication launch in the workspace in edit mode', async () => {
     await expect(page.getByText('Aspirin 81mg (81mg)')).toBeVisible();
   });
 

@@ -53,7 +53,7 @@ test('Record vital signs', async ({ page }) => {
     await vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i }).fill('98');
   });
 
-  await test.step('And I add  `37` as the oxygen saturation', async () => {
+  await test.step('And I add `37` as the oxygen saturation', async () => {
     await vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i }).fill('98');
   });
 

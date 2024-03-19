@@ -66,7 +66,7 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await programsPage.editProgramButton().click();
   });
 
-  await test.step('Then I should see the `Record program enrollment` form of the created program`', async () => {
+  await test.step('Then I should see the program launch in the workspace in edit mode`', async () => {
     await expect(page.getByRole('cell', { name: /hiv care and treatment/i })).toBeVisible();
   });
 
