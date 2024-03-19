@@ -20,7 +20,7 @@ test('Start and end a visit', async ({ page }) => {
     await chartPage.page.getByRole('button', { name: /start a visit/i }).click();
   });
 
-  await test.step('Then I should see the `Start Visit` form in the workspace', async () => {
+  await test.step('Then I should see the `Start Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
     await expect(chartPage.page.getByPlaceholder(/dd\/mm\/yyyy/i)).toBeVisible();
     await expect(chartPage.page.getByPlaceholder(/hh\:mm/i)).toBeVisible();

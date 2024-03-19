@@ -22,7 +22,7 @@ test('Record an allergy', async ({ page }) => {
     await allergiesPage.page.getByText(/record allergy intolerance/i).click();
   });
 
-  await test.step('Then I should be redirected to the record allergy form', async () => {
+  await test.step('Then I should see the record allergy form launch in the workspace', async () => {
     await expect(page.getByText(/record a new allergy/i)).toBeVisible();
   });
 

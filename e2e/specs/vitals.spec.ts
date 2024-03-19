@@ -25,7 +25,7 @@ test('Record vital signs', async ({ page }) => {
     await vitalsPage.page.getByText(/record vital signs/i).click();
   });
 
-  await test.step('Then I should be redirected to the record vitals and biometrics form', async () => {
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
     await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
   });
 
@@ -61,7 +61,7 @@ test('Record vital signs', async ({ page }) => {
     await vitalsPage.page.getByPlaceholder(/type any additional notes here/i).fill('Test notes');
   });
 
-  await test.step('And I click on the `save and close` button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 

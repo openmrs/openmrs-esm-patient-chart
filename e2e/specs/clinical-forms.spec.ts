@@ -47,11 +47,11 @@ test('Fill a clinical form', async ({ page, api }) => {
     await chartPage.page.getByText(/soap note template/i).click();
   });
 
-  await test.step('Then I should be redirected to `Soap note template` form', async () => {
+  await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/soap note template/i)).toBeVisible();
   });
 
-  await test.step('When I fill the subjective findings', async () => {
+  await test.step('When I fill the `Subjective findings` question', async () => {
     await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill(subjectiveFindings);
   });
 
@@ -59,7 +59,7 @@ test('Fill a clinical form', async ({ page, api }) => {
     await chartPage.page.locator('#SOAPObjectiveFindingsid').fill(objectiveFindings);
   });
 
-  await test.step('And I fill the assemenent', async () => {
+  await test.step('And I fill the `Assessment` question', async () => {
     await chartPage.page.locator('#SOAPAssessmentid').fill(assessment);
   });
 

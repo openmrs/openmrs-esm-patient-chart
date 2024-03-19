@@ -22,11 +22,11 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await page.getByText(/record program enrollment/i).click();
   });
 
-  await test.step('Then I should be redirected to the `Record program enrollment` form', async () => {
+  await test.step('Then I should see the `Record program enrollment` form launch in the workspace', async () => {
     await expect(page.getByText('Record program enrollment', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I select `Hiv care and Treatment`as a program', async () => {
+  await test.step('When I select the program named `Hiv Care and Treatment`', async () => {
     await page.locator('#program').selectOption('64f950e6-1b07-4ac0-8e7e-f3e148f3463f');
   });
 
@@ -43,7 +43,7 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await page.locator('#location').selectOption('44c3efb0-2583-4c80-a79e-1f756a03c0a1');
   });
 
-  await test.step('And I click on the `save and close` button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -66,7 +66,7 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await programsPage.editProgramButton().click();
   });
 
-  await test.step('Then I should be redirected to the `Record program enrollment` form of the created program`', async () => {
+  await test.step('Then I should see the `Record program enrollment` form of the created program`', async () => {
     await expect(page.getByRole('cell', { name: /hiv care and treatment/i })).toBeVisible();
   });
 

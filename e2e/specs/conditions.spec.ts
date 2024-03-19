@@ -22,11 +22,11 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await conditionsPage.page.getByText(/record conditions/i).click();
   });
 
-  await test.step('Then I should be redircted to the conditions form', async () => {
+  await test.step('Then I should see the conditions form launch in the workspace', async () => {
     await expect(conditionsPage.page.getByText(/record a condition/i)).toBeVisible();
   });
 
-  await test.step('When I search `Mental status change` as a condition', async () => {
+  await test.step('When I search for `Mental status change` in the search box', async () => {
     await page.getByPlaceholder(/search conditions/i).fill('mental');
   });
 
@@ -56,7 +56,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await expect(dataRow).toContainText(/active/i);
   });
 
-  await test.step('When I click the overflow menu of the created condition', async () => {
+  await test.step('When I click the overflow menu in the table row with the newly created condition', async () => {
     await conditionsPage.page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -67,7 +67,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await conditionsPage.page.getByRole('menuitem', { name: /edit/i }).click();
   });
 
-  await test.step('Then I should be redirected to the conditons form of the created condition`', async () => {
+  await test.step('Then I should see the conditons form of the created condition launch in the workspace`', async () => {
     await expect(page.getByRole('cell', { name: /mental status change/i })).toBeVisible();
   });
 
@@ -98,7 +98,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await expect(dataRow).toContainText(/inactive/i);
   });
 
-  await test.step('When I click the overflow menu of the created condition', async () => {
+  await test.step('When I click the overflow menu in the table row with the updated condition', async () => {
     await conditionsPage.page
       .getByRole('button', { name: /options/i })
       .nth(0)

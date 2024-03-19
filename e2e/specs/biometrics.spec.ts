@@ -23,7 +23,7 @@ test('Record biometrics', async ({ page }) => {
     await biometricsPage.page.getByText(/record biometrics/i).click();
   });
 
-  await test.step('Then I should be redirected to the record vitals and biometrics form', async () => {
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
     await expect(biometricsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
   });
 
