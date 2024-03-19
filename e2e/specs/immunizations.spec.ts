@@ -26,7 +26,7 @@ test('Add an immunization', async ({ page }) => {
     await page.getByRole('button', { name: /record immunizations/i }).click();
   });
 
-  await test.step('Then I should be redirected to the Immunization form', async () => {
+  await test.step('Then I should see the Immunization form launch in the workspace', async () => {
     await expect(page.getByText(/immunization form/i)).toBeVisible();
   });
 
