@@ -106,7 +106,7 @@ export function useInfiniteVisits(patientUuid: string) {
 
 export function fetchConceptDiagnosisByName(searchTerm: string, diagnosisConceptClass: string) {
   return openmrsObservableFetch<Array<Concept>>(
-    `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&name=&v=custom:(uuid,display)`,
+    `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=custom:(uuid,display)`,
   ).pipe(map(({ data }) => data['results']));
 }
 
