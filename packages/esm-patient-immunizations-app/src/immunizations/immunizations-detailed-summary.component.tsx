@@ -144,7 +144,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
         <DataTable rows={paginatedImmunizations} headers={tableHeader} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getExpandHeaderProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="immunizations summary" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
