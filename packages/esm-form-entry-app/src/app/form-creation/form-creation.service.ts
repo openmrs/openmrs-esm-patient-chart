@@ -288,8 +288,8 @@ export class FormCreationService {
         const question = form.searchNodeByQuestionId(questionId);
         question[0]?.control?.setValue(value);
       });
-      
-      if (encounterDate && preFilledQuestions.hasOwnProperty('encDate') && preFilledQuestions['encDate'] !== null){
+
+      if (encounterDate && preFilledQuestions.hasOwnProperty('encDate') && preFilledQuestions['encDate'] !== null) {
         encounterDate[0].question.resetValueOnDisable = false;
         encounterDate[0]?.control?.disable();
       }
