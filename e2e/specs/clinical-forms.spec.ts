@@ -43,19 +43,31 @@ test('Fill a clinical form', async ({ page, api }) => {
     await expect(chartPage.page.getByRole('cell', { name: /surgical operation/i })).toBeVisible();
   });
 
-  await test.step('And if I fill a form', async () => {
+  await test.step('When I click the `Soap note template` link to launch the form', async () => {
     await chartPage.page.getByText(/soap note template/i).click();
+  });
 
-    await expect(chartPage.page.getByRole('button', { name: /save and close/i })).toBeVisible();
-    await expect(chartPage.page.getByRole('button', { name: /discard/i })).toBeVisible();
+  await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
+    await expect(chartPage.page.getByText(/soap note template/i)).toBeVisible();
+  });
 
+  await test.step('When I fill the `Subjective findings` question', async () => {
     await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill(subjectiveFindings);
+  });
+
+  await test.step('And I fill the `Objective findings` question', async () => {
     await chartPage.page.locator('#SOAPObjectiveFindingsid').fill(objectiveFindings);
+  });
+
+  await test.step('And I fill the `Assessment` question', async () => {
     await chartPage.page.locator('#SOAPAssessmentid').fill(assessment);
+  });
+
+  await test.step('And I fill the `Plan` question', async () => {
     await chartPage.page.locator('#SOAPPlanid').fill(plan);
   });
 
-  await test.step('And I click the submit button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await chartPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
