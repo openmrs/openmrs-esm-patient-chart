@@ -14,6 +14,7 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
+  InlineNotification,
   Row,
   Search,
   SkeletonText,
@@ -431,6 +432,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
                 error={formState?.errors?.primaryDiagnosisSearch}
                 setIsSearching={setIsSearching}
               />
+              {error ? (
+                <InlineNotification
+                  className={styles.errorNotification}
+                  lowContrast
+                  title={t('error', 'Error')}
+                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                  onClose={() => setError(null)}
+                />
+              ) : null}
               <DiagnosesDisplay
                 fieldName={'primaryDiagnosisSearch'}
                 isDiagnosisNotSelected={isDiagnosisNotSelected}
@@ -458,6 +468,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
                 handleSearch={handleSearch}
                 setIsSearching={setIsSearching}
               />
+              {error ? (
+                <InlineNotification
+                  className={styles.errorNotification}
+                  lowContrast
+                  title={t('error', 'Error')}
+                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                  onClose={() => setError(null)}
+                />
+              ) : null}
               <DiagnosesDisplay
                 fieldName={'secondaryDiagnosisSearch'}
                 isDiagnosisNotSelected={isDiagnosisNotSelected}

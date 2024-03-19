@@ -1,21 +1,14 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { map } from 'rxjs/operators';
-import {
-  openmrsFetch,
-  openmrsObservableFetch,
-  restBaseUrl,
-  useAbortController,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import {
-  type EncountersFetchResponse,
-  type RESTPatientNote,
-  type PatientNote,
-  type VisitNotePayload,
-  type DiagnosisPayload,
-  type Concept,
+import type {
+  Concept,
+  DiagnosisPayload,
+  EncountersFetchResponse,
+  PatientNote,
+  RESTPatientNote,
+  VisitNotePayload,
 } from '../types';
 
 interface UseVisitNotes {
