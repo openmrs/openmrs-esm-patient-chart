@@ -375,7 +375,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid).then(
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid, abortController).then(
                     () => {
                       mutateCurrentVisit();
                       mutateVisits();
@@ -383,7 +383,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                         isLowContrast: true,
                         kind: 'success',
                         subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
-                        title: t('appointmentCheckedIn', 'Appointment checked'),
+                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
                       });
                     },
                     (error) => {
