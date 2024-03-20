@@ -3,7 +3,16 @@
 @import '@openmrs/esm-styleguide/src/vars';
 
 .condition {
-  padding: 1rem 0.75rem;
+  padding: 0.75rem;
+  border-top: 0.0625rem solid $grey-2;
+
+  &:first-of-type {
+    border-top: none;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
 .conditionsList {
