@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { map } from 'rxjs/operators';
 import { openmrsFetch, openmrsObservableFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import {
   type EncountersFetchResponse,
   type RESTPatientNote,
@@ -22,7 +23,7 @@ interface UseVisitNotes {
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
     visitNoteConfig: { encounterNoteTextConceptUuid, visitDiagnosesConceptUuid },
-  } = useConfig();
+  } = useConfig<ConfigObject>();
 
   const customRepresentation =
     'custom:(uuid,display,encounterDatetime,patient,obs,' +
@@ -103,9 +104,9 @@ export function useInfiniteVisits(patientUuid: string) {
   };
 }
 
-export function fetchConceptDiagnosisByName(searchTerm: string) {
+export function fetchConceptDiagnosisByName(searchTerm: string, diagnosisConceptClass: string) {
   return openmrsObservableFetch<Array<Concept>>(
-    `${restBaseUrl}/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
+    `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=custom:(uuid,display)`,
   ).pipe(map(({ data }) => data['results']));
 }
 

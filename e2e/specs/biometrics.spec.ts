@@ -12,25 +12,38 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Record biometrics', async ({ page, api }) => {
+test('Record biometrics', async ({ page }) => {
   const biometricsPage = new BiometricsAndVitalsPage(page);
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await biometricsPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click the `Record biometrics` link to launch the form', async () => {
+  await test.step('And I click on the `Record biometrics` link to launch the form', async () => {
     await biometricsPage.page.getByText(/record biometrics/i).click();
   });
 
-  await test.step('And then I fill the form', async () => {
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
+    await expect(biometricsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step('When I fill `170` as the height', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('170');
+  });
+
+  await test.step('And I fill `65` as the weight', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('65');
+  });
+
+  await test.step('Then I should see `22.51` as the auto calculated body mass index', async () => {
     await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('22.5');
+  });
+
+  await test.step('When I fill `25` as the mid upper arm circumference ', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /muac/i }).fill('25');
   });
 
-  await test.step('And I click the submit button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await biometricsPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
