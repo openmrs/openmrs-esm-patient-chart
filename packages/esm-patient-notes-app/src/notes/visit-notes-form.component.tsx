@@ -49,7 +49,7 @@ import {
 import styles from './visit-notes-form.scss';
 import { mutate } from 'swr';
 
-const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
+const allowedImageTypes = ['.jpeg', '.jpg', '.png', '.webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -213,15 +213,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
-        if (file.fileType !== 'image') {
-          showSnackbar({
-            title: t('invalidImageType', 'Invalid image type'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: t('onlyImageAllowed', 'Only image files are allowed.'),
-          });
-          return Promise.reject(new Error('Invalid image type'));
-        }
         setValue('image', file);
         close();
         return Promise.resolve();
