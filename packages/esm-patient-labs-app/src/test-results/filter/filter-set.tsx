@@ -42,8 +42,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   const [showSearchInput, setShowSearchInput] = useState(false);
 
   const handleInputChange = useCallback(
-    (e) => {
-      setSearchTerm(searchTerm);
+    (searchTerm) => {
       const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
       setTreeDataFiltered(filteredData);
     },

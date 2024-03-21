@@ -81,7 +81,7 @@ function PrintModal({ patientUuid, closeDialog }) {
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
