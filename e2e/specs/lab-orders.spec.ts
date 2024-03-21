@@ -68,7 +68,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the newly created lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -99,7 +99,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the updated lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)

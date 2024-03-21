@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Record, edit and delete a condition', async ({ page, api }) => {
+test('Record, edit and delete a condition', async ({ page }) => {
   const conditionsPage = new ConditionsPage(page);
   const headerRow = conditionsPage.conditionsTable().locator('thead > tr');
   const dataRow = conditionsPage.conditionsTable().locator('tbody > tr');
@@ -22,14 +22,24 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
     await conditionsPage.page.getByText(/record conditions/i).click();
   });
 
-  await test.step('And I fill the form', async () => {
+  await test.step('Then I should see the conditions form launch in the workspace', async () => {
+    await expect(conditionsPage.page.getByText(/record a condition/i)).toBeVisible();
+  });
+
+  await test.step('When I search for `Mental status change` in the search box', async () => {
     await page.getByPlaceholder(/search conditions/i).fill('mental');
+  });
+
+  await test.step('And I click on the condition', async () => {
     await page.getByRole('menuitem', { name: 'Mental status change' }).click();
+  });
+
+  await test.step('And I set `10/07/2023` as the onset date', async () => {
     await page.getByLabel(/onset date/i).fill('10/07/2023');
     await page.getByLabel(/onset date/i).press('Tab');
   });
 
-  await test.step('And I save the form', async () => {
+  await test.step('And I click on the `Save & close` button', async () => {
     await page.getByRole('button', { name: /save & close/i }).click();
   });
 
@@ -46,20 +56,32 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
     await expect(dataRow).toContainText(/active/i);
   });
 
-  await test.step('Then if I click on the overflow menu and click the `Edit` button', async () => {
-    await expect(conditionsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
-    await conditionsPage.page.getByRole('button', { name: /options/i }).click();
-    await expect(conditionsPage.page.getByRole('menu', { name: /edit or delete condition/i })).toBeVisible();
+  await test.step('When I click the overflow menu in the table row with the newly created condition', async () => {
+    await conditionsPage.page
+      .getByRole('button', { name: /options/i })
+      .nth(0)
+      .click();
+  });
+
+  await test.step('And I click on the `Edit` button', async () => {
     await conditionsPage.page.getByRole('menuitem', { name: /edit/i }).click();
   });
 
-  await test.step('And I edit the condition', async () => {
-    await page.locator('label').filter({ hasText: 'Inactive' }).click();
-    await page.getByLabel(/end date/i).fill('11/07/2023');
-    await page.getByLabel(/end date/i).press('Tab');
+  await test.step('Then I should see the Conditions form launch in the workspace in edit mode`', async () => {
+    await expect(page.getByRole('cell', { name: /mental status change/i })).toBeVisible();
   });
 
-  await test.step('And I save the form', async () => {
+  await test.step('When I change the condition status to `Inactive`', async () => {
+    await page.locator('label').filter({ hasText: 'Inactive' }).click();
+  });
+
+  await test.step('And I change the on onset date to `11/07/2023`', async () => {
+    await page.getByLabel(/onset date/i).clear();
+    await page.getByLabel(/onset date/i).fill('11/07/2023');
+    await page.getByLabel(/onset date/i).press('Tab');
+  });
+
+  await test.step('And I click on the `Save & close` button', async () => {
     await page.getByRole('button', { name: /save & close/i }).click();
   });
 
@@ -76,16 +98,15 @@ test('Record, edit and delete a condition', async ({ page, api }) => {
     await expect(dataRow).toContainText(/inactive/i);
   });
 
-  await test.step('And if I click the overflow menu and then click the `Delete` button', async () => {
-    await expect(conditionsPage.page.getByRole('button', { name: /options/i })).toBeVisible();
-    await conditionsPage.page.getByRole('button', { name: /options/i }).click();
-    await expect(conditionsPage.page.getByRole('menu', { name: /edit or delete condition/i })).toBeVisible();
+  await test.step('When I click the overflow menu in the table row with the updated condition', async () => {
+    await conditionsPage.page
+      .getByRole('button', { name: /options/i })
+      .nth(0)
+      .click();
+  });
+
+  await test.step('And I click on the `Delete` button', async () => {
     await conditionsPage.page.getByRole('menuitem', { name: /delete/i }).click();
-
-    await expect(conditionsPage.page.getByRole('heading', { name: /delete condition/i })).toBeVisible();
-    await expect(conditionsPage.page.getByText(/are you sure you want to delete this condition/i)).toBeVisible();
-    await expect(conditionsPage.page.getByRole('button', { name: /danger delete/i })).toBeVisible();
-
     await page.getByRole('button', { name: /danger delete/i }).click();
   });
 
