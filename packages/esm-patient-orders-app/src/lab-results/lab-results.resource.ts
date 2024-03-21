@@ -1,13 +1,15 @@
-import { type OpenmrsResource, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
+import { type Encounter } from '../types/encounter';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
   'patient:(uuid,display),encounterProviders:(uuid,provider:(uuid,name)),' +
-  'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
-  'names:(uuid,conceptNameType,name))))';
+  'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),' +
+  'value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name))))';
 const labConceptRepresentation =
-  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,' +
+  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
 export interface LabOrderConcept {
@@ -66,13 +68,6 @@ export interface Mapping {
   resourceVersion: string;
 }
 
-export interface ObPayload {
-  concept: string;
-  order: string;
-  value: string | number;
-  status: string;
-}
-
 export function useOrderConceptByUuid(uuid: string) {
   const apiUrl = `${restBaseUrl}/concept/${uuid}?v=${labConceptRepresentation}`;
 
@@ -82,6 +77,23 @@ export function useOrderConceptByUuid(uuid: string) {
   );
   return {
     concept: data?.data,
+    isLoading,
+    isError: error,
+    isValidating,
+    mutate,
+  };
+}
+
+export function useLabEncounterConcepts(encounterUuid: string) {
+  const apiUrl = `${restBaseUrl}/encounter/${encounterUuid}?v=${labEncounterRepresentation}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<Encounter>, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  return {
+    encounter: data?.data,
     isLoading,
     isError: error,
     isValidating,

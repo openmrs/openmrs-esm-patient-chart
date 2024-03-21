@@ -12,6 +12,7 @@ interface ResultFormFieldProps {
   register: any;
   errors?: any;
 }
+
 const ResultFormField: React.FC<ResultFormFieldProps> = ({ defaultValue, register, concept, control, errors }) => {
   const { t } = useTranslation();
   const isTextOrNumeric = (concept) => concept.datatype?.display === 'Text' || concept.datatype?.display === 'Numeric';

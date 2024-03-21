@@ -241,7 +241,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   });
 
   if (isLoading) {
-    return <DataTableSkeleton role="progress" compact={!isTablet} zebra />;
+    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
   if (isError) {
@@ -409,7 +409,7 @@ function ExpandedRowView({ row }: { readonly row: any }) {
   } else {
     return (
       <div>
-        <p>{t('unknownOrderType', 'Unknown Order Type')}</p>
+        <p>{t('unknownOrderType', 'Unknown order type')}</p>
       </div>
     );
   }
@@ -473,7 +473,7 @@ function OrderBasketItemActions({
       <OverflowMenuItem
         className={styles.menuItem}
         id="modify"
-        itemText={t('viewEdit', 'View/Edit Order')}
+        itemText={t('viewEdit', 'View/Edit order')}
         onClick={handleViewEditClick}
         disabled={alreadyInBasket}
       />
@@ -483,8 +483,8 @@ function OrderBasketItemActions({
           id="reorder"
           itemText={
             orderItem.fulfillerStatus === 'COMPLETED'
-              ? t('editResults', 'Edit Results')
-              : t('addResults', 'Add Results')
+              ? t('editResults', 'Edit results')
+              : t('addResults', 'Add results')
           }
           onClick={handleAddResultsClick}
           disabled={alreadyInBasket}
@@ -493,7 +493,7 @@ function OrderBasketItemActions({
       <OverflowMenuItem
         className={styles.menuItem}
         id="discontinue"
-        itemText={t('cancelOrder', 'Cancel Order')}
+        itemText={t('cancelOrder', 'Cancel order')}
         onClick={handleCancelClick}
         disabled={alreadyInBasket || orderItem.action === 'DISCONTINUE'}
         isDelete={true}

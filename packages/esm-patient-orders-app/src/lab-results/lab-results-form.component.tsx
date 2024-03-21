@@ -4,7 +4,13 @@ import { useForm } from 'react-hook-form';
 import { showNotification, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { useOrderConceptByUuid, UpdateOrderResult, fetchEncounter, fetchObservation } from './lab-results.resource';
+import {
+  useOrderConceptByUuid,
+  UpdateOrderResult,
+  fetchEncounter,
+  fetchObservation,
+  useLabEncounterConcepts,
+} from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import styles from './lab-results-form.scss';
 
@@ -12,7 +18,12 @@ export interface LabResultsFormProps extends DefaultWorkspaceProps {
   order: Order;
 }
 
-const LabResultsForm: React.FC<LabResultsFormProps> = ({ order, closeWorkspace, promptBeforeClosing }) => {
+const LabResultsForm: React.FC<LabResultsFormProps> = ({
+  order,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [inEditMode, setInEditMode] = useState(false);
@@ -21,6 +32,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({ order, closeWorkspace, 
   const [initialValues, setInitialValues] = useState(null);
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
+  const { mutate } = useLabEncounterConcepts(order.encounter.uuid);
 
   const {
     control,
@@ -123,8 +135,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({ order, closeWorkspace, 
     UpdateOrderResult(order.uuid, order.encounter.uuid, obsUuid, obsPayload, resultsStatusPayload).then(
       () => {
         setIsSubmitting(false);
-        closeWorkspace();
-        // mutate(`/encounter/${order.encounter.uuid}`);
+        closeWorkspaceWithSavedChanges();
+        mutate();
 
         showSnackbar({
           isLowContrast: true,

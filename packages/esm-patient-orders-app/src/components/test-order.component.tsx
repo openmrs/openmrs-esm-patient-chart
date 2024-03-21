@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './test-order.scss';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
+  SkeletonText,
   Table,
   TableBody,
   TableCell,
@@ -12,7 +13,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { useLabEncounterConcepts, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { TableContainer } from '@carbon/react';
 
@@ -24,6 +25,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder.concept.uuid);
+  const { encounter, isLoading: isLoadingResult } = useLabEncounterConcepts(testOrder.encounter.uuid);
 
   const tableHeaders: Array<{ key: string; header: string }> = [
     {
@@ -40,26 +42,36 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     },
   ];
 
+  const testResultObs = useMemo(() => {
+    if (encounter && concept) {
+      return encounter.obs?.find((obs) => obs.concept.uuid === concept.uuid);
+    }
+  }, [concept]);
+
   const testRows = useMemo(() => {
-    if (concept && concept.setMembers.length === 0) {
-      return [
-        {
-          id: concept.uuid,
-          testType: concept.display,
-          result: 'TBD',
-          normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
-        },
-      ];
-    } else if (concept && concept.setMembers.length > 0) {
+    if (concept && concept.setMembers.length > 0) {
       return concept?.setMembers.map((memberConcept) => ({
         id: memberConcept.uuid,
-        testType: memberConcept.display,
-        result: 'TBD',
+        testType: <div className={styles.testType}>{memberConcept.display}</div>,
+        result: isLoadingResult ? (
+          <SkeletonText />
+        ) : (
+          testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value.display ?? '--'
+        ),
         normalRange:
           memberConcept.hiNormal && memberConcept.lowNormal
             ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
             : 'N/A',
       }));
+    } else if (concept && concept.setMembers.length === 0) {
+      return [
+        {
+          id: concept.uuid,
+          testType: <div className={styles.testType}>{concept.display}</div>,
+          result: isLoadingResult ? <SkeletonText /> : testResultObs?.value.display ?? '--',
+          normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+        },
+      ];
     } else {
       return [];
     }
