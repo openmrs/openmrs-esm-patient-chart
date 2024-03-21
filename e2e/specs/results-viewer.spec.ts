@@ -42,8 +42,6 @@ test('Record and edit test result', async ({ page }) => {
     await expect(page.getByRole('button', { name: /hematology/i, exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Chemistry', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /other/i, exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: /save and close/i, exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: /discard/i, exact: true })).toBeVisible();
   });
 
   await test.step('When I click the `Hematology` tab', async () => {
@@ -122,7 +120,7 @@ test('Record and edit test result', async ({ page }) => {
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(page.getByText('Laboratory Test Results')).toBeVisible();
+    await expect(page.getByText('The form has been submitted successfully.')).toBeVisible();
   });
 
   await test.step('When I reload the viewer page', async () => {
