@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { generateRandomPatient, type Patient, startVisit, endVisit, deletePatient } from '../commands';
 import { test } from '../core';
-import { ChartPage, ResultsViewerPage, VisitsPage } from '../pages';
+import { ResultsViewerPage, VisitsPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
@@ -13,12 +13,11 @@ test.beforeEach(async ({ api }) => {
 });
 
 test('Record and edit test result', async ({ page }) => {
-  const chartPage = new ChartPage(page);
   const resultsViewerPage = new ResultsViewerPage(page);
   const visitsPage = new VisitsPage(page);
 
   await test.step('When I visit the results viewer page', async () => {
-    await chartPage.goTo(patient.uuid);
+    await resultsViewerPage.goTo(patient.uuid);
   });
 
   await test.step('And I click on the `Clinical forms` button on the siderail', async () => {
@@ -26,7 +25,7 @@ test('Record and edit test result', async ({ page }) => {
   });
 
   await test.step('Then I should see the clinical forms workspace', async () => {
-    const headerRow = chartPage.formsTable().locator('thead > tr');
+    const headerRow = resultsViewerPage.formsTable().locator('thead > tr');
 
     await expect(page.getByPlaceholder(/search this list/i)).toBeVisible();
     await expect(headerRow).toContainText(/form name \(a-z\)/i);
@@ -45,7 +44,7 @@ test('Record and edit test result', async ({ page }) => {
   });
 
   await test.step('When I click the `Hematology` tab', async () => {
-    await page.getByRole('button', { name: /hematology/i }).click();
+    await page.getByRole('button', { name: 'Hematology', exact: true }).click();
   });
 
   await test.step('And Then I fill the complete blood count form', async () => {
