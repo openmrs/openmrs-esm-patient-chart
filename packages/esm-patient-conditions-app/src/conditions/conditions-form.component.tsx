@@ -16,10 +16,10 @@ interface ConditionFormProps extends DefaultWorkspaceProps {
 }
 
 const conditionSchema = z.object({
+  abatementDateTime: z.date().optional().nullable(),
   clinicalStatus: z.string(),
-  endDate: z.date().optional(),
+  conditionName: z.string({ required_error: 'A condition is required' }),
   onsetDateTime: z.date().nullable(),
-  search: z.string({ required_error: 'A condition is required' }),
 });
 
 export type ConditionFormData = z.infer<typeof conditionSchema>;
@@ -45,14 +45,20 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     mode: 'all',
     resolver: zodResolver(conditionSchema),
     defaultValues: {
+      abatementDateTime:
+        formContext == 'editing'
+          ? matchingCondition?.abatementDateTime
+            ? new Date(matchingCondition?.abatementDateTime)
+            : null
+          : null,
+      conditionName: '',
+      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
       onsetDateTime:
         formContext == 'editing'
           ? matchingCondition?.onsetDateTime
             ? new Date(matchingCondition?.onsetDateTime)
             : null
           : null,
-      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
-      search: '',
     },
   });
 
@@ -67,8 +73,8 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
 
   const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
     setIsSubmittingForm(true);
-    if (formContext === 'creating' && !data.search.trim()) {
-      setError('search', {
+    if (formContext === 'creating' && !data.conditionName.trim()) {
+      setError('conditionName', {
         type: 'manual',
         message: t('conditionRequired', 'A condition is required'),
       });
