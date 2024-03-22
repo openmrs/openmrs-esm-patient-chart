@@ -16,6 +16,7 @@ interface ConditionFormProps extends DefaultWorkspaceProps {
 }
 
 const conditionSchema = z.object({
+  currentStatus: z.string(),
   clinicalStatus: z.string(),
   endDate: z.date().optional(),
   onsetDateTime: z.date().nullable(),
@@ -51,7 +52,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             ? new Date(matchingCondition?.onsetDateTime)
             : null
           : null,
-      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
+      currentStatus: condition?.cells?.find((cell) => cell?.info?.header === 'currentStatus')?.value ?? 'Active',
       search: '',
     },
   });
