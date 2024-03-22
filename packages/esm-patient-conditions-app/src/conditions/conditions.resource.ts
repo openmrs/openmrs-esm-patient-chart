@@ -9,6 +9,7 @@ export type Condition = {
   onsetDateTime: string;
   recordedDate: string;
   id: string;
+  abatementDateTime?: string;
 };
 
 export interface ConditionDataTableRow {
@@ -51,7 +52,6 @@ type CreatePayload = {
       },
     ];
   };
-  endDate: string;
   onsetDateTime: string;
   recorder: {
     reference: string;
@@ -61,6 +61,7 @@ type CreatePayload = {
   subject: {
     reference: string;
   };
+  abatementDateTime?: string;
 };
 
 type EditPayload = CreatePayload & {
@@ -71,7 +72,7 @@ export type FormFields = {
   clinicalStatus: string;
   conceptId: string;
   display: string;
-  endDate: string;
+  abatementDateTime: string;
   onsetDateTime: string;
   patientId: string;
   userId: string;
@@ -79,7 +80,6 @@ export type FormFields = {
 
 export function useConditions(patientUuid: string) {
   const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
-
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
     patientUuid ? conditionsUrl : null,
     openmrsFetch,
@@ -105,9 +105,7 @@ export function useConditions(patientUuid: string) {
 export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
-
   const conditionsSearchUrl = `${restBaseUrl}/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
-
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
     conditionToLookup ? conditionsSearchUrl : null,
     openmrsFetch,
@@ -126,6 +124,7 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
     clinicalStatus: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '',
     conceptId: condition?.code?.coding[0]?.code,
     display: condition?.code?.coding[0]?.display,
+    abatementDateTime: condition?.abatementDateTime,
     onsetDateTime: condition?.onsetDateTime,
     recordedDate: condition?.recordedDate,
     id: condition?.id,
@@ -153,7 +152,7 @@ export async function createCondition(payload: FormFields) {
         },
       ],
     },
-    endDate: payload.endDate,
+    abatementDateTime: payload.abatementDateTime,
     onsetDateTime: payload.onsetDateTime,
     recorder: {
       reference: `Practitioner/${payload.userId}`,
@@ -198,7 +197,7 @@ export async function updateCondition(conditionId, payload: FormFields) {
         },
       ],
     },
-    endDate: payload.endDate,
+    abatementDateTime: payload.abatementDateTime,
     id: conditionId,
     onsetDateTime: payload.onsetDateTime,
     recorder: {
