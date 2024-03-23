@@ -1,9 +1,10 @@
-import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
+import useSWR, { mutate } from 'swr';
+import { type ConfigObject } from '../config-schema';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type DrugOrderBasketItem } from '../types';
+import useSWRImmutable from 'swr/immutable';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -129,4 +130,30 @@ export function prepMedicationOrderPostData(
   } else {
     throw new Error(`Unknown order action ${order.action}. This is a development error.`);
   }
+}
+
+/**
+ * Hook to fetch the system setting for whether to require quantity, quantity units,
+ * and number of refills for outpatient drug orders.
+ *
+ * @returns {Object} An object containing:
+ * - requireOutpatientQuantity: A boolean indicating if outpatient quantity is required.
+ * - error: Any error encountered during the fetch operation.
+ * - isLoading: A boolean indicating if the fetch operation is in progress.
+ */
+export function useRequireOutpatientQuantity() {
+  const url = `${restBaseUrl}/systemsetting/drugOrder.requireOutpatientQuantity?v=custom:(value)`;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: { value: 'true' | 'false' } }, Error>(url, openmrsFetch);
+
+  const results = useMemo(
+    () => ({
+      requireOutpatientQuantity: data?.data?.value && data.data.value === 'true',
+      error,
+      isLoading,
+    }),
+    [data?.data?.value, error, isLoading],
+  );
+
+  return results;
 }
