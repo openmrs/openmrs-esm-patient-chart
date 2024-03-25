@@ -21,7 +21,7 @@ test('Add and remove an attachment', async ({ page }) => {
     await page.getByRole('button', { name: /record attachments/i }).click();
   });
 
-  await test.step('Then I should see the `Add attachment` model launch in the workspace', async () => {
+  await test.step('Then I should see the `Add attachment` modal launch in the workspace', async () => {
     await expect(page.getByText(/add attachment/i)).toBeVisible();
   });
 
@@ -36,7 +36,7 @@ test('Add and remove an attachment', async ({ page }) => {
     await page.click('.cds--file-browse-btn');
   });
 
-  await test.step('And I add the attachment description', async () => {
+  await test.step('And I add a description for the image I uploaded', async () => {
     await page.getByLabel(/image description/i).clear();
     await page.getByLabel(/image description/i).fill('This is a brain scan image of the patient');
   });
@@ -56,7 +56,7 @@ test('Add and remove an attachment', async ({ page }) => {
       .click();
   });
 
-  await test.step('Then I should see the uploaded file dispalyed in the attachments table', async () => {
+  await test.step('Then I should see the file I uploaded displayed in the attachments table', async () => {
     await expect(page.getByRole('button', { name: /brainScan.jpeg/i })).toBeVisible();
   });
 
