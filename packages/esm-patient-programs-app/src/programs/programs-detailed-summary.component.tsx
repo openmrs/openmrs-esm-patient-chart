@@ -86,6 +86,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }, [enrollments, t]);
 
   const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
+  const noCompletedPrograms = useMemo(() => {
+    return enrollments?.every((program) => !program.dateCompleted);
+  }, [enrollments]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -100,7 +103,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add programs"
               onClick={launchProgramsForm}
-              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+              disabled={availablePrograms?.length && eligiblePrograms?.length === 0 && noCompletedPrograms}
             >
               {t('add', 'Add')}
             </Button>
