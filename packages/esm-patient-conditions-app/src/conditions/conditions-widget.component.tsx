@@ -44,9 +44,8 @@ interface ConditionsWidgetProps {
   setIsSubmittingForm: Dispatch<boolean>;
 }
 
-interface RequiredLabelProps {
-  isRequired: boolean;
-  text: string;
+interface RequiredFieldLabelProps {
+  label: string;
   t: TFunction;
 }
 
@@ -214,7 +213,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
-        <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} editing={editing} t={t} />}>
+        <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} t={t} />}>
           {editing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
@@ -312,9 +311,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             )}
           />
         </FormGroup>
-        <FormGroup
-          legendText={<RequiredFieldLabel label={t('clinicalStatus', 'Clinical status')} editing={editing} t={t} />}
-        >
+        <FormGroup legendText={<RequiredFieldLabel label={t('clinicalStatus', 'Clinical status')} t={t} />}>
           <Controller
             name="clinicalStatus"
             control={control}
@@ -367,15 +364,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   );
 };
 
-function RequiredFieldLabel({ editing, label, t }) {
+function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
     <>
       <span>{label}</span>
-      {!editing && (
-        <span title={t('required', 'Required')} className={styles.required}>
-          *
-        </span>
-      )}
+
+      <span title={t('required', 'Required')} className={styles.required}>
+        *
+      </span>
     </>
   );
 }
