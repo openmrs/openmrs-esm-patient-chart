@@ -4,13 +4,7 @@ import { useForm } from 'react-hook-form';
 import { showNotification, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import {
-  useOrderConceptByUuid,
-  UpdateOrderResult,
-  fetchEncounter,
-  fetchObservation,
-  useLabEncounterConcepts,
-} from './lab-results.resource';
+import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import styles from './lab-results-form.scss';
 
@@ -26,13 +20,13 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [inEditMode, setInEditMode] = useState(false);
   const [obsUuid, setObsUuid] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
-  const { mutate } = useLabEncounterConcepts(order.encounter.uuid);
+  const { encounter, isLoading: isLoadingEncounter, mutate } = useLabEncounter(order.encounter.uuid);
 
   const {
     control,
@@ -44,27 +38,20 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     defaultValues: {},
   });
 
-  useEffect(() => {
-    fetchEncounter(order.encounter.uuid).then((data) => {
-      const observation = data?.obs;
-      if (observation?.length && observation.some((obs) => obs.order?.uuid === order.uuid)) {
-        setInEditMode(true);
-        setObsUuid(observation.find((obs) => obs.order?.uuid === order.uuid).uuid);
-      }
-    });
-  }, []);
+  if (!isLoadingEncounter && encounter?.obs.length > 0 && !isEditing) {
+    setObsUuid(encounter.obs.find((obs) => obs.order?.uuid === order.uuid).uuid);
+    setIsEditing(true);
+  }
 
-  useEffect(() => {
-    if (inEditMode) {
-      setIsLoadingInitialValues(true);
-      fetchObservation(obsUuid).then((data) => {
-        if (data) {
-          setInitialValues(data);
-        }
-        setIsLoadingInitialValues(false);
-      });
-    }
-  }, [inEditMode]);
+  if (isEditing && !obsUuid) {
+    setIsLoadingInitialValues(true);
+    fetchObservation(obsUuid).then((data) => {
+      if (data) {
+        setInitialValues(data);
+      }
+      setIsLoadingInitialValues(false);
+    });
+  }
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -132,7 +119,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       fulfillerComment: 'Test Results Entered',
     };
 
-    UpdateOrderResult(order.uuid, order.encounter.uuid, obsUuid, obsPayload, resultsStatusPayload).then(
+    updateOrderResult(order.uuid, order.encounter.uuid, obsUuid, obsPayload, resultsStatusPayload).then(
       () => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
@@ -163,10 +150,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     <Form className={styles.form}>
       <div className={styles.grid}>
         <Stack>
-          <section>
-            <h4 className={styles.orderDisplay}>{order?.display}</h4>
-            <hr />
-          </section>
           {concept.setMembers.length > 0 && <div>{concept.display}</div>}
           {concept && (
             <section className={styles.section}>

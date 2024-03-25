@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './test-order.scss';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
@@ -8,14 +8,14 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounterConcepts, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { TableContainer } from '@carbon/react';
 
 interface TestOrderProps {
   testOrder: Order;
@@ -25,7 +25,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder.concept.uuid);
-  const { encounter, isLoading: isLoadingResult } = useLabEncounterConcepts(testOrder.encounter.uuid);
+  const { encounter, isLoading: isLoadingResult } = useLabEncounter(testOrder.encounter.uuid);
 
   const tableHeaders: Array<{ key: string; header: string }> = [
     {

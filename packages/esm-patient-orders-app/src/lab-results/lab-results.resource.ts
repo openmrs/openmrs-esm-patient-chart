@@ -84,7 +84,7 @@ export function useOrderConceptByUuid(uuid: string) {
   };
 }
 
-export function useLabEncounterConcepts(encounterUuid: string) {
+export function useLabEncounter(encounterUuid: string) {
   const apiUrl = `${restBaseUrl}/encounter/${encounterUuid}?v=${labEncounterRepresentation}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<Encounter>, Error>(
@@ -101,33 +101,12 @@ export function useLabEncounterConcepts(encounterUuid: string) {
   };
 }
 
-export function fetchEncounter(encounterUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}?v=${labEncounterRepresentation}`).then(({ data }) => {
-    if (data) {
-      return data;
-    }
-    return null;
-  });
-}
-
 export function fetchObservation(obsUuid: string) {
   return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`).then(({ data }) => {
     if (data) {
       return data;
     }
     return null;
-  });
-}
-
-export async function UpdateEncounter(uuid: string, payload: any) {
-  const abortController = new AbortController();
-  return openmrsFetch(`${restBaseUrl}/encounter/${uuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: payload,
   });
 }
 
@@ -158,7 +137,7 @@ const editObservation = async (obsUuid: string, obsPayload: any, abortController
 };
 
 //TODO: the calls to update order and observations for results should be transactional to allow for rollback
-export async function UpdateOrderResult(
+export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
   obsUuid: string,
