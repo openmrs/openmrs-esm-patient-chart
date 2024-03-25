@@ -93,7 +93,7 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('button', { name: 'Other', exact: true }).click();
   });
 
-  await test.step('And Then I fill the other test results', async () => {
+  await test.step('And I fill the other test results', async () => {
     await page.locator('#manualEntryCultureandSensitivityUrineid').fill('83%');
     await page.locator('#manualEntryUrinePregnancyTestid_1').check();
     await page.locator('#manualEntryUrineProteinDipStickid_0').check();
