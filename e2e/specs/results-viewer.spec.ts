@@ -47,7 +47,7 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('button', { name: 'Hematology', exact: true }).click();
   });
 
-  await test.step('And Then I fill the complete blood count form', async () => {
+  await test.step('And I fill the complete blood count form', async () => {
     await page.locator('#ManualInputWhiteBloodCellsid').fill('12');
     await page.locator('#ManualEntryRedBloodCellsid').fill('15');
     await page.locator('#ManualEntryPlateletsid').fill('10');
