@@ -92,9 +92,11 @@ const schemaFields = {
   asNeededCondition: z.string().nullable(),
   duration: z.number().nullable(),
   durationUnit: z.object({ ...comboSchema }).nullable(),
+  // t( 'pillDispensedErrorMessage', 'The quantity to dispense is required' )
   pillsDispensed: z.number({
     invalid_type_error: translateFrom(moduleName, 'pillDispensedErrorMessage', 'The quantity to dispense is required'),
   }),
+  // t( 'selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit' )
   quantityUnits: z.object(
     { ...comboSchema },
     {
@@ -106,6 +108,7 @@ const schemaFields = {
     },
   ),
   numRefills: z.number().nullable(),
+  // t( 'indicationErrorMessage', 'Please add an indication' )
   indication: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
   }),
