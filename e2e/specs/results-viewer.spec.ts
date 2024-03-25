@@ -65,7 +65,7 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('button', { name: 'Chemistry', exact: true }).click();
   });
 
-  await test.step('And Then I fill the chemistry results form', async () => {
+  await test.step('And I fill the chemistry results form', async () => {
     await page.locator('#ManualEntryAlkalinePhosphataseid').fill('10');
     await page.locator('#ManualEntryAmylaseid').fill('10');
     await page.locator('#ManualEntryBUNid').fill('10');
