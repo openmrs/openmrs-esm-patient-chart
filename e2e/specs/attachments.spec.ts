@@ -36,7 +36,7 @@ test('Add and remove an attachment', async ({ page }) => {
     await page.click('.cds--file-browse-btn');
   });
 
-  await test.step('And I add a description for the image I uploaded', async () => {
+  await test.step('And I add a description for the image to upload', async () => {
     await page.getByLabel(/image description/i).clear();
     await page.getByLabel(/image description/i).fill('This is a brain scan image of the patient');
   });
@@ -86,6 +86,6 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 });
 
-test.afterEach(async ({ api, page }) => {
+test.afterEach(async ({ api }) => {
   await deletePatient(api, patient.uuid);
 });
