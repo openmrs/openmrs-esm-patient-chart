@@ -15,14 +15,14 @@ interface ConditionFormProps extends DefaultWorkspaceProps {
   formContext: 'creating' | 'editing';
 }
 
-const conditionSchema = z.object({
+const schema = z.object({
+  abatementDateTime: z.date().optional().nullable(),
   clinicalStatus: z.string(),
-  endDate: z.date().optional(),
+  conditionName: z.string({ required_error: 'A condition is required' }),
   onsetDateTime: z.date().nullable(),
-  search: z.string({ required_error: 'A condition is required' }),
 });
 
-export type ConditionFormData = z.infer<typeof conditionSchema>;
+export type ConditionSchema = z.infer<typeof schema>;
 
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
@@ -33,52 +33,68 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
+
   const isTablet = useLayoutType() === 'tablet';
   const { conditions } = useConditions(patientUuid);
-  const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
-
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
+  const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
 
-  const methods = useForm<ConditionFormData>({
+  const methods = useForm<ConditionSchema>({
     mode: 'all',
-    resolver: zodResolver(conditionSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
+      abatementDateTime:
+        formContext == 'editing'
+          ? matchingCondition?.abatementDateTime
+            ? new Date(matchingCondition?.abatementDateTime)
+            : null
+          : null,
+      conditionName: '',
+      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? '',
       onsetDateTime:
         formContext == 'editing'
           ? matchingCondition?.onsetDateTime
             ? new Date(matchingCondition?.onsetDateTime)
             : null
           : null,
-      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? 'Active',
-      search: '',
     },
   });
 
   const {
     setError,
-    formState: { isDirty, errors },
+    formState: { isDirty },
   } = methods;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const onSubmit: SubmitHandler<ConditionFormData> = (data) => {
+  const onSubmit: SubmitHandler<ConditionSchema> = (payload) => {
     setIsSubmittingForm(true);
-    if (formContext === 'creating' && !data.search.trim()) {
-      setError('search', {
-        type: 'manual',
-        message: t('conditionRequired', 'A condition is required'),
-      });
+
+    if (formContext === 'creating') {
+      if (!payload.conditionName.trim()) {
+        setError('conditionName', {
+          type: 'manual',
+          message: t('conditionRequired', 'A condition is required'),
+        });
+      }
+      if (!payload.clinicalStatus) {
+        setError('clinicalStatus', {
+          type: 'manual',
+          message: t('clinicalStatusRequired', 'A clinical status is required'),
+        });
+      }
       setIsSubmittingForm(false);
-      return;
     }
+
     setIsSubmittingForm(true);
   };
 
-  const onError = (error) => {
+  const onError = (e) => {
+    console.error('Error submitting condition: ', e);
     setIsSubmittingForm(false);
   };
 
@@ -86,13 +102,13 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
-          patientUuid={patientUuid}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           conditionToEdit={condition}
           editing={formContext === 'editing'}
+          isSubmittingForm={isSubmittingForm}
+          patientUuid={patientUuid}
           setErrorCreating={setErrorCreating}
           setErrorUpdating={setErrorUpdating}
-          isSubmittingForm={isSubmittingForm}
           setIsSubmittingForm={setIsSubmittingForm}
         />
         <div>
