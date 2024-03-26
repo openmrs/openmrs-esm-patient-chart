@@ -7,7 +7,7 @@ export interface ExtractedOrderErrorObject {
   fieldErrors: string[];
   globalErrors: string[];
 }
-export interface OderErrorObject {
+export interface OrderErrorObject {
   responseBody?: {
     error?: {
       message?: string;

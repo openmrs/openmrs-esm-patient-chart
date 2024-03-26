@@ -125,12 +125,11 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
           )}
           {ordersWithErrors.map((order) => (
             <InlineNotification
+              lowContrast
               kind="error"
-              title={t('saveDugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
+              title={t('saveDrugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
               subtitle={order.extractedOrderError?.fieldErrors?.join(', ')}
-              lowContrast={true}
               className={styles.inlineNotification}
-              inline
             />
           ))}
           <ButtonSet className={styles.buttonSet}>

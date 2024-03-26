@@ -2,7 +2,7 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import { type ExtractedOrderErrorObject, type OrderBasketItem, type OrderPost } from './types';
-import { type OderErrorObject } from './types';
+import { type OrderErrorObject } from './types';
 
 export async function postOrders(encounterUuid: string, abortController: AbortController) {
   const patientUuid = getPatientUuidFromUrl();
@@ -36,7 +36,7 @@ function postOrder(body: OrderPost, abortController?: AbortController) {
   });
 }
 
-function extractErrorDetails(errorObject: OderErrorObject): ExtractedOrderErrorObject {
+function extractErrorDetails(errorObject: OrderErrorObject): ExtractedOrderErrorObject {
   const errorDetails = {
     message: errorObject.responseBody?.error?.message,
     fieldErrors: [],
