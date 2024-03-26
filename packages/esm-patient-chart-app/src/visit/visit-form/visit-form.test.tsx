@@ -71,7 +71,7 @@ jest.mock('@openmrs/esm-framework', () => {
           displayInThePatientBanner: true,
         },
         {
-          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
           required: false,
           displayInThePatientBanner: true,
         },
@@ -285,7 +285,7 @@ describe('Visit Form', () => {
           displayInThePatientBanner: true,
         },
         {
-          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
           required: false,
           displayInThePatientBanner: true,
         },
@@ -341,7 +341,7 @@ describe('Visit Form', () => {
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
-      body: { attributeType: 'aac48226-d143-4274-80e0-264db4e368ee', value: '183299' },
+      body: { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
     });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
@@ -369,7 +369,7 @@ describe('Visit Form', () => {
           displayInThePatientBanner: true,
         },
         {
-          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
           required: false,
           displayInThePatientBanner: true,
         },
@@ -458,7 +458,7 @@ describe('Visit Form', () => {
           displayInThePatientBanner: true,
         },
         {
-          uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
           required: false,
           displayInThePatientBanner: true,
         },
