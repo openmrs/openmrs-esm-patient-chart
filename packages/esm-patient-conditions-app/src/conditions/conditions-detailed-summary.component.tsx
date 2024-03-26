@@ -90,7 +90,10 @@ function ConditionsDetailedSummary({ patient }) {
   };
 
   const launchConditionsForm = useCallback(
-    () => launchPatientWorkspace('conditions-form-workspace', { formContext: 'creating' }),
+    () =>
+      launchPatientWorkspace('conditions-form-workspace', {
+        formContext: 'creating',
+      }),
     [],
   );
 

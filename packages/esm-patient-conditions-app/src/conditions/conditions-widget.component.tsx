@@ -29,24 +29,23 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionFormData } from './conditions-form.component';
+import { type ConditionSchema } from './conditions-form.component';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
+  isSubmittingForm: boolean;
   patientUuid: string;
-  setHasSubmissibleValue?: (value: boolean) => void;
   setErrorCreating?: (error: Error) => void;
   setErrorUpdating?: (error: Error) => void;
-  isSubmittingForm: boolean;
+  setHasSubmissibleValue?: (value: boolean) => void;
   setIsSubmittingForm: Dispatch<boolean>;
 }
 
-interface RequiredLabelProps {
-  isRequired: boolean;
-  text: string;
+interface RequiredFieldLabelProps {
+  label: string;
   t: TFunction;
 }
 
@@ -54,20 +53,20 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
-  patientUuid,
   isSubmittingForm,
-  setIsSubmittingForm,
+  patientUuid,
   setErrorCreating,
   setErrorUpdating,
+  setIsSubmittingForm,
 }) => {
   const { t } = useTranslation();
   const { conditions, mutate } = useConditions(patientUuid);
   const {
     control,
-    watch,
-    getValues,
     formState: { errors },
-  } = useFormContext<ConditionFormData>();
+    getValues,
+    watch,
+  } = useFormContext<ConditionSchema>();
   const session = useSession();
   const searchInputRef = useRef(null);
   const clinicalStatus = watch('clinicalStatus');
@@ -90,6 +89,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
+
   const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
   }, []);
@@ -213,7 +213,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
-        <FormGroup legendText={<RequiredLabel isRequired text={t('condition', 'Condition')} t={t} />}>
+        <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} t={t} />}>
           {editing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
@@ -221,7 +221,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               <Controller
                 name="conditionName"
                 control={control}
-                render={({ field: { onChange, value, onBlur } }) => (
+                render={({ field: { onChange, value } }) => (
                   <ResponsiveWrapper>
                     <Search
                       autoFocus
@@ -238,7 +238,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                         handleSearchTermChange(e);
                       }}
                       renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
-                      onBlur={onBlur}
                       onClear={() => {
                         setSearchTerm('');
                         setSelectedCondition(null);
@@ -312,24 +311,26 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             )}
           />
         </FormGroup>
-        <FormGroup legendText={t('clinicalStatus', 'Current status')}>
+        <FormGroup legendText={<RequiredFieldLabel label={t('clinicalStatus', 'Clinical status')} t={t} />}>
           <Controller
             name="clinicalStatus"
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                valueSelected={value.toLowerCase()}
+                invalid={errors?.clinicalStatus}
                 name="clinicalStatus"
-                orientation="vertical"
-                onChange={onChange}
                 onBlur={onBlur}
+                onChange={onChange}
+                orientation="vertical"
+                valueSelected={value.toLowerCase()}
               >
-                <RadioButton id="active" labelText="Active" value="active" />
-                <RadioButton id="inactive" labelText="Inactive" value="inactive" />
+                <RadioButton id="active" labelText={t('active', 'Active')} value="active" />
+                <RadioButton id="inactive" labelText={t('inactive', 'Inactive')} value="inactive" />
               </RadioButtonGroup>
             )}
           />
+          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">
@@ -363,15 +364,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   );
 };
 
-function RequiredLabel({ isRequired, text, t }: RequiredLabelProps) {
+function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
     <>
-      <span>{text}</span>
-      {isRequired && (
-        <span title={t('required', 'Required')} className={styles.required}>
-          *
-        </span>
-      )}
+      <span>{label}</span>
+
+      <span title={t('required', 'Required')} className={styles.required}>
+        *
+      </span>
     </>
   );
 }
