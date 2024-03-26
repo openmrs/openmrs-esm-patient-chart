@@ -803,7 +803,7 @@ const ControlledFieldInput = ({
       return (
         <NumberInput
           value={!!value ? value : 0}
-          onChange={(e, { value }) => handleChange(isNaN(parseFloat(value)) ? 0 : parseFloat(value))}
+          onChange={(e, { value }) => handleChange(isNaN(parseFloat(value)) ? null : parseFloat(value))}
           className={fieldState?.error?.message && styles.fieldError}
           onBlur={onBlur}
           ref={ref}
