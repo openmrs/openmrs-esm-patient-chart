@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { ConfigurableLink, usePatient } from '@openmrs/esm-framework';
 import { Grid, ShadowBox } from '../panel-timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
@@ -188,7 +188,6 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   const {
     data: {
       parsedTime: { timeColumns, sortedTimes },
-      rowData,
     },
   } = timelineData;
 
@@ -216,7 +215,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
     }
   }, [handleScroll]);
 
-  const onIntersect = (entries, observer) => {
+  const onIntersect = (entries) => {
     entries.forEach((entry) => {
       if (entry.intersectionRatio > 0.5) {
         // setPanelName(parent.display);
@@ -263,7 +262,6 @@ export const GroupedTimeline = () => {
   const [xScroll, setXScroll] = useState(0);
   const { t } = useTranslation();
   let shownGroups = 0;
-  const tablet = useLayoutType() === 'tablet';
 
   const {
     data: {

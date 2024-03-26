@@ -63,7 +63,6 @@ interface TrendlineProps {
 const Trendline: React.FC<TrendlineProps> = ({
   patientUuid,
   conceptUuid,
-  basePath,
   hideTrendlineHeader = false,
   showBackToTimelineButton = false,
 }) => {

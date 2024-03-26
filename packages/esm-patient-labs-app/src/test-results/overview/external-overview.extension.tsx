@@ -46,7 +46,7 @@ function useFilteredOverviewData(patientUuid: string, filter: (filterProps: Pane
 
 const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }) => {
   const { t } = useTranslation();
-  const { overviewData, loaded, error } = useFilteredOverviewData(patientUuid, filter);
+  const { overviewData, loaded } = useFilteredOverviewData(patientUuid, filter);
 
   const cardTitle = t('recentResults', 'Recent Results');
   const handleSeeAll = useCallback(() => {

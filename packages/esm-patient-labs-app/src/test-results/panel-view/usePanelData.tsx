@@ -31,7 +31,7 @@ export function useObservations() {
     },
     [patientUuid],
   );
-  const { data, error, size, setSize, isLoading } = useSWRInfinite<
+  const { data, size, setSize, isLoading } = useSWRInfinite<
     FetchResponse<FhirResponse<FHIRObservationResource>>,
     Error
   >(getUrl, openmrsFetch, {
@@ -72,7 +72,7 @@ function useConcepts(conceptUuids: Array<string>) {
     },
     [conceptUuids],
   );
-  const { data, error, isLoading } = useSWRInfinite<FetchResponse<Concept>>(getUrl, openmrsFetch, {
+  const { data, isLoading } = useSWRInfinite<FetchResponse<Concept>>(getUrl, openmrsFetch, {
     initialSize: conceptUuids?.length ?? 1,
     revalidateIfStale: false,
     revalidateOnFocus: false,
@@ -95,7 +95,7 @@ function useConcepts(conceptUuids: Array<string>) {
 
 export default function usePanelData() {
   const { observations: fhirObservations, conceptUuids, isLoading: isLoadingObservations } = useObservations();
-  const { isLoading: isLoadingConcepts, concepts } = useConcepts(conceptUuids);
+  const { concepts } = useConcepts(conceptUuids);
 
   const conceptData: Record<string, ConceptMeta> = useMemo(
     () =>
