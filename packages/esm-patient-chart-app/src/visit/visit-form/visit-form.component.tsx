@@ -33,6 +33,8 @@ import {
   type Visit,
   updateVisit,
   useConnectivity,
+  openmrsFetch,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -55,6 +57,8 @@ import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import { from } from 'rxjs';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit?: Visit;
@@ -91,6 +95,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
+  const { data: visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
   const displayVisitStopDateTimeFields = useMemo(
@@ -247,6 +252,88 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     return validSubmission;
   }, [setError]);
 
+  const handleVisitAttributes = useCallback(
+    (visitAttributes: { [p: string]: string }, visitUuid: string) => {
+      const visitExistingAttributesTypes =
+        visitToEdit?.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
+
+      const promises = [];
+
+      for (const [attributeType, value] of Object.entries(visitAttributes)) {
+        if (attributeType && visitExistingAttributesTypes.includes(attributeType)) {
+          const attributeToEdit = visitToEdit.attributes.find((attr) => attr.attributeType.uuid === attributeType);
+
+          if (attributeToEdit) {
+            // continue to next attribute if the previous value is same as new value
+            if (typeof attributeToEdit.value === 'object' && attributeToEdit.value.uuid === value) {
+              continue;
+            } else if (attributeToEdit.value === value) {
+              continue;
+            }
+
+            if (value) {
+              // Update attribute with updated value
+              promises.push(
+                openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
+                  method: 'POST',
+                  headers: { 'Content-type': 'application/json' },
+                  body: { value },
+                }).catch((err) => {
+                  showSnackbar({
+                    title: t('errorUpdatingVisitAttribute', 'Could not update {{attributeName}} attribute', {
+                      attributeName: attributeToEdit.attributeType.display,
+                    }),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: err?.message,
+                  });
+                }),
+              );
+            } else {
+              // Delete attribute if the was no value provided
+              promises.push(
+                openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
+                  method: 'DELETE',
+                }).catch((err) => {
+                  showSnackbar({
+                    title: t('errorDeletingVisitAttribute', 'Could not delete {{attributeName}} attribute', {
+                      attributeName: attributeToEdit.attributeType.display,
+                    }),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: err?.message,
+                  });
+                }),
+              );
+            }
+          }
+        } else {
+          if (value) {
+            promises.push(
+              openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: { attributeType, value },
+              }).catch((err) => {
+                showSnackbar({
+                  title: t('errorCreatingVisitAttribute', 'Could not delete {{attributeName}} attribute', {
+                    attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType).display,
+                  }),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: err?.message,
+                });
+              }),
+            );
+          }
+        }
+      }
+
+      return Promise.all(promises);
+    },
+    [visitToEdit, visitAttributeTypes],
+  );
+
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
       if (visitToEdit && !validateVisitStartStopDatetime()) {
@@ -284,16 +371,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ),
         visitType: visitType,
         location: visitLocation?.uuid,
-        attributes: Object.entries(visitAttributes)
-          .filter(([key, value]) => !!value)
-          .map(([key, value]) => ({
-            attributeType: key,
-            value: value as string,
-          })),
       };
+
       if (visitToEdit?.uuid) {
         // The request throws 400 (Bad request)error when patient is passed in the update payload
-
         delete payload.patient;
       }
 
@@ -397,25 +478,35 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
               }
-              mutateCurrentVisit();
-              mutateVisits();
-              closeWorkspace({ ignoreChanges: true });
 
-              showSnackbar({
-                isLowContrast: true,
-                timeoutInMs: 5000,
-                kind: 'success',
-                subtitle: !visitToEdit
-                  ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                      visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                    })
-                  : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                      visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                    }),
-                title: !visitToEdit
-                  ? t('visitStarted', 'Visit started')
-                  : t('visitDetailsUpdated', 'Visit details updated'),
-              });
+              from(handleVisitAttributes(visitAttributes, response.data.uuid))
+                .pipe(first())
+                .subscribe((attributesResponses) => {
+                  setIsSubmitting(false);
+                  // Check for no undefined,
+                  // that if there was no failed requests on either creating, updating or deleting an attribute
+                  // then continue and close workspace
+                  if (!attributesResponses.includes(undefined)) {
+                    mutateCurrentVisit();
+                    mutateVisits();
+                    closeWorkspace({ ignoreChanges: true });
+                    showSnackbar({
+                      isLowContrast: true,
+                      timeoutInMs: 5000,
+                      kind: 'success',
+                      subtitle: !visitToEdit
+                        ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                            visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                          })
+                        : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                            visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                          }),
+                      title: !visitToEdit
+                        ? t('visitStarted', 'Visit started')
+                        : t('visitDetailsUpdated', 'Visit details updated'),
+                    });
+                  }
+                });
             },
             (error) => {
               showSnackbar({

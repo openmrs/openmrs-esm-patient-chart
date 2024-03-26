@@ -34,6 +34,29 @@ interface Concept {
 const visitAttributeTypeCustomRepresentation =
   'custom:(uuid,display,name,description,datatypeClassname,datatypeConfig)';
 
+export function useVisitAttributeTypes() {
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: VisitAttributeType[] }>, Error>(
+    `/ws/rest/v1/visitattributetype?v=${visitAttributeTypeCustomRepresentation}`,
+    openmrsFetch,
+  );
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
+  const results = useMemo(() => {
+    return {
+      isLoading,
+      error: error,
+      data: data?.data.results,
+    };
+  }, [data, error, isLoading]);
+
+  return results;
+}
+
 export function useVisitAttributeType(uuid) {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<VisitAttributeType>, Error>(
     `${restBaseUrl}/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,

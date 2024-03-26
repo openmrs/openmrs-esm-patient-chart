@@ -177,7 +177,9 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <TextInput
             {...fieldProps}
+            id={uuid}
             labelText={labelText}
+            placeholder={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={errors.visitAttributes?.[uuid]?.message}
           />
