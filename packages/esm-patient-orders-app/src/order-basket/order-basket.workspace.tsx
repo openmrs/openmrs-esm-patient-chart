@@ -120,7 +120,6 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
               subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
               lowContrast={true}
               className={styles.inlineNotification}
-              inline
             />
           )}
           {ordersWithErrors.map((order) => (
