@@ -187,6 +187,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const workspaceIndexInOpenWorkspaces = openWorkspaces.findIndex((w) => w.name === name);
   const isWorkspaceAlreadyOpen = workspaceIndexInOpenWorkspaces >= 0;
   const openedWorkspaceWithSameType = openWorkspaces.find((w) => w.type == newWorkspace.type);
+  const isEditingEncounter = newWorkspace?.additionalProps?.hasOwnProperty('formInfo');
 
   if (openWorkspaces.length === 0) {
     updateStoreWithNewWorkspace(newWorkspace);
@@ -195,6 +196,16 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       name,
       additionalProps,
     });
+  } else if (isWorkspaceAlreadyOpen && !!openedWorkspaceWithSameType && isEditingEncounter) {
+    const workspaceToApply: OpenWorkspace = {
+      ...openedWorkspaceWithSameType,
+      additionalProps: newWorkspace.additionalProps,
+    };
+    const restOfWorkspaces = openWorkspaces.filter((w) => w.type != newWorkspace.type);
+
+    showWorkspacePrompts('closing-workspace-launching-new-workspace', () =>
+      updateStoreWithNewWorkspace(workspaceToApply, restOfWorkspaces),
+    );
   } else if (isWorkspaceAlreadyOpen) {
     openWorkspaces[workspaceIndexInOpenWorkspaces].additionalProps = newWorkspace.additionalProps;
     const restOfWorkspaces = openWorkspaces.filter((w) => w.name != name);
