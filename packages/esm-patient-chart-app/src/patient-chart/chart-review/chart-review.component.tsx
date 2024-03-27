@@ -34,17 +34,28 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
-  const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
-    getDashboardDefinition(e.meta, e.config),
+  const ungroupedDashboards = useMemo(
+    () =>
+      extensionStore.slots['patient-chart-dashboard-slot']?.assignedExtensions?.map((e) =>
+        getDashboardDefinition(e.meta, e.config),
+      ) ?? [],
+    [extensionStore.slots['patient-chart-dashboard-slot']],
   );
-  const groupedDashboards = navGroups
-    .map((slotName) =>
-      extensionStore.slots[slotName].assignedExtensions.map((e) => getDashboardDefinition(e.meta, e.config)),
-    )
-    .flat();
+
+  const groupedDashboards = useMemo(
+    () =>
+      navGroups.flatMap(
+        (slotName) =>
+          extensionStore.slots[slotName]?.assignedExtensions?.map((e) => getDashboardDefinition(e.meta, e.config)) ??
+          [],
+      ),
+    [extensionStore.slots, navGroups],
+  );
+
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
-  const defaultDashboard = dashboards.filter((dashboard) => dashboard.path)[0];
+  const defaultDashboard = useMemo(() => dashboards.find((dashboard) => dashboard.path), [dashboards]);
+
   const dashboard = useMemo(() => {
     return dashboards.find((dashboard) => dashboard.path === view);
   }, [dashboards, view]);
@@ -52,17 +63,15 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;
     if (setDashboardLayoutMode) {
-      setDashboardLayoutMode(activeDashboard.layoutMode ?? 'contained');
+      setDashboardLayoutMode(activeDashboard?.layoutMode ?? 'contained');
     }
   }, [dashboard, defaultDashboard, setDashboardLayoutMode]);
 
-  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
+  if (!extensionStore.slots['patient-chart-dashboard-slot'] || !defaultDashboard) {
     return null;
   }
 
-  if (!defaultDashboard) {
-    return null;
-  } else if (!dashboard) {
+  if (!dashboard) {
     return (
       <Navigate
         to={makePath(defaultDashboard, {
