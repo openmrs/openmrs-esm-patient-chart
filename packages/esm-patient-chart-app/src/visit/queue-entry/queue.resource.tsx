@@ -1,10 +1,13 @@
 import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, type Visit } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, type OpenmrsResource, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
 export type QueueService = 'Clinical consultation' | 'Triage';
 export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+export type AllowedPriority = OpenmrsResource;
+export type AllowedStatus = OpenmrsResource;
+export interface Concept extends OpenmrsResource {}
 
 interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
@@ -29,15 +32,7 @@ interface VisitQueueEntry {
     uuid: string;
   };
   providerWaitingFor: null;
-  queue: {
-    description: string;
-    display: string;
-    name: string;
-    service: {
-      display: QueueService;
-    };
-    uuid: string;
-  };
+  queue: Queue;
   startedAt: string;
   status: {
     display: QueueStatus;
@@ -58,7 +53,7 @@ export interface MappedVisitQueueEntry {
   statusUuid: string;
   visitUuid: string;
   visitType: string;
-  queueUuid: string;
+  queue: Queue;
   queueEntryUuid: string;
 }
 
@@ -69,14 +64,28 @@ interface UseVisitQueueEntries {
   isValidating?: boolean;
   mutate: () => void;
 }
+export interface Queue {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  location: Location;
+  service: string;
+  allowedPriorities: Array<Concept>;
+  allowedStatuses: Array<Concept>;
+}
+export interface Location {
+  uuid: string;
+  display?: string;
+  name?: string;
+}
 
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?v=full&patient=${patientUuid}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
-
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
     id: visitQueueEntry.uuid,
     name: visitQueueEntry.queueEntry.queue.display,
@@ -91,7 +100,7 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
     statusUuid: visitQueueEntry.queueEntry.status.uuid,
     visitUuid: visitQueueEntry.visit?.uuid,
     visitType: visitQueueEntry.visit?.visitType?.display,
-    queueUuid: visitQueueEntry.queueEntry.queue.uuid,
+    queue: visitQueueEntry.queueEntry.queue,
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
@@ -100,7 +109,6 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
       ?.map(mapVisitQueueEntryProperties)
       .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
       .shift() ?? null;
-
   return {
     queueEntry: mappedVisitQueueEntry,
     isLoading,

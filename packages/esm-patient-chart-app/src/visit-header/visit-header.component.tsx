@@ -15,11 +15,11 @@ import {
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
+import { CloseButton } from './close-button.component';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
+import RetrospectiveVisitLabel from './retrospective-visit-label.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
-import RetrospectiveVisitLabel from './retrospective-visit-label.component';
-import { CloseButton } from './close-button.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -132,7 +132,10 @@ const VisitHeader: React.FC = () => {
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
-  const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
+  const toggleSideMenu = useCallback(
+    (state?: boolean) => setIsSideMenuExpanded((prevState) => (state !== undefined ? state : !prevState)),
+    [],
+  );
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {

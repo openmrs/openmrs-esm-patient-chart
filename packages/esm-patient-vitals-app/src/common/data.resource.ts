@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type FHIRResource, type FetchResponse, fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { type ObsRecord, useVitalsConceptMetadata, type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import { type KeyedMutator } from 'swr';
+import {
+  type FHIRResource,
+  type FetchResponse,
+  fhirBaseUrl,
+  restBaseUrl,
+  openmrsFetch,
+  useConfig,
+} from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
+import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
+import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
-import type { FHIRSearchBundleResponse, MappedVitals, PatientVitals, VitalsResponse } from './types';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
+import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.component';
 
 const pageSize = 100;
@@ -25,6 +33,66 @@ type VitalsAndBiometricsSwrKey = {
 };
 
 type VitalsFetchResponse = FetchResponse<VitalsResponse>;
+
+export interface ConceptMetadata {
+  uuid: string;
+  display: string;
+  hiNormal: number | null;
+  hiAbsolute: number | null;
+  hiCritical: number | null;
+  lowNormal: number | null;
+  lowAbsolute: number | null;
+  lowCritical: number | null;
+  units: string | null;
+}
+
+interface VitalsConceptMetadataResponse {
+  results: Array<{
+    setMembers: Array<ConceptMetadata>;
+  }>;
+}
+
+export function useVitalsConceptMetadata() {
+  const customRepresentation =
+    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+
+  const apiUrl = `${restBaseUrl}/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: VitalsConceptMetadataResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  const conceptMetadata = data?.data?.results[0]?.setMembers;
+
+  const conceptUnits = conceptMetadata?.length
+    ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
+    : new Map<string, string>([]);
+
+  const conceptRanges = conceptMetadata?.length
+    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+        conceptMetadata.map((concept) => [
+          concept.uuid,
+          {
+            lowAbsolute: concept.lowAbsolute ?? null,
+            highAbsolute: concept.hiAbsolute ?? null,
+          },
+        ]),
+      )
+    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]);
+
+  return {
+    data: conceptUnits,
+    error,
+    isLoading,
+    conceptMetadata,
+    conceptRanges,
+  };
+}
+
+export const withUnit = (label: string, unit: string | null | undefined) => {
+  return `${label} ${unit ? `(${unit})` : ''}`;
+};
 
 // We need to track a bound mutator for basically every hook, because there does not appear to be
 // a way to invalidate an SWRInfinite key that works other than using the bound mutator
@@ -70,7 +138,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     [swrKeyNeedle, mode, conceptUuids],
   );
 
-  const { data, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
+  const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
     getPage,
     handleFetch,
   );
@@ -107,7 +175,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     }
   };
 
-  const formattedObs: Array<PatientVitals> = useMemo(() => {
+  const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
     const vitalsHashTable = data?.[0]?.data?.entry
       ?.map((entry) => entry.resource)
       .filter(Boolean)
@@ -130,7 +198,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         }
 
         return vitalsHashTable;
-      }, new Map<string, Partial<PatientVitals>>());
+      }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
 
     return Array.from(vitalsHashTable ?? []).map(([date, vitalSigns], index) => {
       const result = {
@@ -158,8 +226,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
   return {
     data: data ? formattedObs : undefined,
-    isLoading: !data && !error,
-    isError: error,
+    isLoading,
+    error,
     hasMore: data?.length
       ? !!data[data.length - 1].data?.link?.some((link: { relation?: string }) => link.relation === 'next')
       : false,
@@ -222,7 +290,7 @@ export function saveVitalsAndBiometrics(
   abortController: AbortController,
   location: string,
 ) {
-  return openmrsFetch<unknown>(`/ws/rest/v1/encounter`, {
+  return openmrsFetch<unknown>(`${restBaseUrl}/encounter`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -248,7 +316,7 @@ export function updateVitalsAndBiometrics(
   encounterUuid: string,
   location: string,
 ) {
-  return openmrsFetch(`/ws/rest/v1/encounter/${encounterUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

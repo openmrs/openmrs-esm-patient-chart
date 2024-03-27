@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-flags-app",
-  "version": "7.0.1",
+  "version": "7.1.0",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient flags",
   "browser": "dist/openmrs-esm-patient-flags-app.js",
@@ -11,7 +11,7 @@
     "serve": "webpack serve --mode=development",
     "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "TIMING=1 eslint src --ext js,jsx,ts,tsx",
+    "lint": "cross-env eslint src --ext js,jsx,ts,tsx --fix --max-warnings=0",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",

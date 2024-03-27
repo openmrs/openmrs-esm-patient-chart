@@ -30,6 +30,12 @@ export const configSchema = {
     _default: 99,
     _description: 'The maximum number of days for medication dispensing.',
   },
+  debounceDelayInMs: {
+    _type: Type.Number,
+    _description:
+      'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
+    _default: 300,
+  },
 };
 
 export interface ConfigObject {
@@ -40,4 +46,5 @@ export interface ConfigObject {
   drugOrderTypeUUID: string;
   showPrintButton: boolean;
   maxDispenseDurationInDays: number;
+  debounceDelayInMs: number;
 }

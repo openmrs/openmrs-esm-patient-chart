@@ -9,7 +9,7 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-test('Record an allergy', async ({ page, api }) => {
+test('Record an allergy', async ({ page }) => {
   const allergiesPage = new PatientAllergiesPage(page);
   const headerRow = allergiesPage.allergiesTable().locator('thead > tr');
   const dataRow = allergiesPage.allergiesTable().locator('tbody > tr');
@@ -18,19 +18,32 @@ test('Record an allergy', async ({ page, api }) => {
     await allergiesPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click the `Record allergy intolerance` link to launch the form', async () => {
+  await test.step('And I click on the `Record allergy intolerance` link to launch the form', async () => {
     await allergiesPage.page.getByText(/record allergy intolerance/i).click();
   });
 
-  await test.step('And I fill the form', async () => {
+  await test.step('Then I should see the record allergy form launch in the workspace', async () => {
+    await expect(page.getByText(/record a new allergy/i)).toBeVisible();
+  });
+
+  await test.step('When I select `ACE inhibitors` as the allergy', async () => {
     await allergiesPage.page.getByPlaceholder(/select the allergen/i).click();
     await allergiesPage.page.getByText(/ace inhibitors/i).click();
+  });
+
+  await test.step('And I select `Mental status change` as the reaction', async () => {
     await allergiesPage.page.getByText(/mental status change/i).click();
+  });
+
+  await test.step('And I select `Mild` as the severity', async () => {
     await allergiesPage.page.getByText(/mild/i).click();
+  });
+
+  await test.step('And I write `Test comment` as a comment', async () => {
     await allergiesPage.page.locator('#comments').fill('Test comment');
   });
 
-  await test.step('And I click the submit button', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await allergiesPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -44,7 +57,7 @@ test('Record an allergy', async ({ page, api }) => {
     await expect(headerRow).toContainText(/reaction/i);
     await expect(headerRow).toContainText(/onset date and comments/i);
     await expect(dataRow).toContainText(/ace inhibitors/i);
-    await expect(dataRow).toContainText(/MILD/i);
+    await expect(dataRow).toContainText(/mild/i);
     await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/test comment/i);
   });

@@ -1,5 +1,6 @@
 import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import {
@@ -17,53 +18,58 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
-  createCondition,
   type FormFields,
+  createCondition,
   updateCondition,
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionFormData } from './conditions-form.component';
+import { type ConditionSchema } from './conditions-form.component';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
-  closeWorkspace?: () => void;
+  closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
+  isSubmittingForm: boolean;
   patientUuid: string;
-  setHasSubmissibleValue?: (value: boolean) => void;
   setErrorCreating?: (error: Error) => void;
   setErrorUpdating?: (error: Error) => void;
-  isSubmittingForm: boolean;
+  setHasSubmissibleValue?: (value: boolean) => void;
   setIsSubmittingForm: Dispatch<boolean>;
 }
 
+interface RequiredFieldLabelProps {
+  label: string;
+  t: TFunction;
+}
+
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
-  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
-  patientUuid,
   isSubmittingForm,
-  setIsSubmittingForm,
+  patientUuid,
   setErrorCreating,
   setErrorUpdating,
+  setIsSubmittingForm,
 }) => {
   const { t } = useTranslation();
   const { conditions, mutate } = useConditions(patientUuid);
   const {
     control,
-    watch,
-    getValues,
     formState: { errors },
-  } = useFormContext<ConditionFormData>();
-  const isTablet = useLayoutType() === 'tablet';
+    getValues,
+    watch,
+  } = useFormContext<ConditionSchema>();
   const session = useSession();
   const searchInputRef = useRef(null);
-  const currentStatus = watch('clinicalStatus');
+  const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
   const getFieldValue = (
@@ -78,10 +84,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const displayName = getFieldValue(conditionToEdit?.cells, 'display');
   const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
+  const editableAbatementDateTime = getFieldValue(conditionToEdit?.cells, 'abatementDateTime');
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
+
   const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
   }, []);
@@ -95,7 +103,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       clinicalStatus: getValues('clinicalStatus'),
       conceptId: selectedCondition?.concept?.uuid,
       display: selectedCondition?.concept?.display,
-      endDate: getValues('endDate') ? dayjs(getValues('endDate')).format() : null,
+      abatementDateTime: getValues('abatementDateTime') ? dayjs(getValues('abatementDateTime')).format() : null,
       onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
       patientId: patientUuid,
       userId: session?.user?.uuid,
@@ -114,14 +122,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionSaved', 'Condition saved'),
         });
 
-        closeWorkspace?.();
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     getValues,
     mutate,
     patientUuid,
@@ -137,7 +145,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       clinicalStatus: editing ? getValues('clinicalStatus') : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
-      endDate: getValues('endDate') ? dayjs(getValues('endDate')).format() : null,
+      abatementDateTime: editing
+        ? getValues('abatementDateTime')
+          ? dayjs(getValues('abatementDateTime')).format()
+          : editableAbatementDateTime
+        : null,
       onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
       patientId: patientUuid,
       userId: session?.user?.uuid,
@@ -156,14 +168,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           title: t('conditionUpdated', 'Condition updated'),
         });
 
-        closeWorkspace();
+        closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
     }
   }, [
-    closeWorkspace,
+    closeWorkspaceWithSavedChanges,
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
@@ -178,15 +190,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     t,
   ]);
 
-  const searchInputFocus = () => {
-    searchInputRef.current.focus();
+  const focusOnSearchInput = () => {
+    searchInputRef?.current?.focus();
   };
 
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
   useEffect(() => {
-    if (errors?.search) {
-      searchInputFocus();
+    if (errors?.conditionName) {
+      focusOnSearchInput();
     }
     if (isSubmittingForm) {
       if (Object.keys(errors).length > 0) {
@@ -201,16 +213,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
-        <FormGroup legendText={t('condition', 'Condition')}>
+        <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} t={t} />}>
           {editing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
             <>
               <Controller
-                name="search"
+                name="conditionName"
                 control={control}
-                render={({ field: { onChange, value, onBlur } }) => (
-                  <ResponsiveWrapper isTablet={isTablet}>
+                render={({ field: { onChange, value } }) => (
+                  <ResponsiveWrapper>
                     <Search
                       autoFocus
                       ref={searchInputRef}
@@ -218,13 +230,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       id="conditionsSearch"
                       labelText={t('enterCondition', 'Enter condition')}
                       placeholder={t('searchConditions', 'Search conditions')}
-                      className={errors?.search && styles.conditionsError}
+                      className={classNames({
+                        [styles.conditionsError]: errors?.conditionName,
+                      })}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
                       }}
-                      renderIcon={errors?.search && <WarningFilled />}
-                      onBlur={onBlur}
+                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
                       onClear={() => {
                         setSearchTerm('');
                         setSelectedCondition(null);
@@ -242,7 +255,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.search && <p className={styles.errorMessage}>{errors?.search?.message}</p>}
+              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
@@ -250,12 +263,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 if (searchResults && searchResults.length) {
                   return (
                     <ul className={styles.conditionsList}>
-                      {/*TODO: use uuid instead of index as the key*/}
-                      {searchResults?.map((searchResult, index) => (
+                      {searchResults?.map((searchResult) => (
                         <li
                           role="menuitem"
                           className={styles.condition}
-                          key={index}
+                          key={searchResult?.concept?.uuid}
                           onClick={() => handleConditionChange(searchResult)}
                         >
                           {searchResult.display}
@@ -282,7 +294,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             name="onsetDateTime"
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <DatePicker
                   id="onsetDate"
                   datePickerType="single"
@@ -299,55 +311,69 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             )}
           />
         </FormGroup>
-        <FormGroup legendText={t('currentStatus', 'Current status')}>
+        <FormGroup legendText={<RequiredFieldLabel label={t('clinicalStatus', 'Clinical status')} t={t} />}>
           <Controller
             name="clinicalStatus"
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                valueSelected={value.toLowerCase()}
+                invalid={errors?.clinicalStatus}
                 name="clinicalStatus"
-                orientation="vertical"
-                onChange={onChange}
                 onBlur={onBlur}
+                onChange={onChange}
+                orientation="vertical"
+                valueSelected={value.toLowerCase()}
               >
-                <RadioButton id="active" labelText="Active" value="active" />
-                <RadioButton id="inactive" labelText="Inactive" value="inactive" />
+                <RadioButton id="active" labelText={t('active', 'Active')} value="active" />
+                <RadioButton id="inactive" labelText={t('inactive', 'Inactive')} value="inactive" />
               </RadioButtonGroup>
             )}
           />
+          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
         </FormGroup>
-        {currentStatus === 'inactive' && (
-          <Controller
-            name="endDate"
-            control={control}
-            render={({ field: { onBlur, onChange, value } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
-                <DatePicker
-                  id="endDate"
-                  datePickerType="single"
-                  dateFormat="d/m/Y"
-                  minDate={new Date(watch('onsetDateTime')).toISOString()}
-                  maxDate={dayjs().utc().format()}
-                  placeholder="dd/mm/yyyy"
-                  onChange={([date]) => onChange(date)}
-                  onBlur={onBlur}
-                  value={value}
-                >
-                  <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
-                </DatePicker>
-              </ResponsiveWrapper>
-            )}
-          />
+        {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
+          <FormGroup legendText="">
+            <Controller
+              name="abatementDateTime"
+              control={control}
+              render={({ field: { onBlur, onChange, value } }) => (
+                <>
+                  <ResponsiveWrapper>
+                    <DatePicker
+                      id="endDate"
+                      datePickerType="single"
+                      dateFormat="d/m/Y"
+                      minDate={new Date(watch('abatementDateTime')).toISOString()}
+                      maxDate={dayjs().utc().format()}
+                      placeholder="dd/mm/yyyy"
+                      onChange={([date]) => onChange(date)}
+                      onBlur={onBlur}
+                      value={value}
+                    >
+                      <DatePickerInput id="abatementDateTime" labelText={t('endDate', 'End date')} />
+                    </DatePicker>
+                  </ResponsiveWrapper>
+                </>
+              )}
+            />
+          </FormGroup>
         )}
       </Stack>
     </div>
   );
 };
 
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
+  return (
+    <>
+      <span>{label}</span>
+
+      <span title={t('required', 'Required')} className={styles.required}>
+        *
+      </span>
+    </>
+  );
 }
 
 export default ConditionsWidget;

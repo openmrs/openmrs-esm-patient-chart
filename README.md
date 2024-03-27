@@ -7,7 +7,6 @@
 The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It contains various microfrontends that constitute widgets in a patient dashboard. These widgets include:
 
 - [Allergies](packages/esm-patient-allergies-app/README.md)
-- [Appointments](packages/esm-patient-appointments-app/README.md)
 - [Attachments](packages/esm-patient-attachments-app/README.md)
 - [Biometrics](packages/esm-patient-biometrics-app/README.md)
 - [Conditions](packages/esm-patient-conditions-app/README.md)
@@ -30,9 +29,10 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+This monorepo uses [yarn](https://yarnpkg.com).
 
 To install the dependencies, run:
+
 ```bash
 yarn
 ```
@@ -119,7 +119,7 @@ If you notice that your local version of the application is not working or that 
 
 ```bash
 # Upgrade core libraries
-yarn up openmrs @openmrs/esm-framework
+yarn up openmrs@next @openmrs/esm-framework@next
 
 # Reset version specifiers to `next`. Don't commit actual version numbers.
 git checkout package.json

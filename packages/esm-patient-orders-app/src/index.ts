@@ -1,4 +1,10 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerFeatureFlag,
+  translateFrom,
+} from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
@@ -16,11 +22,21 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+
+  registerWorkspace({
+    name: 'patient-orders-form-workspace',
+    // t('orderCancellation','Order cancellation')
+    title: translateFrom(moduleName, 'orderCancellation', 'Order cancellation'),
+    load: getAsyncLifecycle(() => import('./order-cancellation-form/cancel-order-form.component'), options),
+    type: 'order',
+    canHide: false,
+  });
 }
 
+// t('orderBasketWorkspaceTitle', 'Order Basket')
 registerWorkspace({
   name: 'order-basket',
-  title: 'Order Basket',
+  title: translateFrom(moduleName, 'orderBasketWorkspaceTitle', 'Order Basket'),
   load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
   type: 'order',
   canHide: true,

@@ -41,6 +41,7 @@
 
 .inlineNotification, .actionNotification {
   max-width: unset !important;
+  margin-bottom: spacing.$spacing-02;
 }
 
 /* Tablet */
@@ -52,8 +53,5 @@
   .buttonSet {
     padding: 1.5rem 1rem;
     background-color: $ui-02;
-    position: fixed;
-    bottom: 0rem;
-    width: 100%;
   }
 }

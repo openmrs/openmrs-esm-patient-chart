@@ -11,6 +11,7 @@ import ProgramsForm from './programs-form.component';
 
 const testProps = {
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
 };

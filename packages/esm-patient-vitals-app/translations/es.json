@@ -33,6 +33,7 @@
   "pulse": "Pulso",
   "recordBiometrics": "Registrar datos biométricos",
   "recordVitals": "Registrar signos vitales",
+  "recordVitalsAndBiometrics": "Record Vitals and Biometrics",
   "respirationRate": "Frecuencia respiratoria",
   "respiratoryRate": "FR",
   "saveAndClose": "Guardar y cerrar",

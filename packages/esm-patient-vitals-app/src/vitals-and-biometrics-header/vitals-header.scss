@@ -1,13 +1,13 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .vitals-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: spacing.$spacing-09;
-  margin-left: spacing.$spacing-05;
+  height: layout.$spacing-09;
+  margin-left: layout.$spacing-05;
   outline: none;
   pointer-events: visibleFill;
 }
@@ -48,7 +48,7 @@
   display: flex;
   background-color: $openmrs-background-grey;
   justify-content: center;
-  min-height: spacing.$spacing-09;
+  min-height: layout.$spacing-09;
 }
 
 .container-row {
@@ -88,7 +88,7 @@
 
 .heading {
   @include type.type-style("heading-compact-02");
-  margin-right: spacing.$spacing-03;
+  margin-right: layout.$spacing-03;
   color: $text-02;
 }
 
@@ -112,7 +112,7 @@
 html[dir='rtl'] {
   .container {
     & > span:nth-child(2) {
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
     }
   }
 }

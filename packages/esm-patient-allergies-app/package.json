@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-allergies-app",
-  "version": "7.0.1",
+  "version": "7.1.0",
   "license": "MPL-2.0",
   "description": "Patient allergies microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-allergies-app.js",
@@ -12,7 +12,7 @@
     "debug": "npm run serve",
     "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "cross-env TIMING=1 eslint src --ext tsx,ts --fix --max-warnings=0",
+    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",

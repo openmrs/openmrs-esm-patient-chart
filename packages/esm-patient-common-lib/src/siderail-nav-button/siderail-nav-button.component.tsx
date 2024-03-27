@@ -6,13 +6,12 @@ import { useWorkspaces } from '../workspaces';
 import styles from './siderail-nav-button.scss';
 
 interface TagsProps {
-  isTablet: boolean;
   getIcon: (props: object) => JSX.Element;
   formOpenInTheBackground: boolean;
   tagContent?: string | React.ReactNode;
 }
 
-function Tags({ isTablet, getIcon, formOpenInTheBackground, tagContent }: TagsProps) {
+function Tags({ getIcon, formOpenInTheBackground, tagContent }: TagsProps) {
   return (
     <>
       {getIcon({ size: 16 })}
@@ -51,7 +50,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
   const isWorkspaceActive = workspaceWindowState !== 'hidden' && workspaceIndex === 0;
   const formOpenInTheBackground = workspaceIndex > 0 || (workspaceIndex === 0 && workspaceWindowState === 'hidden');
 
-  if (layout === 'tablet') {
+  if (layout === 'tablet' || layout === 'phone') {
     return (
       <Button
         className={classNames(styles.container, { [styles.active]: isWorkspaceActive })}
@@ -62,7 +61,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
         tabIndex={0}
       >
         <span className={styles.elementContainer}>
-          <Tags isTablet formOpenInTheBackground={formOpenInTheBackground} getIcon={getIcon} tagContent={tagContent} />
+          <Tags formOpenInTheBackground={formOpenInTheBackground} getIcon={getIcon} tagContent={tagContent} />
         </span>
         <span>{label}</span>
       </Button>
@@ -83,12 +82,7 @@ export const SiderailNavButton: React.FC<SiderailNavButtonProps> = ({
       size="md"
     >
       <div className={styles.elementContainer}>
-        <Tags
-          isTablet={false}
-          formOpenInTheBackground={formOpenInTheBackground}
-          getIcon={getIcon}
-          tagContent={tagContent}
-        />
+        <Tags formOpenInTheBackground={formOpenInTheBackground} getIcon={getIcon} tagContent={tagContent} />
       </div>
     </IconButton>
   );

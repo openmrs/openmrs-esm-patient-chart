@@ -1,17 +1,14 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
-import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '__mocks__';
+import { type FetchResponse, showSnackbar, useConfig, defineConfigSchema } from '@openmrs/esm-framework';
+import { configSchema } from '../config-schema';
+import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveVitalsAndBiometrics } from '../common';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 
-const testProps = {
-  closeWorkspace: () => {},
-  patientUuid: mockPatient.id,
-  promptBeforeClosing: () => {},
-};
+defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
 const heightValue = 180;
 const muacValue = 23;
@@ -24,39 +21,7 @@ const temperatureValue = 37;
 
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-
-const mockConceptUnits = new Map<string, string>(
-  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
-);
-
-const mockConceptRanges = new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
-  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [
-    concept.uuid,
-    { lowAbsolute: concept.lowAbsolute ?? null, highAbsolute: concept.hiAbsolute ?? null },
-  ]),
-);
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockImplementation(() => mockVitalsConfig),
-  };
-});
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
-      conceptRanges: mockConceptRanges,
-    })),
-  };
-});
+const mockedUseConfig = jest.mocked(useConfig);
 
 jest.mock('../common', () => ({
   assessValue: jest.fn(),
@@ -66,11 +31,17 @@ jest.mock('../common', () => ({
   invalidateCachedVitalsAndBiometrics: jest.fn(),
   saveVitalsAndBiometrics: jest.fn(),
   useVitalsAndBiometrics: jest.fn(),
+  useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
+    data: mockConceptUnits,
+    conceptMetadata: mockConceptMetadata,
+    conceptRanges: mockConceptRanges,
+  })),
 }));
 
 describe('VitalsBiometricsForm', () => {
   beforeEach(() => {
-    mockedShowSnackbar.mockClear();
+    mockedUseConfig.mockReturnValue(mockVitalsConfig);
+    jest.clearAllMocks();
   });
 
   it('renders the vitals and biometrics form', async () => {
@@ -268,5 +239,11 @@ describe('VitalsBiometricsForm', () => {
 });
 
 function renderForm() {
+  const testProps = {
+    closeWorkspace: () => {},
+    closeWorkspaceWithSavedChanges: jest.fn(),
+    patientUuid: mockPatient.id,
+    promptBeforeClosing: () => {},
+  };
   render(<VitalsAndBiometricsForm {...testProps} />);
 }

@@ -1,6 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, type OpenmrsResource, parseDate, type Visit } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  type OpenmrsResource,
+  parseDate,
+  type Visit,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import { type OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -9,8 +16,6 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
  * Refreshes patient orders for all kinds of orders.
  *
- * TODO: This isn't working. See https://github.com/vercel/swr/issues/2746
- *
  * @param patientUuid The UUID of the patient to get an order mutate function for.
  */
 export function useMutatePatientOrders(patientUuid: string) {
@@ -18,7 +23,7 @@ export function useMutatePatientOrders(patientUuid: string) {
   const mutateOrders = useCallback(
     () =>
       mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`);
+        return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
       }),
     [patientUuid, mutate],
   );
@@ -29,14 +34,14 @@ export function useMutatePatientOrders(patientUuid: string) {
 }
 
 export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
+  return openmrsFetch(`${restBaseUrl}/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
     signal: abortController.signal,
   });
 }
 
 export function getMedicationByUuid(abortController: AbortController, orderUuid: string) {
   return openmrsFetch(
-    `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,route:(uuid,display),action,urgency,display,drug:(display,strength),frequency:(display),dose,doseUnits:(display),orderer,dateStopped,dateActivated,previousOrder,numRefills,duration,durationUnits:(display),dosingInstructions)`,
+    `${restBaseUrl}/order/${orderUuid}?v=custom:(uuid,route:(uuid,display),action,urgency,display,drug:(display,strength),frequency:(display),dose,doseUnits:(display),orderer,dateStopped,dateActivated,previousOrder,numRefills,duration,durationUnits:(display),dosingInstructions)`,
     {
       signal: abortController.signal,
     },
@@ -71,7 +76,7 @@ export function createEmptyEncounter(
     obs: [],
   };
 
-  return openmrsFetch<OpenmrsResource>('/ws/rest/v1/encounter', {
+  return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -82,7 +87,7 @@ export function createEmptyEncounter(
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/order`, {
+  return openmrsFetch(`${restBaseUrl}/order`, {
     method: 'POST',
     signal: abortController?.signal,
     headers: { 'Content-Type': 'application/json' },
@@ -103,7 +108,7 @@ export function useOrderEncounter(patientUuid: string): {
   const nowDateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
   const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
     !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
-      ? `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
       : null,
     openmrsFetch,
   );

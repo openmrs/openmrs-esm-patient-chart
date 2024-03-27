@@ -19,9 +19,9 @@ import {
 import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { compare } from './utils';
+import { useConditions } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -71,6 +71,7 @@ function ConditionsDetailedSummary({ patient }) {
         ...condition,
         id: condition.id,
         condition: condition.display,
+        abatementDateTime: condition.abatementDateTime,
         onsetDateTime: {
           sortKey: condition.onsetDateTime ?? '',
           content: condition.onsetDateTime
@@ -89,7 +90,10 @@ function ConditionsDetailedSummary({ patient }) {
   };
 
   const launchConditionsForm = useCallback(
-    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
+    () =>
+      launchPatientWorkspace('conditions-form-workspace', {
+        formContext: 'creating',
+      }),
     [],
   );
 

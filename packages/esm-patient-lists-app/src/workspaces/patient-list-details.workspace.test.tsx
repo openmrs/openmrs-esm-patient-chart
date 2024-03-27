@@ -6,7 +6,10 @@ import PatientListDetailsWorkspace from './patient-list-details.workspace';
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
 const testProps = {
+  patientUuid: '',
+  promptBeforeClosing: jest.fn(),
   closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
   list: {
     attributes: [],
     description:

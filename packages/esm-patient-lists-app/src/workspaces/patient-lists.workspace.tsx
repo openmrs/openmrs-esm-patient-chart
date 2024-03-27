@@ -20,7 +20,7 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { closeWorkspace, launchPatientWorkspace, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
@@ -34,7 +34,6 @@ function PatientListsWorkspace() {
   const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
-    closeWorkspace('patient-lists', true);
     launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 

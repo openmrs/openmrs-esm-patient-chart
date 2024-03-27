@@ -1,7 +1,8 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
 import { type OrderBasketStore, orderBasketStore } from './store';
-import { type OrderBasketItem, type OrderPost } from './types';
+import { type ExtractedOrderErrorObject, type OrderBasketItem, type OrderPost } from './types';
+import { type OrderErrorObject } from './types';
 
 export async function postOrders(encounterUuid: string, abortController: AbortController) {
   const patientUuid = getPatientUuidFromUrl();
@@ -18,6 +19,7 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
         erroredItems.push({
           ...order,
           orderError: error,
+          extractedOrderError: extractErrorDetails(error),
         });
       });
     }
@@ -26,10 +28,29 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
 }
 
 function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/order`, {
+  return openmrsFetch(`${restBaseUrl}/order`, {
     method: 'POST',
     signal: abortController?.signal,
     headers: { 'Content-Type': 'application/json' },
     body,
   });
+}
+
+function extractErrorDetails(errorObject: OrderErrorObject): ExtractedOrderErrorObject {
+  const errorDetails = {
+    message: errorObject.responseBody?.error?.message,
+    fieldErrors: [],
+    globalErrors: errorObject.responseBody?.error?.globalErrors,
+  };
+
+  if (errorObject.responseBody?.error?.fieldErrors) {
+    const fieldErrors = errorObject.responseBody?.error?.fieldErrors;
+    for (const fieldName in fieldErrors) {
+      fieldErrors[fieldName].forEach((error) => {
+        errorDetails.fieldErrors.push(error.message);
+      });
+    }
+  }
+
+  return errorDetails;
 }

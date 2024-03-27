@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import { Layer, Tile } from '@carbon/react';
-import { useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
+import { Tile } from '@carbon/react';
+import { useConfig, useConnectivity, usePatient, ResponsiveWrapper } from '@openmrs/esm-framework';
 import {
+  type DefaultWorkspaceProps,
   EmptyDataIllustration,
-  closeWorkspace,
   launchFormEntryOrHtmlForms,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard = () => {
+const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
@@ -22,13 +22,8 @@ const FormsDashboard = () => {
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-    return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-  }
-
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
-      closeWorkspace('clinical-forms-workspace', true);
       launchFormEntryOrHtmlForms(
         htmlFormEntryForms,
         patientUuid,
@@ -56,7 +51,7 @@ const FormsDashboard = () => {
 
   if (forms?.length === 0) {
     return (
-      <ResponsiveWrapper isTablet>
+      <ResponsiveWrapper>
         <Tile className={styles.emptyState}>
           <EmptyDataIllustration />
           <p className={styles.emptyStateContent}>{t('noFormsToDisplay', 'There are no forms to display.')}</p>

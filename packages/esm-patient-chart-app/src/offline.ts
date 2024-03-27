@@ -1,15 +1,21 @@
-import { messageOmrsServiceWorker, saveVisit, setupOfflineSync, usePatient } from '@openmrs/esm-framework';
+import {
+  fhirBaseUrl,
+  messageOmrsServiceWorker,
+  restBaseUrl,
+  saveVisit,
+  setupOfflineSync,
+} from '@openmrs/esm-framework';
 import { type OfflineVisit, visitSyncType } from '@openmrs/esm-patient-common-lib';
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/fhir2/R4/Patient/.+',
+    pattern: `.+${fhirBaseUrl}/R4/Patient/.+`,
   });
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/visit.+',
+    pattern: `.+${restBaseUrl}/visit.+`,
   });
 }
 

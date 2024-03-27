@@ -141,8 +141,10 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
       // Directly adding the order to basket should be marked as incomplete
       searchResult.isOrderIncomplete = true;
       setOrders([...orders, searchResult]);
-      closeWorkspace('add-drug-order', true);
-      launchPatientWorkspace('order-basket');
+      closeWorkspace('add-drug-order', {
+        ignoreChanges: true,
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      });
     },
     [orders, setOrders],
   );

@@ -44,7 +44,7 @@ import {
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { type ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -57,7 +57,7 @@ import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
-  visitToEdit: Visit;
+  visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
 }
 
@@ -83,8 +83,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { mutateVisits } = useVisits(patientUuid);
   const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
   const { mutate } = useVisit(patientUuid);
-  const { mutate: mutateVisit } = useVisit(patientUuid);
-  const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
@@ -93,6 +91,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [visitUuid, setVisitUuid] = useState('');
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
+  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
   const displayVisitStopDateTimeFields = useMemo(
     () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
@@ -179,9 +178,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     handleSubmit,
     control,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
     setError,
   } = methods;
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const validateVisitStartStopDatetime = useCallback(() => {
     let visitStartDate = getValues('visitStartDate');
@@ -314,6 +317,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
 
       const abortController = new AbortController();
+      if (config.showExtraVisitAttributesSlot) {
+        const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
+        payload.attributes.push(...attributes);
+        handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
+      }
 
       if (isOnline) {
         (visitToEdit?.uuid
@@ -367,28 +375,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  const appointmentPayload: AppointmentPayload = {
-                    appointmentKind: upcomingAppointment?.appointmentKind,
-                    serviceUuid: upcomingAppointment?.service.uuid,
-                    startDateTime: upcomingAppointment?.startDateTime,
-                    endDateTime: upcomingAppointment?.endDateTime,
-                    locationUuid: visitLocation?.uuid,
-                    patientUuid: patientUuid,
-                    uuid: upcomingAppointment?.uuid,
-                    dateHonored: dayjs(visitStartDate).format(),
-                  };
-                  saveAppointment(appointmentPayload, abortController).then(
-                    ({ status }) => {
-                      if (status === 201) {
-                        mutateCurrentVisit();
-                        mutateVisits();
-                        showSnackbar({
-                          isLowContrast: true,
-                          kind: 'success',
-                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                          title: t('appointmentEdited', 'Appointment edited'),
-                        });
-                      }
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid, abortController).then(
+                    () => {
+                      mutateCurrentVisit();
+                      mutateVisits();
+                      showSnackbar({
+                        isLowContrast: true,
+                        kind: 'success',
+                        subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
+                      });
                     },
                     (error) => {
                       showSnackbar({
@@ -403,7 +399,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               }
               mutateCurrentVisit();
               mutateVisits();
-              closeWorkspace();
+              closeWorkspace({ ignoreChanges: true });
 
               showSnackbar({
                 isLowContrast: true,
@@ -440,9 +436,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           (offlineVisit) => {
-            //setCurrentVisit(patientUuid, offlineVisit.uuid);
             mutate();
-            closeWorkspace();
+            closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -479,11 +474,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     ],
   );
 
-  const handleOnChange = () => {
-    setIgnoreChanges((prevState) => !prevState);
-    promptBeforeClosing(() => true);
-  };
-
   let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
     if (!visitToEdit?.encounters?.length) {
       return [null, null];
@@ -512,7 +502,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -646,6 +636,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
+            <ExtensionSlot state={{ patientUuid, setExtraVisitInfo }} name="extra-visit-attribute-slot" />
+
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
               <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
@@ -666,7 +658,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
           <Button

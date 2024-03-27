@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { type DrugOrderBasketItem, type DrugOrderTemplate, type OrderTemplate } from '../../types';
 
@@ -26,7 +26,7 @@ export function useDrugSearch(query: string): {
 } {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
     query
-      ? `/ws/rest/v1/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
+      ? `${restBaseUrl}/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
     openmrsFetch,
   );
@@ -58,7 +58,7 @@ export function useDrugTemplate(drugUuid: string): {
       }>;
     }>,
     Error
-  >(drugUuid ? `/ws/rest/v1/ordertemplates/orderTemplate?drug=${drugUuid}` : null, openmrsFetch);
+  >(drugUuid ? `${restBaseUrl}/ordertemplates/orderTemplate?drug=${drugUuid}` : null, openmrsFetch);
 
   const results = useMemo(
     () => ({

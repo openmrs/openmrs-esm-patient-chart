@@ -1,5 +1,5 @@
-import { APIRequestContext, expect } from '@playwright/test';
-import { Visit } from '@openmrs/esm-framework';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 export const startVisit = async (api: APIRequestContext, patientId: string): Promise<Visit> => {

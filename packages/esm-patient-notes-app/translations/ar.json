@@ -29,5 +29,6 @@
   "visitNoteNowVisible": "أصبحت مرئية الآن في صفحة اللقاءات",
   "visitNotes": "ملاحظات الزيارة",
   "visitNoteSaved": "تم حفظ ملاحظة الزيارة",
-  "visitNoteSaveError": "خطأ في حفظ ملاحظة الزيارة"
+  "visitNoteSaveError": "خطأ في حفظ ملاحظة الزيارة",
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

@@ -1,4 +1,4 @@
-import { type ConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type ConceptMetadata } from '../common';
 import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 
 export function calculateBodyMassIndex(weight: number, height: number) {

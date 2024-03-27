@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .desktopHeader, .tabletHeader {
   display: flex;
@@ -18,7 +18,7 @@
   }
 }
 
-.desktopHeader {  
+.desktopHeader {
   height: 3rem;
   h4 {
     @include type.type-style('heading-compact-02');
@@ -26,7 +26,7 @@
   }
 }
 
-.tabletHeader {  
+.tabletHeader {
   height: 4.5rem;
   h4 {
     @include type.type-style('heading-03');

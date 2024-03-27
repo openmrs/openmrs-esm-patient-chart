@@ -25,7 +25,7 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -39,6 +39,7 @@ import {
   interpretBloodPressure,
   invalidateCachedVitalsAndBiometrics,
   saveVitalsAndBiometrics as savePatientVitals,
+  useVitalsConceptMetadata,
 } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
@@ -70,7 +71,12 @@ const VitalsAndBiometricFormSchema = z
 
 export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
 
-const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
+  patientUuid,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
@@ -80,17 +86,27 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading, isError } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  const { control, handleSubmit, watch, setValue } = useForm<VitalsBiometricsFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isDirty },
+  } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
     resolver: zodResolver(VitalsAndBiometricFormSchema),
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
     ?.uuid;
@@ -177,7 +193,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
         .then((response) => {
           if (response.status === 201) {
             invalidateCachedVitalsAndBiometrics();
-            closeWorkspace();
+            closeWorkspaceWithSavedChanges();
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -216,7 +232,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,
-          closeWorkspace,
+          closeWorkspaceWithSavedChanges,
         }}
       />
     );
@@ -567,7 +583,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       )}
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button

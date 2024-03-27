@@ -1,4 +1,4 @@
-import { usePatient, openmrsFetch } from '@openmrs/esm-framework';
+import { usePatient, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
@@ -31,7 +31,7 @@ const augmentObstreeData = (node, prefix) => {
 
 const useGetObstreeData = (conceptUuid) => {
   const { patientUuid } = usePatient();
-  const response = useSWR(`/ws/rest/v1/obstree?patient=${patientUuid}&concept=${conceptUuid}`, openmrsFetch);
+  const response = useSWR(`${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`, openmrsFetch);
   const result = useMemo(() => {
     if (response.data) {
       const { data, ...rest } = response;
@@ -52,7 +52,7 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
   const { patientUuid } = usePatient();
   const getObstreeUrl = (index: number) => {
     if (index < uuidArray.length && patientUuid) {
-      return `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
+      return `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
     } else return null;
   };
   const { data, error, isLoading } = useSWRInfinite(getObstreeUrl, openmrsFetch, {

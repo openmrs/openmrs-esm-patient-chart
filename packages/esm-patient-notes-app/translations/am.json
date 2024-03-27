@@ -22,12 +22,13 @@
   "searchForPrimaryDiagnosis": "Search for a primary diagnosis",
   "searchForSecondaryDiagnosis": "Search for a secondary diagnosis",
   "secondaryDiagnosis": "Secondary diagnosis",
-  "secondaryDiagnosisInputPlaceholder": "Choose a secondary diagnose",
+  "secondaryDiagnosisInputPlaceholder": "Choose a secondary diagnosis",
   "seeAll": "See all",
   "visitDate": "Visit date",
   "visitNote": "Visit note",
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved",
-  "visitNoteSaveError": "Error saving visit note"
+  "visitNoteSaveError": "Error saving visit note",
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

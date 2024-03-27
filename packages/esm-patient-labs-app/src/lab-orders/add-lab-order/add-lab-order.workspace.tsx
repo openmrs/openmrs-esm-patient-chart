@@ -9,8 +9,8 @@ import {
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   type OrderBasketItem,
+  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { type LabOrderBasketItem } from '../api';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
@@ -22,7 +22,12 @@ export interface AddLabOrderWorkspaceAdditionalProps {
 export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
 
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
-export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspace }: AddLabOrderWorkspace) {
+export default function AddLabOrderWorkspace({
+  order: initialOrder,
+  closeWorkspace,
+  closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
+}: AddLabOrderWorkspace) {
   const { t } = useTranslation();
 
   const { patient, isLoading: isLoadingPatient } = usePatient();
@@ -33,8 +38,10 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
 
   const cancelOrder = useCallback(() => {
-    closeWorkspace();
-    launchPatientWorkspace('order-basket');
+    closeWorkspace({
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
   }, [closeWorkspace]);
 
   return (
@@ -64,7 +71,12 @@ export default function AddLabOrderWorkspace({ order: initialOrder, closeWorkspa
       {!currentLabOrder ? (
         <TestTypeSearch openLabForm={setCurrentLabOrder} />
       ) : (
-        <LabOrderForm initialOrder={currentLabOrder} closeWorkspace={closeWorkspace} />
+        <LabOrderForm
+          initialOrder={currentLabOrder}
+          closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+          promptBeforeClosing={promptBeforeClosing}
+        />
       )}
     </div>
   );

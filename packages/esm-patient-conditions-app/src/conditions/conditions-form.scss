@@ -1,8 +1,18 @@
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .condition {
-  padding: 1rem 0.75rem;
+  padding: 0.75rem;
+  border-top: 0.0625rem solid $grey-2;
+
+  &:first-of-type {
+    border-top: none;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
 .conditionsList {
@@ -43,11 +53,8 @@
 }
 
 .tablet {
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   background-color: $ui-02;
-  position: fixed;
-  bottom: 0rem;
-  width: 100%;
 }
 
 .desktop {
@@ -68,7 +75,7 @@
 
 .conditionsError {
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger
+    outline: 2px solid $danger
   }
 
   :global(.cds--search-magnifier) {
@@ -88,10 +95,19 @@
   :global(.cds--radio-button-wrapper) {
     margin-block-end: .375rem !important;
   }
+
+  :global(.cds--radio-button__validation-msg) {
+    display: none;
+  }
 }
 
 .spinner {
   &:global(.cds--inline-loading) {
     min-height: 1rem;
   }
+}
+
+.required {
+  color: colors.$red-60;
+  margin-left: 0.125rem;
 }

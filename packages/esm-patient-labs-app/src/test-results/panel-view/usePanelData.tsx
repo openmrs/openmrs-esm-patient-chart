@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type FetchResponse, openmrsFetch, usePatient } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, usePatient, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRInfinite from 'swr/infinite';
 import { extractMetaInformation, getConceptUuid } from './helper';
 import {
@@ -66,7 +66,7 @@ function useConcepts(conceptUuids: Array<string>) {
   const getUrl = useCallback(
     (index) => {
       if (conceptUuids && index < conceptUuids.length) {
-        return `/ws/rest/v1/concept/${conceptUuids[index]}?v=full`;
+        return `${restBaseUrl}/concept/${conceptUuids[index]}?v=full`;
       }
       return null;
     },

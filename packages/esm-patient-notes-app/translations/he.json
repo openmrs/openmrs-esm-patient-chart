@@ -29,5 +29,6 @@
   "visitNoteNowVisible": "הערה כעת נראית בעמוד הפגישות",
   "visitNotes": "הערות ביקור",
   "visitNoteSaved": "הערת הביקור נשמרה בהצלחה",
-  "visitNoteSaveError": "שגיאה בשמירת הערת הביקור"
+  "visitNoteSaveError": "שגיאה בשמירת הערת הביקור",
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

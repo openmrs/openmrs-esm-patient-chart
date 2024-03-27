@@ -1,8 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import { type OrderBasketItem, type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import useSWRImmutable from 'swr/immutable';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 /**
@@ -13,7 +14,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  */
 export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
   const { labOrderTypeUuid: labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
-  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -21,7 +22,7 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)),
+    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
     [patientUuid],
   );
 
@@ -42,27 +43,83 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
   };
 }
 
-export interface LabOrderBasketItem extends OrderBasketItem {
-  testType?: {
-    label: string;
-    conceptUuid: string;
-  };
-  labReferenceNumber?: string;
-  urgency?: string;
-  instructions?: string;
+export function useOrderReasons(conceptUuids: Array<string>) {
+  const shouldFetch = conceptUuids && conceptUuids.length > 0;
+  const url = shouldFetch ? getConceptReferenceUrls(conceptUuids) : null;
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
+    shouldFetch ? `${restBaseUrl}/${url[0]}` : null,
+    openmrsFetch,
+  );
+
+  const ob = data?.data;
+  const orderReasons = ob
+    ? Object.entries(ob).map(([key, value]) => ({
+        uuid: value.uuid,
+        display: value.display,
+      }))
+    : [];
+
+  if (error) {
+    showSnackbar({
+      title: error.name,
+      subtitle: error.message,
+      kind: 'error',
+    });
+  }
+
+  return { orderReasons: orderReasons, isLoading };
 }
 
 export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
-  return {
-    action: 'NEW',
-    patient: patientUuid,
-    type: 'testorder',
-    careSetting: careSettingUuid,
-    orderer: order.orderer,
-    encounter: encounterUuid,
-    concept: order.testType.conceptUuid,
-    instructions: order.instructions,
-  };
+  if (order.action === 'NEW' || order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: careSettingUuid,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+    };
+  } else if (order.action === 'REVISE') {
+    return {
+      action: 'REVISE',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      instructions: order.instructions,
+      orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
+    };
+  } else if (order.action === 'DISCONTINUE') {
+    return {
+      action: 'DISCONTINUE',
+      type: 'testorder',
+      patient: patientUuid,
+      careSetting: order.careSetting,
+      orderer: order.orderer,
+      encounter: encounterUuid,
+      concept: order.testType.conceptUuid,
+      orderReason: order.orderReason,
+      previousOrder: order.previousOrder,
+    };
+  } else {
+    throw new Error(`Unknown order action: ${order.action}.`);
+  }
+}
+const chunkSize = 10;
+export function getConceptReferenceUrls(conceptUuids: Array<string>) {
+  const accumulator = [];
+  for (let i = 0; i < conceptUuids.length; i += chunkSize) {
+    accumulator.push(conceptUuids.slice(i, i + chunkSize));
+  }
+
+  return accumulator.map((partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`);
 }
 
 export type PostDataPrepLabOrderFunction = (
@@ -70,3 +127,18 @@ export type PostDataPrepLabOrderFunction = (
   patientUuid: string,
   encounterUuid: string,
 ) => OrderPost;
+
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
+}
+export interface ConceptResponse {
+  uuid: string;
+  display: string;
+  datatype: {
+    uuid: string;
+    display: string;
+  };
+  answers: Array<ConceptAnswers>;
+  setMembers: Array<ConceptAnswers>;
+}

@@ -72,18 +72,20 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces.length).toEqual(0);
     });
 
-    it('should show a modal when a workspace is already open and it cannot hide', () => {
+    it('should show a modal when a workspace is already open (with changes) and it cannot hide', () => {
       const store = getWorkspaceStore();
       registerWorkspace({ name: 'allergies', title: 'Allergies', load: jest.fn() });
       launchPatientWorkspace('allergies', { foo: true });
       expect(store.getState().openWorkspaces.length).toEqual(1);
+      const allergies = store.getState().openWorkspaces?.[0];
+      allergies.promptBeforeClosing(() => true);
       registerWorkspace({ name: 'conditions', title: 'Conditions', load: jest.fn() });
       launchPatientWorkspace('conditions', { foo: true });
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
-      expect(prompt.title).toMatch('You have unsaved changes');
+      expect(prompt.title).toMatch('Unsaved Changes');
       expect(prompt.body).toMatch(
-        'There are unsaved changes in Allergies. Please save them before opening another form.',
+        'There are unsaved changes in Allergies. Please save them before opening another workspace.',
       );
       expect(prompt.confirmText).toMatch('Open anyway');
       prompt.onConfirm();
@@ -139,15 +141,17 @@ describe('workspace system', () => {
       expect(store.getState().openWorkspaces.length).toEqual(2);
       expect(store.getState().openWorkspaces[0].name).toBe('conditions');
       expect(store.getState().openWorkspaces[1].name).toBe('allergies');
+      const allergies = store.getState().openWorkspaces[1];
+      allergies.promptBeforeClosing(() => true);
       launchPatientWorkspace('vitals');
       expect(store.getState().openWorkspaces.length).toEqual(2);
       expect(store.getState().openWorkspaces[0].name).toBe('allergies');
       expect(store.getState().openWorkspaces[1].name).toBe('conditions');
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
-      expect(prompt.title).toMatch('You have unsaved changes');
+      expect(prompt.title).toMatch('Unsaved Changes');
       expect(prompt.body).toMatch(
-        'There are unsaved changes in Allergies. Please save them before opening another form.',
+        'There are unsaved changes in Allergies. Please save them before opening another workspace.',
       );
       expect(prompt.confirmText).toMatch('Open anyway');
       prompt.onConfirm();
@@ -225,13 +229,17 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions');
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces.map((w) => w.name)).toEqual(['conditions', 'attachments', 'allergies']);
+      const conditionsWorkspace = store.getState().openWorkspaces?.[0];
+      const allergiesWorkspace = store.getState().openWorkspaces?.[2];
+      conditionsWorkspace.promptBeforeClosing(() => true);
+      allergiesWorkspace.promptBeforeClosing(() => true);
       launchPatientWorkspace('vitals');
       expect(store.getState().openWorkspaces.length).toEqual(3);
       expect(store.getState().openWorkspaces[0].name).toBe('conditions');
       const prompt = store.getState().prompt;
       expect(prompt).toBeTruthy();
       expect(prompt.body).toMatch(
-        'There are unsaved changes in Conditions. Please save them before opening another form.',
+        'There are unsaved changes in Conditions. Please save them before opening another workspace.',
       );
       // Closing the conditions workspace because it cannot be hidden
       prompt.onConfirm();
@@ -241,7 +249,7 @@ describe('workspace system', () => {
       const prompt2 = store.getState().prompt;
       expect(prompt2).toBeTruthy();
       expect(prompt2.body).toMatch(
-        'There are unsaved changes in Allergies. Please save them before opening another form.',
+        'There are unsaved changes in Allergies. Please save them before opening another workspace.',
       );
       prompt2.onConfirm();
       expect(store.getState().openWorkspaces.length).toEqual(2);
@@ -282,11 +290,11 @@ describe('workspace system', () => {
       launchPatientWorkspace('conditions');
       expect(store.getState().openWorkspaces.length).toBe(3);
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace({ ignoreChanges: true });
       expect(store.getState().workspaceWindowState).toBe('normal');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace();
       expect(store.getState().workspaceWindowState).toBe('maximized');
-      store.getState().openWorkspaces[0].closeWorkspace(false);
+      store.getState().openWorkspaces[0].closeWorkspace({ ignoreChanges: true });
       expect(store.getState().workspaceWindowState).toBe('normal');
     });
   });
@@ -308,11 +316,13 @@ describe('workspace system', () => {
     launchPatientWorkspace('conditions');
     launchPatientWorkspace('conditions');
     expect(store.getState().openWorkspaces.length).toEqual(1);
+    const conditionsWorkspace = store.getState().openWorkspaces[0];
+    conditionsWorkspace.promptBeforeClosing(() => true);
     // Test opening a workspace of the same type--should require confirmation and then replace
     launchPatientWorkspace('form-entry', { foo: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
-    expect(store.getState().prompt.title).toMatch('You have unsaved changes');
+    expect(store.getState().prompt.title).toMatch('Unsaved Changes');
     store.getState().prompt.onConfirm();
     expect(store.getState().prompt).toBeNull();
     expect(store.getState().openWorkspaces.length).toEqual(1);
@@ -323,13 +333,15 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
     expect(store.getState().openWorkspaces[1].name).toBe('form-entry');
+    const formEntryWorkspace = store.getState().openWorkspaces[1];
+    formEntryWorkspace.promptBeforeClosing(() => true);
     // Test going through confirmation flow while order-meds is open
     // Changing the form workspace shouldn't destroy the order-meds workspace
     launchPatientWorkspace('conditions');
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('form-entry');
     expect(store.getState().openWorkspaces[1].name).toBe('order-meds');
-    expect(store.getState().prompt.title).toMatch('You have unsaved changes');
+    expect(store.getState().prompt.title).toMatch('Unsaved Changes');
     cancelPrompt(); // should leave same workspaces intact
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('form-entry');
@@ -340,7 +352,7 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
     expect(store.getState().openWorkspaces[1].name).toBe('order-meds');
-    store.getState().openWorkspaces[0].closeWorkspace();
+    store.getState().openWorkspaces[0].closeWorkspace({ ignoreChanges: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
   });
@@ -357,7 +369,7 @@ describe('workspace system', () => {
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
     launchPatientWorkspace('hiv');
     expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
-    expect(store.getState().prompt.title).toBe('You have unsaved changes');
+    expect(store.getState().prompt.title).toBe('Unsaved Changes');
     store.getState().prompt.onConfirm();
     expect(store.getState().openWorkspaces[0].name).toBe('hiv');
   });
@@ -391,10 +403,10 @@ describe('workspace system', () => {
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
     launchPatientWorkspace('hiv');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
-    store.getState().openWorkspaces[0].closeWorkspace(false);
+    store.getState().openWorkspaces[0].closeWorkspace({ ignoreChanges: false });
     expect(store.getState().prompt.title).toBe('Unsaved Changes');
     expect(store.getState().prompt.body).toBe(
-      'You have unsaved changes in the side panel. Do you want to discard these changes?',
+      'You have unsaved changes in the opened workspace. Do you want to discard these changes?',
     );
     expect(store.getState().prompt.confirmText).toBe('Discard');
     store.getState().prompt.onConfirm();

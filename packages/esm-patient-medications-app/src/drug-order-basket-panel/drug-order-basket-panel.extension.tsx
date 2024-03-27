@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import type { DrugOrderBasketItem } from '../types';
 import OrderBasketItemTile from './order-basket-item-tile.component';
@@ -56,11 +56,17 @@ export default function DrugOrderBasketPanelExtension() {
   }, [orders]);
 
   const openDrugSearch = () => {
-    launchPatientWorkspace('add-drug-order');
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order'),
+    });
   };
 
   const openDrugForm = (order: DrugOrderBasketItem) => {
-    launchPatientWorkspace('add-drug-order', { order });
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
+    });
   };
 
   const removeMedication = useCallback(

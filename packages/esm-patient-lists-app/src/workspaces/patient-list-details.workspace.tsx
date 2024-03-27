@@ -2,23 +2,21 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type MappedList, usePatientListMembers } from '../patient-lists.resource';
 import PatientListDetailsTable from './patient-list-details-table.component';
 import styles from './patient-list-details.scss';
 
-interface PatientListDetailsWorkspaceProps {
-  closeWorkspace: () => void;
+interface PatientListDetailsWorkspaceProps extends DefaultWorkspaceProps {
   list: MappedList;
 }
 
-function PatientListDetailsWorkspace({ closeWorkspace, list }: PatientListDetailsWorkspaceProps) {
+function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps) {
   const { t } = useTranslation();
   const { listMembers, isLoading } = usePatientListMembers(list.id);
 
   const closeListDetailsWorkspace = useCallback(() => {
-    closeWorkspace();
     launchPatientWorkspace('patient-lists');
   }, []);
 
