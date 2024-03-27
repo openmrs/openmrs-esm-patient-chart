@@ -22,7 +22,7 @@ import {
   TextArea,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { priorityOptions } from './lab-order';
+import { ordersEqual, priorityOptions } from './lab-order';
 import { useTestTypes } from './useTestTypes';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -100,13 +100,22 @@ export function LabOrderForm({
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
-      data.action = 'NEW';
-      data.careSetting = careSettingUuid;
-      data.orderer = session.currentProvider.uuid;
+      const finalizedOrder: LabOrderBasketItem = {
+        ...initialOrder,
+        ...data,
+      };
+      finalizedOrder.careSetting = careSettingUuid;
+      finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
-      const existingOrder = orders.find((order) => order.testType.conceptUuid == defaultValues.testType.conceptUuid);
-      const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
-      newOrders[orderIndex] = data;
+      const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
+
+      if (existingOrder) {
+        newOrders[orders.indexOf(existingOrder)] = {
+          ...finalizedOrder,
+        };
+      } else {
+        newOrders.push(finalizedOrder);
+      }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
@@ -186,6 +195,7 @@ export function LabOrderForm({
                       maxLength={150}
                       value={value}
                       onChange={onChange}
+                      onBlur={onBlur}
                       invalid={errors.labReferenceNumber?.message}
                       invalidText={errors.labReferenceNumber?.message}
                     />
