@@ -12,7 +12,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Record and edit test result', async ({ page }) => {
+test('Record and edit test results', async ({ page }) => {
   const resultsViewerPage = new ResultsViewerPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -37,7 +37,7 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByText(/laboratory test results/i).click();
   });
 
-  await test.step('Then I should see the laboratory test result form workspace', async () => {
+  await test.step('Then it should launch in the workspace', async () => {
     await expect(page.getByRole('button', { name: /hematology/i, exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Chemistry', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /other/i, exact: true })).toBeVisible();
@@ -47,53 +47,46 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('button', { name: 'Hematology', exact: true }).click();
   });
 
-  await test.step('And I fill the complete blood count form', async () => {
+  await test.step('And I fill the "Complete Blood Count" section', async () => {
+    await page.locator('#ManualInputWhiteBloodCellsid').clear();
     await page.locator('#ManualInputWhiteBloodCellsid').fill('12');
+    await page.locator('#ManualEntryRedBloodCellsid').clear();
     await page.locator('#ManualEntryRedBloodCellsid').fill('15');
+    await page.locator('#ManualEntryPlateletsid').clear();
     await page.locator('#ManualEntryPlateletsid').fill('10');
+    await page.locator('#ManualEntryNeutrophilsMicroscopicid').clear();
     await page.locator('#ManualEntryNeutrophilsMicroscopicid').fill('10');
+    await page.locator('#ManualEntryMCVid').clear();
     await page.locator('#ManualEntryMCVid').fill('10');
+    await page.locator('#ManualEntryMCHid').clear();
     await page.locator('#ManualEntryMCHid').fill('10');
-    await page.locator('#ManualEntryMCHCid').fill('10');
-    await page.locator('#ManualEntryLymphocytesMicroscopicid').fill('10');
-    await page.locator('#ManualEntryHematocritid').fill('10');
-    await page.locator('#ManualEntryHaemoglobinid').fill('10');
-    await page.locator('#ManualEntryCombinedPercentageMonocytesEosinophilsBasophilsid').fill('10');
   });
 
   await test.step('When I click the `Chemistry` tab', async () => {
     await page.getByRole('button', { name: 'Chemistry', exact: true }).click();
   });
 
-  await test.step('And I fill the chemistry results form', async () => {
+  await test.step('And I fill the "Chemistry Results" section', async () => {
+    await page.locator('#ManualEntryAlkalinePhosphataseid').clear();
     await page.locator('#ManualEntryAlkalinePhosphataseid').fill('10');
+    await page.locator('#ManualEntryAmylaseid').clear();
     await page.locator('#ManualEntryAmylaseid').fill('10');
+    await page.locator('#ManualEntryBUNid').clear();
     await page.locator('#ManualEntryBUNid').fill('10');
+    await page.locator('#manualEntryFastingBloodGlucosemgdlid').clear();
     await page.locator('#manualEntryFastingBloodGlucosemgdlid').fill('10');
+    await page.locator('#manualEntryPostPrandialBloodGlucosemgdlid').clear();
     await page.locator('#manualEntryPostPrandialBloodGlucosemgdlid').fill('10');
+    await page.locator('#manualEntrySerumAlbuminid').clear();
     await page.locator('#manualEntrySerumAlbuminid').fill('10');
-    await page.locator('#manualEntrySerumCalciumid').fill('10');
-    await page.locator('#manualEntrySerumPotassiumid').fill('10');
-    await page.locator('#manualEntrySerumSodiumid').fill('10');
-    await page.locator('#manualEntrySerumCreatinineid').fill('10');
-    await page.locator('#manualEntryTotalProteinid').fill('10');
-    await page.locator('#manualEntrySerumGlucosemgdlid').fill('10');
-    await page.locator('#manualEntrySerumGlucosemmolid').fill('10');
-    await page.locator('#manualEntryTotalBilirubinid').fill('10');
-    await page.locator('#manualEntrySerumGlutamicOxaloaceticTransaminaseid').fill('10');
-    await page.locator('#manualEntryAlkalinePhosphastaseid').fill('10');
-    await page.locator('#manualEntrySerumUricAcidid').fill('10');
-    await page.locator('#manualEntryTotalCholesterolid').fill('10');
-    await page.locator('#manualEntryTriglyceridesid').fill('10');
-    await page.locator('#manualEntryAmylaseid').fill('10');
-    await page.locator('#manualEntrySerumCarbonDioxideid').fill('10');
   });
 
   await test.step('When I click the `Other` tab', async () => {
     await page.getByRole('button', { name: 'Other', exact: true }).click();
   });
 
-  await test.step('And I fill the other test results', async () => {
+  await test.step('And I fill the "Urine" and "Stool" sections', async () => {
+    await page.locator('#manualEntryCultureandSensitivityUrineid').clear();
     await page.locator('#manualEntryCultureandSensitivityUrineid').fill('83%');
     await page.locator('#manualEntryUrinePregnancyTestid_1').check();
     await page.locator('#manualEntryUrineProteinDipStickid_0').check();
@@ -105,16 +98,13 @@ test('Record and edit test result', async ({ page }) => {
     await page.locator('#manualEntrySporePresenceInUrineTestid_3').check();
     await page.locator('#manualEntryTrichomonasVaginalisPresenceInUrineSedimentByLightMicroscopyid_0').check();
     await page.locator('#manualEntryCrystalsTypeInUrineSedimentByLightMicroscopyTestid_3').check();
-    await page.locator('#manualEntryStoolCultureBacterialid').fill('no signs');
     await page.locator('#manualEntryStoolExamid').selectOption('Cestode Infection');
-    await page.locator('#manualEntryStoolMicroscopyWithConcentrationid').fill('no signs');
-    await page.locator('#manualEntryKinyounsStainForCoccidiansid').fill('no signs');
     await page.locator('#manualEntryStoolFatTestSemiQuantitativeid_3').check();
     await page.locator('#manualEntryStoolTestforReducingSubstanceid_0').check();
     await page.locator('#manualEntryFecalOccultBloodTestid_2').check();
   });
 
-  await test.step('And I save the form', async () => {
+  await test.step('And I click on the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -122,11 +112,11 @@ test('Record and edit test result', async ({ page }) => {
     await expect(page.getByText('The form has been submitted successfully.')).toBeVisible();
   });
 
-  await test.step('When I reload the viewer page', async () => {
+  await test.step('When I go to the results viewer page', async () => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
-  await test.step('Then I should see 12 and 15 as white and red blood cells test results displayed respectively', async () => {
+  await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
     await expect(page.getByRole('link', { name: /white blood cells/i })).toBeVisible();
     await expect(page.getByText('12', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /red blood cells/i })).toBeVisible();
@@ -141,7 +131,7 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('tab', { name: /all encounters/i }).click();
   });
 
-  await test.step('Then I should see the newly added lab test result in the list', async () => {
+  await test.step('Then I should see the newly added lab test results included in the list', async () => {
     await expect(
       page.getByRole('cell', { name: /laboratory test results/i }).getByText('Laboratory Test Results'),
     ).toBeVisible();
@@ -158,8 +148,10 @@ test('Record and edit test result', async ({ page }) => {
     await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
 
-  await test.step('And I change the white and red blood cells test results to `13` and `16` respectively', async () => {
+  await test.step('And I amend the values for "White blood cells" and "Red blood cells"', async () => {
+    await page.locator('#ManualInputWhiteBloodCellsid').clear();
     await page.locator('#ManualInputWhiteBloodCellsid').fill('13');
+    await page.locator('#ManualEntryRedBloodCellsid').clear();
     await page.locator('#ManualEntryRedBloodCellsid').fill('16');
   });
 
@@ -175,7 +167,7 @@ test('Record and edit test result', async ({ page }) => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
-  await test.step('Then I should see `13` and `16` as white and red blood cells test results respectively', async () => {
+  await test.step('Then I should see the updated results reflect in the results viewer', async () => {
     await expect(page.getByRole('link', { name: /white blood cells/i })).toBeVisible();
     await expect(page.getByText('13', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /red blood cells/i })).toBeVisible();
