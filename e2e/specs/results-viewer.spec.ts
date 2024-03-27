@@ -48,17 +48,11 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('And I fill the "Complete Blood Count" section', async () => {
-    await page.locator('#ManualInputWhiteBloodCellsid').clear();
     await page.locator('#ManualInputWhiteBloodCellsid').fill('12');
-    await page.locator('#ManualEntryRedBloodCellsid').clear();
     await page.locator('#ManualEntryRedBloodCellsid').fill('15');
-    await page.locator('#ManualEntryPlateletsid').clear();
     await page.locator('#ManualEntryPlateletsid').fill('10');
-    await page.locator('#ManualEntryNeutrophilsMicroscopicid').clear();
     await page.locator('#ManualEntryNeutrophilsMicroscopicid').fill('10');
-    await page.locator('#ManualEntryMCVid').clear();
     await page.locator('#ManualEntryMCVid').fill('10');
-    await page.locator('#ManualEntryMCHid').clear();
     await page.locator('#ManualEntryMCHid').fill('10');
   });
 
@@ -67,17 +61,11 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('And I fill the "Chemistry Results" section', async () => {
-    await page.locator('#ManualEntryAlkalinePhosphataseid').clear();
     await page.locator('#ManualEntryAlkalinePhosphataseid').fill('10');
-    await page.locator('#ManualEntryAmylaseid').clear();
     await page.locator('#ManualEntryAmylaseid').fill('10');
-    await page.locator('#ManualEntryBUNid').clear();
     await page.locator('#ManualEntryBUNid').fill('10');
-    await page.locator('#manualEntryFastingBloodGlucosemgdlid').clear();
     await page.locator('#manualEntryFastingBloodGlucosemgdlid').fill('10');
-    await page.locator('#manualEntryPostPrandialBloodGlucosemgdlid').clear();
     await page.locator('#manualEntryPostPrandialBloodGlucosemgdlid').fill('10');
-    await page.locator('#manualEntrySerumAlbuminid').clear();
     await page.locator('#manualEntrySerumAlbuminid').fill('10');
   });
 
@@ -86,7 +74,6 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('And I fill the "Urine" and "Stool" sections', async () => {
-    await page.locator('#manualEntryCultureandSensitivityUrineid').clear();
     await page.locator('#manualEntryCultureandSensitivityUrineid').fill('83%');
     await page.locator('#manualEntryUrinePregnancyTestid_1').check();
     await page.locator('#manualEntryUrineProteinDipStickid_0').check();
