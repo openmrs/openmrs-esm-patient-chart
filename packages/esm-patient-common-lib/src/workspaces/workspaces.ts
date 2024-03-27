@@ -120,7 +120,6 @@ export function canCloseWorkspaceWithoutPrompting(name: string, ignoreChanges: b
 function promptBeforeLaunchingWorkspace(
   workspace: OpenWorkspace,
   newWorkspaceDetails: { name: string; additionalProps?: object },
-  successCallback?: () => void,
 ) {
   const { name, additionalProps } = newWorkspaceDetails;
 
