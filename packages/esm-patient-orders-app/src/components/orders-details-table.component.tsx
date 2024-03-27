@@ -74,6 +74,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchAddLabsOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -159,7 +161,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           items={orders}
           setOrderItems={setOrders}
           openOrderBasket={launchOrderBasket}
-          openOrderForm={launchOrderBasket}
+          openOrderForm={order.type === 'drugorder' ? launchAddDrugOrder : launchAddLabsOrder}
         />
       ),
     }));
@@ -432,16 +434,18 @@ function OrderBasketItemActions({
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
-  const handleViewEditClick = useCallback(() => {
+  const handleModifyClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
       getDrugOrderByUuid(orderItem.uuid).then((res) => {
         let medicationOrder = res.data;
-        setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'REVISE')]);
-        openOrderBasket();
+        const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
+        setOrderItems(medicationsOrderBasket, [...items, medicationItem]);
+        openOrderForm({ order: medicationItem });
       });
     } else {
-      setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'REVISE')]);
-      openOrderBasket();
+      const labItem = buildLabOrder(orderItem, 'REVISE');
+      setOrderItems(labsOrderBasket, [...items, labItem]);
+      openOrderForm({ order: labItem });
     }
   }, [orderItem, openOrderForm]);
 
@@ -473,8 +477,8 @@ function OrderBasketItemActions({
       <OverflowMenuItem
         className={styles.menuItem}
         id="modify"
-        itemText={t('viewEdit', 'View/Edit order')}
-        onClick={handleViewEditClick}
+        itemText={t('modifyOrder', 'Modify order')}
+        onClick={handleModifyClick}
         disabled={alreadyInBasket}
       />
       {orderItem.type === 'testorder' && (

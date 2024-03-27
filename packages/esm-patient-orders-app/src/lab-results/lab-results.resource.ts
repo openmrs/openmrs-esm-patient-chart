@@ -1,5 +1,11 @@
 import useSWR from 'swr';
-import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
+import {
+  type OpenmrsResource,
+  openmrsFetch,
+  restBaseUrl,
+  type FetchResponse,
+  useAbortController,
+} from '@openmrs/esm-framework';
 import { type Encounter } from '../types/encounter';
 
 const labEncounterRepresentation =
@@ -144,13 +150,13 @@ export async function updateOrderResult(
   obsPayload: any,
   fulfillerPayload: any,
 ) {
-  const abortController = new AbortController();
+  const abortController = useAbortController();
   const saveObs = obsUuid
     ? editObservation(obsUuid, obsPayload, abortController)
     : addObservation(encounterUuid, obsPayload, abortController);
 
   saveObs.then((obsStatus) => {
-    if (obsStatus === 200) {
+    if (obsStatus === 200 || obsStatus === 201) {
       return openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {

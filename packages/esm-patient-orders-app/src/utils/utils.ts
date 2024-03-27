@@ -58,7 +58,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
   return {
     uuid: order.uuid,
     display: order.drug?.display,
-    previousOrder: null,
+    previousOrder: action === 'REVISE' ? order.uuid : null,
     action: action,
     drug: order.drug,
     dosage: order.dose,
@@ -80,7 +80,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition,
-    startDate: order.dateActivated,
+    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
     duration: order.duration,
     durationUnit: {
       valueCoded: order.durationUnits?.uuid,
@@ -102,15 +102,11 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
  * Builds lab order object from the given order object
  */
 export function buildLabOrder(order: Order, action?: OrderAction) {
-  let previousOrder = null;
-  if (action === 'REVISE' || action === 'DISCONTINUE') {
-    previousOrder = order.uuid;
-  }
   return {
     uuid: order.uuid,
     action: action,
     display: order.display,
-    previousOrder: previousOrder,
+    previousOrder: action === 'REVISE' ? order.uuid : null,
     orderer: order.orderer.uuid,
     careSetting: order.careSetting.uuid,
     instructions: order.instructions,
