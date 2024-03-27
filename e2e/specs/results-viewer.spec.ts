@@ -118,13 +118,13 @@ test('Record and edit test results', async ({ page }) => {
     await page.getByRole('tab', { name: /all encounters/i }).click();
   });
 
-  await test.step('Then I should see the newly added lab test results included in the list', async () => {
+  await test.step('Then I should see the newly added test results included in the list', async () => {
     await expect(
       page.getByRole('cell', { name: /laboratory test results/i }).getByText('Laboratory Test Results'),
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab test result', async () => {
+  await test.step('When I launch the overflow menu of the created test results', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
