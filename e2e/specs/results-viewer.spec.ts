@@ -123,7 +123,7 @@ test('Record and edit test results', async ({ page }) => {
     await expect(page.getByText('15', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I navigate to `Visits` page', async () => {
+  await test.step('When I navigate to the `Visits` page', async () => {
     visitsPage.goTo(patient.uuid);
   });
 
