@@ -627,6 +627,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     label={t('quantityToDispense', 'Quantity to dispense')}
                     min={0}
                     hideSteppers
+                    allowEmpty
                   />
                 </InputWrapper>
               </Column>
@@ -657,6 +658,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       min={0}
                       label={t('prescriptionRefills', 'Prescription refills')}
                       max={99}
+                      allowEmpty
                     />
                   ) : (
                     <CustomNumberInput
@@ -801,7 +803,7 @@ const ControlledFieldInput = ({
       return (
         <NumberInput
           value={!!value ? value : 0}
-          onChange={(e, { value }) => handleChange(parseFloat(value))}
+          onChange={(e, { value }) => handleChange(isNaN(parseFloat(value)) ? null : parseFloat(value))}
           className={fieldState?.error?.message && styles.fieldError}
           onBlur={onBlur}
           ref={ref}
