@@ -71,6 +71,14 @@
       "online": true,
       "offline": true
     },
+     {
+      "name": "view-past-visits-button",
+      "slot": "patient-actions-slot",
+      "component": "viewPastVisitsActionButton",
+      "featureFlag": "rde",
+      "online": true,
+      "offline": true
+    },
     {
       "name": "add-past-visit-button",
       "slot": "patient-search-actions-slot",

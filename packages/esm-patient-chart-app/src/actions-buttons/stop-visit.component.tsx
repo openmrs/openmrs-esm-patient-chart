@@ -8,7 +8,7 @@ interface StopVisitOverflowMenuItemProps {
 
 const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
 
   const openModal = useCallback(() => {
     const dispose = showModal('end-visit-dialog', {
@@ -23,14 +23,22 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
         <button
           className="cds--overflow-menu-options__btn"
           role="menuitem"
-          title={`${t('endVisit', 'End visit')}`}
+          title={`${
+            !currentVisitIsRetrospective
+              ? t('endVisit', 'End visit')
+              : t('exitRetrospective', 'Exit retrospective entry')
+          }`}
           data-floating-menu-primary-focus
           onClick={openModal}
           style={{
             maxWidth: '100vw',
           }}
         >
-          <span className="cds--overflow-menu-options__option-content">{t('endVisit', 'End visit')}</span>
+          <span className="cds--overflow-menu-options__option-content">
+            {!currentVisitIsRetrospective
+              ? t('endVisit', 'End visit')
+              : t('exitRetrospective', 'Exit retrospective entry')}
+          </span>
         </button>
       </li>
     )

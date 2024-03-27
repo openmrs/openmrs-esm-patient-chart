@@ -187,7 +187,9 @@ const VisitHeader: React.FC = () => {
             )}
             {!isLoading && !!currentVisit && (
               <Button onClick={() => openModal(patient?.id)} className={styles.startVisitButton}>
-                {t('endVisit', 'End visit')}
+                {!currentVisitIsRetrospective
+                  ? t('endVisit', 'End visit')
+                  : t('exitRetrospective', 'Exit retrospective entry')}
               </Button>
             )}
           </>
