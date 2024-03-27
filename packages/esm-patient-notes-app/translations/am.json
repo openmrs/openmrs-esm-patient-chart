@@ -11,6 +11,8 @@
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
   "enterSecondaryDiagnoses": "Enter Secondary diagnoses",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "Image",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",
   "noMatchingDiagnoses": "No diagnoses found matching",
