@@ -63,7 +63,7 @@ function PatientListsWorkspace() {
             extract: (list) => `${list.name} ${list.type}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
+          .map((result) => (result ? result.original : null))
       : patientLists;
   }, [debouncedSearchTerm, patientLists]);
 
@@ -117,6 +117,8 @@ function PatientListsWorkspace() {
                     <TableBody>
                       {rows.map((row) => {
                         const currentList = patientLists?.find((list) => list?.id === row.id);
+
+                        if (!currentList) return null;
 
                         return (
                           <TableRow {...getRowProps({ row })} key={row.id}>

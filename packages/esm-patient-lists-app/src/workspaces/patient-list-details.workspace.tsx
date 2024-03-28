@@ -20,6 +20,10 @@ function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps)
     launchPatientWorkspace('patient-lists');
   }, []);
 
+  if (!listMembers) {
+    return null; // or return a loading indicator or placeholder
+  }
+
   return (
     <main className={styles.container}>
       <section className={styles.header}>

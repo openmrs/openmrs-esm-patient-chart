@@ -35,6 +35,10 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
 
+  if (!listMembers) {
+    return null; // or return a loading indicator or placeholder
+  }
+
   const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
       {
