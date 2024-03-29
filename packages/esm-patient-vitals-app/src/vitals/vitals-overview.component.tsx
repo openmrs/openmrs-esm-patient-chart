@@ -89,8 +89,11 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
       key: 'spo2',
       header: withUnit(t('spo2', 'SPO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
     },
+    {
+      key: 'notes',
+      header: withUnit(t('notes', 'Notes'), conceptUnits.get(config.concepts.notesUuid) ?? ''),
+    },
   ];
-
   const tableRows = useMemo(
     () =>
       vitals?.map((vitalSigns, index) => {
@@ -103,6 +106,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
           spo2: vitalSigns.spo2 ?? '--',
           temperature: vitalSigns.temperature ?? '--',
           respiratoryRate: vitalSigns.respiratoryRate ?? '--',
+          notes: vitalSigns.notes ?? '--',
         };
       }),
     [vitals],

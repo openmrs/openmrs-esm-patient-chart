@@ -47,6 +47,11 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       value: 'spo2',
     },
     {
+      id: 'notes',
+      title: withUnit(t('notes', 'Notes'), conceptUnits.get(config.concepts.notesUuid) ?? '-'),
+      value: 'notes',
+    },
+    {
       id: 'temperature',
       title: withUnit(t('temp', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
       value: 'temperature',

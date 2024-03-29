@@ -148,6 +148,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             />
             <VitalsHeaderItem
               interpretation={assessValue(
+                parseFloat(latestVitals?.notes),
+                getReferenceRangesForConcept(config.concepts.notesUuid, conceptMetadata),
+              )}
+              unitName={t('notes', 'Notes')}
+              unitSymbol={(latestVitals?.notes && conceptUnits.get(config.concepts.notesUuid)) ?? ''}
+              value={parseFloat(latestVitals?.notes) ?? 0}
+            />
+            <VitalsHeaderItem
+              interpretation={assessValue(
                 latestVitals.temperature,
                 getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
               )}

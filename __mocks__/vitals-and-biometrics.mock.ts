@@ -6002,6 +6002,7 @@ export const mockVitalsConfig = {
     systolicBloodPressureUuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     temperatureUuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    notesUuid:'2343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   vitals: {
     encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',

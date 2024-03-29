@@ -20,6 +20,7 @@ type fieldId =
   | 'respiratoryRate'
   | 'systolicBloodPressure'
   | 'temperature'
+  | 'notes'
   | 'weight';
 
 type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';

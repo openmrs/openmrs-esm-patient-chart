@@ -42,6 +42,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    notesUuid: {
+      _type: Type.ConceptUuid,
+      _default: '2343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
   },
   vitals: {
     useFormEngine: {
@@ -114,6 +118,7 @@ export interface ConfigObject {
     oxygenSaturationUuid: string;
     heightUuid: string;
     weightUuid: string;
+    notesUuid: string;
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
   };

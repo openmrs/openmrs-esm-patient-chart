@@ -39,6 +39,7 @@ export interface PatientVitalsAndBiometrics {
   bmi?: number | null;
   respiratoryRate?: number;
   muac?: number;
+  notes?: string | null;
 }
 
 export interface VitalsResponse {

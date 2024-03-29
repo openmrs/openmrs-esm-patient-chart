@@ -54,6 +54,7 @@ const VitalsAndBiometricFormSchema = z
     temperature: z.number(),
     generalPatientNote: z.string(),
     weight: z.number(),
+    notes: z.string(),
     height: z.number(),
     midUpperArmCircumference: z.number(),
     computedBodyMassIndex: z.number(),
@@ -120,6 +121,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
   const pulse = watch('pulse');
   const weight = watch('weight');
   const height = watch('height');
+  const notes = watch('notes');
 
   useEffect(() => {
     getMuacColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
@@ -149,6 +151,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
       weightRange: conceptRanges.get(config.concepts.weightUuid),
       heightRange: conceptRanges.get(config.concepts.heightUuid),
       pulseRange: conceptRanges.get(config.concepts.pulseUuid),
+      notesRange: conceptRanges.get(config.concepts.notesUuid),
     }),
     [
       conceptRanges,
@@ -161,6 +164,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
       config.concepts.systolicBloodPressureUuid,
       config.concepts.temperatureUuid,
       config.concepts.weightUuid,
+      config.concepts.notesUuid,
     ],
   );
 
@@ -450,11 +454,12 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
                   {
                     name: t('notes', 'Notes'),
                     type: 'textarea',
-                    id: 'generalPatientNote',
+                    id: 'notes',
                   },
                 ]}
                 placeholder={t('additionalNoteText', 'Type any additional notes here')}
                 label={t('notes', 'Notes')}
+                unitSymbol={conceptUnits.get(config.concepts.notesUuid) ?? ''}
               />
             </Column>
           </Row>

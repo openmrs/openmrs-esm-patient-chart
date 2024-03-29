@@ -166,6 +166,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         return 'spo2';
       case concepts.respiratoryRateUuid:
         return 'respiratoryRate';
+      case concepts.notesUuid:
+        return 'notes';
       case concepts.heightUuid:
         return 'height';
       case concepts.weightUuid:
