@@ -103,11 +103,15 @@ test('Record and edit test results', async ({ page }) => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
+  await test.step('And I click on the `Panel` tab', async () => {
+    await page.getByRole('tab', { name: /panel/i }).click();
+  });
+
   await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
-    await expect(page.getByRole('link', { name: /white blood cells/i })).toBeVisible();
-    await expect(page.getByText('12', { exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: /red blood cells/i })).toBeVisible();
-    await expect(page.getByText('15', { exact: true })).toBeVisible();
+    const whiteBloodCellRow = page.locator('tr:has-text("white blood cells")');
+    const redBloodCellRow = page.locator('tr:has-text("red blood cells")');
+    await expect(whiteBloodCellRow).toContainText(/12/i);
+    await expect(redBloodCellRow).toContainText(/15/i);
   });
 
   await test.step('When I navigate to the `Visits` page', async () => {
@@ -154,11 +158,15 @@ test('Record and edit test results', async ({ page }) => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
+  await test.step('And I click on the `Panel` tab', async () => {
+    await page.getByRole('tab', { name: /panel/i }).click();
+  });
+
   await test.step('Then I should see the updated results reflect in the results viewer', async () => {
-    await expect(page.getByRole('link', { name: /white blood cells/i })).toBeVisible();
-    await expect(page.getByText('13', { exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: /red blood cells/i })).toBeVisible();
-    await expect(page.getByText('16', { exact: true })).toBeVisible();
+    const whiteBloodCellRow = page.locator('tr:has-text("white blood cells")');
+    const redBloodCellRow = page.locator('tr:has-text("red blood cells")');
+    await expect(whiteBloodCellRow).toContainText(/13/i);
+    await expect(redBloodCellRow).toContainText(/16/i);
   });
 });
 
