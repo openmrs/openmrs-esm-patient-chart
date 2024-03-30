@@ -86,7 +86,7 @@ export const mapToFHIRImmunizationResource = (
       ],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
-    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
+    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of meeting
     occurrenceDateTime: immunizationFormData.vaccinationDate,
     expirationDate: immunizationFormData.expirationDate,
     location: toReferenceOfType('Location', locationUuid),
