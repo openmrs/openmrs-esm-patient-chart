@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
-import last from 'lodash-es/last';
+
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
