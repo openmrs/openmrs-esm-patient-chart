@@ -57,6 +57,41 @@ test('Add an immunization', async ({ page }) => {
   });
 });
 
+test('Edit an immunization', async ({ page }) => {
+  const immunizationsPage = new ImmunizationsPage(page);
+
+  await test.step('When I go to the Immunizations page', async () => {
+    await immunizationsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I edit the Immunization', async () => {
+    await page.getByLabel('Expand current row').click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+  });
+  await test.step('Then I should see the Immunization form launch in the workspace', async () => {
+    await expect(page.getByText(/immunization form/i)).toBeVisible();
+  });
+
+  await test.step('When I set `21/03/2024` as the vaccination date', async () => {
+    await page.getByLabel(/vaccination date/i).clear();
+    await page.getByLabel(/vaccination date/i).fill('21/03/2024');
+    await page.getByLabel(/vaccination date/i).press('Tab');
+  });
+
+  await test.step('And I set `Polio vaccination, oral` as the immunization', async () => {
+    await page.getByRole('combobox', { name: /immunization/i }).click();
+    await page.getByText(/polio vaccination, oral/i).click();
+  });
+
+  await test.step('And I click on the `Save` button', async () => {
+    await page.getByRole('button', { name: /save/i }).click();
+  });
+
+  await test.step('Then I should see a success toast notification', async () => {
+    await expect(page.getByText(/Vaccination saved successfully/i)).toBeVisible();
+  });
+});
+
 test.afterEach(async ({ api }) => {
   await deletePatient(api, patient.uuid);
 });
