@@ -68,7 +68,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the newly created lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -99,7 +99,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the updated lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -117,7 +117,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
 
   await test.step('And the encounters table should be empty', async () => {
     await expect(
-      page.getByLabel(/all encounters/i).getByText(/There are no encounters to display for this patient/i),
+      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
     ).toBeVisible();
   });
 });
