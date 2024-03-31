@@ -800,19 +800,17 @@ const ControlledFieldInput = ({
   );
 
   const handleInputChange = (inputValue: string) => {
-    // Check if optionsWithAbbreviations is defined before calling find
-    if (optionsWithAbbreviations) {
+    if (optionsWithAbbreviations && typeof inputValue === 'string') {
       const matchedOption = optionsWithAbbreviations.find(
         ({ abbreviation }) => abbreviation.toLowerCase() === inputValue.toLowerCase(),
       );
       if (matchedOption) {
-        handleChange({ value: matchedOption.value, valueCoded: matchedOption.abbreviation });
-        return; // Exit early after handling the matched option
+        const finalOption = restProps.items.find(
+          (item) => item.value && item.value.toLowerCase() === matchedOption.value.toLowerCase(),
+        );
+        handleChange({ value: finalOption.value, valueCoded: finalOption.valueCoded });
       }
     }
-
-    // If no matched option is found or optionsWithAbbreviations is undefined
-    handleChange({ value: inputValue, valueCoded: inputValue });
   };
 
   const component = useMemo(() => {
