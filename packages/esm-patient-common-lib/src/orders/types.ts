@@ -2,6 +2,26 @@ import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
+export interface ExtractedOrderErrorObject {
+  message: string;
+  fieldErrors: string[];
+  globalErrors: string[];
+}
+export interface OrderErrorObject {
+  responseBody?: {
+    error?: {
+      message?: string;
+      fieldErrors?: {
+        [fieldName: string]: {
+          message: string;
+          [key: string]: string;
+        }[];
+      };
+      globalErrors?: string[];
+    };
+  };
+}
+
 export interface OrderBasketItem {
   action?: OrderAction;
   display: string;
@@ -17,6 +37,7 @@ export interface OrderBasketItem {
       };
     };
   };
+  extractedOrderError?: ExtractedOrderErrorObject;
   isOrderIncomplete?: boolean;
 }
 

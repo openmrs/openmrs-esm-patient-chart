@@ -30,13 +30,17 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await page.getByPlaceholder(/search conditions/i).fill('mental');
   });
 
-  await test.step('And I click on the condition', async () => {
+  await test.step('And I select the condition', async () => {
     await page.getByRole('menuitem', { name: 'Mental status change' }).click();
   });
 
   await test.step('And I set `10/07/2023` as the onset date', async () => {
     await page.getByLabel(/onset date/i).fill('10/07/2023');
     await page.getByLabel(/onset date/i).press('Tab');
+  });
+
+  await test.step('And I set the clinical status to `Active`', async () => {
+    await page.getByText('Active', { exact: true }).check();
   });
 
   await test.step('And I click on the `Save & close` button', async () => {
@@ -47,7 +51,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await expect(conditionsPage.page.getByText(/condition saved/i)).toBeVisible();
   });
 
-  await test.step('And I should see the new condition added to the list', async () => {
+  await test.step('Then I should see the new condition added to the list', async () => {
     await expect(headerRow).toContainText(/condition/i);
     await expect(headerRow).toContainText(/date of onset/i);
     await expect(headerRow).toContainText(/status/i);
@@ -116,7 +120,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
 
   await test.step('And I should not see the deleted condition in the list', async () => {
     await expect(conditionsPage.page.getByText(/mental status change/i)).not.toBeVisible();
-    await expect(conditionsPage.page.getByText(/There are no conditions to display for this patient/i)).toBeVisible();
+    await expect(conditionsPage.page.getByText(/there are no conditions to display for this patient/i)).toBeVisible();
   });
 });
 
