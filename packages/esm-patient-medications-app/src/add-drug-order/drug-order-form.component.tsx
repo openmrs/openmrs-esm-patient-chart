@@ -53,27 +53,13 @@ export interface DrugOrderFormProps {
   onCancel: () => void;
   promptBeforeClosing: (testFcn: () => boolean) => void;
 }
-interface AbbreviationOption {
-  abbreviation: string;
-  value: string;
-}
 
 const comboSchema = {
   value: z.string(),
   valueCoded: z.string(),
   default: z.boolean().optional(),
 };
-const frequencyAbbreviations: AbbreviationOption[] = [
-  { abbreviation: 'od', value: 'Once daily' },
-  { abbreviation: 'q2h', value: 'Every two hours' },
-  { abbreviation: 'bid', value: 'Twice daily' },
-  { abbreviation: 'tid', value: 'Thrice daily' },
-  { abbreviation: 'q6h', value: 'Every six hours' },
-  { abbreviation: 'q4h', value: 'Every four hours' },
-  { abbreviation: 'q3h', value: 'Every three hours' },
-  { abbreviation: 'q12h', value: 'Every twelve hours' },
-  { abbreviation: 'q1h', value: 'Every hour' },
-];
+
 const schemaFields = {
   // t( 'freeDosageErrorMessage', 'Add free dosage note')
   freeTextDosage: z.string().refine((value) => value !== '', {
@@ -492,7 +478,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         size={isTablet ? 'lg' : 'md'}
                         id="editFrequency"
                         items={orderFrequencies}
-                        optionsWithAbbreviations={frequencyAbbreviations}
                         placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                         titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                         itemToString={(item) => item?.value}
@@ -782,9 +767,8 @@ const ControlledFieldInput = ({
   control,
   getValues,
   handleAfterChange,
-  optionsWithAbbreviations,
   ...restProps
-}: ControlledFieldInputProps & { optionsWithAbbreviations?: AbbreviationOption[] }) => {
+}: ControlledFieldInputProps) => {
   const {
     field: { onBlur, onChange, value, ref },
     fieldState,
@@ -798,22 +782,6 @@ const ControlledFieldInput = ({
     },
     [getValues, onChange, handleAfterChange],
   );
-
-  const handleInputChange = (inputValue: string) => {
-    // Check if optionsWithAbbreviations is defined before calling find
-    if (optionsWithAbbreviations) {
-      const matchedOption = optionsWithAbbreviations.find(
-        ({ abbreviation }) => abbreviation.toLowerCase() === inputValue.toLowerCase(),
-      );
-      if (matchedOption) {
-        handleChange({ value: matchedOption.value, valueCoded: matchedOption.abbreviation });
-        return; // Exit early after handling the matched option
-      }
-    }
-
-    // If no matched option is found or optionsWithAbbreviations is undefined
-    handleChange({ value: inputValue, valueCoded: inputValue });
-  };
 
   const component = useMemo(() => {
     if (type === 'toggle')
@@ -870,7 +838,6 @@ const ControlledFieldInput = ({
         <ComboBox
           selectedItem={value}
           onChange={({ selectedItem }) => handleChange(selectedItem)}
-          onInputChange={(inputValue) => handleInputChange(inputValue)}
           onBlur={onBlur}
           ref={ref}
           className={fieldState?.error?.message && styles.fieldError}
