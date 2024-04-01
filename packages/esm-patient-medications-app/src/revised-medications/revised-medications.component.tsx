@@ -37,7 +37,7 @@ const RevisedMedications: React.FC<RevisedMedicationsProps> = ({ patientUuid }) 
       />
     );
   }
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
 };
 
 export default RevisedMedications;
