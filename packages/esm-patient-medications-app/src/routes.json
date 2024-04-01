@@ -13,6 +13,14 @@
       }
     },
     {
+      "name": "revised-medications-id",
+      "component": "reviseMedications",
+      "slot": "patient-chart-medications-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
       "name": "active-medications-widget",
       "component": "activeMedications",
       "slot": "patient-chart-summary-dashboard-slot",
