@@ -117,7 +117,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
 
   await test.step('And the encounters table should be empty', async () => {
     await expect(
-      page.getByLabel(/all encounters/i).getByText(/There are no encounters to display for this patient/i),
+      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
     ).toBeVisible();
   });
 });

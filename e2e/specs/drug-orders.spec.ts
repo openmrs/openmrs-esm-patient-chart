@@ -206,7 +206,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And the medications table should be empty', async () => {
-    await expect(page.getByText(/There are no active medications to display for this patient/i)).toBeVisible();
+    await expect(page.getByText(/there are no active medications to display for this patient/i)).toBeVisible();
   });
 });
 
