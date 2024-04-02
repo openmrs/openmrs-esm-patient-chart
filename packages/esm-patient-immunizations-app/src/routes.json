@@ -7,18 +7,12 @@
     {
       "name": "immunization-overview-widget",
       "component": "immunizationsOverview",
-      "meta": {
-        "columnSpan": 4
-      },
       "order": 8
     },
     {
       "name": "immunization-details-widget",
       "component": "immunizationsDetailedSummary",
       "slot": "patient-chart-immunizations-dashboard-slot",
-      "meta": {
-        "columnSpan": 1
-      }
     },
     {
       "name": "immunization-summary-dashboard",
@@ -26,7 +20,6 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-immunizations-dashboard-slot",
-        "columns": 1,
         "path": "Immunizations"
       },
       "order": 8
@@ -41,3 +34,4 @@
     }
   ]
 }
+

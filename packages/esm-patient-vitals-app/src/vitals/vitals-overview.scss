@@ -5,6 +5,9 @@
 .widgetCard {
   background-color: colors.$white;
   border: 1px solid colors.$gray-20;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .divider {
@@ -42,4 +45,8 @@
 
 .printButton {
   margin-left: 1.25rem;
+}
+
+.vitalsTable {
+  height: 100%;
 }

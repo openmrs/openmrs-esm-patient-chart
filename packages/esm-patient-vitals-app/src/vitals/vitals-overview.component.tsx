@@ -214,7 +214,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
               {chartView ? (
                 <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
               ) : (
-                <div ref={contentToPrintRef}>
+                <div ref={contentToPrintRef} className={styles.vitalsTable}>
                   <PrintComponent subheader={headerTitle} patientDetails={patientDetails} />
                   <PaginatedVitals
                     isPrinting={isPrinting}

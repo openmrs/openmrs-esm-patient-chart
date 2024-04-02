@@ -1,6 +1,16 @@
 @use '@carbon/colors';
 @use '@carbon/type';
 
+.paginatedVitals {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tableContainer {
+  flex: 1;
+}
+
 .table {
   td {
     white-space: nowrap;

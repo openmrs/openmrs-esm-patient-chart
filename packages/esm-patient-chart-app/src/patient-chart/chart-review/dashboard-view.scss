@@ -9,11 +9,25 @@
 
 .dashboard {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-auto-rows: auto;
-  grid-auto-columns: auto;
   grid-gap: 25px;
   margin: 1.3125rem;
+}
+
+.dashboardContainer {
+  container-name: dashboard;
+  container-type: inline-size;
+}
+
+@container dashboard (width > 1100px){
+  .dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.child:only-child {
+  grid-column: 1 / span 2;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .dashboard {

@@ -12,6 +12,7 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import styles from './paginated-biometrics.scss';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 
 interface PaginatedBiometricsProps {
@@ -70,7 +71,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   return (
-    <div>
+    <div className={styles.paginatedBiometrics}>
       <DataTable
         rows={paginatedBiometrics}
         headers={tableHeaders}
@@ -80,7 +81,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         isSortable
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <TableContainer>
+          <TableContainer className={styles.tableContainer}>
             <Table aria-label="biometrics" {...getTableProps()}>
               <TableHead>
                 <TableRow>

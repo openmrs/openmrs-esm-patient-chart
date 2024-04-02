@@ -17,7 +17,7 @@
     {
       "name": "start-visit-button",
       "component": "startVisitActionButton",
-      "slot": "patient-actions-slot",      
+      "slot": "patient-actions-slot",
       "online": true,
       "offline": true
     },
@@ -85,7 +85,6 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "columns": 1,
         "path": "Visits"
       },
       "order": 5,
@@ -100,7 +99,7 @@
       "meta": {
         "title": "Visits",
         "view": "visits"
-      },      
+      },
       "online": true,
       "offline": true
     },
@@ -213,9 +212,6 @@
     {
       "name": "current-visit-summary",
       "component": "currentVisitSummary",
-      "meta": {
-        "columnSpan": 4
-      },
       "online": true,
       "offline": true
     },

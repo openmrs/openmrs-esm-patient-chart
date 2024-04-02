@@ -56,7 +56,6 @@
       "order": 2,
       "meta": {
         "slot": "patient-chart-vitals-biometrics-dashboard-slot",
-        "columns": 1,
         "path": "Vitals & Biometrics"
       }
     },

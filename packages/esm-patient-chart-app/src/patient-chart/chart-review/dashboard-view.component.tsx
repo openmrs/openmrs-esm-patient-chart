@@ -11,11 +11,6 @@ import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
-function getColumnsLayoutStyle(dashboard: DashboardConfig) {
-  const numberOfColumns = dashboard.columns ?? 2;
-  return '1fr '.repeat(numberOfColumns).trimEnd();
-}
-
 /**
  * The layout mode dictates the width occuppied by the chart dashboard widgets.
  * - In 'contained' mode, the dashboard widgets are displayed in a centered
@@ -45,7 +40,6 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   const {
     params: { view },
   } = useMatch(dashboardPath);
-  const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = useMemo(
     () => ({
@@ -56,14 +50,6 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       launchStartVisitPrompt,
     }),
     [patient, patientUuid, view],
-  );
-
-  const wrapItem = useCallback(
-    (slot: ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 1 } = widgetMetas[getExtensionNameFromId(extension.extensionId)];
-      return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
-    },
-    [widgetMetas],
   );
 
   const [resolvedTitle, setResolvedTitle] = useState<string | undefined>();
@@ -82,14 +68,11 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
     <>
       <ExtensionSlot state={state} name="top-of-all-patient-dashboards-slot" />
       {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
-      <ExtensionSlot
-        key={dashboard.slot}
-        name={dashboard.slot}
-        className={styles.dashboard}
-        style={{ gridTemplateColumns }}
-      >
-        <Extension state={state}>{wrapItem}</Extension>
-      </ExtensionSlot>
+      <div className={styles.dashboardContainer}>
+        <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
+          <Extension state={state} className={styles.child}></Extension>
+        </ExtensionSlot>
+      </div>
     </>
   );
 }
