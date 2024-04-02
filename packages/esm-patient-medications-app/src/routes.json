@@ -14,7 +14,7 @@
     },
     {
       "name": "revised-medications-id",
-      "component": "reviseMedications",
+      "component": "revisedMedications",
       "slot": "patient-chart-medications-dashboard-slot",
       "meta": {
         "columnSpan": 1
