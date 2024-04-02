@@ -4,7 +4,6 @@ import { configSchema } from './config-schema';
 import { dashboardMeta, moduleName } from './dashboard.meta';
 import medicationsSummaryComponent from './medications-summary/medications-summary.component';
 import activeMedicationsComponent from './active-medications/active-medications.component';
-import revisedMedicationsComponent from './revised-medications/revised-medications.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -21,7 +20,10 @@ export const medicationsSummary = getSyncLifecycle(medicationsSummaryComponent, 
 
 export const activeMedications = getSyncLifecycle(activeMedicationsComponent, options);
 
-export const reviseMedications = getSyncLifecycle(revisedMedicationsComponent, options);
+export const reviseMedications = getAsyncLifecycle(
+  () => import('./revised-medications/revised-medications.component'),
+  options,
+);
 
 export const drugOrderPanel = getAsyncLifecycle(
   () => import('./drug-order-basket-panel/drug-order-basket-panel.extension'),

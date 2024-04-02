@@ -18,8 +18,6 @@ const RevisedMedications: React.FC<RevisedMedicationsProps> = ({ patientUuid }) 
 
   const revisedPatientOrders = patientOrders?.filter((order) => order.action == 'REVISE');
 
-  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
-
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
   if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
@@ -30,6 +28,7 @@ const RevisedMedications: React.FC<RevisedMedicationsProps> = ({ patientUuid }) 
         isValidating={isValidating}
         title={t('revisedMedicationsTableTitle', 'Revised Medications')}
         medications={revisedPatientOrders}
+        showAddButton={false}
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
