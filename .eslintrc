@@ -4,8 +4,9 @@
   },
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "react-hooks"],
   "rules": {
+    "react-hooks/exhaustive-deps": "warn",
     // Disabling these rules for now just to keep the diff small. I'll enable them in a future PR that fixes lint issues.
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": "off",
