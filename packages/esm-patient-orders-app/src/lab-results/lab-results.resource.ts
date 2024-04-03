@@ -84,7 +84,7 @@ export function useOrderConceptByUuid(uuid: string) {
   return {
     concept: data?.data,
     isLoading,
-    isError: error,
+    error,
     isValidating,
     mutate,
   };

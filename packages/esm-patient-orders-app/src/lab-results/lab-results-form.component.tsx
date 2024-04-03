@@ -152,7 +152,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         <Stack>
           {concept.setMembers.length > 0 && <div>{concept.display}</div>}
           {concept && (
-            <section className={styles.section}>
+            <section className={styles.formSection}>
               {!isLoadingInitialValues ? (
                 <ResultFormField
                   defaultValue={initialValues}
