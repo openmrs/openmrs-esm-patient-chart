@@ -92,6 +92,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
 
+  // launch respective order basket based on order type
+  const openOrderForm = useCallback((orderItem) => {
+    switch (orderItem.type) {
+      case 'drugorder':
+        launchAddDrugOrder();
+        break;
+      case 'testorder':
+        launchAddLabsOrder();
+        break;
+      default:
+        launchOrderBasket();
+    }
+  }, []);
+
   const tableHeaders: Array<OrderHeaderProps> = [
     {
       key: 'orderNumber',
@@ -161,7 +175,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           items={orders}
           setOrderItems={setOrders}
           openOrderBasket={launchOrderBasket}
-          openOrderForm={order.type === 'drugorder' ? launchAddDrugOrder : launchAddLabsOrder}
+          openOrderForm={() => openOrderForm(order)}
         />
       ),
     }));
