@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
-import { fetchConceptDiagnosisByName, saveVisitNote } from './visit-notes.resource';
+import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
   diagnosisSearchResponse,
@@ -21,7 +21,7 @@ const testProps = {
   promptBeforeClosing: jest.fn(),
 };
 
-const mockFetchConceptDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
+const mockFetchDiagnosisConceptsByName = fetchDiagnosisConceptsByName as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = useConfig as jest.Mock;
@@ -42,7 +42,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 jest.mock('./visit-notes.resource', () => ({
-  fetchConceptDiagnosisByName: jest.fn(),
+  fetchDiagnosisConceptsByName: jest.fn(),
   useLocationUuid: jest.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
   })),
@@ -59,7 +59,7 @@ jest.mock('./visit-notes.resource', () => ({
 }));
 
 test('renders the visit notes form with all the relevant fields and values', () => {
-  mockFetchConceptDiagnosisByName.mockReturnValue(of([]));
+  mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
 
   renderVisitNotesForm();
 
@@ -74,7 +74,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
 });
 
 test.only('typing in the diagnosis search input triggers a search', async () => {
-  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
@@ -99,7 +99,7 @@ test.only('typing in the diagnosis search input triggers a search', async () => 
 
 test('renders an error message when no matching diagnoses are found', async () => {
   const user = userEvent.setup();
-  mockFetchConceptDiagnosisByName.mockReturnValue(of([]));
+  mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
 
   renderVisitNotesForm();
 
@@ -139,7 +139,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   };
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' });
-  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
@@ -173,7 +173,7 @@ test('renders an error snackbar if there was a problem recording a condition', a
   };
 
   mockSaveVisitNote.mockRejectedValueOnce(error);
-  mockFetchConceptDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 

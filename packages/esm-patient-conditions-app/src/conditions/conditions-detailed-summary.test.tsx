@@ -92,7 +92,7 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
   await user.click(recordConditionsLink);
 
   expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
 });
 
 function renderConditionsDetailedSummary() {
