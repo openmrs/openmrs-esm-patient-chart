@@ -65,6 +65,29 @@
   object-fit: cover;
 }
 
+.imgThumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+ 
+.imgThumbnailItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+ 
+.removeButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 .button {
   height: 4rem;
   display: flex;
