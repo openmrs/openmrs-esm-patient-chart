@@ -58,7 +58,14 @@ const visitNoteFormSchema = z.object({
   }),
   secondaryDiagnosisSearch: z.string().optional(),
   clinicalNote: z.string().optional(),
-  image: z.any(),
+  images: z
+    .array(
+      z.object({
+        base64Content: z.string(),
+        fileType: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
@@ -115,6 +122,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
       noteDate: new Date(),
+      images: [],
     },
   });
 
@@ -124,7 +132,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const currentImage = watch('image');
+  const currentImage = watch('images');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutateVisits } = useInfiniteVisits(patientUuid);
 
@@ -227,8 +235,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile) => {
-        setValue('image', file);
+      saveFile: (files: UploadedFile[]) => {
+        setValue('images', (prevImages) => [...prevImages, ...files]);
         close();
         return Promise.resolve();
       },
@@ -236,14 +244,14 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
         close();
       },
       allowedExtensions: allowedImageTypes,
-      multipleFiles: false,
+      multipleFiles: true,
       collectDescription: false,
     });
   }, [patientUuid]);
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData, event: SyntheticEvent) => {
-      const { noteDate, clinicalNote } = data;
+      const { noteDate, clinicalNote, images } = data;
       setIsHandlingSubmit(true);
 
       if (!selectedPrimaryDiagnoses.length) {
@@ -290,14 +298,14 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
           }
         })
         .then(() => {
-          if (data.image) {
-            return createAttachment(patientUuid, data.image);
+          if (data.images) {
+            return createAttachment(patientUuid, data.images);
           }
         })
         .then(() => {
           mutateVisitNotes();
           mutateVisits();
-          if (data.image) {
+          if (data.images) {
             mutateAttachments();
           }
           closeWorkspaceWithSavedChanges();
@@ -528,30 +536,23 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
-              {currentImage?.base64Content ? (
-                <Button
-                  className={styles.uploadButton}
-                  kind={isTablet ? 'ghost' : 'tertiary'}
-                  onClick={() => showImageCaptureModal()}
-                  renderIcon={(props) => <Edit size={16} {...props} />}
-                >
-                  {t('changeImage', 'Change image')}
-                </Button>
-              ) : (
-                <Button
-                  className={styles.uploadButton}
-                  kind={isTablet ? 'ghost' : 'tertiary'}
-                  onClick={() => showImageCaptureModal()}
-                  renderIcon={(props) => <Add size={16} {...props} />}
-                >
-                  {t('addImage', 'Add image')}
-                </Button>
-              )}
-              {currentImage?.base64Content && currentImage?.fileType == 'image' ? (
-                <div className={styles.imgThumbnailContainer}>
-                  <img src={currentImage.base64Content} className={styles.imgThumbnail} />
+              {currentImage.map((image, index) => (
+                <div key={index}>
+                  <Button
+                    className={styles.uploadButton}
+                    kind={isTablet ? 'ghost' : 'tertiary'}
+                    onClick={() => showImageCaptureModal(index)}
+                    renderIcon={(props) => <Add size={16} {...props} />}
+                  >
+                    {t('addImage', 'Add image')}
+                  </Button>
+                  {image.base64Content && image.fileType === 'image' && (
+                    <div className={styles.imgThumbnailContainer}>
+                      <img src={image.base64Content} className={styles.imgThumbnail} />
+                    </div>
+                  )}
                 </div>
-              ) : null}
+              ))}
             </FormGroup>
           </Column>
         </Row>
