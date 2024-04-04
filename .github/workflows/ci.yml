@@ -26,7 +26,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Cache dependencies
         id: cache
@@ -63,7 +63,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           registry-url: 'https://registry.npmjs.org'
 
       - name: Cache dependencies
@@ -84,7 +84,7 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: Version
-        run: yarn lerna version "$(node -e "console.log(require('semver').inc(require('./lerna.json').version, 'patch'))")-pre.${{ github.run_number }}" --no-git-tag-version --no-push --yes
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
       - name: Build
         run: yarn turbo build --color --concurrency=5
@@ -93,7 +93,7 @@ jobs:
       - run: git add . && git commit -m "Prerelease version" --no-verify
 
       - name: Pre-release
-        run: yarn run ci:prepublish
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -103,6 +103,7 @@ jobs:
           name: packages
           path: |
             packages/**/dist
+          overwrite: true
 
   deploy_patient_chart:
     runs-on: ubuntu-latest
@@ -132,7 +133,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           registry-url: 'https://registry.npmjs.org'
 
       - name: Cache dependencies
@@ -156,6 +157,6 @@ jobs:
         run: yarn turbo build --color --concurrency=5
 
       - name: Publish
-        run: yarn run ci:publish
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

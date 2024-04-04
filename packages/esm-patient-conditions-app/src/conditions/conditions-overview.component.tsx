@@ -54,7 +54,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
 
   const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () =>
+      launchPatientWorkspace('conditions-form-workspace', {
+        formContext: 'creating',
+      }),
+    [],
+  );
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {

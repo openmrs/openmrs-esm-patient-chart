@@ -45,7 +45,7 @@ import {
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { type ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -395,28 +395,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   );
                 }
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  const appointmentPayload: AppointmentPayload = {
-                    appointmentKind: upcomingAppointment?.appointmentKind,
-                    serviceUuid: upcomingAppointment?.service.uuid,
-                    startDateTime: upcomingAppointment?.startDateTime,
-                    endDateTime: upcomingAppointment?.endDateTime,
-                    locationUuid: visitLocation?.uuid,
-                    patientUuid: patientUuid,
-                    uuid: upcomingAppointment?.uuid,
-                    dateHonored: dayjs(visitStartDate).format(),
-                  };
-                  saveAppointment(appointmentPayload, abortController).then(
-                    ({ status }) => {
-                      if (status === 201) {
-                        mutateCurrentVisit();
-                        mutateVisits();
-                        showSnackbar({
-                          isLowContrast: true,
-                          kind: 'success',
-                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                          title: t('appointmentEdited', 'Appointment edited'),
-                        });
-                      }
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid, abortController).then(
+                    () => {
+                      mutateCurrentVisit();
+                      mutateVisits();
+                      showSnackbar({
+                        isLowContrast: true,
+                        kind: 'success',
+                        subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
+                      });
                     },
                     (error) => {
                       showSnackbar({

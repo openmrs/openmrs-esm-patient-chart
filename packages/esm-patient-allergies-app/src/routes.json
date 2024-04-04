@@ -35,6 +35,10 @@
         "slot": "patient-chart-allergies-dashboard-slot",
         "path": "Allergies"
       }
+    },
+    {
+      "name": "allergy-delete-confirmation-dialog",
+      "component": "allergyDeleteConfirmationDialog"
     }
   ]
 }
