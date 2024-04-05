@@ -1,11 +1,5 @@
 import useSWR from 'swr';
-import {
-  type OpenmrsResource,
-  openmrsFetch,
-  restBaseUrl,
-  type FetchResponse,
-  useAbortController,
-} from '@openmrs/esm-framework';
+import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { type Encounter } from '../types/encounter';
 
 const labEncounterRepresentation =
@@ -142,7 +136,7 @@ const editObservation = async (obsUuid: string, obsPayload: any, abortController
   return editResultObs.status;
 };
 
-//TODO: the calls to update order and observations for results should be transactional to allow for rollback
+// TODO: the calls to update order and observations for results should be transactional to allow for rollback
 export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
@@ -150,7 +144,7 @@ export async function updateOrderResult(
   obsPayload: any,
   fulfillerPayload: any,
 ) {
-  const abortController = useAbortController();
+  const abortController = new AbortController();
   const saveObs = obsUuid
     ? editObservation(obsUuid, obsPayload, abortController)
     : addObservation(encounterUuid, obsPayload, abortController);
