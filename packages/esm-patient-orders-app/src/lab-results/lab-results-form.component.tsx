@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
@@ -19,6 +19,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
+  const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const [obsUuid, setObsUuid] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -58,7 +59,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   }, [isDirty]);
 
   if (isLoadingConcepts) {
-    return <InlineLoading iconDescription="Loading" description="Loading test details" status="active" />;
+    return (
+      <div className={styles.loaderContainer}>
+        <InlineLoading
+          className={styles.loader}
+          description={t('loadingTestDetails', 'Loading test details') + '...'}
+          iconDescription={t('loading', 'Loading')}
+          status="active"
+        />
+      </div>
+    );
   }
 
   const saveLabResults = (data, e) => {
@@ -119,7 +129,14 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       fulfillerComment: 'Test Results Entered',
     };
 
-    updateOrderResult(order.uuid, order.encounter.uuid, obsUuid, obsPayload, resultsStatusPayload).then(
+    updateOrderResult(
+      order.uuid,
+      order.encounter.uuid,
+      obsUuid,
+      obsPayload,
+      resultsStatusPayload,
+      abortController,
+    ).then(
       () => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
@@ -147,24 +164,22 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   return (
     <Form className={styles.form}>
       <div className={styles.grid}>
-        <Stack>
-          {concept.setMembers.length > 0 && <div>{concept.display}</div>}
-          {concept && (
-            <section className={styles.formSection}>
-              {!isLoadingInitialValues ? (
-                <ResultFormField
-                  defaultValue={initialValues}
-                  register={register}
-                  concept={concept}
-                  control={control}
-                  errors={errors}
-                />
-              ) : (
-                <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
-              )}
-            </section>
-          )}
-        </Stack>
+        {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
+        {concept && (
+          <Stack gap={2}>
+            {!isLoadingInitialValues ? (
+              <ResultFormField
+                defaultValue={initialValues}
+                register={register}
+                concept={concept}
+                control={control}
+                errors={errors}
+              />
+            ) : (
+              <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
+            )}
+          </Stack>
+        )}
       </div>
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

@@ -143,8 +143,8 @@ export async function updateOrderResult(
   obsUuid: string,
   obsPayload: any,
   fulfillerPayload: any,
+  abortController: AbortController,
 ) {
-  const abortController = new AbortController();
   const saveObs = obsUuid
     ? editObservation(obsUuid, obsPayload, abortController)
     : addObservation(encounterUuid, obsPayload, abortController);

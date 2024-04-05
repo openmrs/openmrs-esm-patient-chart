@@ -2,8 +2,21 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.formSection {
-  margin: spacing.$spacing-03;
+.heading {
+  margin-bottom: 1rem;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader {
+  height: calc(100vh - 6rem);
+  justify-content: center;
+  align-items: center;
 }
 
 .sectionTitle {

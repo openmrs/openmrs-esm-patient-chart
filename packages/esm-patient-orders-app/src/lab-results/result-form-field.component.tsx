@@ -51,7 +51,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ defaultValue, registe
               {...field}
               type={concept.datatype.display === 'Numeric' ? 'number' : 'text'}
               labelText={
-                concept?.display + (concept.datatype.display === 'Numeric' ? printValueRange(concept) ?? '' : '')
+                concept?.display + (concept.datatype.display === 'Numeric' ? ` ${printValueRange(concept)}` ?? '' : '')
               }
               defaultValue={defaultValue?.value}
               autoFocus
