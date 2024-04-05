@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { showNotification, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
@@ -126,7 +126,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         mutate();
 
         showSnackbar({
-          isLowContrast: true,
           title: t('saveLabResults', 'Save lab results'),
           kind: 'success',
           subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
@@ -136,11 +135,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       },
       (err) => {
         setIsSubmitting(false);
-        showNotification({
+        showSnackbar({
           title: t('errorSavingLabResults', 'Error saving lab results'),
           kind: 'error',
-          critical: true,
-          description: err?.message,
+          subtitle: err?.message,
         });
       },
     );
