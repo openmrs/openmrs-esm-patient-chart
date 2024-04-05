@@ -33,6 +33,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
+  launchPatientWorkspace,
   PatientChartPagination,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
@@ -43,7 +44,6 @@ import {
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
 import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
-import { labsOrderBasket, medicationsOrderBasket } from '../constants';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
@@ -65,12 +65,17 @@ interface OrderHeaderProps {
 
 type MutableOrderBasketItem = OrderBasketItem | LabOrderBasketItem | DrugOrderBasketItem;
 
+const medicationsOrderBasket = 'medications';
+const labsOrderBasket = 'labs';
+
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, showAddButton, showPrintButton }) => {
   const { t } = useTranslation();
   const defaultPageSize = 10;
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchAddLabsOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -86,6 +91,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+
+  // launch respective order basket based on order type
+  const openOrderForm = useCallback((orderItem) => {
+    switch (orderItem.type) {
+      case 'drugorder':
+        launchAddDrugOrder();
+        break;
+      case 'testorder':
+        launchAddLabsOrder();
+        break;
+      default:
+        launchOrderBasket();
+    }
+  }, []);
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -156,7 +175,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           items={orders}
           setOrderItems={setOrders}
           openOrderBasket={launchOrderBasket}
-          openOrderForm={launchOrderBasket}
+          openOrderForm={() => openOrderForm(order)}
         />
       ),
     }));
@@ -226,7 +245,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
-        if (patient && patient.patient && title) {
+        if (patient && patient?.patient && title) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
@@ -380,7 +399,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   );
 };
 
-function FormatCellDisplay({ rowDisplay }: { rowDisplay: string }) {
+function FormatCellDisplay({ rowDisplay }: { readonly rowDisplay: string }) {
   return (
     <>
       {typeof rowDisplay === 'string' && rowDisplay.length > 20 ? (
@@ -394,7 +413,7 @@ function FormatCellDisplay({ rowDisplay }: { rowDisplay: string }) {
   );
 }
 
-function ExpandedRowView({ row }: { row: any }) {
+function ExpandedRowView({ row }: { readonly row: any }) {
   const { t } = useTranslation();
   let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
   let orderItem = orderActions.value?.props?.orderItem;
@@ -406,7 +425,7 @@ function ExpandedRowView({ row }: { row: any }) {
   } else {
     return (
       <div>
-        <p>{t('unknownOrderType', 'Unknown Order Type')}</p>
+        <p>{t('unknownOrderType', 'Unknown order type')}</p>
       </div>
     );
   }
@@ -429,13 +448,24 @@ function OrderBasketItemActions({
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
-  const handleViewEditClick = useCallback(() => {
-    // openOrderForm({ order: orderItem });
+  const handleModifyClick = useCallback(() => {
+    if (orderItem.type === 'drugorder') {
+      getDrugOrderByUuid(orderItem.uuid).then((res) => {
+        let medicationOrder = res.data;
+        const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
+        setOrderItems(medicationsOrderBasket, [...items, medicationItem]);
+        openOrderForm({ order: medicationItem });
+      });
+    } else {
+      const labItem = buildLabOrder(orderItem, 'REVISE');
+      setOrderItems(labsOrderBasket, [...items, labItem]);
+      openOrderForm({ order: labItem });
+    }
   }, [orderItem, openOrderForm]);
 
   const handleAddResultsClick = useCallback(() => {
-    // openOrderForm({ order: orderItem, addResults: true });
-  }, [orderItem, openOrderForm]);
+    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
+  }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
@@ -461,15 +491,19 @@ function OrderBasketItemActions({
       <OverflowMenuItem
         className={styles.menuItem}
         id="modify"
-        itemText={t('viewEdit', 'View/Edit Order')}
-        onClick={handleViewEditClick}
+        itemText={t('modifyOrder', 'Modify order')}
+        onClick={handleModifyClick}
         disabled={alreadyInBasket}
       />
-      {!orderItem.fulfillerStatus && (
+      {orderItem.type === 'testorder' && (
         <OverflowMenuItem
           className={styles.menuItem}
           id="reorder"
-          itemText={t('addResults', 'Add Results')}
+          itemText={
+            orderItem.fulfillerStatus === 'COMPLETED'
+              ? t('editResults', 'Edit results')
+              : t('addResults', 'Add results')
+          }
           onClick={handleAddResultsClick}
           disabled={alreadyInBasket}
         />
@@ -477,7 +511,7 @@ function OrderBasketItemActions({
       <OverflowMenuItem
         className={styles.menuItem}
         id="discontinue"
-        itemText={t('cancelOrder', 'Cancel Order')}
+        itemText={t('cancelOrder', 'Cancel order')}
         onClick={handleCancelClick}
         disabled={alreadyInBasket || orderItem.action === 'DISCONTINUE'}
         isDelete={true}
