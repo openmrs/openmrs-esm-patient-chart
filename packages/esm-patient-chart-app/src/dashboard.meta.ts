@@ -17,5 +17,4 @@ export const activeVisitDashboardMeta = {
   columns: 1,
   path: 'Active Visits',
   title: 'Active Visits',
-  hideDashboardTitle: true,
 };

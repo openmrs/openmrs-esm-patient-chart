@@ -36,12 +36,6 @@ import activeVisitDetailOverviewComponent from './visit/visits-widget/active-vis
 // using webpack. This is used for ngx-formentry.
 window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
 
-registerFeatureFlag(
-  'activeVisitsSummaryTab',
-  'Active visits summary',
-  'This feature introduces a navigation on the patient chart left nav called active visit and shows the active visit details within patient chart',
-);
-
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
@@ -274,14 +268,6 @@ export const deleteVisitActionButton = getAsyncLifecycle(
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
-);
-
-export const activeVisitDashboardLink = getSyncLifecycle(
-  createDashboardLink({
-    ...activeVisitDashboardMeta,
-    moduleName,
-  }),
-  { featureName: 'active-visit', moduleName },
 );
 
 export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {

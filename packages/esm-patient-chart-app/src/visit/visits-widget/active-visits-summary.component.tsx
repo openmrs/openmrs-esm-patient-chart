@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useVisits } from './visit.resource';
 import VisitSummary from './past-visits-components/visit-summary.component';
@@ -60,6 +60,9 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
                             </>
                           ) : null}
                         </div>
+                      </div>
+                      <div>
+                        <ExtensionSlot name="active-visit-actions" />
                       </div>
                     </div>
                   </div>

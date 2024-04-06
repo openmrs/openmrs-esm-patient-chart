@@ -250,13 +250,8 @@
       "meta": {
         "slot": "patient-chart-active-visit-dashboard-slot",
         "columns": 1,
-        "path": "Active Visits",
-        "hideDashboardTitle": true
-      },
-      "featureFlag": "activeVisitsSummaryTab",
-      "order": 10,
-      "online": true,
-      "offline": false
+        "path": "Active Visits"
+      }
     },
     {
       "name": "active-visit-overview",
@@ -266,10 +261,7 @@
       "meta": {
         "title": "Active Visits",
         "view": "Active Visits"
-      },
-      "featureFlag": "activeVisitsSummaryTab",
-      "online": true,
-      "offline": false
+      }
     }
   ],
   "pages": [
