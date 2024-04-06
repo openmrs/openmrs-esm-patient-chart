@@ -47,11 +47,6 @@ jest.mock('@openmrs/esm-framework', () => {
     useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
-    usePagination: jest.fn().mockImplementation(() => ({
-      results: mockVisitTypes,
-      goTo: () => {},
-      currentPage: 1,
-    })),
   };
 });
 
