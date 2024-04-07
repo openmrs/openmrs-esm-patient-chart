@@ -561,7 +561,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               <Button
                 className={styles.uploadButton}
                 kind="ghost"
-                onClick={showImageCaptureModal} // Modify this line to trigger image capture modal
+                onClick={showImageCaptureModal}
                 renderIcon={(props) => <Add size={16} {...props} />}
               >
                 {t('addImage', 'Add image')}
