@@ -23,12 +23,21 @@ const options = {
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
+  // t('orderCancellation','Order cancellation')
   registerWorkspace({
     name: 'patient-orders-form-workspace',
-    // t('orderCancellation','Order cancellation')
     title: translateFrom(moduleName, 'orderCancellation', 'Order cancellation'),
     load: getAsyncLifecycle(() => import('./order-cancellation-form/cancel-order-form.component'), options),
     type: 'order',
+    canHide: false,
+  });
+
+  // t('enterTestResults', 'Enter test results')
+  registerWorkspace({
+    name: 'test-results-form-workspace',
+    title: translateFrom(moduleName, 'enterTestResults', 'Enter test results'),
+    load: getAsyncLifecycle(() => import('./lab-results/lab-results-form.component'), options),
+    type: 'lab-results',
     canHide: false,
   });
 }
