@@ -67,8 +67,12 @@ const visitNoteFormSchema = z.object({
     )
     .optional(),
 });
-
-type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
+type VisitNotesFormData = z.infer<typeof visitNoteFormSchema> & {
+  images?: {
+    base64Content: string;
+    fileType: string;
+  }[];
+};
 
 interface DiagnosesDisplayProps {
   fieldName: string;
@@ -236,7 +240,11 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (files: UploadedFile[]) => {
-        setValue('images', (prevImages) => [...prevImages, ...files]);
+        const newImages = files.map((file) => ({
+          base64Content: file.base64Content,
+          fileType: file.fileType,
+        }));
+        setValue('images', (prevImages: VisitNotesFormData['images']) => [...(prevImages ?? []), ...newImages]);
         close();
         return Promise.resolve();
       },
@@ -247,7 +255,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
       multipleFiles: true,
       collectDescription: false,
     });
-  }, [patientUuid]);
+  }, [patientUuid, setValue]);
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData, event: SyntheticEvent) => {
@@ -298,14 +306,24 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
           }
         })
         .then(() => {
-          if (data.images) {
-            return createAttachment(patientUuid, data.images);
+          if (images && images.length > 0) {
+            return Promise.all(
+              images.map((image) => {
+                const uploadedFile: UploadedFile = {
+                  base64Content: image.base64Content,
+                  fileName: 'filename',
+                  fileType: image.fileType,
+                  fileDescription: 'description',
+                };
+                return createAttachment(patientUuid, [uploadedFile]);
+              }),
+            );
           }
         })
         .then(() => {
           mutateVisitNotes();
           mutateVisits();
-          if (data.images) {
+          if (images && images.length > 0) {
             mutateAttachments();
           }
           closeWorkspaceWithSavedChanges();
@@ -349,6 +367,10 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   );
 
   const onError = (errors) => console.error(errors);
+
+  function handleRemoveImage(index: number) {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
@@ -534,21 +556,24 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
           <Column sm={3}>
             <FormGroup>
               <p className={styles.imgUploadHelperText}>
-                {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
+                {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
               </p>
+              <Button
+                className={styles.uploadButton}
+                kind="ghost"
+                onClick={showImageCaptureModal} // Modify this line to trigger image capture modal
+                renderIcon={(props) => <Add size={16} {...props} />}
+              >
+                {t('addImage', 'Add image')}
+              </Button>
               {currentImage.map((image, index) => (
                 <div key={index}>
-                  <Button
-                    className={styles.uploadButton}
-                    kind={isTablet ? 'ghost' : 'tertiary'}
-                    onClick={() => showImageCaptureModal(index)}
-                    renderIcon={(props) => <Add size={16} {...props} />}
-                  >
-                    {t('addImage', 'Add image')}
-                  </Button>
                   {image.base64Content && image.fileType === 'image' && (
                     <div className={styles.imgThumbnailContainer}>
                       <img src={image.base64Content} className={styles.imgThumbnail} />
+                      <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
+                        {t('remove', 'Remove')}
+                      </Button>
                     </div>
                   )}
                 </div>
