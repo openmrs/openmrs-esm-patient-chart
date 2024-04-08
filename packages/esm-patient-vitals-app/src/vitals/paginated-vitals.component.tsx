@@ -85,7 +85,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       sortedRows.reverse();
     }
     return sortedRows;
-  }, [tableHeaders, sortParams]);
+  }, [tableHeaders, tableRows, sortParams]);
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 

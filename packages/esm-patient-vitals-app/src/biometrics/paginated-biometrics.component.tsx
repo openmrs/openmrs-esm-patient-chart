@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   DataTable,
   type DataTableRow,
@@ -12,14 +12,14 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import orderBy from 'lodash/orderBy';
+import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 
 interface PaginatedBiometricsProps {
-  tableRows: Array<typeof DataTableRow>;
+  tableRows: Array<BiometricsTableRow>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<{ key: string; header: string }>;
+  tableHeaders: Array<BiometricsTableHeader>;
 }
 
 const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
@@ -31,25 +31,42 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
-  const [sortParams, setSortParams] = useState({ key: '', order: 'NONE' });
+  const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
+    key: '',
+    sortDirection: 'NONE',
+  });
 
-  const handleSort = (cellA, cellB, { sortDirection }) => {
-    setSortParams({ key: 'date', order: sortDirection });
+  const handleSorting = (
+    cellA,
+    cellB,
+    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+  ) => {
+    if (sortDirection === 'NONE') {
+      setSortParams({ key: '', sortDirection });
+    } else {
+      setSortParams({ key, sortDirection });
+    }
   };
 
-  const sortDate = (myArray, order) =>
-    order === 'ASC'
-      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
-      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+  const sortedData: Array<BiometricsTableRow> = useMemo(() => {
+    if (sortParams.sortDirection === 'NONE') {
+      return tableRows;
+    }
 
-  const { key, order } = sortParams;
+    const header = tableHeaders.find((header) => header.key === sortParams.key);
 
-  const sortedData =
-    key === 'date'
-      ? sortDate(tableRows, order)
-      : order === 'DESC'
-      ? orderBy(tableRows, [key], ['desc'])
-      : orderBy(tableRows, [key], ['asc']);
+    if (!header) {
+      return tableRows;
+    }
+
+    const sortedRows = [...tableRows].sort((rowA, rowB) => header.sortFunc(rowA, rowB));
+
+    if (sortParams.sortDirection === 'DESC') {
+      sortedRows.reverse();
+    }
+
+    return sortedRows;
+  }, [tableRows, tableHeaders, sortParams]);
 
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
@@ -60,7 +77,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         headers={tableHeaders}
         size={isTablet ? 'lg' : 'sm'}
         useZebraStyles
-        sortRow={handleSort}
+        sortRow={handleSorting}
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
