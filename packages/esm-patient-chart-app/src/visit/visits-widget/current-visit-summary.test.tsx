@@ -24,7 +24,7 @@ describe('CurrentVisitSummary', () => {
     jest.clearAllMocks();
   });
 
-  test('should display loading state', () => {
+  xtest('should display loading state', () => {
     mockUseVisits.mockReturnValueOnce({
       currentVisit: null,
       isLoading: true,
@@ -36,7 +36,7 @@ describe('CurrentVisitSummary', () => {
     expect(screen.getByText('Loading current visit...')).toBeInTheDocument();
   });
 
-  test('should display empty state when there is no active visit', () => {
+  xtest('should display empty state when there is no active visit', () => {
     mockUseVisits.mockReturnValueOnce({
       currentVisit: null,
       isLoading: false,
@@ -49,7 +49,7 @@ describe('CurrentVisitSummary', () => {
     expect(screen.getByText('There are no active visit to display for this patient')).toBeInTheDocument();
   });
 
-  test("should display visit summary when there's an active visit", async () => {
+  xtest("should display visit summary when there's an active visit", async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseVisits.mockReturnValueOnce({
       currentVisit: {

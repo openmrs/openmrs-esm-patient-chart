@@ -48,7 +48,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
-  const isActiveVisitSummaryTabEnabled = useFeatureFlag('activeVisitsSummaryTab');
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -163,24 +162,14 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
-          {isActiveVisitSummaryTabEnabled === true ? (
-            visit?.encounters?.length > 0 &&
+          {visit?.encounters?.length > 0 &&
             visit?.encounters
               .filter((enc) => !!enc.form)
               .map((enc, ind) => (
                 <Tab id={'tab-' + ind} key={ind} className={classNames(styles.tab, styles.bodyLong01)}>
                   {enc?.form?.display}
                 </Tab>
-              ))
-          ) : (
-            <Tab
-              className={styles.tab}
-              id="encounters-tab"
-              disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
-            >
-              {t('encounters_title', 'Encounters')}
-            </Tab>
-          )}
+              ))}
           {extensions.map((extension, index) => (
             <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
               {t(extension.meta.title, {
@@ -200,22 +189,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {isActiveVisitSummaryTabEnabled === true ? (
-            visit?.encounters?.length > 0 &&
-            foundEncounter && (
-              <TabPanel key={selectedIndex}>
-                <OHRIForm
-                  patientUUID={patientUuid}
-                  formUUID={foundEncounter.form?.uuid}
-                  encounterUUID={foundEncounter.uuid}
-                  mode="view"
-                />
-                <p>Test</p>
-              </TabPanel>
-            )
-          ) : (
-            <TabPanel>
-              <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
+          {visit?.encounters?.length > 0 && foundEncounter && (
+            <TabPanel key={selectedIndex}>
+              <OHRIForm
+                patientUUID={patientUuid}
+                formUUID={foundEncounter.form?.uuid}
+                encounterUUID={foundEncounter.uuid}
+                mode="view"
+              />
+              <p>Test</p>
             </TabPanel>
           )}
           <ExtensionSlot name={visitSummaryPanelSlot}>

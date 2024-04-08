@@ -10,7 +10,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
-import { summaryDashboardMeta, encountersDashboardMeta, activeVisitDashboardMeta } from './dashboard.meta';
+import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
@@ -35,12 +35,6 @@ import activeVisitDetailOverviewComponent from './visit/visits-widget/active-vis
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
 window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
-
-registerFeatureFlag(
-  'activeVisitsSummaryTab',
-  'Active visits summary',
-  'This feature introduces a navigation on the patient chart left nav called active visit and shows the active visit details within patient chart',
-);
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -274,14 +268,6 @@ export const deleteVisitActionButton = getAsyncLifecycle(
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
-);
-
-export const activeVisitDashboardLink = getSyncLifecycle(
-  createDashboardLink({
-    ...activeVisitDashboardMeta,
-    moduleName,
-  }),
-  { featureName: 'active-visit', moduleName },
 );
 
 export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {
