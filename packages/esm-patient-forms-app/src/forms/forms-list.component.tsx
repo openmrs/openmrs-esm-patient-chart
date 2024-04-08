@@ -45,7 +45,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
       .filter(searchTerm, completedForms, { extract: (formInfo) => formInfo.form.display ?? formInfo.form.name })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [completedForms, searchTerm, locale]);
+  }, [completedForms, searchTerm]);
 
   const tableHeaders = useMemo(() => {
     return [

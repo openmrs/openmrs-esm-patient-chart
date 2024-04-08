@@ -37,7 +37,7 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
         mutateForms,
       );
     },
-    [currentVisit, htmlFormEntryForms, patient, mutateForms],
+    [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
   const sections = useMemo(() => {

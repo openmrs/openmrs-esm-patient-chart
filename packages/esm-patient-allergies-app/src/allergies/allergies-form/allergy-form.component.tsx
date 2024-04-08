@@ -160,7 +160,7 @@ function AllergyForm(props: AllergyFormProps) {
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const selectedAllergen = watch('allergen');
   const selectedAllergicReactions = watch('allergicReactions');
@@ -268,7 +268,7 @@ function AllergyForm(props: AllergyFormProps) {
             )
             .finally(() => abortController.abort());
     },
-    [otherConceptUuid, patientUuid, closeWorkspaceWithSavedChanges, t, mutate],
+    [otherConceptUuid, patientUuid, t, mutate, allergy?.id, closeWorkspace, formContext],
   );
 
   return (

@@ -179,7 +179,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         />
       ),
     }));
-  }, [allOrders]);
+  }, [allOrders, isPrinting, launchOrderBasket, orders, setOrders]);
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
     return sortDirection === sortStates.DESC
@@ -461,7 +461,7 @@ function OrderBasketItemActions({
       setOrderItems(labsOrderBasket, [...items, labItem]);
       openOrderForm({ order: labItem });
     }
-  }, [orderItem, openOrderForm]);
+  }, [orderItem, openOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });

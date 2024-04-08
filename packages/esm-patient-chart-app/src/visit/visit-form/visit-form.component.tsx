@@ -166,7 +166,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return defaultValues;
-  }, [visitToEdit]);
+  }, [visitToEdit, sessionLocation]);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -184,7 +184,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
+
+  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
+    if (!visitToEdit?.encounters?.length) {
+      return [null, null];
+    }
+
+    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
+      Date.parse(encounterDatetime),
+    );
+    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
+    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
+    return [maxVisitStartDatetime, minVisitStopDatetime];
+  }, [visitToEdit]);
 
   const validateVisitStartStopDatetime = useCallback(() => {
     let visitStartDate = getValues('visitStartDate');
@@ -245,7 +258,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return validSubmission;
-  }, [setError]);
+  }, [setError, displayVisitStopDateTimeFields, getValues, t, maxVisitStartDatetime, minVisitStopDatetime]);
 
   const onSubmit = useCallback(
     (data: VisitFormData, event) => {
@@ -471,21 +484,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       t,
       visitToEdit,
       displayVisitStopDateTimeFields,
+      config.offlineVisitTypeUuid,
+      config.showExtraVisitAttributesSlot,
+      extraVisitInfo,
+      isOnline,
+      mutate,
+      mutateQueueEntry,
+      validateVisitStartStopDatetime,
     ],
   );
-
-  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
-    if (!visitToEdit?.encounters?.length) {
-      return [null, null];
-    }
-
-    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
-      Date.parse(encounterDatetime),
-    );
-    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
-    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
-    return [maxVisitStartDatetime, minVisitStopDatetime];
-  }, [visitToEdit]);
 
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());

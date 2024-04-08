@@ -106,7 +106,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
     ?.uuid;
@@ -164,61 +164,76 @@ const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
     ],
   );
 
-  const savePatientVitalsAndBiometrics = useCallback((data: VitalsBiometricsFormData) => {
-    const formData = data;
-    setShowErrorMessage(true);
-    setShowErrorNotification(false);
+  const savePatientVitalsAndBiometrics = useCallback(
+    (data: VitalsBiometricsFormData) => {
+      const formData = data;
+      setShowErrorMessage(true);
+      setShowErrorNotification(false);
 
-    data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
+      data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
 
-    const allFieldsAreValid = Object.entries(formData)
-      .filter(([, value]) => Boolean(value))
-      .every(([key, value]) => isValueWithinReferenceRange(conceptMetadata, config.concepts[`${key}Uuid`], value));
+      const allFieldsAreValid = Object.entries(formData)
+        .filter(([, value]) => Boolean(value))
+        .every(([key, value]) => isValueWithinReferenceRange(conceptMetadata, config.concepts[`${key}Uuid`], value));
 
-    if (allFieldsAreValid) {
-      setIsSubmitting(true);
-      setShowErrorMessage(false);
-      const abortController = new AbortController();
+      if (allFieldsAreValid) {
+        setIsSubmitting(true);
+        setShowErrorMessage(false);
+        const abortController = new AbortController();
 
-      savePatientVitals(
-        config.vitals.encounterTypeUuid,
-        config.vitals.formUuid,
-        config.concepts,
-        patientUuid,
-        formData,
-        new Date(),
-        abortController,
-        session?.sessionLocation?.uuid,
-      )
-        .then((response) => {
-          if (response.status === 201) {
-            invalidateCachedVitalsAndBiometrics();
-            closeWorkspaceWithSavedChanges();
+        savePatientVitals(
+          config.vitals.encounterTypeUuid,
+          config.vitals.formUuid,
+          config.concepts,
+          patientUuid,
+          formData,
+          new Date(),
+          abortController,
+          session?.sessionLocation?.uuid,
+        )
+          .then((response) => {
+            if (response.status === 201) {
+              invalidateCachedVitalsAndBiometrics();
+              closeWorkspaceWithSavedChanges();
+              showSnackbar({
+                isLowContrast: true,
+                kind: 'success',
+                title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+                subtitle: t(
+                  'vitalsAndBiometricsNowAvailable',
+                  'They are now visible on the Vitals and Biometrics page',
+                ),
+              });
+            }
+          })
+          .catch((err) => {
+            setIsSubmitting(false);
+            createErrorHandler();
             showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-              subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
+              title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
             });
-          }
-        })
-        .catch((err) => {
-          setIsSubmitting(false);
-          createErrorHandler();
-          showSnackbar({
-            title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
+          })
+          .finally(() => {
+            abortController.abort();
           });
-        })
-        .finally(() => {
-          abortController.abort();
-        });
-    } else {
-      setHasInvalidVitals(true);
-    }
-  }, []);
+      } else {
+        setHasInvalidVitals(true);
+      }
+    },
+    [
+      closeWorkspaceWithSavedChanges,
+      conceptMetadata,
+      config.concepts,
+      config.vitals.encounterTypeUuid,
+      config.vitals.formUuid,
+      patientUuid,
+      session?.sessionLocation?.uuid,
+      t,
+    ],
+  );
 
   if (config.vitals.useFormEngine) {
     return (

@@ -188,6 +188,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     setErrorUpdating,
     setIsSubmittingForm,
     t,
+    editableAbatementDateTime,
   ]);
 
   const focusOnSearchInput = () => {

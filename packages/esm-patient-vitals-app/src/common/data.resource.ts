@@ -111,7 +111,10 @@ const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>(
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
   const { conceptMetadata } = useVitalsConceptMetadata();
   const { concepts } = useConfig<ConfigObject>();
-  const biometricsConcepts = [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid];
+  const biometricsConcepts = useMemo(
+    () => [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
+    [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
+  );
 
   const conceptUuids = useMemo(
     () =>
@@ -123,7 +126,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
               (mode === 'biometrics' && biometricsConcepts.includes(uuid)),
           )
       ).join(','),
-    [concepts, biometricsConcepts],
+    [concepts, biometricsConcepts, mode],
   );
 
   const getPage = useCallback(
@@ -135,7 +138,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       page,
       prevPageData,
     }),
-    [swrKeyNeedle, mode, conceptUuids],
+    [mode, conceptUuids, patientUuid],
   );
 
   const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
@@ -152,28 +155,43 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     };
   }, [mutate]);
 
-  const getVitalsMapKey = (conceptUuid: string): string => {
-    switch (conceptUuid) {
-      case concepts.systolicBloodPressureUuid:
-        return 'systolic';
-      case concepts.diastolicBloodPressureUuid:
-        return 'diastolic';
-      case concepts.pulseUuid:
-        return 'pulse';
-      case concepts.temperatureUuid:
-        return 'temperature';
-      case concepts.oxygenSaturationUuid:
-        return 'spo2';
-      case concepts.respiratoryRateUuid:
-        return 'respiratoryRate';
-      case concepts.heightUuid:
-        return 'height';
-      case concepts.weightUuid:
-        return 'weight';
-      case concepts.midUpperArmCircumferenceUuid:
-        return 'muac';
-    }
-  };
+  const getVitalsMapKey = useCallback(
+    (conceptUuid: string): string => {
+      switch (conceptUuid) {
+        case concepts.systolicBloodPressureUuid:
+          return 'systolic';
+        case concepts.diastolicBloodPressureUuid:
+          return 'diastolic';
+        case concepts.pulseUuid:
+          return 'pulse';
+        case concepts.temperatureUuid:
+          return 'temperature';
+        case concepts.oxygenSaturationUuid:
+          return 'spo2';
+        case concepts.respiratoryRateUuid:
+          return 'respiratoryRate';
+        case concepts.heightUuid:
+          return 'height';
+        case concepts.weightUuid:
+          return 'weight';
+        case concepts.midUpperArmCircumferenceUuid:
+          return 'muac';
+        default:
+          return ''; // or throw an error for unknown conceptUuid
+      }
+    },
+    [
+      concepts.heightUuid,
+      concepts.midUpperArmCircumferenceUuid,
+      concepts.systolicBloodPressureUuid,
+      concepts.oxygenSaturationUuid,
+      concepts.diastolicBloodPressureUuid,
+      concepts.pulseUuid,
+      concepts.respiratoryRateUuid,
+      concepts.temperatureUuid,
+      concepts.weightUuid,
+    ],
+  );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
     const vitalsHashTable = data?.[0]?.data?.entry
@@ -222,7 +240,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
       return result;
     });
-  }, [data, conceptMetadata, getVitalsMapKey]);
+  }, [data, conceptMetadata, getVitalsMapKey, concepts, mode]);
 
   return {
     data: data ? formattedObs : undefined,
