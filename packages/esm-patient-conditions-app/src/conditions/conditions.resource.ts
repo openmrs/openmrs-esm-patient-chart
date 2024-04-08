@@ -251,9 +251,9 @@ export interface ConditionTableHeader {
 
 export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, tableRows: Array<ConditionTableRow>) {
   const [sortParams, setSortParams] = useState<{
-    key: ConditionTableHeader['key'];
+    key: ConditionTableHeader['key'] | '';
     sortDirection: 'ASC' | 'DESC' | 'NONE';
-  }>({ key: 'display', sortDirection: 'ASC' });
+  }>({ key: '', sortDirection: 'NONE' });
   const sortRow = (cellA, cellB, { key, sortDirection }) => {
     setSortParams({ key, sortDirection });
   };
