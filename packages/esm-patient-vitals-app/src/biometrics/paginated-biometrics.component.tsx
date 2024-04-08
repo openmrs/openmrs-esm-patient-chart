@@ -59,11 +59,10 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       return tableRows;
     }
 
-    const sortedRows = [...tableRows].sort((rowA, rowB) => header.sortFunc(rowA, rowB));
-
-    if (sortParams.sortDirection === 'DESC') {
-      sortedRows.reverse();
-    }
+    const sortedRows = tableRows.slice().sort((rowA, rowB) => {
+      const sortingNum = header.sortFunc(rowA, rowB);
+      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
+    });
 
     return sortedRows;
   }, [tableRows, tableHeaders, sortParams]);
@@ -78,6 +77,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         size={isTablet ? 'lg' : 'sm'}
         useZebraStyles
         sortRow={handleSorting}
+        isSortable
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>

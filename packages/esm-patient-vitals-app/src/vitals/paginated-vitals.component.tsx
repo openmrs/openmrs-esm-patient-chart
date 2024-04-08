@@ -79,11 +79,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       return tableRows;
     }
 
-    const sortedRows = [...tableRows].sort((rowA, rowB) => header.sortFunc(rowA, rowB));
+    const sortedRows = tableRows.slice().sort((rowA, rowB) => {
+      const sortingNum = header.sortFunc(rowA, rowB);
+      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
+    });
 
-    if (sortParams.sortDirection === 'DESC') {
-      sortedRows.reverse();
-    }
     return sortedRows;
   }, [tableHeaders, tableRows, sortParams]);
 
@@ -99,6 +99,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         size={isTablet ? 'lg' : 'sm'}
         useZebraStyles
         sortRow={handleSorting}
+        isSortable
       >
         {({ rows, headers, getTableProps, getHeaderProps }) => (
           <TableContainer>

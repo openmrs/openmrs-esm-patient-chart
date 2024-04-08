@@ -267,7 +267,7 @@ export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, 
 
     return tableRows?.slice().sort((a, b) => {
       const sortingNum = tableHeader.sortFunc(a, b);
-      return (sortDirection === 'ASC' ? -1 : 1) * sortingNum;
+      return sortDirection === 'DESC' ? sortingNum : -sortingNum;
     });
   }, [sortParams, tableRows, tableHeaders]);
 
