@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   type DataTableRow,
@@ -12,6 +12,7 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import orderBy from 'lodash/orderBy';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<typeof DataTableRow>;
@@ -28,12 +29,39 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   urlLabel,
   tableHeaders,
 }) => {
-  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
   const isTablet = useLayoutType() === 'tablet';
+
+  const [sortParams, setSortParams] = useState({ key: '', order: 'NONE' });
+
+  const handleSort = (cellA, cellB, { sortDirection }) => {
+    setSortParams({ key: 'date', order: sortDirection });
+  };
+
+  const sortDate = (myArray, order) =>
+    order === 'ASC'
+      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
+      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+
+  const { key, order } = sortParams;
+
+  const sortedData =
+    key === 'date'
+      ? sortDate(tableRows, order)
+      : order === 'DESC'
+      ? orderBy(tableRows, [key], ['desc'])
+      : orderBy(tableRows, [key], ['asc']);
+
+  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   return (
     <div>
-      <DataTable rows={paginatedBiometrics} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+      <DataTable
+        rows={paginatedBiometrics}
+        headers={tableHeaders}
+        size={isTablet ? 'lg' : 'sm'}
+        useZebraStyles
+        sortRow={handleSort}
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table aria-label="biometrics" {...getTableProps()}>
@@ -43,6 +71,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     <TableHeader
                       {...getHeaderProps({
                         header,
+                        isSortable: header.isSortable,
                       })}
                     >
                       {header.header?.content ?? header.header}
