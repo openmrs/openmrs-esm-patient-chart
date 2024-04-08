@@ -524,7 +524,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup>
+            <FormGroup legendText="">
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
