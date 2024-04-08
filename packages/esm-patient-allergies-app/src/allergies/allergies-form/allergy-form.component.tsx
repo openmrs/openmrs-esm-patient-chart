@@ -377,7 +377,6 @@ function AllergyForm(props: AllergyFormProps) {
                     onChange={(event) => onChange(event.toString())}
                     valueSelected={value}
                     onBlur={onBlur}
-                    labelText={t('severityOfWorstReaction', 'Severity of worst reaction')}
                   >
                     {severityLevels.map((severity, index) => (
                       <RadioButton
