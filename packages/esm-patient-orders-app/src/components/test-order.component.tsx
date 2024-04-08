@@ -46,7 +46,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     if (encounter && concept) {
       return encounter.obs?.find((obs) => obs.concept.uuid === concept.uuid);
     }
-  }, [concept]);
+  }, [concept, encounter]);
 
   const testRows = useMemo(() => {
     if (concept && concept.setMembers.length > 0) {
@@ -75,7 +75,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     } else {
       return [];
     }
-  }, [concept]);
+  }, [concept, isLoadingResult, testResultObs?.groupMembers, testResultObs?.value?.display]);
 
   return (
     <div className={styles.testOrder}>
