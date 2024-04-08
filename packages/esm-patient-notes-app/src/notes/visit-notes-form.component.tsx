@@ -49,7 +49,7 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-const allowedImageTypes = ['.jpeg', '.jpg', '.png', '.webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
