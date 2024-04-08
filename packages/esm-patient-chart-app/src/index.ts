@@ -10,7 +10,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
-import { summaryDashboardMeta, encountersDashboardMeta, activeVisitDashboardMeta } from './dashboard.meta';
+import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';

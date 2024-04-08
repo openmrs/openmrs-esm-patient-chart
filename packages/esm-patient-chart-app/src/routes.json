@@ -244,16 +244,6 @@
       "order": 1
     },
     {
-      "name": "active-visit-summary-dashboard",
-      "component": "activeVisitDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "slot": "patient-chart-active-visit-dashboard-slot",
-        "columns": 1,
-        "path": "Active Visits"
-      }
-    },
-    {
       "name": "active-visit-overview",
       "component": "activeVisitDetailOverview",
       "slot": "patient-chart-active-visit-dashboard-slot",

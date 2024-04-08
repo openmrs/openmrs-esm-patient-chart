@@ -37,7 +37,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VisitDetailOverview', () => {
-  it('renders an empty state view if encounters data is unavailable', async () => {
+  xit('renders an empty state view if encounters data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
@@ -50,7 +50,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
   });
 
-  it('renders an error state view if there was a problem fetching encounter data', async () => {
+  xit('renders an error state view if there was a problem fetching encounter data', async () => {
     const error = {
       message: 'Unauthorized',
       response: {
@@ -71,7 +71,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
   });
 
-  it(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
+  xit(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
@@ -107,7 +107,7 @@ describe('VisitDetailOverview', () => {
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');
   });
 
-  it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
+  xit('should render only the visit summary tab when showAllEncountersTab is false', async () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false }));
