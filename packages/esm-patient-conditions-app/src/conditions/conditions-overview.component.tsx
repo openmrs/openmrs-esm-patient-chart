@@ -169,7 +169,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         </CardHeader>
         <DataTable
           aria-label="conditions overview"
-          rows={tableRows}
+          rows={paginatedConditions}
           headers={headers}
           isSortable
           size={isTablet ? 'lg' : 'sm'}
