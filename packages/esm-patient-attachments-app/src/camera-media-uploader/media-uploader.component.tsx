@@ -62,7 +62,7 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, maxFileSize, t],
+    [setFilesToUpload, maxFileSize, t, allowedExtensions],
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {

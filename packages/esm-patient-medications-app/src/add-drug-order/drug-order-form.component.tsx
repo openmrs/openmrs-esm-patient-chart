@@ -229,7 +229,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -237,7 +237,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
         setValue('quantityUnits', newValue, { shouldValidate: true });
       }
     },
-    [setValue],
+    [setValue, getValues],
   );
 
   const routeValue = watch('route')?.value;
@@ -780,7 +780,7 @@ const ControlledFieldInput = ({
       onChange(newValue);
       handleAfterChange?.(newValue, prevValue);
     },
-    [getValues, onChange, handleAfterChange],
+    [getValues, onChange, handleAfterChange, name],
   );
 
   const component = useMemo(() => {
@@ -846,7 +846,7 @@ const ControlledFieldInput = ({
       );
 
     return null;
-  }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
+  }, [fieldState?.error?.message, onBlur, ref, restProps, type, value, handleChange]);
 
   return (
     <>

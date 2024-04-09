@@ -41,6 +41,7 @@
     "dotenv": "^16.3.1",
     "eslint": "^8.50.0",
     "eslint-plugin-playwright": "^0.16.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "i18next": "^21.10.0",
     "i18next-parser": "^6.6.0",

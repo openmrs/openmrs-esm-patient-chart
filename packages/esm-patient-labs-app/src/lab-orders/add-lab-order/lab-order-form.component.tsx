@@ -121,7 +121,7 @@ export function LabOrderForm({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
+    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
   );
 
   const cancelOrder = useCallback(() => {
@@ -139,7 +139,7 @@ export function LabOrderForm({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   return (
     <>
