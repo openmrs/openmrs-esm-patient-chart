@@ -54,6 +54,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
 
+  const handleSort = (cellA, cellB, { sortDirection }) => {
+    setSortParams({ key: 'date', order: sortDirection });
+  };
+
   const sortDate = (myArray, order) =>
     order === 'ASC'
       ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
@@ -62,7 +66,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { key, order } = sortParams;
 
   const sortedData =
-    key === 'encounterDate'
+    key === 'date'
       ? sortDate(tableRows, order)
       : order === 'DESC'
       ? orderBy(tableRows, [key], ['desc'])
@@ -74,14 +78,16 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
   return (
     <div>
-      <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-        {({ rows, headers, getTableProps }) => (
+      <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles sortRow={handleSort}>
+        {({ rows, headers, getTableProps, getHeaderProps }) => (
           <TableContainer>
             <Table className={styles.table} aria-label="vitals" {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
+                    <TableHeader {...getHeaderProps({ header, isSortable: header.isSortable })} key={header.key}>
+                      {header.header?.content ?? header.header}
+                    </TableHeader>
                   ))}
                 </TableRow>
               </TableHead>

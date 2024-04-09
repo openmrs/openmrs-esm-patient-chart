@@ -37,7 +37,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   );
 
   const tableHeaders = [
-    { key: 'date', header: t('dateAndTime', 'Date and time') },
+    { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
     { key: 'weight', header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? '') },
     { key: 'height', header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? '') },
     { key: 'bmi', header: `${t('bmi', 'BMI')} (${bmiUnit})` },

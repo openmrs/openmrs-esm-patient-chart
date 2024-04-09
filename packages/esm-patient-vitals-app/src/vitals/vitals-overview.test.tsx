@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig, usePagination } from '@openmrs/esm-framework';
+import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { formattedVitals, mockConceptMetadata, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
@@ -11,7 +11,6 @@ import VitalsOverview from './vitals-overview.component';
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 const mockedUseConfig = jest.mocked(useConfig);
 const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockUsePagination = jest.mocked(usePagination);
 
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
@@ -91,34 +90,42 @@ describe('VitalsOverview', () => {
   });
 
   it("renders a tabular overview of the patient's vital signs", async () => {
+    const user = userEvent.setup();
+
     mockedUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
-
-    mockUsePagination.mockReturnValue({
-      currentPage: 1,
-      goTo: () => {},
-      results: formattedVitals.slice(0, 5),
-      totalPages: formattedVitals.length / 5,
-      paginated: true,
-      showNextButton: true,
-      showPreviousButton: false,
-      goToNext: undefined,
-      goToPrevious: undefined,
-    } as ReturnType<typeof usePagination>);
 
     renderVitalsOverview();
 
     await waitForLoadingToFinish();
     expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
 
+    const initialRowElements = screen.getAllByRole('row');
+
     const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/];
+
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [/37 76 12/, /37 66 45 90/, /36.5 78 65/];
+    const expectedTableRows = [
+      /19 — May — 2021, 04:26 AM 37 121 \/ 89 76 12 --/,
+      /10 — May — 2021, 06:41 AM 37 120 \/ 90 66 45 90/,
+      /07 — May — 2021, 09:04 AM -- 120 \/ 80 -- -- --/,
+      /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
+    ];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+
+    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
+
+    await user.click(sortRowsButton);
+
+    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
+
+    await user.click(sortRowsButton);
+
+    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
@@ -127,18 +134,6 @@ describe('VitalsOverview', () => {
     mockedUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
-
-    mockUsePagination.mockReturnValue({
-      currentPage: 1,
-      goTo: () => {},
-      results: formattedVitals.slice(0, 5),
-      totalPages: formattedVitals.length / 5,
-      paginated: true,
-      showNextButton: true,
-      showPreviousButton: false,
-      goToNext: undefined,
-      goToPrevious: undefined,
-    } as ReturnType<typeof usePagination>);
 
     renderVitalsOverview();
 

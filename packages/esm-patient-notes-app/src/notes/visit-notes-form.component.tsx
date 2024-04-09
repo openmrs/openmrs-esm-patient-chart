@@ -49,7 +49,7 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-const allowedImageTypes = ['.jpeg', '.jpg', '.png', '.webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -547,7 +547,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup>
+            <FormGroup legendText="">
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
               </p>
