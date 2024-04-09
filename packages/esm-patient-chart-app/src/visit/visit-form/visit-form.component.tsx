@@ -72,7 +72,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const isOnline = useConnectivity();
   const sessionUser = useSession();
-  const { error: errorFetchingLocations } = isOnline ? useLocations() : { error: false };
+  const { error } = useLocations();
+  const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
@@ -81,7 +82,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
-  const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
+  const allVisitTypes = useConditionalVisitTypes();
+
   const { mutate } = useVisit(patientUuid);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -305,8 +307,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           })),
       };
       if (visitToEdit?.uuid) {
-        // The request throws 400 (Bad request)error when patient is passed in the update payload
-
+        // The request throws 400 (Bad request) error when patient is passed in the update payload
         delete payload.patient;
       }
 
@@ -681,5 +682,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     </FormProvider>
   );
 };
+
+function useConditionalVisitTypes() {
+  const isOnline = useConnectivity();
+
+  const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
+
+  const allVisitTypes = visitTypesHook();
+
+  return allVisitTypes;
+}
 
 export default StartVisitForm;
