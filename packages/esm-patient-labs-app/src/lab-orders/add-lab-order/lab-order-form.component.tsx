@@ -6,7 +6,7 @@ import {
   launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, usePatient } from '@openmrs/esm-framework';
+import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
 import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,

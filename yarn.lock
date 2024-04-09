@@ -4232,7 +4232,7 @@ __metadata:
     "@carbon/styles": "npm:~1.14.0"
     "@ng-select/ng-select": "npm:^11.2.0"
     "@ngx-translate/core": "npm:^15.0.0"
-    "@openmrs/esm-framework": "npm:^5.5.1-pre.1685"
+    "@openmrs/esm-framework": "npm:next"
     "@openmrs/ngx-file-uploader": "npm:next"
     "@openmrs/ngx-formentry": "npm:next"
     "@types/jasmine": "npm:~3.6.11"
@@ -4255,7 +4255,7 @@ __metadata:
     ngx-bootstrap: "npm:^11.0.1"
     ngx-build-plus: "npm:^16.0.0"
     ngx-webcam: "npm:^0.4.1"
-    openmrs: "npm:^5.5.1-pre.1685"
+    openmrs: "npm:next"
     protractor: "npm:~7.0.0"
     reflect-metadata: "npm:^0.1.13"
     rxjs: "npm:^7.8.0"
@@ -4274,7 +4274,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-framework@npm:5.5.1-pre.1685, @openmrs/esm-framework@npm:^5.5.1-pre.1685, @openmrs/esm-framework@npm:next":
+"@openmrs/esm-framework@npm:5.5.1-pre.1685, @openmrs/esm-framework@npm:next":
   version: 5.5.1-pre.1685
   resolution: "@openmrs/esm-framework@npm:5.5.1-pre.1685"
   dependencies:
@@ -17990,7 +17990,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openmrs@npm:^5.5.1-pre.1685, openmrs@npm:next":
+"openmrs@npm:next":
   version: 5.5.1-pre.1685
   resolution: "openmrs@npm:5.5.1-pre.1685"
   dependencies:
