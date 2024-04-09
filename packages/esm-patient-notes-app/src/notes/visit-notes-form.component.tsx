@@ -49,7 +49,7 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
+const allowedImageTypes = ['.jpeg', '.jpg', '.png', '.webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -105,6 +105,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const session = useSession();
   const config = useConfig<ConfigObject>();
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedFile[]>([]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [isHandlingSubmit, setIsHandlingSubmit] = useState(false);
@@ -362,7 +363,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const onError = (errors) => console.error(errors);
 
   function handleRemoveImage(index: number) {
-    throw new Error('Function not implemented.');
+    const updatedImages = [...uploadedImages];
+    updatedImages.splice(index, 1);
+    setUploadedImages(updatedImages);
   }
 
   return (
@@ -547,7 +550,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup legendText="">
+            <FormGroup>
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
               </p>
@@ -559,20 +562,19 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               >
                 {t('addImage', 'Add image')}
               </Button>
-              {currentImages.map(
-                (image, index) =>
-                  image.base64Content &&
-                  image.fileType === 'image' && (
-                    <>
-                      <div key={index} className={styles.imgThumbnailContainer}>
-                        <img src={image.base64Content} className={styles.imgThumbnail} />
-                      </div>
+              {uploadedImages?.map((image, index) => {
+                if (image?.base64Content && image.fileType === 'image') {
+                  return (
+                    <div key={index} className={styles.imgThumbnailContainer}>
+                      <img src={image.base64Content} className={styles.imgThumbnail} />
                       <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
                         {t('remove', 'Remove')}
                       </Button>
-                    </>
-                  ),
-              )}
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </FormGroup>
           </Column>
         </Row>
