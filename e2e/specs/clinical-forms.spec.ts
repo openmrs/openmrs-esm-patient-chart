@@ -17,7 +17,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Fill a clinical form', async ({ page, api }) => {
+test('Fill a clinical form', async ({ page }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -79,7 +79,7 @@ test('Fill a clinical form', async ({ page, api }) => {
     await visitsPage.goTo(patient.uuid);
   });
 
-  await test.step('Then I should the newly filled form in the encounters table', async () => {
+  await test.step('Then I should see the newly filled form in the encounters table', async () => {
     await expect(visitsPage.page.getByRole('tab', { name: /visit summaries/i })).toBeVisible();
     await expect(visitsPage.page.getByRole('tab', { name: /all encounters/i })).toBeVisible();
 
