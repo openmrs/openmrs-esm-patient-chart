@@ -67,11 +67,9 @@ const visitNoteFormSchema = z.object({
     )
     .optional(),
 });
-type VisitNotesFormData = z.infer<typeof visitNoteFormSchema> & {
-  images?: {
-    base64Content: string;
-    fileType: string;
-  }[];
+
+type VisitNotesFormData = Omit<z.infer<typeof visitNoteFormSchema>, 'images'> & {
+  images?: UploadedFile[];
 };
 
 interface DiagnosesDisplayProps {
@@ -126,7 +124,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
       noteDate: new Date(),
-      images: [],
     },
   });
 
@@ -136,7 +133,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const currentImage = watch('images');
+  const currentImages = watch('images');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutateVisits } = useInfiniteVisits(patientUuid);
 
@@ -239,12 +236,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (files: UploadedFile[]) => {
-        const newImages = files.map((file) => ({
-          base64Content: file.base64Content,
-          fileType: file.fileType,
-        }));
-        setValue('images', (prevImages: VisitNotesFormData['images']) => [...(prevImages ?? []), ...newImages]);
+      saveFile: (file: UploadedFile[]) => {
+        setValue('images', file);
         close();
         return Promise.resolve();
       },
@@ -255,7 +248,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
       multipleFiles: true,
       collectDescription: false,
     });
-  }, [patientUuid, setValue]);
+  }, [patientUuid]);
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData, event: SyntheticEvent) => {
@@ -315,7 +308,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
                   fileType: image.fileType,
                   fileDescription: 'description',
                 };
-                return createAttachment(patientUuid, [uploadedFile]);
+                return createAttachment(patientUuid, uploadedFile);
               }),
             );
           }
@@ -566,18 +559,20 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               >
                 {t('addImage', 'Add image')}
               </Button>
-              {currentImage.map((image, index) => (
-                <div key={index}>
-                  {image.base64Content && image.fileType === 'image' && (
-                    <div className={styles.imgThumbnailContainer}>
-                      <img src={image.base64Content} className={styles.imgThumbnail} />
+              {currentImages.map(
+                (image, index) =>
+                  image.base64Content &&
+                  image.fileType === 'image' && (
+                    <>
+                      <div key={index} className={styles.imgThumbnailContainer}>
+                        <img src={image.base64Content} className={styles.imgThumbnail} />
+                      </div>
                       <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
                         {t('remove', 'Remove')}
                       </Button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    </>
+                  ),
+              )}
             </FormGroup>
           </Column>
         </Row>
