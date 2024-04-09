@@ -4484,6 +4484,7 @@ __metadata:
     dotenv: "npm:^16.3.1"
     eslint: "npm:^8.50.0"
     eslint-plugin-playwright: "npm:^0.16.0"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
     husky: "npm:^8.0.3"
     i18next: "npm:^21.10.0"
     i18next-parser: "npm:^6.6.0"
@@ -12040,6 +12041,15 @@ __metadata:
     eslint-plugin-jest:
       optional: true
   checksum: 10/d44bfc78cbe216261f2afd3620a6aefa30bfbdc038f0ae269c6f93b2f77bd5167ae469ff7cfcb1c56b156806697ca533aabeda34893e4e2945ffa3a795958a90
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-react-hooks@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "eslint-plugin-react-hooks@npm:4.6.0"
+  peerDependencies:
+    eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
+  checksum: 10/3c63134e056a6d98d66e2c475c81f904169db817e89316d14e36269919e31f4876a2588aa0e466ec8ef160465169c627fe823bfdaae7e213946584e4a165a3ac
   languageName: node
   linkType: hard
 
