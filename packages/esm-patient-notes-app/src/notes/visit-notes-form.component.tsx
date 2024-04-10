@@ -237,12 +237,17 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile[]) => {
-        const filteredFiles = file.filter((f) => {
-          const extension = f.fileName.split('.').pop().toLowerCase();
-          return allowedImageTypes.includes('.' + extension);
-        });
-        setUploadedImages([...uploadedImages, ...filteredFiles]);
+      saveFile: (file: UploadedFile) => {
+        if (file) {
+          const filteredFiles = allowedImageTypes.includes('.' + file.fileName.split('.').pop().toLowerCase());
+          if (filteredFiles) {
+            setUploadedImages([...uploadedImages, file]);
+          } else {
+            console.error('Error: Unsupported file type');
+          }
+        } else {
+          console.error('Error: Uploaded file is empty');
+        }
         close();
         return Promise.resolve();
       },
@@ -566,19 +571,16 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               >
                 {t('addImage', 'Add image')}
               </Button>
-              {uploadedImages?.map((image, index) => {
-                if (image?.base64Content && image.fileType === 'image') {
-                  return (
-                    <div key={index} className={styles.imgThumbnailContainer}>
-                      <img src={image.base64Content} className={styles.imgThumbnail} />
-                      <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
-                        {t('remove', 'Remove')}
-                      </Button>
-                    </div>
-                  );
-                }
-                return null;
-              })}
+              <div className={styles.imgThumbnailContainer}>
+                {uploadedImages.map((image, index) => (
+                  <div key={index} className={styles.imgThumbnailContainer}>
+                    <img src={image.base64Content} className={styles.imgThumbnail} alt={`Image ${index}`} />
+                    <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
+                      {t('remove', 'Remove')}
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </FormGroup>
           </Column>
         </Row>
