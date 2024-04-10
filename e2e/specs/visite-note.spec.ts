@@ -12,7 +12,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Add a visit note', async ({ page }) => {
+test('Add and delete a visit note', async ({ page }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -46,7 +46,7 @@ test('Add a visit note', async ({ page }) => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
@@ -58,6 +58,32 @@ test('Add a visit note', async ({ page }) => {
     await expect(page.getByText(/asthma/i)).toBeVisible();
     await expect(page.getByText(/infection by ascaris lumbricoides/i)).toBeVisible();
     await expect(page.getByText(/this is a note/i)).toBeVisible();
+  });
+
+  await test.step('When I click the `All encounters` tab', async () => {
+    await page.getByRole('tab', { name: /all encounters/i }).click();
+  });
+
+  await test.step('And I click the overflow menu in the table row of the newly added visit note', async () => {
+    await page
+      .getByRole('button', { name: /options/i })
+      .nth(0)
+      .click();
+  });
+
+  await test.step('And I click on the `Delete this encounter` button', async () => {
+    await page.getByRole('menuitem', { name: /delete this encounter/i }).click();
+    await page.getByRole('button', { name: /delete/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/encounter deleted/i)).toBeVisible();
+  });
+
+  await test.step('And the encounters table should be empty', async () => {
+    await expect(
+      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
+    ).toBeVisible();
   });
 });
 
