@@ -295,6 +295,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               ? t('orders', 'Orders')
               : (orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).display + 's'
           }
+          launchForm={launchOrderBasket}
         />
       ) : (
         <div className={styles.widgetCard}>
@@ -316,7 +317,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                   {t('print', 'Print')}
                 </Button>
               )}
-              {showAddButton ?? true ? (
+              {showAddButton && (
                 <Button
                   kind="ghost"
                   renderIcon={(props) => <Add size={16} {...props} />}
@@ -325,7 +326,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                 >
                   {t('add', 'Add')}
                 </Button>
-              ) : null}
+              )}
             </div>
           </CardHeader>
           <div ref={contentToPrintRef}>
