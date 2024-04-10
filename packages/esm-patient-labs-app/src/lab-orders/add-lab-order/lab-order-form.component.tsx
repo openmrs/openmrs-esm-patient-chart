@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type LabOrderBasketItem,
@@ -46,7 +46,7 @@ export function LabOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const [isEditing, setIsEditing] = useState(initialOrder && initialOrder.action === 'REVISE');
+  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
