@@ -238,18 +238,22 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile[]) => {
-        setValue('images', file);
+        const filteredFiles = file.filter((f) => {
+          const extension = f.fileName.split('.').pop().toLowerCase();
+          return allowedImageTypes.includes('.' + extension);
+        });
+        setUploadedImages([...uploadedImages, ...filteredFiles]);
         close();
         return Promise.resolve();
       },
       closeModal: () => {
         close();
       },
-      allowedExtensions: allowedImageTypes,
+      allowedExtensions: allowedImageTypes.map((ext) => ext.slice(1)),
       multipleFiles: true,
       collectDescription: false,
     });
-  }, [patientUuid]);
+  }, [uploadedImages]);
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData, event: SyntheticEvent) => {
