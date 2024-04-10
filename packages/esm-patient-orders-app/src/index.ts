@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  registerFeatureFlag,
-  translateFrom,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
 import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
@@ -50,12 +44,6 @@ registerWorkspace({
   type: 'order',
   canHide: true,
 });
-
-registerFeatureFlag(
-  'ordersSummary',
-  'Orders Summary',
-  'This feature introduces a navigation on the patient chart left nav called Orders and shows a history of patient orders within patient chart',
-);
 
 export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);
 
