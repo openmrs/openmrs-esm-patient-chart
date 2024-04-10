@@ -71,7 +71,7 @@ test('Fill a clinical form', async ({ page }) => {
     await chartPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(chartPage.page.getByText(/the form has been submitted successfully/i)).toBeVisible();
   });
 

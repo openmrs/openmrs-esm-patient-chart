@@ -47,7 +47,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await page.getByRole('button', { name: /save & close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(conditionsPage.page.getByText(/condition saved/i)).toBeVisible();
   });
 
@@ -89,7 +89,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await page.getByRole('button', { name: /save & close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(conditionsPage.page.getByText(/condition updated/i)).toBeVisible();
   });
 
@@ -114,7 +114,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await page.getByRole('button', { name: /danger delete/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(conditionsPage.page.getByText(/condition deleted/i)).toBeVisible();
   });
 

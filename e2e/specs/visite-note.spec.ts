@@ -46,7 +46,7 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
@@ -76,7 +76,7 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByRole('button', { name: /delete/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/encounter deleted/i)).toBeVisible();
   });
 
