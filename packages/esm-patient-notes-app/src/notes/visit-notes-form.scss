@@ -180,3 +180,17 @@
 .uploadButton {
   margin-top: 1rem;
 }
+
+.imgThumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.imgThumbnailItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+

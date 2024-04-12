@@ -571,9 +571,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
               >
                 {t('addImage', 'Add image')}
               </Button>
-              <div className={styles.imgThumbnailContainer}>
+              <div className={styles.imgThumbnailGrid}>
                 {uploadedImages.map((image, index) => (
-                  <div key={index} className={styles.imgThumbnailContainer}>
+                  <div key={index} className={styles.imgThumbnailItem}>
                     <img src={image.base64Content} className={styles.imgThumbnail} alt={`Image ${index}`} />
                     <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
                       {t('remove', 'Remove')}
