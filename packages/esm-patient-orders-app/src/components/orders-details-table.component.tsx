@@ -93,18 +93,21 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
 
   // launch respective order basket based on order type
-  const openOrderForm = useCallback((orderItem) => {
-    switch (orderItem.type) {
-      case 'drugorder':
-        launchAddDrugOrder();
-        break;
-      case 'testorder':
-        launchAddLabsOrder();
-        break;
-      default:
-        launchOrderBasket();
-    }
-  }, []);
+  const openOrderForm = useCallback(
+    (orderItem) => {
+      switch (orderItem.type) {
+        case 'drugorder':
+          launchAddDrugOrder();
+          break;
+        case 'testorder':
+          launchAddLabsOrder();
+          break;
+        default:
+          launchOrderBasket();
+      }
+    },
+    [launchAddDrugOrder, launchAddLabsOrder, launchOrderBasket],
+  );
 
   const tableHeaders: Array<OrderHeaderProps> = [
     {
@@ -179,7 +182,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         />
       ),
     }));
-  }, [allOrders]);
+  }, [allOrders, isPrinting, launchOrderBasket, orders, setOrders, openOrderForm]);
 
   const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
     return sortDirection === sortStates.DESC
@@ -292,6 +295,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               ? t('orders', 'Orders')
               : (orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).display + 's'
           }
+          launchForm={launchOrderBasket}
         />
       ) : (
         <div className={styles.widgetCard}>
@@ -313,7 +317,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                   {t('print', 'Print')}
                 </Button>
               )}
-              {showAddButton ?? true ? (
+              {showAddButton && (
                 <Button
                   kind="ghost"
                   renderIcon={(props) => <Add size={16} {...props} />}
@@ -322,7 +326,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                 >
                   {t('add', 'Add')}
                 </Button>
-              ) : null}
+              )}
             </div>
           </CardHeader>
           <div ref={contentToPrintRef}>
@@ -461,7 +465,7 @@ function OrderBasketItemActions({
       setOrderItems(labsOrderBasket, [...items, labItem]);
       openOrderForm({ order: labItem });
     }
-  }, [orderItem, openOrderForm]);
+  }, [orderItem, openOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });

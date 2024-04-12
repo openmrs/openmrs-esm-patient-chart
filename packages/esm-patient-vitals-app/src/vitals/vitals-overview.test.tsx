@@ -115,7 +115,6 @@ describe('VitalsOverview', () => {
       /07 — May — 2021, 09:04 AM -- 120 \/ 80 -- -- --/,
       /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
     ];
-
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
 
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });

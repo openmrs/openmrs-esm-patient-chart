@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type LabOrderBasketItem,
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
-  promptBeforeClosing,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
@@ -31,11 +30,8 @@ import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
-export interface LabOrderFormProps {
+export interface LabOrderFormProps extends DefaultWorkspaceProps {
   initialOrder: LabOrderBasketItem;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
-  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
-  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
 // Designs:
@@ -50,6 +46,7 @@ export function LabOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -121,7 +118,7 @@ export function LabOrderForm({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
+    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
   );
 
   const cancelOrder = useCallback(() => {
@@ -139,7 +136,7 @@ export function LabOrderForm({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   return (
     <>
@@ -171,7 +168,7 @@ export function LabOrderForm({
                         isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
                       }
                       onBlur={onBlur}
-                      disabled={isLoadingTestTypes}
+                      disabled={isLoadingTestTypes || isEditing}
                       onChange={({ selectedItem }) => onChange(selectedItem)}
                       invalid={errors.testType?.message}
                       invalidText={errors.testType?.message}

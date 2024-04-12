@@ -88,7 +88,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
   });
 
@@ -159,7 +159,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
   });
 
@@ -201,7 +201,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
   });
 
