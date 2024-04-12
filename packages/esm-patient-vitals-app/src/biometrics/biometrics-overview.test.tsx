@@ -109,10 +109,17 @@ describe('BiometricsOverview: ', () => {
 
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
 
+    // Sorting in descending order
+    // Since the date order is already in descending order, the rows should be the same
+    await user.click(sortRowsButton);
+    // Sorting in ascending order
     await user.click(sortRowsButton);
 
     expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
 
+    // Sorting order = NONE, hence it is still in the ascending order
+    await user.click(sortRowsButton);
+    // Sorting in descending order
     await user.click(sortRowsButton);
 
     expect(screen.getAllByRole('row')).toEqual(initialRowElements);
