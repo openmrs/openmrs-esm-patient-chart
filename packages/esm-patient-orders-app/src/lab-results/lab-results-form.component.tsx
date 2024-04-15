@@ -56,7 +56,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   if (isLoadingConcepts) {
     return (

@@ -39,7 +39,7 @@ const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
-  }, [orders]);
+  }, [orders, promptBeforeClosing]);
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {

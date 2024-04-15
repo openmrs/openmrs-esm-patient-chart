@@ -53,7 +53,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
-    [attachments, onOpenAttachment],
+    [attachments, onOpenAttachment, responsiveSize],
   );
 
   const headers = useMemo(

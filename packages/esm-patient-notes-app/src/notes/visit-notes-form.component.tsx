@@ -132,7 +132,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const currentImages = watch('images');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
@@ -177,7 +177,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             });
         }
       }, searchTimeoutInMs),
-    [],
+    [config.diagnosisConceptClass],
   );
 
   const handleAddDiagnosis = (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
@@ -366,6 +366,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
       mutateVisitNotes,
       closeWorkspaceWithSavedChanges,
       t,
+      mutateVisits,
     ],
   );
 
