@@ -4190,7 +4190,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    "@openmrs/openmrs-form-engine-lib": "npm:next"
+    "@openmrs/openmrs-form-engine-lib": "npm:1.0.0-pre.589"
     lodash-es: "npm:^4.17.21"
     react-error-boundary: "npm:^4.0.11"
     webpack: "npm:^5.88.2"
@@ -4459,7 +4459,7 @@ __metadata:
   dependencies:
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-framework": "npm:next"
-    "@playwright/test": "npm:1.43.0"
+    "@playwright/test": "npm:1.42.1"
     "@swc/cli": "npm:^0.1.62"
     "@swc/core": "npm:^1.3.89"
     "@swc/jest": "npm:^0.2.29"
@@ -4484,7 +4484,6 @@ __metadata:
     dotenv: "npm:^16.3.1"
     eslint: "npm:^8.50.0"
     eslint-plugin-playwright: "npm:^0.16.0"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
     husky: "npm:^8.0.3"
     i18next: "npm:^21.10.0"
     i18next-parser: "npm:^6.6.0"
@@ -4900,13 +4899,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.541
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.541"
+"@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.589":
+  version: 1.0.0-pre.589
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.589"
   dependencies:
     ace-builds: "npm:^1.4.12"
-    enzyme: "npm:^3.11.0"
-    enzyme-adapter-react-16: "npm:^1.15.6"
     formik: "npm:^2.2.6"
     jest-coverage-badges: "npm:^1.0.0"
     lodash-es: "npm:^4.17.15"
@@ -4925,7 +4922,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 10/72fd51894651f6b2be13aa94ff7c58fece73e08420ff7ca17b4f1cecde277ef167408dfbcd0830cf9ce5c25c1656e7ced1f489be0afdd0d9c20070e0812fd112
+  checksum: 10/37bef80c99aa250dd78881b18057fa05d08c0c2e657b33787216cf3d00ef95e23355f3a0f20539bf526afdc5a596e5007713f707fde4fd6e1e01cf7ba6f3f51b
   languageName: node
   linkType: hard
 
@@ -8432,7 +8429,7 @@ __metadata:
     babel-helper-flip-expressions: "npm:^0.4.3"
     babel-helper-is-nodes-equiv: "npm:^0.0.1"
     babel-helper-to-multiple-sequence-expressions: "npm:^0.5.0"
-  checksum: 10/ad857a7de659f054ecd8185a19f369b1fa6887fbd8a94d4205a5c2b66fe53a56aca002fbb26ac2d84a334df031948004eebe375abbe6c21a0568737cbdfc3cbb
+  checksum: 10/ad857a7de659f054e cd8185a19f369b1fa6887fbd8a94d4205a5c2b66fe53a56aca002fbb26ac2d84a334df031948004eebe375abbe6c21a0568737cbdfc3cbb
   languageName: node
   linkType: hard
 
@@ -9290,7 +9287,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.2, cheerio@npm:^1.0.0-rc.3":
+"cheerio@npm:^1.0.0-rc.2":
   version: 1.0.0-rc.12
   resolution: "cheerio@npm:1.0.0-rc.12"
   dependencies:
