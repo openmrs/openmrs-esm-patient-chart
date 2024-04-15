@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockPatientImmunizationsSearchResponse, mockPaginatedImmunizations } from '__mocks__';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { mockPatientImmunizationsSearchResponse } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ImmunizationsOverview from './immunizations-overview.component';
 
@@ -12,20 +12,6 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
-  };
-});
 
 describe('ImmunizationOverview: ', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
@@ -69,11 +55,6 @@ describe('ImmunizationOverview: ', () => {
 
   it('renders a tabular overview of recently administered immunizations if available', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockPatientImmunizationsSearchResponse });
-    mockUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockPaginatedImmunizations,
-    }));
 
     renderImmunizationsOverview();
 

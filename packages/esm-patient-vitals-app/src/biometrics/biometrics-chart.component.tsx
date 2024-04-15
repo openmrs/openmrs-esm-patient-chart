@@ -90,7 +90,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       },
       height: '400px',
     };
-  }, [selectedBiometrics]);
+  }, [selectedBiometrics, t]);
 
   return (
     <div className={styles.biometricChartContainer}>

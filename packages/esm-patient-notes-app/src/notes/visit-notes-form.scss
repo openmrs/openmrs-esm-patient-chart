@@ -14,12 +14,20 @@
 
 .diagnosis {
   padding: 0.75rem;
+  border-top: 0.0625rem solid $grey-2;
+}
+
+.diagnosis:first-of-type {
+  border-top: none;
+}
+
+.diagnosis:last-of-type {
+  border-bottom: none;
 }
 
 .diagnosisList {
-  margin-top: 0.25rem;
   background-color: $ui-02;
-  max-height: 14rem;
+  max-height: 13.5rem;
   overflow-y: auto;
   border: 1px solid $ui-03;
 }
@@ -31,11 +39,11 @@
 .diagnosesText {
   @include type.type-style("body-compact-01");
   color: $text-02;
+  margin-bottom: 1rem;
 }
 
 .emptyResults {
   @include type.type-style("body-compact-01");
-  margin-top: 0.25rem;
   color: $text-02;
   min-height: 1rem;
 }
@@ -102,7 +110,7 @@
 }
 
 .row {
-  margin: 0.5rem 0rem 2.75rem;
+  margin: 0.5rem 0rem 2.5rem;
 }
 
 .skeleton {
@@ -129,7 +137,6 @@
 .errorMessage {
   @include type.type-style("label-02");
   color: $danger;
-  margin-top: 0.5rem;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -159,4 +166,17 @@
   .skeleton {
     height: 2.5rem;
   }
+}
+
+.errorNotification {
+  margin-top: 0.25rem;
+}
+
+.tag {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+.uploadButton {
+  margin-top: 1rem;
 }

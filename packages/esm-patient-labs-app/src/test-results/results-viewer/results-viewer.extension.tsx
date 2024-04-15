@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
-import { Printer } from '@carbon/react/icons';
+import { Printer, Renew } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
@@ -18,6 +18,11 @@ import styles from './results-viewer.styles.scss';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';
+
+interface RefreshDataButtonProps {
+  isTablet: boolean;
+  t: TFunction;
+}
 
 interface ResultsViewerProps {
   basePath: string;
@@ -62,6 +67,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
   const showPrintButton = config.showPrintButton;
+  const responsiveSize = isTablet ? 'lg' : 'md';
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
@@ -92,6 +98,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               <Switch name="tree" text={t('tree', 'Tree')} />
             </ContentSwitcher>
           </div>
+          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
         {selectedSection === 'tree' ? (
           <TreeViewWrapper
@@ -131,39 +138,41 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
-            {showPrintButton && (
-              <Button
-                kind="ghost"
-                size={isTablet ? 'md' : 'sm'}
-                renderIcon={Printer}
-                iconDescription="Print results"
-                onClick={openPrintModal}
-              >
-                {t('print', 'Print')}
-              </Button>
-            )}
             <ContentSwitcher
-              size={isTablet ? 'lg' : 'md'}
+              size={responsiveSize}
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
             >
               <Switch name="panel" text={t('panel', 'Panel')} />
               <Switch name="tree" text={t('tree', 'Tree')} />
             </ContentSwitcher>
+            {showPrintButton && (
+              <Button
+                className={styles.button}
+                kind="ghost"
+                size={isTablet ? 'md' : 'sm'}
+                renderIcon={Printer}
+                iconDescription="Print results"
+                onClick={openPrintModal}
+              >
+                <span>{t('print', 'Print')}</span>
+              </Button>
+            )}
           </div>
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
             <ContentSwitcher
-              size={isTablet ? 'lg' : 'md'}
-              style={{ maxWidth: '10rem' }}
+              className={styles.viewOptionsSwitcher}
               onChange={({ name }: { name: viewOpts }) => setView(name)}
               selectedIndex={isExpanded ? 1 : 0}
+              size={responsiveSize}
             >
               <Switch name="split" text={t('split', 'Split')} disabled={loading} />
               <Switch name="full" text={t('full', 'Full')} disabled={loading} />
             </ContentSwitcher>
           </div>
+          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
       </div>
       <div className={styles.flex}>
@@ -188,5 +197,19 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     </div>
   );
 };
+
+function RefreshDataButton({ isTablet, t }: RefreshDataButtonProps) {
+  return (
+    <Button
+      className={styles.button}
+      kind="ghost"
+      renderIcon={Renew}
+      size={isTablet ? 'md' : 'sm'}
+      onClick={() => window.location.reload()}
+    >
+      <span>{t('refreshData', 'Refresh data')}</span>
+    </Button>
+  );
+}
 
 export default RoutedResultsViewer;

@@ -57,6 +57,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       isOnline,
       mutateForm,
       closeWorkspaceWithSavedChanges,
+      additionalProps,
     ],
   );
 

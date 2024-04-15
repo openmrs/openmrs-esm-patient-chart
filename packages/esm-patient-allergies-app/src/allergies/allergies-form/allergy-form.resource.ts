@@ -113,7 +113,7 @@ export function useAllergens() {
       allergens,
       isLoading: !drugAllergenData || !environmentalAllergenData || !foodAllergenData,
     };
-  }, [drugAllergenData, environmentalAllergenData, foodAllergenData]);
+  }, [drugAllergenData, environmentalAllergenData, foodAllergenData, otherConceptUuid]);
 }
 
 export function useAllergenSearch(allergenToLookup: string) {
@@ -135,6 +135,22 @@ export function useAllergenSearch(allergenToLookup: string) {
 
 export function saveAllergy(payload: NewAllergy, patientUuid: string, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: payload,
+    signal: abortController.signal,
+  });
+}
+
+export function updatePatientAllergy(
+  payload: NewAllergy,
+  patientUuid: string,
+  allergenUuid: string,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergenUuid}`, {
     headers: {
       'Content-Type': 'application/json',
     },

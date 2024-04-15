@@ -34,8 +34,22 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { useConditions } from './conditions.resource';
+import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-overview.scss';
+
+interface ConditionTableRow extends Condition {
+  id: string;
+  condition: string;
+  abatementDateTime: string;
+  onsetDateTimeRender: string;
+}
+
+interface ConditionTableHeader {
+  key: 'display' | 'onsetDateTimeRender' | 'status';
+  header: string;
+  isSortable: true;
+  sortFunc: (valueA: ConditionTableRow, valueB: ConditionTableRow) => number;
+}
 
 interface ConditionsOverviewProps {
   patientUuid: string;
@@ -54,7 +68,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
 
   const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () =>
+      launchPatientWorkspace('conditions-form-workspace', {
+        formContext: 'creating',
+      }),
+    [],
+  );
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -68,35 +88,51 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
     return conditions;
   }, [filter, conditions]);
 
-  const {
-    results: paginatedConditions,
-    goTo,
-    currentPage,
-  } = usePagination(filteredConditions ?? [], conditionPageSize);
-
-  const tableHeaders = [
-    {
-      key: 'display',
-      header: t('condition', 'Condition'),
-    },
-    {
-      key: 'onsetDateTime',
-      header: t('dateOfOnset', 'Date of onset'),
-    },
-    {
-      key: 'clinicalStatus',
-      header: t('status', 'Status'),
-    },
-  ];
+  const headers: Array<ConditionTableHeader> = useMemo(
+    () => [
+      {
+        key: 'display',
+        header: t('condition', 'Condition'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) => valueA.display?.localeCompare(valueB.display),
+      },
+      {
+        key: 'onsetDateTimeRender',
+        header: t('dateOfOnset', 'Date of onset'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) =>
+          valueA.onsetDateTime && valueB.onsetDateTime
+            ? new Date(valueA.onsetDateTime).getTime() - new Date(valueB.onsetDateTime).getTime()
+            : 0,
+      },
+      {
+        key: 'status',
+        header: t('status', 'Status'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) => valueA.clinicalStatus?.localeCompare(valueB.clinicalStatus),
+      },
+    ],
+    [t],
+  );
 
   const tableRows = useMemo(() => {
-    return paginatedConditions?.map((condition) => ({
-      ...condition,
-      onsetDateTime: condition.onsetDateTime
-        ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
-        : '--',
-    }));
-  }, [paginatedConditions]);
+    return filteredConditions?.map((condition) => {
+      return {
+        ...condition,
+        id: condition.id,
+        condition: condition.display,
+        abatementDateTime: condition.abatementDateTime,
+        onsetDateTimeRender: condition.onsetDateTime
+          ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+          : '--',
+        status: condition.clinicalStatus,
+      };
+    });
+  }, [filteredConditions]);
+
+  const { sortedRows, sortRow } = useConditionsSorting(headers, tableRows);
+
+  const { results: paginatedConditions, goTo, currentPage } = usePagination(sortedRows, conditionPageSize);
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
@@ -133,12 +169,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         </CardHeader>
         <DataTable
           aria-label="conditions overview"
-          rows={tableRows}
-          headers={tableHeaders}
+          rows={paginatedConditions}
+          headers={headers}
           isSortable
           size={isTablet ? 'lg' : 'sm'}
           useZebraStyles
           overflowMenuOnHover={isDesktop}
+          sortRow={sortRow}
         >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>

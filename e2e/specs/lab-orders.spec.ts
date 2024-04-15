@@ -68,7 +68,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the newly created lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -87,7 +87,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText('Lab order(s) generated')).toBeVisible();
     await expect(page.getByText(/blood urea nitrogen/i)).not.toBeVisible();
     await expect(page.getByText(/hepatitis c test - qualitative/i)).toBeVisible();
@@ -99,7 +99,7 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created lab order', async () => {
+  await test.step('When I click the overflow menu in the table row with the updated lab order', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -111,13 +111,13 @@ test('Record, edit and discontinue a lab order', async ({ page }) => {
     await page.getByRole('button', { name: /delete/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/encounter successfully deleted/i)).toBeVisible();
   });
 
   await test.step('And the encounters table should be empty', async () => {
     await expect(
-      page.getByLabel(/all encounters/i).getByText(/There are no encounters to display for this patient/i),
+      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
     ).toBeVisible();
   });
 });

@@ -63,7 +63,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     } else {
       return '';
     }
-  }, [queueEntry]);
+  }, [queueEntry, t]);
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {

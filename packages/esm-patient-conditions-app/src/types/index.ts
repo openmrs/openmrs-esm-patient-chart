@@ -10,6 +10,7 @@ export interface FHIRConditionResponse {
   total: number;
   type: string;
 }
+
 export interface FHIRCondition {
   clinicalStatus: {
     coding: Array<CodingData>;
@@ -36,6 +37,7 @@ export interface FHIRCondition {
     div: string;
     status: string;
   };
+  abatementDateTime?: string;
 }
 
 export interface CodingData {

@@ -81,7 +81,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
       lotNumber: z.string().nullable(),
       manufacturer: z.string().nullable(),
     });
-  }, []);
+  }, [t]);
 
   type ImmunizationFormInputData = z.infer<typeof immunizationFormSchema>;
   const formProps = useForm<ImmunizationFormInputData>({
@@ -109,7 +109,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const vaccineUuid = watch('vaccineUuid');
 
@@ -136,7 +136,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
       sub.unsubscribe();
       immunizationFormSub.next(null);
     };
-  }, []);
+  }, [reset]);
 
   const onSubmit = useCallback(
     (data: ImmunizationFormInputData) => {
@@ -218,6 +218,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
       immunizationsConceptSet,
       closeWorkspaceWithSavedChanges,
       t,
+      mutate,
     ],
   );
 

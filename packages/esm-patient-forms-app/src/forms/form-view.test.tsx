@@ -21,11 +21,6 @@ jest.mock('@openmrs/esm-framework', () => {
     showModal: jest.fn(),
     useConfig: jest.fn(),
     useConnectivity: jest.fn(),
-    usePagination: jest.fn().mockImplementation((data) => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: data,
-    })),
   };
 });
 

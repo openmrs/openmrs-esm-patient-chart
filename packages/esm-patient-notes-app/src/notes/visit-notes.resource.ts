@@ -1,14 +1,14 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { map } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import {
-  type EncountersFetchResponse,
-  type RESTPatientNote,
-  type PatientNote,
-  type VisitNotePayload,
-  type DiagnosisPayload,
-  type Concept,
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
+import type {
+  Concept,
+  DiagnosisPayload,
+  EncountersFetchResponse,
+  PatientNote,
+  RESTPatientNote,
+  VisitNotePayload,
 } from '../types';
 
 interface UseVisitNotes {
@@ -22,7 +22,7 @@ interface UseVisitNotes {
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
     visitNoteConfig: { encounterNoteTextConceptUuid, visitDiagnosesConceptUuid },
-  } = useConfig();
+  } = useConfig<ConfigObject>();
 
   const customRepresentation =
     'custom:(uuid,display,encounterDatetime,patient,obs,' +
@@ -103,10 +103,11 @@ export function useInfiniteVisits(patientUuid: string) {
   };
 }
 
-export function fetchConceptDiagnosisByName(searchTerm: string) {
-  return openmrsObservableFetch<Array<Concept>>(
-    `${restBaseUrl}/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
-  ).pipe(map(({ data }) => data['results']));
+export function fetchDiagnosisConceptsByName(searchTerm: string, diagnosisConceptClass: string) {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `${restBaseUrl}/concept?name=${searchTerm}&searchType=fuzzy&class=${diagnosisConceptClass}&v=${customRepresentation}`;
+
+  return openmrsFetch<Array<Concept>>(url).then(({ data }) => Promise.resolve(data['results']));
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {

@@ -334,49 +334,6 @@ export const mockFhirConditionsResponse = {
   ],
 };
 
-export const mockConditions = [
-  {
-    clinicalStatus: 'active',
-    conceptId: '138571AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'HIV Positive',
-    onsetDateTime: '2021-05-15T21:00:00+00:00',
-    recordedDate: '2021-05-17T07:07:43+00:00',
-    id: 'cbffbb42-41b4-4c38-bc14-842ef675df85',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '160148AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Malaria, confirmed',
-    onsetDateTime: '2021-05-04T21:00:00+00:00',
-    recordedDate: '2021-05-05T10:09:33+00:00',
-    id: 'b648963a-8258-4131-a7fc-257f2a347435',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '160155AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Malaria sevère',
-    onsetDateTime: '2021-01-27T00:00:00+00:00',
-    recordedDate: '2021-01-28T09:09:27+00:00',
-    id: '9479e872-c9ca-48cc-82ee-273d67c41187',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Anaemia',
-    onsetDateTime: '2021-01-27T00:00:00+00:00',
-    recordedDate: '2021-01-28T09:09:27+00:00',
-    id: 'c1006bd4-0b21-4305-9eba-c9c647534502',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Hypertension',
-    onsetDateTime: '2020-08-19T00:00:00+00:00',
-    recordedDate: '2020-08-19T18:42:25+00:00',
-    id: '08c4dbcb-b474-4843-8e62-7096ff6dd6a2',
-  },
-];
-
 export const searchedCondition = [
   {
     display: 'Headache',

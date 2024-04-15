@@ -240,6 +240,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     errorFetchingVisitAttributeAnswers,
     fieldProps,
     errors.visitAttributes,
+    id,
   ]);
 
   if (isLoading) {

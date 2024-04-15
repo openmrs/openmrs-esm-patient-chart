@@ -1,5 +1,4 @@
 export * from './allergies.mock';
-export * from './appointments.mock';
 export * from './chart-widgets-config.mock';
 export * from './conditions.mock';
 export * from './encounters.mock';

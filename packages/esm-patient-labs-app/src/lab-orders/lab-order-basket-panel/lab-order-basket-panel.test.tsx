@@ -30,6 +30,7 @@ describe('LabOrderBasketPanel: ', () => {
         },
         display: 'HIV VIRAL LOAD',
         urgency: 'ROUTINE',
+        uuid: 'order-uuid-1',
       },
       {
         action: 'NEW',
@@ -39,6 +40,7 @@ describe('LabOrderBasketPanel: ', () => {
         },
         display: 'CD4 COUNT',
         urgency: 'STAT',
+        uuid: 'order-uuid-2',
       },
     ];
     let orders = [...labs];

@@ -38,7 +38,7 @@
             (click)="onSubmit()"
             type="submit"
           >
-            <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}...</span>
+            <span *ngIf="formState !== 'submitting'">{{ 'saveAndCloseButton' | translate }}</span>
             <loader
               class="spinner"
               *ngIf="formState === 'submitting'"

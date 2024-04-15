@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockAllergies, mockFhirAllergyIntoleranceResponse } from '__mocks__';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AllergiesOverview from './allergies-overview.component';
 
@@ -11,7 +11,6 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -19,11 +18,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     attach: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
   };
 });
 
@@ -65,11 +59,7 @@ describe('AllergiesOverview: ', () => {
 
   it("renders an overview of the patient's allergic reactions and their manifestations", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
-    mockUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockAllergies,
-    }));
+
     renderAllergiesOverview();
 
     await waitForLoadingToFinish();
@@ -78,11 +68,11 @@ describe('AllergiesOverview: ', () => {
 
     const expectedColumnHeaders = [/name/, /reactions/];
     const expectedAllergies = [
+      /non-coded allergen non-coded allergic reaction \(severe\)/,
       /ACE inhibitors Anaphylaxis \(moderate\)/,
-      /Aspirin Mental status change \(severe\)/,
       /Fish Anaphylaxis, Angioedema, Fever, Hives \(mild\)/,
+      /Penicillins Mental status change, Angioedema, Cough, Diarrhea, Musculoskeletal pain \(severe\)/,
       /Morphine Mental status change \(severe\)/,
-      /Penicillins Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema \(Severe\)/,
     ];
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();

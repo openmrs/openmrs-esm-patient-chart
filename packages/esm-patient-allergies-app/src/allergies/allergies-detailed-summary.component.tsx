@@ -21,6 +21,7 @@ import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
 import styles from './allergies-detailed-summary.scss';
 import { ReactionSeverity } from '../types';
+import { AllergiesActionMenu } from './allergies-action-menu.component';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -110,6 +111,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}
+                    <TableHeader />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -118,6 +120,12 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
+                      <TableCell className="cds--table-column-menu">
+                        <AllergiesActionMenu
+                          patientUuid={patient.id}
+                          allergy={allergies.find((allergy) => allergy.id == row.id)}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

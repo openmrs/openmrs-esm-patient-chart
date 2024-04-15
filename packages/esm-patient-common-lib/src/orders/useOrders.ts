@@ -28,7 +28,7 @@ export function usePatientOrders(patientUuid: string, status?: 'ACTIVE' | 'any',
       mutate((key) => {
         return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
       }, data),
-    [patientUuid],
+    [patientUuid, data, mutate],
   );
 
   const orders = useMemo(

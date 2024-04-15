@@ -26,7 +26,7 @@ export function usePaginationInfo(pageSize: number, totalItems: number, pageNumb
     }
 
     return t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
-  }, [pageSize, totalItems, pageNumber, currentItems]);
+  }, [pageSize, totalItems, pageNumber, currentItems, t]);
 
   return {
     pageSizes,

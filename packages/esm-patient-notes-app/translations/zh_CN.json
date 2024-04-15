@@ -11,6 +11,8 @@
   "emptyDiagnosisText": "未选择诊断 — 请在下方输入诊断",
   "enterPrimaryDiagnoses": "输入主要诊断",
   "enterSecondaryDiagnoses": "输入次要诊断",
+  "error": "错误",
+  "errorFetchingConcepts": "获取概念时出现问题",
   "image": "图像",
   "imageUploadHelperText": "上传一张图像或使用此设备的摄像头拍摄一张图像",
   "noMatchingDiagnoses": "未找到匹配的诊断",

@@ -10,6 +10,7 @@ import { type ConfigObject } from '../config-schema';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
+import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 
 interface BiometricsBaseProps {
   pageSize: number;
@@ -36,28 +37,50 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
     [config, currentVisit],
   );
 
-  const tableHeaders = [
-    { key: 'date', header: t('dateAndTime', 'Date and time') },
-    { key: 'weight', header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? '') },
-    { key: 'height', header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? '') },
-    { key: 'bmi', header: `${t('bmi', 'BMI')} (${bmiUnit})` },
+  const tableHeaders: Array<BiometricsTableHeader> = [
     {
-      key: 'muac',
+      key: 'dateRender',
+      header: t('dateAndTime', 'Date and time'),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => new Date(valueA.date).getTime() - new Date(valueB.date).getTime(),
+    },
+    {
+      key: 'weightRender',
+      header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.weight && valueB.weight ? valueA.weight - valueB.weight : 0),
+    },
+    {
+      key: 'heightRender',
+      header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
+    },
+    {
+      key: 'bmiRender',
+      header: `${t('bmi', 'BMI')} (${bmiUnit})`,
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
+    },
+    {
+      key: 'muacRender',
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.muac && valueB.muac ? valueA.muac - valueB.muac : 0),
     },
   ];
 
-  const tableRows = useMemo(
+  const tableRows: Array<BiometricsTableRow> = useMemo(
     () =>
       biometrics?.map((biometricsData, index) => {
         return {
           ...biometricsData,
           id: `${index}`,
-          date: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
-          weight: biometricsData.weight ?? '--',
-          height: biometricsData.height ?? '--',
-          bmi: biometricsData.bmi ?? '--',
-          muac: biometricsData.muac ?? '--',
+          dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
+          weightRender: biometricsData.weight ?? '--',
+          heightRender: biometricsData.height ?? '--',
+          bmiRender: biometricsData.bmi ?? '--',
+          muacRender: biometricsData.muac ?? '--',
         };
       }),
     [biometrics],

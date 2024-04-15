@@ -16,7 +16,7 @@ interface TreeViewWrapperProps {
 
 const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const config = useConfig();
-  const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
+  const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
   const { t } = useTranslation();
 

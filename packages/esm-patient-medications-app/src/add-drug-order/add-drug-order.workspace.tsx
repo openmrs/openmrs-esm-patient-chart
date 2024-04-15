@@ -27,7 +27,7 @@ export default function AddDrugOrderWorkspace({
     closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
-  }, [closeWorkspace, currentOrder, orders, setOrders]);
+  }, [closeWorkspace]);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {

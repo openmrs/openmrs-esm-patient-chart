@@ -3,7 +3,16 @@
 @import '@openmrs/esm-styleguide/src/vars';
 
 .condition {
-  padding: 1rem 0.75rem;
+  padding: 0.75rem;
+  border-top: 0.0625rem solid $grey-2;
+
+  &:first-of-type {
+    border-top: none;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
 .conditionsList {
@@ -66,7 +75,7 @@
 
 .conditionsError {
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger
+    outline: 2px solid $danger
   }
 
   :global(.cds--search-magnifier) {
@@ -85,6 +94,10 @@
 .radioGroup {
   :global(.cds--radio-button-wrapper) {
     margin-block-end: .375rem !important;
+  }
+
+  :global(.cds--radio-button__validation-msg) {
+    display: none;
   }
 }
 
