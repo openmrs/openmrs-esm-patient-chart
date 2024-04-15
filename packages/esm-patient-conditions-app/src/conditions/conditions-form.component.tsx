@@ -69,7 +69,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit: SubmitHandler<ConditionSchema> = (payload) => {
     setIsSubmittingForm(true);

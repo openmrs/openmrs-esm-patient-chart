@@ -50,7 +50,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
         required_error: t('reasonForCancellationRequired', 'Reason for cancellation is required'),
       }),
     });
-  }, []);
+  }, [t]);
 
   type CancelOrderFormData = z.infer<typeof cancelOrderSchema>;
 
@@ -71,43 +71,46 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
-  const cancelOrderRequest = useCallback((data: CancelOrderFormData) => {
-    const formData = data;
-    setShowErrorNotification(false);
-    setIsSubmitting(true);
+  const cancelOrderRequest = useCallback(
+    (data: CancelOrderFormData) => {
+      const formData = data;
+      setShowErrorNotification(false);
+      setIsSubmitting(true);
 
-    const payload = {
-      fulfillerStatus: 'DECLINED',
-      fulfillerComment: formData.reasonForCancellation,
-    };
+      const payload = {
+        fulfillerStatus: 'DECLINED',
+        fulfillerComment: formData.reasonForCancellation,
+      };
 
-    cancelOrder(order, payload).then(
-      (res) => {
-        setIsSubmitting(false);
-        closeWorkspace();
-        mutate();
+      cancelOrder(order, payload).then(
+        (res) => {
+          setIsSubmitting(false);
+          closeWorkspace();
+          mutate();
 
-        showSnackbar({
-          title: t('orderCancelled', 'Order cancelled'),
-          kind: 'success',
-          subtitle: t('successfullyCancelledOrder', 'Order {{orderNumber}} has been cancelled successfully', {
-            orderNumber: order?.orderNumber,
-          }),
-        });
-      },
-      (err) => {
-        setIsSubmitting(false);
-        showSnackbar({
-          isLowContrast: true,
-          title: t('errorCancellingOrder', 'Error cancelling order'),
-          kind: 'error',
-          subtitle: err?.message,
-        });
-      },
-    );
-  }, []);
+          showSnackbar({
+            title: t('orderCancelled', 'Order cancelled'),
+            kind: 'success',
+            subtitle: t('successfullyCancelledOrder', 'Order {{orderNumber}} has been cancelled successfully', {
+              orderNumber: order?.orderNumber,
+            }),
+          });
+        },
+        (err) => {
+          setIsSubmitting(false);
+          showSnackbar({
+            isLowContrast: true,
+            title: t('errorCancellingOrder', 'Error cancelling order'),
+            kind: 'error',
+            subtitle: err?.message,
+          });
+        },
+      );
+    },
+    [closeWorkspace, mutate, order, t],
+  );
 
   return (
     <Form className={styles.form}>

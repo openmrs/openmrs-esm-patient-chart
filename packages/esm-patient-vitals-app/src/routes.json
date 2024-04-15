@@ -20,7 +20,8 @@
       "slot": "patient-chart-vitals-biometrics-dashboard-slot",
       "meta": {
         "title": "Vitals",
-        "view": "vitals"
+        "view": "vitals",
+        "columnSpan": 2
       },
       "order": 1
     },
@@ -44,7 +45,8 @@
       "slot": "patient-chart-vitals-biometrics-dashboard-slot",
       "meta": {
         "view": "biometrics",
-        "title": "Biometrics"
+        "title": "Biometrics",
+        "columnSpan": 2
       }
     },
     {

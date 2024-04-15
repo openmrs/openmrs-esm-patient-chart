@@ -17,3 +17,9 @@ export function createEmptyLabOrder(testType: TestType, orderer: string): LabOrd
     orderer,
   };
 }
+
+type LabOrderRequest = Pick<LabOrderBasketItem, 'action' | 'testType'>;
+
+export function ordersEqual(order1: LabOrderRequest, order2: LabOrderRequest) {
+  return order1.testType.conceptUuid === order2.testType.conceptUuid && order1.action === order2.action;
+}

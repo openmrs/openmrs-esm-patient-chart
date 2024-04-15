@@ -62,7 +62,7 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, maxFileSize, t],
+    [setFilesToUpload, maxFileSize, t, allowedExtensions],
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
@@ -70,13 +70,7 @@ const MediaUploaderComponent = () => {
       return true;
     }
 
-    const match = fileName.match(/\.[^.\s]+$/);
-
-    if (!match) {
-      return false;
-    }
-
-    const fileExtension = match[0].toLowerCase();
+    const fileExtension = fileName.split('.').pop();
     return allowedExtensions?.includes(fileExtension.toLowerCase());
   };
 
@@ -101,7 +95,7 @@ const MediaUploaderComponent = () => {
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions?.map((ext) => ext) || ['*']}
+          accept={allowedExtensions?.map((ext) => '.' + ext) || ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
