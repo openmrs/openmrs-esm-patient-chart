@@ -30,7 +30,7 @@ export interface PatientVitalsAndBiometrics {
   date: string;
   systolic?: number;
   diastolic?: number;
-  bloodPressureInterpretation?: ObservationInterpretation;
+  bloodPressureRenderInterpretation?: ObservationInterpretation;
   pulse?: number;
   temperature?: number;
   spo2?: number;
