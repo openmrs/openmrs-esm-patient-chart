@@ -309,7 +309,6 @@ export function saveVitalsAndBiometrics(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: VitalsBiometricsFormData,
-  encounterDatetime: Date,
   abortController: AbortController,
   location: string,
 ) {
@@ -321,7 +320,6 @@ export function saveVitalsAndBiometrics(
     signal: abortController.signal,
     body: {
       patient: patientUuid,
-      encounterDatetime: encounterDatetime,
       location: location,
       encounterType: encounterTypeUuid,
       form: formUuid,
