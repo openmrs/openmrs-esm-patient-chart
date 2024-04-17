@@ -52,6 +52,11 @@ interface VitalsConceptMetadataResponse {
   }>;
 }
 
+function getInterpretationKey(header: string) {
+  // Reason for `Render` string is to match the column header in the table
+  return `${header}RenderInterpretation`;
+}
+
 export function useVitalsConceptMetadata() {
   const customRepresentation =
     'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
@@ -205,13 +210,13 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalsHashTable.set(recordedDate, {
             ...vitalsHashTable.get(recordedDate),
             [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-            [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+            [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
           vitalSign.value &&
             vitalsHashTable.set(recordedDate, {
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-              [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+              [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
         }
 
@@ -230,7 +235,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       }
 
       if (mode === 'both' || mode === 'vitals') {
-        result.bloodPressureInterpretation = interpretBloodPressure(
+        result.bloodPressureRenderInterpretation = interpretBloodPressure(
           vitalSigns.systolic,
           vitalSigns.diastolic,
           concepts,
