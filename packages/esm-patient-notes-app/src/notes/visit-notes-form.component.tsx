@@ -23,7 +23,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, WarningFilled } from '@carbon/react/icons';
+import { Add, Edit, WarningFilled, CloseFilled } from '@carbon/react/icons';
 import {
   type UploadedFile,
   createAttachment,
@@ -576,8 +576,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
                 {uploadedImages.map((image, index) => (
                   <div key={index} className={styles.imgThumbnailItem}>
                     <img src={image.base64Content} className={styles.imgThumbnail} alt={`Image ${index}`} />
-                    <Button kind="ghost" onClick={() => handleRemoveImage(index)}>
-                      {t('remove', 'Remove')}
+                    <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
+                      <CloseFilled size={16} />
                     </Button>
                   </div>
                 ))}

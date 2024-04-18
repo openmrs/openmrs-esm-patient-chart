@@ -191,6 +191,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
-
+.removeButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
