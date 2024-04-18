@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientDeceased } from '../deceased/deceased.resource';
 
 const MarkPatientDeceasedOverflowMenuItem = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const handleClick = useCallback(() => launchWorkspace('mark-patient-deceased-workspace-form'), []);
+  const handleClick = useCallback(() => launchPatientWorkspace('mark-patient-deceased-workspace-form'), []);
   const { isDead, isLoading: isPatientLoading } = usePatientDeceased(patientUuid);
 
   return (

@@ -31,7 +31,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn(),
   };
 });

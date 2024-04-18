@@ -29,7 +29,7 @@ import {
   EmptyState,
   ErrorState,
   PatientChartPagination,
-  launchWorkspace,
+  launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -70,7 +70,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
-      launchWorkspace('conditions-form-workspace', {
+      launchPatientWorkspace('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],

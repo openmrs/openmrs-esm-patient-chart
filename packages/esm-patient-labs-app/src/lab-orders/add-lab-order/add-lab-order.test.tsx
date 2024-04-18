@@ -38,11 +38,11 @@ jest.mock('./useTestTypes', () => ({
 const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
 });
-const mocklaunchWorkspace = jest.fn();
+const mocklaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   closeWorkspace: (...args) => mockCloseWorkspace(...args),
-  launchWorkspace: (...args) => mocklaunchWorkspace(...args),
+  launchPatientWorkspace: (...args) => mocklaunchPatientWorkspace(...args),
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => ({
@@ -142,7 +142,7 @@ describe('AddLabOrder', () => {
     });
 
     expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('from lab search, click add directly to order basket', async () => {
@@ -161,7 +161,7 @@ describe('AddLabOrder', () => {
     ]);
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('back to order basket', async () => {
@@ -171,7 +171,7 @@ describe('AddLabOrder', () => {
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('should display a patient header on tablet', () => {

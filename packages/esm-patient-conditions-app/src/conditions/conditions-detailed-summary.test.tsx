@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
@@ -14,7 +14,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -91,8 +91,8 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
 
   await user.click(recordConditionsLink);
 
-  expect(launchWorkspace).toHaveBeenCalledTimes(1);
-  expect(launchWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
+  expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
 });
 
 function renderConditionsDetailedSummary() {

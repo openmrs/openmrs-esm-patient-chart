@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EmptyState } from '.';
-import { launchWorkspace } from '..';
+import { launchPatientWorkspace } from '..';
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -32,8 +32,8 @@ describe('EmptyState', () => {
 
     await user.click(recordAppointmentsLink);
 
-    expect(launchWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchWorkspace).toHaveBeenCalledWith('sample-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('sample-form-workspace');
   });
 });
 
@@ -42,5 +42,5 @@ function renderEmptyState() {
 }
 
 function launchAppointmentsForm() {
-  launchWorkspace('sample-form-workspace');
+  launchPatientWorkspace('sample-form-workspace');
 }

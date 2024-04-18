@@ -1,8 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Button, IconButton } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
-import { useWorkspaces } from '../workspaces';
+import { useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
 import styles from './siderail-nav-button.scss';
 
 interface TagsProps {

@@ -7,7 +7,7 @@ import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@open
 import {
   type LabOrderBasketItem,
   closeWorkspace,
-  launchWorkspace,
+  launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { prepLabOrderPostData } from '../api';
@@ -164,7 +164,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
     setOrders([...orders, labOrder]);
     closeWorkspace('add-lab-order', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
   }, [orders, setOrders, createLabOrder, testType]);
 

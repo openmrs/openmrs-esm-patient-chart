@@ -20,7 +20,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchWorkspace,
+  launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
@@ -65,7 +65,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     }));
   }, [paginatedAllergies]);
 
-  const launchAllergiesForm = React.useCallback(() => launchWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;

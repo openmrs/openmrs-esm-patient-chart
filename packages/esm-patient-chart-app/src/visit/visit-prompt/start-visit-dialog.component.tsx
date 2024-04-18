@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
-import { launchPatientChartWithWorkspaceOpen, launchWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
 import { useFeatureFlag } from '@openmrs/esm-framework';
 import styles from './start-visit-dialog.scss';
 
@@ -28,7 +28,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         workspaceName: 'past-visits-overview',
       });
     } else {
-      launchWorkspace('past-visits-overview');
+      launchPatientWorkspace('past-visits-overview');
     }
     closeModal();
   }, [closeModal, patientUuid, launchPatientChart]);
@@ -40,7 +40,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         workspaceName: 'start-visit-workspace-form',
       });
     } else {
-      launchWorkspace('start-visit-workspace-form');
+      launchPatientWorkspace('start-visit-workspace-form');
     }
 
     closeModal();

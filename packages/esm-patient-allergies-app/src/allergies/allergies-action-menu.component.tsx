@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Allergy } from './allergy-intolerance.resource';
 import styles from './allergies-action-menu.scss';
@@ -17,7 +17,7 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
   const isTablet = useLayoutType() === 'tablet';
 
   const launchEditAllergiesForm = useCallback(() => {
-    launchWorkspace(patientAllergiesFormWorkspace, {
+    launchPatientWorkspace(patientAllergiesFormWorkspace, {
       workspaceTitle: t('editAllergy', 'Edit an Allergy'),
       allergy,
       formContext: 'editing',

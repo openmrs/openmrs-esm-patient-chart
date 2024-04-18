@@ -4,17 +4,17 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
+  type DefaultPatientWorkspaceProps,
   postOrders,
   useOrderBasket,
   useVisitOrOfflineVisit,
   type OrderBasketItem,
-  type DefaultWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
 import styles from './order-basket.scss';
 
-const OrderBasket: React.FC<DefaultWorkspaceProps> = ({
+const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,

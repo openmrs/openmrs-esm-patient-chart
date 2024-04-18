@@ -6,7 +6,7 @@ import { useLaunchWorkspaceRequiringVisit, useVisitOrOfflineVisit } from '@openm
 import VisitNoteActionButton from './visit-note-action-button.component';
 
 const mockedUseLayoutType = jest.mocked(useLayoutType);
-const mockUseLaunchWorkspaceRequiringVisit = jest.mocked(useLaunchWorkspaceRequiringVisit);
+const mockuseLaunchWorkspaceRequiringVisit = jest.mocked(useLaunchWorkspaceRequiringVisit);
 
 jest.mock('@carbon/react/icons', () => ({
   ...(jest.requireActual('@carbon/react/icons') as jest.Mock),
@@ -18,7 +18,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockReturnValue({ currentVisit: null }),
     useLaunchWorkspaceRequiringVisit: jest.fn(),
   };
@@ -46,7 +46,7 @@ describe('VisitNoteActionButton', () => {
 
     await user.click(visitNoteButton);
 
-    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
+    expect(mockuseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
     expect(visitNoteButton).toHaveClass('active');
   });
 
@@ -63,7 +63,7 @@ describe('VisitNoteActionButton', () => {
 
     await user.click(visitNoteButton);
 
-    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
+    expect(mockuseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
     expect(visitNoteButton).toHaveClass('active');
   });
 });

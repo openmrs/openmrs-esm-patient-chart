@@ -34,7 +34,7 @@ export function launchFormEntry(
   mutateForm?: () => void,
   currentVisit?: Visit,
 ) {
-  launchWorkspace('patient-form-entry-workspace', {
+  launchPatientWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
     mutateForm,
     formInfo: { encounterUuid, formUuid, visit: currentVisit },

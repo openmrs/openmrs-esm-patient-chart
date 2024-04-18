@@ -11,7 +11,7 @@ import { patientVitalsBiometricsFormWorkspace } from './constants';
  * @param formName The name of the form to use
  */
 export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
-  launchWorkspace('patient-form-entry-workspace', {
+  launchPatientWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
     formInfo: { formUuid, encounterUuid },
   });
@@ -32,6 +32,6 @@ export function launchVitalsAndBiometricsForm(currentVisit: Visit, config: Confi
     const { formUuid, formName } = config.vitals;
     launchFormEntry(formUuid, '', formName);
   } else {
-    launchWorkspace(patientVitalsBiometricsFormWorkspace);
+    launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
   }
 }

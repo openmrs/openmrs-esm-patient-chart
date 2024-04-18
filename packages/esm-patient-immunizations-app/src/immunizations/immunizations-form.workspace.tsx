@@ -27,7 +27,7 @@ import {
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { type DefaultWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import styles from './immunizations-form.scss';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
@@ -46,7 +46,7 @@ interface ResponsiveWrapperProps {
 
 const datePickerFormat = 'd/m/Y';
 
-const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({
+const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,

@@ -5,7 +5,7 @@ import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import {
-  launchWorkspace,
+  launchPatientWorkspace,
   type OrderBasketItem,
   useOrderBasket,
   closeWorkspace,
@@ -63,14 +63,14 @@ export default function LabOrderBasketPanelExtension() {
   const openNewLabForm = useCallback(() => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('add-lab-order'),
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order'),
     });
   }, []);
 
   const openEditLabForm = useCallback((order: OrderBasketItem) => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('add-lab-order', { order }),
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
     });
   }, []);
 

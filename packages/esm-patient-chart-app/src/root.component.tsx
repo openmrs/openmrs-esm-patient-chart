@@ -11,17 +11,17 @@ export default function Root() {
   const { patientUuid } = useParams();
   return (
     <>
-      <BrowserRouter basename={spaRoot}>
-        <div className={styles.patientChartWrapper}>
+      <div className={styles.patientChartWrapper}>
+        <BrowserRouter basename={spaRoot}>
           <VisitHeader />
           <SideMenu />
           <Routes>
             <Route path={basePath} element={<PatientChart />} />
             <Route path={dashboardPath} element={<PatientChart />} />
           </Routes>
-        </div>
-      </BrowserRouter>
-      <WorkspaceWindow contextKey={`patient/${patientUuid}`} />
+        </BrowserRouter>
+        <WorkspaceWindow contextKey={`patient/${patientUuid}`} />
+      </div>
     </>
   );
 }

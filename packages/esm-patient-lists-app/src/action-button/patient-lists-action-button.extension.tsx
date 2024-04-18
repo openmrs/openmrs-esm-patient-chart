@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Events } from '@carbon/react/icons';
 import { SiderailNavButton } from '@openmrs/esm-patient-common-lib';
 
-const handleLaunchPatientListsWorkspace = () => launchWorkspace('patient-lists');
+const handleLaunchPatientListsWorkspace = () => launchPatientWorkspace('patient-lists');
 
 function PatientListsActionButton() {
   const { t } = useTranslation();

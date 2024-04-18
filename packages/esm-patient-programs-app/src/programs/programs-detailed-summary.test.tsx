@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
@@ -23,7 +23,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -90,12 +90,12 @@ describe('ProgramsDetailedSummary ', () => {
     // Clicking "Add" launches the programs form in a workspace
     await user.click(addButton);
 
-    expect(launchWorkspace).toHaveBeenCalledWith('programs-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
     // Clicking the edit button launches the edit form in a workspace
     await user.click(editButton);
 
-    expect(launchWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
     });
   });

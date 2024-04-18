@@ -16,10 +16,10 @@ mockUseSession.mockReturnValue({
   },
 });
 
-const mocklaunchWorkspace = jest.fn();
+const mocklaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchWorkspace: (...args) => mocklaunchWorkspace(...args),
+  launchPatientWorkspace: (...args) => mocklaunchPatientWorkspace(...args),
 }));
 
 /** This is needed to render the order form */
@@ -130,7 +130,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
       }),
     ]);
 
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('can open the drug form ', async () => {

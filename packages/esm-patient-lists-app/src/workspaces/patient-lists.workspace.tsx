@@ -34,7 +34,7 @@ function PatientListsWorkspace() {
   const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
-    launchWorkspace('patient-list-details', { list, workspaceTitle: list.name });
+    launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 
   const tableHeaders: Array<typeof DataTableHeader> = [

@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
 import { configSchema } from '../config-schema';
@@ -13,7 +13,7 @@ import VitalsHeader from './vitals-header.component';
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
 const mockedUseConfig = jest.mocked(useConfig);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mocklaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
 const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -21,7 +21,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useWorkspaces: jest.fn().mockImplementation(() => ({ workspaces: [] })),
   };
@@ -98,8 +98,8 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
@@ -156,7 +156,7 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         encounterUuid: '',
         formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',

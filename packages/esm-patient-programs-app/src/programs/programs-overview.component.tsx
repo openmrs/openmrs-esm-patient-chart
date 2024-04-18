@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
-  launchWorkspace,
+  launchPatientWorkspace,
   CardHeader,
   EmptyState,
   ErrorState,
@@ -58,7 +58,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
 
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
-  const launchProgramsForm = React.useCallback(() => launchWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   const tableHeaders = [
     {

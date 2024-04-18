@@ -4,9 +4,9 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, formatDate, launchWorkspace, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, formatDate, launchPatientWorkspace, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
@@ -18,7 +18,7 @@ export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
 }
 
-export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
+export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
 
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({
@@ -39,7 +39,7 @@ export default function AddLabOrderWorkspace({
   const cancelOrder = useCallback(() => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
   }, [closeWorkspace]);
 

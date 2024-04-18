@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
-import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
 
 interface ActionMenuInterface {}
 

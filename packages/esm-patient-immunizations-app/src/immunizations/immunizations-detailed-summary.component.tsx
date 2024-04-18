@@ -21,7 +21,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchWorkspace,
+  launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import { useConfig, useLayoutType, usePagination, useVisit } from '@openmrs/esm-framework';
@@ -61,7 +61,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
       launchStartVisitPrompt();
       return;
     }
-    launchWorkspace('immunization-form-workspace');
+    launchPatientWorkspace('immunization-form-workspace');
   }, [currentVisit, launchStartVisitPrompt]);
 
   const sortedImmunizations = orderBy(

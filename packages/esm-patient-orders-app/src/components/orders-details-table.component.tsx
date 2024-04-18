@@ -33,13 +33,13 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchWorkspace,
   PatientChartPagination,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
   getDrugOrderByUuid,
+  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
@@ -469,7 +469,7 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
-    launchWorkspace('test-results-form-workspace', { order: orderItem });
+    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {

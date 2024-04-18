@@ -25,7 +25,7 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -71,7 +71,7 @@ const VitalsAndBiometricFormSchema = z
 
 export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
 
-const VitalsAndBiometricsForm: React.FC<DefaultWorkspaceProps> = ({
+const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,

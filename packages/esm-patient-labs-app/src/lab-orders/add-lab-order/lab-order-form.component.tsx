@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type LabOrderBasketItem,
-  type DefaultWorkspaceProps,
-  launchWorkspace,
+  type DefaultPatientWorkspaceProps,
+  launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
@@ -30,7 +30,7 @@ import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultWorkspaceProps {
+export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: LabOrderBasketItem;
 }
 
@@ -115,7 +115,7 @@ export function LabOrderForm({
       }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
+        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
     [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
@@ -124,7 +124,7 @@ export function LabOrderForm({
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 

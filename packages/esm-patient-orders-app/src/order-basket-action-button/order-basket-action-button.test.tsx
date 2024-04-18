@@ -19,7 +19,7 @@ jest.mock('@carbon/react/icons', () => ({
   ShoppingCart: jest.fn((props) => <div data-testid="shopping-cart-icon" {...props} />),
 }));
 
-const mocklaunchWorkspace = jest.fn();
+const mocklaunchPatientWorkspace = jest.fn();
 const mockLaunchStartVisitPrompt = jest.fn();
 const mockUseVisitOrOfflineVisit = jest.fn(() => ({
   activeVisit: {
@@ -37,7 +37,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
-    launchWorkspace: (arg) => mocklaunchWorkspace(arg),
+    launchPatientWorkspace: (arg) => mocklaunchPatientWorkspace(arg),
     launchStartVisitPrompt: () => mockLaunchStartVisitPrompt(),
     useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit(),
     useSystemVisitSetting: jest.fn().mockReturnValue({ data: true }),
@@ -81,7 +81,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 
@@ -94,7 +94,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 
@@ -110,7 +110,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mocklaunchWorkspace).not.toBeCalled();
+    expect(mocklaunchPatientWorkspace).not.toBeCalled();
     expect(mockLaunchStartVisitPrompt).toHaveBeenCalled();
     expect(orderBasketButton).toHaveClass('active');
   });

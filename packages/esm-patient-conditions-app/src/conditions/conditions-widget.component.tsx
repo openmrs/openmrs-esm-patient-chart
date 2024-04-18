@@ -19,7 +19,7 @@ import {
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
 import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
   type ConditionDataTableRow,
@@ -33,7 +33,7 @@ import { type ConditionSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
-  closeWorkspaceWithSavedChanges?: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
+  closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
   isSubmittingForm: boolean;

@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { screen, render } from '@testing-library/react';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
@@ -14,7 +14,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchWorkspace: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -49,7 +49,7 @@ it('renders flags in the patient flags slot', async () => {
 
   await user.click(editButton);
 
-  expect(launchWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
 });
 
 function renderFlags() {
