@@ -29,7 +29,7 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionSchema } from './conditions-form.component';
+import { type ConditionSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {

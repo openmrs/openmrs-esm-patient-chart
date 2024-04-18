@@ -33,7 +33,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchPatientWorkspace,
+  launchWorkspace,
   PatientChartPagination,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
@@ -469,7 +469,7 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
-    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
+    launchWorkspace('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {

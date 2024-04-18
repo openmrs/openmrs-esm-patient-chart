@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
-  launchPatientWorkspace,
+  launchWorkspace,
   CardHeader,
   EmptyState,
   ErrorState,
@@ -43,7 +43,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   const { data: immunizations, error, isLoading, isValidating } = useImmunizations(patientUuid);
   const { results: paginatedImmunizations, goTo, currentPage } = usePagination(immunizations ?? [], immunizationsCount);
 
-  const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
+  const launchImmunizationsForm = React.useCallback(() => launchWorkspace('immunization-form-workspace'), []);
 
   const tableHeaders = [
     {

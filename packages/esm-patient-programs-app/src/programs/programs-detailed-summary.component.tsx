@@ -25,7 +25,7 @@ import {
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, launchWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePrograms } from './programs.resource';
 import styles from './programs-detailed-summary.scss';
 
@@ -85,7 +85,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     });
   }, [enrollments, t]);
 
-  const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = useCallback(() => launchWorkspace('programs-form-workspace'), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -161,7 +161,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const launchEditProgramsForm = React.useCallback(
-    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
+    () => launchWorkspace('programs-form-workspace', { programEnrollmentId }),
     [programEnrollmentId],
   );
 

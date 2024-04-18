@@ -9,7 +9,7 @@ import {
 } from '@openmrs/esm-framework';
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
 function getColumnsLayoutStyle(dashboard: DashboardConfig) {
   const numberOfColumns = dashboard.columns ?? 2;
@@ -52,7 +52,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       basePath: view,
       patient,
       patientUuid,
-      launchPatientWorkspace,
+      launchWorkspace,
       launchStartVisitPrompt,
     }),
     [patient, patientUuid, view],

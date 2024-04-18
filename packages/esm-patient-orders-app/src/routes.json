@@ -30,5 +30,28 @@
         "columnSpan": 4
       }
     }
+  ],
+  "workspaces": [
+    {
+      "name": "order-basket",
+      "title": "orderBasketWorkspaceTitle",
+      "component": "orderBasketWorkspace",
+      "type": "order",
+      "canHide": true
+    },
+    {
+      "name": "patient-orders-form-workspace",
+      "title": "orderCancellation",
+      "component": "patientOrdersFormWorkspace",
+      "type": "order",
+      "canHide": false
+    },
+    {
+      "name": "test-results-form-workspace",
+      "title": "enterTestResults",
+      "component": "testResultsFormWorkspace",
+      "type": "lab-results",
+      "canHide": false
+    }
   ]
 }

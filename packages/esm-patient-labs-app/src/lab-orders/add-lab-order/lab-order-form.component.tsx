@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import {
   type LabOrderBasketItem,
   type DefaultWorkspaceProps,
-  launchPatientWorkspace,
+  launchWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
@@ -115,7 +115,7 @@ export function LabOrderForm({
       }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
     [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
@@ -124,7 +124,7 @@ export function LabOrderForm({
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 

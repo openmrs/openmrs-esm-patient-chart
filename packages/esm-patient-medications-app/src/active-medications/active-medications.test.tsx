@@ -16,14 +16,14 @@ function renderActiveMedications() {
   renderWithSwr(<ActiveMedications {...testProps} />);
 }
 
-const mockLaunchPatientWorkspace = jest.fn();
+const mocklaunchWorkspace = jest.fn();
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
-    launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
+    launchWorkspace: (...args) => mocklaunchWorkspace(...args),
     useWorkspaces: jest.fn(() => {
       return { workspaces: [{ name: 'order-basket' }] };
     }),
@@ -113,7 +113,7 @@ test('clicking the Record active medications link opens the order basket form', 
   await waitForLoadingToFinish();
   const orderLink = await screen.getByText('Record active medications');
   fireEvent.click(orderLink);
-  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(mocklaunchWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
 });
 
 test('clicking the Add button opens the order basket form', async () => {
@@ -122,5 +122,5 @@ test('clicking the Add button opens the order basket form', async () => {
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
-  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(mocklaunchWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
 });

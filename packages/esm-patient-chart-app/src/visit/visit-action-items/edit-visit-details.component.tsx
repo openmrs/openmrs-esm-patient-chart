@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@carbon/react';
 import { UserHasAccess, type Visit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { Edit } from '@carbon/react/icons';
 
 interface EditVisitDetailsActionItemProps {
@@ -16,7 +16,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const isTablet = useLayoutType() === 'tablet';
 
   const editVisitDetails = () => {
-    launchPatientWorkspace('start-visit-workspace-form', {
+    launchWorkspace('start-visit-workspace-form', {
       workspaceTitle: t('editVisitDetails', 'Edit visit details'),
       visitToEdit: visit,
     });

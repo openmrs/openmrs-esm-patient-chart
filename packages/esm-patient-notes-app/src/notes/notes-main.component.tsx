@@ -7,7 +7,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchPatientWorkspace,
+  launchWorkspace,
   launchStartVisitPrompt,
 } from '@openmrs/esm-patient-common-lib';
 import { useVisitNotes } from './visit-notes.resource';
@@ -32,7 +32,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
-      launchPatientWorkspace('visit-notes-form-workspace');
+      launchWorkspace('visit-notes-form-workspace');
     } else {
       launchStartVisitPrompt();
     }

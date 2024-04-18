@@ -4,10 +4,9 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, formatDate, launchWorkspace, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
   type DefaultWorkspaceProps,
-  launchPatientWorkspace,
   type OrderBasketItem,
   type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
@@ -40,7 +39,7 @@ export default function AddLabOrderWorkspace({
   const cancelOrder = useCallback(() => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, [closeWorkspace]);
 

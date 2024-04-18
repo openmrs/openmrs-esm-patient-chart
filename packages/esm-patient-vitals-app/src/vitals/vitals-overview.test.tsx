@@ -23,7 +23,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
   };
 });
 
@@ -32,7 +32,7 @@ jest.mock('../common', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,

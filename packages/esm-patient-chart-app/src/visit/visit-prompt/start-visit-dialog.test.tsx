@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import StartVisitDialog from './start-visit-dialog.component';
 
 const testProps = {
@@ -15,7 +15,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
   };
 });
 
@@ -35,7 +35,7 @@ describe('StartVisit', () => {
 
     await user.click(startNewVisitButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
 
   test('should launch edit past visit form', async () => {
@@ -55,7 +55,7 @@ describe('StartVisit', () => {
 
     await user.click(editPastVisitButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('past-visits-overview');
+    expect(launchWorkspace).toHaveBeenCalledWith('past-visits-overview');
   });
 });
 

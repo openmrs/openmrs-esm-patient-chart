@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import DrugSearch from './drug-search/drug-search.component';
-import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
 import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
@@ -25,7 +25,7 @@ export default function AddDrugOrderWorkspace({
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, [closeWorkspace]);
 
@@ -58,7 +58,7 @@ export default function AddDrugOrderWorkspace({
       }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
     [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],

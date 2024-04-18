@@ -19,7 +19,7 @@ jest.mock('@carbon/react/icons', () => ({
   ShoppingCart: jest.fn((props) => <div data-testid="shopping-cart-icon" {...props} />),
 }));
 
-const mockLaunchPatientWorkspace = jest.fn();
+const mocklaunchWorkspace = jest.fn();
 const mockLaunchStartVisitPrompt = jest.fn();
 const mockUseVisitOrOfflineVisit = jest.fn(() => ({
   activeVisit: {
@@ -37,7 +37,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
-    launchPatientWorkspace: (arg) => mockLaunchPatientWorkspace(arg),
+    launchWorkspace: (arg) => mocklaunchWorkspace(arg),
     launchStartVisitPrompt: () => mockLaunchStartVisitPrompt(),
     useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit(),
     useSystemVisitSetting: jest.fn().mockReturnValue({ data: true }),
@@ -81,7 +81,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 
@@ -94,7 +94,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mocklaunchWorkspace).toHaveBeenCalledWith('order-basket');
     expect(orderBasketButton).toHaveClass('active');
   });
 
@@ -110,7 +110,7 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).not.toBeCalled();
+    expect(mocklaunchWorkspace).not.toBeCalled();
     expect(mockLaunchStartVisitPrompt).toHaveBeenCalled();
     expect(orderBasketButton).toHaveClass('active');
   });

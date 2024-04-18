@@ -1,10 +1,6 @@
 import { useCallback } from 'react';
 import { usePatient } from '@openmrs/esm-framework';
-import {
-  launchPatientWorkspace,
-  launchStartVisitPrompt,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, launchStartVisitPrompt, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
@@ -15,7 +11,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
   const launchWorkspace = useCallback(
     (additionalProps?: T) => {
       if (!systemVisitEnabled || currentVisit) {
-        launchPatientWorkspace(workspaceName, additionalProps);
+        launchWorkspace(workspaceName, additionalProps);
       } else {
         launchStartVisitPrompt();
       }

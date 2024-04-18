@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { type DefaultWorkspaceProps, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, launchWorkspace } from '@openmrs/esm-patient-common-lib';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type MappedList, usePatientListMembers } from '../patient-lists.resource';
 import PatientListDetailsTable from './patient-list-details-table.component';
@@ -17,7 +17,7 @@ function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps)
   const { listMembers, isLoading } = usePatientListMembers(list.id);
 
   const closeListDetailsWorkspace = useCallback(() => {
-    launchPatientWorkspace('patient-lists');
+    launchWorkspace('patient-lists');
   }, []);
 
   return (

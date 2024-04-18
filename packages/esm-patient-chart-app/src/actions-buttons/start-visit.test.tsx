@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePatient, useVisit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
 
@@ -24,7 +24,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
   };
 });
 
@@ -42,8 +42,8 @@ describe('StartVisitOverflowMenuItem', () => {
 
     await user.click(startVisitButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
 
   it('should not show start visit button for deceased patient', () => {

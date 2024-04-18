@@ -1,6 +1,6 @@
 import { navigate } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
 interface HtmlFormEntryForm {
   formUuid: string;
@@ -63,7 +63,7 @@ export function launchFormEntry(
   visitStopDatetime?: string,
   mutateForm?: () => void,
 ) {
-  launchPatientWorkspace('patient-form-entry-workspace', {
+  launchWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
     mutateForm,
     formInfo: {

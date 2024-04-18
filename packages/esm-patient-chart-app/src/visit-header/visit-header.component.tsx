@@ -13,7 +13,7 @@ import {
   ExtensionSlot,
   interpolateUrl,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
 import { CloseButton } from './close-button.component';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
@@ -117,7 +117,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 };
 
 function launchStartVisitForm() {
-  launchPatientWorkspace('start-visit-workspace-form');
+  launchWorkspace('start-visit-workspace-form');
 }
 
 const VisitHeader: React.FC = () => {

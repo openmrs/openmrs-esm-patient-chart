@@ -24,7 +24,7 @@ import escapeRegExp from 'lodash-es/escapeRegExp';
 // work. Trust me, I tried. But by now, I don't want to waste any more time on this issue when this
 // workaround here exists.
 // If anyone reading this comment wants to take on the challenge, please feel
-// free to do so and, if successful, notify me when `launchPatientWorkspace` can be called
+// free to do so and, if successful, notify me when `launchWorkspace` can be called
 // from `esm-form-entry-app` and/or directly migrate this file's content to the appropriate location.
 import type { PatientFormSyncItemContent } from '../../esm-form-entry-app/src/app/offline/sync';
 import type { EncounterCreate } from '../../esm-form-entry-app/src/app/types';

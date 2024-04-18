@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Events } from '@carbon/react/icons';
-import { launchPatientWorkspace, SiderailNavButton } from '@openmrs/esm-patient-common-lib';
+import { SiderailNavButton } from '@openmrs/esm-patient-common-lib';
 
-const handleLaunchPatientListsWorkspace = () => launchPatientWorkspace('patient-lists');
+const handleLaunchPatientListsWorkspace = () => launchWorkspace('patient-lists');
 
 function PatientListsActionButton() {
   const { t } = useTranslation();

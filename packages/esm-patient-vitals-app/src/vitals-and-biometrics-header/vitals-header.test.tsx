@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
 import { configSchema } from '../config-schema';
@@ -13,7 +13,7 @@ import VitalsHeader from './vitals-header.component';
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
 const mockedUseConfig = jest.mocked(useConfig);
-const mockLaunchWorkspace = jest.mocked(launchPatientWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -21,7 +21,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useWorkspaces: jest.fn().mockImplementation(() => ({ workspaces: [] })),
   };

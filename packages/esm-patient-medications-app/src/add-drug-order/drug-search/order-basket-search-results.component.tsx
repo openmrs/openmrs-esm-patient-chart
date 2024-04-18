@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
@@ -143,7 +143,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
       setOrders([...orders, searchResult]);
       closeWorkspace('add-drug-order', {
         ignoreChanges: true,
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
     [orders, setOrders],

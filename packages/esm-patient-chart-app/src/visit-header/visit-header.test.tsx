@@ -11,12 +11,13 @@ import {
   showModal,
   getHistory,
   goBackInHistory,
-  age,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
-import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
+// FIXME: We shouldn't be importing from the internal API.
+import { registerWorkspace } from '@openmrs/esm-framework/src/internal';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -44,7 +45,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
+    launchWorkspace: jest.fn(),
   };
 });
 
@@ -57,7 +58,12 @@ describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
-    registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
+    registerWorkspace({
+      name: 'start-visit-workspace-form',
+      title: 'Start visit',
+      load: jest.fn(),
+      moduleName: 'test-module',
+    });
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
       isLoading: false,
@@ -93,7 +99,7 @@ describe('Visit Header', () => {
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
 
   test('should display a truncated name when the patient name is very long', async () => {

@@ -3,7 +3,7 @@ import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   useWorkspaces,
-  launchPatientWorkspace,
+  launchWorkspace,
   SiderailNavButton,
   useLaunchWorkspaceRequiringVisit,
 } from '@openmrs/esm-patient-common-lib';
@@ -21,7 +21,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   const launchWorkspace = () => {
     if (isClinicalFormOpen) {
-      launchPatientWorkspace('patient-form-entry-workspace', {
+      launchWorkspace('patient-form-entry-workspace', {
         workspaceTitle: recentlyOpenedForm?.additionalProps?.['workspaceTitle'],
       });
     } else {
