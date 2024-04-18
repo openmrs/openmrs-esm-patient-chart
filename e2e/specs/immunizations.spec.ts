@@ -65,7 +65,7 @@ test('Edit an immunization', async ({ page }) => {
   });
 
   await test.step('And I edit the Immunization', async () => {
-    await page..getByRole('button', { name: 'Expand current row' }).click();
+    await page.getByRole('button', { name: 'Expand current row' }).click();
     await page.getByRole('button', { name: 'Edit' }).click();
   });
   await test.step('Then I should see the Immunization form launch in the workspace', async () => {
