@@ -43,7 +43,9 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   const results = useMemo(() => {
     if (isLoading || error) return null;
     return labOrderableConcepts
-      ? (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers)
+      ? (data as Array<ConceptResult>)?.flatMap((d) => {
+          return d.data.setMembers?.length > 0 ? d.data?.setMembers : d.data?.answers;
+        })
       : (data as ConceptResults)?.data.results ?? ([] as Concept[]);
   }, [data, isLoading, error, labOrderableConcepts]);
 
