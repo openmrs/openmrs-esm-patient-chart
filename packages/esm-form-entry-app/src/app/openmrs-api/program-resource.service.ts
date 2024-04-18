@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
-import { MetaData } from '../types';
+import { Encounter, MetaData } from '../types';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+
 dayjs.extend(utc);
 
 @Injectable()
@@ -24,21 +24,23 @@ export class ProgramResourceService {
     return `${this.windowRef.nativeWindow.openmrsBase}${restBaseUrl}/programenrollment`;
   }
 
-  public handlePatientCareProgram(form: Form, encounterUuid: string): void {
+  public handlePatientCareProgram(form: Form, encounter: Encounter): void {
     const careProgramMeta: MetaData | undefined = form.schema.meta?.programs;
     if (!careProgramMeta) {
       return;
     }
 
     const { uuid, isEnrollment, enrollmentDateQuestionId, discontinuationDateQuestionId } = careProgramMeta;
-    const enrollmentDate = this.getProgramDate(form, isEnrollment, enrollmentDateQuestionId);
+    const enrollmentDate = encounter?.encounterDatetime;
     const discontinuationDate = this.getProgramDate(form, !isEnrollment, discontinuationDateQuestionId);
     const locationUuid = this.getUserLocationUuid(form);
     const utcOffset = form.valueProcessingInfo.utcOffset ?? '+0300';
 
-    isEnrollment
-      ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounterUuid, utcOffset)
-      : this.discontinuePatientFromCareProgram(discontinuationDate, encounterUuid, utcOffset);
+    if (isEnrollment) {
+      this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounter.uuid, utcOffset);
+    } else {
+      this.discontinuePatientFromCareProgram(discontinuationDate, encounter.uuid, utcOffset);
+    }
   }
 
   public enrollPatientToCareProgram(
@@ -49,7 +51,7 @@ export class ProgramResourceService {
     utcOffset: string,
   ) {
     const patientUuid = this.singleSpaService.getPropOrThrow('patientUuid');
-    const enrolledDate = enrollmentDate ? enrollmentDate : dayjs(new Date()).utcOffset(utcOffset).format();
+    const enrolledDate = enrollmentDate ?? dayjs(new Date()).utcOffset(utcOffset).format();
     const inEditModeEncounterUuid = this.singleSpaService.getProp('encounterUuid');
     // Should not enroll patient if in edit mode
     if (inEditModeEncounterUuid) {
@@ -62,7 +64,7 @@ export class ProgramResourceService {
       dateCompleted: null,
       location: locationUuid,
     };
-
+    console.log('enrollment payload', payload);
     this.httpClient.post(this.programEnrollmentUrl(), payload).subscribe(
       () => {
         showSnackbar({

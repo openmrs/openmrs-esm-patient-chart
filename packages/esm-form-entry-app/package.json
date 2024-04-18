@@ -50,7 +50,7 @@
     "@ng-select/ng-select": "^11.2.0",
     "@ngx-translate/core": "^15.0.0",
     "@openmrs/ngx-file-uploader": "next",
-    "@openmrs/ngx-formentry": "next",
+    "@openmrs/ngx-formentry": "/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry",
     "jspdf": "^2.5.1",
     "moment": "^2.29.4",
     "ngx-bootstrap": "^11.0.1",

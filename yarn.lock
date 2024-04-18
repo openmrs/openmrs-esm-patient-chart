@@ -4234,7 +4234,7 @@ __metadata:
     "@ngx-translate/core": "npm:^15.0.0"
     "@openmrs/esm-framework": "npm:next"
     "@openmrs/ngx-file-uploader": "npm:next"
-    "@openmrs/ngx-formentry": "npm:next"
+    "@openmrs/ngx-formentry": /Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry
     "@types/jasmine": "npm:~3.6.11"
     "@types/jasminewd2": "npm:~2.0.3"
     "@types/webpack-env": "npm:^1.18.2"
@@ -4873,9 +4873,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/ngx-formentry@npm:next":
-  version: 5.0.1-pre.444
-  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.444"
+"@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app":
+  version: 5.0.0
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=6abf1d&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -4896,7 +4896,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/24bd06807483d9577316f332ad955503815a299a1b3544e4aa7e15b2d1eeb017743d08833536fe9ee273d21480bdaddc29bd16b2d40d98750d6fbf9d26fae941
+  checksum: 10/0289e581347ad6676c83a84d64c8dc2382bdbc311728b22cf03b918de2c5679de4598f77e88fcb4db10fa85f0eab247367cd43d7b3468196a8fada7f0d7ed285
   languageName: node
   linkType: hard
 
