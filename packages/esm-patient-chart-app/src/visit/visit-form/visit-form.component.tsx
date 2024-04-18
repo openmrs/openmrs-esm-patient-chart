@@ -116,7 +116,18 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     );
 
     return z.object({
-      visitStartDate: z.date(),
+      visitStartDate: z.date().refine(
+        (value) =>
+          displayVisitStopDateTimeFields
+            ? true
+            : dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day'),
+        t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
+          firstEncounterDatetime: new Date().toLocaleString(),
+          interpolation: {
+            escapeValue: false,
+          },
+        }),
+      ),
       visitStartTime: z
         .string()
         .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
