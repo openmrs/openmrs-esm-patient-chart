@@ -332,6 +332,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           <div ref={contentToPrintRef}>
             <PrintComponent subheader={title} patientDetails={patientDetails} />
             <DataTable
+              aria-label={t('orderDetails', 'Order details')}
               data-floating-menu-container
               size="sm"
               headers={tableHeaders}
