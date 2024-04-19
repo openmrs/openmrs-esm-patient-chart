@@ -1,4 +1,5 @@
 import { type ConceptMetadata } from '../common';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/types';
 import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
@@ -85,6 +86,18 @@ export function generatePlaceholder(value: string) {
 
     default:
       return '--';
+  }
+}
+
+export function getDecimalCountForField(key: keyof VitalsBiometricsFormData) {
+  switch (key) {
+    case 'temperature':
+    case 'weight':
+    case 'oxygenSaturation':
+      return 1;
+
+    default:
+      return 0;
   }
 }
 

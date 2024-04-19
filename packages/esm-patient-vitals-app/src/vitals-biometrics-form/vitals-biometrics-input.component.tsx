@@ -1,26 +1,13 @@
 import React, { Fragment, useId, useState } from 'react';
 import classNames from 'classnames';
-import { type Control, Controller } from 'react-hook-form';
+import { type Control, Controller, useForm, useFormContext } from 'react-hook-form';
 import { FormLabel, NumberInput, TextArea } from '@carbon/react';
 import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
-import { type VitalsBiometricsFormData } from './vitals-biometrics-form.workspace';
 import styles from './vitals-biometrics-input.scss';
-
-type fieldId =
-  | 'computedBodyMassIndex'
-  | 'diastolicBloodPressure'
-  | 'generalPatientNote'
-  | 'height'
-  | 'midUpperArmCircumference'
-  | 'oxygenSaturation'
-  | 'pulse'
-  | 'respiratoryRate'
-  | 'systolicBloodPressure'
-  | 'temperature'
-  | 'weight';
+import { type VitalsBiometricsFormData } from './types';
 
 type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';
 type FieldTypes = 'number' | 'textarea';
@@ -31,69 +18,60 @@ interface ResponsiveWrapperProps {
 }
 
 interface VitalsAndBiometricsInputProps {
-  control: Control<VitalsBiometricsFormData>;
   fieldStyles?: React.CSSProperties;
   fieldWidth?: string;
   fieldProperties: Array<{
     className?: string;
-    id: fieldId;
+    id: keyof VitalsBiometricsFormData;
     invalid?: boolean;
-    max?: number | null;
-    min?: number | null;
     name: string;
     separator?: string;
     type?: FieldTypes;
   }>;
   interpretation?: string;
-  isValueWithinReferenceRange?: boolean;
   label: string;
   muacColorCode?: string;
   placeholder?: string;
   readOnly?: boolean;
-  showErrorMessage?: boolean;
+  showFormSubmissionErrorNotifications?: boolean;
   unitSymbol?: string;
   useMuacColors?: boolean;
 }
 
 const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
-  control,
   fieldProperties,
   fieldStyles,
   fieldWidth,
   interpretation,
-  isValueWithinReferenceRange = true,
   label,
   muacColorCode,
   placeholder,
   readOnly,
-  showErrorMessage,
+  showFormSubmissionErrorNotifications,
   unitSymbol,
   useMuacColors,
 }) => {
   const { t } = useTranslation();
   const fieldId = useId();
   const isTablet = useLayoutType() === 'tablet';
-  const [invalid, setInvalid] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const {
+    control,
+    formState: { errors },
+    setValue,
+  } = useFormContext<VitalsBiometricsFormData>();
 
   const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
 
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
-  function checkValidity(value, onChange) {
-    setInvalid(!(Number(value) || value === ''));
-
-    if (!invalid) {
-      onChange(value === '' ? undefined : Number(value));
-    }
-  }
-
   function handleFocusChange(isFocused: boolean) {
     setIsFocused(isFocused);
   }
 
-  const isInvalidInput = !isValueWithinReferenceRange || invalid;
-  const showInvalidInputError = Boolean(showErrorMessage && isInvalidInput);
+  const fieldIdWithError = fieldProperties?.find(({ id }) => errors?.[id])?.id;
+  const errorMessage = errors?.[fieldIdWithError]?.message;
+  const showInvalidInputError = Boolean((showFormSubmissionErrorNotifications || !isFocused) && errorMessage);
   const errorMessageClass = showInvalidInputError ? styles.invalidInput : '';
 
   const containerClasses = classNames(styles.container, {
@@ -146,12 +124,12 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               disableWheel
                               hideSteppers
                               id={`${fieldId}-${fieldProperty.id}`}
-                              max={fieldProperty.max ?? undefined}
-                              min={fieldProperty.min ?? undefined}
                               name={fieldProperty.name}
                               onBlur={() => handleFocusChange(false)}
-                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                checkValidity(event.target.value, onChange)
+                              onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
+                                setValue(fieldProperty.id, isNaN(Number(value)) ? undefined : Number(value), {
+                                  shouldValidate: true,
+                                })
                               }
                               onFocus={() => handleFocusChange(true)}
                               placeholder={generatePlaceholder(fieldProperty.name)}
@@ -205,14 +183,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
         </section>
       </div>
 
-      {showInvalidInputError && (
-        <FormLabel className={styles.invalidInputError}>
-          {t('validationInputError', `Value must be between {{min}} and {{max}}`, {
-            min: fieldProperties[0].min,
-            max: fieldProperties[0].max,
-          })}
-        </FormLabel>
-      )}
+      {showInvalidInputError && <FormLabel className={styles.invalidInputError}>{errorMessage}</FormLabel>}
     </>
   );
 };
