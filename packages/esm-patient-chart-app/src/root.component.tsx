@@ -5,10 +5,8 @@ import PatientChart from './patient-chart/patient-chart.component';
 import SideMenu from './side-nav/side-menu.component';
 import VisitHeader from './visit-header/visit-header.component';
 import styles from './root.scss';
-import { WorkspaceWindow } from '@openmrs/esm-framework';
 
 export default function Root() {
-  const { patientUuid } = useParams();
   return (
     <>
       <div className={styles.patientChartWrapper}>
@@ -20,7 +18,6 @@ export default function Root() {
             <Route path={dashboardPath} element={<PatientChart />} />
           </Routes>
         </BrowserRouter>
-        <WorkspaceWindow contextKey={`patient/${patientUuid}`} />
       </div>
     </>
   );

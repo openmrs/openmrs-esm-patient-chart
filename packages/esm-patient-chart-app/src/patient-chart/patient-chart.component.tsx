@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
+  ActionMenu,
   ExtensionSlot,
+  WorkspaceWindow,
   setCurrentVisit,
   setLeftNav,
   unsetLeftNav,
@@ -11,7 +13,6 @@ import {
 import { useParams } from 'react-router-dom';
 import { spaBasePath } from '../constants';
 import { type LayoutMode } from './chart-review/dashboard-view.component';
-import ActionMenu from './action-menu/action-menu.component';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
@@ -46,35 +47,40 @@ const PatientChart: React.FC = () => {
   }, [leftNavBasePath]);
 
   return (
-    <main className={classNames('omrs-main-content', styles.chartContainer)}>
-      <>
-        <div
-          className={classNames(
-            styles.innerChartContainer,
-            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
-          )}
-        >
-          <ExtensionSlot name="breadcrumbs-slot" />
-          {isLoadingPatient ? (
-            <Loader />
-          ) : (
-            <>
-              <aside>
-                <ExtensionSlot name="patient-header-slot" state={state} />
-                <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
-                <ExtensionSlot name="patient-info-slot" state={state} />
-              </aside>
-              <div className={styles.grid}>
-                <div className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}>
-                  <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
+    <>
+      <main className={classNames('omrs-main-content', styles.chartContainer)}>
+        <>
+          <div
+            className={classNames(
+              styles.innerChartContainer,
+              workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
+            )}
+          >
+            <ExtensionSlot name="breadcrumbs-slot" />
+            {isLoadingPatient ? (
+              <Loader />
+            ) : (
+              <>
+                <aside>
+                  <ExtensionSlot name="patient-header-slot" state={state} />
+                  <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
+                  <ExtensionSlot name="patient-info-slot" state={state} />
+                </aside>
+                <div className={styles.grid}>
+                  <div
+                    className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
+                  >
+                    <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
-        <ActionMenu />
-      </>
-    </main>
+              </>
+            )}
+          </div>
+        </>
+      </main>
+      <WorkspaceWindow contextKey={`patient/${patientUuid}`} />
+      <ActionMenu />
+    </>
   );
 };
 

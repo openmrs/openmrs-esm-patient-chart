@@ -1,13 +1,9 @@
 import React from 'react';
 import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import {
-  launchPatientWorkspace,
-  SiderailNavButton,
-  useLaunchWorkspaceRequiringVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { formEntryWorkspace } from './constants';
-import { useWorkspaces } from '@openmrs/esm-framework';
+import { ActionMenuButton, useWorkspaces } from '@openmrs/esm-framework';
 
 const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -30,8 +26,7 @@ const ClinicalFormActionButton: React.FC = () => {
   };
 
   return (
-    <SiderailNavButton
-      name={'clinical-form-action-menu'}
+    <ActionMenuButton
       getIcon={(props) => <Document {...props} />}
       label={t('clinicalForms', 'Clinical forms')}
       iconDescription={t('clinicalForms', 'Clinical forms')}

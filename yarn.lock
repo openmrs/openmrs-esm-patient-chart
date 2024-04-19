@@ -4753,9 +4753,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-react-utils@npm:5.5.1-pre.1685":
-  version: 5.5.1-pre.1685
-  resolution: "@openmrs/esm-react-utils@npm:5.5.1-pre.1685"
+"@openmrs/esm-react-utils@portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-react-utils::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-react-utils@portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-react-utils::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
   dependencies:
     lodash-es: "npm:^4.17.21"
     single-spa-react: "npm:^6.0.0"
@@ -4774,9 +4774,8 @@ __metadata:
     react-i18next: 11.x
     rxjs: 6.x
     swr: 2.x
-  checksum: 10/7100738974dba6372a4df6960d1b6550d43e42f686cb7e2d5795b3ea9ce03da3454469b2b68f46cffc22d4dc4af40b13eb0fa310b076a5796c4c22886d9b216a
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@openmrs/esm-routes@npm:5.5.1-pre.1685":
   version: 5.5.1-pre.1685

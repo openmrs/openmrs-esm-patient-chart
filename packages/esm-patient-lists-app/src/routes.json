@@ -7,7 +7,7 @@
     {
       "name": "patient-lists-action-menu",
       "component": "patientListsActionMenu",
-      "slot": "action-menu-chart-items-slot"
+      "slot": "action-menu-patient-chart-items-slot"
     }
   ],
   "workspaces": [

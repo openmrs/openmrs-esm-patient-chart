@@ -74,7 +74,8 @@
     "sass": "^1.54.3",
     "@openmrs/esm-translations": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-translations",
     "@openmrs/esm-styleguide": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-styleguide",
-    "@openmrs/esm-globals": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-globals"
+    "@openmrs/esm-globals": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-globals",
+    "@openmrs/esm-react-utils": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-react-utils"
   },
   "packageManager": "yarn@4.1.1",
   "dependencies": {

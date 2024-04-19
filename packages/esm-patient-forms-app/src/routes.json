@@ -33,7 +33,7 @@
     {
       "name": "clinical-form-action-menu",
       "component": "clinicalFormActionMenu",
-      "slot": "action-menu-chart-items-slot",
+      "slot": "action-menu-patient-chart-items-slot",
       "offline": true,
       "online": true,
       "order": 2
