@@ -85,15 +85,15 @@ describe('useTestTypes filters by text', () => {
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBeFalsy();
     expect(result.current.testTypes).toEqual([
-      expect.objectContaining({ label: 'Sodium Chloride' }),
-      expect.objectContaining({ label: 'Sodium Bicarbonate' }),
       expect.objectContaining({ label: 'Potassium' }),
+      expect.objectContaining({ label: 'Sodium Bicarbonate' }),
+      expect.objectContaining({ label: 'Sodium Chloride' }),
     ]);
     rerender('sodium');
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.testTypes).toEqual([
-      expect.objectContaining({ label: 'Sodium Chloride' }),
       expect.objectContaining({ label: 'Sodium Bicarbonate' }),
+      expect.objectContaining({ label: 'Sodium Chloride' }),
     ]);
     rerender('pt');
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
