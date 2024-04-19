@@ -149,7 +149,6 @@ describe('VitalsBiometricsForm', () => {
         temperature: temperatureValue,
         weight: weightValue,
       }),
-      expect.anything(),
       new AbortController(),
       undefined,
     );

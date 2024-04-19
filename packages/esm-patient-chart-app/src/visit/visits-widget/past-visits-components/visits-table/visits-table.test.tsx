@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { getConfig, showModal, usePagination, userHasAccess } from '@openmrs/esm-framework';
+import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
@@ -14,7 +14,6 @@ const testProps = {
 
 const mockedShowModal = showModal as jest.Mock;
 const mockedGetConfig = getConfig as jest.Mock;
-const mockedUsePagination = usePagination as jest.Mock;
 const mockedUserHasAccess = userHasAccess as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -24,11 +23,6 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     getConfig: jest.fn().mockResolvedValue({ htmlFormEntryForms: [] }),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-    usePagination: jest.fn().mockImplementation((data) => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: data,
-    })),
   };
 });
 
@@ -37,11 +31,6 @@ describe('EncounterList', () => {
     testProps.visits = [];
 
     mockedGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    mockedUsePagination.mockImplementationOnce(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    }));
 
     renderVisitsTable();
 
@@ -52,12 +41,6 @@ describe('EncounterList', () => {
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
     testProps.visits = mockEncounters;
-
-    mockedUsePagination.mockImplementationOnce(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockEncounters,
-    }));
 
     renderVisitsTable();
 
@@ -111,11 +94,6 @@ describe('Delete Encounter', () => {
     testProps.visits = mockEncounters;
 
     mockedUserHasAccess.mockReturnValue(true);
-    mockedUsePagination.mockImplementationOnce(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockEncounters,
-    }));
 
     renderVisitsTable();
 
