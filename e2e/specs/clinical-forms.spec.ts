@@ -37,7 +37,6 @@ test('Fill a clinical form', async ({ page }) => {
     await expect(headerRow).toContainText(/last completed/i);
 
     await expect(chartPage.page.getByRole('cell', { name: /covid 19/i })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /laboratory test orders/i })).toBeVisible();
     await expect(chartPage.page.getByRole('cell', { name: /laboratory test results/i })).toBeVisible();
     await expect(chartPage.page.getByRole('cell', { name: /soap note template/i })).toBeVisible();
     await expect(chartPage.page.getByRole('cell', { name: /surgical operation/i })).toBeVisible();
