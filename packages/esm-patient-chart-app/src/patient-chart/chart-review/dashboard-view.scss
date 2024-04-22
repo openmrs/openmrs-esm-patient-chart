@@ -26,7 +26,11 @@
   }
 }
 
-.child:only-child {
+.extensionWrapper {
+  height: 100%;
+}
+
+.extension:only-child {
   grid-column: 1 / span 2;
 }
 

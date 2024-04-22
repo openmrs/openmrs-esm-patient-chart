@@ -8,7 +8,6 @@
       "order": 0,
       "meta": {
         "slot": "patient-chart-summary-dashboard-slot",
-        "columns": 4,
         "path": "Patient Summary"
       },
       "online": true,
@@ -213,7 +212,10 @@
       "name": "current-visit-summary",
       "component": "currentVisitSummary",
       "online": true,
-      "offline": true
+      "offline": true,
+      "meta": {
+        "fullWidth": true
+      }
     },
     {
       "name": "edit-visit-action-button",

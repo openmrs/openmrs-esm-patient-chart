@@ -10,7 +10,7 @@
       "component": "vitalsSummary",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": true
       },
       "order": 1
     },
@@ -21,7 +21,7 @@
       "meta": {
         "title": "Vitals",
         "view": "vitals",
-        "columnSpan": 2
+        "fullWidth": true
       },
       "order": 1
     },
@@ -46,7 +46,7 @@
       "meta": {
         "view": "biometrics",
         "title": "Biometrics",
-        "columnSpan": 2
+        "fullWidth": true
       }
     },
     {
