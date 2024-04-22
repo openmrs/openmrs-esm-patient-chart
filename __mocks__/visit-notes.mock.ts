@@ -7194,31 +7194,3 @@ export const mockVisitNotes = [
     encounterProviderRole: 'Clinician',
   },
 ];
-
-export const formattedVisitNotes = [
-  {
-    id: 0,
-    encounterDate: '2022-01-27T16:51:29.000+0000',
-    diagnoses: 'Malaria, Primary respiratory tuberculosis, confirmed',
-  },
-  {
-    id: 1,
-    encounterDate: '2022-01-14T08:46:05.000+0000',
-    diagnoses: 'Malaria',
-  },
-  {
-    id: 2,
-    encounterDate: '2022-01-14T08:42:22.000+0000',
-    diagnoses: 'Hemorrhage in early pregnancy',
-  },
-  {
-    id: 3,
-    encounterDate: '2022-01-11T12:18:55.000+0000',
-    diagnoses: 'Malaria',
-  },
-  {
-    id: 4,
-    encounterDate: '2021-09-08T03:09:37.000+0000',
-    diagnoses: 'Malaria, confirmed, Human immunodeficiency virus (HIV) disease',
-  },
-];

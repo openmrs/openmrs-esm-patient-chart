@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
-import { mockConditions, mockFhirConditionsResponse } from '__mocks__';
+import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
@@ -14,7 +14,6 @@ const testProps = {
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -70,11 +69,6 @@ describe('ConditionsOverview: ', () => {
     const user = userEvent.setup();
 
     mockedOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
-    mockedUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockConditions,
-    }));
 
     renderConditionsOverview();
 
@@ -100,7 +94,7 @@ describe('ConditionsOverview: ', () => {
 
     await user.click(nextPageButton);
 
-    expect(screen.getAllByRole('row').length).toEqual(6);
+    expect(screen.getAllByRole('row').length).toEqual(3);
   });
 
   it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
@@ -117,7 +111,7 @@ describe('ConditionsOverview: ', () => {
     await user.click(recordConditionsLink);
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
   });
 });
 
