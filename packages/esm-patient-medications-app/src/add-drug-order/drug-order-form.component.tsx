@@ -53,27 +53,13 @@ export interface DrugOrderFormProps {
   onCancel: () => void;
   promptBeforeClosing: (testFcn: () => boolean) => void;
 }
-interface AbbreviationOption {
-  abbreviation: string;
-  value: string;
-}
 
 const comboSchema = {
   value: z.string(),
   valueCoded: z.string(),
   default: z.boolean().optional(),
 };
-const frequencyAbbreviations: AbbreviationOption[] = [
-  { abbreviation: 'od', value: 'Once daily' },
-  { abbreviation: 'q2h', value: 'Every two hours' },
-  { abbreviation: 'bid', value: 'Twice daily' },
-  { abbreviation: 'tid', value: 'Thrice daily' },
-  { abbreviation: 'q6h', value: 'Every six hours' },
-  { abbreviation: 'q4h', value: 'Every four hours' },
-  { abbreviation: 'q3h', value: 'Every three hours' },
-  { abbreviation: 'q12h', value: 'Every twelve hours' },
-  { abbreviation: 'q1h', value: 'Every hour' },
-];
+
 const schemaFields = {
   // t( 'freeDosageErrorMessage', 'Add free dosage note')
   freeTextDosage: z.string().refine((value) => value !== '', {
@@ -317,10 +303,13 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     [orderConfigObject, config?.daysDurationUnit],
   );
 
-  const orderFrequencies: Array<MedicationFrequency> = useMemo(
-    () => orderConfigObject?.orderFrequencies ?? [],
-    [orderConfigObject],
-  );
+  const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
+    return orderConfigObject?.orderFrequencies ?? [];
+  }, [orderConfigObject]);
+
+  const filterItems = (menu) => {
+    return menu?.item?.abbreviation?.some((abbr) => abbr.toLowerCase().includes(menu?.inputValue?.toLowerCase()));
+  };
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
@@ -492,7 +481,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         size={isTablet ? 'lg' : 'md'}
                         id="editFrequency"
                         items={orderFrequencies}
-                        optionsWithAbbreviations={frequencyAbbreviations}
+                        shouldFilterItem={filterItems}
                         placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                         titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                         itemToString={(item) => item?.value}
@@ -783,8 +772,9 @@ const ControlledFieldInput = ({
   getValues,
   handleAfterChange,
   optionsWithAbbreviations,
+  orderFrequencies,
   ...restProps
-}: ControlledFieldInputProps & { optionsWithAbbreviations?: AbbreviationOption[] }) => {
+}: ControlledFieldInputProps) => {
   const {
     field: { onBlur, onChange, value, ref },
     fieldState,
@@ -798,20 +788,6 @@ const ControlledFieldInput = ({
     },
     [getValues, onChange, handleAfterChange],
   );
-
-  const handleInputChange = (inputValue: string) => {
-    if (optionsWithAbbreviations && typeof inputValue === 'string') {
-      const matchedOption = optionsWithAbbreviations.find(
-        ({ abbreviation }) => abbreviation.toLowerCase() === inputValue.toLowerCase(),
-      );
-      if (matchedOption) {
-        const finalOption = restProps.items.find(
-          (item) => item.value && item.value.toLowerCase() === matchedOption.value.toLowerCase(),
-        );
-        handleChange({ value: finalOption.value, valueCoded: finalOption.valueCoded });
-      }
-    }
-  };
 
   const component = useMemo(() => {
     if (type === 'toggle')
@@ -868,7 +844,6 @@ const ControlledFieldInput = ({
         <ComboBox
           selectedItem={value}
           onChange={({ selectedItem }) => handleChange(selectedItem)}
-          onInputChange={(inputValue) => handleInputChange(inputValue)}
           onBlur={onBlur}
           ref={ref}
           className={fieldState?.error?.message && styles.fieldError}

@@ -9,9 +9,16 @@ import {
   type QuantityUnit,
 } from '../types';
 
+export interface Names {
+  uuid: string;
+  display: string;
+}
 export interface CommonConfigProps {
   uuid: string;
   display: string;
+  concept?: {
+    names: Names[];
+  }; //
 }
 
 export interface OrderConfig {
@@ -34,7 +41,7 @@ export function useOrderConfig(): {
   };
 } {
   const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
-    `${restBaseUrl}/orderentryconfig`,
+    `${restBaseUrl}/orderentryconfig?v=full`,
     openmrsFetch,
   );
 
@@ -57,16 +64,24 @@ export function useOrderConfig(): {
           valueCoded: uuid,
           value: display,
         })),
-        orderFrequencies: data?.data?.orderFrequencies?.map(({ uuid, display }) => ({
-          valueCoded: uuid,
-          value: display,
-        })),
+        orderFrequencies: data?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
+          const getAbbreviation = (names: Names[]) => {
+            return names.map((name) => name.display);
+          };
+
+          const abbreviation = getAbbreviation(concept.names);
+
+          return {
+            valueCoded: uuid,
+            value: display,
+            abbreviation: abbreviation,
+          };
+        }),
       },
       isLoading,
       error,
     }),
     [data, error, isLoading],
   );
-
   return results;
 }
