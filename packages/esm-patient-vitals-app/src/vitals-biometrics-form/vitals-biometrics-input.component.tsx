@@ -115,7 +115,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                       <Controller
                         name={fieldProperty.id}
                         control={control}
-                        render={({ field: { onChange, ref, value } }) => {
+                        render={({ field: { ref, value } }) => {
                           return (
                             <NumberInput
                               allowEmpty
@@ -127,9 +127,13 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               name={fieldProperty.name}
                               onBlur={() => handleFocusChange(false)}
                               onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
-                                setValue(fieldProperty.id, isNaN(Number(value)) ? undefined : Number(value), {
-                                  shouldValidate: true,
-                                })
+                                setValue(
+                                  fieldProperty.id,
+                                  value === '' || value === undefined ? undefined : Number(value),
+                                  {
+                                    shouldValidate: true,
+                                  },
+                                )
                               }
                               onFocus={() => handleFocusChange(true)}
                               placeholder={generatePlaceholder(fieldProperty.name)}

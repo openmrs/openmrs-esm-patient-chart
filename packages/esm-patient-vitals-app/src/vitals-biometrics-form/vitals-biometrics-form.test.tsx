@@ -1,10 +1,10 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, defineConfigSchema } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
-import { mockPatient } from 'tools';
+import { getByTextWithMarkup, mockPatient } from 'tools';
 import { saveVitalsAndBiometrics } from '../common';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
 
@@ -149,7 +149,6 @@ describe('VitalsBiometricsForm', () => {
         temperature: temperatureValue,
         weight: weightValue,
       }),
-      new AbortController(),
       undefined,
     );
 
@@ -158,7 +157,7 @@ describe('VitalsBiometricsForm', () => {
       expect.objectContaining({
         isLowContrast: true,
         kind: 'success',
-        subtitle: 'They are now visible on the Vitals and Biometrics page',
+        subtitle: 'The latest results are now visible on the Vitals and Biometrics page',
         title: 'Vitals and Biometrics saved',
       }),
     );
@@ -219,21 +218,17 @@ describe('VitalsBiometricsForm', () => {
     const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
 
     await user.type(systolic, '1000');
+    await user.tab();
+    await user.tab();
+    expect(screen.getByText(/Systolic value must be between 0 and 250/i)).toBeInTheDocument();
     await user.type(pulse, pulseValue.toString());
     await user.type(oxygenSaturation, '200');
+    await user.tab();
     await user.type(temperature, temperatureValue.toString());
+    expect(screen.getByText(/Oxygen saturation value must be between 0 and 100/i)).toBeInTheDocument();
 
     const saveButton = screen.getByRole('button', { name: /save and close/i });
     await user.click(saveButton);
-
-    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
-
-    // close the inline notification --> resubmit --> check for presence of inline notification
-    const closeInlineNotificationButton = screen.getByTitle(/close notification/i);
-    await user.click(closeInlineNotificationButton);
-    expect(screen.queryByText(/some of the values entered are invalid/i)).not.toBeInTheDocument();
-    await user.click(saveButton);
-    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
   });
 });
 

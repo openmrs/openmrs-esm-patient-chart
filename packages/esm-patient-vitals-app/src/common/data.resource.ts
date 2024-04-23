@@ -309,7 +309,6 @@ export function saveVitalsAndBiometrics(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: VitalsBiometricsFormData,
-  abortController: AbortController,
   location: string,
 ) {
   return openmrsFetch<unknown>(`${restBaseUrl}/encounter`, {
@@ -317,7 +316,6 @@ export function saveVitalsAndBiometrics(
     headers: {
       'Content-Type': 'application/json',
     },
-    signal: abortController.signal,
     body: {
       patient: patientUuid,
       location: location,

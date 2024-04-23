@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { number, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -44,7 +44,6 @@ import {
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
 import { type VitalsBiometricsFormData } from './types';
-import { getDecimalCountForField } from '../common/helpers';
 
 const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -92,93 +91,130 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     ],
   );
 
-  const decimalRefinement = (key: keyof VitalsBiometricsFormData, schema: z.ZodNumber) => {
-    const decimalCountAllowed = getDecimalCountForField(key);
-    return schema.refine(
-      (value) => {
-        if (value === undefined) {
-          return true;
-        }
-        if (!decimalCountAllowed) {
-          return Number.isInteger(value);
-        }
+  const VitalsAndBiometricFormSchema = useMemo(() => {
+    const fieldKeyToLabelMap: Record<keyof VitalsBiometricsFormData, string> = {
+      systolicBloodPressure: t('systolic', 'Systolic'),
+      diastolicBloodPressure: t('diastolic', 'Diastolic'),
+      respiratoryRate: t('respirationRate', 'Respiration rate'),
+      oxygenSaturation: t('oxygenSaturation', 'Oxygen saturation'),
+      pulse: t('pulse', 'Pulse'),
+      temperature: t('temperature', 'Temperature'),
+      generalPatientNote: t('notes', 'Notes'),
+      weight: t('weight', 'Weight'),
+      height: t('height', 'Height'),
+      midUpperArmCircumference: t('muac', 'MUAC'),
+      computedBodyMassIndex: t('bmi', 'BMI'),
+    };
+    function getMaxDecimalCountAllowedForField(key: keyof VitalsBiometricsFormData) {
+      switch (key) {
+        case 'temperature':
+        case 'weight':
+        case 'oxygenSaturation':
+          return 1;
 
-        const decimalCount = value.toString().split('.')?.[1]?.length ?? 0;
-        return decimalCount <= decimalCountAllowed;
-      },
-      decimalCountAllowed
-        ? t('limitedDecimalPlacesAllowed', 'Value must be a number with {{count}} decimal places', {
-            count: decimalCountAllowed,
-          })
-        : t('valueMustBeInteger', 'Value must be an integer'),
-    );
-  };
-
-  const getZodNumberSchema = (key: keyof VitalsBiometricsFormData, min: number, max: number) => {
-    let numberSchema = z.number();
-    if (min) {
-      numberSchema = numberSchema.min(
-        min,
-        t('validationInputError', 'Value must be between {{min}} and {{max}}', { min, max }),
-      );
+        default:
+          return 0;
+      }
     }
-    if (max) {
-      numberSchema = numberSchema.max(
-        max,
-        t('validationInputError', 'Value must be between {{min}} and {{max}}', { min, max }),
-      );
-    }
-    return decimalRefinement(key, numberSchema);
-  };
 
-  const VitalsAndBiometricFormSchema = z
-    .object({
-      systolicBloodPressure: getZodNumberSchema(
-        'systolicBloodPressure',
-        concepts.systolicBloodPressure.lowAbsolute,
-        concepts.systolicBloodPressure.highAbsolute,
-      ),
-      diastolicBloodPressure: getZodNumberSchema(
-        'diastolicBloodPressure',
-        concepts.diastolicBloodPressure.lowAbsolute,
-        concepts.diastolicBloodPressure.highAbsolute,
-      ),
-      respiratoryRate: getZodNumberSchema(
-        'respiratoryRate',
-        concepts.respiratoryRate.lowAbsolute,
-        concepts.respiratoryRate.highAbsolute,
-      ),
-      oxygenSaturation: getZodNumberSchema(
-        'oxygenSaturation',
-        concepts.oxygenSaturation.lowAbsolute,
-        concepts.oxygenSaturation.highAbsolute,
-      ),
-      pulse: getZodNumberSchema('pulse', concepts.pulse.lowAbsolute, concepts.pulse.highAbsolute),
-      temperature: getZodNumberSchema(
-        'temperature',
-        concepts.temperature.lowAbsolute,
-        concepts.temperature.highAbsolute,
-      ),
-      generalPatientNote: z.string(),
-      weight: getZodNumberSchema('weight', concepts.weight.lowAbsolute, concepts.weight.highAbsolute),
-      height: getZodNumberSchema('height', concepts.height.lowAbsolute, concepts.height.highAbsolute),
-      midUpperArmCircumference: getZodNumberSchema(
-        'midUpperArmCircumference',
-        concepts.midUpperArmCircumference.lowAbsolute,
-        concepts.midUpperArmCircumference.highAbsolute,
-      ),
-      computedBodyMassIndex: z.number(),
-    })
-    .partial()
-    .refine(
-      (fields) => {
-        return Object.values(fields).some((value) => Boolean(value));
-      },
-      {
-        message: t('fillAtleaseOneField', 'Please fill at least one field'),
-        path: ['oneFieldRequired'],
-      },
-    );
+    const decimalRefinement = (key: keyof VitalsBiometricsFormData, schema: z.ZodNumber) => {
+      const maxDecimalCountsAllowed = getMaxDecimalCountAllowedForField(key);
+      return schema.refine(
+        (value) => {
+          if (value === undefined) {
+            return true;
+          }
+
+          if (Math.floor(value) === value) {
+            return true;
+          }
+
+          const decimalCount = value.toString().split('.')?.[1]?.length ?? 0;
+          return decimalCount <= maxDecimalCountsAllowed;
+        },
+        maxDecimalCountsAllowed
+          ? t('limitedDecimalPlacesAllowed', '{{fieldName}} value must be a number with {{count}} decimal places', {
+              count: maxDecimalCountsAllowed,
+              fieldName: fieldKeyToLabelMap[key],
+            })
+          : t('valueMustBeInteger', 'Value must be an integer'),
+      );
+    };
+
+    const getZodNumberSchema = (key: keyof VitalsBiometricsFormData, min: number, max: number) => {
+      let numberSchema = z.number();
+      if (min) {
+        numberSchema = numberSchema.min(
+          min,
+          t('validationInputError', '{{fieldName}} value must be between {{min}} and {{max}}', {
+            min,
+            max,
+            fieldName: fieldKeyToLabelMap[key],
+          }),
+        );
+      }
+      if (max) {
+        numberSchema = numberSchema.max(
+          max,
+          t('validationInputError', '{{fieldName}} value must be between {{min}} and {{max}}', {
+            min,
+            max,
+            fieldName: fieldKeyToLabelMap[key],
+          }),
+        );
+      }
+      return decimalRefinement(key, numberSchema);
+    };
+
+    return z
+      .object({
+        systolicBloodPressure: getZodNumberSchema(
+          'systolicBloodPressure',
+          concepts.systolicBloodPressure.lowAbsolute,
+          concepts.systolicBloodPressure.highAbsolute,
+        ),
+        diastolicBloodPressure: getZodNumberSchema(
+          'diastolicBloodPressure',
+          concepts.diastolicBloodPressure.lowAbsolute,
+          concepts.diastolicBloodPressure.highAbsolute,
+        ),
+        respiratoryRate: getZodNumberSchema(
+          'respiratoryRate',
+          concepts.respiratoryRate.lowAbsolute,
+          concepts.respiratoryRate.highAbsolute,
+        ),
+        oxygenSaturation: getZodNumberSchema(
+          'oxygenSaturation',
+          concepts.oxygenSaturation.lowAbsolute,
+          concepts.oxygenSaturation.highAbsolute,
+        ),
+        pulse: getZodNumberSchema('pulse', concepts.pulse.lowAbsolute, concepts.pulse.highAbsolute),
+        temperature: getZodNumberSchema(
+          'temperature',
+          concepts.temperature.lowAbsolute,
+          concepts.temperature.highAbsolute,
+        ),
+        generalPatientNote: z.string(),
+        weight: getZodNumberSchema('weight', concepts.weight.lowAbsolute, concepts.weight.highAbsolute),
+        height: getZodNumberSchema('height', concepts.height.lowAbsolute, concepts.height.highAbsolute),
+        midUpperArmCircumference: getZodNumberSchema(
+          'midUpperArmCircumference',
+          concepts.midUpperArmCircumference.lowAbsolute,
+          concepts.midUpperArmCircumference.highAbsolute,
+        ),
+        computedBodyMassIndex: z.number(),
+      })
+      .partial()
+      .refine(
+        (fields) => {
+          return Object.values(fields).some((value) => Boolean(value));
+        },
+        {
+          message: t('fillAtleaseOneField', 'Please enter at least one vital sign field'),
+          path: ['oneFieldRequired'],
+        },
+      );
+  }, [t, concepts]);
 
   const methods = useForm<VitalsBiometricsFormData>({
     mode: 'all',
@@ -186,28 +222,11 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   });
 
   const {
-    control,
     handleSubmit,
     watch,
     setValue,
     formState: { isDirty, errors },
   } = methods;
-
-  const fieldKeyLabelMap: {
-    [x in keyof VitalsBiometricsFormData]: string;
-  } = {
-    systolicBloodPressure: t('systolic', 'systolic'),
-    diastolicBloodPressure: t('diastolic', 'diastolic'),
-    respiratoryRate: t('respirationRate', 'Respiration rate'),
-    oxygenSaturation: t('oxygenSaturation', 'Oxygen saturation'),
-    pulse: t('pulse', 'Pulse'),
-    temperature: t('temperature', 'Temperature'),
-    generalPatientNote: t('notes', 'Notes'),
-    weight: t('weight', 'Weight'),
-    height: t('height', 'Height'),
-    midUpperArmCircumference: t('muac', 'MUAC'),
-    computedBodyMassIndex: t('bmi', 'BMI'),
-  };
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -249,7 +268,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
 
       setIsSubmitting(true);
-      const abortController = new AbortController();
 
       savePatientVitals(
         config.vitals.encounterTypeUuid,
@@ -257,7 +275,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         config.concepts,
         patientUuid,
         formData,
-        abortController,
         session?.sessionLocation?.uuid,
       )
         .then((response) => {
@@ -268,7 +285,10 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               isLowContrast: true,
               kind: 'success',
               title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-              subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
+              subtitle: t(
+                'vitalsAndBiometricsNowAvailable',
+                'The latest results are now visible on the Vitals and Biometrics page',
+              ),
             });
           }
         })
@@ -281,9 +301,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
             isLowContrast: false,
             subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
           });
-        })
-        .finally(() => {
-          abortController.abort();
         });
     },
     [
@@ -562,11 +579,13 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           {showFormSubmissionErrorNotifications && (
             <Stack>
               {Object.entries(errors).map(([key, { message }]) => (
-                <Row>
+                <Row key={key}>
                   <Column>
                     <InlineNotification
+                      role="alert"
+                      aria-label={'vineet'}
                       lowContrast
-                      title={fieldKeyLabelMap?.[key] ?? t('formValidationError', 'Form validation error')}
+                      title={t('error', 'Error')}
                       subtitle={message}
                       hideCloseButton
                     />
