@@ -23,7 +23,8 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const sessionUser = useSession();
   const sessionPrevillages = sessionUser?.user?.privileges;
-  let newForms: any[];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  let newForms = [];
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
