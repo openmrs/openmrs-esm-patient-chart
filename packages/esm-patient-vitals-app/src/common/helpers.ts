@@ -89,18 +89,6 @@ export function generatePlaceholder(value: string) {
   }
 }
 
-export function getDecimalCountForField(key: keyof VitalsBiometricsFormData) {
-  switch (key) {
-    case 'temperature':
-    case 'weight':
-    case 'oxygenSaturation':
-      return 1;
-
-    default:
-      return 0;
-  }
-}
-
 export function getReferenceRangesForConcept(
   conceptUuid: string | undefined | null,
   conceptMetadata: Array<ConceptMetadata> | undefined,
