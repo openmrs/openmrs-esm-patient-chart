@@ -15,6 +15,7 @@ interface FormRendererProps {
   encounterUuid?: string;
   additionalProps?: Record<string, any>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
@@ -22,6 +23,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   patientUuid,
   visit,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   encounterUuid,
   additionalProps,
 }) => {
@@ -53,7 +55,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
-          onSubmit={closeWorkspace}
+          onSubmit={closeWorkspaceWithSavedChanges}
           mode={additionalProps?.mode}
         />
       )}
