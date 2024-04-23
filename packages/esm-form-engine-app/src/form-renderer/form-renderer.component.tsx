@@ -8,12 +8,13 @@ import FormError from './form-error.component';
 import styles from './form-renderer.scss';
 import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface FormRendererProps extends DefaultWorkspaceProps {
+interface FormRendererProps {
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
   encounterUuid?: string;
   additionalProps?: Record<string, any>;
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
@@ -21,7 +22,6 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   patientUuid,
   visit,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
   encounterUuid,
   additionalProps,
 }) => {
@@ -53,7 +53,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
-          onSubmit={closeWorkspaceWithSavedChanges}
+          onSubmit={closeWorkspace}
           mode={additionalProps?.mode}
         />
       )}
