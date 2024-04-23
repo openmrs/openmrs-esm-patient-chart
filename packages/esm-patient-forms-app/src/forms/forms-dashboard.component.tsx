@@ -22,7 +22,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const sessionUser = useSession();
-  const sessionPrevillages = sessionUser?.user?.privileges;
+  const sessionPrivileges = sessionUser?.user?.privileges;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   let newForms = [];
 
@@ -47,7 +47,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   if (Array.isArray(forms)) {
     forms.forEach((item) => {
       const editPrivilege = item.form.encounterType?.editPrivilege?.name;
-      sessionPrevillages.forEach((item) => {
+      sessionPrivileges.forEach((item) => {
         if (item?.display === editPrivilege) {
           newForms.push(item);
         }
