@@ -15,6 +15,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
   mutateForm,
   formInfo,
 }) => {
@@ -44,6 +45,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
         typeof mutateForm === 'function' && mutateForm();
         closeWorkspaceWithSavedChanges();
       },
+      promptBeforeClosing,
       additionalProps,
     }),
     [
@@ -63,6 +65,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       mutateForm,
       closeWorkspace,
       closeWorkspaceWithSavedChanges,
+      promptBeforeClosing,
       additionalProps,
     ],
   );
