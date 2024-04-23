@@ -1,7 +1,7 @@
 import { ReplaySubject } from 'rxjs';
 import { AppProps } from 'single-spa';
 import { Encounter, EncounterCreate } from './app/types';
-import { DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 export const singleSpaPropsSubject = new ReplaySubject<SingleSpaProps>(1);
 
