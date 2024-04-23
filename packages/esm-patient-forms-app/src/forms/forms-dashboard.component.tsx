@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Tile } from '@carbon/react';
-import { useConfig, useConnectivity, usePatient, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useConfig, useConnectivity, usePatient, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
@@ -21,6 +21,9 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { patient, patientUuid } = usePatient();
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const sessionUser = useSession();
+  const sessionPrevillages = sessionUser?.user?.privileges;
+  let newForms: any[];
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
@@ -40,16 +43,27 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
     [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
+  if (Array.isArray(forms)) {
+    forms.forEach((item) => {
+      const editPrivilege = item.form.encounterType?.editPrivilege?.name;
+      sessionPrevillages.forEach((item) => {
+        if (item?.display === editPrivilege) {
+          newForms.push(item);
+        }
+      });
+    });
+  }
+
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({
       ...formSection,
-      availableForms: forms?.filter((formInfo) =>
+      availableForms: newForms?.filter((formInfo) =>
         formSection.forms.some((formConfig) => formInfo.form.uuid === formConfig || formInfo.form.name === formConfig),
       ),
     }));
-  }, [config.formSections, forms]);
+  }, [config.formSections, newForms]);
 
-  if (forms?.length === 0) {
+  if (newForms?.length === 0) {
     return (
       <ResponsiveWrapper>
         <Tile className={styles.emptyState}>
@@ -63,7 +77,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList completedForms={newForms} error={error} handleFormOpen={handleFormOpen} />
       ) : (
         sections.map((section) => {
           return (
