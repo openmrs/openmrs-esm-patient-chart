@@ -235,7 +235,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               timeoutInMs: 5000,
             });
             this.changeState('submitted');
-            this.closeFormOnSubmission();
+            this.closeForm();
           },
           (error: Error) => {
             this.changeState('submissionError');
@@ -331,11 +331,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   public closeForm() {
     const closeWorkspace = this.singleSpaPropsService.getPropOrThrow('closeWorkspace');
     closeWorkspace();
-  }
-
-  public closeFormOnSubmission() {
-    const closeWorkspaceWithSavedChanges = this.singleSpaPropsService.getPropOrThrow('closeWorkspaceWithSavedChanges');
-    closeWorkspaceWithSavedChanges();
   }
 
   public onPostResponse(encounter: Encounter | undefined) {

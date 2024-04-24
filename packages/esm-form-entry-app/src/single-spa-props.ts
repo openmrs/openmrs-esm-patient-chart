@@ -1,7 +1,6 @@
 import { ReplaySubject } from 'rxjs';
 import { AppProps } from 'single-spa';
 import { Encounter, EncounterCreate } from './app/types';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 export const singleSpaPropsSubject = new ReplaySubject<SingleSpaProps>(1);
 
@@ -25,9 +24,7 @@ type PatientProperties = {
 
 type UIBehavior = {
   view: string;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
-  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
-  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
+  closeWorkspace: () => void;
   handleOnValidate?: (valid: boolean) => void;
   showDiscardSubmitButtons?: boolean;
 };
