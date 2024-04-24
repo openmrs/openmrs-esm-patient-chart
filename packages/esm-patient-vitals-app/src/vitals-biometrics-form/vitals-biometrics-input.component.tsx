@@ -17,7 +17,7 @@ interface ResponsiveWrapperProps {
   isTablet: boolean;
 }
 
-interface VitalsAndBiometricsInputProps {
+interface VitalsAndBiometricsInputProps<T = FieldTypes> {
   fieldStyles?: React.CSSProperties;
   fieldWidth?: string;
   fieldProperties: Array<{
@@ -27,6 +27,7 @@ interface VitalsAndBiometricsInputProps {
     name: string;
     separator?: string;
     type?: FieldTypes;
+    allowDecimal: boolean;
   }>;
   interpretation?: string;
   label: string;

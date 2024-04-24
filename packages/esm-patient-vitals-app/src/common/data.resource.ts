@@ -44,6 +44,7 @@ export interface ConceptMetadata {
   lowAbsolute: number | null;
   lowCritical: number | null;
   units: string | null;
+  allowDecimal: boolean;
 }
 
 interface VitalsConceptMetadataResponse {
@@ -59,7 +60,7 @@ function getInterpretationKey(header: string) {
 
 export function useVitalsConceptMetadata() {
   const customRepresentation =
-    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal))';
 
   const apiUrl = `${restBaseUrl}/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
 
@@ -75,16 +76,17 @@ export function useVitalsConceptMetadata() {
     : new Map<string, string>([]);
 
   const conceptRanges = conceptMetadata?.length
-    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null; allowDecimal: boolean }>(
         conceptMetadata.map((concept) => [
           concept.uuid,
           {
             lowAbsolute: concept.lowAbsolute ?? null,
             highAbsolute: concept.hiAbsolute ?? null,
+            allowDecimal: concept.allowDecimal ?? false,
           },
         ]),
       )
-    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]);
+    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null; allowDecimal: boolean }>([]);
 
   return {
     data: conceptUnits,

@@ -380,6 +380,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       id: 'temperature',
                       name: t('temperature', 'Temperature'),
                       type: 'number',
+                      allowDecimal: concepts.temperature.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -402,11 +403,13 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       separator: '/',
                       type: 'number',
                       id: 'systolicBloodPressure',
+                      allowDecimal: concepts.systolicBloodPressure.allowDecimal,
                     },
                     {
                       name: t('diastolic', 'diastolic'),
                       type: 'number',
                       id: 'diastolicBloodPressure',
+                      allowDecimal: concepts.diastolicBloodPressure.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -431,6 +434,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('pulse', 'Pulse'),
                       type: 'number',
                       id: 'pulse',
+                      allowDecimal: concepts.pulse.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -449,6 +453,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('respirationRate', 'Respiration rate'),
                       type: 'number',
                       id: 'respiratoryRate',
+                      allowDecimal: concepts.respiratoryRate.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -470,6 +475,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('oxygenSaturation', 'Oxygen saturation'),
                       type: 'number',
                       id: 'oxygenSaturation',
+                      allowDecimal: concepts.oxygenSaturation.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -495,6 +501,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('notes', 'Notes'),
                       type: 'textarea',
                       id: 'generalPatientNote',
+                      allowDecimal: false,
                     },
                   ]}
                   placeholder={t('additionalNoteText', 'Type any additional notes here')}
@@ -515,6 +522,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('weight', 'Weight'),
                       type: 'number',
                       id: 'weight',
+                      allowDecimal: concepts.weight.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -533,6 +541,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('height', 'Height'),
                       type: 'number',
                       id: 'height',
+                      allowDecimal: concepts.height.allowDecimal,
                     },
                   ]}
                   interpretation={
@@ -551,6 +560,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('bmi', 'BMI'),
                       type: 'number',
                       id: 'computedBodyMassIndex',
+                      allowDecimal: true,
                     },
                   ]}
                   readOnly
@@ -565,6 +575,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       name: t('muac', 'MUAC'),
                       type: 'number',
                       id: 'midUpperArmCircumference',
+                      allowDecimal: concepts.midUpperArmCircumference.allowDecimal,
                     },
                   ]}
                   muacColorCode={muacColorCode}

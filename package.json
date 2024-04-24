@@ -71,7 +71,8 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "@openmrs/openmrs-form-engine-lib": "portal:/Users/vasharma05/Projects/openmrs-form-engine-lib"
   },
   "packageManager": "yarn@4.1.1",
   "dependencies": {
