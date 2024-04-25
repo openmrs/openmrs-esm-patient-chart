@@ -1,3 +1,5 @@
+import { PatientVitalsAndBiometrics } from '../packages/esm-patient-vitals-app/src/common';
+
 export const mockBiometricsResponse = {
   resourceType: 'Bundle',
   id: '0b0f8529-3e6e-41d9-8007-0ef639fb893b',
@@ -6057,6 +6059,25 @@ export const formattedVitals = [
   },
 ];
 
+export const formattedVitalsAndBiometrics = [
+  {
+    id: '0',
+    uuid: 'fd481c9f-f81f-4aaf-b00b-747900af9935',
+    date: '2024-04-21T09:31:27.000Z',
+    height: 12,
+    weight: 12,
+    bmi: 833.3,
+    bloodPressureRenderInterpretation: 'normal',
+    systolic: 1,
+    diastolic: 2,
+    pulse: 12,
+    respiratoryRate: 12,
+    spo2: 12,
+    temperature: 31,
+    muac: 12,
+    generalPatientNote: 'notes',
+  },
+] as PatientVitalsAndBiometrics[];
 export const mockVitalsConceptMetadata = mockVitalsSignsConcepts.data.results[0].setMembers;
 
 export const mockConceptUnits = new Map<string, string>(
