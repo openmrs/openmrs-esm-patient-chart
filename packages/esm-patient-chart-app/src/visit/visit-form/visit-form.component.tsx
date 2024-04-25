@@ -33,6 +33,7 @@ import {
   type Visit,
   updateVisit,
   useConnectivity,
+  formatDatetime,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -55,6 +56,9 @@ import { type VisitFormData } from './visit-form.resource';
 import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrBefore);
 
 interface StartVisitFormProps extends DefaultWorkspaceProps {
   visitToEdit?: Visit;
@@ -117,12 +121,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
     return z.object({
       visitStartDate: z.date().refine(
-        (value) =>
-          displayVisitStopDateTimeFields
-            ? true
-            : dayjs(value).isBefore(dayjs(), 'day') || dayjs(value).isSame(dayjs(), 'day'),
+        (value) => {
+          const today = dayjs();
+          const startDate = dayjs(value);
+          return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
+        },
         t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date().toLocaleString(),
+          firstEncounterDatetime: formatDatetime(new Date()),
           interpolation: {
             escapeValue: false,
           },
