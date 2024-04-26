@@ -6,7 +6,7 @@ import {
   launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
+import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
@@ -149,8 +149,14 @@ export function LabOrderForm({
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
+
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
+          <ExtensionSlot
+            style={{ margin: '0.25rem 0.5rem' }}
+            name="top-of-lab-order-slot"
+            state={{ order: initialOrder }}
+          />
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
