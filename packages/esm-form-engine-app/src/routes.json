@@ -8,6 +8,11 @@
       "name": "react-form-engine-widget",
       "component": "formRenderer",
       "slot": "form-widget-slot"
+    },
+    {
+      "name": "rfe-form-collapse-toggle",
+      "component": "FormCollapseToggle",
+      "slot": "patient-chart-workspace-header-slot"
     }
   ],
   "pages": []
