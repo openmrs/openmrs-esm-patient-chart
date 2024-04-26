@@ -15,7 +15,7 @@ export function startupApp() {
 }
 
 export const formRenderer = getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options);
-export const FormCollapseToggle = getAsyncLifecycle(
+export const formCollapseToggle = getAsyncLifecycle(
   () => import('./form-collapse-toggle/form-collapse-toggle.component'),
   {
     featureName: 'rfe-form-collapse-toggle',
