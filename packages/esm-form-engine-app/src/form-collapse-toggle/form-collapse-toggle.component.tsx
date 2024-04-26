@@ -19,14 +19,6 @@ const FormCollapseToggle = () => {
     };
   }, []);
 
-  useEffect(() => {
-    window.addEventListener('openmrs:form-collapse-toggle', null);
-
-    return () => {
-      window.removeEventListener('openmrs:form-collapse-toggle', null);
-    };
-  }, []);
-
   const handleOnToggle = (value: boolean) => {
     const FormCollapseToggleEvent = new CustomEvent('openmrs:form-collapse-toggle', { detail: { value } });
     window.dispatchEvent(FormCollapseToggleEvent);
