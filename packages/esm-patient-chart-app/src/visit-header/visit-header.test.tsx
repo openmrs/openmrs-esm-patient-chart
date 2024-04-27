@@ -15,8 +15,6 @@ import {
 import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
-// FIXME: We shouldn't be importing from the internal API.
-import { registerWorkspace } from '@openmrs/esm-framework/src/internal';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
@@ -58,12 +56,6 @@ describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
-    registerWorkspace({
-      name: 'start-visit-workspace-form',
-      title: 'Start visit',
-      load: jest.fn(),
-      moduleName: 'test-module',
-    });
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
       isLoading: false,
