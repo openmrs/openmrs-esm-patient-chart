@@ -33,8 +33,21 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-
     useConnectivity: jest.fn().mockReturnValue(true),
+    useWorkspaces: jest.fn().mockImplementation(() => ({
+      active: true,
+      windowState: 'normal',
+      workspaces: [
+        {
+          name: 'clinical-forms-workspace',
+          title: 'Clinical forms',
+          preferredWindowSize: 'normal',
+          type: 'form',
+        },
+      ],
+      workspaceWindowState: 'normal',
+      prompt: null,
+    })),
   };
 });
 
@@ -46,24 +59,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => mockCurrentVisit),
   };
 });
-
-jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
-  useWorkspaces: jest.fn().mockImplementation(() => ({
-    active: true,
-    windowState: 'normal',
-    workspaces: [
-      {
-        name: 'clinical-forms-workspace',
-        title: 'Clinical forms',
-        preferredWindowSize: 'normal',
-        type: 'form',
-      },
-    ],
-    workspaceWindowState: 'normal',
-    prompt: null,
-  })),
-}));
 
 test('should display clinical form action button on tablet view', () => {
   mockedUseLayoutType.mockReturnValue('tablet');

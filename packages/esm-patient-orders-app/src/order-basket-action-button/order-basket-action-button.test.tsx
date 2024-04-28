@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { useLayoutType, usePatient, useWorkspaces } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -9,15 +9,20 @@ import OrderBasketActionButton from './order-basket-action-button.extension';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
+const mockUseWorkspaces = useWorkspaces as jest.Mock;
+
+mockUseWorkspaces.mockReturnValue({
+  workspaces: [{ type: 'order' }],
+  workspaceWindowState: 'normal',
+}),
+  jest.mock('@carbon/react/icons', () => ({
+    ...(jest.requireActual('@carbon/react/icons') as jest.Mock),
+    ShoppingCart: jest.fn((props) => <div data-testid="shopping-cart-icon" {...props} />),
+  }));
 
 // This pattern of mocking seems to be required: defining the mocked function here and
 // then assigning it with an arrow function wrapper in jest.mock. It is very particular.
 // I think it is related to this: https://github.com/swc-project/jest/issues/14#issuecomment-1238621942
-
-jest.mock('@carbon/react/icons', () => ({
-  ...(jest.requireActual('@carbon/react/icons') as jest.Mock),
-  ShoppingCart: jest.fn((props) => <div data-testid="shopping-cart-icon" {...props} />),
-}));
 
 const mocklaunchPatientWorkspace = jest.fn();
 const mockLaunchStartVisitPrompt = jest.fn();
@@ -47,14 +52,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => {
   return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() };
 });
-
-jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
-  useWorkspaces: jest.fn().mockReturnValue({
-    workspaces: [{ type: 'order' }],
-    workspaceWindowState: 'normal',
-  }),
-}));
 
 describe('<OrderBasketActionButton/>', () => {
   beforeAll(() => {

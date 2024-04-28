@@ -4,11 +4,13 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ActiveMedications from './active-medications.component';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
 const mockUseSession = useSession as jest.Mock;
+const mockUseLaunchWorkspaceRequiringVisit = useLaunchWorkspaceRequiringVisit as jest.Mock;
 
 function renderActiveMedications() {
   mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -24,6 +26,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: (...args) => mocklaunchPatientWorkspace(...args),
+    useLaunchWorkspaceRequiringVisit: (...args) => mocklaunchPatientWorkspace(...args),
     useWorkspaces: jest.fn(() => {
       return { workspaces: [{ name: 'order-basket' }] };
     }),
@@ -113,7 +116,7 @@ test('clicking the Record active medications link opens the order basket form', 
   await waitForLoadingToFinish();
   const orderLink = await screen.getByText('Record active medications');
   fireEvent.click(orderLink);
-  expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(useLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('add-drug-order', undefined);
 });
 
 test('clicking the Add button opens the order basket form', async () => {
@@ -122,5 +125,5 @@ test('clicking the Add button opens the order basket form', async () => {
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
-  expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(useLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('add-drug-order', undefined);
 });

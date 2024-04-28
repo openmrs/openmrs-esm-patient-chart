@@ -23,7 +23,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
-    useWorkspaces: jest.fn().mockImplementation(() => ({ workspaces: [] })),
   };
 });
 

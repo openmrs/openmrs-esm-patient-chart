@@ -4,11 +4,10 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
   restBaseUrl,
-  translateFrom,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import notesOverviewComponent from './notes/notes-overview.component';
-import visitNotesActionButtonComponent from './visit-note-action-button.component';
+import notesOverviewExtension from './notes/notes-overview.extension';
+import visitNotesActionButtonExtension from './visit-note-action-button.extension';
 
 const moduleName = '@openmrs/esm-patient-notes-app';
 
@@ -28,9 +27,9 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const notesOverview = getSyncLifecycle(notesOverviewComponent, options);
+export const notesOverview = getSyncLifecycle(notesOverviewExtension, options);
 
-export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonComponent, options);
+export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExtension, options);
 
 // t('visitNoteWorkspaceTitle', 'Visit Note')
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
