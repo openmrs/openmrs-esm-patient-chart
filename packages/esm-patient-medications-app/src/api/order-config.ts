@@ -41,7 +41,15 @@ export function useOrderConfig(): {
   };
 } {
   const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
-    `${restBaseUrl}/orderentryconfig?v=full`,
+    `${restBaseUrl}/orderentryconfig`,
+    openmrsFetch,
+  );
+  const {
+    data: frequencyData,
+    error: frequencyError,
+    isLoading: frequencyLoading,
+  } = useSWRImmutable<{ data: OrderConfig }, Error>(
+    `${restBaseUrl}/orderentryconfig?v=custom:(uuid,display,concept:(names:(display,uuid)))`,
     openmrsFetch,
   );
 
@@ -64,7 +72,7 @@ export function useOrderConfig(): {
           valueCoded: uuid,
           value: display,
         })),
-        orderFrequencies: data?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
+        orderFrequencies: frequencyData?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
           const getAbbreviation = (names: Names[]) => {
             return names.map((name) => name.display);
           };
@@ -78,10 +86,10 @@ export function useOrderConfig(): {
           };
         }),
       },
-      isLoading,
-      error,
+      isLoading: isLoading || frequencyLoading,
+      error: error || frequencyError,
     }),
-    [data, error, isLoading],
+    [data, error, isLoading, frequencyData, frequencyError, frequencyLoading],
   );
   return results;
 }
