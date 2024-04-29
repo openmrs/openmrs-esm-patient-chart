@@ -34,8 +34,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
-    launchPatientWorkspace('clinical-forms-workspace');
-  }, [closeWorkspace]);
+    !encounterUuid && launchPatientWorkspace('clinical-forms-workspace');
+  }, [closeWorkspace, encounterUuid]);
 
   const handleMarkFormAsDirty = useCallback(
     (isDirty: boolean) => promptBeforeClosing(() => isDirty),
