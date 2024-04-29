@@ -251,8 +251,14 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
         return;
       }
 
+      let finalNoteDate = dayjs(noteDate);
+      const now = new Date();
+      if (finalNoteDate.isSame(now, 'minute') || finalNoteDate.isAfter(now, 'minute')) {
+        finalNoteDate = null;
+      }
+
       let visitNotePayload: VisitNotePayload = {
-        encounterDatetime: dayjs(noteDate).format(),
+        encounterDatetime: finalNoteDate?.format(),
         form: formConceptUuid,
         patient: patientUuid,
         location: locationUuid,
