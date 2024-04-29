@@ -1,9 +1,10 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import useSWRImmutable from 'swr/immutable';
+import { chunk } from 'lodash-es';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
+import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 /**
@@ -44,16 +45,14 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
 }
 
 export function useOrderReasons(conceptUuids: Array<string>) {
-  const shouldFetch = conceptUuids && conceptUuids.length > 0;
-  const url = shouldFetch ? getConceptReferenceUrls(conceptUuids) : null;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
-    shouldFetch ? `${restBaseUrl}/${url[0]}` : null,
-    openmrsFetch,
+  const { data, error, isLoading } = useSWRImmutable<Array<FetchResponse<ConceptReferenceResponse>>, Error>(
+    conceptUuids && conceptUuids.length > 0 ? getConceptReferenceUrls(conceptUuids) : null,
+    (key: Array<string>) => Promise.all(key.map((url) => openmrsFetch<ConceptReferenceResponse>(url))),
   );
 
-  const ob = data?.data;
+  const ob: ConceptReferenceResponse = data?.reduce((acc, response) => ({ ...acc, ...response.data }), {});
   const orderReasons = ob
-    ? Object.entries(ob).map(([key, value]) => ({
+    ? Object.values(ob).map((value) => ({
         uuid: value.uuid,
         display: value.display,
       }))
@@ -68,6 +67,12 @@ export function useOrderReasons(conceptUuids: Array<string>) {
   }
 
   return { orderReasons: orderReasons, isLoading };
+}
+
+function getConceptReferenceUrls(conceptUuids: Array<string>) {
+  return chunk(conceptUuids, 10).map(
+    (partition) => `${restBaseUrl}/conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`,
+  );
 }
 
 export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
@@ -112,15 +117,6 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
     throw new Error(`Unknown order action: ${order.action}.`);
   }
 }
-const chunkSize = 10;
-export function getConceptReferenceUrls(conceptUuids: Array<string>) {
-  const accumulator = [];
-  for (let i = 0; i < conceptUuids.length; i += chunkSize) {
-    accumulator.push(conceptUuids.slice(i, i + chunkSize));
-  }
-
-  return accumulator.map((partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`);
-}
 
 export type PostDataPrepLabOrderFunction = (
   order: LabOrderBasketItem,
@@ -132,13 +128,16 @@ export interface ConceptAnswers {
   display: string;
   uuid: string;
 }
-export interface ConceptResponse {
-  uuid: string;
-  display: string;
-  datatype: {
+
+export interface ConceptReferenceResponse {
+  [key: string]: {
     uuid: string;
     display: string;
+    datatype: {
+      uuid: string;
+      display: string;
+    };
+    answers: Array<ConceptAnswers>;
+    setMembers: Array<ConceptAnswers>;
   };
-  answers: Array<ConceptAnswers>;
-  setMembers: Array<ConceptAnswers>;
 }
