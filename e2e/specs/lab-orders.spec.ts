@@ -46,6 +46,9 @@ test('Record a lab order', async ({ page }) => {
   await test.step('When I fill in the fields in the form for the Blood urea nitrogen test and submit the form', async () => {
     await page.getByLabel(/lab reference number/i).fill(' 20240419-1234');
     await page.getByLabel(/additional instructions/i).fill(' N/A');
+  });
+
+  await test.step('Add I save the lab order form', async () => {
     await page.getByRole('button', { name: /save order/i }).click();
     await page.getByRole('button', { name: /sign and close/i }).click();
   });

@@ -4874,8 +4874,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 5.0.1-pre.444
-  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.444"
+  version: 5.0.1-pre.445
+  resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.445"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -4896,34 +4896,35 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/24bd06807483d9577316f332ad955503815a299a1b3544e4aa7e15b2d1eeb017743d08833536fe9ee273d21480bdaddc29bd16b2d40d98750d6fbf9d26fae941
+  checksum: 10/a5e5e34002e0863581db2fa8930e0b09758b352c38653eda476cca3e4977d5c1d61e81db057ca314193fc800dfb78e7bd6f81fc8670e4388e484a10199d242c4
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.594
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.594"
+  version: 1.1.0-pre.746
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.1.0-pre.746"
   dependencies:
     ace-builds: "npm:^1.4.12"
+    classnames: "npm:^2.5.1"
+    dayjs: "npm:1.x"
     formik: "npm:^2.2.6"
-    jest-coverage-badges: "npm:^1.0.0"
     lodash-es: "npm:^4.17.15"
-    react-anchor-link-smooth-scroll: "npm:^1.0.12"
     react-error-boundary: "npm:^4.0.11"
     react-markdown: "npm:^7.1.0"
-    react-scroll: "npm:^1.8.2"
-    react-test-renderer: "npm:^16.9.0"
     react-waypoint: "npm:^10.3.0"
     react-webcam: "npm:^7.1.1"
-    semver: "npm:^7.3.5"
     yup: "npm:^0.29.1"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 7.x
+    dayjs: 1.x
+    i18next: 23.x
     react: 18.x
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 10/13d3d24cc5517f60f55dfc330f84ff1a7c501da5e981fab61ea2006e6e696e1ad236c73f965f8931237510fa5d7e857aed8ebff82b734dfd9a7b71fd048c4459
+    swr: 2.x
+  checksum: 10/9cded40c431b9a5acca80063212ae9963e63b30d9a3f60d26b24c139342ef4faa254e2f47094a59f7f2b6c43fb344c5cc043e69922f26313baa40eb4e5e64dc0
   languageName: node
   linkType: hard
 
@@ -9301,6 +9302,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"classnames@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: 10/58eb394e8817021b153bb6e7d782cfb667e4ab390cb2e9dac2fc7c6b979d1cc2b2a733093955fc5c94aa79ef5c8c89f11ab77780894509be6afbb91dddd79d15
+  languageName: node
+  linkType: hard
+
 "clean-css@npm:^5.2.2":
   version: 5.3.0
   resolution: "clean-css@npm:5.3.0"
@@ -10746,7 +10754,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.10.4, dayjs@npm:^1.10.7, dayjs@npm:^1.11.10":
+"dayjs@npm:1.x, dayjs@npm:^1.10.4, dayjs@npm:^1.10.7, dayjs@npm:^1.11.10":
   version: 1.11.10
   resolution: "dayjs@npm:1.11.10"
   checksum: 10/27e8f5bc01c0a76f36c656e62ab7f08c2e7b040b09e613cd4844abf03fb258e0350f0a83b02c887b84d771c1f11e092deda0beef8c6df2a1afbc3f6c1fade279
@@ -15000,17 +15008,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-coverage-badges@npm:^1.0.0":
-  version: 1.1.2
-  resolution: "jest-coverage-badges@npm:1.1.2"
-  dependencies:
-    mkdirp: "npm:0.5.1"
-  bin:
-    jest-coverage-badges: cli.js
-  checksum: 10/d3560a5e43902dca8cbfef747d42f367a40b12bc222edfb1bfafc546624583f9ae78c778736e387f21ff590836847e6c0b1d8d0e352ed3747155e9aca81c1c96
-  languageName: node
-  linkType: hard
-
 "jest-diff@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest-diff@npm:29.7.0"
@@ -16912,13 +16909,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:0.0.8":
-  version: 0.0.8
-  resolution: "minimist@npm:0.0.8"
-  checksum: 10/1e6279f747b3330fb918e47bd88093b26dadca91ea31bd50f40a805d9ff55fd9af16162248ffa303876b1cbb75fd5b701e773d46319c22025ec124e53bca0714
-  languageName: node
-  linkType: hard
-
 "minimist@npm:^1.2.0, minimist@npm:^1.2.6":
   version: 1.2.6
   resolution: "minimist@npm:1.2.6"
@@ -17039,17 +17029,6 @@ __metadata:
     minipass: "npm:^3.0.0"
     yallist: "npm:^4.0.0"
   checksum: 10/ae0f45436fb51344dcb87938446a32fbebb540d0e191d63b35e1c773d47512e17307bf54aa88326cc6d176594d00e4423563a091f7266c2f9a6872cdc1e234d1
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:0.5.1":
-  version: 0.5.1
-  resolution: "mkdirp@npm:0.5.1"
-  dependencies:
-    minimist: "npm:0.0.8"
-  bin:
-    mkdirp: bin/cmd.js
-  checksum: 10/8651af2facdfa53f39e68fd93cf1653c11f7c1d49c6d1b4e53bcedc52e669cc64f1b5e95c49cfde7e99dbbcad26d3e61f4f2b4812f18c871c6455d9592f02806
   languageName: node
   linkType: hard
 
@@ -19183,13 +19162,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-anchor-link-smooth-scroll@npm:^1.0.12":
-  version: 1.0.12
-  resolution: "react-anchor-link-smooth-scroll@npm:1.0.12"
-  checksum: 10/ca4f4a12eca0d657b5d1a96980b7b27fd94b8a896dc426d425364069f001d92c4c596936ba7b526aa26535623216e823792dee86470d5e798ef54110d5a0e0b8
-  languageName: node
-  linkType: hard
-
 "react-avatar@npm:^5.0.3":
   version: 5.0.3
   resolution: "react-avatar@npm:5.0.3"
@@ -19301,7 +19273,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.13.1, react-is@npm:^16.7.0, react-is@npm:^16.8.6":
+"react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: 10/5aa564a1cde7d391ac980bedee21202fc90bdea3b399952117f54fb71a932af1e5902020144fb354b4690b2414a0c7aafe798eb617b76a3d441d956db7726fdf
@@ -19388,19 +19360,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-scroll@npm:^1.8.2":
-  version: 1.8.9
-  resolution: "react-scroll@npm:1.8.9"
-  dependencies:
-    lodash.throttle: "npm:^4.1.1"
-    prop-types: "npm:^15.7.2"
-  peerDependencies:
-    react: ^15.5.4 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^15.5.4 || ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: 10/ef37eb28c519ac90a30c741e2b006d50ce3a535029fc22996f3f436bf48b0907267d6f45593d533a55cc4e5d6ba63db28631fca854a760580fb822577a31d298
-  languageName: node
-  linkType: hard
-
 "react-scrolllock@npm:^2.0.1":
   version: 2.0.7
   resolution: "react-scrolllock@npm:2.0.7"
@@ -19408,20 +19367,6 @@ __metadata:
     exenv: "npm:^1.2.2"
     react-prop-toggle: "npm:^1.0.2"
   checksum: 10/83c49d874d8f2f7810e6c9c1f23e413e2a28c1e1567d2e4d86d5cf360cda7f702fa9b51b6e6d13615ec58e069c89884ea375a1e3b9c43e9c98445ae4eb5437c2
-  languageName: node
-  linkType: hard
-
-"react-test-renderer@npm:^16.9.0":
-  version: 16.14.0
-  resolution: "react-test-renderer@npm:16.14.0"
-  dependencies:
-    object-assign: "npm:^4.1.1"
-    prop-types: "npm:^15.6.2"
-    react-is: "npm:^16.8.6"
-    scheduler: "npm:^0.19.1"
-  peerDependencies:
-    react: ^16.14.0
-  checksum: 10/1a064a65c6073bb72376e8539e979836c52cd6629207163594078005e7bf68a4b35d9397a0ac04aa2a534a9f8f9eb2c2c3a5ff9d2dc8b67bafd6be7451dd1527
   languageName: node
   linkType: hard
 
@@ -20257,16 +20202,6 @@ __metadata:
   dependencies:
     xmlchars: "npm:^2.2.0"
   checksum: 10/97b50daf6ca3a153e89842efa18a862e446248296622b7473c169c84c823ee8a16e4a43bac2f73f11fc8cb9168c73fbb0d73340f26552bac17970e9052367aa9
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.19.1":
-  version: 0.19.1
-  resolution: "scheduler@npm:0.19.1"
-  dependencies:
-    loose-envify: "npm:^1.1.0"
-    object-assign: "npm:^4.1.1"
-  checksum: 10/2bf42cd56994dd8a97bad0ecb6fbd720674f640c4a95957f9ab453dda28133d5f56755d842e6a0b203efef89a49c52354d151946f50e5c0b633d97d718285c8d
   languageName: node
   linkType: hard
 
