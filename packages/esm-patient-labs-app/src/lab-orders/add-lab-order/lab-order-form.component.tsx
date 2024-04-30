@@ -153,8 +153,8 @@ export function LabOrderForm({
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
           <ExtensionSlot
-            style={{ margin: '0.25rem 0.5rem' }}
-            name="top-of-lab-order-slot"
+            className={styles.topOfFormSlot}
+            name="top-of-lab-order-form-slot"
             state={{ order: initialOrder }}
           />
           <Grid className={styles.gridRow}>

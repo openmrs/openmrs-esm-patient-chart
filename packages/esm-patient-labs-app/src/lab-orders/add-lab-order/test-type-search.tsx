@@ -184,7 +184,6 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
         <p>
           <span className={styles.productiveHeading01}>{testType.label}</span>{' '}
         </p>
-        <ExtensionSlot name="lab-result-tile-slot" state={{ order: testType }} />
       </div>
       <div className={styles.searchResultActions}>
         {testTypeAlreadyInBasket ? (
