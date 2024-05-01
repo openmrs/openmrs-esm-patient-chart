@@ -6,8 +6,11 @@ import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './dr
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 import { mockDrugSearchResultApiData, mockDrugOrderTemplateApiData, mockPatientDrugOrdersApiData } from '__mocks__';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { useSession } from '@openmrs/esm-framework';
+import { closeWorkspace, useSession } from '@openmrs/esm-framework';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+
+const mockCloseWorkspace = closeWorkspace as jest.Mock;
+mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
 
 const mockUseSession = useSession as jest.Mock;
 mockUseSession.mockReturnValue({
@@ -16,10 +19,10 @@ mockUseSession.mockReturnValue({
   },
 });
 
-const mocklaunchPatientWorkspace = jest.fn();
+const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchPatientWorkspace: (...args) => mocklaunchPatientWorkspace(...args),
+  launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
 }));
 
 /** This is needed to render the order form */
@@ -48,8 +51,8 @@ function renderDrugSearch() {
   render(
     <AddDrugOrderWorkspace
       order={undefined as any}
-      closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
+      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
       promptBeforeClosing={() => false}
       patientUuid={'mock-patient-uuid'}
     />,
@@ -129,8 +132,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
         startDate: expect.any(Date),
       }),
     ]);
-
-    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('can open the drug form ', async () => {
