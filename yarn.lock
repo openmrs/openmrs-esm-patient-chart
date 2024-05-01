@@ -4232,7 +4232,7 @@ __metadata:
     "@carbon/styles": "npm:~1.14.0"
     "@ng-select/ng-select": "npm:^11.2.0"
     "@ngx-translate/core": "npm:^15.0.0"
-    "@openmrs/esm-framework": "npm:^5.5.1-pre.1737"
+    "@openmrs/esm-framework": "npm:next"
     "@openmrs/ngx-file-uploader": "npm:next"
     "@openmrs/ngx-formentry": "npm:next"
     "@types/jasmine": "npm:~3.6.11"
@@ -4255,7 +4255,7 @@ __metadata:
     ngx-bootstrap: "npm:^11.0.1"
     ngx-build-plus: "npm:^16.0.0"
     ngx-webcam: "npm:^0.4.1"
-    openmrs: "npm:^5.5.1-pre.1737"
+    openmrs: "npm:next"
     protractor: "npm:~7.0.0"
     reflect-metadata: "npm:^0.1.13"
     rxjs: "npm:^7.8.0"
@@ -4274,7 +4274,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-framework@npm:5.5.1-pre.1737, @openmrs/esm-framework@npm:^5.5.1-pre.1737":
+"@openmrs/esm-framework@npm:5.5.1-pre.1737, @openmrs/esm-framework@npm:next":
   version: 5.5.1-pre.1737
   resolution: "@openmrs/esm-framework@npm:5.5.1-pre.1737"
   dependencies:
@@ -4458,7 +4458,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
     "@hookform/resolvers": "npm:^3.3.1"
-    "@openmrs/esm-framework": "npm:^5.5.1-pre.1737"
+    "@openmrs/esm-framework": "npm:next"
     "@playwright/test": "npm:1.43.0"
     "@swc/cli": "npm:^0.1.62"
     "@swc/core": "npm:^1.3.89"
@@ -4494,7 +4494,7 @@ __metadata:
     jest-environment-jsdom: "npm:^29.7.0"
     lint-staged: "npm:^14.0.1"
     lodash: "npm:^4.17.21"
-    openmrs: "npm:^5.5.1-pre.1737"
+    openmrs: "npm:next"
     prettier: "npm:^3.0.3"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -17729,7 +17729,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openmrs@npm:^5.5.1-pre.1737":
+"openmrs@npm:next":
   version: 5.5.1-pre.1737
   resolution: "openmrs@npm:5.5.1-pre.1737"
   dependencies:
