@@ -121,7 +121,7 @@ describe('VitalsHeader: ', () => {
         date: '2022-05-19T00:00:00.000Z',
         systolic: 165,
         diastolic: 150,
-        bloodPressureInterpretation: 'critically_high',
+        bloodPressureRenderInterpretation: 'critically_high',
         pulse: 76,
         spo2: undefined,
         temperature: 37,

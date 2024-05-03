@@ -30,7 +30,7 @@ export default function AddLabOrderWorkspace({
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
 
-  const { patient, isLoading: isLoadingPatient } = usePatient();
+  const { patient, isLoading: isLoadingPatient, patientUuid } = usePatient();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
 
   const isTablet = useLayoutType() === 'tablet';
@@ -73,6 +73,7 @@ export default function AddLabOrderWorkspace({
       ) : (
         <LabOrderForm
           initialOrder={currentLabOrder}
+          patientUuid={patientUuid}
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}

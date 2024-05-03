@@ -101,7 +101,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = React.useCallback(
     (data: ProgramsFormData) => {

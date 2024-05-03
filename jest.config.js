@@ -14,6 +14,7 @@ module.exports = {
     '^@carbon/charts-react$': path.resolve(__dirname, '__mocks__', '@carbon__charts-react.ts'),
     '^dexie$': require.resolve('dexie'),
     '^lodash-es/(.*)$': 'lodash/$1',
+    '^lodash-es$': 'lodash',
     '^react-i18next$': path.resolve(__dirname, '__mocks__', 'react-i18next.js'),
     '^uuid$': path.resolve(__dirname, 'node_modules', 'uuid', 'dist', 'index.js'),
   },

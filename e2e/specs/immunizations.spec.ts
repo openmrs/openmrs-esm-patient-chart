@@ -45,7 +45,7 @@ test('Add an immunization', async ({ page }) => {
     await page.getByRole('button', { name: /save/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/vaccination saved successfully/i)).toBeVisible();
   });
 

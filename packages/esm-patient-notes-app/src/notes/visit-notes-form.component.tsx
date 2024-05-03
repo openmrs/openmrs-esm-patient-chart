@@ -49,7 +49,7 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-const allowedImageTypes = ['.jpeg', '.jpg', '.png', '.webp'];
+const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
@@ -122,7 +122,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const currentImage = watch('image');
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
@@ -167,7 +167,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             });
         }
       }, searchTimeoutInMs),
-    [],
+    [config.diagnosisConceptClass],
   );
 
   const handleAddDiagnosis = (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
@@ -239,7 +239,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
       multipleFiles: false,
       collectDescription: false,
     });
-  }, [patientUuid]);
+  }, [setValue]);
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData, event: SyntheticEvent) => {
@@ -251,8 +251,14 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
         return;
       }
 
+      let finalNoteDate = dayjs(noteDate);
+      const now = new Date();
+      if (finalNoteDate.isSame(now, 'minute') || finalNoteDate.isAfter(now, 'minute')) {
+        finalNoteDate = null;
+      }
+
       let visitNotePayload: VisitNotePayload = {
-        encounterDatetime: dayjs(noteDate).format(),
+        encounterDatetime: finalNoteDate?.format(),
         form: formConceptUuid,
         patient: patientUuid,
         location: locationUuid,
@@ -337,6 +343,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
       mutateVisitNotes,
       closeWorkspaceWithSavedChanges,
       t,
+      mutateVisits,
     ],
   );
 
@@ -524,7 +531,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup>
+            <FormGroup legendText="">
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>

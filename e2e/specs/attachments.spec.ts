@@ -42,10 +42,10 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And I click on the `Add Attachment` button', async () => {
-    await page.getByRole('button', { name: /add Attachment/i }).click();
+    await page.getByRole('button', { name: /add attachment/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/upload complete/i)).toBeVisible();
   });
 
@@ -73,7 +73,7 @@ test('Add and remove an attachment', async ({ page }) => {
     await page.getByRole('button', { name: /delete/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/file deleted/i)).toBeVisible();
   });
 
@@ -82,7 +82,7 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And the attachments table should be empty', async () => {
-    await expect(page.getByText(/There are no attachments to display for this patient/i)).toBeVisible();
+    await expect(page.getByText(/there are no attachments to display for this patient/i)).toBeVisible();
   });
 });
 
