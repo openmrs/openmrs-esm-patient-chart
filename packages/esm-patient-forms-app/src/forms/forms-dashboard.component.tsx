@@ -24,7 +24,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const sessionUser = useSession();
   const sessionPrivileges = sessionUser?.user?.privileges;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  let newForms = [];
+  let editableForms = [];
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
@@ -49,7 +49,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
       const editPrivilege = item.form.encounterType?.editPrivilege?.name;
       sessionPrivileges.forEach((item) => {
         if (item?.display === editPrivilege) {
-          newForms.push(item);
+          editableForms.push(item);
         }
       });
     });
@@ -58,13 +58,13 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({
       ...formSection,
-      availableForms: newForms?.filter((formInfo) =>
+      availableForms: editableForms?.filter((formInfo) =>
         formSection.forms.some((formConfig) => formInfo.form.uuid === formConfig || formInfo.form.name === formConfig),
       ),
     }));
-  }, [config.formSections, newForms]);
+  }, [config.formSections, editableForms]);
 
-  if (newForms?.length === 0) {
+  if (editableForms?.length === 0) {
     return (
       <ResponsiveWrapper>
         <Tile className={styles.emptyState}>
@@ -78,7 +78,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={newForms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList completedForms={editableForms} error={error} handleFormOpen={handleFormOpen} />
       ) : (
         sections.map((section) => {
           return (
