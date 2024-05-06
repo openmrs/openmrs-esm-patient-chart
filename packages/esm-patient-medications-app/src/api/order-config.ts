@@ -18,7 +18,7 @@ export interface CommonConfigProps {
   display: string;
   concept?: {
     names: Names[];
-  }; //
+  };
 }
 
 export interface OrderConfig {
@@ -73,16 +73,16 @@ export function useOrderConfig(): {
           value: display,
         })),
         orderFrequencies: frequencyData?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
-          const getAbbreviation = (names: Names[]) => {
-            return names.map((name) => name.display);
-          };
+          // const getAbbreviation = (names: Names[]) => {
+          //   return names.map((name) => name.display);
+          // };
 
-          const abbreviation = getAbbreviation(concept.names);
+          // const abbreviation = getAbbreviation(concept.names);
 
           return {
             valueCoded: uuid,
             value: display,
-            abbreviation: abbreviation,
+            names: concept.names.map((name) => name.display),
           };
         }),
       },

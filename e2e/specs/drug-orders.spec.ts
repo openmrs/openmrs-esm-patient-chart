@@ -137,7 +137,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And I change the frequency to `Twice daily`', async () => {
-    await page.getByPlaceholder(/frequency/i).click();
+    await page.getByPlaceholder(/frequency/i).clear();
     await page.getByText('Twice daily', { exact: true }).click();
   });
 

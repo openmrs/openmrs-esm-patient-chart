@@ -308,7 +308,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, [orderConfigObject]);
 
   const filterItems = (menu) => {
-    return menu?.item?.abbreviation?.some((abbr) => abbr.toLowerCase().includes(menu?.inputValue?.toLowerCase()));
+    return menu?.item?.names?.some((abbr) => abbr.toLowerCase().includes(menu?.inputValue?.toLowerCase()));
   };
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);

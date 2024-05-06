@@ -72,5 +72,5 @@ interface CommonMedicationProps {
 
 export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
-  abbreviation?: string[];
+  names?: string[];
 }
