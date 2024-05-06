@@ -1,6 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import { Tile } from '@carbon/react';
-import { useConfig, useConnectivity, usePatient, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
+import {
+  useConfig,
+  useConnectivity,
+  usePatient,
+  ResponsiveWrapper,
+  useSession,
+  userHasAccess,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
@@ -44,15 +51,10 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
     [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
-  if (Array.isArray(forms)) {
-    forms.forEach((item) => {
-      const editPrivilege = item.form.encounterType?.editPrivilege?.name;
-      sessionPrivileges.forEach((item) => {
-        if (item?.display === editPrivilege) {
-          editableForms.push(item);
-        }
-      });
-    });
+  if (sessionUser?.user) {
+    editableForms = forms?.filter((formInfo) =>
+      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.name, sessionUser.user),
+    );
   }
 
   const sections = useMemo(() => {
