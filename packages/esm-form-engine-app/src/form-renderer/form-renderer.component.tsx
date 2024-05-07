@@ -3,19 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
 import { type Visit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface FormRendererProps {
+interface FormRendererProps extends DefaultPatientWorkspaceProps {
   additionalProps?: Record<string, any>;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
-  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   encounterUuid?: string;
   formUuid: string;
   patientUuid: string;
-  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
   visit?: Visit;
 }
 

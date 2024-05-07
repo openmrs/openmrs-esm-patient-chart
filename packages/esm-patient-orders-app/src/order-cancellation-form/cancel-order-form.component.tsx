@@ -17,11 +17,11 @@ import {
   InlineLoading,
 } from '@carbon/react';
 import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
 import { cancelOrder } from './cancel-order.resource';
 import styles from './cancel-order-form.scss';
 
-interface OrderCancellationFormProps extends DefaultWorkspaceProps {
+interface OrderCancellationFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
 }
 
