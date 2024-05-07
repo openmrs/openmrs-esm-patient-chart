@@ -20,10 +20,38 @@ export interface DashboardConfig extends DashboardLinkConfig {
 
 export interface PatientProgram {
   uuid: string;
+  patient?: DisplayMetadata;
+  program: {
+    uuid: string;
+    name: string;
+    allWorkflows: Array<{
+      uuid: string;
+      concept: DisplayMetadata;
+      retired: boolean;
+      states: Array<Record<string, unknown>>;
+      links?: Links;
+    }>;
+    concept: DisplayMetadata;
+    links: Links;
+  };
   display: string;
-  patient: OpenmrsResource;
-  program: OpenmrsResource;
   dateEnrolled: string;
-  dateCompleted: string;
-  location: OpenmrsResource;
+  dateCompleted: string | null;
+  location?: DisplayMetadata;
+  voided?: boolean;
+  outcome?: null;
+  states?: [];
+  links: Links;
+  resourceVersion?: string;
+}
+
+export type Links = Array<{
+  rel: string;
+  uri: string;
+}>;
+
+export interface DisplayMetadata {
+  display: string;
+  links: Links;
+  uuid: string;
 }
