@@ -38,7 +38,7 @@ import {
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
@@ -60,7 +60,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 dayjs.extend(isSameOrBefore);
 
-interface StartVisitFormProps extends DefaultWorkspaceProps {
+interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type LabOrderBasketItem,
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
@@ -30,7 +30,7 @@ import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultWorkspaceProps {
+export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: LabOrderBasketItem;
 }
 

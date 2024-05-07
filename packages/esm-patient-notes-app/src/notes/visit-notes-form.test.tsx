@@ -12,7 +12,7 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import VisitNotesForm from './visit-notes-form.component';
+import VisitNotesForm from './visit-notes-form.workspace';
 
 const testProps = {
   patientUuid: mockPatient.id,

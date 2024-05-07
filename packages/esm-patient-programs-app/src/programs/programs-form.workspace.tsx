@@ -28,7 +28,7 @@ import {
   useLayoutType,
   parseDate,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
   useAvailablePrograms,
@@ -37,7 +37,7 @@ import {
 } from './programs.resource';
 import styles from './programs-form.scss';
 
-interface ProgramsFormProps extends DefaultWorkspaceProps {
+interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
   programEnrollmentId?: string;
 }
 

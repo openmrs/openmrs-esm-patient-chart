@@ -37,7 +37,7 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -84,7 +84,7 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({
+const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   patientUuid,

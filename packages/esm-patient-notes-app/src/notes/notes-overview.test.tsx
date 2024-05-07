@@ -4,7 +4,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
-import NotesOverview from './notes-overview.component';
+import NotesOverview from './notes-overview.extension';
 
 const testProps = {
   basePath: patientChartBasePath,

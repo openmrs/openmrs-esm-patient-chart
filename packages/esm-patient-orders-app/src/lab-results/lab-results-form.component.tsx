@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
-import { type DefaultWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import styles from './lab-results-form.scss';
 
-export interface LabResultsFormProps extends DefaultWorkspaceProps {
+export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
 }
 
