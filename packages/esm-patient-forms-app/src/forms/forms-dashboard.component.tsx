@@ -29,9 +29,7 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const sessionUser = useSession();
-  const sessionPrivileges = sessionUser?.user?.privileges;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  let editableForms = [];
+  // let editableForms = [];
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
@@ -51,11 +49,14 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
     [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
-  if (sessionUser?.user) {
-    editableForms = forms?.filter((formInfo) =>
-      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.name, sessionUser.user),
-    );
-  }
+  let editableForms = useMemo(() => {
+    if (sessionUser?.user) {
+      return forms?.filter((formInfo) =>
+        userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.name, sessionUser.user),
+      );
+    }
+    return [];
+  }, [sessionUser?.user, forms]);
 
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({
