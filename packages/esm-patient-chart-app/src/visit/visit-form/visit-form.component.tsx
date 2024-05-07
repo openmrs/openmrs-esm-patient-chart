@@ -34,6 +34,7 @@ import {
   updateVisit,
   useConnectivity,
   formatDatetime,
+  usePatient,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -63,6 +64,7 @@ dayjs.extend(isSameOrBefore);
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
+  showPatientHeader?: boolean;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
@@ -71,6 +73,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   promptBeforeClosing,
   visitToEdit,
   showVisitEndDateTimeFields,
+  showPatientHeader = true,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -80,6 +83,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
+  const { patient } = usePatient(patientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
@@ -527,6 +531,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   return (
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {showPatientHeader && patient && (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: patientUuid,
+              hideActionsOverflow: true,
+            }}
+          />
+        )}
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
