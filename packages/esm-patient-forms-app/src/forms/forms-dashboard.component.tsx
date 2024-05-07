@@ -29,8 +29,6 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const sessionUser = useSession();
-  // let editableForms = [];
-
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
       launchFormEntryOrHtmlForms(
