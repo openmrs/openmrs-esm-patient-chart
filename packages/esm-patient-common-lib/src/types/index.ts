@@ -28,23 +28,16 @@ export interface PatientProgram {
       uuid: string;
       concept: DisplayMetadata;
       retired: boolean;
-      states: Array<{}>;
+      states: Array<Record<string, unknown>>;
       links?: Links;
     }>;
-    concept: {
-      display: string;
-      uuid: string;
-    };
+    concept: DisplayMetadata;
     links: Links;
   };
   display: string;
   dateEnrolled: string;
   dateCompleted: string | null;
-  location?: {
-    uuid: string;
-    display: string;
-    links: Links;
-  };
+  location?: DisplayMetadata;
   voided?: boolean;
   outcome?: null;
   states?: [];
@@ -58,7 +51,7 @@ export type Links = Array<{
 }>;
 
 export interface DisplayMetadata {
-  display?: string;
-  links?: Links;
-  uuid?: string;
+  display: string;
+  links: Links;
+  uuid: string;
 }
