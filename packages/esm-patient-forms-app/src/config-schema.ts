@@ -90,6 +90,11 @@ export const configSchema = {
     _description: 'Custom forms endpoint to fetch forms using a custom url.',
     _default: '',
   },
+  filterFormsByEditPrivilege: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Whether to filter forms based on user privileges.',
+  },
   orderBy: {
     _type: Type.String,
     _description:
@@ -152,4 +157,5 @@ export interface ConfigObject {
   customFormsUrl: string;
   orderBy: 'name' | 'most-recent';
   showHtmlFormEntryForms: boolean;
+  filterFormsByEditPrivilege: boolean;
 }
