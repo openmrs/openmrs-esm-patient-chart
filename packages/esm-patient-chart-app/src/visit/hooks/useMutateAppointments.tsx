@@ -1,8 +1,9 @@
-import { useSWRConfig } from 'swr';
 import { useCallback } from 'react';
+import { useSWRConfig } from 'swr';
+import { restBaseUrl } from '@openmrs/esm-framework';
 
 // this is copied directly from a similar hook in the appointments-app in patient management; ideally at some point we could import that hook directly
-const appointmentUrlMatcher = '${restBaseUrl}/appointment';
+const appointmentUrlMatcher = `${restBaseUrl}/appointment`;
 
 export function useMutateAppointments() {
   const { mutate } = useSWRConfig();
