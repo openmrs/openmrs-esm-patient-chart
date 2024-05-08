@@ -113,7 +113,7 @@ export function useAllergens() {
       allergens,
       isLoading: !drugAllergenData || !environmentalAllergenData || !foodAllergenData,
     };
-  }, [drugAllergenData, environmentalAllergenData, foodAllergenData]);
+  }, [drugAllergenData, environmentalAllergenData, foodAllergenData, otherConceptUuid]);
 }
 
 export function useAllergenSearch(allergenToLookup: string) {

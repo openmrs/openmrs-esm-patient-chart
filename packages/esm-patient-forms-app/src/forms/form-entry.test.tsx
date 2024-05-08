@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { useConnectivity, usePatient } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
-import FormEntry from './form-entry.component';
+import FormEntry from './form-entry.workspace';
 
 const mockFormEntrySub = jest.fn();
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;

@@ -68,6 +68,7 @@ export interface OrderPost {
   orderReasonNonCoded?: string;
   orderReason?: string;
   instructions?: string;
+  labReferenceNumber?: string;
 }
 
 export interface PatientOrderFetchResponse {
@@ -204,4 +205,5 @@ export interface LabOrderBasketItem extends OrderBasketItem {
   instructions?: string;
   previousOrder?: string;
   orderReason?: string;
+  orderNumber?: string;
 }
