@@ -3,14 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
-import {
-  closeWorkspace,
-  useDebounce,
-  useLayoutType,
-  useSession,
-  ExtensionSlot,
-  ResponsiveWrapper,
-} from '@openmrs/esm-framework';
+import { closeWorkspace, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
