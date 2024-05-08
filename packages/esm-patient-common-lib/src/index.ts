@@ -19,3 +19,4 @@ export * from './types';
 export * from './useSystemVisitSetting';
 export * from './workspaces';
 export * from './form-entry-interop';
+export * from './use-allowed-file-extensions';
