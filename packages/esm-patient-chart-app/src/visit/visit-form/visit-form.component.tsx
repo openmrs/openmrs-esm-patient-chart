@@ -73,7 +73,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   promptBeforeClosing,
   visitToEdit,
   showVisitEndDateTimeFields,
-  showPatientHeader = true,
+  showPatientHeader = false,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
