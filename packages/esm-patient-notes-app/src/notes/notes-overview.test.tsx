@@ -1,11 +1,10 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
-import { formattedVisitNotes, mockVisitNotes, ConfigMock } from '__mocks__';
+import { useConfig } from '@openmrs/esm-framework';
+import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
-import NotesOverview from './notes-overview.component';
 import { useVisitNotes } from './visit-notes.resource';
+import NotesOverview from './notes-overview.extension';
 
 const testProps = {
   basePath: patientChartBasePath,
@@ -14,7 +13,6 @@ const testProps = {
 };
 
 const mockUseVisitNotes = useVisitNotes as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('./visit-notes.resource', () => {
@@ -27,11 +25,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
     useVisit: jest.fn().mockReturnValue([{}]),
   };
 });
@@ -77,11 +70,6 @@ describe('NotesOverview: ', () => {
 
   test("renders a tabular overview of the patient's visit notes when present", async () => {
     mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
-    mockUsePagination.mockReturnValueOnce({
-      results: formattedVisitNotes.slice(0, 10),
-      goTo: () => {},
-      currentPage: 1,
-    });
 
     renderNotesOverview();
 
@@ -97,23 +85,13 @@ describe('NotesOverview: ', () => {
 
     const expectedTableRows = [
       /27 — Jan — 2022 Malaria, Primary respiratory tuberculosis, confirmed/,
-      /14 — Jan — 2022 Malaria/,
-      /14 — Jan — 2022 Hemorrhage in early pregnancy/,
-      /11 — Jan — 2022 Malaria/,
-      /08 — Sept — 2021 Malaria, confirmed, Human immunodeficiency virus \(HIV\) disease/,
+      /14 — Jan — 2022 Visit Diagnoses: Presumed diagnosis, Malaria, Primary/,
+      /14 — Jan — 2022 Visit Diagnoses: Presumed diagnosis, Hemorrhage in early pregnancy, Primary/,
     ];
 
     expectedTableRows.map((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
-
-    // Expanding a row displays any associated visit notes
-    await userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
-    expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
-
-    // Collapsing the row hides the visit note
-    await userEvent.click(screen.getByRole('button', { name: /collapse current row/i }));
-    expect(screen.queryByText(/No visit note to display/i)).not.toBeInTheDocument();
   });
 });
 

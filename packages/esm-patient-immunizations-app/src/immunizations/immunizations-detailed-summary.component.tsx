@@ -62,7 +62,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
       return;
     }
     launchPatientWorkspace('immunization-form-workspace');
-  }, [currentVisit]);
+  }, [currentVisit, launchStartVisitPrompt]);
 
   const sortedImmunizations = orderBy(
     consolidatedImmunizations,
