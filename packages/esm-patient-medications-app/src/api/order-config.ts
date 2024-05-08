@@ -73,12 +73,6 @@ export function useOrderConfig(): {
           value: display,
         })),
         orderFrequencies: frequencyData?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
-          // const getAbbreviation = (names: Names[]) => {
-          //   return names.map((name) => name.display);
-          // };
-
-          // const abbreviation = getAbbreviation(concept.names);
-
           return {
             valueCoded: uuid,
             value: display,
