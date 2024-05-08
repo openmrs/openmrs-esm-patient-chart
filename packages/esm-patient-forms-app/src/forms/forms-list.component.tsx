@@ -62,15 +62,17 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
 
   const tableRows = useMemo(
     () =>
-      filteredForms?.map((formData) => {
-        return {
-          id: formData.form?.uuid,
-          lastCompleted: formData.lastCompleted ? formatDatetime(formData.lastCompleted) : undefined,
-          formName: formData.form?.display ?? formData.form?.name,
-          formUuid: formData.form?.uuid,
-          encounterUuid: formData?.associatedEncounters?.[0]?.uuid,
-        };
-      }) ?? [],
+      filteredForms
+        ?.filter((formData) => Boolean(formData))
+        ?.map((formData) => {
+          return {
+            id: formData.form?.uuid,
+            lastCompleted: formData.lastCompleted ? formatDatetime(formData.lastCompleted) : undefined,
+            formName: formData.form?.display ?? formData.form?.name,
+            formUuid: formData.form?.uuid,
+            encounterUuid: formData?.associatedEncounters?.[0]?.uuid,
+          };
+        }) ?? [],
     [filteredForms],
   );
 
