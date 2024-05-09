@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useVisits } from './visit.resource';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
+import type { Visit } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 
 interface ActiveVisitOverviewComponentProps {
   patientUuid: string;
+  visit: Visit;
 }
 
 function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverviewComponentProps) {
@@ -16,6 +19,16 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
   const { visits, error, isLoading, mutateVisits } = useVisits(patientUuid);
 
   const activeVisits = visits?.filter((visit) => visit.stopDatetime === null);
+
+  const handleStartVisit = useCallback(() => {
+    launchPatientChartWithWorkspaceOpen({
+      patientUuid,
+      workspaceName: 'start-visit-workspace-form',
+    });
+    navigate({
+      to: `/openmrs/spa/patient/${patientUuid}/chart/Active%20Visits`,
+    });
+  }, [patientUuid]);
 
   if (isLoading) {
     return (
@@ -29,6 +42,16 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
 
   if (error) {
     return <ErrorState headerTitle={t('failedToLoadActiveVisits', 'Failed loading active visits')} error={error} />;
+  }
+
+  if (activeVisits?.length === 0) {
+    return (
+      <EmptyState
+        displayText={t('noActiveVisitsAvailable', 'Visits')}
+        headerTitle={t('noActiveVisits', 'No active visits')}
+        launchForm={handleStartVisit}
+      />
+    );
   }
 
   return (
@@ -62,7 +85,11 @@ function ActiveVisitDetailOverviewComponent({ patientUuid }: ActiveVisitOverview
                         </div>
                       </div>
                       <div>
-                        <ExtensionSlot name="active-visit-actions" />
+                        <ExtensionSlot
+                          name="active-visit-actions"
+                          className={styles.visitDetailOverviewActions}
+                          state={{ patientUuid, visit }}
+                        />
                       </div>
                     </div>
                   </div>

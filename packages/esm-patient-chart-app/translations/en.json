@@ -96,6 +96,8 @@
   "name": "Name",
   "no": "No",
   "noActiveVisit": "No Active Visit",
+  "noActiveVisits": "No active visits",  
+  "noActiveVisitsAvailable": "Visits",
   "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "You can't add data to the patient chart without an active visit. Would you like to start a new visit?",
   "noActiveVisitText": "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",

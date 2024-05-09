@@ -1,17 +1,15 @@
-import { launchPatientWorkspace, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import styles from './active-visit-buttons.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, MenuButton, MenuItem } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
+import { useLaunchWorkspaceRequiringVisit, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import type { Visit } from '@openmrs/esm-framework';
 import { showModal, useLayoutType, useConfig } from '@openmrs/esm-framework';
-
 interface ActiveVisitActionsInterface {
   visit: Visit;
   patientUuid: string;
 }
-
 interface ActiveVisitProps {
   encounterUuid: string;
   formUuid: string;
@@ -20,11 +18,11 @@ interface ActiveVisitProps {
 }
 
 const ActiveVisitActions: React.FC<ActiveVisitActionsInterface & ActiveVisitProps> = ({
-                                                                                        patientUuid,
-                                                                                        mutateform,
-                                                                                        action,
-                                                                                        visit,
-                                                                                      }) => {
+  patientUuid,
+  mutateform,
+  action,
+  visit,
+}) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -53,48 +51,55 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface & ActiveVisitProp
     });
   };
 
+  const launchAllergiesFormWorkspace = useLaunchWorkspaceRequiringVisit('patient-allergy-form-workspace');
+  const launchAppointmentsFormWorkspace = useLaunchWorkspaceRequiringVisit('appointments-form-workspace');
+  const launchClinicalFormsWorkspace = useLaunchWorkspaceRequiringVisit('clinical-forms-workspace');
+  const launchConditionsFormWorkspace = useLaunchWorkspaceRequiringVisit('conditions-form-workspace');
+  const launchOrderBasketFormWorkspace = useLaunchWorkspaceRequiringVisit('order-basket');
+  const launchVitalsAndBiometricsFormWorkspace = useLaunchWorkspaceRequiringVisit(
+    'patient-vitals-biometrics-form-workspace',
+  );
   return (
     <div>
       {isTablet || isMobile ? (
         <div className={styles.buttonsContainer}>
           <VisitActionsComponent patientUuid={patientUuid} visit={visit} />
-
           <MenuButton label={t('more', 'More')} kind="ghost">
             <MenuItem kind="ghost" label={t('addNote', 'Add note')} onClick={handleLaunchNotesForm} renderIcon={Add} />
             <MenuItem
               kind="ghost"
               label={t('addLabOrPrescription', 'Add lab or prescription')}
-              onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
+              onClick={launchOrderBasketFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addVitals', 'Add vitals')}
-              onClick={useLaunchWorkspaceRequiringVisit('patient-vitals-biometrics-form-workspace')}
+              onClick={launchVitalsAndBiometricsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addCondition', 'Add condition')}
-              onClick={useLaunchWorkspaceRequiringVisit('conditions-form-workspace')}
+              onClick={launchConditionsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addAllergy', 'Add allergy')}
-              onClick={useLaunchWorkspaceRequiringVisit('patient-allergy-form-workspace')}
+              onClick={launchAllergiesFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addAppointment', 'Add appointment')}
-              onClick={useLaunchWorkspaceRequiringVisit('appointments-form-workspace')}
+              onClick={launchAppointmentsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('otherForm', 'Other form')}
-              onClick={useLaunchWorkspaceRequiringVisit('clinical-forms-workspace')}
+              onClick={launchClinicalFormsWorkspace}
               renderIcon={Add}
             />
           </MenuButton>
@@ -113,42 +118,40 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface & ActiveVisitProp
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add lab or prescription"
-            onClick={useLaunchWorkspaceRequiringVisit('order-basket')}
+            onClick={launchOrderBasketFormWorkspace}
           >
             {t('addLabOrPrescription', 'Add lab or prescription')}
           </Button>
-
           <VisitActionsComponent patientUuid={patientUuid} visit={visit} />
-
           <MenuButton label={t('more', 'More')} kind="ghost">
             <MenuItem
               kind="ghost"
               label={t('addVitals', 'Add vitals')}
-              onClick={useLaunchWorkspaceRequiringVisit('patient-vitals-biometrics-form-workspace')}
+              onClick={launchVitalsAndBiometricsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addCondition', 'Add condition')}
-              onClick={useLaunchWorkspaceRequiringVisit('conditions-form-workspace')}
+              onClick={launchConditionsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addAllergy', 'Add allergy')}
-              onClick={useLaunchWorkspaceRequiringVisit('patient-allergy-form-workspace')}
+              onClick={launchAllergiesFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('addAppointment', 'Add appointment')}
-              onClick={useLaunchWorkspaceRequiringVisit('appointments-form-workspace')}
+              onClick={launchAppointmentsFormWorkspace}
               renderIcon={Add}
             />
             <MenuItem
               kind="ghost"
               label={t('otherForm', 'Other form')}
-              onClick={useLaunchWorkspaceRequiringVisit('clinical-forms-workspace')}
+              onClick={launchClinicalFormsWorkspace}
               renderIcon={Add}
             />
           </MenuButton>
@@ -157,7 +160,6 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface & ActiveVisitProp
     </div>
   );
 };
-
 export default ActiveVisitActions;
 interface VisitActionsProps {
   patientUuid: string;
