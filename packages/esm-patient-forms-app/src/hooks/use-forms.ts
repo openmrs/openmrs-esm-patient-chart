@@ -4,7 +4,6 @@ import {
   getDynamicOfflineDataEntries,
   openmrsFetch,
   restBaseUrl,
-  type Session,
   useConfig,
   userHasAccess,
   useSession,
@@ -13,7 +12,6 @@ import { type ListResponse, type Form, type EncounterWithFormRef, type Completed
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { type ConfigObject } from '../config-schema';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
-import { useMemo } from 'react';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
