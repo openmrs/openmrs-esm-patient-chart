@@ -39,20 +39,6 @@ export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: s
     return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
   });
 }
-export function useFormFilters(patientUuid: string, session: Session, isOnline: boolean, config: ConfigObject) {
-  const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
-
-  const filteredForms = useMemo(() => {
-    if (session?.user && config.filterFormsByEditPrivilege) {
-      return forms?.filter((formInfo) =>
-        userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.name, session.user),
-      );
-    }
-    return forms;
-  }, [forms, session.user, config.filterFormsByEditPrivilege]);
-
-  return { forms: filteredForms, error, mutateForms };
-}
 
 export function useEncountersWithFormRef(
   patientUuid: string,

@@ -17,7 +17,7 @@ import {
 import type { ConfigObject } from '../config-schema';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
-import { useFormFilters } from '../hooks/use-forms';
+import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
 const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
@@ -26,10 +26,26 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const isOnline = useConnectivity();
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { patient, patientUuid } = usePatient();
-  const sessionUser = useSession();
-  const { forms, error, mutateForms } = useFormFilters(patientUuid, sessionUser, isOnline, config);
+  const session = useSession();
 
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+
+  const useFormFilters = () => {
+    const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
+
+    const filteredForms = useMemo(() => {
+      if (session && config.filterFormsByEditPrivilege) {
+        return forms?.filter((formInfo) =>
+          userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.name, session?.user),
+        );
+      }
+      return forms;
+    }, [forms]);
+
+    return { forms: filteredForms, error, mutateForms };
+  };
+
+  const { forms, error, mutateForms } = useFormFilters();
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
