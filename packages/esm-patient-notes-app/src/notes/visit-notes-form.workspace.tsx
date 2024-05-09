@@ -253,7 +253,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
-      if (finalNoteDate.isSame(now, 'minute') || finalNoteDate.isAfter(now, 'minute')) {
+      if (finalNoteDate.diff(now, 'minute') <= 30) {
         finalNoteDate = null;
       }
 
