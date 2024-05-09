@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { ActionMenuButton, launchWorkspace, useLayoutType, usePatient, useWorkspaces } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -9,15 +9,24 @@ import OrderBasketActionButton from './order-basket-action-button.extension';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
+const mockUseWorkspaces = useWorkspaces as jest.Mock;
+const mockLaunchWorkspace = launchWorkspace as jest.Mock;
+const MockActionMenuButton = ActionMenuButton as jest.Mock;
+
+MockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
+  <button onClick={handler}>
+    {tagContent} {label}
+  </button>
+));
+
+mockUseWorkspaces.mockReturnValue({
+  workspaces: [{ type: 'order' }],
+  workspaceWindowState: 'normal',
+});
 
 // This pattern of mocking seems to be required: defining the mocked function here and
 // then assigning it with an arrow function wrapper in jest.mock. It is very particular.
 // I think it is related to this: https://github.com/swc-project/jest/issues/14#issuecomment-1238621942
-
-jest.mock('@carbon/react/icons', () => ({
-  ...(jest.requireActual('@carbon/react/icons') as jest.Mock),
-  ShoppingCart: jest.fn((props) => <div data-testid="shopping-cart-icon" {...props} />),
-}));
 
 const mockLaunchPatientWorkspace = jest.fn();
 const mockLaunchStartVisitPrompt = jest.fn();
@@ -30,6 +39,7 @@ const mockUseVisitOrOfflineVisit = jest.fn(() => ({
   },
 }));
 const mockGetPatientUuidFromUrl = jest.fn(() => mockPatient.id);
+const mockUseSystemVisitSetting = jest.fn();
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -38,23 +48,26 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
     launchPatientWorkspace: (arg) => mockLaunchPatientWorkspace(arg),
-    launchStartVisitPrompt: () => mockLaunchStartVisitPrompt(),
-    useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit(),
-    useSystemVisitSetting: jest.fn().mockReturnValue({ data: true }),
   };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => {
+  return {
+    useSystemVisitSetting: () => mockUseSystemVisitSetting(),
+  };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
+  return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => {
   return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib/src/workspaces/useWorkspaces'),
-  useWorkspaces: jest.fn().mockReturnValue({
-    workspaces: [{ type: 'order' }],
-    workspaceWindowState: 'normal',
-  }),
-}));
+jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
+  return { useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit() };
+});
 
 describe('<OrderBasketActionButton/>', () => {
   beforeAll(() => {
@@ -65,11 +78,12 @@ describe('<OrderBasketActionButton/>', () => {
         },
       },
     });
-    mockUsePatient.mockReturnValue({ patientUuid: mockPatient.id });
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUsePatient.mockReturnValue({ patientUuid: mockPatient.id });
+    mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
   });
 
   it('should display tablet view action button', async () => {
@@ -77,12 +91,10 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseLayoutType.mockReturnValue('tablet');
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('16');
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
-    expect(orderBasketButton).toHaveClass('active');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket', expect.any(Object));
   });
 
   it('should display desktop view action button', async () => {
@@ -90,17 +102,16 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseLayoutType.mockReturnValue('desktop');
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByTestId('shopping-cart-icon').getAttribute('size')).toBe('16');
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
-    expect(orderBasketButton).toHaveClass('active');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket', expect.any(Object));
   });
 
   it('should prompt user to start visit if no currentVisit found', async () => {
     const user = userEvent.setup();
     mockedUseLayoutType.mockReturnValue('desktop');
+    mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
     mockUseVisitOrOfflineVisit.mockImplementation(() => ({
       activeVisit: null,
       currentVisit: null,
@@ -110,9 +121,8 @@ describe('<OrderBasketActionButton/>', () => {
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
     await user.click(orderBasketButton);
-    expect(mockLaunchPatientWorkspace).not.toBeCalled();
+    expect(mockLaunchPatientWorkspace).not.toHaveBeenCalled();
     expect(mockLaunchStartVisitPrompt).toHaveBeenCalled();
-    expect(orderBasketButton).toHaveClass('active');
   });
 
   it('should display a count tag when orders are present on the desktop view', () => {

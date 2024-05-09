@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ImmunizationsForm from './immunizations-form.component';
+import ImmunizationsForm from './immunizations-form.workspace';
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
 import { immunizationFormSub } from './utils';

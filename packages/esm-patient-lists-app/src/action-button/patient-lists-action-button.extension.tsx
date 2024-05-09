@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Events } from '@carbon/react/icons';
-import { launchPatientWorkspace, SiderailNavButton } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { ActionMenuButton } from '@openmrs/esm-framework';
 
 const handleLaunchPatientListsWorkspace = () => launchPatientWorkspace('patient-lists');
 
@@ -9,8 +10,7 @@ function PatientListsActionButton() {
   const { t } = useTranslation();
 
   return (
-    <SiderailNavButton
-      name="patient-lists-action-menu"
+    <ActionMenuButton
       getIcon={(props) => <Events {...props} />}
       label={t('patientLists', 'Patient lists')}
       iconDescription={t('patientLists', 'Patient lists')}

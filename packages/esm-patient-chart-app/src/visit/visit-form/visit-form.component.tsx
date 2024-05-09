@@ -38,7 +38,7 @@ import {
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
@@ -57,10 +57,11 @@ import VisitDateTimeField from './visit-date-time.component';
 import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 
 dayjs.extend(isSameOrBefore);
 
-interface StartVisitFormProps extends DefaultWorkspaceProps {
+interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
 }
@@ -86,6 +87,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
+  const { mutateAppointments } = useMutateAppointments();
   const allVisitTypes = useConditionalVisitTypes();
 
   const { mutate } = useVisit(patientUuid);
@@ -409,6 +411,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     () => {
                       mutateCurrentVisit();
                       mutateVisits();
+                      mutateAppointments();
                       showSnackbar({
                         isLowContrast: true,
                         kind: 'success',
@@ -506,6 +509,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       extraVisitInfo,
       isOnline,
       mutate,
+      mutateAppointments,
       mutateQueueEntry,
       validateVisitStartStopDatetime,
     ],
