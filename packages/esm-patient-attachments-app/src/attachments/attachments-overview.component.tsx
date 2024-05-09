@@ -13,9 +13,8 @@ import {
   type Attachment,
   type UploadedFile,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
-import { useAllowedExtensions } from './use-allowed-extensions';
 import AttachmentPreview from './attachment-preview.component';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
@@ -38,7 +37,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
-  const { allowedExtensions } = useAllowedExtensions();
+  const { allowedFileExtensions } = useAllowedFileExtensions();
 
   const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
   const [hasUploadError, setHasUploadError] = useState(false);
@@ -99,13 +98,13 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   const showAddAttachmentModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
-      allowedExtensions: allowedExtensions,
+      allowedExtensions: allowedFileExtensions,
       closeModal: () => close(),
       onCompletion: () => mutate(),
       multipleFiles: true,
       collectDescription: true,
     });
-  }, [patientUuid, mutate, allowedExtensions]);
+  }, [allowedFileExtensions, mutate, patientUuid]);
 
   const showDeleteAttachmentModal = useCallback(
     (attachment: Attachment) => {
