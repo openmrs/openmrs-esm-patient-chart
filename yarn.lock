@@ -4901,8 +4901,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.1.0-pre.850
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.1.0-pre.850"
+  version: 1.1.0-pre.917
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.1.0-pre.917"
   dependencies:
     ace-builds: "npm:^1.4.12"
     classnames: "npm:^2.5.1"
@@ -4924,7 +4924,7 @@ __metadata:
     react-i18next: 11.x
     rxjs: 6.x
     swr: 2.x
-  checksum: 10/25a150f2614c3e8f6254fb375bb9428e0d98c518eade778d385c343f719010d4961ff520d5fbcba86530b5a6f211390bae37d7ec169eb30fcfd252e85201e9f4
+  checksum: 10/141e4dd270d7e5f66af397aef39105f30b2626b8553016851d7f0e7d3259ea826f618803866257d9f1f384269c189df056f9f837b9613c2bf5284437ec2fbd1c
   languageName: node
   linkType: hard
 
