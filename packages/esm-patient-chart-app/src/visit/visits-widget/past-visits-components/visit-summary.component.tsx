@@ -29,7 +29,6 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-summary.scss';
-import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -189,17 +188,25 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
-          {visit?.encounters?.length > 0 && foundEncounter && (
-            <TabPanel key={selectedIndex}>
-              <OHRIForm
-                patientUUID={patientUuid}
-                formUUID={foundEncounter.form?.uuid}
-                encounterUUID={foundEncounter.uuid}
-                mode="view"
-              />
-              <p>Test</p>
-            </TabPanel>
-          )}
+          {visit?.encounters?.length > 0 &&
+            visit?.encounters
+              .filter((enc) => !!enc.form)
+              .map((enc, ind) => (
+                <TabPanel key={ind}>
+                  {selectedTab === enc.uuid && (
+                    <ExtensionSlot
+                      name="form-widget-slot"
+                      state={{
+                        additionalProps: { mode: 'embedded-view' },
+                        formUuid: enc.form?.uuid,
+                        encounterUuid: enc.uuid,
+                        patientUuid: patientUuid,
+                        promptBeforeClosing: () => {}, //TODO pass the actual function for promptBeforeClosing
+                      }}
+                    />
+                  )}
+                </TabPanel>
+              ))}
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
               <Extension state={{ patientUuid, visit }} />
