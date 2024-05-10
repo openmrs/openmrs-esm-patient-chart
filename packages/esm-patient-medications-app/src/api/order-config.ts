@@ -17,7 +17,7 @@ export interface CommonConfigProps {
   uuid: string;
   display: string;
   concept?: {
-    names: Names[];
+    names: ConceptName[];
   };
 }
 
