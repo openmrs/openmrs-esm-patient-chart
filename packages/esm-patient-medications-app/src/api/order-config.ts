@@ -9,7 +9,7 @@ import {
   type QuantityUnit,
 } from '../types';
 
-export interface Names {
+export interface ConceptName {
   uuid: string;
   display: string;
 }
