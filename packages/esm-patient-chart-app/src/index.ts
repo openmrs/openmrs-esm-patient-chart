@@ -62,24 +62,6 @@ export function startupApp() {
    * t('Forms & Notes dashboard', 'Forms & Notes dashboard')
    * t('Results Viewer dashboard', 'Results Viewer dashboard')
    */
-  registerBreadcrumbs([
-    {
-      path: spaBasePath,
-      title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
-      parent: `${window.spaBase}/home`,
-    },
-    {
-      path: `${spaBasePath}/:view`,
-      title: ([_, key]) =>
-        Promise.resolve(
-          window.i18next.t(`${decodeURIComponent(key)} dashboard`, {
-            ns: moduleName,
-            defaultValue: `${decodeURIComponent(key)} dashboard`,
-          }),
-        ),
-      parent: spaBasePath,
-    },
-  ]);
 
   registerFeatureFlag(
     'rde',
