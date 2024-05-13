@@ -26,6 +26,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import {
+  ExtensionSlot,
   age,
   formatDate,
   parseDate,
@@ -172,6 +173,7 @@ function MedicationInfoHeader({
           </strong>
         </>
       ) : null}{' '}
+      <ExtensionSlot name="medication-info-slot" state={{ order: orderBasketItem }} />
     </div>
   );
 }
