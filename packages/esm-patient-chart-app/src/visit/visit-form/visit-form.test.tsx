@@ -1,8 +1,8 @@
 import React from 'react';
 import { of, throwError } from 'rxjs';
-import { screen, render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { saveVisit, showSnackbar, useConfig, openmrsFetch, type Visit, updateVisit } from '@openmrs/esm-framework';
+import { openmrsFetch, saveVisit, showSnackbar, updateVisit, useConfig, type Visit } from '@openmrs/esm-framework';
 import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { mockPatient } from 'tools';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
@@ -319,13 +319,14 @@ describe('Visit Form', () => {
 
     await user.click(saveButton);
 
+    expect(mockSaveVisit).toHaveBeenCalledTimes(1);
     expect(mockSaveVisit).toHaveBeenCalledWith(
       expect.objectContaining({
         location: mockLocations[1].uuid,
         patient: mockPatient.id,
         visitType: 'some-uuid1',
       }),
-      new AbortController(),
+      expect.any(Function),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
@@ -409,7 +410,7 @@ describe('Visit Form', () => {
         location: mockLocations[1].uuid,
         visitType: 'some-uuid1',
       }),
-      new AbortController(),
+      expect.any(Function),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
@@ -497,7 +498,7 @@ describe('Visit Form', () => {
         location: mockLocations[1].uuid,
         visitType: 'some-uuid1',
       }),
-      new AbortController(),
+      expect.any(Function),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
