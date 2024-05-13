@@ -130,22 +130,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     const visitStopTimeValidation = z
       .string()
       .refine(
-        (value) => (!
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    && !value) || value.match(time12HourFormatRegex),
+        (value) => (!visitToEdit?.stopDatetime && !value) || value.match(time12HourFormatRegex),
         t('invalidTimeFormat', 'Invalid time format'),
       );
 
@@ -178,7 +163,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }),
       visitAttributes: z.object(visitAttributes),
     });
-  }, [t, config, visitToEdit?.stopDatetime]);
+  }, [t, config, visitToEdit?.stopDatetime, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
     const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
