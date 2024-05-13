@@ -16,6 +16,7 @@ const overridenMetadata = [
     lowAbsolute: 0,
     lowCritical: 85,
     units: 'mmHg',
+    allowDecimal: false,
   },
   {
     uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -27,6 +28,7 @@ const overridenMetadata = [
     lowAbsolute: 0,
     lowCritical: 49,
     units: 'beats/min',
+    allowDecimal: false,
   },
 ];
 

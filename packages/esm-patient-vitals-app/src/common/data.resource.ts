@@ -14,7 +14,7 @@ import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
 import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
-import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.workspace';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/types';
 
 const pageSize = 100;
 
@@ -44,6 +44,7 @@ export interface ConceptMetadata {
   lowAbsolute: number | null;
   lowCritical: number | null;
   units: string | null;
+  allowDecimal: boolean;
 }
 
 interface VitalsConceptMetadataResponse {
@@ -59,7 +60,7 @@ function getInterpretationKey(header: string) {
 
 export function useVitalsConceptMetadata() {
   const customRepresentation =
-    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal))';
 
   const apiUrl = `${restBaseUrl}/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
 
@@ -75,16 +76,17 @@ export function useVitalsConceptMetadata() {
     : new Map<string, string>([]);
 
   const conceptRanges = conceptMetadata?.length
-    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null; allowDecimal: boolean }>(
         conceptMetadata.map((concept) => [
           concept.uuid,
           {
             lowAbsolute: concept.lowAbsolute ?? null,
             highAbsolute: concept.hiAbsolute ?? null,
+            allowDecimal: concept.allowDecimal ?? false,
           },
         ]),
       )
-    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]);
+    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null; allowDecimal: boolean }>([]);
 
   return {
     data: conceptUnits,
@@ -309,7 +311,6 @@ export function saveVitalsAndBiometrics(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: VitalsBiometricsFormData,
-  abortController: AbortController,
   location: string,
 ) {
   return openmrsFetch<unknown>(`${restBaseUrl}/encounter`, {
@@ -317,7 +318,6 @@ export function saveVitalsAndBiometrics(
     headers: {
       'Content-Type': 'application/json',
     },
-    signal: abortController.signal,
     body: {
       patient: patientUuid,
       location: location,

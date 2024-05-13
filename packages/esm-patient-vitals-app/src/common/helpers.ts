@@ -1,4 +1,5 @@
 import { type ConceptMetadata } from '../common';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/types';
 import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
