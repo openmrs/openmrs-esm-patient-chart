@@ -6,7 +6,7 @@ import { configSchema } from '../config-schema';
 import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveVitalsAndBiometrics } from '../common';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
+import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
 
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
@@ -149,7 +149,6 @@ describe('VitalsBiometricsForm', () => {
         temperature: temperatureValue,
         weight: weightValue,
       }),
-      expect.anything(),
       new AbortController(),
       undefined,
     );

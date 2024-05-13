@@ -1,19 +1,17 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
+import { useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import BaseVisitType from './base-visit-type.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
-const mockUsePagination = usePagination as jest.Mock;
 const mockUseVisitTypes = useVisitTypes as jest.Mock;
 const mockGoToPage = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
-  usePagination: jest.fn(),
   useVisitTypes: jest.fn(),
 }));
 
@@ -71,11 +69,6 @@ jest.mock('react-hook-form', () => ({
 
 describe('VisitTypeOverview', () => {
   const renderVisitTypeOverview = () => {
-    mockUsePagination.mockReturnValue({
-      results: mockVisitTypes.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
     render(<BaseVisitType visitTypes={mockVisitTypes} />);
   };

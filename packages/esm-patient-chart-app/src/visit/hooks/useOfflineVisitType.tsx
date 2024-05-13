@@ -12,7 +12,7 @@ export const useOfflineVisitType = () => {
     setVisitTypes([
       { uuid: config.offlineVisitTypeUuid, name: 'Offline Visit', display: t('offlineVisit', 'Offline Visit') },
     ]);
-  }, []);
+  }, [t, config.offlineVisitTypeUuid]);
 
   return visitTypes;
 };

@@ -37,15 +37,6 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-allergies-app
 
-[o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-appointments-app]
-file_filter            = packages/esm-patient-appointments-app/translations/<lang>.json
-source_file            = packages/esm-patient-appointments-app/translations/en.json
-source_lang            = en
-type                   = KEYVALUEJSON
-replace_edited_strings = false
-keep_translations      = false
-resource_name          = esm-patient-appointments-app
-
 [o:openmrs:p:openmrs-esm-patient-chart:r:esm-patient-attachments-app]
 file_filter            = packages/esm-patient-attachments-app/translations/<lang>.json
 source_file            = packages/esm-patient-attachments-app/translations/en.json

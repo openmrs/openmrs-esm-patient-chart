@@ -16,8 +16,17 @@
     {
       "name": "visit-note-nav-button",
       "component": "visitNotesActionButton",
-      "slot": "action-menu-chart-items-slot",
+      "slot": "action-menu-patient-chart-items-slot",
       "order": 1
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "visit-notes-form-workspace",
+      "title": "visitNoteWorkspaceTitle",
+      "component": "visitNotesFormWorkspace",
+      "type": "visit-note",
+      "canHide": true
     }
   ]
 }

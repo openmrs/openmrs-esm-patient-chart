@@ -28,4 +28,5 @@ export interface VisitNoteConfigObject {
   encounterNoteTextConceptUuid: string;
   encounterTypeUuid: string;
   formConceptUuid: string;
+  visitDiagnosesConceptUuid: string;
 }

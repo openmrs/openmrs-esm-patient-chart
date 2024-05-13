@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-lists-app",
-  "version": "7.0.1",
+  "version": "7.1.0",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient lists in the Patient Chart",
   "browser": "dist/openmrs-esm-patient-lists-app.js",
@@ -18,7 +18,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "verify": "turbo lint typescript coverage",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.workspace.tsx' 'src/**/*.extension.tsx' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

@@ -26,6 +26,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import {
+  ExtensionSlot,
   age,
   formatDate,
   parseDate,
@@ -92,9 +93,23 @@ const schemaFields = {
   asNeededCondition: z.string().nullable(),
   duration: z.number().nullable(),
   durationUnit: z.object({ ...comboSchema }).nullable(),
-  pillsDispensed: z.number().nullable(),
-  quantityUnits: z.object({ ...comboSchema }).nullable(),
+  // t( 'pillDispensedErrorMessage', 'The quantity to dispense is required' )
+  pillsDispensed: z.number({
+    invalid_type_error: translateFrom(moduleName, 'pillDispensedErrorMessage', 'The quantity to dispense is required'),
+  }),
+  // t( 'selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit' )
+  quantityUnits: z.object(
+    { ...comboSchema },
+    {
+      invalid_type_error: translateFrom(
+        moduleName,
+        'selectQuantityUnitsErrorMessage',
+        'Dispensing requires a quantity unit',
+      ),
+    },
+  ),
   numRefills: z.number().nullable(),
+  // t( 'indicationErrorMessage', 'Please add an indication' )
   indication: z.string().refine((value) => value !== '', {
     message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
   }),
@@ -108,35 +123,21 @@ const schemaFields = {
   ),
 };
 
-const medicationOrderFormSchema = z
-  .discriminatedUnion('isFreeTextDosage', [
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(false),
-      freeTextDosage: z.string().optional(),
-    }),
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(true),
-      dosage: z.number().nullable(),
-      unit: z.object({ ...comboSchema }).nullable(),
-      route: z.object({ ...comboSchema }).nullable(),
-      frequency: z.object({ ...comboSchema }).nullable(),
-    }),
-  ])
-  .refine(
-    (formValues) => {
-      if (formValues.pillsDispensed > 0) {
-        return Boolean(formValues.quantityUnits);
-      }
-      return true;
-    },
-    {
-      // t('selectQuantityUnitsErrorMessage', 'Please select quantity unit')
-      message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Please select quantity unit'),
-      path: ['quantityUnits'],
-    },
-  );
+const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(false),
+    freeTextDosage: z.string().optional(),
+  }),
+  z.object({
+    ...schemaFields,
+    isFreeTextDosage: z.literal(true),
+    dosage: z.number().nullable(),
+    unit: z.object({ ...comboSchema }).nullable(),
+    route: z.object({ ...comboSchema }).nullable(),
+    frequency: z.object({ ...comboSchema }).nullable(),
+  }),
+]);
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
@@ -172,6 +173,7 @@ function MedicationInfoHeader({
           </strong>
         </>
       ) : null}{' '}
+      <ExtensionSlot name="medication-info-slot" state={{ order: orderBasketItem }} />
     </div>
   );
 }
@@ -229,7 +231,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -237,7 +239,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
         setValue('quantityUnits', newValue, { shouldValidate: true });
       }
     },
-    [setValue],
+    [setValue, getValues],
   );
 
   const routeValue = watch('route')?.value;
@@ -264,7 +266,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       frequency: data.frequency,
       startDate: data.startDate,
     };
-
     onSave(newBasketItems as DrugOrderBasketItem);
   };
 
@@ -780,7 +781,7 @@ const ControlledFieldInput = ({
       onChange(newValue);
       handleAfterChange?.(newValue, prevValue);
     },
-    [getValues, onChange, handleAfterChange],
+    [getValues, onChange, handleAfterChange, name],
   );
 
   const component = useMemo(() => {
@@ -846,7 +847,7 @@ const ControlledFieldInput = ({
       );
 
     return null;
-  }, [fieldState?.error?.message, onBlur, onChange, ref, restProps, type, value]);
+  }, [fieldState?.error?.message, onBlur, ref, restProps, type, value, handleChange]);
 
   return (
     <>
