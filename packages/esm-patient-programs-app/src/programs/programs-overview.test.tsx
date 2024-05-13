@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockEnrolledProgramsResponse } from '__mocks__';
 
@@ -9,21 +9,6 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsOverview from './programs-overview.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
-  };
-});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -74,11 +59,6 @@ describe('ProgramsOverview', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
-    mockUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockEnrolledProgramsResponse.slice(0, 5),
-    }));
 
     renderProgramsOverview();
 

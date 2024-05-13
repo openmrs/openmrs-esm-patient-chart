@@ -1,11 +1,5 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  registerFeatureFlag,
-  translateFrom,
-} from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
@@ -22,30 +16,21 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-
-  registerWorkspace({
-    name: 'patient-orders-form-workspace',
-    // t('orderCancellation','Order cancellation')
-    title: translateFrom(moduleName, 'orderCancellation', 'Order cancellation'),
-    load: getAsyncLifecycle(() => import('./order-cancellation-form/cancel-order-form.component'), options),
-    type: 'order',
-    canHide: false,
-  });
 }
 
 // t('orderBasketWorkspaceTitle', 'Order Basket')
-registerWorkspace({
-  name: 'order-basket',
-  title: translateFrom(moduleName, 'orderBasketWorkspaceTitle', 'Order Basket'),
-  load: getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options),
-  type: 'order',
-  canHide: true,
-});
+export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
-registerFeatureFlag(
-  'ordersSummary',
-  'Orders Summary',
-  'This feature introduces a navigation on the patient chart left nav called Orders and shows a history of patient orders within patient chart',
+// t('orderCancellation','Order cancellation')
+export const patientOrdersFormWorkspace = getAsyncLifecycle(
+  () => import('./order-cancellation-form/cancel-order-form.component'),
+  options,
+);
+
+// t('enterTestResults', 'Enter test results')
+export const testResultsFormWorkspace = getAsyncLifecycle(
+  () => import('./lab-results/lab-results-form.component'),
+  options,
 );
 
 export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);

@@ -34,7 +34,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
       { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
       { key: 'edit', header: '' },
     ],
-    [t],
+    [t, sequences.length],
   );
 
   const tableRows = existingDoses?.map((dose) => {

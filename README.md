@@ -1,4 +1,4 @@
-:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
+:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
 
 ![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
 
@@ -7,7 +7,6 @@
 The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It contains various microfrontends that constitute widgets in a patient dashboard. These widgets include:
 
 - [Allergies](packages/esm-patient-allergies-app/README.md)
-- [Appointments](packages/esm-patient-appointments-app/README.md)
 - [Attachments](packages/esm-patient-attachments-app/README.md)
 - [Biometrics](packages/esm-patient-biometrics-app/README.md)
 - [Conditions](packages/esm-patient-conditions-app/README.md)
@@ -108,7 +107,7 @@ To run end-to-end tests, run:
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing) to learn more about End-to-End tests in this project.
+Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 

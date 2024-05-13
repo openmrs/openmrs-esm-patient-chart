@@ -11,12 +11,11 @@ import {
   showModal,
   getHistory,
   goBackInHistory,
-  age,
 } from '@openmrs/esm-framework';
-import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -57,7 +56,6 @@ describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
-    registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
       isLoading: false,

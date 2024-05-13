@@ -6020,7 +6020,7 @@ export const formattedVitals = [
     diastolic: 89,
     systolic: 121,
     bmi: null,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '1',
@@ -6034,7 +6034,7 @@ export const formattedVitals = [
     temperature: 37,
     spo2: 90,
     bmi: 23,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '2',
@@ -6042,7 +6042,7 @@ export const formattedVitals = [
     diastolic: 80,
     systolic: 120,
     bmi: null,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '3',
@@ -6053,7 +6053,7 @@ export const formattedVitals = [
     pulse: 78,
     respiratoryRate: 65,
     bmi: 22.6,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
 ];
 

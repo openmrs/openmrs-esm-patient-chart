@@ -35,18 +35,21 @@ import {
   useConnectivity,
   openmrsFetch,
   type FetchResponse,
+  formatDatetime,
+  usePatient,
+  useAbortController,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { type ChartConfig } from '../../config-schema';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { type AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -59,33 +62,44 @@ import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { from } from 'rxjs';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 
-interface StartVisitFormProps extends DefaultWorkspaceProps {
+dayjs.extend(isSameOrBefore);
+
+interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
+  showPatientHeader?: boolean;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
-  patientUuid,
+  patientUuid: initialPatientUuid,
   closeWorkspace,
   promptBeforeClosing,
   visitToEdit,
   showVisitEndDateTimeFields,
+  showPatientHeader = false,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const isOnline = useConnectivity();
   const sessionUser = useSession();
-  const { error: errorFetchingLocations } = isOnline ? useLocations() : { error: false };
+  const { error } = useLocations();
+  const abortController = useAbortController();
+  const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
+  const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
-  const allVisitTypes = isOnline ? useVisitTypes() : useOfflineVisitType();
+  const { mutateAppointments } = useMutateAppointments();
+  const allVisitTypes = useConditionalVisitTypes();
+
   const { mutate } = useVisit(patientUuid);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -119,7 +133,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     );
 
     return z.object({
-      visitStartDate: z.date(),
+      visitStartDate: z.date().refine(
+        (value) => {
+          const today = dayjs();
+          const startDate = dayjs(value);
+          return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
+        },
+        t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
+          firstEncounterDatetime: formatDatetime(new Date()),
+          interpolation: {
+            escapeValue: false,
+          },
+        }),
+      ),
       visitStartTime: z
         .string()
         .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
@@ -171,7 +197,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return defaultValues;
-  }, [visitToEdit]);
+  }, [visitToEdit, sessionLocation]);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -189,7 +215,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
+
+  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
+    if (!visitToEdit?.encounters?.length) {
+      return [null, null];
+    }
+
+    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
+      Date.parse(encounterDatetime),
+    );
+    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
+    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
+    return [maxVisitStartDatetime, minVisitStopDatetime];
+  }, [visitToEdit]);
 
   const validateVisitStartStopDatetime = useCallback(() => {
     let visitStartDate = getValues('visitStartDate');
@@ -250,7 +289,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return validSubmission;
-  }, [setError]);
+  }, [setError, displayVisitStopDateTimeFields, getValues, t, maxVisitStartDatetime, minVisitStopDatetime]);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -381,23 +420,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       if (displayVisitStopDateTimeFields) {
         const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
 
-        payload = {
-          ...payload,
-          stopDatetime: toDateObjectStrict(
-            toOmrsIsoString(
-              new Date(
-                dayjs(visitStopDate).year(),
-                dayjs(visitStopDate).month(),
-                dayjs(visitStopDate).date(),
-                visitStopHours,
-                visitStopMinutes,
-              ),
+        payload.stopDatetime = toDateObjectStrict(
+          toOmrsIsoString(
+            new Date(
+              dayjs(visitStopDate).year(),
+              dayjs(visitStopDate).month(),
+              dayjs(visitStopDate).date(),
+              visitStopHours,
+              visitStopMinutes,
             ),
           ),
-        };
+        );
       }
 
-      const abortController = new AbortController();
       if (config.showExtraVisitAttributesSlot) {
         const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
         payload.attributes.push(...attributes);
@@ -416,11 +451,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 if (config.showServiceQueueFields) {
                   // retrieve values from queue extension
                   setVisitUuid(response.data.uuid);
-                  const queueLocation = event?.target['queueLocation']?.value;
-                  const serviceUuid = event?.target['service']?.value;
-                  const priority = event?.target['priority']?.value;
-                  const status = event?.target['status']?.value;
-                  const sortWeight = event?.target['sortWeight']?.value;
+                  const queueLocation = event.target['queueLocation']?.value;
+                  const serviceUuid = event.target['service']?.value;
+                  const priority = event.target['priority']?.value;
+                  const status = event.target['status']?.value;
+                  const sortWeight = event.target['sortWeight']?.value;
 
                   saveQueueEntry(
                     response.data.uuid,
@@ -429,7 +464,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     priority,
                     status,
                     sortWeight,
-                    new AbortController(),
+                    abortController,
                     queueLocation,
                     visitQueueNumberAttributeUuid,
                   ).then(
@@ -455,29 +490,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     },
                   );
                 }
+
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  const appointmentPayload: AppointmentPayload = {
-                    appointmentKind: upcomingAppointment?.appointmentKind,
-                    serviceUuid: upcomingAppointment?.service.uuid,
-                    startDateTime: upcomingAppointment?.startDateTime,
-                    endDateTime: upcomingAppointment?.endDateTime,
-                    locationUuid: visitLocation?.uuid,
-                    patientUuid: patientUuid,
-                    uuid: upcomingAppointment?.uuid,
-                    dateHonored: dayjs(visitStartDate).format(),
-                  };
-                  saveAppointment(appointmentPayload, abortController).then(
-                    ({ status }) => {
-                      if (status === 201) {
-                        mutateCurrentVisit();
-                        mutateVisits();
-                        showSnackbar({
-                          isLowContrast: true,
-                          kind: 'success',
-                          subtitle: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
-                          title: t('appointmentEdited', 'Appointment edited'),
-                        });
-                      }
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
+                    () => {
+                      mutateCurrentVisit();
+                      mutateVisits();
+                      mutateAppointments();
+                      showSnackbar({
+                        isLowContrast: true,
+                        kind: 'success',
+                        subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
+                      });
                     },
                     (error) => {
                       showSnackbar({
@@ -538,7 +563,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           config.offlineVisitTypeUuid,
           payload.startDatetime,
         ).then(
-          (offlineVisit) => {
+          () => {
             mutate();
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
@@ -563,6 +588,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
     },
     [
+      abortController,
       closeWorkspace,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
@@ -574,21 +600,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       t,
       visitToEdit,
       displayVisitStopDateTimeFields,
+      config.offlineVisitTypeUuid,
+      config.showExtraVisitAttributesSlot,
+      extraVisitInfo,
+      isOnline,
+      mutate,
+      mutateAppointments,
+      mutateQueueEntry,
+      validateVisitStartStopDatetime,
     ],
   );
-
-  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
-    if (!visitToEdit?.encounters?.length) {
-      return [null, null];
-    }
-
-    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
-      Date.parse(encounterDatetime),
-    );
-    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
-    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
-    return [maxVisitStartDatetime, minVisitStopDatetime];
-  }, [visitToEdit]);
 
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
@@ -606,6 +627,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   return (
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {showPatientHeader && patient && (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: patientUuid,
+              hideActionsOverflow: true,
+            }}
+          />
+        )}
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -777,5 +808,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     </FormProvider>
   );
 };
+
+function useConditionalVisitTypes() {
+  const isOnline = useConnectivity();
+
+  const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
+
+  const allVisitTypes = visitTypesHook();
+
+  return allVisitTypes;
+}
 
 export default StartVisitForm;
