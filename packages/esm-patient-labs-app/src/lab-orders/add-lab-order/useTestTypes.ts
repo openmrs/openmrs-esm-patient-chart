@@ -66,10 +66,12 @@ export function useTestTypes(searchTerm: string = ''): UseTestType {
   }, [error]);
 
   const testConcepts = useMemo(() => {
-    return data?.map((concept) => ({
-      label: concept.display,
-      conceptUuid: concept.uuid,
-    }));
+    return data
+      ?.map((concept) => ({
+        label: concept.display,
+        conceptUuid: concept.uuid,
+      }))
+      ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label));
   }, [data]);
 
   const filteredTestTypes = useMemo(() => {

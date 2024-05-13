@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useConnectivity, usePatient } from '@openmrs/esm-framework';
 import {
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   type FormEntryProps,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
-interface FormEntryComponentProps extends DefaultWorkspaceProps {
+interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
   mutateForm: () => void;
   formInfo: FormEntryProps;
 }
 
 const FormEntry: React.FC<FormEntryComponentProps> = ({
   patientUuid,
+  closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  promptBeforeClosing,
   mutateForm,
   formInfo,
 }) => {
@@ -37,8 +39,13 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       encounterUuid: encounterUuid ?? null,
       closeWorkspace: () => {
         typeof mutateForm === 'function' && mutateForm();
+        closeWorkspace();
+      },
+      closeWorkspaceWithSavedChanges: () => {
+        typeof mutateForm === 'function' && mutateForm();
         closeWorkspaceWithSavedChanges();
       },
+      promptBeforeClosing,
       additionalProps,
     }),
     [
@@ -56,7 +63,9 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       patient,
       isOnline,
       mutateForm,
+      closeWorkspace,
       closeWorkspaceWithSavedChanges,
+      promptBeforeClosing,
       additionalProps,
     ],
   );

@@ -67,5 +67,12 @@
       "order": 2
     }
   ],
-  "pages": []
+  "pages": [],
+  "workspaces": [
+    {
+      "name": "patient-vitals-biometrics-form-workspace",
+      "title": "recordVitalsAndBiometrics",
+      "component": "vitalsBiometricsFormWorkspace"
+    }
+  ]
 }

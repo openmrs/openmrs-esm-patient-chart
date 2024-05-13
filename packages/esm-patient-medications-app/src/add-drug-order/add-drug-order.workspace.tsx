@@ -1,6 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import DrugSearch from './drug-search/drug-search.component';
-import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  type DefaultPatientWorkspaceProps,
+  launchPatientWorkspace,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { DrugOrderForm } from './drug-order-form.component';
 import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
@@ -11,7 +15,7 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
 }
 
-export interface AddDrugOrderWorkspace extends DefaultWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
+export interface AddDrugOrderWorkspace extends DefaultPatientWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
 
 export default function AddDrugOrderWorkspace({
   order: initialOrder,

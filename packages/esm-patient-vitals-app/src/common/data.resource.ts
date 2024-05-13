@@ -14,7 +14,7 @@ import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
 import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
-import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.component';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.workspace';
 
 const pageSize = 100;
 
@@ -50,6 +50,11 @@ interface VitalsConceptMetadataResponse {
   results: Array<{
     setMembers: Array<ConceptMetadata>;
   }>;
+}
+
+function getInterpretationKey(header: string) {
+  // Reason for `Render` string is to match the column header in the table
+  return `${header}RenderInterpretation`;
 }
 
 export function useVitalsConceptMetadata() {
@@ -205,13 +210,13 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalsHashTable.set(recordedDate, {
             ...vitalsHashTable.get(recordedDate),
             [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-            [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+            [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
           vitalSign.value &&
             vitalsHashTable.set(recordedDate, {
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-              [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+              [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
         }
 
@@ -230,7 +235,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       }
 
       if (mode === 'both' || mode === 'vitals') {
-        result.bloodPressureInterpretation = interpretBloodPressure(
+        result.bloodPressureRenderInterpretation = interpretBloodPressure(
           vitalSigns.systolic,
           vitalSigns.diastolic,
           concepts,
@@ -304,7 +309,6 @@ export function saveVitalsAndBiometrics(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: VitalsBiometricsFormData,
-  encounterDatetime: Date,
   abortController: AbortController,
   location: string,
 ) {
@@ -316,7 +320,6 @@ export function saveVitalsAndBiometrics(
     signal: abortController.signal,
     body: {
       patient: patientUuid,
-      encounterDatetime: encounterDatetime,
       location: location,
       encounterType: encounterTypeUuid,
       form: formUuid,

@@ -18,6 +18,7 @@
     "src/index.ts",
   ],
   "include": [
+    "../../node_modules/@openmrs/esm-framework/src/declarations.d.ts",
     "src/**/*.d.ts",
   ],
   "exclude": [

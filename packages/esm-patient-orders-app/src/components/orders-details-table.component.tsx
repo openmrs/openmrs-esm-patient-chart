@@ -33,13 +33,13 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  launchPatientWorkspace,
   PatientChartPagination,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
   getDrugOrderByUuid,
+  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
@@ -332,6 +332,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           <div ref={contentToPrintRef}>
             <PrintComponent subheader={title} patientDetails={patientDetails} />
             <DataTable
+              aria-label={t('orderDetails', 'Order details')}
               data-floating-menu-container
               size="sm"
               headers={tableHeaders}

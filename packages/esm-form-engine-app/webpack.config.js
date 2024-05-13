@@ -5,7 +5,6 @@ config.scriptRuleConfig.exclude = /(node_modules(?![\/\\]@(?:openmrs|ohri)))/;
 config.overrides.resolve = {
   extensions: ['.tsx', '.ts', '.jsx', '.js', '.scss'],
   alias: {
-    '@ohri/openmrs-esm-ohri-commons-lib': path.resolve(__dirname, '../esm-commons-lib/src/index'),
     '@openmrs/openmrs-form-engine-lib': '@openmrs/openmrs-form-engine-lib/src/index',
   },
 };

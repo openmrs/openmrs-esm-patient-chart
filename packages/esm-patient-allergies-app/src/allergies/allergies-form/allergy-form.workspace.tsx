@@ -28,7 +28,7 @@ import {
   useLayoutType,
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type Allergen,
   type AllergicReaction,
@@ -66,7 +66,7 @@ type AllergyFormData = {
   comment: string;
 };
 
-interface AllergyFormProps extends DefaultWorkspaceProps {
+interface AllergyFormProps extends DefaultPatientWorkspaceProps {
   allergy?: Allergy;
   formContext: 'creating' | 'editing';
 }

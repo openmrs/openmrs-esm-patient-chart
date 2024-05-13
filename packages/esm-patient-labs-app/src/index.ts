@@ -6,7 +6,7 @@ import {
   messageOmrsServiceWorker,
   translateFrom,
 } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './test-results/dashboard.meta';
 import externalOverviewComponent from './test-results/overview/external-overview.extension';
@@ -50,9 +50,7 @@ export const labOrderPanel = getAsyncLifecycle(
 );
 
 // t('addLabOrderWorkspaceTitle', 'Add lab order')
-registerWorkspace({
-  name: 'add-lab-order',
-  type: 'order',
-  title: translateFrom(moduleName, 'addLabOrderWorkspaceTitle', 'Add lab order'),
-  load: getAsyncLifecycle(() => import('./lab-orders/add-lab-order/add-lab-order.workspace'), options),
-});
+export const addLabOrderWorkspace = getAsyncLifecycle(
+  () => import('./lab-orders/add-lab-order/add-lab-order.workspace'),
+  options,
+);

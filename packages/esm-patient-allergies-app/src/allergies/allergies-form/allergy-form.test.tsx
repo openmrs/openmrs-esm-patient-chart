@@ -11,7 +11,7 @@ import {
   useAllergicReactions,
   updatePatientAllergy,
 } from './allergy-form.resource';
-import AllergyForm from './allergy-form.component';
+import AllergyForm from './allergy-form.workspace';
 import { AllergenType, ReactionSeverity } from '../../types';
 import { mockAllergy } from '__mocks__';
 

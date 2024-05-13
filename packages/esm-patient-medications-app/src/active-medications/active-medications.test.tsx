@@ -1,29 +1,32 @@
 import React from 'react';
-import { openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ActiveMedications from './active-medications.component';
 
+function renderActiveMedications() {
+  mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+  renderWithSwr(<ActiveMedications {...testProps} />);
+}
+
 const testProps = {
   patientUuid: mockPatient.id,
 };
 const mockUseSession = useSession as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-function renderActiveMedications() {
-  mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-
-  renderWithSwr(<ActiveMedications {...testProps} />);
-}
-
-const mockLaunchPatientWorkspace = jest.fn();
+const mockLaunchWorkspace = launchWorkspace as jest.Mock;
+const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+  return () => mockLaunchWorkspace(name);
+});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
-    launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
+    useLaunchWorkspaceRequiringVisit: (...args) => mockUseLaunchWorkspaceRequiringVisit(...args),
     useWorkspaces: jest.fn(() => {
       return { workspaces: [{ name: 'order-basket' }] };
     }),
@@ -35,9 +38,10 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
 describe('ActiveMedications: ', () => {
+  beforeEach(() => {
+    mockLaunchWorkspace.mockClear();
+  });
   test('renders an empty state view when there are no active medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
@@ -113,7 +117,7 @@ test('clicking the Record active medications link opens the order basket form', 
   await waitForLoadingToFinish();
   const orderLink = await screen.getByText('Record active medications');
   fireEvent.click(orderLink);
-  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });
 
 test('clicking the Add button opens the order basket form', async () => {
@@ -122,5 +126,5 @@ test('clicking the Add button opens the order basket form', async () => {
   await waitForLoadingToFinish();
   const button = await screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
-  expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('add-drug-order', undefined);
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });

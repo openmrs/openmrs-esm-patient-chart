@@ -16,11 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { CardHeader, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  type Order,
+  useOrderBasket,
+  useLaunchWorkspaceRequiringVisit,
+} from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';

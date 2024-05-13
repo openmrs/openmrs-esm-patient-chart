@@ -6,7 +6,7 @@ import useFormSchema from '../hooks/useFormSchema';
 const mockUseFormSchema = useFormSchema as jest.Mock;
 
 jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
-  OHRIForm: jest
+  FormEngine: jest
     .fn()
     .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
 }));

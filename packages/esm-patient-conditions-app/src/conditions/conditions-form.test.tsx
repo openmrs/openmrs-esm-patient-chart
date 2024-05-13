@@ -6,7 +6,7 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
-import ConditionsForm from './conditions-form.component';
+import ConditionsForm from './conditions-form.workspace';
 
 jest.mock('zod', () => {
   const originalModule = jest.requireActual('zod');

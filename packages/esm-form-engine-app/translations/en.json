@@ -1,8 +1,11 @@
 {
   "closeThisPanel": "Close this panel",
+  "collapseAll": "Collapse all",
   "errorTitle": "There was an error with this form",
+  "expandAll": "Expand all",
   "loading": "Loading",
   "or": "or",
   "thisList": "this list",
+  "toggleCollapseOrExpand": "Toggle collapse or expand",
   "tryAgainMessage": "Try opening another form from"
 }

@@ -264,7 +264,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       frequency: data.frequency,
       startDate: data.startDate,
     };
-
     onSave(newBasketItems as DrugOrderBasketItem);
   };
 
