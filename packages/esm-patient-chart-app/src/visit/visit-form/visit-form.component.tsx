@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -14,30 +14,29 @@ import {
   Switch,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { first } from 'rxjs/operators';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ExtensionSlot,
+  formatDatetime,
+  type NewVisitPayload,
+  openmrsFetch,
   saveVisit,
   showSnackbar,
-  useSession,
-  ExtensionSlot,
-  type NewVisitPayload,
-  toOmrsIsoString,
   toDateObjectStrict,
-  useLayoutType,
-  useVisitTypes,
-  useConfig,
-  useVisit,
-  type Visit,
+  toOmrsIsoString,
   updateVisit,
-  useConnectivity,
-  openmrsFetch,
-  type FetchResponse,
-  formatDatetime,
-  usePatient,
   useAbortController,
+  useConfig,
+  useConnectivity,
+  useLayoutType,
+  usePatient,
+  useSession,
+  useVisit,
+  useVisitTypes,
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -370,7 +369,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
       return Promise.all(promises);
     },
-    [visitToEdit, visitAttributeTypes],
+    [visitToEdit, t, visitAttributeTypes],
   );
 
   const onSubmit = useCallback(
@@ -471,7 +470,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     ({ status }) => {
                       if (status === 201) {
                         mutateCurrentVisit();
-                        mutateVisits();
+                        mutateVisits().then();
                         mutateQueueEntry();
                         showSnackbar({
                           kind: 'success',
@@ -495,8 +494,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
                     () => {
                       mutateCurrentVisit();
-                      mutateVisits();
-                      mutateAppointments();
+                      mutateVisits().then();
+                      mutateAppointments().then();
                       showSnackbar({
                         isLowContrast: true,
                         kind: 'success',
@@ -525,7 +524,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   // then continue and close workspace
                   if (!attributesResponses.includes(undefined)) {
                     mutateCurrentVisit();
-                    mutateVisits();
+                    mutateVisits().then();
                     closeWorkspace({ ignoreChanges: true });
                     showSnackbar({
                       isLowContrast: true,
@@ -607,6 +606,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutate,
       mutateAppointments,
       mutateQueueEntry,
+      handleVisitAttributes,
       validateVisitStartStopDatetime,
     ],
   );
@@ -700,7 +700,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     render={({ field: { onChange } }) => (
                       <RadioButtonGroup
                         orientation="vertical"
-                        onChange={(uuid) =>
+                        onChange={(uuid: string) =>
                           onChange(activePatientEnrollment.find(({ program }) => program.uuid === uuid)?.uuid)
                         }
                         name="program-type-radio-group"
@@ -814,9 +814,7 @@ function useConditionalVisitTypes() {
 
   const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
 
-  const allVisitTypes = visitTypesHook();
-
-  return allVisitTypes;
+  return visitTypesHook();
 }
 
 export default StartVisitForm;
