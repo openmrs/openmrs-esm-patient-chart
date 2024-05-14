@@ -5,16 +5,10 @@ import {
   openmrsFetch,
   type OpenmrsResource,
   parseDate,
-  type Visit,
   restBaseUrl,
+  type Visit,
 } from '@openmrs/esm-framework';
-import {
-  type OrderPost,
-  useVisitOrOfflineVisit,
-  useSystemVisitSetting,
-  getPatientUuidFromUrl,
-  type OrderBasketItem,
-} from '@openmrs/esm-patient-common-lib';
+import { type OrderPost, useSystemVisitSetting, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderBasketStore, type OrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -55,7 +49,7 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
   );
 }
 
-export function createEmptyEncounter(
+export function saveOrdersWithNewEncounter(
   patientUuid: string,
   orderEncounterType: string,
   activeVisit: Visit | null,

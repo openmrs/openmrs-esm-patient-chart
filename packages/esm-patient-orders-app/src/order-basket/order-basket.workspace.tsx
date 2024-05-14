@@ -4,14 +4,14 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
+  type OrderBasketItem,
   type DefaultPatientWorkspaceProps,
   postOrders,
   useOrderBasket,
   useVisitOrOfflineVisit,
-  type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
+import { saveOrdersWithNewEncounter, useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
@@ -57,7 +57,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     // If there's no encounter present, create an encounter along with the orders.
     if (!orderEncounterUuid) {
       try {
-        orderEncounterUuid = await createEmptyEncounter(
+        await saveOrdersWithNewEncounter(
           patientUuid,
           config?.orderEncounterType,
           activeVisitRequired ? activeVisit : null,
