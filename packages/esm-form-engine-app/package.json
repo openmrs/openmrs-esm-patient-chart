@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "7.1.0",
+  "version": "8.0.0",
   "license": "MPL-2.0",
   "description": "Forms engine microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-engine-app.js",
