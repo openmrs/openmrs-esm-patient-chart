@@ -304,10 +304,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     [orderConfigObject, config?.daysDurationUnit],
   );
 
-  const orderFrequencies: Array<MedicationFrequency> = useMemo(
-    () => orderConfigObject?.orderFrequencies ?? [],
-    [orderConfigObject],
-  );
+  const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
+    return orderConfigObject?.orderFrequencies ?? [];
+  }, [orderConfigObject]);
+
+  const filterItems = useCallback((menu) => {
+    if (menu?.inputValue?.length) {
+      return menu.item?.names?.some((abbr: string) => abbr.toLowerCase().includes(menu.inputValue.toLowerCase()));
+    }
+    return menu?.item?.names ?? [];
+  }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
@@ -479,6 +485,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         size={isTablet ? 'lg' : 'md'}
                         id="editFrequency"
                         items={orderFrequencies}
+                        shouldFilterItem={filterItems}
                         placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                         titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                         itemToString={(item) => item?.value}
@@ -768,6 +775,8 @@ const ControlledFieldInput = ({
   control,
   getValues,
   handleAfterChange,
+  optionsWithAbbreviations,
+  orderFrequencies,
   ...restProps
 }: ControlledFieldInputProps) => {
   const {
