@@ -34,6 +34,8 @@ import {
   updateVisit,
   useConnectivity,
   formatDatetime,
+  usePatient,
+  useAbortController,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -64,23 +66,27 @@ dayjs.extend(isSameOrBefore);
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   visitToEdit?: Visit;
   showVisitEndDateTimeFields: boolean;
+  showPatientHeader?: boolean;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
-  patientUuid,
+  patientUuid: initialPatientUuid,
   closeWorkspace,
   promptBeforeClosing,
   visitToEdit,
   showVisitEndDateTimeFields,
+  showPatientHeader = false,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const isOnline = useConnectivity();
   const sessionUser = useSession();
   const { error } = useLocations();
+  const abortController = useAbortController();
   const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
+  const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
@@ -318,10 +324,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         visitType: visitType,
         location: visitLocation?.uuid,
         attributes: Object.entries(visitAttributes)
-          .filter(([key, value]) => !!value)
+          .filter(([, value]) => !!value)
           .map(([key, value]) => ({
             attributeType: key,
-            value: value as string,
+            value: value,
           })),
       };
       if (visitToEdit?.uuid) {
@@ -332,23 +338,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       if (displayVisitStopDateTimeFields) {
         const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
 
-        payload = {
-          ...payload,
-          stopDatetime: toDateObjectStrict(
-            toOmrsIsoString(
-              new Date(
-                dayjs(visitStopDate).year(),
-                dayjs(visitStopDate).month(),
-                dayjs(visitStopDate).date(),
-                visitStopHours,
-                visitStopMinutes,
-              ),
+        payload.stopDatetime = toDateObjectStrict(
+          toOmrsIsoString(
+            new Date(
+              dayjs(visitStopDate).year(),
+              dayjs(visitStopDate).month(),
+              dayjs(visitStopDate).date(),
+              visitStopHours,
+              visitStopMinutes,
             ),
           ),
-        };
+        );
       }
 
-      const abortController = new AbortController();
       if (config.showExtraVisitAttributesSlot) {
         const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
         payload.attributes.push(...attributes);
@@ -367,11 +369,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 if (config.showServiceQueueFields) {
                   // retrieve values from queue extension
                   setVisitUuid(response.data.uuid);
-                  const queueLocation = event?.target['queueLocation']?.value;
-                  const serviceUuid = event?.target['service']?.value;
-                  const priority = event?.target['priority']?.value;
-                  const status = event?.target['status']?.value;
-                  const sortWeight = event?.target['sortWeight']?.value;
+                  const queueLocation = event.target['queueLocation']?.value;
+                  const serviceUuid = event.target['service']?.value;
+                  const priority = event.target['priority']?.value;
+                  const status = event.target['status']?.value;
+                  const sortWeight = event.target['sortWeight']?.value;
 
                   saveQueueEntry(
                     response.data.uuid,
@@ -380,7 +382,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     priority,
                     status,
                     sortWeight,
-                    new AbortController(),
+                    abortController,
                     queueLocation,
                     visitQueueNumberAttributeUuid,
                   ).then(
@@ -406,8 +408,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     },
                   );
                 }
+
                 if (config.showUpcomingAppointments && upcomingAppointment) {
-                  updateAppointmentStatus('CheckedIn', upcomingAppointment?.uuid, abortController).then(
+                  updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
                     () => {
                       mutateCurrentVisit();
                       mutateVisits();
@@ -468,7 +471,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           config.offlineVisitTypeUuid,
           payload.startDatetime,
         ).then(
-          (offlineVisit) => {
+          () => {
             mutate();
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
@@ -493,6 +496,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
     },
     [
+      abortController,
       closeWorkspace,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
@@ -531,6 +535,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   return (
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {showPatientHeader && patient && (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: patientUuid,
+              hideActionsOverflow: true,
+            }}
+          />
+        )}
         {errorFetchingResources && (
           <InlineNotification
             kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}

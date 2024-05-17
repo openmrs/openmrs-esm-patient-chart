@@ -47,6 +47,7 @@ jest.mock('@openmrs/esm-framework', () => {
     useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
+    usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
   };
 });
 
@@ -215,7 +216,7 @@ describe('Visit Form', () => {
         patient: mockPatient.id,
         visitType: 'some-uuid1',
       }),
-      new AbortController(),
+      expect.any(Function),
     );
 
     expect(showSnackbar).toHaveBeenCalledTimes(1);
