@@ -306,12 +306,12 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     return orderConfigObject?.orderFrequencies ?? [];
   }, [orderConfigObject]);
 
-  const filterItems = useMemo(
-    () => (menu) => {
-      return menu?.item?.names?.some((abbr) => abbr.toLowerCase().includes(menu?.inputValue?.toLowerCase()));
-    },
-    [],
-  );
+  const filterItems = useCallback((menu) => {
+    if (menu?.inputValue?.length) {
+      return menu.item?.names?.some((abbr: string) => abbr.toLowerCase().includes(menu.inputValue.toLowerCase()));
+    }
+    return menu?.item?.names ?? [];
+  }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
