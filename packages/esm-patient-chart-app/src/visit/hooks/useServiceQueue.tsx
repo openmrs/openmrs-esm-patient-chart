@@ -7,12 +7,12 @@ export async function saveQueueEntry(
   priority: string,
   status: string,
   sortWeight: number,
+  abortController: AbortController,
   locationUuid: string,
   visitQueueNumberAttributeUuid: string,
-  abortController?: AbortController,
 ) {
   await Promise.all([
-    generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, visitQueueNumberAttributeUuid, abortController),
+    generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, abortController, visitQueueNumberAttributeUuid),
   ]);
 
   return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
@@ -20,6 +20,7 @@ export async function saveQueueEntry(
     headers: {
       'Content-Type': 'application/json',
     },
+    signal: abortController.signal,
     body: {
       visit: { uuid: visitUuid },
       queueEntry: {
@@ -39,7 +40,6 @@ export async function saveQueueEntry(
         sortWeight: sortWeight,
       },
     },
-    signal: abortController?.signal,
   });
 }
 
@@ -47,12 +47,18 @@ export async function generateVisitQueueNumber(
   location: string,
   visitUuid: string,
   queueUuid: string,
+  abortController: AbortController,
   visitQueueNumberAttributeUuid: string,
-  abortController?: AbortController,
 ) {
   await openmrsFetch(
     `${restBaseUrl}/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
-    { signal: abortController?.signal },
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortController.signal,
+    },
   );
 }
 
