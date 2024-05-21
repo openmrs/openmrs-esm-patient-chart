@@ -12,12 +12,12 @@
 }
 
 .heading {
-  @include type.type-style("heading-03");
+  @include type.type-style('heading-03');
   margin: spacing.$spacing-05;
 }
 
 .sectionTitle {
-  @include type.type-style("heading-compact-02");
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin: 0 0 spacing.$spacing-03 0;
 }
@@ -44,8 +44,13 @@
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: start;
   height: var(--desktop-workspace-window-height);
+}
+
+.buttonSet {
+  margin-top: auto;
+  justify-self: end;
 }
 
 .button {
@@ -82,7 +87,7 @@
 }
 
 .label {
-  @include type.type-style("label-01");
+  @include type.type-style('label-01');
   color: $text-02;
 }
 

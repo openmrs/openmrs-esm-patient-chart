@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { first } from 'rxjs/operators';
+import { first } from 'rxjs';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -35,7 +35,6 @@ import {
   useConnectivity,
   formatDatetime,
   usePatient,
-  useAbortController,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -60,6 +59,7 @@ import { useVisits } from '../visits-widget/visit.resource';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
+import classNames from 'classnames';
 
 dayjs.extend(isSameOrBefore);
 
@@ -82,7 +82,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const isOnline = useConnectivity();
   const sessionUser = useSession();
   const { error } = useLocations();
-  const abortController = useAbortController();
   const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
   const config = useConfig() as ChartConfig;
@@ -351,6 +350,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         );
       }
 
+      const abortController = new AbortController();
+
       if (config.showExtraVisitAttributesSlot) {
         const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
         payload.attributes.push(...attributes);
@@ -382,9 +383,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     priority,
                     status,
                     sortWeight,
-                    abortController,
                     queueLocation,
                     visitQueueNumberAttributeUuid,
+                    abortController,
                   ).then(
                     ({ status }) => {
                       if (status === 201) {
@@ -483,7 +484,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               title: t('visitStarted', 'Visit started'),
             });
           },
-          (error) => {
+          (error: Error) => {
             showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
@@ -496,7 +497,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       }
     },
     [
-      abortController,
       closeWorkspace,
       config.showServiceQueueFields,
       config.showUpcomingAppointments,
@@ -699,7 +699,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             )}
           </Stack>
         </div>
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <ButtonSet
+          className={classNames({
+            [styles.tablet]: isTablet,
+            [styles.desktop]: !isTablet,
+            [styles.buttonSet]: true,
+          })}
+        >
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
