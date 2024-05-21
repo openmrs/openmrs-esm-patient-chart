@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { first } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
