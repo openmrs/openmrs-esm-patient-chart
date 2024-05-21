@@ -216,7 +216,7 @@ describe('Visit Form', () => {
         patient: mockPatient.id,
         visitType: 'some-uuid1',
       }),
-      expect.any(Function),
+      expect.any(Object),
     );
 
     expect(showSnackbar).toHaveBeenCalledTimes(1);
