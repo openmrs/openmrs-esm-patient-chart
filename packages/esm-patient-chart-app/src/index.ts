@@ -1,5 +1,4 @@
 import {
-  registerBreadcrumbs,
   defineConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
@@ -9,7 +8,7 @@ import {
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
-import { moduleName, spaBasePath } from './constants';
+import { moduleName } from './constants';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
@@ -44,42 +43,6 @@ export function startupApp() {
   defineConfigSchema(moduleName, esmPatientChartSchema);
   defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
-
-  /**
-   * This comment tells i18n to still keep the following translation keys (DO NOT DELETE THESE):
-   *
-   * t('patientBreadcrumb', 'Patient')
-   * t('Patient Summary dashboard', 'Patient Summary dashboard')
-   * t('Allergies dashboard', 'Allergies dashboard')
-   * t('Appointments dashboard', 'Appointments dashboard')
-   * t('Vitals & Biometrics dashboard', 'Vitals & Biometrics dashboard')
-   * t('Medications dashboard', 'Medications dashboard')
-   * t('Visits dashboard', 'Visits dashboard')
-   * t('Conditions dashboard', 'Conditions dashboard')
-   * t('Attachments dashboard', 'Attachments dashboard')
-   * t('Programs dashboard', 'Programs dashboard')
-   * t('Offline Actions dashboard', 'Offline Actions dashboard')
-   * t('Forms & Notes dashboard', 'Forms & Notes dashboard')
-   * t('Results Viewer dashboard', 'Results Viewer dashboard')
-   */
-  registerBreadcrumbs([
-    {
-      path: spaBasePath,
-      title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
-      parent: `${window.spaBase}/home`,
-    },
-    {
-      path: `${spaBasePath}/:view`,
-      title: ([_, key]) =>
-        Promise.resolve(
-          window.i18next.t(`${decodeURIComponent(key)} dashboard`, {
-            ns: moduleName,
-            defaultValue: `${decodeURIComponent(key)} dashboard`,
-          }),
-        ),
-      parent: spaBasePath,
-    },
-  ]);
 
   registerFeatureFlag(
     'rde',
