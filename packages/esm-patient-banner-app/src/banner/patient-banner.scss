@@ -15,7 +15,7 @@
 .buttonCol {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-end;
 }
 
@@ -80,7 +80,7 @@
 
   .row {
     &:first-child {
-    border-bottom: 1px solid $ui-03;
+      border-bottom: 1px solid $ui-03;
     }
   }
 

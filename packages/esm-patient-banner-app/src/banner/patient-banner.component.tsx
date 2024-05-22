@@ -65,13 +65,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               isDeceased={patient.deceasedBoolean}
             />
           ) : null}
-          <PatientBannerToggleContactDetailsButton
-            className={styles.toggleContactDetailsButton}
-            toggleContactDetails={toggleContactDetails}
-            showContactDetails={showContactDetails}
-          />
         </div>
       </div>
+      <PatientBannerToggleContactDetailsButton
+        className={styles.toggleContactDetailsButton}
+        toggleContactDetails={toggleContactDetails}
+        showContactDetails={showContactDetails}
+      />
       {showContactDetails && (
         <div
           className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
