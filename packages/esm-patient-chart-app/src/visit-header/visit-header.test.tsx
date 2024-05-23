@@ -75,7 +75,7 @@ describe('Visit Header', () => {
     const homeLink = screen.getByRole('link');
     expect(hamburgerButton).toBeInTheDocument();
     expect(homeLink).toBeInTheDocument();
-    expect(homeLink).toHaveAttribute('href', '${openmrsSpaBase}/home');
+    expect(homeLink).toHaveAttribute('href', '/openmrs/spa/home');
 
     // Should display the leftNavMenu
     await user.click(hamburgerButton);
