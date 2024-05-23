@@ -54,9 +54,8 @@
 }
 
 .imgThumbnailContainer {
-  height: 5rem;
+  height: 6rem;
   width: 6rem;
-  margin-top: spacing.$spacing-04;
 }
 
 .imgThumbnail {
@@ -65,12 +64,45 @@
   object-fit: cover;
 }
 
+.imgThumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: spacing.$spacing-05;
+}
+
+.imgThumbnailItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 1rem;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  padding-block-start: 0;
+}
+
+.closeIcon {
+  fill: white !important;
+}
+
 .button {
   height: 4rem;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+}
+
+.spinner {
+  min-height: 1rem;
 }
 
 .tablet {
@@ -120,16 +152,17 @@
 
 .errorMessage {
   color: $danger;
+  margin-top: spacing.$spacing-03;
 }
 
 .diagnosisErrorOutline{
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger
+    outline: 2.5px solid $danger;
   }
 
   :global(.cds--search-magnifier) {
     svg {
-      fill: $danger
+      fill: $danger;
     }
   }
 }

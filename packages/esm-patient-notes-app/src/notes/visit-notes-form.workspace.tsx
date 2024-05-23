@@ -1,4 +1,5 @@
-import React, { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import classnames from 'classnames';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
 import { useTranslation, type TFunction } from 'react-i18next';
@@ -14,6 +15,7 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   Row,
   Search,
@@ -23,9 +25,8 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, WarningFilled } from '@carbon/react/icons';
+import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
 import {
-  type UploadedFile,
   createAttachment,
   createErrorHandler,
   ExtensionSlot,
@@ -33,11 +34,12 @@ import {
   restBaseUrl,
   showModal,
   showSnackbar,
+  type UploadedFile,
   useConfig,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -49,19 +51,9 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-const allowedImageTypes = ['jpeg', 'jpg', 'png', 'webp'];
-
-const visitNoteFormSchema = z.object({
-  noteDate: z.date(),
-  primaryDiagnosisSearch: z.string({
-    required_error: 'Choose at least one primary diagnosis',
-  }),
-  secondaryDiagnosisSearch: z.string().optional(),
-  clinicalNote: z.string().optional(),
-  image: z.any(),
-});
-
-type VisitNotesFormData = z.infer<typeof visitNoteFormSchema>;
+type VisitNotesFormData = Omit<z.infer<typeof visitNoteFormSchema>, 'images'> & {
+  images?: UploadedFile[];
+};
 
 interface DiagnosesDisplayProps {
   fieldName: string;
@@ -84,6 +76,28 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
+const visitNoteFormSchema = z.object({
+  noteDate: z.date(),
+  primaryDiagnosisSearch: z.string({
+    required_error: 'Choose at least one primary diagnosis',
+  }),
+  secondaryDiagnosisSearch: z.string().optional(),
+  clinicalNote: z.string().optional(),
+  images: z
+    .array(
+      z.object({
+        base64Content: z.string(),
+        file: z.custom<File>((value) => value instanceof File, {
+          message: 'Invalid file',
+        }),
+        fileDescription: z.string().optional(),
+        fileName: z.string(),
+        fileType: z.string(),
+      }),
+    )
+    .optional(),
+});
+
 const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
@@ -95,10 +109,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const config = useConfig<ConfigObject>();
-  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
-  const [isHandlingSubmit, setIsHandlingSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
   const [isLoadingSecondaryDiagnoses, setIsLoadingSecondaryDiagnoses] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -109,6 +123,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
+  const { allowedFileExtensions } = useAllowedFileExtensions();
 
   const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
@@ -124,22 +139,15 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  const currentImage = watch('image');
+  const currentImages = watch('images');
+
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutateVisits } = useInfiniteVisits(patientUuid);
-
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
+
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
-
-  const handleSearch = (fieldName) => {
-    const fieldQuery = watch(fieldName);
-    if (fieldQuery) {
-      debouncedSearch(fieldQuery, fieldName);
-    }
-    setIsSearching(false);
-  };
 
   const debouncedSearch = useMemo(
     () =>
@@ -153,10 +161,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
           fetchDiagnosisConceptsByName(fieldQuery, config.diagnosisConceptClass)
             .then((matchingConceptDiagnoses: Array<Concept>) => {
-              if (fieldName == 'primaryDiagnosisSearch') {
+              if (fieldName === 'primaryDiagnosisSearch') {
                 setSearchPrimaryResults(matchingConceptDiagnoses);
                 setIsLoadingPrimaryDiagnoses(false);
-              } else if (fieldName == 'secondaryDiagnosisSearch') {
+              } else if (fieldName === 'secondaryDiagnosisSearch') {
                 setSearchSecondaryResults(matchingConceptDiagnoses);
                 setIsLoadingSecondaryDiagnoses(false);
               }
@@ -170,14 +178,25 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     [config.diagnosisConceptClass],
   );
 
+  const handleSearch = useCallback(
+    (fieldName) => {
+      const fieldQuery = watch(fieldName);
+      if (fieldQuery) {
+        debouncedSearch(fieldQuery, fieldName);
+      }
+      setIsSearching(false);
+    },
+    [debouncedSearch, watch],
+  );
+
   const handleAddDiagnosis = (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
     let newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
-    if (searchInputField == 'primaryDiagnosisSearch') {
+    if (searchInputField === 'primaryDiagnosisSearch') {
       newDiagnosis.rank = 1;
       setValue('primaryDiagnosisSearch', '');
       setSearchPrimaryResults([]);
       setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
-    } else if (searchInputField == 'secondaryDiagnosisSearch') {
+    } else if (searchInputField === 'secondaryDiagnosisSearch') {
       setValue('secondaryDiagnosisSearch', '');
       setSearchSecondaryResults([]);
       setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
@@ -186,11 +205,11 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
-    if (searchInputField == 'primaryInputSearch') {
+    if (searchInputField === 'primaryInputSearch') {
       setSelectedPrimaryDiagnoses(
         selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
       );
-    } else if (searchInputField == 'secondaryInputSearch') {
+    } else if (searchInputField === 'secondaryInputSearch') {
       setSelectedSecondaryDiagnoses(
         selectedSecondaryDiagnoses.filter(
           (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
@@ -213,41 +232,57 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
   };
 
-  const createDiagnosis = (concept: Concept) => {
-    return {
-      patient: patientUuid,
-      diagnosis: {
-        coded: concept.uuid,
-      },
-      rank: 2,
-      certainty: 'PROVISIONAL',
-      display: concept.display,
-    };
-  };
+  const createDiagnosis = (concept: Concept) => ({
+    certainty: 'PROVISIONAL',
+    display: concept.display,
+    diagnosis: {
+      coded: concept.uuid,
+    },
+    patient: patientUuid,
+    rank: 2,
+  });
 
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
-        setValue('image', file);
+        if (file) {
+          setValue('images', currentImages ? [...currentImages, file] : [file]);
+        }
+
         close();
         return Promise.resolve();
       },
       closeModal: () => {
         close();
       },
-      allowedExtensions: allowedImageTypes,
-      multipleFiles: false,
-      collectDescription: false,
+      allowedExtensions:
+        allowedFileExtensions && Array.isArray(allowedFileExtensions)
+          ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
+          : [],
+      multipleFiles: true,
+      collectDescription: true,
     });
-  }, [setValue]);
+  }, [allowedFileExtensions, currentImages, setValue]);
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = [...currentImages];
+    updatedImages.splice(index, 1);
+    setValue('images', updatedImages);
+
+    showSnackbar({
+      title: t('imageRemoved', 'Image removed'),
+      kind: 'success',
+      isLowContrast: true,
+    });
+  };
 
   const onSubmit = useCallback(
-    (data: VisitNotesFormData, event: SyntheticEvent) => {
-      const { noteDate, clinicalNote } = data;
-      setIsHandlingSubmit(true);
+    (data: VisitNotesFormData) => {
+      const { noteDate, clinicalNote, images } = data;
+      setIsSubmitting(true);
 
       if (!selectedPrimaryDiagnoses.length) {
-        setIsHandlingSubmit(false);
+        setIsSubmitting(false);
         return;
       }
 
@@ -257,7 +292,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         finalNoteDate = null;
       }
 
-      let visitNotePayload: VisitNotePayload = {
+      const visitNotePayload: VisitNotePayload = {
         encounterDatetime: finalNoteDate?.format(),
         form: formConceptUuid,
         patient: patientUuid,
@@ -275,12 +310,13 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       };
 
       const abortController = new AbortController();
+
       saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
             return Promise.all(
               combinedDiagnoses.map((diagnosis, position: number) => {
-                const diagnosisPayload: DiagnosisPayload = {
+                const diagnosesPayload: DiagnosisPayload = {
                   encounter: response.data.uuid,
                   patient: patientUuid,
                   condition: null,
@@ -290,27 +326,42 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   certainty: diagnosis.certainty,
                   rank: diagnosis.rank,
                 };
-                return savePatientDiagnosis(abortController, diagnosisPayload);
+                return savePatientDiagnosis(abortController, diagnosesPayload);
               }),
             );
           }
         })
         .then(() => {
-          if (data.image) {
-            return createAttachment(patientUuid, data.image);
+          if (images?.length) {
+            return Promise.all(
+              images.map((image) => {
+                const imageToUpload: UploadedFile = {
+                  base64Content: image.base64Content,
+                  file: image.file,
+                  fileName: image.fileName,
+                  fileType: image.fileType,
+                  fileDescription: image.fileDescription || '',
+                };
+                return createAttachment(patientUuid, imageToUpload);
+              }),
+            );
+          } else {
+            return Promise.resolve([]);
           }
         })
         .then(() => {
           mutateVisitNotes();
           mutateVisits();
-          if (data.image) {
+
+          if (images?.length) {
             mutateAttachments();
           }
+
           closeWorkspaceWithSavedChanges();
 
           showSnackbar({
             isLowContrast: true,
-            subtitle: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
+            subtitle: t('visitNoteNowVisible', 'It is now visible on the Visits page'),
             kind: 'success',
             title: t('visitNoteSaved', 'Visit note saved'),
           });
@@ -326,24 +377,23 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           });
         })
         .finally(() => {
-          setIsHandlingSubmit(false);
-          abortController.abort();
+          setIsSubmitting(false);
         });
     },
     [
-      selectedPrimaryDiagnoses.length,
-      formConceptUuid,
-      patientUuid,
-      locationUuid,
       clinicianEncounterRole,
-      providerUuid,
-      encounterTypeUuid,
-      encounterNoteTextConceptUuid,
-      combinedDiagnoses,
-      mutateVisitNotes,
       closeWorkspaceWithSavedChanges,
-      t,
+      combinedDiagnoses,
+      encounterNoteTextConceptUuid,
+      encounterTypeUuid,
+      formConceptUuid,
+      locationUuid,
+      mutateVisitNotes,
       mutateVisits,
+      patientUuid,
+      providerUuid,
+      selectedPrimaryDiagnoses.length,
+      t,
     ],
   );
 
@@ -353,7 +403,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       {isTablet && (
         <Row className={styles.headerGridRow}>
-          <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+          <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
         </Row>
       )}
       <Stack className={styles.formContainer} gap={2}>
@@ -531,57 +581,53 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup legendText="">
+            <FormGroup>
               <p className={styles.imgUploadHelperText}>
-                {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
+                {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
               </p>
-              {currentImage?.base64Content ? (
-                <Button
-                  className={styles.uploadButton}
-                  kind={isTablet ? 'ghost' : 'tertiary'}
-                  onClick={() => showImageCaptureModal()}
-                  renderIcon={(props) => <Edit size={16} {...props} />}
-                >
-                  {t('changeImage', 'Change image')}
-                </Button>
-              ) : (
-                <Button
-                  className={styles.uploadButton}
-                  kind={isTablet ? 'ghost' : 'tertiary'}
-                  onClick={() => showImageCaptureModal()}
-                  renderIcon={(props) => <Add size={16} {...props} />}
-                >
-                  {t('addImage', 'Add image')}
-                </Button>
-              )}
-              {currentImage?.base64Content && currentImage?.fileType == 'image' ? (
-                <div className={styles.imgThumbnailContainer}>
-                  <img src={currentImage.base64Content} className={styles.imgThumbnail} />
-                </div>
-              ) : null}
+              <Button
+                className={styles.uploadButton}
+                kind="ghost"
+                onClick={showImageCaptureModal}
+                renderIcon={(props) => <Add size={16} {...props} />}
+              >
+                {t('addImage', 'Add image')}
+              </Button>
+              <div className={styles.imgThumbnailGrid}>
+                {currentImages?.map((image, index) => (
+                  <div key={index} className={styles.imgThumbnailItem}>
+                    <div className={styles.imgThumbnailContainer}>
+                      <img
+                        className={styles.imgThumbnail}
+                        src={image.base64Content}
+                        alt={image.fileDescription ?? image.fileName}
+                      />
+                    </div>
+                    <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
+                      <CloseFilled size={16} className={styles.closeIcon} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </FormGroup>
           </Column>
         </Row>
       </Stack>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          onClick={handleSubmit}
-          disabled={isHandlingSubmit}
-          type="submit"
-        >
-          {t('saveAndClose', 'Save and close')}
+        <Button className={styles.button} kind="primary" onClick={handleSubmit} disabled={isSubmitting} type="submit">
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('saveAndClose', 'Save and close')}</span>
+          )}
         </Button>
       </ButtonSet>
     </Form>
   );
 };
-
-export default VisitNotesForm;
 
 function DiagnosisSearch({
   name,
@@ -629,7 +675,7 @@ function DiagnosisSearch({
               onBlur={onBlur}
             />
           </ResponsiveWrapper>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
+          {fieldState?.error?.message && <p className={styles.errorMessage}>{fieldState?.error?.message}</p>}
         </>
       )}
     />
@@ -691,11 +737,11 @@ function DiagnosesDisplay({
 function Loader() {
   return (
     <>
-      <SkeletonText className={styles.skeleton} />
-      <SkeletonText className={styles.skeleton} />
-      <SkeletonText className={styles.skeleton} />
-      <SkeletonText className={styles.skeleton} />
-      <SkeletonText className={styles.skeleton} />
+      {Array.from({ length: 5 }).map((_, index) => (
+        <SkeletonText key={index} className={styles.skeleton} />
+      ))}
     </>
   );
 }
+
+export default VisitNotesForm;
