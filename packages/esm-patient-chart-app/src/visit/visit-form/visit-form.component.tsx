@@ -28,7 +28,6 @@ import {
   toDateObjectStrict,
   toOmrsIsoString,
   updateVisit,
-  useAbortController,
   useConfig,
   useConnectivity,
   useLayoutType,
@@ -472,7 +471,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     ({ status }) => {
                       if (status === 201) {
                         mutateCurrentVisit();
-                        mutateVisits().then();
+                        mutateVisits();
                         mutateQueueEntry();
                         showSnackbar({
                           kind: 'success',
@@ -496,8 +495,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
                     () => {
                       mutateCurrentVisit();
-                      mutateVisits().then();
-                      mutateAppointments().then();
+                      mutateVisits();
+                      mutateAppointments();
                       showSnackbar({
                         isLowContrast: true,
                         kind: 'success',
@@ -526,7 +525,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   // then continue and close workspace
                   if (!attributesResponses.includes(undefined)) {
                     mutateCurrentVisit();
-                    mutateVisits().then();
+                    mutateVisits();
                     closeWorkspace({ ignoreChanges: true });
                     showSnackbar({
                       isLowContrast: true,
