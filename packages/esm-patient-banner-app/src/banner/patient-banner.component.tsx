@@ -65,13 +65,22 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               isDeceased={patient.deceasedBoolean}
             />
           ) : null}
+          {!isTabletViewport ? (
+            <PatientBannerToggleContactDetailsButton
+              className={styles.toggleContactDetailsButton}
+              toggleContactDetails={toggleContactDetails}
+              showContactDetails={showContactDetails}
+            />
+          ) : null}
         </div>
       </div>
-      <PatientBannerToggleContactDetailsButton
-        className={styles.toggleContactDetailsButton}
-        toggleContactDetails={toggleContactDetails}
-        showContactDetails={showContactDetails}
-      />
+      {isTabletViewport ? (
+        <PatientBannerToggleContactDetailsButton
+          className={styles.toggleContactDetailsButton}
+          toggleContactDetails={toggleContactDetails}
+          showContactDetails={showContactDetails}
+        />
+      ) : null}
       {showContactDetails && (
         <div
           className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
