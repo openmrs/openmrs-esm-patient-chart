@@ -353,7 +353,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 body: { attributeType, value },
               }).catch((err) => {
                 showSnackbar({
-                  title: t('errorCreatingVisitAttribute', 'Could not delete {{attributeName}} attribute', {
+                  title: t('errorCreatingVisitAttribute', 'Could not create {{attributeName}} attribute', {
                     attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType).display,
                   }),
                   kind: 'error',
