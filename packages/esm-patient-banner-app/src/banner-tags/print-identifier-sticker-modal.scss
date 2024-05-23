@@ -1,0 +1,31 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.stickerContainer {
+  padding: 1rem 1rem 0 1rem;
+}
+
+.row {
+  margin: layout.$spacing-03 0rem 0rem;
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+}
+
+.gridRow {
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  div {
+    margin-left: 0px;
+    margin-bottom: 5px;
+  }
+}
+
+.patientName {
+  font-size: 1.5rem;
+  font-weight: bolder;
+  margin-bottom: 5px;
+}

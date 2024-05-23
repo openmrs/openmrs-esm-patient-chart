@@ -7,8 +7,14 @@ import {
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
+  showModal,
+  useConfig,
 } from '@openmrs/esm-framework';
+import { Printer } from '@carbon/react/icons';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
 import styles from './patient-banner.scss';
+import { type ConfigObject } from '../config-schema';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -17,6 +23,7 @@ interface PatientBannerProps {
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
+  const { t } = useTranslation();
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
 
@@ -46,6 +53,15 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const maxDesktopWorkspaceWidthInPx = 520;
   const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= maxDesktopWorkspaceWidthInPx;
 
+  const { showPrintIdentifierStickerButton } = useConfig<ConfigObject>();
+
+  const openModal = useCallback(() => {
+    const dispose = showModal('print-identifier-sticker-modal', {
+      closeModal: () => dispose(),
+      patient,
+    });
+  }, [patient]);
+
   return (
     <header
       className={classNames(
@@ -60,13 +76,26 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         </div>
         <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow ? (
-            <PatientBannerActionsMenu
-              actionsSlotName="patient-actions-slot"
-              isDeceased={patient.deceasedBoolean}
-              patientUuid={patientUuid}
-            />
-          ) : null}
+          <div className={styles.buttonRow}>
+            {showPrintIdentifierStickerButton && (
+              <Button
+                kind="ghost"
+                hasIconOnly={true}
+                renderIcon={(props) => <Printer size={16} {...props} />}
+                iconDescription={t('printIdentifierSticker', 'Print Identification Sticker')}
+                tooltipPosition="bottom"
+                className={styles.printButton}
+                onClick={openModal}
+              />
+            )}
+            {!hideActionsOverflow ? (
+              <PatientBannerActionsMenu
+                actionsSlotName="patient-actions-slot"
+                isDeceased={patient.deceasedBoolean}
+                patientUuid={patientUuid}
+              />
+            ) : null}
+          </div>
           {!showDetailsButtonBelowHeader ? (
             <PatientBannerToggleContactDetailsButton
               className={styles.toggleContactDetailsButton}

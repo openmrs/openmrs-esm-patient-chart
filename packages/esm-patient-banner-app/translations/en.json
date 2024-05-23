@@ -1,12 +1,25 @@
 {
   "address1": "Address line 1",
   "address2": "Address line 2",
+  "age": "Age",
+  "bod": "DOB",
+  "cancel": "Cancel",
   "city": "City",
   "cityVillage": "city",
   "country": "Country",
   "countyDistrict": "District",
   "district": "District",
+  "female": "Female",
+  "male": "Male",
+  "other": "Other",
+  "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "Postal code",
+  "print": "Print",
+  "printFailed": "Print Failed",
+  "printIdentifierSticker": "Print identifier sticker",
+  "printingFailed": "Printing has failed after 3 attempts",
+  "sex": "Sex",
   "state": "State",
-  "stateProvince": "State"
+  "stateProvince": "State",
+  "unknown": "Unknown"
 }
