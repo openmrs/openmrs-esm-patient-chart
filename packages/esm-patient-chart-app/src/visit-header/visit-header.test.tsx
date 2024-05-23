@@ -2,17 +2,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  getHistory,
+  goBackInHistory,
+  navigate,
+  showModal,
   useAssignedExtensions,
   useLayoutType,
   useOnClickOutside,
   usePatient,
   useVisit,
-  navigate,
-  showModal,
-  getHistory,
-  goBackInHistory,
 } from '@openmrs/esm-framework';
-import { mockPatient, mockPatientWithLongName, getByTextWithMarkup } from 'tools';
+import { getByTextWithMarkup, mockPatient, mockPatientWithLongName } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -75,7 +75,7 @@ describe('Visit Header', () => {
     const homeLink = screen.getByRole('link');
     expect(hamburgerButton).toBeInTheDocument();
     expect(homeLink).toBeInTheDocument();
-    expect(homeLink).toHaveAttribute('href', '/openmrs/spa/home');
+    expect(homeLink).toHaveAttribute('href', '${openmrsSpaBase}/home');
 
     // Should display the leftNavMenu
     await user.click(hamburgerButton);

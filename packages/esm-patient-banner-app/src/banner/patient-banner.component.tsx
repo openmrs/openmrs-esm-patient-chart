@@ -43,6 +43,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
+  // render details button below patient details for workspaces
+  // 520px is the maximum width a workspace occupies
+  const renderDetailsButtonBelow = patientBannerRef.current?.scrollWidth <= 520;
 
   return (
     <header
@@ -65,7 +68,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               isDeceased={patient.deceasedBoolean}
             />
           ) : null}
-          {!isTabletViewport ? (
+          {!renderDetailsButtonBelow ? (
             <PatientBannerToggleContactDetailsButton
               className={styles.toggleContactDetailsButton}
               toggleContactDetails={toggleContactDetails}
@@ -74,7 +77,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           ) : null}
         </div>
       </div>
-      {isTabletViewport ? (
+      {renderDetailsButtonBelow ? (
         <PatientBannerToggleContactDetailsButton
           className={styles.toggleContactDetailsButton}
           toggleContactDetails={toggleContactDetails}
