@@ -326,7 +326,7 @@ describe('Visit Form', () => {
         patient: mockPatient.id,
         visitType: 'some-uuid1',
       }),
-      expect.any(Function),
+      expect.any(Object),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
@@ -410,7 +410,7 @@ describe('Visit Form', () => {
         location: mockLocations[1].uuid,
         visitType: 'some-uuid1',
       }),
-      expect.any(Function),
+      expect.any(Object),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
@@ -498,7 +498,7 @@ describe('Visit Form', () => {
         location: mockLocations[1].uuid,
         visitType: 'some-uuid1',
       }),
-      expect.any(Function),
+      expect.any(Object),
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
