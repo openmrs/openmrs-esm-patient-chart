@@ -259,8 +259,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         allowedFileExtensions && Array.isArray(allowedFileExtensions)
           ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
           : [],
-      multipleFiles: true,
       collectDescription: true,
+      multipleFiles: true,
     });
   }, [allowedFileExtensions, currentImages, setValue]);
 
@@ -581,13 +581,13 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
           <Column sm={3}>
-            <FormGroup>
+            <FormGroup legendText="">
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
               </p>
               <Button
                 className={styles.uploadButton}
-                kind="ghost"
+                kind={isTablet ? 'ghost' : 'tertiary'}
                 onClick={showImageCaptureModal}
                 renderIcon={(props) => <Add size={16} {...props} />}
               >
