@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
-import { type Visit } from '@openmrs/esm-framework';
+import { showModal, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
@@ -35,6 +35,21 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     !encounterUuid && launchPatientWorkspace('clinical-forms-workspace');
   }, [closeWorkspace, encounterUuid]);
 
+  const handleConfirmQuestionDeletion = useCallback(() => {
+    return new Promise<void>((resolve, reject) => {
+      const dispose = showModal('form-engine-delete-question-confirm-modal', {
+        onCancel() {
+          dispose();
+          reject();
+        },
+        onConfirm() {
+          dispose();
+          resolve();
+        },
+      });
+    });
+  }, []);
+
   const handleMarkFormAsDirty = useCallback(
     (isDirty: boolean) => promptBeforeClosing(() => isDirty),
     [promptBeforeClosing],
@@ -63,6 +78,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           encounterUUID={encounterUuid}
           formJson={schema}
           handleClose={handleCloseForm}
+          handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
           onSubmit={closeWorkspaceWithSavedChanges}
