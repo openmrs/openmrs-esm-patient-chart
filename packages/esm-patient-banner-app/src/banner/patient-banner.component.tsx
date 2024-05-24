@@ -6,6 +6,7 @@ import {
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
+  displayName,
 } from '@openmrs/esm-framework';
 import styles from './patient-banner.scss';
 
@@ -34,7 +35,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     };
   }, [patientBannerRef, setIsTabletViewport]);
 
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = patient ? displayName(patient) : '';
 
   const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
