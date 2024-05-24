@@ -11,7 +11,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ onConfirm, onCancel }) => {
   const { t } = useTranslation();
 
   return (
-    <div>
+    <React.Fragment>
       <ModalHeader
         closeModal={onCancel}
         title={t('deleteQuestionConfirmation', 'Are you sure you want to delete this question?')}
@@ -27,7 +27,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ onConfirm, onCancel }) => {
           {t('deleteQuestion', 'Delete question')}
         </Button>
       </ModalFooter>
-    </div>
+    </React.Fragment>
   );
 };
 

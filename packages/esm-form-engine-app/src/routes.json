@@ -17,7 +17,7 @@
   ],
   "modals": [
     {
-      "name": "delete-question-confirm-modal",
+      "name": "form-engine-delete-question-confirm-modal",
       "component": "deleteQuestionModal"
     }
   ],

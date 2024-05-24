@@ -37,7 +37,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
-      const dispose = showModal('delete-question-confirm-modal', {
+      const dispose = showModal('form-engine-delete-question-confirm-modal', {
         onCancel() {
           dispose();
           reject();
