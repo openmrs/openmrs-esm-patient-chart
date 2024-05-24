@@ -1,10 +1,11 @@
 @use '@carbon/colors';
 @use '@carbon/type';
+@use '@carbon/layout';
 
 .table {
   td {
     white-space: nowrap;
-    padding: 0.25rem;
+    padding: layout.$spacing-02;
     > span {
       width: 100%;
       height: 100%;
@@ -19,22 +20,18 @@
   }
 }
 
-.criticallyHigh span, .criticallyLow span {
+.criticallyHigh > span, .criticallyLow > span {
   border: 2px solid colors.$red-60 !important;
-  padding-left: 1rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
+  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
+} 
 
-.high span, .low span {
+.high > span, .low > span {
   border: 1.5px solid colors.$black-100 !important;
-  padding-left: 1rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
 }
 
-.normal span {
-  padding-left: 1rem;
+.normal > span {
+  padding-left: layout.$spacing-05;
 }
 
 .criticallyLow {
@@ -82,18 +79,18 @@
   @include type.type-style('heading-compact-01');
 }
 
-.criticallyLow span::after {
+.criticallyLow > span::after {
   content: " ↓↓";
 }
 
-.criticallyHigh span::after {
+.criticallyHigh > span::after {
   content: " ↑↑";
 }
 
-.low span::after {
+.low > span::after {
   content: " ↓";
 }
 
-.high span::after {
+.high > span::after {
   content: " ↑";
 }
