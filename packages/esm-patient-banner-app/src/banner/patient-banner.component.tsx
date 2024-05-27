@@ -43,10 +43,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
-  // render details button below patient details for workspaces
-  // 520px is the maximum width a workspace occupies
-  const workspaceWidth = 520;
-  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= workspaceWidth;
+  const maxDesktopWorkspaceWidthInPx = 520;
+  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= maxDesktopWorkspaceWidthInPx;
 
   return (
     <header
@@ -64,9 +62,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         <div className={styles.buttonCol}>
           {!hideActionsOverflow ? (
             <PatientBannerActionsMenu
-              patientUuid={patientUuid}
-              actionsSlotName={'patient-actions-slot'}
+              actionsSlotName="patient-actions-slot"
               isDeceased={patient.deceasedBoolean}
+              patientUuid={patientUuid}
             />
           ) : null}
           {!showDetailsButtonBelowHeader ? (
@@ -87,9 +85,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
       ) : null}
       {showContactDetails && (
         <div
-          className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
-            styles[isTabletViewport && 'tabletContactDetails']
-          }`}
+          className={classNames(styles.contactDetails, {
+            [styles.deceasedContactDetails]: patient.deceasedBoolean,
+            [styles.tabletContactDetails]: isTabletViewport,
+          })}
         >
           <PatientBannerContactDetails patientId={patient?.id} deceased={isDeceased} />
         </div>
