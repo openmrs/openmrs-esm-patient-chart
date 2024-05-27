@@ -1,5 +1,5 @@
+import { useMemo } from 'react';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 interface VisitAttributeType {
@@ -40,16 +40,20 @@ export function useVisitAttributeTypes() {
     openmrsFetch,
   );
 
-  // eslint-disable-next-line no-console
-  console.log('FailedToFetchVisitAttributeTypes', error);
+  if (error) {
+    console.error('Failed to fetch visit attribute types: ', error);
+  }
 
-  return useMemo(() => {
-    return {
+  const results = useMemo(
+    () => ({
       isLoading,
       error,
-      visitAttributeTypes: data?.data.results || [],
-    };
-  }, [data, error, isLoading]);
+      visitAttributeTypes: data?.data?.results ?? [],
+    }),
+    [data, error, isLoading],
+  );
+
+  return results;
 }
 
 export function useVisitAttributeType(uuid) {
@@ -58,19 +62,18 @@ export function useVisitAttributeType(uuid) {
     openmrsFetch,
   );
 
-  useEffect(() => {
-    if (error) {
-      console.error(error);
-    }
-  }, [error]);
+  if (error) {
+    console.error(`Failed to fetch visit attribute type ${uuid}: `, error);
+  }
 
-  const results = useMemo(() => {
-    return {
+  const results = useMemo(
+    () => ({
       isLoading,
       error: error,
       data: data?.data,
-    };
-  }, [data, error, isLoading]);
+    }),
+    [data, error, isLoading],
+  );
 
   return results;
 }
@@ -81,20 +84,19 @@ export function useConceptAnswersForVisitAttributeType(conceptUuid) {
     openmrsFetch,
   );
 
-  useEffect(() => {
-    if (error) {
-      console.error(error);
-    }
-  }, [error]);
+  if (error) {
+    console.error(`Failed to fetch concept answers for visit attribute type ${conceptUuid}: `, error);
+  }
 
-  const results = useMemo(() => {
-    return {
+  const results = useMemo(
+    () => ({
       isLoading,
       error: error,
       data: data?.data,
       answers: data?.data?.answers,
-    };
-  }, [data, error, isLoading]);
+    }),
+    [data, error, isLoading],
+  );
 
   return results;
 }

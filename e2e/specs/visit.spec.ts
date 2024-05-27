@@ -16,7 +16,7 @@ test('Start and end a visit', async ({ page }) => {
     await chartPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Start a visit` button ', async () => {
+  await test.step('And I click on the `Start visit` button ', async () => {
     await chartPage.page.getByRole('button', { name: /start a visit/i }).click();
   });
 
@@ -33,7 +33,7 @@ test('Start and end a visit', async ({ page }) => {
     await expect(chartPage.page.getByLabel(/Offline Visit/i)).toBeVisible();
     await expect(chartPage.page.getByLabel(/Group Session/i)).toBeVisible();
     await expect(chartPage.page.getByRole('button', { name: /discard/i })).toBeVisible();
-    await expect(chartPage.page.locator('form').getByRole('button', { name: /start a visit/i })).toBeVisible();
+    await expect(chartPage.page.locator('form').getByRole('button', { name: /start visit/i })).toBeVisible();
   });
 
   await test.step('When I select the visit type: `OPD Visit`', async () => {
@@ -43,7 +43,7 @@ test('Start and end a visit', async ({ page }) => {
   await test.step('And I click on the `Start Visit` button', async () => {
     await chartPage.page
       .locator('form')
-      .getByRole('button', { name: /start a visit/i })
+      .getByRole('button', { name: /start visit/i })
       .click();
   });
 

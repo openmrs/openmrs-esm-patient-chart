@@ -60,6 +60,7 @@ jest.mock('@openmrs/esm-framework', () => {
     get getStartedVisit() {
       return mockGetStartedVisitGetter();
     },
+    restBaseUrl: '/ws/rest/v1',
     saveVisit: jest.fn(),
     updateVisit: jest.fn(),
     openmrsFetch: jest.fn(),
@@ -572,7 +573,7 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    mockedUseConfig.mockReturnValueOnce({
+    mockedUseConfig.mockReturnValue({
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,
@@ -591,7 +592,6 @@ describe('Visit Form', () => {
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
     await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
-
     await user.click(saveButton);
 
     expect(mockSaveVisit).not.toHaveBeenCalled();
