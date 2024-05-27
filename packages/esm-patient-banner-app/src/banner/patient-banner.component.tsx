@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
+  displayName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
-  displayName,
 } from '@openmrs/esm-framework';
 import styles from './patient-banner.scss';
 
@@ -45,7 +45,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const isDeceased = Boolean(patient?.deceasedDateTime);
   // render details button below patient details for workspaces
   // 520px is the maximum width a workspace occupies
-  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= 520;
+  const workspaceWidth = 520;
+  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= workspaceWidth;
 
   return (
     <header
