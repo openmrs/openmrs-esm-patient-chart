@@ -29,6 +29,7 @@ import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-t
 import genericNavGroupComponent from './side-nav/generic-nav-group.component';
 import genericDashboardComponent from './side-nav/generic-dashboard.component';
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
+import activeVisitDetailOverviewComponent from './visit/visits-widget/active-visits-summary.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -231,3 +232,8 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
 );
+
+export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {
+  featureName: 'active-visit-overview',
+  moduleName,
+});
