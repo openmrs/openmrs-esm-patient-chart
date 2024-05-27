@@ -208,7 +208,7 @@ describe('Visit Form', () => {
 
     const saveButton = screen.getByRole('button', { name: /start visit/i });
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     await user.click(saveButton);
@@ -231,7 +231,7 @@ describe('Visit Form', () => {
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     mockSaveVisit.mockReturnValue(
@@ -295,7 +295,7 @@ describe('Visit Form', () => {
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
@@ -380,7 +380,7 @@ describe('Visit Form', () => {
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
@@ -469,7 +469,7 @@ describe('Visit Form', () => {
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
@@ -531,7 +531,7 @@ describe('Visit Form', () => {
 
     const saveButton = screen.getByRole('button', { name: /Start Visit/i });
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
     mockSaveVisit.mockReturnValue(throwError({ status: 500, statusText: 'Internal server error' }));
 
@@ -593,7 +593,7 @@ describe('Visit Form', () => {
 
     // Set location
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
-    await userEvent.click(locationPicker);
+    await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
 
     await user.click(saveButton);

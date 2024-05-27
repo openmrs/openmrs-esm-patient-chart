@@ -291,25 +291,26 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
-      const visitExistingAttributesTypes =
+      const existingVisitAttributeTypes =
         visitToEdit?.attributes?.map((attribute) => attribute.attributeType.uuid) || [];
 
       const promises = [];
 
       for (const [attributeType, value] of Object.entries(visitAttributes)) {
-        if (attributeType && visitExistingAttributesTypes.includes(attributeType)) {
+        if (attributeType && existingVisitAttributeTypes.includes(attributeType)) {
           const attributeToEdit = visitToEdit.attributes.find((attr) => attr.attributeType.uuid === attributeType);
 
           if (attributeToEdit) {
             // continue to next attribute if the previous value is same as new value
-            if (typeof attributeToEdit.value === 'object' && attributeToEdit.value.uuid === value) {
-              continue;
-            } else if (attributeToEdit.value === value) {
-              continue;
-            }
+            const isSameValue =
+              typeof attributeToEdit.value === 'object'
+                ? attributeToEdit.value.uuid === value
+                : attributeToEdit.value === value;
+
+            if (isSameValue) continue;
 
             if (value) {
-              // Update attribute with updated value
+              // Update attribute with new value
               promises.push(
                 openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
                   method: 'POST',
@@ -327,7 +328,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 }),
               );
             } else {
-              // Delete attribute if the was no value provided
+              // Delete attribute if no value is provided
               promises.push(
                 openmrsFetch(`/ws/rest/v1/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
                   method: 'DELETE',
@@ -354,7 +355,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               }).catch((err) => {
                 showSnackbar({
                   title: t('errorCreatingVisitAttribute', 'Could not create {{attributeName}} attribute', {
-                    attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType).display,
+                    attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType)?.display,
                   }),
                   kind: 'error',
                   isLowContrast: false,
@@ -529,7 +530,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     closeWorkspace({ ignoreChanges: true });
                     showSnackbar({
                       isLowContrast: true,
-                      timeoutInMs: 5000,
                       kind: 'success',
                       subtitle: !visitToEdit
                         ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
