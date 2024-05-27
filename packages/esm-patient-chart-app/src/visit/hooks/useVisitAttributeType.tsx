@@ -40,11 +40,14 @@ export function useVisitAttributeTypes() {
     openmrsFetch,
   );
 
+  // eslint-disable-next-line no-console
+  console.log('FailedToFetchVisitAttributeTypes', error);
+
   return useMemo(() => {
     return {
       isLoading,
       error,
-      data: data?.data.results || [],
+      visitAttributeTypes: data?.data.results || [],
     };
   }, [data, error, isLoading]);
 }
