@@ -263,7 +263,6 @@ describe('Visit Form', () => {
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
-      timeoutInMs: 5000,
     });
   });
 
@@ -348,7 +347,6 @@ describe('Visit Form', () => {
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
-      timeoutInMs: 5000,
     });
   });
 
@@ -437,7 +435,6 @@ describe('Visit Form', () => {
       subtitle: 'Facility Visit updated successfully',
       kind: 'success',
       title: 'Visit details updated',
-      timeoutInMs: 5000,
     });
   });
 
@@ -518,7 +515,6 @@ describe('Visit Form', () => {
       subtitle: 'Facility Visit updated successfully',
       kind: 'success',
       title: 'Visit details updated',
-      timeoutInMs: 5000,
     });
   });
 
