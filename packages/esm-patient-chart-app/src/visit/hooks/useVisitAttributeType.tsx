@@ -36,7 +36,7 @@ const visitAttributeTypeCustomRepresentation =
 
 export function useVisitAttributeTypes() {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: VisitAttributeType[] }>, Error>(
-    `/ws/rest/v1/visitattriutetype?v=${visitAttributeTypeCustomRepresentation}`,
+    `/ws/rest/v1/visitattributetype?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
 
@@ -44,7 +44,7 @@ export function useVisitAttributeTypes() {
     return {
       isLoading,
       error,
-      data: data?.data.results,
+      data: data?.data.results || [],
     };
   }, [data, error, isLoading]);
 }
