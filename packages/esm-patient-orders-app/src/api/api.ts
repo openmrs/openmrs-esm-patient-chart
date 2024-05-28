@@ -73,13 +73,12 @@ export function saveOrdersWithNewEncounter(
   const patientItems = items[patientUuid];
 
   const orders: Array<OrderPost> = [];
-  for (let grouping in patientItems) {
-    const groupOrders = patientItems[grouping];
-    for (let i = 0; i < groupOrders.length; i++) {
-      const order = groupOrders[i];
+
+  Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
+    groupOrders.forEach((order) => {
       orders.push(postDataPrepFunctions[grouping](order, patientUuid, null));
-    }
-  }
+    });
+  });
 
   const emptyEncounter = {
     patient: patientUuid,
