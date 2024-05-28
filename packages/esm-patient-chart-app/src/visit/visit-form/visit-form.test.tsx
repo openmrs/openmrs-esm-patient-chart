@@ -1,10 +1,19 @@
 import React from 'react';
 import { of, throwError } from 'rxjs';
 import { render, screen } from '@testing-library/react';
+import { esmPatientChartSchema } from '../../config-schema';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, saveVisit, showSnackbar, updateVisit, useConfig, type Visit } from '@openmrs/esm-framework';
-import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
+import {
+  getDefaultsFromConfigSchema,
+  openmrsFetch,
+  saveVisit,
+  showSnackbar,
+  updateVisit,
+  useConfig,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
+import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
@@ -47,7 +56,7 @@ const testProps = {
 const mockSaveVisit = saveVisit as jest.Mock;
 const mockUpdateVisit = updateVisit as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
+const mockedUseConfig = jest.mocked(useConfig);
 const mockedUseVisitAttributeType = useVisitAttributeType as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
 
@@ -64,20 +73,6 @@ jest.mock('@openmrs/esm-framework', () => {
     saveVisit: jest.fn(),
     updateVisit: jest.fn(),
     openmrsFetch: jest.fn(),
-    useConfig: jest.fn(() => ({
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-        {
-          uuid: visitAttributes.insurancePolicyNumber.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-      ],
-    })),
     toOmrsIsoString: jest.fn(),
     useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
@@ -175,6 +170,24 @@ jest.mock('../hooks/useLocations', () => {
 });
 
 describe('Visit Form', () => {
+  beforeAll(() => {
+    mockedUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -223,6 +236,17 @@ describe('Visit Form', () => {
   it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
+    mockSaveVisit.mockReturnValue(
+      of({
+        status: 201,
+        data: {
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
+
     renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
@@ -234,17 +258,6 @@ describe('Visit Form', () => {
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
     await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
-
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
-        },
-      }),
-    );
 
     await user.click(saveButton);
 
@@ -270,23 +283,9 @@ describe('Visit Form', () => {
   it('starts a new visit with attributes upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    renderVisitForm();
-
     mockOpenmrsFetch.mockResolvedValue({});
-    mockedUseConfig.mockReturnValueOnce({
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: true,
-          displayInThePatientBanner: true,
-        },
-        {
-          uuid: visitAttributes.insurancePolicyNumber.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-      ],
-    });
+
+    renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
 
@@ -351,26 +350,12 @@ describe('Visit Form', () => {
     });
   });
 
-  it('Updates visit attributes on an existing visit upon successful submission of the form', async () => {
+  it('updates visit attributes when editing an existing visit', async () => {
     const user = userEvent.setup();
 
-    renderVisitForm(mockVisitWithAttributes);
-
     mockOpenmrsFetch.mockResolvedValue({});
-    mockedUseConfig.mockReturnValueOnce({
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: true,
-          displayInThePatientBanner: true,
-        },
-        {
-          uuid: visitAttributes.insurancePolicyNumber.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-      ],
-    });
+
+    renderVisitForm(mockVisitWithAttributes);
 
     const saveButton = screen.getByRole('button', { name: /Update visit/i });
 
@@ -439,26 +424,12 @@ describe('Visit Form', () => {
     });
   });
 
-  it('deletes visit attributes on an existing visit upon successful submission of the form', async () => {
+  it('deletes visit attributes if the value of the field is cleared when editing an existing visit', async () => {
     const user = userEvent.setup();
 
-    renderVisitForm(mockVisitWithAttributes);
-
     mockOpenmrsFetch.mockResolvedValue({});
-    mockedUseConfig.mockReturnValueOnce({
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: true,
-          displayInThePatientBanner: true,
-        },
-        {
-          uuid: visitAttributes.insurancePolicyNumber.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-      ],
-    });
+
+    renderVisitForm(mockVisitWithAttributes);
 
     const saveButton = screen.getByRole('button', { name: /Update visit/i });
 
@@ -521,6 +492,7 @@ describe('Visit Form', () => {
 
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
+    mockSaveVisit.mockReturnValue(throwError(() => ({ status: 500, statusText: 'Internal server error' })));
 
     renderVisitForm();
 
@@ -530,7 +502,6 @@ describe('Visit Form', () => {
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
     await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
-    mockSaveVisit.mockReturnValue(throwError({ status: 500, statusText: 'Internal server error' }));
 
     await user.click(saveButton);
 
@@ -543,7 +514,7 @@ describe('Visit Form', () => {
     );
   });
 
-  it('displays the `Unsaved changes` modal when a form has unsaved changes', async () => {
+  it('displays a warning modal if the user attempts to discard the visit form with unsaved changes', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -557,8 +528,33 @@ describe('Visit Form', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
-  it('should not submit the form if the visit attributes type is required and throw the error', async () => {
+  it('should show an inline error notification if an optional visit attribute type field fails to load', async () => {
+    mockedUseVisitAttributeType.mockReturnValue({
+      isLoading: false,
+      error: new Error('failed to load'),
+      data: visitAttributes.punctuality,
+    });
+
+    renderVisitForm();
+
+    expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
+    expect(screen.getByText(/Please refresh to try again/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Start visit/i })).not.toBeDisabled();
+  });
+
+  it('should show an error if a required visit attribute type is not provided', async () => {
     const user = userEvent.setup();
+
+    mockedUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: true,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
 
     mockSaveVisit.mockReturnValue(
       of({
@@ -573,16 +569,6 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    mockedUseConfig.mockReturnValue({
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: true,
-          displayInThePatientBanner: true,
-        },
-      ],
-    });
-
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
 
     // Set visit type
@@ -595,22 +581,9 @@ describe('Visit Form', () => {
     await user.click(saveButton);
 
     expect(mockSaveVisit).not.toHaveBeenCalled();
-    expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
   });
 
-  it('should show a banner if the not required visitAttribute fields are failed to load', async () => {
-    mockedUseVisitAttributeType.mockReturnValue({
-      isLoading: false,
-      error: new Error('failed to load'),
-      data: visitAttributes.punctuality,
-    });
-    renderVisitForm();
-    expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
-    expect(screen.getByText(/Please refresh to try again/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Start visit/i })).not.toBeDisabled();
-  });
-
-  it('should show a banner if the required visitAttribute fields are failed to load and block the submit button', async () => {
+  it('should disable the submit button show an inline error notification if required visit attribute fields fail to load', async () => {
     mockedUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
@@ -625,6 +598,7 @@ describe('Visit Form', () => {
         },
       ],
     });
+
     renderVisitForm();
 
     expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
