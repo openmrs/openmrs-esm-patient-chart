@@ -18,7 +18,7 @@ export async function postOrdersOnNewEncounter(
     encounterDate = now;
   } else {
     console.warn(
-      'create Encounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
+      'postOrdersOnNewEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
     );
     encounterDate = visitStartDate;
   }
