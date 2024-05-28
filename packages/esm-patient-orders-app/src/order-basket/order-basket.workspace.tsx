@@ -125,7 +125,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
-              title={t('errorCreatingAnEncounter', 'Error creating an encounter')}
+              title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
               subtitle={creatingEncounterError}
               lowContrast={true}
               className={styles.inlineNotification}
