@@ -15,5 +15,11 @@
       "slot": "patient-chart-workspace-header-slot"
     }
   ],
+  "modals": [
+    {
+      "name": "form-engine-delete-question-confirm-modal",
+      "component": "deleteQuestionModal"
+    }
+  ],
   "pages": []
 }

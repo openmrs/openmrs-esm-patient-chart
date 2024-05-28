@@ -133,15 +133,12 @@ yarn
 The patient chart consists of the following parts:
 
 - Navigation menu
-- Breadcrumbs menu
 - Patient header
 - Chart review / Dashboards
 - Workspace
 - Side menu
 
 The **navigation menu** lives on the left side of the screen and provides links to dashboards in the patient chart.
-
-The **breadcrumbs menu** gets shown at the top of the page under the navigation bar. It shows the user their current location relative to the information architecture and helps them quickly navigate to a parent level or previous step.
 
 The **patient header** contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
 
