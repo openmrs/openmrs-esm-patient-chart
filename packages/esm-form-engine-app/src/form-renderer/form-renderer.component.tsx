@@ -7,6 +7,7 @@ import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
 import { age, displayName, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
+
 import FormError from './form-error.component';
 import PrintComponent from '../form-print/print.component';
 import useFormSchema from '../hooks/useFormSchema';
@@ -174,7 +175,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   return (
     <>
-      {printOptions?.showPrintButton && schema && (
+      {printOptions?.showPrintButton && schema && additionalProps?.mode === 'view' && (
         <Button
           className={styles.printButton}
           disabled={isPrinting}
