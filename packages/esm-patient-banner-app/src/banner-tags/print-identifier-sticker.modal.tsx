@@ -25,7 +25,7 @@ interface PrintComponentProps extends Partial<ConfigObject> {
   t: TFunction;
 }
 
-const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
+const PrintIdentifierStickerModal: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
   const { printIdentifierStickerFields, printIdentifierStickerSize, excludePatientIdentifierCodeTypes } =
     useConfig<ConfigObject>();
@@ -179,4 +179,4 @@ const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: Pri
   );
 };
 
-export default PrintIdentifierSticker;
+export default PrintIdentifierStickerModal;

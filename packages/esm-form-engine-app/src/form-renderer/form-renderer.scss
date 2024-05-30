@@ -1,6 +1,5 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 
 .loaderContainer {
   height: 100vh;
@@ -15,4 +14,30 @@
 
 .errorContainer {
   height: 100vh;
+}
+
+.printButton {
+  display: flex;
+  margin-left: auto;
+
+  svg {
+    order: 1;
+  }
+
+  span {
+    order: 2;
+    margin-left: 0.5rem;
+  }
+}
+
+.sidebar > {
+  .error {
+    color: red;
+  }
+}
+
+@media print {
+  :global(.cds--btn-set) {
+    display: none;
+  }
 }

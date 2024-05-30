@@ -7,9 +7,19 @@
   "deleteQuestionExplainerText": "This action cannot be undone.",
   "errorTitle": "There was an error with this form",
   "expandAll": "Expand all",
+  "female": "Female",
   "loading": "Loading",
+  "male": "Male",
   "or": "or",
+  "other": "Other",
+  "print": "Print",
+  "printedBy": "Printed by",
+  "printError": "Print error",
+  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
+  "printForm": "Print form",
+  "printing": "Printing...",
   "thisList": "this list",
   "toggleCollapseOrExpand": "Toggle collapse or expand",
-  "tryAgainMessage": "Try opening another form from"
+  "tryAgainMessage": "Try opening another form from",
+  "unknown": "Unknown"
 }

@@ -1,0 +1,44 @@
+@use '@carbon/colors';
+@use "@carbon/layout";
+@use '@carbon/type';
+
+@media screen {
+  .printPage {
+    background-color: colors.$white;
+    display: none;
+  }
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: layout.$spacing-08;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: colors.$white;
+  }
+
+  .formName {
+    @include type.type-style('heading-compact-02');
+    margin: layout.$spacing-05;
+  }
+
+  .patientDetails {
+    @include type.type-style('body-compact-02');
+    margin: 0 layout.$spacing-03;
+  }
+
+  .patientInfo {
+    color: colors.$gray-80;
+    @include type.type-style('body-compact-02');
+  }
+
+  .printedBy {
+    @include type.type-style('body-compact-01');
+    margin: 0 layout.$spacing-02;
+  }
+}
