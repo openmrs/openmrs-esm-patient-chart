@@ -5,11 +5,13 @@ script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # create a temporary working directory
 working_dir=$(mktemp -d "${TMPDIR:-/tmp/}openmrs-e2e-frontends.XXXXXXXXXX")
 # get a list of all the apps in this workspace
-apps=$(yarn workspaces list --json | jq -r 'if ((.location == ".") or (.location | test("form-engine-app")) or (.location | test("-app") | not)) then halt else .name end')
+apps=$(yarn workspaces list --json | jq -r 'select((.location != ".") and (.location | test("form-engine-app") | not) and (.location | test("-app"))) | .name')
 # this array will hold all of the packed app names
 app_names=()
 
 echo "Creating packed archives of apps..."
+# override the version of the common lib
+yarn add openmrs/esm-patient-common-lib@workspace:*
 # for each app
 for app in $apps
 do
