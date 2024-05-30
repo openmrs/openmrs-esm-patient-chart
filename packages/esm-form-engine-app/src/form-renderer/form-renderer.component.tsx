@@ -157,6 +157,12 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     onPrintError: handlePrintError,
   });
 
+  useEffect(() => {
+    if (typeof onBeforeGetContentResolve.current === 'function') {
+      onBeforeGetContentResolve.current();
+    }
+  }, [onBeforeGetContentResolve]);
+
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
