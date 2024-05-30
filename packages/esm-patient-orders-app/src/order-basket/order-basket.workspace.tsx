@@ -73,7 +73,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       } catch (e) {
         console.error(e);
         setCreatingEncounterError(
-          e.responseBody.error.message ||
+          e.responseBody?.error?.message ||
             t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
         );
       }
