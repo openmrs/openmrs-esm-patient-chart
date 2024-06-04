@@ -4,3 +4,11 @@
   height: var(--workspace-header-height);
   margin-right: 0.5rem;
 }
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .toggle {
+    :global(.cds--toggle__text) {
+      color: white;
+    }
+  }
+}
