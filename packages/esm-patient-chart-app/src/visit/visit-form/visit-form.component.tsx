@@ -440,6 +440,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
       if (config.showExtraVisitAttributesSlot) {
         const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
+        if (!payload.attributes) {
+          payload.attributes = [];
+        }
         payload.attributes.push(...attributes);
         handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
       }
