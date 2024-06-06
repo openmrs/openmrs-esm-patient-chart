@@ -111,6 +111,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
+  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
+    service: null,
+    priority: null,
+    status: null,
+    sortWeight: null,
+    queueLocation: null,
+  });
 
   const displayVisitStopDateTimeFields = useMemo(
     () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
@@ -459,15 +466,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                 if (config.showServiceQueueFields) {
                   // retrieve values from the queue extension
                   setVisitUuid(response.data.uuid);
-                  const queueLocation = event.target['queueLocation']?.value;
-                  const serviceUuid = event.target['service']?.value;
-                  const priority = event.target['priority']?.value;
-                  const status = event.target['status']?.value;
-                  const sortWeight = event.target['sortWeight']?.value;
 
                   saveQueueEntry(
                     response.data.uuid,
-                    serviceUuid,
+                    service,
                     patientUuid,
                     priority,
                     status,
@@ -622,6 +624,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateQueueEntry,
       mutateVisits,
       patientUuid,
+      priority,
+      queueLocation,
+      service,
+      sortWeight,
+      status,
       t,
       upcomingAppointment,
       validateVisitStartStopDatetime,
@@ -804,7 +811,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <section>
                 <div className={styles.sectionTitle}></div>
                 <div className={styles.sectionField}>
-                  <ExtensionSlot name="add-queue-entry-slot" />
+                  <ExtensionSlot name="visit-form-queue-slot" state={{ setFormFields: setVisitFormFields }} />
                 </div>
               </section>
             )}
