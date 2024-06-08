@@ -17,7 +17,6 @@
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
-    "verify": "turbo lint typescript coverage",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [

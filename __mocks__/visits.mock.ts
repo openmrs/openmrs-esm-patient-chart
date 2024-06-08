@@ -590,5 +590,5 @@ export const mockVisitWithAttributes = {
         resourceVersion: '2.0',
       },
     },
-  ]
-}
+  ],
+};
