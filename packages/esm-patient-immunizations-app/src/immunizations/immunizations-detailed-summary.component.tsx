@@ -44,7 +44,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 }) => {
   const { t, i18n } = useTranslation();
   const { immunizationsConfig } = useConfig();
-  const displayText = t('immunizations', 'immunizations');
+  const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const locale = i18n.language.replace('_', '-');
   const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
@@ -73,7 +73,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const tableHeader = useMemo(
     () => [
       { key: 'vaccine', header: t('vaccine', 'Vaccine') },
-      { key: 'recentVaccination', header: t('recentVaccination', 'Recent Vaccination') },
+      { key: 'recentVaccination', header: t('recentVaccination', 'Recent vaccination') },
       { key: 'add', header: '' },
     ],
     [t],

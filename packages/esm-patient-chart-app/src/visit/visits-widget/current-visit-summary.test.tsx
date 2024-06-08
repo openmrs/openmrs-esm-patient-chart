@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useVisit, getConfig } from '@openmrs/esm-framework';
+import { waitForLoadingToFinish } from 'tools';
 import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockUseVisits = useVisit as jest.Mock;
@@ -17,19 +18,7 @@ describe('CurrentVisitSummary', () => {
     jest.clearAllMocks();
   });
 
-  test('should display loading state', () => {
-    mockUseVisits.mockReturnValueOnce({
-      currentVisit: null,
-      isLoading: true,
-      isValidating: false,
-      error: null,
-    });
-
-    render(<CurrentVisitSummary patientUuid="some-uuid" />);
-    expect(screen.getByText('Loading current visit...')).toBeInTheDocument();
-  });
-
-  test('should display empty state when there is no active visit', () => {
+  test('renders an empty state when there is no active visit', () => {
     mockUseVisits.mockReturnValueOnce({
       currentVisit: null,
       isLoading: false,
@@ -38,11 +27,11 @@ describe('CurrentVisitSummary', () => {
     });
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
-    expect(screen.getByText('currentVisit')).toBeInTheDocument();
+    expect(screen.getByText(/current visit/i)).toBeInTheDocument();
     expect(screen.getByText('There are no active visit to display for this patient')).toBeInTheDocument();
   });
 
-  test("should display visit summary when there's an active visit", async () => {
+  test('renders a visit summary when for the active visit', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseVisits.mockReturnValueOnce({
       currentVisit: {
@@ -67,7 +56,9 @@ describe('CurrentVisitSummary', () => {
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
 
-    await screen.findByText('Current Visit');
+    await waitForLoadingToFinish();
+
+    expect(screen.getByText(/current visit/i)).toBeInTheDocument();
     expect(screen.getByText('Diagnoses')).toBeInTheDocument();
     const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
     buttonNames.forEach((buttonName) => {

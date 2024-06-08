@@ -26,7 +26,7 @@ export const drugOrderPanel = getAsyncLifecycle(
 );
 
 export const medicationsDashboardLink =
-  // t('Medications', 'Medications')
+  // t('medications', 'Medications')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
