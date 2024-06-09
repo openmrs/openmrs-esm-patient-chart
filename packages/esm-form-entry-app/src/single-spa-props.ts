@@ -49,7 +49,6 @@ export type SingleSpaProps = AppProps &
   VisitProperties &
   EncounterProperties &
   PatientProperties &
-  UIBehavior &
   PreFilledQuestions &
   ApplicationStatus & {
     additionalProps?: any;

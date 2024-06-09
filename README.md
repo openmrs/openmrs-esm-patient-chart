@@ -1,4 +1,4 @@
-:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
+:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
 
 ![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
 
@@ -107,7 +107,7 @@ To run end-to-end tests, run:
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing) to learn more about End-to-End tests in this project.
+Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 
@@ -133,15 +133,12 @@ yarn
 The patient chart consists of the following parts:
 
 - Navigation menu
-- Breadcrumbs menu
 - Patient header
 - Chart review / Dashboards
 - Workspace
 - Side menu
 
 The **navigation menu** lives on the left side of the screen and provides links to dashboards in the patient chart.
-
-The **breadcrumbs menu** gets shown at the top of the page under the navigation bar. It shows the user their current location relative to the information architecture and helps them quickly navigate to a parent level or previous step.
 
 The **patient header** contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
 

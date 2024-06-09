@@ -44,5 +44,13 @@
       "order": 2
     }
   ],
-  "pages": []
+  "pages": [],
+  "workspaces": [
+    {
+      "name": "add-lab-order",
+      "type": "order",
+      "component": "addLabOrderWorkspace",
+      "title": "addLabOrderWorkspaceTitle"
+    }
+  ]
 }

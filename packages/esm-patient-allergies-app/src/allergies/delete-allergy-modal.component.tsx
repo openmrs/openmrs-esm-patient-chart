@@ -40,7 +40,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
           subtitle: error?.message,
         });
       });
-  }, [closeDeleteModal, allergyId, mutate, t]);
+  }, [closeDeleteModal, allergyId, mutate, t, patientUuid]);
 
   return (
     <div>

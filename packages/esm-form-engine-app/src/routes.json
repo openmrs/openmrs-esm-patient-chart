@@ -8,6 +8,17 @@
       "name": "react-form-engine-widget",
       "component": "formRenderer",
       "slot": "form-widget-slot"
+    },
+    {
+      "name": "rfe-form-collapse-toggle",
+      "component": "formCollapseToggle",
+      "slot": "workspace-header-patient-chart-slot"
+    }
+  ],
+  "modals": [
+    {
+      "name": "form-engine-delete-question-confirm-modal",
+      "component": "deleteQuestionModal"
     }
   ],
   "pages": []

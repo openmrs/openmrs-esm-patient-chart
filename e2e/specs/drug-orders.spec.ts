@@ -88,7 +88,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
   });
 
@@ -137,7 +137,25 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And I change the frequency to `Twice daily`', async () => {
-    await page.getByPlaceholder(/frequency/i).click();
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByText('Twice daily', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `q12`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('q12');
+    await page.getByText('Every twelve hours', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `od`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('od');
+    await page.getByText('Once daily', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `bd`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('bd');
     await page.getByText('Twice daily', { exact: true }).click();
   });
 
@@ -159,7 +177,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
   });
 
@@ -201,12 +219,12 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
   });
 
   await test.step('And the medications table should be empty', async () => {
-    await expect(page.getByText(/There are no active medications to display for this patient/i)).toBeVisible();
+    await expect(page.getByText(/there are no active medications to display for this patient/i)).toBeVisible();
   });
 });
 

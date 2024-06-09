@@ -7,7 +7,7 @@ import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-fra
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { createProgramEnrollment, updateProgramEnrollment } from './programs.resource';
 import { mockPatient } from 'tools';
-import ProgramsForm from './programs-form.component';
+import ProgramsForm from './programs-form.workspace';
 
 const testProps = {
   closeWorkspace: jest.fn(),

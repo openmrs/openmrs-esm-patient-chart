@@ -7,7 +7,7 @@ import {
   restBaseUrl,
   translateFrom,
 } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import allergiesDetailedSummaryComponent from './allergies/allergies-detailed-summary.component';
@@ -53,12 +53,10 @@ export const allergiesDashboardLink = getSyncLifecycle(
 );
 
 // t('recordNewAllergy', "Record a new allergy")
-registerWorkspace({
-  name: 'patient-allergy-form-workspace',
-  title: translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy'),
-  load: getAsyncLifecycle(() => import('./allergies/allergies-form/allergy-form.component'), options),
-  type: 'form',
-});
+export const allergyFormWorkspace = getAsyncLifecycle(
+  () => import('./allergies/allergies-form/allergy-form.workspace'),
+  options,
+);
 
 export const allergyTile = getSyncLifecycle(allergyTileComponent, options);
 

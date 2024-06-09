@@ -441,3 +441,154 @@ export const mockEncounters2 = [
     resourceVersion: '2.2',
   },
 ];
+
+export const mockVisitWithAttributes = {
+  ...mockVisits.data.results[0],
+  attributes: [
+    {
+      attributeType: {
+        uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+        display: 'Insurance Policy Number',
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/visitattributetype/aac48226-d143-4274-80e0-264db4e368ee',
+            resourceAlias: 'visitattributetype',
+          },
+        ],
+      },
+      display: 'Insurance Policy Number: 832832',
+      uuid: 'd6d7d26a-5975-4f03-8abb-db073c948897',
+      value: '832832',
+    },
+    {
+      attributeType: {
+        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+        display: 'Punctuality',
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/visitattributetype/57ea0cbb-064f-4d09-8cf4-e8228700491c',
+            resourceAlias: 'visitattributetype',
+          },
+        ],
+      },
+      display: 'Punctuality: Concept #1092',
+      uuid: 'c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      value: {
+        uuid: '66cdc0a1-aa19-4676-af51-80f66d78d9eb',
+        display: 'On time',
+        name: {
+          display: 'On time',
+          uuid: '03f6dd3e-d270-3ea6-a833-f867e49a40bb',
+          name: 'On time',
+          locale: 'en',
+          localePreferred: true,
+          conceptNameType: 'FULLY_SPECIFIED',
+          links: [
+            {
+              rel: 'self',
+              uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/03f6dd3e-d270-3ea6-a833-f867e49a40bb',
+              resourceAlias: 'name',
+            },
+            {
+              rel: 'full',
+              uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/03f6dd3e-d270-3ea6-a833-f867e49a40bb?v=full',
+              resourceAlias: 'name',
+            },
+          ],
+          resourceVersion: '1.9',
+        },
+        datatype: {
+          uuid: '8d4a4c94-c2cc-11de-8d13-0010c6dffd0f',
+          display: 'N/A',
+          links: [
+            {
+              rel: 'self',
+              uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f',
+              resourceAlias: 'conceptdatatype',
+            },
+          ],
+        },
+        conceptClass: {
+          uuid: '8d492774-c2cc-11de-8d13-0010c6dffd0f',
+          display: 'Misc',
+          links: [
+            {
+              rel: 'self',
+              uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/conceptclass/8d492774-c2cc-11de-8d13-0010c6dffd0f',
+              resourceAlias: 'conceptclass',
+            },
+          ],
+        },
+        set: false,
+        version: null,
+        retired: false,
+        names: [
+          {
+            uuid: 'dc2adaff-ae4d-30d2-9ce8-0b6ae2518f11',
+            display: 'À temps',
+            links: [
+              {
+                rel: 'self',
+                uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/dc2adaff-ae4d-30d2-9ce8-0b6ae2518f11',
+                resourceAlias: 'name',
+              },
+            ],
+          },
+          {
+            uuid: '03f6dd3e-d270-3ea6-a833-f867e49a40bb',
+            display: 'On time',
+            links: [
+              {
+                rel: 'self',
+                uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/03f6dd3e-d270-3ea6-a833-f867e49a40bb',
+                resourceAlias: 'name',
+              },
+            ],
+          },
+          {
+            uuid: '9c3ecda9-dd54-331e-aebf-d7426e358752',
+            display: 'À temps',
+            links: [
+              {
+                rel: 'self',
+                uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/9c3ecda9-dd54-331e-aebf-d7426e358752',
+                resourceAlias: 'name',
+              },
+            ],
+          },
+          {
+            uuid: '0ab86d36-0a8f-38f9-963e-8138251fc619',
+            display: 'On time',
+            links: [
+              {
+                rel: 'self',
+                uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb/name/0ab86d36-0a8f-38f9-963e-8138251fc619',
+                resourceAlias: 'name',
+              },
+            ],
+          },
+        ],
+        descriptions: [],
+        mappings: [],
+        answers: [],
+        setMembers: [],
+        attributes: [],
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb',
+            resourceAlias: 'concept',
+          },
+          {
+            rel: 'full',
+            uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/concept/66cdc0a1-aa19-4676-af51-80f66d78d9eb?v=full',
+            resourceAlias: 'concept',
+          },
+        ],
+        resourceVersion: '2.0',
+      },
+    },
+  ]
+}

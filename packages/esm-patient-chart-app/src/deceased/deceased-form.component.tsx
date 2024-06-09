@@ -12,14 +12,14 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
-import { type DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, useLayoutType, showSnackbar, showModal, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
 
 import styles from './deceased-form.scss';
 
-const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);

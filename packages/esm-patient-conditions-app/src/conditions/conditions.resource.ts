@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type FHIRCondition, type FHIRConditionResponse } from '../types';
+import { useMemo, useState } from 'react';
 
 export type Condition = {
   clinicalStatus: string;
@@ -232,4 +233,46 @@ export async function deleteCondition(conditionId: string) {
   });
 
   return res;
+}
+
+export interface ConditionTableRow extends Condition {
+  id: string;
+  condition: string;
+  abatementDateTime: string;
+  onsetDateTimeRender: string;
+}
+
+export interface ConditionTableHeader {
+  key: 'display' | 'onsetDateTimeRender' | 'status';
+  header: string;
+  isSortable: true;
+  sortFunc: (valueA: ConditionTableRow, valueB: ConditionTableRow) => number;
+}
+
+export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, tableRows: Array<ConditionTableRow>) {
+  const [sortParams, setSortParams] = useState<{
+    key: ConditionTableHeader['key'] | '';
+    sortDirection: 'ASC' | 'DESC' | 'NONE';
+  }>({ key: '', sortDirection: 'NONE' });
+  const sortRow = (cellA, cellB, { key, sortDirection }) => {
+    setSortParams({ key, sortDirection });
+  };
+  const sortedRows = useMemo(() => {
+    if (sortParams.sortDirection === 'NONE') {
+      return tableRows;
+    }
+
+    const { key, sortDirection } = sortParams;
+    const tableHeader = tableHeaders.find((h) => h.key === key);
+
+    return tableRows?.slice().sort((a, b) => {
+      const sortingNum = tableHeader.sortFunc(a, b);
+      return sortDirection === 'DESC' ? sortingNum : -sortingNum;
+    });
+  }, [sortParams, tableRows, tableHeaders]);
+
+  return {
+    sortedRows,
+    sortRow,
+  };
 }

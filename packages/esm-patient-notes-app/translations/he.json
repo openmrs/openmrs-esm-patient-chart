@@ -11,6 +11,8 @@
   "emptyDiagnosisText": "לא נבחרה אבחנה - הכנס אבחנה למטה",
   "enterPrimaryDiagnoses": "הזן אבחנות ראשיות",
   "enterSecondaryDiagnoses": "הזן אבחנות משניות",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "תמונה",
   "imageUploadHelperText": "טען תמונה או השתמש במצלמה של המכשיר כדי לצלם תמונה",
   "noMatchingDiagnoses": "לא נמצאו אבחנות התואמות",

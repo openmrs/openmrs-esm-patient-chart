@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 
-const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
+const mocklaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   launchPatientWorkspace: jest.fn(),
@@ -46,6 +46,6 @@ describe('FormError', () => {
     await user.click(link);
 
     expect(closeWorkspace).toHaveBeenCalled();
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('clinical-forms-workspace');
+    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('clinical-forms-workspace');
   });
 });

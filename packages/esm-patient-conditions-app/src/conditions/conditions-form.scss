@@ -75,7 +75,7 @@
 
 .conditionsError {
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger
+    outline: 2px solid $danger
   }
 
   :global(.cds--search-magnifier) {
@@ -94,6 +94,10 @@
 .radioGroup {
   :global(.cds--radio-button-wrapper) {
     margin-block-end: .375rem !important;
+  }
+
+  :global(.cds--radio-button__validation-msg) {
+    display: none;
   }
 }
 

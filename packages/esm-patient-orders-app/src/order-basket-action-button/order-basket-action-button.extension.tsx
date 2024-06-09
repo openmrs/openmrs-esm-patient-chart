@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLaunchWorkspaceRequiringVisit, useOrderBasket, SiderailNavButton } from '@openmrs/esm-patient-common-lib';
+import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { ActionMenuButton } from '@openmrs/esm-framework';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -9,8 +10,7 @@ const OrderBasketActionButton: React.FC = () => {
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
 
   return (
-    <SiderailNavButton
-      name={'order-basket-action-menu'}
+    <ActionMenuButton
       getIcon={(props) => <ShoppingCart {...props} />}
       label={t('orderBasket', 'Order basket')}
       iconDescription={t('medications', 'Medications')}

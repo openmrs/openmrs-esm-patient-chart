@@ -11,6 +11,8 @@
   "emptyDiagnosisText": "មិនបានជ្រើសរើសការធ្វើរោគវិនិច្ឆ័យទេ — បញ្ចូលការធ្វើរោគវិនិច្ឆ័យខាងក្រោម",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
   "enterSecondaryDiagnoses": "Enter Secondary diagnoses",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "រូបភាព",
   "imageUploadHelperText": "បង្ហោះរូបភាព ឬប្រើកាមេរ៉ារបស់ឧបករណ៍នេះដើម្បីចាប់យករូបភាព",
   "noMatchingDiagnoses": "រកមិនឃើញការធ្វើរោគវិនិច្ឆ័យត្រូវគ្នាទេ",

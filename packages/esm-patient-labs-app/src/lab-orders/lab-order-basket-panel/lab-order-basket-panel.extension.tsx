@@ -3,12 +3,11 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import {
   launchPatientWorkspace,
   type OrderBasketItem,
   useOrderBasket,
-  closeWorkspace,
   type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';

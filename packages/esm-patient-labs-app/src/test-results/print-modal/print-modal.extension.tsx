@@ -20,6 +20,7 @@ import {
 import { useReactToPrint } from 'react-to-print';
 import {
   age,
+  displayName,
   formatDate,
   useConfig,
   useLayoutType,
@@ -77,7 +78,7 @@ function PrintModal({ patientUuid, closeDialog }) {
       ) ?? [];
 
     return {
-      name: `${patient?.patient?.name?.[0]?.given?.join(' ')} ${patient?.patient?.name?.[0].family}`,
+      name: patient?.patient ? displayName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

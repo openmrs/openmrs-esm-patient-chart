@@ -21,7 +21,7 @@ export interface AppointmentPayload {
 export const updateAppointmentStatus = async (
   toStatus: string,
   appointmentUuid: string,
-  abortController: AbortController,
+  abortController?: AbortController,
 ) => {
   const statusChangeTime = dayjs().format(omrsDateFormat);
   const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
@@ -29,6 +29,6 @@ export const updateAppointmentStatus = async (
     body: { toStatus, onDate: statusChangeTime },
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    signal: abortController.signal,
+    signal: abortController?.signal,
   });
 };

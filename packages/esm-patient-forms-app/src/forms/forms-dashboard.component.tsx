@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Tile } from '@carbon/react';
 import { useConfig, useConnectivity, usePatient, ResponsiveWrapper } from '@openmrs/esm-framework';
 import {
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
   launchFormEntryOrHtmlForms,
   useVisitOrOfflineVisit,
@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
+const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
@@ -37,7 +37,7 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
         mutateForms,
       );
     },
-    [currentVisit, htmlFormEntryForms, patient, mutateForms],
+    [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
   const sections = useMemo(() => {

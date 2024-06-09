@@ -23,7 +23,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       removeQueuedPatient(queueEntry.queue.uuid, queueEntry.queueEntryUuid, new AbortController());
     }
     closeModal();
-  }, []);
+  }, [visitQueryEntry?.queueEntry, closeModal]);
 
   const { initiateDeletingVisit, isDeletingVisit } = useDeleteVisit(patientUuid, currentVisit, onDeleteVisit);
 

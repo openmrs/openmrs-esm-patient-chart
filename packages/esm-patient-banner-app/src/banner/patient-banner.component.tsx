@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
+  displayName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
@@ -34,7 +35,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     };
   }, [patientBannerRef, setIsTabletViewport]);
 
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = patient ? displayName(patient) : '';
 
   const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
@@ -42,6 +43,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
+  const maxDesktopWorkspaceWidthInPx = 520;
+  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= maxDesktopWorkspaceWidthInPx;
 
   return (
     <header
@@ -59,23 +62,33 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         <div className={styles.buttonCol}>
           {!hideActionsOverflow ? (
             <PatientBannerActionsMenu
-              patientUuid={patientUuid}
-              actionsSlotName={'patient-actions-slot'}
+              actionsSlotName="patient-actions-slot"
               isDeceased={patient.deceasedBoolean}
+              patientUuid={patientUuid}
             />
           ) : null}
-          <PatientBannerToggleContactDetailsButton
-            className={styles.toggleContactDetailsButton}
-            toggleContactDetails={toggleContactDetails}
-            showContactDetails={showContactDetails}
-          />
+          {!showDetailsButtonBelowHeader ? (
+            <PatientBannerToggleContactDetailsButton
+              className={styles.toggleContactDetailsButton}
+              toggleContactDetails={toggleContactDetails}
+              showContactDetails={showContactDetails}
+            />
+          ) : null}
         </div>
       </div>
+      {showDetailsButtonBelowHeader ? (
+        <PatientBannerToggleContactDetailsButton
+          className={styles.toggleContactDetailsButton}
+          toggleContactDetails={toggleContactDetails}
+          showContactDetails={showContactDetails}
+        />
+      ) : null}
       {showContactDetails && (
         <div
-          className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
-            styles[isTabletViewport && 'tabletContactDetails']
-          }`}
+          className={classNames(styles.contactDetails, {
+            [styles.deceasedContactDetails]: patient.deceasedBoolean,
+            [styles.tabletContactDetails]: isTabletViewport,
+          })}
         >
           <PatientBannerContactDetails patientId={patient?.id} deceased={isDeceased} />
         </div>
