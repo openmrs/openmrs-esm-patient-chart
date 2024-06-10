@@ -1,7 +1,7 @@
 import React from 'react';
 import { of, throwError } from 'rxjs';
 import { render, screen } from '@testing-library/react';
-import { esmPatientChartSchema } from '../../config-schema';
+import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import userEvent from '@testing-library/user-event';
 import {
   getDefaultsFromConfigSchema,
@@ -172,7 +172,7 @@ jest.mock('../hooks/useLocations', () => {
 describe('Visit Form', () => {
   beforeAll(() => {
     mockedUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,
@@ -546,7 +546,7 @@ describe('Visit Form', () => {
     const user = userEvent.setup();
 
     mockedUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,
