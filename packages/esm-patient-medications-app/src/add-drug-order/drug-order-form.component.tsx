@@ -134,21 +134,47 @@ const schemaFields = {
   requireOutpatientQuantity: z.boolean().optional(),
 };
 
-const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(false),
-    freeTextDosage: z.string().optional(),
-  }),
-  z.object({
-    ...schemaFields,
-    isFreeTextDosage: z.literal(true),
-    dosage: z.number().nullable(),
-    unit: z.object({ ...comboSchema }).nullable(),
-    route: z.object({ ...comboSchema }).nullable(),
-    frequency: z.object({ ...comboSchema }).nullable(),
-  }),
-]);
+const medicationOrderFormSchema = z
+  .discriminatedUnion('isFreeTextDosage', [
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(false),
+      freeTextDosage: z.string().optional(),
+    }),
+    z.object({
+      ...schemaFields,
+      isFreeTextDosage: z.literal(true),
+      dosage: z.number().nullable(),
+      unit: z.object({ ...comboSchema }).nullable(),
+      route: z.object({ ...comboSchema }).nullable(),
+      frequency: z.object({ ...comboSchema }).nullable(),
+    }),
+  ])
+  .superRefine((formValues, ctx) => {
+    if (formValues.requireOutpatientQuantity === true) {
+      if (!z.number().safeParse(formValues.pillsDispensed).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['pillsDispensed'],
+          message: translateFrom(moduleName, 'pillDispensedErrorMessage', 'The quantity to dispense is required'),
+        });
+      }
+      if (!z.object({ ...comboSchema }).safeParse(formValues.quantityUnits).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['quantityUnits'],
+          message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit'),
+        });
+      }
+      if (!z.number().safeParse(formValues.numRefills).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['numRefills'],
+          message: translateFrom(moduleName, 'numRefillsErrorMessage', 'The number of refills is required'),
+        });
+      }
+    }
+  });
 
 type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
 
