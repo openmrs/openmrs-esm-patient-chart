@@ -11,7 +11,7 @@ import {
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
-import { configSchema } from '../config-schema';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
@@ -51,7 +51,10 @@ jest.mock('../common', () => {
 
 describe('VitalsHeader: ', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockVitalsConfig });
+    mockedUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      mockVitalsConfig,
+    });
     jest.clearAllMocks();
   });
 
@@ -152,7 +155,7 @@ describe('VitalsHeader: ', () => {
     const user = userEvent.setup();
 
     mockedUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
       vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
     });
 
