@@ -48,6 +48,7 @@ import type {
 } from '../types';
 import styles from './drug-order-form.scss';
 import { moduleName } from '../dashboard.meta';
+import { useRequireOutpatientQuantity } from '../api/api';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -130,6 +131,7 @@ const schemaFields = {
       invalid_type_error: translateFrom(moduleName, 'selectFrequencyErrorMessage', 'Please select a frequency'),
     },
   ),
+  requireOutpatientQuantity: z.boolean().optional(),
 };
 
 const medicationOrderFormSchema = z.discriminatedUnion('isFreeTextDosage', [
@@ -201,6 +203,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
+  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const defaultStartDate = useMemo(() => {
     if (typeof initialOrderBasketItem?.startDate === 'string') parseDate(initialOrderBasketItem?.startDate);
@@ -235,8 +238,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
       startDate: defaultStartDate,
+      requireOutpatientQuantity: true,
     },
   });
+
+  useEffect(() => {
+    if (config.checkRequireOutpatientQuantityProperty) {
+      setValue('requireOutpatientQuantity', requireOutpatientQuantity);
+    }
+  }, [config.checkRequireOutpatientQuantityProperty, requireOutpatientQuantity, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
