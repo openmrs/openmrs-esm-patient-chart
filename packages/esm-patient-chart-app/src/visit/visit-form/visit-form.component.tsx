@@ -590,7 +590,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
-              subtitle: t('visitStartedSuccessfully', '{visit} started successfully', {
+              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
                 visit: t('offlineVisit', 'Offline Visit'),
               }),
               title: t('visitStarted', 'Visit started'),

@@ -29,10 +29,10 @@ export function startupApp() {
   subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 }
 
-// t('clinicalForm', 'Clinical Form')
+// t('clinicalForm', 'Clinical form')
 export const patientFormEntryWorkspace = getAsyncLifecycle(() => import('./forms/form-entry.workspace'), options);
 
-// t('clinicalForms', 'Clinical Forms')
+// t('clinicalForms', 'Clinical forms')
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
 
 export const clinicalFormActionMenu = getSyncLifecycle(clinicalFormActionMenuComponent, options);
