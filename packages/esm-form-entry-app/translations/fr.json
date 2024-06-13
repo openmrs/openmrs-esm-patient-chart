@@ -18,6 +18,7 @@
   "daysAgo": " jours",
   "deleteEntry": "Êtes-vous sûr(e) de vouloir supprimer cet élément ?",
   "discardButton": "Écarter",
+  "disallowDecimals": "Decimals are not allowed",
   "enterMoreCharacters": "Veuillez entrer au moins 2 caractères",
   "errorFetchingFormData": "Une erreur s'est produite lors de la récupération des données du formulaire. Détails : {detail}",
   "errorLoadingForm": "Erreur lors du chargement du formulaire",

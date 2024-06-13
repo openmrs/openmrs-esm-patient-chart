@@ -43,7 +43,7 @@
   "male": "ប្រុស",
   "medicationDurationAndUnit": "សម្រាប់ {រយៈពេល} {ឯកតារយៈពេល}",
   "medicationIndefiniteDuration": "រយៈពេលមិនកំណត់",
-  "Medications": "ថ្នាំ",
+  "medications": "Medications",
   "modify": "កែប្រែ",
   "none": "គ្មាន",
   "noResultsForDrugSearch": "គ្មានលទ្ធផលដែលត្រូវបង្ហាញសម្រាប់ \"{{searchTerm}}\"",
