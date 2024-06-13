@@ -37,40 +37,57 @@ test('Record and edit test results', async ({ page }) => {
     await page.getByText(/laboratory test results/i).click();
   });
 
-  await test.step('Then it should launch in the workspace', async () => {
-    await expect(page.getByRole('button', { name: /hematology/i, exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Chemistry', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: /other/i, exact: true })).toBeVisible();
-  });
-
-  await test.step('When I click the `Hematology` tab', async () => {
-    await page.getByRole('button', { name: 'Hematology', exact: true }).click();
-  });
-
   await test.step('And I fill the "Complete Blood Count" section', async () => {
-    await page.locator('#ManualInputWhiteBloodCellsid').fill('12');
-    await page.locator('#ManualEntryRedBloodCellsid').fill('15');
-    await page.locator('#ManualEntryPlateletsid').fill('10');
-    await page.locator('#ManualEntryNeutrophilsMicroscopicid').fill('10');
-    await page.locator('#ManualEntryMCVid').fill('10');
-    await page.locator('#ManualEntryMCHid').fill('10');
-  });
 
-  await test.step('When I click the `Chemistry` tab', async () => {
-    await page.getByRole('button', { name: 'Chemistry', exact: true }).click();
+    await page.getByLabel('White Blood Cells (WBC) (10^3/uL)').fill('12');
+    await page.getByLabel('Red Blood Cells (RBC) (10^6/').fill('15');
+    await page.getByLabel('Platelets (10^3/mL)').fill('10');
+    await page.getByLabel('Neutrophils (%)').fill('10');
+    await page.getByLabel('MCV (fL)').fill('10');
+    await page.getByLabel('MCH (pg)').fill('10');
+    await page.getByLabel('MCHC (g/dL)').fill('10');
+    await page.getByLabel('Lymphocytes (%) - microscopic exam').fill('10');
+    await page.getByLabel('Hematocrit (%)').fill('10');
+    await page.getByLabel('Haemoglobin (g/dL)').fill('10');
+    await page.getByLabel('Combined % of monocytes, eosinophils and basophils (%)').fill('10');
   });
 
   await test.step('And I fill the "Chemistry Results" section', async () => {
+    // Alkaline Phosphatase (U/L)
+    // Amylase (IU/L)
+    // BUN (mmol/L) - Blood Urea Nitrogen
+    // Fasting Blood Glucose (mg/dL)
+    // Post-Prandial Blood Glucose (mg/dL)
+    // Serum Albumin (g/dL)
+    // Serum Calcium (mg/dL)
+    // Serum Potassium (mmol/L)
+    // Serum Sodium (mmol/L)
+    // Serum Creatinine (umol/L)
+    // Total Protein (g/dL)
+    // Serum Glucose (mg/dl)
+    // Serum Glucose (mmol)
+    // Total Bilirubin (umol/L)
+    // Serum Glutamic-Oxaloacetic Transaminase (IU/L) aka SGPT, AST
+    // Alkaline Phosphatase, ALP (U/L)
+    // Serum Uric Acid (mg/dL)
+    // Total Cholesterol (mmol/L)
+    // Triglycerides (mmol/L)
+    // Serum Carbon Dioxide CO2 (mmol/L)
+    await page.getByLabel('Alkaline Phosphatase (U/L)').fill('10');
+    await page.getByLabel('Amylase (IU/L)').fill('10');
+    await page.getByLabel('BUN (mmol/L)').fill('10');
+    await page.getByLabel('Fasting Blood Glucose (mg/dL)').fill('10');
+    await page.getByLabel('Post-Prandial Blood Glucose (mg/dL)').fill('10');
+    await page.getByLabel('Serum Albumin (g/dL)').fill('10');
+    await
+
+
     await page.locator('#ManualEntryAlkalinePhosphataseid').fill('10');
     await page.locator('#ManualEntryAmylaseid').fill('10');
     await page.locator('#ManualEntryBUNid').fill('10');
     await page.locator('#manualEntryFastingBloodGlucosemgdlid').fill('10');
     await page.locator('#manualEntryPostPrandialBloodGlucosemgdlid').fill('10');
     await page.locator('#manualEntrySerumAlbuminid').fill('10');
-  });
-
-  await test.step('When I click the `Other` tab', async () => {
-    await page.getByRole('button', { name: 'Other', exact: true }).click();
   });
 
   await test.step('And I fill the "Urine" and "Stool" sections', async () => {

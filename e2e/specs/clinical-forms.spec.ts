@@ -36,10 +36,10 @@ test('Fill a clinical form', async ({ page }) => {
     await expect(headerRow).toContainText(/form name \(a-z\)/i);
     await expect(headerRow).toContainText(/last completed/i);
 
-    await expect(chartPage.page.getByRole('cell', { name: /covid 19/i })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /laboratory test results/i })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /soap note template/i })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /surgical operation/i })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: 'Covid 19', exact: true })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: /soap note template/i, exact: true })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: /surgical operation/i, exact: true })).toBeVisible();
   });
 
   await test.step('When I click the `Soap note template` link to launch the form', async () => {
@@ -51,27 +51,28 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
-    await chartPage.page.locator('#SOAPSubjectiveFindingsid').fill(subjectiveFindings);
+    await chartPage.page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
   });
 
   await test.step('And I fill the `Objective findings` question', async () => {
-    await chartPage.page.locator('#SOAPObjectiveFindingsid').fill(objectiveFindings);
+    await chartPage.page.getByLabel(/objective findings/i).fill(objectiveFindings);
   });
 
   await test.step('And I fill the `Assessment` question', async () => {
-    await chartPage.page.locator('#SOAPAssessmentid').fill(assessment);
+    await chartPage.page.getByLabel(/assessment/i).fill(assessment);
   });
 
   await test.step('And I fill the `Plan` question', async () => {
-    await chartPage.page.locator('#SOAPPlanid').fill(plan);
+    await chartPage.page.getByLabel(/plan/i).fill(plan);
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
-    await chartPage.page.getByRole('button', { name: /save and close/i }).click();
+    await chartPage.page.getByRole('button', { name: /save/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(chartPage.page.getByText(/the form has been submitted successfully/i)).toBeVisible();
+    await expect(chartPage.page.getByText(/record created/i, { exact: true })).toBeVisible();
+    await expect(chartPage.page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
   });
 
   await test.step('And if I navigate to the visits dashboard', async () => {
