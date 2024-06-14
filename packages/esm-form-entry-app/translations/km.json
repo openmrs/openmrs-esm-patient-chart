@@ -18,6 +18,7 @@
   "daysAgo": " ថ្ងៃ​មុន",
   "deleteEntry": "តើអ្នកពិតជាចង់លុបធាតុនេះទេ?",
   "discardButton": "បោះបង់",
+  "disallowDecimals": "Decimals are not allowed",
   "enterMoreCharacters": "សូមបញ្ចូលតួអក្សរ ២ ឬច្រើន។",
   "errorFetchingFormData": "ការទាញយកទិន្នន័យពីទម្រង់មិនដំណើរការ។ ព័ត៌មានលម្អិត៖ {detail}",
   "errorLoadingForm": "ទម្រង់ចម្លងទិន្នន័យមិនដំណើរការ",
