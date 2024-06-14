@@ -29,7 +29,7 @@ export const VitalsAndBiometricsActionMenu = ({ formType, rowId }: VitalsActionM
   }, [t, vitalsBiometrics, encounterUuid, formType]);
 
   const launchDeleteVitalForm = () => {
-    const dispose = showModal('vitals-biometrics-delete-dialog', {
+    const dispose = showModal('vitals-and-biometrics-delete-modal', {
       closeDeleteModal: () => dispose(),
       patientUuid,
       encounterUuid,

@@ -267,7 +267,7 @@ describe('VitalsBiometricsForm', () => {
     await user.click(saveButton);
     expect(height).toHaveValue(80);
 
-    const updatedPayLoad: VitalsBiometricsFormData = {
+    const updatedPayload: VitalsBiometricsFormData = {
       systolicBloodPressure: mockVitalsBiometrics.systolic,
       diastolicBloodPressure: mockVitalsBiometrics.diastolic,
       respiratoryRate: mockVitalsBiometrics.respiratoryRate,
@@ -284,7 +284,7 @@ describe('VitalsBiometricsForm', () => {
     expect(mockedUpdateVitalsAndBiometrics).toHaveBeenCalledWith(
       mockVitalsConfig.concepts,
       mockPatient.id,
-      expect.objectContaining(updatedPayLoad),
+      expect.objectContaining(updatedPayload),
       expect.anything(),
       new AbortController(),
       mockVitalsBiometrics.uuid,

@@ -197,7 +197,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsBiometricsFormProps> = ({
   const handleUpdatePatientVitalsAndBiometrics = useCallback(
     async (formData, abortController, date) => {
       try {
-        const response = await updatePatientVitalsAndBiometrics(
+        await updatePatientVitalsAndBiometrics(
           config.concepts,
           patientUuid,
           formData,
@@ -207,27 +207,26 @@ const VitalsAndBiometricsForm: React.FC<VitalsBiometricsFormProps> = ({
           session?.sessionLocation?.uuid,
         );
 
-        if (response.status === 200) {
-          invalidateCachedVitalsAndBiometrics();
-          closeWorkspaceWithSavedChanges();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            title: t('vitalsAndBiometricsUpdated', 'Vitals and Biometrics Updated'),
-            subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
-          });
-        }
+        setIsSubmitting(false);
+        invalidateCachedVitalsAndBiometrics();
+        closeWorkspaceWithSavedChanges();
+
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          title: t('vitalsAndBiometricsUpdated', 'Vitals and Biometrics Updated'),
+          subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
+        });
       } catch (err) {
         setIsSubmitting(false);
         createErrorHandler();
+
         showSnackbar({
           title: t('vitalsAndBiometricsEditError', 'Error editing vitals and biometrics'),
           kind: 'error',
           isLowContrast: false,
           subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
         });
-      } finally {
-        abortController.abort();
       }
     },
     [
@@ -243,7 +242,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsBiometricsFormProps> = ({
   const handleSavePatientVitals = useCallback(
     async (formData, abortController) => {
       try {
-        const response = await savePatientVitals(
+        await savePatientVitals(
           config.vitals.encounterTypeUuid,
           config.vitals.formUuid,
           config.concepts,
@@ -253,27 +252,26 @@ const VitalsAndBiometricsForm: React.FC<VitalsBiometricsFormProps> = ({
           session?.sessionLocation?.uuid,
         );
 
-        if (response.status === 201) {
-          invalidateCachedVitalsAndBiometrics();
-          closeWorkspaceWithSavedChanges();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-            subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
-          });
-        }
+        setIsSubmitting(false);
+        invalidateCachedVitalsAndBiometrics();
+        closeWorkspaceWithSavedChanges();
+
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+          subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
+        });
       } catch (err) {
         setIsSubmitting(false);
         createErrorHandler();
+
         showSnackbar({
           title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
           kind: 'error',
           isLowContrast: false,
           subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
         });
-      } finally {
-        abortController.abort();
       }
     },
     [

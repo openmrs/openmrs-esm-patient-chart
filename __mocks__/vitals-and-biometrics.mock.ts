@@ -1,4 +1,4 @@
-import { PatientVitalsAndBiometrics } from '../packages/esm-patient-vitals-app/src/common';
+import { type PatientVitalsAndBiometrics } from '../packages/esm-patient-vitals-app/src/common';
 
 export const mockBiometricsResponse = {
   resourceType: 'Bundle',
@@ -6059,7 +6059,7 @@ export const formattedVitals = [
   },
 ];
 
-export const formattedVitalsAndBiometrics = [
+export const formattedVitalsAndBiometrics: Array<PatientVitalsAndBiometrics> = [
   {
     id: '0',
     uuid: 'fd481c9f-f81f-4aaf-b00b-747900af9935',
@@ -6077,7 +6077,8 @@ export const formattedVitalsAndBiometrics = [
     muac: 12,
     generalPatientNote: 'notes',
   },
-] as PatientVitalsAndBiometrics[];
+];
+
 export const mockVitalsConceptMetadata = mockVitalsSignsConcepts.data.results[0].setMembers;
 
 export const mockConceptUnits = new Map<string, string>(

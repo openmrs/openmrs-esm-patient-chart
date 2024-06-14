@@ -78,8 +78,8 @@
   ],
   "modals": [
     {
-      "name": "vitals-biometrics-delete-dialog",
-      "component": "vitalsBiometricsDeleteConfirmationDialog"
+      "name": "vitals-and-biometrics-delete-modal",
+      "component": "vitalsAndBiometricsDeleteModal"
     }
   ]
 }

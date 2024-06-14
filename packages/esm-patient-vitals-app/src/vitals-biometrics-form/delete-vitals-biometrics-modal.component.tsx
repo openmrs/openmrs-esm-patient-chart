@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   deleteVitalsAndBiometrics,
   getEncounterByUuid,
@@ -16,11 +16,13 @@ interface DeleteVitalModalProps {
 
 const DeleteVitalsBiometricsModal = ({ closeDeleteModal, encounterUuid }: DeleteVitalModalProps) => {
   const { t } = useTranslation();
+  const { concepts } = useConfig<ConfigObject>();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const voidVitalsInEncounter = async (encounterUuid: string) => {
+  const voidVitalsAndBiometricsObsInEncounter = async (encounterUuid: string) => {
     try {
       const response = await getEncounterByUuid(encounterUuid);
+
       if (!response?.data) {
         showSnackbar({
           isLowContrast: false,
@@ -29,9 +31,13 @@ const DeleteVitalsBiometricsModal = ({ closeDeleteModal, encounterUuid }: Delete
         });
       }
 
+      const conceptUuids = new Set(Object.values(concepts));
+
       const updatedEncounter = {
         ...response.data,
-        obs: response.data.obs?.map((obs) => ({ ...obs, voided: true })) || [],
+        obs: (response.data.obs || [])
+          .filter((obs) => conceptUuids.has(obs.concept.uuid))
+          .map((obs) => ({ ...obs, voided: true })),
       };
 
       return updatedEncounter;
@@ -43,20 +49,20 @@ const DeleteVitalsBiometricsModal = ({ closeDeleteModal, encounterUuid }: Delete
       });
     }
   };
+
   const handleDeleteVitalsAndBiometrics = async () => {
     setIsDeleting(true);
-    const encounter = await voidVitalsInEncounter(encounterUuid);
-    try {
-      const response = await deleteVitalsAndBiometrics(encounterUuid, encounter);
+    const encounter = await voidVitalsAndBiometricsObsInEncounter(encounterUuid);
 
-      if (response.status === 200) {
-        invalidateCachedVitalsAndBiometrics();
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          title: t('vitalsAndBiometricsDeleted', 'Vitals and Biometrics deleted'),
-        });
-      }
+    try {
+      await deleteVitalsAndBiometrics(encounterUuid, encounter);
+      invalidateCachedVitalsAndBiometrics();
+
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        title: t('vitalsAndBiometricsDeleted', 'Vitals and Biometrics deleted'),
+      });
     } catch (error) {
       console.error('Error deleting vitals and biometrics: ', error);
 
@@ -96,4 +102,5 @@ const DeleteVitalsBiometricsModal = ({ closeDeleteModal, encounterUuid }: Delete
     </>
   );
 };
+
 export default DeleteVitalsBiometricsModal;

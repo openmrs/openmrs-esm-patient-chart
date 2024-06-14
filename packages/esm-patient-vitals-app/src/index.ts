@@ -5,7 +5,6 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
   restBaseUrl,
-  translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import dashboardMeta from './dashboard.meta';
@@ -61,7 +60,7 @@ export const vitalsAndBiometricsDashboardLink =
 
 export const weightTile = getAsyncLifecycle(() => import('./weight-tile/weight-tile.component'), options);
 
-export const vitalsBiometricsDeleteConfirmationDialog = getAsyncLifecycle(
+export const vitalsAndBiometricsDeleteModal = getAsyncLifecycle(
   () => import('./vitals-biometrics-form/delete-vitals-biometrics-modal.component'),
   options,
 );
