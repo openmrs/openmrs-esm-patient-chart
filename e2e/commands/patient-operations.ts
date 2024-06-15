@@ -47,14 +47,16 @@ export interface Identifier {
 }
 
 export const generateRandomPatient = async (api: APIRequestContext): Promise<Patient> => {
-  const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {
-    data: {},
-  });
+  const identifierRes = await api.post(
+    'rest/v1/idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier',
+    {
+      data: {},
+    },
+  );
   await expect(identifierRes.ok()).toBeTruthy();
   const { identifier } = await identifierRes.json();
 
-  const patientRes = await api.post('patient', {
-    // TODO: This is not configurable right now. It probably should be.
+  const patientRes = await api.post('rest/v1/patient', {
     data: {
       identifiers: [
         {
@@ -96,10 +98,65 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
 };
 
 export const getPatient = async (api: APIRequestContext, uuid: string): Promise<Patient> => {
-  const patientRes = await api.get(`patient/${uuid}?v=full`);
+  const patientRes = await api.get(`rest/v1/patient/${uuid}?v=full`);
   return await patientRes.json();
 };
 
 export const deletePatient = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`patient/${uuid}`, { data: {} });
+  await api.delete(`rest/v1/patient/${uuid}`, { data: {} });
+};
+
+export const createImmunizations = async (api: APIRequestContext, uuid: string) => {
+  const immunizationData = {
+    resourceType: 'Immunization',
+    status: 'completed',
+    vaccineCode: {
+      coding: [
+        {
+          code: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Polio vaccination, oral',
+        },
+      ],
+    },
+    patient: {
+      type: 'Patient',
+      reference: `Patient/${uuid}`,
+    },
+    encounter: {
+      type: 'Encounter',
+      reference: 'Encounter/fca94b00-8b1f-4468-b006-68e77f438978',
+    },
+    occurrenceDateTime: '2024-06-10T13:50:00.000Z',
+    expirationDate: '2052-06-29T18:30:00.000Z',
+    location: {
+      type: 'Location',
+      reference: 'Location/44c3efb0-2583-4c80-a79e-1f756a03c0a1',
+    },
+    performer: [
+      {
+        actor: {
+          type: 'Practitioner',
+          reference: 'Practitioner/f39e57d8-1185-4199-8567-6f1eeb160f05',
+        },
+      },
+    ],
+    manufacturer: {
+      display: 'Sanofi Pasteur SA',
+    },
+    lotNumber: 'POLIO-001',
+    protocolApplied: [
+      {
+        doseNumberPositiveInt: 1,
+        series: null,
+      },
+    ],
+  };
+
+  const immunizationRes = await api.post('fhir2/R4/Immunization?_summary=data', {
+    data: immunizationData,
+  });
+  console.log('Immunization response:', immunizationRes);
+  await expect(immunizationRes.ok()).toBeTruthy();
+  const immunization = await immunizationRes.json();
+  return immunization;
 };
