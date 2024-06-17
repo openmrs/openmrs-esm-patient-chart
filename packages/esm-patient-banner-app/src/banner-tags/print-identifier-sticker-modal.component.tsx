@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, type TFunction } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { Button, Column, Grid, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { age, displayName, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker-modal.scss';
@@ -9,6 +9,21 @@ import styles from './print-identifier-sticker-modal.scss';
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
   patient: fhir.Patient;
+}
+
+interface PrintComponentProps extends Partial<ConfigObject> {
+  patientDetails: {
+    address?: fhir.Address[];
+    age?: string;
+    dateOfBirth?: string;
+    gender?: string;
+    id?: string;
+    identifiers?: fhir.Identifier[];
+    name?: string;
+    photo?: fhir.Attachment[];
+  };
+  printRef: React.RefObject<HTMLDivElement>;
+  t: TFunction;
 }
 
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
@@ -23,8 +38,6 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
-
-      document.documentElement.style.setProperty('--print-identifier-sticker-size', printIdentifierStickerSize);
     }
   }, [isPrinting, printIdentifierStickerSize]);
 
@@ -71,15 +84,9 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         if (patient && headerTitle) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
-          const printStyles = `@media print { @page { size: ${printIdentifierStickerSize}; } }`;
-
-          const style = document.createElement('style');
-          style.appendChild(document.createTextNode(printStyles));
-
-          document.head.appendChild(style);
         }
       }),
-    [headerTitle, patient, printIdentifierStickerSize],
+    [headerTitle, patient],
   );
 
   const handleAfterPrint = useCallback(() => {
@@ -88,12 +95,8 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     closeModal();
   }, [closeModal]);
 
-  const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
-    documentTitle: `${patientDetails.name} - ${headerTitle}`,
-    onAfterPrint: handleAfterPrint,
-    onBeforeGetContent: handleBeforeGetContent,
-    onPrintError: (errorLocation, error) => {
+  const handlePrintError = useCallback(
+    (errorLocation, error) => {
       onBeforeGetContentResolve.current = null;
 
       showSnackbar({
@@ -105,90 +108,81 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
 
       setIsPrinting(false);
     },
+    [t],
+  );
+
+  const handlePrint = useReactToPrint({
+    content: () => contentToPrintRef.current,
+    documentTitle: `${patientDetails.name} - ${headerTitle}`,
+    onAfterPrint: handleAfterPrint,
+    onBeforeGetContent: handleBeforeGetContent,
+    onPrintError: handlePrintError,
   });
-
-  const renderElementsInPairs = (elements) => {
-    const pairs = [];
-    let currentPair = [];
-
-    const getKey = (element) => {
-      if (element?.props?.children?.key?.startsWith('identifier-text')) {
-        return 'identifier';
-      }
-      return element?.key;
-    };
-
-    const filteredElements = elements.filter((element) => {
-      return printIdentifierStickerFields.includes(getKey(element));
-    });
-
-    filteredElements.forEach((element) => {
-      if (element) {
-        currentPair.push(element);
-        if (currentPair.length === 2) {
-          pairs.push(currentPair);
-          currentPair = [];
-        }
-      }
-    });
-
-    if (currentPair.length === 1) {
-      pairs.push(currentPair);
-    }
-
-    return pairs;
-  };
 
   return (
     <>
       <ModalHeader closeModal={closeModal} title={t('printIdentifierSticker', 'Print identifier sticker')} />
       <ModalBody>
-        <div className={styles.stickerContainer} ref={contentToPrintRef}>
-          {printIdentifierStickerFields.includes('name') && (
-            <div key="name" className={styles.patientName}>
-              {patientDetails?.name}
-            </div>
-          )}
-          {renderElementsInPairs(
-            [
-              patientDetails?.identifiers?.map((identifier, index) => (
-                <div key={`identifier-${index}`}>
-                  <p key={`identifier-text-${index}`}>
-                    {identifier?.type?.text}: <strong>{identifier?.value}</strong>
-                  </p>
-                </div>
-              )),
-              <p key="gender">
-                {t('sex', 'Sex')}: <strong>{patientDetails?.gender}</strong>
-              </p>,
-              <p key="dateOfBirth">
-                {t('dob', 'DOB')}: <strong>{patientDetails?.dateOfBirth}</strong>
-              </p>,
-              <p key="age">
-                {t('age', 'Age')}: <strong>{patientDetails?.age}</strong>
-              </p>,
-            ].flat(),
-          ).map((pair, index) => (
-            <Grid className={styles.gridRow} key={`grid-${index}`}>
-              <Column lg={8} md={4} sm={4}>
-                <div key={`pair-0-${index}`}>{pair[0]}</div>
-              </Column>
-              <Column lg={8} md={4} sm={4}>
-                <div key={`pair-1-${index}`}>{pair[1] || <div />}</div>
-              </Column>
-            </Grid>
-          ))}
-        </div>
+        <PrintComponent
+          patientDetails={patientDetails}
+          printIdentifierStickerFields={printIdentifierStickerFields}
+          printIdentifierStickerSize={printIdentifierStickerSize}
+          printRef={contentToPrintRef}
+          t={t}
+        />
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} disabled={isPrinting} onClick={handlePrint} kind="primary">
-          {isPrinting ? <InlineLoading description={t('printing', 'Printing') + '...'} /> : t('print', 'Print')}
+          {isPrinting ? (
+            <InlineLoading className={styles.loader} description={t('printing', 'Printing') + '...'} />
+          ) : (
+            t('print', 'Print')
+          )}
         </Button>
       </ModalFooter>
     </>
+  );
+};
+
+const PrintComponent = ({
+  patientDetails,
+  printIdentifierStickerFields,
+  printIdentifierStickerSize,
+  printRef,
+  t,
+}: PrintComponentProps) => {
+  return (
+    <div className={styles.stickerContainer} ref={printRef}>
+      <style type="text/css" media="print">
+        {`
+          @page {
+            size: ${printIdentifierStickerSize};
+          }
+        `}
+      </style>
+      {printIdentifierStickerFields.includes('name') && <div className={styles.patientName}>{patientDetails.name}</div>}
+      <div className={styles.detailsGrid}>
+        {patientDetails.identifiers.map((identifier) => {
+          return (
+            <p key={identifier?.id}>
+              {identifier?.type?.text}: <strong>{identifier?.value}</strong>
+            </p>
+          );
+        })}
+        <p>
+          {t('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
+        </p>
+        <p>
+          {t('dob', 'DOB')}: <strong>{patientDetails.dateOfBirth}</strong>
+        </p>
+        <p>
+          {t('age', 'Age')}: <strong>{patientDetails.age}</strong>
+        </p>
+      </div>
+    </div>
   );
 };
 

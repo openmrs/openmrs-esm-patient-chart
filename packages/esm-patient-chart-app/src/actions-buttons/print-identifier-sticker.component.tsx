@@ -24,6 +24,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
   }, [patient]);
 
   return (
+    patient &&
     Boolean(showPrintIdentifierStickerButton) && (
       <OverflowMenuItem
         itemText={t('printIdentifierSticker', 'Print identifier sticker')}
