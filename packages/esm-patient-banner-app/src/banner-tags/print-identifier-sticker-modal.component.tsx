@@ -38,7 +38,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
     }
-  }, [isPrinting, printIdentifierStickerSize]);
+  }, [isPrinting]);
 
   const patientDetails = useMemo(() => {
     if (!patient) {
@@ -123,6 +123,13 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       <ModalHeader closeModal={closeModal} title={t('printIdentifierSticker', 'Print identifier sticker')} />
       <ModalBody>
         <div ref={contentToPrintRef}>
+          <style type="text/css" media="print">
+            {`
+              @page {
+                size: ${printIdentifierStickerSize};
+              }
+            `}
+          </style>
           <PrintComponent
             patientDetails={patientDetails}
             printIdentifierStickerFields={printIdentifierStickerFields}
@@ -155,13 +162,6 @@ const PrintComponent = ({
 }: PrintComponentProps) => {
   return (
     <div className={styles.stickerContainer}>
-      <style type="text/css" media="print">
-        {`
-          @page {
-            size: ${printIdentifierStickerSize};
-          }
-        `}
-      </style>
       {printIdentifierStickerFields.includes('name') && <div className={styles.patientName}>{patientDetails.name}</div>}
       <div className={styles.detailsGrid}>
         {patientDetails.identifiers.map((identifier) => {
