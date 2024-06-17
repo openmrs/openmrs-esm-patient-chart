@@ -1,8 +1,18 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
+:root {
+  --print-identifier-sticker-size: auto;
+}
+
+@media print {
+  @page {
+    size: var(--print-identifier-sticker-size);
+  }
+}
+
 .stickerContainer {
-  padding: 1rem 1rem 0 1rem;
+  padding: 0.5rem;
 }
 
 .row {
@@ -28,4 +38,10 @@
   font-size: 1.5rem;
   font-weight: bolder;
   margin-bottom: 5px;
+}
+
+.button {
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
 }

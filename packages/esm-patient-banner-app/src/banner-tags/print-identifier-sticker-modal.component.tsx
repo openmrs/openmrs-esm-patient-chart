@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { Button, Column, Grid, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, displayName, useConfig } from '@openmrs/esm-framework';
+import { Button, Column, Grid, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { age, displayName, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker-modal.scss';
 
@@ -13,20 +13,26 @@ interface PrintIdentifierStickerProps {
 
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
-  const [isPrinting, setIsPrinting] = useState(false);
-  const contentToPrintRef = useRef(null);
-  const onBeforeGetContentResolve = useRef(null);
   const { printIdentifierStickerFields, printIdentifierStickerSize, excludePatientIdentifierCodeTypes } =
     useConfig<ConfigObject>();
+  const contentToPrintRef = useRef(null);
+  const onBeforeGetContentResolve = useRef<() => void | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
+
+      document.documentElement.style.setProperty('--print-identifier-sticker-size', printIdentifierStickerSize);
     }
-  }, [isPrinting]);
+  }, [isPrinting, printIdentifierStickerSize]);
 
   const patientDetails = useMemo(() => {
+    if (!patient) {
+      return {};
+    }
+
     const getGender = (gender: string): string => {
       switch (gender) {
         case 'male':
@@ -43,36 +49,38 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     };
 
     const identifiers =
-      patient?.identifier?.filter(
+      patient.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      address: patient?.address,
-      age: age(patient?.birthDate),
+      address: patient.address,
+      age: age(patient.birthDate),
       dateOfBirth: patient.birthDate,
-      gender: getGender(patient?.gender),
-      id: patient?.id,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => ({ value, type })) : [],
+      gender: getGender(patient.gender),
+      id: patient.id,
+      identifiers: [...identifiers],
       name: patient ? displayName(patient) : '',
-      photo: patient?.photo,
+      photo: patient.photo,
     };
-  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
+  }, [excludePatientIdentifierCodeTypes?.uuids, patient, t]);
 
-  const handleBeforeGetContent = useCallback(() => {
-    return new Promise<void>((resolve) => {
-      if (patient && headerTitle) {
-        onBeforeGetContentResolve.current = resolve;
-        setIsPrinting(true);
-        const printStyles = `@media print { @page { size: ${printIdentifierStickerSize}; } }`;
+  const handleBeforeGetContent = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        if (patient && headerTitle) {
+          onBeforeGetContentResolve.current = resolve;
+          setIsPrinting(true);
+          const printStyles = `@media print { @page { size: ${printIdentifierStickerSize}; } }`;
 
-        const style = document.createElement('style');
-        style.appendChild(document.createTextNode(printStyles));
+          const style = document.createElement('style');
+          style.appendChild(document.createTextNode(printStyles));
 
-        document.head.appendChild(style);
-      }
-    });
-  }, [patient, printIdentifierStickerSize, headerTitle]);
+          document.head.appendChild(style);
+        }
+      }),
+    [headerTitle, patient, printIdentifierStickerSize],
+  );
 
   const handleAfterPrint = useCallback(() => {
     onBeforeGetContentResolve.current = null;
@@ -86,7 +94,16 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     onAfterPrint: handleAfterPrint,
     onBeforeGetContent: handleBeforeGetContent,
     onPrintError: (errorLocation, error) => {
-      console.error(`Error in ${errorLocation}: `, error);
+      onBeforeGetContentResolve.current = null;
+
+      showSnackbar({
+        isLowContrast: false,
+        kind: 'error',
+        title: t('printError', 'Print error'),
+        subtitle: t('printErrorExplainer', 'An error occurred in "{{errorLocation}}": ', { errorLocation }) + error,
+      });
+
+      setIsPrinting(false);
     },
   });
 
@@ -123,7 +140,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   };
 
   return (
-    <div>
+    <>
       <ModalHeader closeModal={closeModal} title={t('printIdentifierSticker', 'Print identifier sticker')} />
       <ModalBody>
         <div className={styles.stickerContainer} ref={contentToPrintRef}>
@@ -145,7 +162,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
                 {t('sex', 'Sex')}: <strong>{patientDetails?.gender}</strong>
               </p>,
               <p key="dateOfBirth">
-                {t('bod', 'DOB')}: <strong>{patientDetails?.dateOfBirth}</strong>
+                {t('dob', 'DOB')}: <strong>{patientDetails?.dateOfBirth}</strong>
               </p>,
               <p key="age">
                 {t('age', 'Age')}: <strong>{patientDetails?.age}</strong>
@@ -167,11 +184,11 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isPrinting} onClick={handlePrint} kind="primary">
-          {t('print', 'Print')}
+        <Button className={styles.button} disabled={isPrinting} onClick={handlePrint} kind="primary">
+          {isPrinting ? <InlineLoading description={t('printing', 'Printing') + '...'} /> : t('print', 'Print')}
         </Button>
       </ModalFooter>
-    </div>
+    </>
   );
 };
 

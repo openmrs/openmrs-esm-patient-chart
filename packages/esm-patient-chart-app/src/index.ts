@@ -21,6 +21,7 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
+import printIdentifierStickerActionButtonComponent from './actions-buttons/print-identifier-sticker.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
 import pastVisitsDetailOverviewComponent from './visit/past-visit-overview.component';
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
@@ -226,6 +227,11 @@ export const deleteVisitActionButton = getAsyncLifecycle(
   () => import('./visit/visit-action-items/delete-visit-action-item.component'),
   { featureName: 'delete-visit', moduleName },
 );
+
+export const printIdentifierStickerActionButton = getSyncLifecycle(printIdentifierStickerActionButtonComponent, {
+  featureName: 'patient-actions-slot-print-identifier-sticker-button',
+  moduleName,
+});
 
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
