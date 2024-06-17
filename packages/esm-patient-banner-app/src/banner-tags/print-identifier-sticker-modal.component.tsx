@@ -22,7 +22,6 @@ interface PrintComponentProps extends Partial<ConfigObject> {
     name?: string;
     photo?: fhir.Attachment[];
   };
-  printRef: React.RefObject<HTMLDivElement>;
   t: TFunction;
 }
 
@@ -123,13 +122,14 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     <>
       <ModalHeader closeModal={closeModal} title={t('printIdentifierSticker', 'Print identifier sticker')} />
       <ModalBody>
-        <PrintComponent
-          patientDetails={patientDetails}
-          printIdentifierStickerFields={printIdentifierStickerFields}
-          printIdentifierStickerSize={printIdentifierStickerSize}
-          printRef={contentToPrintRef}
-          t={t}
-        />
+        <div ref={contentToPrintRef}>
+          <PrintComponent
+            patientDetails={patientDetails}
+            printIdentifierStickerFields={printIdentifierStickerFields}
+            printIdentifierStickerSize={printIdentifierStickerSize}
+            t={t}
+          />
+        </div>
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
@@ -151,11 +151,10 @@ const PrintComponent = ({
   patientDetails,
   printIdentifierStickerFields,
   printIdentifierStickerSize,
-  printRef,
   t,
 }: PrintComponentProps) => {
   return (
-    <div className={styles.stickerContainer} ref={printRef}>
+    <div className={styles.stickerContainer}>
       <style type="text/css" media="print">
         {`
           @page {
