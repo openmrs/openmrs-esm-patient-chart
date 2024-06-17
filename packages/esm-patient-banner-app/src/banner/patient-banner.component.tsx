@@ -19,6 +19,7 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
 
   useEffect(() => {
     const currentRef = patientBannerRef.current;
@@ -37,7 +38,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   const patientName = patient ? displayName(patient) : '';
 
-  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
@@ -60,18 +60,20 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         </div>
         <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow ? (
-            <PatientBannerActionsMenu
-              actionsSlotName="patient-actions-slot"
-              isDeceased={patient.deceasedBoolean}
-              patientUuid={patientUuid}
-            />
-          ) : null}
+          <div className={styles.buttonRow}>
+            {!hideActionsOverflow ? (
+              <PatientBannerActionsMenu
+                actionsSlotName="patient-actions-slot"
+                isDeceased={patient.deceasedBoolean}
+                patientUuid={patientUuid}
+              />
+            ) : null}
+          </div>
           {!showDetailsButtonBelowHeader ? (
             <PatientBannerToggleContactDetailsButton
               className={styles.toggleContactDetailsButton}
-              toggleContactDetails={toggleContactDetails}
               showContactDetails={showContactDetails}
+              toggleContactDetails={toggleContactDetails}
             />
           ) : null}
         </div>
@@ -79,8 +81,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
       {showDetailsButtonBelowHeader ? (
         <PatientBannerToggleContactDetailsButton
           className={styles.toggleContactDetailsButton}
-          toggleContactDetails={toggleContactDetails}
           showContactDetails={showContactDetails}
+          toggleContactDetails={toggleContactDetails}
         />
       ) : null}
       {showContactDetails && (
@@ -90,7 +92,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             [styles.tabletContactDetails]: isTabletViewport,
           })}
         >
-          <PatientBannerContactDetails patientId={patient?.id} deceased={isDeceased} />
+          <PatientBannerContactDetails deceased={isDeceased} patientId={patient?.id} />
         </div>
       )}
     </header>
