@@ -133,7 +133,6 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
           <PrintComponent
             patientDetails={patientDetails}
             printIdentifierStickerFields={printIdentifierStickerFields}
-            printIdentifierStickerSize={printIdentifierStickerSize}
             t={t}
           />
         </div>
@@ -154,12 +153,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   );
 };
 
-const PrintComponent = ({
-  patientDetails,
-  printIdentifierStickerFields,
-  printIdentifierStickerSize,
-  t,
-}: PrintComponentProps) => {
+const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: PrintComponentProps) => {
   return (
     <div className={styles.stickerContainer}>
       {printIdentifierStickerFields.includes('name') && <div className={styles.patientName}>{patientDetails.name}</div>}
