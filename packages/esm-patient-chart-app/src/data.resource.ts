@@ -7,34 +7,34 @@ interface CauseOfDeathFetchResponse {
   value: string;
 }
 
-interface DeathPayload {
-  deathDate?: Date;
-  dead: boolean;
-  causeOfDeath?: string;
-}
-
 export interface ConceptAnswer {
-  uuid: string;
-  name: string;
   display: string;
+  name: string;
+  uuid: string;
 }
 
 interface ConceptAnswersResponse {
   answers?: Array<ConceptAnswer>;
 }
 
-export function usePatientDeathConcepts() {
+interface DeathPayload {
+  causeOfDeath?: string;
+  dead: boolean;
+  deathDate?: Date;
+}
+
+export function useCausesOfDeath() {
   const { isCauseOfDeathLoading, isCauseOfDeathValidating, value: causeOfDeathConcept } = useCauseOfDeathConcept();
   const { isConceptLoading, isConceptAnswerValidating, conceptAnswers } = useConceptAnswers(causeOfDeathConcept);
 
   return {
-    conceptAnswers: conceptAnswers,
+    causesOfDeath: conceptAnswers,
     isLoading: isCauseOfDeathLoading || isConceptLoading,
     isValidating: isConceptAnswerValidating || isCauseOfDeathValidating,
   };
 }
 
-export function usePatientDeceased(patientUuid: string) {
+export function usePatientDeceasedStatus(patientUuid: string) {
   const { isLoading: isPatientLoading, patient } = usePatient(patientUuid);
 
   if (isPatientLoading) {
@@ -67,15 +67,15 @@ export function markPatientDeceased(
   deceasedDate: Date,
   personUuid: string,
   selectedCauseOfDeathValue: string | undefined,
-  abortController: AbortController,
 ) {
+  const abortController = new AbortController();
   const payload: DeathPayload = {
     causeOfDeath: selectedCauseOfDeathValue,
     dead: true,
   };
 
   if (deceasedDate) {
-    payload.deathDate = new Date(deceasedDate.getFullYear(), deceasedDate.getMonth(), deceasedDate.getDay());
+    payload.deathDate = deceasedDate;
   } else {
     payload.deathDate = null;
   }
@@ -83,13 +83,14 @@ export function markPatientDeceased(
   return changePatientDeathStatus(personUuid, payload, abortController);
 }
 
-export function markPatientAlive(personUuid: string, abortController: AbortController) {
+export function markPatientAlive(personUuid: string) {
+  const abortController = new AbortController();
   return changePatientDeathStatus(
     personUuid,
     {
-      deathDate: null,
       causeOfDeath: null,
       dead: false,
+      deathDate: null,
     },
     abortController,
   );
