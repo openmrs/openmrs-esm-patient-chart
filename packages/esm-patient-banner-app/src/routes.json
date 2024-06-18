@@ -6,7 +6,7 @@
   "extensions": [
     {
       "name": "visit-tag",
-      "slot": "patient-banner-tags-slot",
+      "slot": "visit-header-tags-slot",
       "component": "visitTag",
       "online": true,
       "offline": true
