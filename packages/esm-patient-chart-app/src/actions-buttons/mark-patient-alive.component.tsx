@@ -16,7 +16,7 @@ const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuIte
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('confirm-alive-modal', {
       patientUuid,
-      closeDialog: () => dispose(),
+      closeModal: () => dispose(),
     });
   }, [patientUuid]);
 
