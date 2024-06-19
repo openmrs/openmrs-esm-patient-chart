@@ -81,6 +81,7 @@
   "loadMore": "Load more",
   "location": "Location",
   "male": "Male",
+  "markAlive": "Mark alive",
   "markAliveSuccessfully": "Patient marked alive succesfully",
   "markDeceasedWarning": "Marking the patient as deceased will end any active visits for this patient",
   "markPatientAlive": "Mark patient alive",
