@@ -72,7 +72,14 @@
     {
       "name": "patient-vitals-biometrics-form-workspace",
       "title": "recordVitalsAndBiometrics",
-      "component": "vitalsBiometricsFormWorkspace"
+      "component": "vitalsBiometricsFormWorkspace",
+      "type": "form"
+    }
+  ],
+  "modals": [
+    {
+      "name": "vitals-and-biometrics-delete-modal",
+      "component": "vitalsAndBiometricsDeleteModal"
     }
   ]
 }

@@ -1,8 +1,15 @@
 {
+  "cancel": "Cancel",
   "closeThisPanel": "סוגר את הפאנל",
+  "collapseAll": "Collapse all",
+  "deleteQuestion": "Delete question",
+  "deleteQuestionConfirmation": "Are you sure you want to delete this question?",
+  "deleteQuestionExplainerText": "This action cannot be undone.",
   "errorTitle": "אירעה שגיאה בטופס",
+  "expandAll": "Expand all",
   "loading": "טוען",
   "or": "או",
   "thisList": "רשימה זו",
+  "toggleCollapseOrExpand": "Toggle collapse or expand",
   "tryAgainMessage": "נסה לפתוח טופס"
 }

@@ -43,7 +43,7 @@
   "male": "זָכָר",
   "medicationDurationAndUnit": "למשך {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "לאורך זמן בלתי מוגבל",
-  "Medications": "תרופות",
+  "medications": "Medications",
   "modify": "שנה",
   "none": "אין",
   "noResultsForDrugSearch": "אין תוצאות להצגה עבור \"{{searchTerm}}\"",

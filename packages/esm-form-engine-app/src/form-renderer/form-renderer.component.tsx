@@ -81,6 +81,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
+          formSessionIntent={additionalProps?.formSessionIntent}
           onSubmit={closeWorkspaceWithSavedChanges}
           patientUUID={patientUuid}
           visit={visit}

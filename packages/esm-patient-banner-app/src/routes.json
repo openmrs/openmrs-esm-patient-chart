@@ -25,5 +25,11 @@
       "online": true,
       "offline": true
     }
+  ],
+  "modals": [
+    {
+      "name": "print-identifier-sticker-modal",
+      "component": "printIdentifierStickerModal"
+    }
   ]
 }
