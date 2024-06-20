@@ -187,13 +187,10 @@ export const deleteVisitDialog = getAsyncLifecycle(() => import('./visit/visit-p
   moduleName,
 });
 
-export const modifyVisitDateDialog = getAsyncLifecycle(
-  () => import('./visit/visit-prompt/modify-visit-date-dialog.component'),
-  {
-    featureName: 'delete visit',
-    moduleName,
-  },
-);
+export const modifyVisitDateDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/modify-visit-date.modal'), {
+  featureName: 'delete visit',
+  moduleName,
+});
 
 export const endVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
   featureName: 'end visit',
@@ -205,13 +202,13 @@ export const confirmDeceasedDialog = getAsyncLifecycle(() => import('./deceased/
   moduleName,
 });
 
-export const confirmAliveDialog = getAsyncLifecycle(() => import('./deceased/mark-alive-modal.component'), {
+export const confirmAliveDialog = getAsyncLifecycle(() => import('./deceased/mark-alive.modal'), {
   featureName: 'confirm alive',
   moduleName,
 });
 
 export const deleteEncounterModal = getAsyncLifecycle(
-  () => import('./visit/visits-widget/past-visits-components/delete-encounter-modal.component'),
+  () => import('./visit/visits-widget/past-visits-components/delete-encounter.modal'),
   {
     featureName: 'delete-encounter-modal',
     moduleName,

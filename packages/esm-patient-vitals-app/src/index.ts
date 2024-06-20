@@ -61,7 +61,7 @@ export const vitalsAndBiometricsDashboardLink =
 export const weightTile = getAsyncLifecycle(() => import('./weight-tile/weight-tile.component'), options);
 
 export const vitalsAndBiometricsDeleteModal = getAsyncLifecycle(
-  () => import('./vitals-biometrics-form/delete-vitals-biometrics-modal.component'),
+  () => import('./vitals-biometrics-form/delete-vitals-and-biometrics.modal'),
   options,
 );
 

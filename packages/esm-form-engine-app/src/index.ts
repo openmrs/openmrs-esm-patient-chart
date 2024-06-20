@@ -25,6 +25,6 @@ export const formCollapseToggle = getAsyncLifecycle(
 );
 
 export const deleteQuestionModal = getAsyncLifecycle(
-  () => import('./form-renderer/repeat/delete-question-modal.component'),
+  () => import('./form-renderer/repeat/delete-question.modal'),
   options,
 );
