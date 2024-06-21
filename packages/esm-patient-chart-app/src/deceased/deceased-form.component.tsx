@@ -16,7 +16,6 @@ import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-l
 import { ExtensionSlot, useLayoutType, showSnackbar, showModal, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
-
 import styles from './deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
@@ -56,7 +55,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ patie
 
   const onSaveClick = () => {
     const dispose = showModal('confirm-deceased-dialog', {
-      closeDialog: () => dispose(),
+      closeModal: () => dispose(),
       handleSubmit,
     });
   };
