@@ -35,7 +35,7 @@ export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
 
 export const printIdentifierStickerModal = getAsyncLifecycle(
-  () => import('./banner-tags/print-identifier-sticker-modal.component'),
+  () => import('./banner-tags/print-identifier-sticker.modal'),
   options,
 );
 

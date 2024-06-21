@@ -80,7 +80,7 @@
   "location": "Location",
   "male": "Male",
   "markAlive": "Mark alive",
-  "markAsAlive": "Mark as alive",
+  "markAsAlive": "Mark As Alive",
   "markAsDeceased": "Are you sure you want to mark patient as deceased?",
   "markDeceased": "Mark deceased",
   "markingPatientDeceasedInfoText": "Marking the patient as deceased will end any active visits for this patient",
