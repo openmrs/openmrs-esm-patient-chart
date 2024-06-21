@@ -177,7 +177,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               })}
             >
               {isLoadingCausesOfDeath ? <StructuredListSkeleton /> : null}
-              {causesOfDeath?.length > 10 ? (
+              {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
                   <Search
                     onChange={(event) => setSearchTerm(event.target.value)}

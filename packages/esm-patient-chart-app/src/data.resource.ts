@@ -116,7 +116,7 @@ export function useConceptAnswers(conceptUuid: string) {
 }
 
 export function useCauseOfDeathConcept() {
-  const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }, Error>(
     `${restBaseUrl}/systemsetting/concept.causeOfDeath`,
     openmrsFetch,
     {
@@ -130,7 +130,8 @@ export function useCauseOfDeathConcept() {
       value: data?.data?.value ?? undefined,
       isCauseOfDeathLoading: isLoading,
       isCauseOfDeathValidating: isValidating,
+      error,
     };
-  }, [data, isLoading, isValidating]);
+  }, [data?.data?.value, error, isLoading, isValidating]);
   return result;
 }
