@@ -175,11 +175,13 @@ const EncountersTableLifecycle = ({ patientUuid }) => {
   }
 
   if (error) {
-    return <ErrorState headerTitle={t('encounters', 'encounters')} error={error} />;
+    return <ErrorState headerTitle={t('encounters', 'Encounters')} error={error} />;
   }
 
   if (!encounters?.length) {
-    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('encounters', 'Encounters')} />;
+    return (
+      <EmptyState headerTitle={t('encounters', 'Encounters')} displayText={t('encounters__lower', 'encounters')} />
+    );
   }
 
   return <EncountersTable encounters={encounters} showAllEncounters />;

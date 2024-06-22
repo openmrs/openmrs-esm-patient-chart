@@ -20,7 +20,7 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
   if (isLoading) {
     return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
   }
-  if (biometrics?.length) {
+  if (weightData?.length) {
     return (
       <div>
         <p className={styles.label}>{t('weight', 'Weight')}</p>

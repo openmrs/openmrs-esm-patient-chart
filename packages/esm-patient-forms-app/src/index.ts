@@ -2,7 +2,6 @@ import {
   defineConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
-  registerBreadcrumbs,
   subscribePrecacheStaticDependencies,
   syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
@@ -25,23 +24,15 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
-  registerBreadcrumbs([
-    {
-      path: `${window.spaBase}/offline-tools/forms`,
-      title: 'Offline forms',
-      parent: `${window.spaBase}/offline-tools`,
-    },
-  ]);
-
   setupPatientFormSync();
   setupDynamicFormDataHandler();
   subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 }
 
-// t('clinicalForm', 'Clinical Form')
+// t('clinicalForm', 'Clinical form')
 export const patientFormEntryWorkspace = getAsyncLifecycle(() => import('./forms/form-entry.workspace'), options);
 
-// t('clinicalForms', 'Clinical Forms')
+// t('clinicalForms', 'Clinical forms')
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
 
 export const clinicalFormActionMenu = getSyncLifecycle(clinicalFormActionMenuComponent, options);

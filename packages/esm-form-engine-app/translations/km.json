@@ -1,8 +1,15 @@
 {
+  "cancel": "Cancel",
   "closeThisPanel": "បិទប្រអប់នេះ",
+  "collapseAll": "Collapse all",
+  "deleteQuestion": "Delete question",
+  "deleteQuestionConfirmation": "Are you sure you want to delete this question?",
+  "deleteQuestionExplainerText": "This action cannot be undone.",
   "errorTitle": "ទម្រង់នេះមិនដំណើរការ",
+  "expandAll": "Expand all",
   "loading": "កំពុងចម្លង...",
   "or": "ឬ",
   "thisList": "បញ្ជីនេះ។",
+  "toggleCollapseOrExpand": "Toggle collapse or expand",
   "tryAgainMessage": "ព្យាយាមបើកទម្រង់ផ្សេងទៀត"
 }

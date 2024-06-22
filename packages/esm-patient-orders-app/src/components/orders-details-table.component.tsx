@@ -42,7 +42,15 @@ import {
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, Printer } from '@carbon/react/icons';
-import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
+import {
+  age,
+  displayName,
+  formatDate,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
@@ -227,7 +235,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       ) ?? [];
 
     return {
-      name: `${patient?.patient?.name?.[0]?.given?.join(' ')} ${patient?.patient?.name?.[0].family}`,
+      name: patient?.patient ? displayName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

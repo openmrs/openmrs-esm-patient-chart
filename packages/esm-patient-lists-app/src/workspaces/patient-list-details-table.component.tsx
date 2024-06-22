@@ -51,7 +51,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
       },
       {
         key: 'startDate',
-        header: t('startDate', 'Start Date'),
+        header: t('startDate', 'Start date'),
       },
     ],
     [t],

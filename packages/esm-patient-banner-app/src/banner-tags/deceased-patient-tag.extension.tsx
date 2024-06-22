@@ -1,15 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, DefinitionTooltip } from '@carbon/react';
+import { DefinitionTooltip, Tag } from '@carbon/react';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { useCauseOfDeath } from './useCauseOfDeath';
 import styles from './deceased-patient-tag.scss';
 
 interface DeceasedPatientBannerTagProps {
-  patient: Pick<fhir.Patient, 'deceasedDateTime'>;
+  patient: fhir.Patient;
 }
+
 const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isDeceased = Boolean(patient?.deceasedDateTime);
+  const { causeOfDeath } = useCauseOfDeath(patient?.id);
 
   return (
     isDeceased && (
@@ -18,7 +21,10 @@ const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ pat
         definition={
           <div role="tooltip" className={styles.tooltipPadding}>
             <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
-            <span>{formatDatetime(parseDate(patient?.deceasedDateTime))}</span>
+            <span>
+              {formatDatetime(parseDate(patient?.deceasedDateTime))}
+              {causeOfDeath ? ` ${t('from_lower', 'from')} ${causeOfDeath}` : null}
+            </span>
           </div>
         }
       >

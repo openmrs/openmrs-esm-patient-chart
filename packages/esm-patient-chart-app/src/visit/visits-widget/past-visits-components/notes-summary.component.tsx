@@ -25,7 +25,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
           </div>
         ))
       ) : (
-        <EmptyState displayText={t('notes', 'notes')} headerTitle="Notes"></EmptyState>
+        <EmptyState displayText={t('notes__lower', 'notes')} headerTitle={t('notes', 'Notes')} />
       )}
     </>
   );

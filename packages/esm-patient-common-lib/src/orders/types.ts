@@ -169,7 +169,11 @@ export interface Drug {
   display: string;
 }
 
-export type PostDataPrepFunction = (order: OrderBasketItem, patientUuid: string, encounterUuid: string) => OrderPost;
+export type PostDataPrepFunction = (
+  order: OrderBasketItem,
+  patientUuid: string,
+  encounterUuid: string | null,
+) => OrderPost;
 
 // Adopted from @openmrs/esm-patient-medications-app package. We should consider maintaining a single shared types file
 export interface DrugOrderBasketItem extends OrderBasketItem {

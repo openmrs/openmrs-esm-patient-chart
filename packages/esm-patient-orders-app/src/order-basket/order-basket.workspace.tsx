@@ -5,13 +5,14 @@ import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@
 import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
+  type OrderBasketItem,
   postOrders,
+  postOrdersOnNewEncounter,
   useOrderBasket,
   useVisitOrOfflineVisit,
-  type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { createEmptyEncounter, useOrderEncounter, useMutatePatientOrders } from '../api/api';
+import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
@@ -34,6 +35,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
   } = useOrderEncounter(patientUuid);
+  const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
@@ -52,10 +54,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     const abortController = new AbortController();
     setCreatingEncounterError('');
     let orderEncounterUuid = encounterUuid;
-    // If there's no encounter present, create an encounter for the order.
+    setIsSavingOrders(true);
+    // If there's no encounter present, create an encounter along with the orders.
     if (!orderEncounterUuid) {
       try {
-        orderEncounterUuid = await createEmptyEncounter(
+        await postOrdersOnNewEncounter(
           patientUuid,
           config?.orderEncounterType,
           activeVisitRequired ? activeVisit : null,
@@ -63,23 +66,29 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           abortController,
         );
         mutateEncounterUuid();
+        clearOrders();
+        await mutateOrders();
+        closeWorkspaceWithSavedChanges();
+        showOrderSuccessToast(t, orders);
       } catch (e) {
-        setCreatingEncounterError(e);
         console.error(e);
-        return; // don't try to create the orders if we couldn't create the encounter
+        setCreatingEncounterError(
+          e.responseBody?.error?.message ||
+            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+        );
+      }
+    } else {
+      const erroredItems = await postOrders(orderEncounterUuid, abortController);
+      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+      await mutateOrders();
+      if (erroredItems.length == 0) {
+        closeWorkspaceWithSavedChanges();
+        showOrderSuccessToast(t, orders);
+      } else {
+        setOrdersWithErrors(erroredItems);
       }
     }
-
-    const erroredItems = await postOrders(orderEncounterUuid, abortController);
-    clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-    mutateOrders();
-    if (erroredItems.length == 0) {
-      closeWorkspaceWithSavedChanges();
-      showOrderSuccessToast(t, orders);
-    } else {
-      setOrdersWithErrors(erroredItems);
-    }
-
+    setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
     activeVisit,
@@ -116,8 +125,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
-              title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
-              subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              subtitle={creatingEncounterError}
               lowContrast={true}
               className={styles.inlineNotification}
             />
@@ -132,7 +141,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             />
           ))}
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.bottomButton} kind="secondary" onClick={handleCancel}>
+            <Button className={styles.bottomButton} disabled={isSavingOrders} kind="secondary" onClick={handleCancel}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button
@@ -140,6 +149,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
               kind="primary"
               onClick={handleSave}
               disabled={
+                isSavingOrders ||
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (activeVisitRequired && !activeVisit) ||

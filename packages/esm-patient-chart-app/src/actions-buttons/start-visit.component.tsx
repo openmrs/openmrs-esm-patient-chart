@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
 import { usePatient, useVisit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import styles from './action-button.scss';
 
 interface StartVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -11,26 +13,18 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const { patient } = usePatient(patientUuid);
-  const handleClick = useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
-
   const isDeceased = Boolean(patient?.deceasedDateTime);
+
+  const handleLaunchModal = useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
 
   return (
     !currentVisit &&
     !isDeceased && (
-      <li className="cds--overflow-menu-options__option">
-        <button
-          className="cds--overflow-menu-options__btn"
-          role="menuitem"
-          data-floating-menu-primary-focus
-          onClick={handleClick}
-          style={{
-            maxWidth: '100vw',
-          }}
-        >
-          <span className="cds--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
-        </button>
-      </li>
+      <OverflowMenuItem
+        className={styles.menuitem}
+        itemText={t('startVisit', 'Start visit')}
+        onClick={handleLaunchModal}
+      />
     )
   );
 };

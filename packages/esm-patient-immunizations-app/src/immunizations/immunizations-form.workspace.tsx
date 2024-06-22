@@ -245,7 +245,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       <DatePickerInput
                         id="vaccinationDateInput"
                         placeholder="dd/mm/yyyy"
-                        labelText={t('vaccinationDate', 'Vaccination Date')}
+                        labelText={t('vaccinationDate', 'Vaccination date')}
                         type="text"
                         invalid={!!errors['vaccinationDate']}
                         invalidText={errors['vaccinationDate']?.message}
@@ -396,7 +396,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       <DatePickerInput
                         id="date-picker-calendar-id"
                         placeholder="dd/mm/yyyy"
-                        labelText={t('expirationDate', 'Expiration Date')}
+                        labelText={t('expirationDate', 'Expiration date')}
                         type="text"
                       />
                     </DatePicker>

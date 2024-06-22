@@ -137,7 +137,25 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And I change the frequency to `Twice daily`', async () => {
-    await page.getByPlaceholder(/frequency/i).click();
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByText('Twice daily', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `q12`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('q12');
+    await page.getByText('Every twelve hours', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `od`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('od');
+    await page.getByText('Once daily', { exact: true }).click();
+  });
+
+  await test.step('And I set the frequency to `bd`', async () => {
+    await page.getByPlaceholder(/frequency/i).clear();
+    await page.getByPlaceholder(/frequency/i).fill('bd');
     await page.getByText('Twice daily', { exact: true }).click();
   });
 

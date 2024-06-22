@@ -95,7 +95,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
         </div>
       ) : (
         <EmptyState
-          displayText={t('medications', 'medications')}
+          displayText={t('medications__lower', 'medications')}
           headerTitle={t('medications', 'Medications')}
         ></EmptyState>
       )}

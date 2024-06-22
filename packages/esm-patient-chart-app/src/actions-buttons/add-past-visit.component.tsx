@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
+import styles from './action-button.scss';
 
 interface AddPastVisitOverflowMenuItemProps {
   patientUuid?: string;
@@ -13,29 +15,20 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
 }) => {
   const { t } = useTranslation();
 
-  const openModal = useCallback(() => {
+  const handleLaunchModal = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
-      patientUuid,
-      launchPatientChart,
       closeModal: () => dispose(),
+      launchPatientChart,
+      patientUuid,
     });
   }, [patientUuid, launchPatientChart]);
 
   return (
-    <li className="cds--overflow-menu-options__option">
-      <button
-        className="cds--overflow-menu-options__btn"
-        role="menuitem"
-        title={t('addPastVisit', 'Add past visit')}
-        data-floating-menu-primary-focus
-        onClick={openModal}
-        style={{
-          maxWidth: '100vw',
-        }}
-      >
-        <span className="cds--overflow-menu-options__option-content">{t('addPastVisit', 'Add past visit')}</span>
-      </button>
-    </li>
+    <OverflowMenuItem
+      className={styles.menuitem}
+      itemText={t('addPastVisit', 'Add past visit')}
+      onClick={handleLaunchModal}
+    />
   );
 };
 

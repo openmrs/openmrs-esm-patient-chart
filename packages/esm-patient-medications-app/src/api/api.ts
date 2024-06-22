@@ -1,5 +1,5 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
@@ -56,7 +56,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
 export function prepMedicationOrderPostData(
   order: DrugOrderBasketItem,
   patientUuid: string,
-  encounterUuid: string,
+  encounterUuid: string | null,
 ): OrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {

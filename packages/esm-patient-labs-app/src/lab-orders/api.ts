@@ -2,11 +2,12 @@ import useSWR, { mutate } from 'swr';
 import { useCallback, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { chunk } from 'lodash-es';
-import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
-import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import type { LabOrderBasketItem, OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
+
 /**
  * SWR-based data fetcher for patient orders.
  *
@@ -75,7 +76,11 @@ function getConceptReferenceUrls(conceptUuids: Array<string>) {
   );
 }
 
-export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
+export function prepLabOrderPostData(
+  order: LabOrderBasketItem,
+  patientUuid: string,
+  encounterUuid: string | null,
+): OrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',

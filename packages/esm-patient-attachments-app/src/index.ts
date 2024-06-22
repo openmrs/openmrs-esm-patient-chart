@@ -42,10 +42,7 @@ export const capturePhotoWidget = getAsyncLifecycle(() => import('./camera-media
   moduleName,
 });
 
-export const deleteAttachmentModal = getAsyncLifecycle(
-  () => import('./attachments/delete-attachment-confirmation-modal.component'),
-  {
-    featureName: 'delete-attachment-modal',
-    moduleName,
-  },
-);
+export const deleteAttachmentModal = getAsyncLifecycle(() => import('./attachments/delete-attachment.modal'), {
+  featureName: 'delete-attachment-modal',
+  moduleName,
+});

@@ -1,0 +1,59 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.stickerContainer {
+  padding: 0.5rem 1rem;
+}
+
+.row {
+  margin: layout.$spacing-03 0rem 0rem;
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+}
+
+.gridRow {
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  div {
+    margin-left: 0px;
+    margin-bottom: 5px;
+  }
+}
+
+.patientName {
+  font-size: 1.5rem;
+  font-weight: bolder;
+  margin-bottom: 5px;
+}
+
+.button {
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.loader {
+  :global(.cds--inline-loading__text) {
+    @include type.type-style('body-01');
+  }
+}
+
+@media print {
+  html, body {
+    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+}

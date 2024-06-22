@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .heading {
   @include type.type-style("heading-03");
@@ -9,12 +9,12 @@
 
 .columnLabel {
   @include type.type-style("heading-compact-02");
-  color: $text-02;
+  color: colors.$gray-70;
 }
 
 .diagnosis {
   padding: 0.75rem;
-  border-top: 0.0625rem solid $grey-2;
+  border-top: 0.0625rem solid colors.$gray-20;
 }
 
 .diagnosis:first-of-type {
@@ -26,43 +26,72 @@
 }
 
 .diagnosisList {
-  background-color: $ui-02;
+  background-color: white;
   max-height: 13.5rem;
   overflow-y: auto;
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$gray-20;
 }
 
 .diagnosisList li:hover {
-  background-color: $ui-03;
+  background-color: colors.$gray-20;
 }
 
 .diagnosesText {
   @include type.type-style("body-compact-01");
-  color: $text-02;
+  color: colors.$gray-70;
   margin-bottom: 1rem;
 }
 
 .emptyResults {
   @include type.type-style("body-compact-01");
-  color: $text-02;
+  color: colors.$gray-70;
   min-height: 1rem;
 }
 
 .imgUploadHelperText {
   @include type.type-style("body-compact-01");
-  color: $text-02;
+  color: colors.$gray-70;
 }
 
 .imgThumbnailContainer {
-  height: 5rem;
-  width: 6rem;
-  margin-top: spacing.$spacing-04;
+  height: 7rem;
+  width: 7rem;
 }
 
 .imgThumbnail {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.imgThumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 7rem);
+  gap: 1rem;
+  margin-top: layout.$spacing-05;
+}
+
+.imgThumbnailItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  padding-block-start: 0;
+  --cds-layout-size-height-local: 0;
+}
+
+.closeIcon {
+  fill: white !important;
 }
 
 .button {
@@ -73,17 +102,21 @@
   min-width: 50%;
 }
 
+.spinner {
+  min-height: 1rem;
+}
+
 .tablet {
   padding: 1.5rem 1rem;
-  background-color: $ui-02;
+  background-color: white;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .headerGridRow {
-  border-bottom: 0.0625rem solid $grey-2;
+  border-bottom: 0.0625rem solid colors.$gray-20;
   margin: 0;
 }
 
@@ -105,12 +138,12 @@
 }
 
 .grid {
-  margin: 0rem;
-  padding: 0rem;
+  margin: 0;
+  padding: 0;
 }
 
 .row {
-  margin: 0.5rem 0rem 2.5rem;
+  margin: 0.5rem 0 2.5rem;
 }
 
 .skeleton {
@@ -119,24 +152,25 @@
 }
 
 .errorMessage {
-  color: $danger;
+  color: colors.$red-60;
+  margin-top: layout.$spacing-03;
 }
 
 .diagnosisErrorOutline{
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger
+    outline: 2.5px solid colors.$red-60;
   }
 
   :global(.cds--search-magnifier) {
     svg {
-      fill: $danger
+      fill: colors.$red-60;
     }
   }
 }
 
 .errorMessage {
   @include type.type-style("label-02");
-  color: $danger;
+  color: colors.$red-60;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {

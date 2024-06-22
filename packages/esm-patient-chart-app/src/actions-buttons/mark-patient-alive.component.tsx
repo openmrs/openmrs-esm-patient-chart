@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
-import { OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
-import { usePatientDeceased } from '../deceased/deceased.resource';
+import { usePatientDeceasedStatus } from '../data.resource';
+import styles from './action-button.scss';
 
 interface MarkPatientAliveOverflowMenuItemProps {
   patientUuid?: string;
@@ -10,25 +11,22 @@ interface MarkPatientAliveOverflowMenuItemProps {
 
 const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { isDead, isLoading: isLoadingPatient } = usePatientDeceasedStatus(patientUuid);
 
-  const { isDead, isLoading: isPatientLoading } = usePatientDeceased(patientUuid);
-
-  const openModal = useCallback(() => {
-    const dispose = showModal('confirm-alive-modal', {
+  const handleLaunchModal = useCallback(() => {
+    const dispose = showModal('mark-patient-alive-modal', {
+      closeModal: () => dispose(),
       patientUuid,
-      closeDialog: () => dispose(),
     });
   }, [patientUuid]);
 
   return (
-    !isPatientLoading &&
+    !isLoadingPatient &&
     isDead && (
       <OverflowMenuItem
-        itemText={t('markAlive', 'Mark alive')}
-        onClick={openModal}
-        style={{
-          maxWidth: '100vw',
-        }}
+        className={styles.menuitem}
+        itemText={t('markPatientAlive', 'Mark patient alive')}
+        onClick={handleLaunchModal}
       />
     )
   );

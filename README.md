@@ -60,25 +60,25 @@ Alternatively, you could run `yarn serve` from within the individual packages an
 To run tests for all packages, run:
 
 ```bash
-yarn turbo test
+yarn turbo run test
 ```
 
 To run tests in `watch` mode, run:
 
 ```bash
-yarn turbo test:watch
+yarn turbo run test:watch
 ```
 
 To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
 
 ```bash
-yarn turbo test --filter="esm-patient-conditions-app"
+yarn turbo run test --filter=@openmrs/esm-patient-conditions-app
 ```
 
 To run a specific test file, run:
 
 ```bash
-yarn turbo test -- visit-notes-form
+yarn turbo run test -- visit-notes-form
 ```
 
 The above command will only run tests in the file or files that match the provided string.
@@ -86,19 +86,19 @@ The above command will only run tests in the file or files that match the provid
 You can also run the matching tests from above in watch mode by running:
 
 ```bash
-yarn turbo test:watch -- visit-notes-form
+yarn turbo run test:watch -- visit-notes-form
 ```
 
 To generate a `coverage` report, run:
 
 ```bash
-yarn turbo coverage
+yarn turbo run coverage
 ```
 
 By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
 
 ```bash
-yarn turbo test --force
+yarn turbo run test --force
 ```
 
 To run end-to-end tests, run:
@@ -133,15 +133,12 @@ yarn
 The patient chart consists of the following parts:
 
 - Navigation menu
-- Breadcrumbs menu
 - Patient header
 - Chart review / Dashboards
 - Workspace
 - Side menu
 
 The **navigation menu** lives on the left side of the screen and provides links to dashboards in the patient chart.
-
-The **breadcrumbs menu** gets shown at the top of the page under the navigation bar. It shows the user their current location relative to the information architecture and helps them quickly navigate to a parent level or previous step.
 
 The **patient header** contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
 

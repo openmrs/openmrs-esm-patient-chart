@@ -42,7 +42,7 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
         renderIcon={TrashCan}
         size={isTablet ? 'lg' : 'sm'}
       >
-        {isActiveVisit ? t('cancelVisit', 'Cancel visit') : t('deleteVisit', 'Delete')}
+        {isActiveVisit ? t('cancelVisit', 'Cancel visit') : t('deleteVisit', 'Delete visit')}
       </Button>
     </UserHasAccess>
   );

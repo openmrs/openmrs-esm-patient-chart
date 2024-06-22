@@ -18,6 +18,7 @@
   "daysAgo": "ימים לפני",
   "deleteEntry": "האם אתה בטוח שברצונך למחוק פריט זה?",
   "discardButton": "בטל",
+  "disallowDecimals": "Decimals are not allowed",
   "enterMoreCharacters": "אנא הזן 2 או יותר תווים",
   "errorFetchingFormData": "אירעה שגיאה באחזור נתוני הטופס. פרטים: {detail}",
   "errorLoadingForm": "שגיאה בטעינת הטופס",

@@ -18,6 +18,7 @@
   "daysAgo": " days ago",
   "deleteEntry": "你确定要删除这个项目吗？",
   "discardButton": "放弃",
+  "disallowDecimals": "不允许使用小数",
   "enterMoreCharacters": "请输入2个或更多字符",
   "errorFetchingFormData": "获取表单数据时发生错误。详细信息：{detail}",
   "errorLoadingForm": "加载表单时出错",

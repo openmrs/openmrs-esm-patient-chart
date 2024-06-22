@@ -56,7 +56,6 @@ const PatientChart: React.FC = () => {
               workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
             )}
           >
-            <ExtensionSlot name="breadcrumbs-slot" />
             {isLoadingPatient ? (
               <Loader />
             ) : (
