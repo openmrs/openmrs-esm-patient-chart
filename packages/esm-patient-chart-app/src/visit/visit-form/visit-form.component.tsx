@@ -280,7 +280,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return defaultValues;
-  }, [visitToEdit, sessionLocation]);
+  }, [
+    visitToEdit?.startDatetime,
+    visitToEdit?.visitType?.uuid,
+    visitToEdit?.location,
+    visitToEdit?.attributes,
+    visitToEdit?.stopDatetime,
+    sessionLocation,
+    displayVisitStopDateTimeFields,
+  ]);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',

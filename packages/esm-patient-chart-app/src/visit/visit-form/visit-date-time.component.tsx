@@ -5,7 +5,6 @@ import { type VisitFormData } from './visit-form.resource';
 import {
   DatePicker,
   DatePickerInput,
-  Layer,
   SelectItem,
   TimePicker,
   TimePickerSelect,
