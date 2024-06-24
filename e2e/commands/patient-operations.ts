@@ -106,7 +106,7 @@ export const deletePatient = async (api: APIRequestContext, uuid: string) => {
   await api.delete(`rest/v1/patient/${uuid}`, { data: {} });
 };
 
-export const createImmunizations = async (api: APIRequestContext, uuid: string) => {
+export const createImmunizations = async (api: APIRequestContext, uuid: string, visit: string) => {
   const immunizationData = {
     resourceType: 'Immunization',
     status: 'completed',
@@ -114,7 +114,7 @@ export const createImmunizations = async (api: APIRequestContext, uuid: string) 
       coding: [
         {
           code: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Polio vaccination, oral',
+          display: 'Hepatitis B vaccination',
         },
       ],
     },
@@ -124,13 +124,13 @@ export const createImmunizations = async (api: APIRequestContext, uuid: string) 
     },
     encounter: {
       type: 'Encounter',
-      reference: 'Encounter/fca94b00-8b1f-4468-b006-68e77f438978',
+      reference: `Encounter/${visit}`,
     },
     occurrenceDateTime: '2024-06-10T13:50:00.000Z',
     expirationDate: '2052-06-29T18:30:00.000Z',
     location: {
       type: 'Location',
-      reference: 'Location/44c3efb0-2583-4c80-a79e-1f756a03c0a1',
+      reference: `Location/${process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID}`,
     },
     performer: [
       {
@@ -155,7 +155,6 @@ export const createImmunizations = async (api: APIRequestContext, uuid: string) 
   const immunizationRes = await api.post('fhir2/R4/Immunization?_summary=data', {
     data: immunizationData,
   });
-  console.log('Immunization response:', immunizationRes);
   await expect(immunizationRes.ok()).toBeTruthy();
   const immunization = await immunizationRes.json();
   return immunization;

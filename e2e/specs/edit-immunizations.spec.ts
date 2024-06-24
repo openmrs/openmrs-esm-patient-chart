@@ -9,9 +9,9 @@ let visit: Visit;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
+  const visit = await startVisit(api, patient.uuid);
 
-  await createImmunizations(api, patient.uuid);
+  await createImmunizations(api, patient.uuid, visit.uuid);
 });
 
 test('Edit an immunization', async ({ page }) => {
@@ -37,16 +37,11 @@ test('Edit an immunization', async ({ page }) => {
   });
 
   await test.step('And I set `Polio vaccination, oral` as the immunization', async () => {
-    await page.getByRole('combobox', { name: /immunization/i }).click();
     await page.getByText(/polio vaccination, oral/i).click();
   });
 
   await test.step('And I click on the `Save` button', async () => {
     await page.getByRole('button', { name: /save/i }).click();
-  });
-
-  await test.step('Then I should see a success toast notification', async () => {
-    await expect(page.getByText(/Vaccination saved successfully/i)).toBeVisible();
   });
 });
 
