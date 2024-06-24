@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useReactToPrint } from 'react-to-print';
 import { mockPatient } from 'tools';
-import PrintIdentifierSticker from './print-identifier-sticker-modal.component';
+import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockedCloseModal = jest.fn();
 const mockedUseReactToPrint = jest.mocked(useReactToPrint);

@@ -4,7 +4,7 @@ import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { age, displayName, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import styles from './print-identifier-sticker-modal.scss';
+import styles from './print-identifier-sticker.scss';
 
 interface PrintIdentifierStickerProps {
   closeModal: () => void;

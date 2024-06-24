@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal, useVisit } from '@openmrs/esm-framework';
+import { OverflowMenuItem } from '@carbon/react';
+import styles from './action-button.scss';
 
 interface StopVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -10,7 +12,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
 
-  const openModal = useCallback(() => {
+  const handleLaunchModal = useCallback(() => {
     const dispose = showModal('end-visit-dialog', {
       closeModal: () => dispose(),
       patientUuid,
@@ -19,20 +21,11 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
 
   return (
     currentVisit && (
-      <li className="cds--overflow-menu-options__option">
-        <button
-          className="cds--overflow-menu-options__btn"
-          role="menuitem"
-          title={`${t('endVisit', 'End visit')}`}
-          data-floating-menu-primary-focus
-          onClick={openModal}
-          style={{
-            maxWidth: '100vw',
-          }}
-        >
-          <span className="cds--overflow-menu-options__option-content">{t('endVisit', 'End visit')}</span>
-        </button>
-      </li>
+      <OverflowMenuItem
+        className={styles.menuitem}
+        itemText={`${t('endVisit', 'End visit')}`}
+        onClick={handleLaunchModal}
+      />
     )
   );
 };

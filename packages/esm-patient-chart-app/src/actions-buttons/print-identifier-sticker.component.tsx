@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
 import { showModal, useConfig, usePatient } from '@openmrs/esm-framework';
+import styles from './action-button.scss';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
   patientUuid: string;
@@ -16,7 +17,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     externalModuleName: '@openmrs/esm-patient-banner-app',
   });
 
-  const launchModal = useCallback(() => {
+  const handleLaunchModal = useCallback(() => {
     const dispose = showModal('print-identifier-sticker-modal', {
       closeModal: () => dispose(),
       patient,
@@ -27,11 +28,9 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     patient &&
     Boolean(showPrintIdentifierStickerButton) && (
       <OverflowMenuItem
+        className={styles.menuitem}
         itemText={t('printIdentifierSticker', 'Print identifier sticker')}
-        onClick={launchModal}
-        style={{
-          maxWidth: '100vw',
-        }}
+        onClick={handleLaunchModal}
       />
     )
   );

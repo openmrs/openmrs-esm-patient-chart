@@ -61,6 +61,6 @@ export const allergyFormWorkspace = getAsyncLifecycle(
 export const allergyTile = getSyncLifecycle(allergyTileComponent, options);
 
 export const allergyDeleteConfirmationDialog = getAsyncLifecycle(
-  () => import('./allergies/delete-allergy-modal.component'),
+  () => import('./allergies/delete-allergy.modal'),
   options,
 );
