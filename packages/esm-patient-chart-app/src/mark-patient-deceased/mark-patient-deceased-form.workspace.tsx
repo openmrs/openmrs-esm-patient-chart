@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import fuzzy from 'fuzzy';
@@ -16,6 +16,7 @@ import {
   Row,
   Search,
   StructuredListSkeleton,
+  TextInput,
 } from '@carbon/react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -34,25 +35,34 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
   const { deathDate, isDead } = usePatientDeceasedStatus(patientUuid);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showOtherInputField, setShowOtherInputField] = useState(false);
+
+  const OTHER_CONCEPT_UUID = 'UUID of other';
+  const OTHER_CONCEPT_DISPLAY = t('other', 'Other');
 
   const filteredCausesOfDeath = useMemo(() => {
-    if (!searchTerm) {
-      return causesOfDeath;
+    if (!causesOfDeath) return [];
+
+    let filtered = causesOfDeath.filter((concept) => concept.uuid !== OTHER_CONCEPT_UUID);
+
+    if (searchTerm) {
+      filtered = fuzzy
+        .filter(searchTerm, filtered, {
+          extract: (causeOfDeathConcept) => causeOfDeathConcept.display,
+        })
+        .sort((r1, r2) => r1.score - r2.score)
+        .map((result) => result.original);
     }
 
-    return searchTerm
-      ? fuzzy
-          .filter(searchTerm, causesOfDeath, {
-            extract: (causeOfDeathConcept) => causeOfDeathConcept.display,
-          })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : causesOfDeath;
-  }, [searchTerm, causesOfDeath]);
+    filtered.push({ uuid: OTHER_CONCEPT_UUID, display: OTHER_CONCEPT_DISPLAY, name: OTHER_CONCEPT_DISPLAY });
+
+    return filtered;
+  }, [searchTerm, causesOfDeath, OTHER_CONCEPT_DISPLAY]);
 
   const schema = z.object({
     causeOfDeath: z.string(),
     deathDate: z.date().nullable(),
+    freeTextCauseOfDeath: z.string().nullable(),
   });
 
   type MarkPatientDeceasedFormSchema = z.infer<typeof schema>;
@@ -62,6 +72,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
     formState: { errors },
     handleSubmit,
     setError,
+    watch,
   } = useForm<MarkPatientDeceasedFormSchema>({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
@@ -70,13 +81,26 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
       deathDate: isDead
         ? new Date(dayjs(deathDate).year(), dayjs(deathDate).month(), dayjs(deathDate).date() - 1)
         : new Date(),
+      freeTextCauseOfDeath: '',
     },
   });
+
+  const causeOfDeathValue = watch('causeOfDeath');
+
+  useEffect(() => {
+    setShowOtherInputField(causeOfDeathValue === OTHER_CONCEPT_UUID);
+  }, [causeOfDeathValue]);
+
+  useEffect(() => {
+    if (causesOfDeath && causesOfDeath.length > 0) {
+      setShowOtherInputField(causeOfDeathValue === OTHER_CONCEPT_UUID);
+    }
+  }, [causesOfDeath, causeOfDeathValue]);
 
   const onSubmit: SubmitHandler<MarkPatientDeceasedFormSchema> = useCallback(
     (data) => {
       setIsSubmitting(true);
-      const { causeOfDeath, deathDate } = data;
+      const { causeOfDeath, deathDate, freeTextCauseOfDeath } = data;
 
       if (!causeOfDeath || !deathDate) {
         if (!deathDate) {
@@ -96,7 +120,9 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
         return;
       }
 
-      markPatientDeceased(deathDate, patientUuid, causeOfDeath)
+      const causeOfDeathToSubmit = causeOfDeath === OTHER_CONCEPT_UUID ? freeTextCauseOfDeath : causeOfDeath;
+
+      markPatientDeceased(deathDate, patientUuid, causeOfDeathToSubmit)
         .then(() => {
           closeWorkspace();
           window.location.reload();
@@ -192,17 +218,15 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                   control={control}
                   render={({ field: { onChange } }) => (
                     <RadioButtonGroup className={styles.radioButtonGroup} orientation="vertical" onChange={onChange}>
-                      {(filteredCausesOfDeath ? filteredCausesOfDeath : causesOfDeath).map(
-                        ({ uuid, display, name }) => (
-                          <RadioButton
-                            key={uuid}
-                            className={styles.radioButton}
-                            id={name}
-                            labelText={display}
-                            value={uuid}
-                          />
-                        ),
-                      )}
+                      {filteredCausesOfDeath.map(({ uuid, display, name }) => (
+                        <RadioButton
+                          key={uuid}
+                          className={styles.radioButton}
+                          id={name}
+                          labelText={display}
+                          value={uuid}
+                        />
+                      ))}
                     </RadioButtonGroup>
                   )}
                 />
@@ -216,6 +240,24 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               ) : null}
             </div>
             {errors?.causeOfDeath && <p className={styles.errorMessage}>{errors?.causeOfDeath?.message}</p>}
+            {showOtherInputField && (
+              <div className={styles.input}>
+                <Controller
+                  name="freeTextCauseOfDeath"
+                  control={control}
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <TextInput
+                      id="freeTextCauseOfDeath"
+                      labelText={t('pleaseSpecify', 'Please specify')}
+                      placeholder={t('enterCauseOfDeath', 'Enter cause of death')}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                    />
+                  )}
+                />
+              </div>
+            )}
           </section>
         </div>
       </div>
