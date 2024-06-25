@@ -26,53 +26,53 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
-    await chartPage.page.getByLabel(/clinical forms/i, { exact: true }).click();
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
   });
 
   await test.step('Then I should see the clinical forms workspace', async () => {
     const headerRow = chartPage.formsTable().locator('thead > tr');
 
-    await expect(chartPage.page.getByPlaceholder(/search this list/i)).toBeVisible();
+    await expect(page.getByPlaceholder(/search this list/i)).toBeVisible();
     await expect(headerRow).toContainText(/form name \(a-z\)/i);
     await expect(headerRow).toContainText(/last completed/i);
 
-    await expect(chartPage.page.getByRole('cell', { name: 'Covid 19', exact: true })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /soap note template/i, exact: true })).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: /surgical operation/i, exact: true })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Covid 19', exact: true })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /soap note template/i, exact: true })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /surgical operation/i, exact: true })).toBeVisible();
   });
 
   await test.step('When I click the `Soap note template` link to launch the form', async () => {
-    await chartPage.page.getByText(/soap note template/i).click();
+    await page.getByText(/soap note template/i).click();
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(chartPage.page.getByText(/soap note template/i)).toBeVisible();
+    await expect(page.getByText(/soap note template/i)).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
-    await chartPage.page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
+    await page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
   });
 
   await test.step('And I fill the `Objective findings` question', async () => {
-    await chartPage.page.getByLabel(/objective findings/i).fill(objectiveFindings);
+    await page.getByLabel(/objective findings/i).fill(objectiveFindings);
   });
 
   await test.step('And I fill the `Assessment` question', async () => {
-    await chartPage.page.getByLabel(/assessment/i).fill(assessment);
+    await page.getByLabel(/assessment/i).fill(assessment);
   });
 
   await test.step('And I fill the `Plan` question', async () => {
-    await chartPage.page.getByLabel(/plan/i).fill(plan);
+    await page.getByLabel(/plan/i).fill(plan);
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
-    await chartPage.page.getByRole('button', { name: /save/i }).click();
+    await page.getByRole('button', { name: /save/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(chartPage.page.getByText(/record created/i, { exact: true })).toBeVisible();
-    await expect(chartPage.page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/record created/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
   });
 
   await test.step('And if I navigate to the visits dashboard', async () => {
@@ -80,23 +80,23 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly filled form in the encounters table', async () => {
-    await expect(visitsPage.page.getByRole('tab', { name: /visit summaries/i })).toBeVisible();
-    await expect(visitsPage.page.getByRole('tab', { name: /all encounters/i })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /visit summaries/i })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /all encounters/i })).toBeVisible();
 
-    await visitsPage.page.getByRole('tab', { name: /^encounters$/i }).click();
+    await page.getByRole('tab', { name: /^encounters$/i }).click();
 
-    const headerRow = visitsPage.page.getByRole('table').locator('thead > tr');
+    const headerRow = page.getByRole('table').locator('thead > tr');
 
     await expect(headerRow).toContainText(/date & time/i);
     await expect(headerRow).toContainText(/encounter type/i);
     await expect(headerRow).toContainText(/provider/i);
 
-    await visitsPage.page.getByRole('table').locator('th#expand').click();
+    await page.getByRole('table').locator('th#expand').click();
 
-    await expect(visitsPage.page.getByText(subjectiveFindings)).toBeVisible();
-    await expect(visitsPage.page.getByText(objectiveFindings)).toBeVisible();
-    await expect(visitsPage.page.getByText(assessment)).toBeVisible();
-    await expect(visitsPage.page.getByText(plan)).toBeVisible();
+    await expect(page.getByText(subjectiveFindings)).toBeVisible();
+    await expect(page.getByText(objectiveFindings)).toBeVisible();
+    await expect(page.getByText(assessment)).toBeVisible();
+    await expect(page.getByText(plan)).toBeVisible();
   });
 });
 
