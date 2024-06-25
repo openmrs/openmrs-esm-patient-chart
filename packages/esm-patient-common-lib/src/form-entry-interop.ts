@@ -10,6 +10,8 @@ interface HtmlFormEntryForm {
   formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
 }
 
+type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
+
 export function launchFormEntryOrHtmlForms(
   htmlFormEntryForms: Array<HtmlFormEntryForm>,
   patientUuid: string,
@@ -21,6 +23,7 @@ export function launchFormEntryOrHtmlForms(
   visitStartDatetime?: string,
   visitStopDatetime?: string,
   mutateForms?: () => void,
+  mode?: LaunchAction,
 ) {
   if (visitUuid) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
@@ -35,6 +38,7 @@ export function launchFormEntryOrHtmlForms(
         visitStartDatetime,
         visitStopDatetime,
         mutateForms,
+        mode,
       );
     } else {
       if (encounterUuid) {
@@ -62,6 +66,7 @@ export function launchFormEntry(
   visitStartDatetime?: string,
   visitStopDatetime?: string,
   mutateForm?: () => void,
+  mode?: LaunchAction,
 ) {
   launchPatientWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
@@ -74,6 +79,9 @@ export function launchFormEntry(
       visitUuid: visitUuid,
       visitStartDatetime,
       visitStopDatetime,
+      additionalProps: {
+        mode,
+      },
     },
   });
 }

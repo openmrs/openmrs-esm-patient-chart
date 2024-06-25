@@ -263,7 +263,22 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 <OverflowMenuItem
                                   size={desktopLayout ? 'sm' : 'lg'}
                                   className={styles.menuItem}
-                                  itemText={t('goToThisEncounter', 'Go to this encounter')}
+                                  itemText={t('viewThisEncounter', 'View this encounter')}
+                                  onClick={() => {
+                                    launchFormEntryOrHtmlForms(
+                                      htmlFormEntryFormsConfig,
+                                      patientUuid,
+                                      selectedVisit?.form?.uuid,
+                                      selectedVisit?.visitUuid,
+                                      selectedVisit?.id,
+                                      selectedVisit?.form?.display,
+                                      selectedVisit?.visitTypeUuid,
+                                      selectedVisit?.visitStartDatetime,
+                                      selectedVisit?.visitStopDatetime,
+                                      () => {},
+                                      'view',
+                                    );
+                                  }}
                                 />
                                 {userHasAccess(selectedVisit?.editPrivilege, session?.user) &&
                                   selectedVisit?.form?.uuid && (
