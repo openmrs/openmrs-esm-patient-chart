@@ -137,6 +137,12 @@
   color: $danger;
 }
 
-.input {
-  margin: 0rem 1rem 1rem;
+.nonCodedCauseOfDeath {
+  margin: 1rem;
+}
+
+.skeleton {
+  :global(.cds--structured-list-tbody .cds--structured-list-row:last-child) {
+    border-bottom: none;
+  }
 }

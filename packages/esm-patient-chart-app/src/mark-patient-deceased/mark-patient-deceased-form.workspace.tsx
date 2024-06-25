@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,19 +23,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
 import { EmptyState, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, useLayoutType, showSnackbar, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { markPatientDeceased, useCausesOfDeath, usePatientDeceasedStatus } from '../data.resource';
+import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import styles from './mark-patient-deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
-  const { t } = useTranslation();
+  const freetextCauseOfDeathUuid = '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
   const isTablet = useLayoutType() === 'tablet';
+  const { t } = useTranslation();
   const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
-  const { deathDate, isDead } = usePatientDeceasedStatus(patientUuid);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const freetextCauseOfDeathUuid = '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+  const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
 
   const filteredCausesOfDeath = useMemo(() => {
     if (!searchTerm) {
@@ -52,11 +49,20 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
       : causesOfDeath;
   }, [searchTerm, causesOfDeath]);
 
-  const schema = z.object({
-    causeOfDeath: z.string(),
-    deathDate: z.date().nullable(),
-    freeTextCauseOfDeath: z.string().nullable(),
-  });
+  const schema = z
+    .object({
+      causeOfDeath: z.string().refine((causeOfDeath) => !!causeOfDeath, {
+        message: t('causeOfDeathIsRequired', 'Please select the cause of death'),
+      }),
+      deathDate: z.date().refine((date) => !!date, {
+        message: t('deathDateRequired', 'Please select the date of death'),
+      }),
+      nonCodedCauseOfDeath: z.string().optional(),
+    })
+    .refine((data) => !(data.causeOfDeath === freetextCauseOfDeathUuid && !data.nonCodedCauseOfDeath), {
+      message: t('nonCodedCauseOfDeathRequired', 'Please enter the non-coded cause of death'),
+      path: ['nonCodedCauseOfDeath'],
+    });
 
   type MarkPatientDeceasedFormSchema = z.infer<typeof schema>;
 
@@ -64,17 +70,14 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
     control,
     formState: { errors },
     handleSubmit,
-    setError,
     watch,
   } = useForm<MarkPatientDeceasedFormSchema>({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     defaultValues: {
       causeOfDeath: '',
-      deathDate: isDead
-        ? new Date(dayjs(deathDate).year(), dayjs(deathDate).month(), dayjs(deathDate).date() - 1)
-        : new Date(),
-      freeTextCauseOfDeath: '',
+      deathDate: new Date(),
+      nonCodedCauseOfDeath: '',
     },
   });
 
@@ -83,31 +86,9 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
   const onSubmit: SubmitHandler<MarkPatientDeceasedFormSchema> = useCallback(
     (data) => {
       setIsSubmitting(true);
-      const { causeOfDeath, deathDate, freeTextCauseOfDeath } = data;
+      const { causeOfDeath, deathDate, nonCodedCauseOfDeath } = data;
 
-      if (!causeOfDeath || !deathDate) {
-        if (!deathDate) {
-          setError('deathDate', {
-            type: 'manual',
-            message: t('deathDateRequired', 'Please select the date of death'),
-          });
-        }
-
-        if (!causeOfDeath) {
-          setError('causeOfDeath', {
-            type: 'manual',
-            message: t('causeOfDeathIsRequired', 'Please select the cause of death'),
-          });
-        }
-        setIsSubmitting(false);
-        return;
-      }
-
-      markPatientDeceased(
-        deathDate,
-        patientUuid,
-        causeOfDeath === freetextCauseOfDeathUuid ? freeTextCauseOfDeath : causeOfDeath,
-      )
+      markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
         .then(() => {
           closeWorkspace();
           window.location.reload();
@@ -124,7 +105,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
           setIsSubmitting(false);
         });
     },
-    [closeWorkspace, patientUuid, setError, t],
+    [closeWorkspace, patientUuid, t],
   );
 
   const onError = (errors) => console.error(errors);
@@ -162,7 +143,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                       value={value}
                     >
                       <DatePickerInput
-                        disabled={isDead}
                         id="deceasedDateInput"
                         labelText={t('date', 'Date')}
                         placeholder="dd/mm/yyyy"
@@ -178,8 +158,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
             )}
           </section>
           <section>
-            {!isDead && <div className={styles.sectionTitle}>{t('causeOfDeath', 'Cause of death')}</div>}
-
+            <div className={styles.sectionTitle}>{t('causeOfDeath', 'Cause of death')}</div>
             <div
               className={classNames(styles.conceptAnswerOverviewWrapper, {
                 [styles.conceptAnswerOverviewWrapperTablet]: isTablet,
@@ -188,6 +167,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               })}
             >
               {isLoadingCausesOfDeath ? <StructuredListSkeleton /> : null}
+
               {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
                   <Search
@@ -197,6 +177,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                   />
                 </ResponsiveWrapper>
               ) : null}
+
               {causesOfDeath?.length ? (
                 <Controller
                   name="causeOfDeath"
@@ -230,17 +211,18 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
           </section>
         </div>
         {causeOfDeathValue === freetextCauseOfDeathUuid && (
-          <div className={styles.input}>
+          <div className={styles.nonCodedCauseOfDeath}>
             <Controller
-              name="freeTextCauseOfDeath"
+              name="nonCodedCauseOfDeath"
               control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
+              render={({ field: { onChange, value } }) => (
                 <TextInput
                   id="freeTextCauseOfDeath"
-                  labelText={t('pleaseSpecify', 'Please specify')}
-                  placeholder={t('enterCauseOfDeath', 'Enter cause of death')}
+                  invalid={errors?.nonCodedCauseOfDeath}
+                  invalidText={errors?.nonCodedCauseOfDeath && errors?.nonCodedCauseOfDeath?.message}
+                  labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
                   onChange={onChange}
-                  onBlur={onBlur}
+                  placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}
                   value={value}
                 />
               )}
@@ -248,7 +230,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
           </div>
         )}
       </div>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
