@@ -36,6 +36,7 @@ test('Record and edit test results', async ({ page }) => {
       value: '150',
       updatedValue: '155',
     },
+    // TODO: Uncomment the rest once https://openmrs.atlassian.net/browse/O3-3478 is fixed
     // {
     //   label: 'Neutrophils (%)',
     //   resultsPageReference: 'Neutrophils',
@@ -86,7 +87,6 @@ test('Record and edit test results', async ({ page }) => {
     // }
   ];
 
-  // Data array for "Chemistry Results" section
   const chemistryResultsData = [
     {
       label: 'Alkaline Phosphatase (U/L)',
@@ -106,6 +106,7 @@ test('Record and edit test results', async ({ page }) => {
       value: '5.5',
       updatedValue: '5.7',
     },
+    // TODO: Uncomment the rest once https://openmrs.atlassian.net/browse/O3-3478 is fixed
     // {
     //   label: 'Fasting Blood Glucose (mg/dL)',
     //   resultsPageReference: 'Fasting Blood Glucose',
