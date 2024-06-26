@@ -4,7 +4,7 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, displayName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -35,7 +35,7 @@ export default function AddLabOrderWorkspace({
 
   const isTablet = useLayoutType() === 'tablet';
 
-  const patientName = patient ? displayName(patient) : '';
+  const patientName = patient ? getPatientName(patient) : '';
 
   const cancelOrder = useCallback(() => {
     closeWorkspace({
