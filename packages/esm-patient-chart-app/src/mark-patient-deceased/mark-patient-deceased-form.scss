@@ -136,3 +136,13 @@
   @include type.type-style("label-02");
   color: $danger;
 }
+
+.nonCodedCauseOfDeath {
+  margin: 1rem;
+}
+
+.skeleton {
+  :global(.cds--structured-list-tbody .cds--structured-list-row:last-child) {
+    border-bottom: none;
+  }
+}
