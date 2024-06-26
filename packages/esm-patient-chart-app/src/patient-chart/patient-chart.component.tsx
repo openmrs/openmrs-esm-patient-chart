@@ -78,7 +78,7 @@ const PatientChart: React.FC = () => {
           </div>
         </>
       </main>
-      <WorkspaceContainer contextKey={`patient/${patientUuid}`} />
+      <WorkspaceContainer showSiderailAndBottomNav contextKey={`patient/${patientUuid}`} />
     </>
   );
 };
