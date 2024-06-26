@@ -4,7 +4,7 @@ import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table, Printer } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { age, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, displayName, formatDate, parseDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
@@ -63,7 +63,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
       ) ?? [];
 
     return {
-      name: `${patient?.patient?.name?.[0]?.given?.join(' ')} ${patient?.patient?.name?.[0].family}`,
+      name: patient?.patient ? displayName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,
@@ -80,7 +80,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     },
     {
       key: 'temperatureRender',
-      header: withUnit(t('temperature', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
+      header: withUnit(t('temperatureAbbreviated', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
       isSortable: true,
 
       sortFunc: (valueA, valueB) =>
@@ -88,7 +88,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     },
     {
       key: 'bloodPressureRender',
-      header: withUnit(t('bloodPressure', 'BP'), conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''),
+      header: withUnit(
+        t('bloodPressureAbbreviated', 'BP'),
+        conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '',
+      ),
       isSortable: true,
 
       sortFunc: (valueA, valueB) =>
@@ -107,7 +110,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     },
     {
       key: 'respiratoryRateRender',
-      header: withUnit(t('respiratoryRate', 'R. Rate'), conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''),
+      header: withUnit(
+        t('respiratoryRateAbbreviated', 'R. Rate'),
+        conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '',
+      ),
       isSortable: true,
 
       sortFunc: (valueA, valueB) =>
@@ -115,7 +121,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     },
     {
       key: 'spo2Render',
-      header: withUnit(t('spo2', 'SPO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
+      header: withUnit(t('spo2', 'SpO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
       isSortable: true,
 
       sortFunc: (valueA, valueB) => (valueA.spo2 && valueB.spo2 ? valueA.spo2 - valueB.spo2 : 0),

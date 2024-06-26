@@ -27,10 +27,10 @@ const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid
 
   const headerData: Array<typeof DataTableHeader> = useMemo(
     () => [
-      { key: 'startDate', header: t('startDate', 'Start Date') },
+      { key: 'startDate', header: t('startDate', 'Start date') },
       { key: 'visitType', header: t('type', 'Type') },
       { key: 'location', header: t('location', 'Location') },
-      { key: 'endDate', header: t('endDate_title', 'End Date'), colSpan: 2 },
+      { key: 'endDate', header: t('endDate_title', 'End date'), colSpan: 2 },
     ],
     [t],
   );

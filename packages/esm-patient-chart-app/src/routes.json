@@ -71,6 +71,13 @@
       "offline": true
     },
     {
+      "name": "print-identifier-sticker-button",
+      "slot": "patient-actions-slot",
+      "component": "printIdentifierStickerActionButton",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "add-past-visit-button",
       "slot": "patient-search-actions-slot",
       "component": "addPastVisitPatientSearchActionButton",
@@ -120,13 +127,6 @@
       "offline": true
     },
     {
-      "name": "mark-patient-deceased-workspace-form",
-      "component": "markPatientDeceasedForm",
-      "meta": {
-        "title": "Mark Deceased"
-      }
-    },
-    {
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
@@ -173,18 +173,6 @@
     {
       "name": "end-visit-dialog",
       "component": "endVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "confirm-deceased-dialog",
-      "component": "confirmDeceasedDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "confirm-alive-modal",
-      "component": "confirmAliveDialog",
       "online": true,
       "offline": true
     },
@@ -242,12 +230,26 @@
       "order": 1
     }
   ],
+  "modals": [
+    {
+      "name": "mark-patient-alive-modal",
+      "component": "markPatientAliveModal"
+    }
+  ],
   "pages": [
     {
       "component": "root",
       "routeRegex": "^patient\/.+\/chart",
       "online": true,
       "offline": true
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "mark-patient-deceased-workspace-form",
+      "component": "markPatientDeceasedForm",
+      "title": "Mark patient deceased",
+      "type": "form"
     }
   ]
 }

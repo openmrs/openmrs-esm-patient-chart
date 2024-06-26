@@ -8,7 +8,8 @@
   background-color: $ui-01;
 }
 
-.activePatientContainer {
+.activePatientContainer,
+.deceasedPatientContainer {
   background-color: $ui-01;
 }
 
@@ -17,22 +18,6 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-}
-
-.deceasedPatientContainer {
-  background-color: colors.$gray-80;
-
-  .demographics, .row, .identifierTag, .identifier, .contactDetails .heading {
-    color: $ui-02;
-  }
-
-  .toggleContactDetailsButton, .toggleContactDetailsButton > svg, .actionsButtonText {
-    color: colors.$blue-40;
-  }
-
-  &:focus, &:hover {
-    background-color: colors.$gray-90;
-  }
 }
 
 .patientBanner {
@@ -65,22 +50,12 @@
   }
 }
 
-.deceasedContactDetails {
-  .contactDetails, .heading, .row, .row > .col {
-    color: $ui-02;
-  }
-
-  a {
-    color: $inverse-link
-  }
-}
-
 .tabletContactDetails {
   display: block;
 
   .row {
     &:first-child {
-    border-bottom: 1px solid $ui-03;
+      border-bottom: 1px solid $ui-03;
     }
   }
 

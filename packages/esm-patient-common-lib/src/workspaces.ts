@@ -1,4 +1,9 @@
-import { type DefaultWorkspaceProps, launchWorkspace, navigateAndLaunchWorkspace, usePatient } from '@openmrs/esm-framework';
+import {
+  type DefaultWorkspaceProps,
+  launchWorkspace,
+  navigateAndLaunchWorkspace,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from './get-patient-uuid-from-url';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';

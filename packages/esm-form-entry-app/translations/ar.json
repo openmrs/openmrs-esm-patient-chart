@@ -18,6 +18,7 @@
   "daysAgo": " أيام مضت",
   "deleteEntry": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
   "discardButton": "تجاهل",
+  "disallowDecimals": "Decimals are not allowed",
   "enterMoreCharacters": "الرجاء إدخال 2 أحرف أو أكثر",
   "errorFetchingFormData": "حدث خطأ أثناء جلب بيانات النموذج. التفاصيل: {detail}",
   "errorLoadingForm": "خطأ في تحميل النموذج",

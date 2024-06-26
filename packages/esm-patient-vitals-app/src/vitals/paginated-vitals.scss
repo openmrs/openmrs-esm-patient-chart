@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/type';
+@use '@carbon/layout';
 
 .paginatedVitals {
   display: flex;
@@ -14,6 +15,12 @@
 .table {
   td {
     white-space: nowrap;
+    padding: layout.$spacing-02;
+    > span {
+      width: 100%;
+      height: 100%;
+      display: inline-block;
+    }
   }
 }
 
@@ -23,12 +30,18 @@
   }
 }
 
-.criticallyLow, .criticallyHigh {
+.criticallyHigh > span, .criticallyLow > span {
   border: 2px solid colors.$red-60 !important;
+  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
+} 
+
+.high > span, .low > span {
+  border: 1.5px solid colors.$black-100 !important;
+  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
 }
 
-.low, .high {
-  border: 1.5px solid colors.$black-100 !important;
+.normal > span {
+  padding-left: layout.$spacing-05;
 }
 
 .criticallyLow {
@@ -76,18 +89,18 @@
   @include type.type-style('heading-compact-01');
 }
 
-.criticallyLow::after {
+.criticallyLow > span::after {
   content: " ↓↓";
 }
 
-.criticallyHigh::after {
+.criticallyHigh > span::after {
   content: " ↑↑";
 }
 
-.low::after {
+.low > span::after {
   content: " ↓";
 }
 
-.high::after {
+.high > span::after {
   content: " ↑";
 }

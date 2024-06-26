@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
-import { configSchema } from '../config-schema';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
@@ -28,7 +28,10 @@ jest.mock('../common', () => {
 
 describe('BiometricsOverview: ', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockBiometricsConfig });
+    mockedUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      mockBiometricsConfig,
+    });
     jest.clearAllMocks();
   });
 
@@ -90,8 +93,12 @@ describe('BiometricsOverview: ', () => {
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
-
-    const initialRowElements = screen.getAllByRole('row');
+    const extractCellsExcludingActions = (row) => {
+      const cells = Array.from(row.querySelectorAll('td'));
+      return cells.filter((cell: HTMLElement) => cell.id !== 'actions');
+    };
+    const initialRows = screen.getAllByRole('row');
+    const initialCellsExcludingActions = initialRows.map(extractCellsExcludingActions);
 
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
@@ -114,15 +121,15 @@ describe('BiometricsOverview: ', () => {
     await user.click(sortRowsButton);
     // Sorting in ascending order
     await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
+    const initialSortedCellsExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
+    expect(initialSortedCellsExcludingActions).not.toEqual(initialCellsExcludingActions);
 
     // Sorting order = NONE, hence it is still in the ascending order
     await user.click(sortRowsButton);
     // Sorting in descending order
     await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
+    const finalCellsSortedExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
+    expect(finalCellsSortedExcludingActions).toEqual(initialCellsExcludingActions);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
