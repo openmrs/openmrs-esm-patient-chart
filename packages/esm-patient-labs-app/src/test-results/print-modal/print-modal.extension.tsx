@@ -21,7 +21,7 @@ import {
 import { useReactToPrint } from 'react-to-print';
 import {
   age,
-  displayName,
+  getPatientName,
   formatDate,
   useConfig,
   useLayoutType,
@@ -86,7 +86,7 @@ function PrintModal({ patientUuid, closeDialog }) {
       ) ?? [];
 
     return {
-      name: patient?.patient ? displayName(patient?.patient) : '',
+      name: patient?.patient ? getPatientName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

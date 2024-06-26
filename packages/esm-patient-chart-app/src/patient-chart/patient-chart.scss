@@ -39,18 +39,10 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   margin-left: var(--omrs-sidenav-width);
 }
 
-:global(.omrs-breakpoint-lt-desktop) .innerChartContainer {
-  padding-right: 0;
-}
-
-:global(.action-menu-expanded) .innerChartContainer {
-  padding-right: $actionPanelExpandedOffset;
-}
 
 .innerChartContainer {
   display: flex;
   width: 100%;
-  padding-right: $actionNavOffset;
   flex-direction: column;
 }
 
@@ -58,19 +50,12 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   padding-right: 0;
 }
 
-.activeWorkspace {
-  padding-right: $actionNavOffset;
-}
 
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .chartContainer {
     padding-right: unset;
     padding-left: spacing.$spacing-01;
-    .activeWorkspace {
-      padding-right: unset;
-      padding-left: $actionNavOffset;
-    }
   }
 
   :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
