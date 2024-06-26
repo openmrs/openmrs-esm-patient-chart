@@ -22,18 +22,19 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
 import { EmptyState, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, useLayoutType, showSnackbar, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, showSnackbar, ResponsiveWrapper, useConfig } from '@openmrs/esm-framework';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
+import { type ChartConfig } from '../config-schema';
 import styles from './mark-patient-deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
-  const freetextCauseOfDeathUuid = '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-  const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
+  const { freeTextFieldConceptUuid } = useConfig<ChartConfig>();
 
   const filteredCausesOfDeath = useMemo(() => {
     if (!searchTerm) {
@@ -59,7 +60,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
       }),
       nonCodedCauseOfDeath: z.string().optional(),
     })
-    .refine((data) => !(data.causeOfDeath === freetextCauseOfDeathUuid && !data.nonCodedCauseOfDeath), {
+    .refine((data) => !(data.causeOfDeath === freeTextFieldConceptUuid && !data.nonCodedCauseOfDeath), {
       message: t('nonCodedCauseOfDeathRequired', 'Please enter the non-coded cause of death'),
       path: ['nonCodedCauseOfDeath'],
     });
@@ -210,7 +211,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
             {errors?.causeOfDeath && <p className={styles.errorMessage}>{errors?.causeOfDeath?.message}</p>}
           </section>
         </div>
-        {causeOfDeathValue === freetextCauseOfDeathUuid && (
+        {causeOfDeathValue === freeTextFieldConceptUuid && (
           <div className={styles.nonCodedCauseOfDeath}>
             <Controller
               name="nonCodedCauseOfDeath"
