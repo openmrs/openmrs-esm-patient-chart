@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
-  displayName,
+  getPatientName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
@@ -36,7 +36,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     };
   }, [patientBannerRef, setIsTabletViewport]);
 
-  const patientName = patient ? displayName(patient) : '';
+  const patientName = patient ? getPatientName(patient) : '';
 
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
