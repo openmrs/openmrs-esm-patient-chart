@@ -18,6 +18,8 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { z } from 'zod';
 import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -29,10 +31,15 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
+  schema: z.ZodObject<{
+    abatementDateTime: z.ZodNullable<z.ZodOptional<z.ZodDate>>;
+    clinicalStatus: z.ZodEffects<z.ZodString, string, string>;
+    conditionName: z.ZodEffects<z.ZodString, string, string>;
+    onsetDateTime: z.ZodNullable<z.ZodDate>;
+  }>;
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
@@ -50,6 +57,7 @@ interface RequiredFieldLabelProps {
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
+  schema,
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
@@ -66,7 +74,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     formState: { errors },
     getValues,
     watch,
-  } = useFormContext<ConditionSchema>();
+  } = useFormContext<z.infer<typeof schema>>();
   const session = useSession();
   const searchInputRef = useRef(null);
   const clinicalStatus = watch('clinicalStatus');
@@ -110,20 +118,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      const res = await createCondition(payload);
+      await createCondition(payload);
+      mutate();
 
-      if (res.status === 201) {
-        mutate();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+        title: t('conditionSaved', 'Condition saved'),
+      });
 
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
-          title: t('conditionSaved', 'Condition saved'),
-        });
-
-        closeWorkspaceWithSavedChanges();
-      }
+      closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
@@ -256,7 +261,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
+              {errors?.conditionName && (
+                <p className={styles.errorMessage}>{errors?.conditionName?.message as string}</p>
+              )}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
@@ -331,7 +338,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               </RadioButtonGroup>
             )}
           />
-          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
+          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message as string}</p>}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">

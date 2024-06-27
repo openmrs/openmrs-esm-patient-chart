@@ -15,15 +15,6 @@ interface ConditionFormProps extends DefaultPatientWorkspaceProps {
   formContext: 'creating' | 'editing';
 }
 
-const schema = z.object({
-  abatementDateTime: z.date().optional().nullable(),
-  clinicalStatus: z.string(),
-  conditionName: z.string({ required_error: 'A condition is required' }),
-  onsetDateTime: z.date().nullable(),
-});
-
-export type ConditionSchema = z.infer<typeof schema>;
-
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
@@ -34,14 +25,26 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const schema = z.object({
+    abatementDateTime: z.date().optional().nullable(),
+    clinicalStatus: z.string().refine((clinicalStatus) => formContext !== 'creating' || !!clinicalStatus, {
+      message: t('clinicalStatusRequired', 'A clinical status is required'),
+    }),
+    conditionName: z.string().refine((conditionName) => formContext !== 'creating' || !!conditionName, {
+      message: t('conditionRequired', 'A condition is required'),
+    }),
+    onsetDateTime: z.date().nullable(),
+  });
+
   const isTablet = useLayoutType() === 'tablet';
   const { conditions } = useConditions(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [errorCreating, setErrorCreating] = useState(null);
   const [errorUpdating, setErrorUpdating] = useState(null);
+
   const matchingCondition = conditions?.find((c) => c?.id === condition?.id);
 
-  const methods = useForm<ConditionSchema>({
+  const methods = useForm<z.infer<typeof schema>>({
     mode: 'all',
     resolver: zodResolver(schema),
     defaultValues: {
@@ -52,7 +55,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
             : null
           : null,
       conditionName: '',
-      clinicalStatus: condition?.cells?.find((cell) => cell?.info?.header === 'clinicalStatus')?.value ?? '',
+      clinicalStatus: formContext === 'editing' ? matchingCondition?.clinicalStatus?.toLowerCase() : '',
       onsetDateTime:
         formContext == 'editing'
           ? matchingCondition?.onsetDateTime
@@ -63,7 +66,6 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   });
 
   const {
-    setError,
     formState: { isDirty },
   } = methods;
 
@@ -71,25 +73,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  const onSubmit: SubmitHandler<ConditionSchema> = (payload) => {
-    setIsSubmittingForm(true);
-
-    if (formContext === 'creating') {
-      if (!payload.conditionName.trim()) {
-        setError('conditionName', {
-          type: 'manual',
-          message: t('conditionRequired', 'A condition is required'),
-        });
-      }
-      if (!payload.clinicalStatus) {
-        setError('clinicalStatus', {
-          type: 'manual',
-          message: t('clinicalStatusRequired', 'A clinical status is required'),
-        });
-      }
-      setIsSubmittingForm(false);
-    }
-
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = () => {
     setIsSubmittingForm(true);
   };
 
@@ -102,6 +86,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
+          schema={schema}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           conditionToEdit={condition}
           editing={formContext === 'editing'}
