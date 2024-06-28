@@ -273,13 +273,15 @@ test('Record and edit test results', async ({ page }) => {
     for (const { resultsPageReference, value } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}")`);
-        await expect(row).toContainText(value);
+        const valueCell = row.locator('td:nth-child(2)');
+        await expect(valueCell).toContainText(value);
       });
     }
     for (const { resultsPageReference, value } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}")`);
-        await expect(row).toContainText(value);
+        const valueCell = row.locator('td:nth-child(2)');
+        await expect(valueCell).toContainText(value);
       });
     }
   });
@@ -346,13 +348,15 @@ test('Record and edit test results', async ({ page }) => {
     for (const { resultsPageReference, updatedValue } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}")`);
-        await expect(row).toContainText(updatedValue);
+        const valueCell = row.locator('td:nth-child(2)');
+        await expect(valueCell).toContainText(updatedValue);
       });
     }
     for (const { resultsPageReference, updatedValue } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}")`);
-        await expect(row).toContainText(updatedValue);
+        const valueCell = row.locator('td:nth-child(2)');
+        await expect(valueCell).toContainText(updatedValue);
       });
     }
   });
