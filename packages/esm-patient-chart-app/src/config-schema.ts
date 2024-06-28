@@ -1,6 +1,10 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const esmPatientChartSchema = {
+  freeTextFieldConceptUuid: {
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _type: Type.ConceptUuid,
+  },
   visitDiagnosisConceptUuid: {
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
@@ -131,6 +135,7 @@ export const esmPatientChartSchema = {
   },
 };
 export interface ChartConfig {
+  freeTextFieldConceptUuid: string;
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
   showRecommendedVisitTypeTab: boolean;

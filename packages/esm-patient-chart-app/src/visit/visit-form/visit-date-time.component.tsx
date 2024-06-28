@@ -7,13 +7,16 @@ import classNames from 'classnames';
 import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
+import dayjs from 'dayjs';
 
 interface VisitDateTimeFieldProps {
   visitDatetimeLabel: string;
   dateFieldName: 'visitStartDate' | 'visitStopDate';
   timeFieldName: 'visitStartTime' | 'visitStopTime';
   timeFormatFieldName: 'visitStartTimeFormat' | 'visitStopTimeFormat';
+  /** minDate: Milliseconds since Jan 1 1970. */
   minDate?: number;
+  /** maxDate: Milliseconds since Jan 1 1970. */
   maxDate?: number;
 }
 
@@ -26,7 +29,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   maxDate,
 }) => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const {
     control,
     formState: { errors },
@@ -35,8 +37,8 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   // Since we have the separate date and time fields, the final validation needs to be done at the form
   // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
   // last second of the day. We want to just compare dates and not time.
-  minDate = minDate ? new Date(minDate).setHours(0, 0, 0, 0) : null;
-  maxDate = maxDate ? new Date(maxDate).setHours(23, 59, 59, 59) : null;
+  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)).format('DD/MM/YYYY') : null;
+  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)).format('DD/MM/YYYY') : null;
 
   return (
     <section>
@@ -52,8 +54,8 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 datePickerType="single"
                 id={dateFieldName}
                 style={{ paddingBottom: '1rem' }}
-                minDate={minDate}
-                maxDate={maxDate}
+                minDate={minDateObj}
+                maxDate={maxDateObj}
                 onChange={([date]) => onChange(date)}
                 value={value}
               >

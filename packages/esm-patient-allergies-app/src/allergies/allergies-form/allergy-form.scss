@@ -83,7 +83,7 @@
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .form {
-    height: calc(100vh - 6rem);
+    height: 100%;
   }
 }
 
