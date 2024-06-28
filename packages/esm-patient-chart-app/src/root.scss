@@ -76,11 +76,11 @@ html[dir='rtl'] {
     }
   }
   :global(.cds--side-nav) {
-      right: 0;
-      :global(.active-left-nav-link) {
-        border-right: 0.25rem solid var(--brand-01);
-        border-left: unset;
-      }
+    right: 0;
+    :global(.active-left-nav-link) {
+      border-right: 0.25rem solid var(--brand-01);
+      border-left: unset;
+    }
   }
 }
 

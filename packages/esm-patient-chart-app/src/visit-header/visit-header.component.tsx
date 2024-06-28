@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Header, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import {
   age,
-  displayName,
+  getPatientName,
   ConfigurableLink,
   useAssignedExtensions,
   useLayoutType,
@@ -49,7 +49,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     [t],
   );
 
-  const name = patient ? displayName(patient) : '';
+  const name = patient ? getPatientName(patient) : '';
   const patientUuid = `${patient?.id}`;
   const { currentVisit } = useVisit(patientUuid);
   const patientNameIsTooLong = !isTablet && name.trim().length > 25;

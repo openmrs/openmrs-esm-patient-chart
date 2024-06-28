@@ -134,7 +134,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: var(--desktop-workspace-window-height);
+  height: 100%;
 }
 
 .grid {
@@ -175,7 +175,7 @@
 
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
-    height: var(--tablet-workspace-window-height);
+    height: 100%;
   }
 
   .row {

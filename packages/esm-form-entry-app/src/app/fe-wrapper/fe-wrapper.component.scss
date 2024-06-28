@@ -127,7 +127,7 @@
 
 /* Desktop */
 :host-context(.omrs-breakpoint-gt-tablet) .form-container {
-  height: calc(100vh - 6rem);
+  height: 100%;
   margin: 0 2rem;
 }
 
@@ -137,7 +137,7 @@
 
 /* Tablet */
 :host-context(.omrs-breakpoint-lt-desktop) .form-container {
-  height: calc(100vh - 6rem);
+  height: 100%;
   margin: 0 2rem;
 }
 

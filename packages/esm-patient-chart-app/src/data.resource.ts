@@ -17,8 +17,9 @@ interface ConceptAnswersResponse {
   answers?: Array<ConceptAnswer>;
 }
 
-interface DeathPayload {
+interface CauseOfDeathPayload {
   causeOfDeath?: string;
+  causeOfDeathNonCoded?: string;
   dead: boolean;
   deathDate?: Date;
 }
@@ -52,7 +53,9 @@ export function usePatientDeceasedStatus(patientUuid: string) {
   };
 }
 
-const changePatientDeathStatus = (personUuid: string, payload: DeathPayload, abortController: AbortController) => {
+const changePatientDeathStatus = (personUuid: string, payload: CauseOfDeathPayload) => {
+  const abortController = new AbortController();
+
   return openmrsFetch(`${restBaseUrl}/person/${personUuid}`, {
     headers: {
       'Content-type': 'application/json',
@@ -67,33 +70,28 @@ export function markPatientDeceased(
   deceasedDate: Date,
   personUuid: string,
   selectedCauseOfDeathValue: string | undefined,
+  nonCodedCauseOfDeath?: string | undefined,
 ) {
-  const abortController = new AbortController();
-  const payload: DeathPayload = {
-    causeOfDeath: selectedCauseOfDeathValue,
+  const payload: CauseOfDeathPayload = {
     dead: true,
+    deathDate: deceasedDate || null,
+    ...(nonCodedCauseOfDeath
+      ? { causeOfDeathNonCoded: nonCodedCauseOfDeath }
+      : {
+          causeOfDeath: selectedCauseOfDeathValue,
+        }),
   };
 
-  if (deceasedDate) {
-    payload.deathDate = deceasedDate;
-  } else {
-    payload.deathDate = null;
-  }
-
-  return changePatientDeathStatus(personUuid, payload, abortController);
+  return changePatientDeathStatus(personUuid, payload);
 }
 
 export function markPatientAlive(personUuid: string) {
-  const abortController = new AbortController();
-  return changePatientDeathStatus(
-    personUuid,
-    {
-      causeOfDeath: null,
-      dead: false,
-      deathDate: null,
-    },
-    abortController,
-  );
+  return changePatientDeathStatus(personUuid, {
+    causeOfDeath: null,
+    causeOfDeathNonCoded: null,
+    dead: false,
+    deathDate: null,
+  });
 }
 
 export function useConceptAnswers(conceptUuid: string) {
