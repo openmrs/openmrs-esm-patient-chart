@@ -5,6 +5,9 @@
 
 .widgetCard {
   border: 1px solid $ui-03;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .divider {
@@ -60,4 +63,8 @@
 .helper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.tableContainer {
+  flex: 1;
 }

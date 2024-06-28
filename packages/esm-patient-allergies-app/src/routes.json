@@ -18,10 +18,7 @@
       "component": "allergiesDetailedSummary",
       "slot": "patient-chart-allergies-dashboard-slot",
       "online": true,
-      "offline": true,
-      "meta": {
-        "columnSpan": 4
-      }
+      "offline": true
     },
     {
       "name": "allergies-summary-dashboard",
@@ -31,7 +28,6 @@
       "offline": true,
       "order": 6,
       "meta": {
-        "columns": 1,
         "slot": "patient-chart-allergies-dashboard-slot",
         "path": "Allergies"
       }
