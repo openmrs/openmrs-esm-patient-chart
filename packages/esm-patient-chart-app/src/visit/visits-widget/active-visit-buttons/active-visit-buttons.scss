@@ -1,0 +1,7 @@
+@use '@carbon/styles/scss/spacing';
+
+.buttonsContainer {
+    display: flex;
+    gap: spacing.$spacing-02;
+    margin: spacing.$spacing-02;
+}

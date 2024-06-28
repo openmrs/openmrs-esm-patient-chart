@@ -2,7 +2,6 @@
   "add": "הוסף",
   "addImage": "הוסף תמונה",
   "addVisitNote": "הוסף הערת ביקור",
-  "changeImage": "Change image",
   "clinicalNoteLabel": "כתוב הערה נוספת",
   "clinicalNotePlaceholder": "כתוב כל נקודות נוספות כאן",
   "date": "תאריך",
@@ -11,7 +10,10 @@
   "emptyDiagnosisText": "לא נבחרה אבחנה - הכנס אבחנה למטה",
   "enterPrimaryDiagnoses": "הזן אבחנות ראשיות",
   "enterSecondaryDiagnoses": "הזן אבחנות משניות",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "תמונה",
+  "imageRemoved": "Image removed",
   "imageUploadHelperText": "טען תמונה או השתמש במצלמה של המכשיר כדי לצלם תמונה",
   "noMatchingDiagnoses": "לא נמצאו אבחנות התואמות",
   "note": "הערה",
@@ -19,6 +21,7 @@
   "primaryDiagnosis": "אבחנה עיקרית",
   "primaryDiagnosisInputPlaceholder": "בחר אבחנה ראשית",
   "saveAndClose": "שמור וסגור",
+  "saving": "Saving",
   "searchForPrimaryDiagnosis": "חפש אבחנה ראשית",
   "searchForSecondaryDiagnosis": "חפש אבחנה משנית",
   "secondaryDiagnosis": "אבחנה משנית",
@@ -30,5 +33,5 @@
   "visitNotes": "הערות ביקור",
   "visitNoteSaved": "הערת הביקור נשמרה בהצלחה",
   "visitNoteSaveError": "שגיאה בשמירת הערת הביקור",
-  "visitNoteWorkspaceTitle": "הערת ביקור"
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

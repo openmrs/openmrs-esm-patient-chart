@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars'; 
+@import '@openmrs/esm-styleguide/src/vars';
 
 // Why do we have this copied everywhere? Can't we just import it from the styleguide?
 
@@ -64,6 +64,6 @@
   white-space: nowrap;
 }
 
-.text02 { 
+.text02 {
   color: $text-02;
 }

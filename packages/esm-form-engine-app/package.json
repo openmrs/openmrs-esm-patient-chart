@@ -1,8 +1,8 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "7.0.1",
+  "version": "8.0.1",
   "license": "MPL-2.0",
-  "description": "Forms engine microfrontend for the OpenMRS SPA",
+  "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",
   "main": "src/index.ts",
   "source": true,
@@ -17,7 +17,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -40,11 +40,11 @@
     "@carbon/react": "^1.12.0",
     "@openmrs/openmrs-form-engine-lib": "next",
     "lodash-es": "^4.17.21",
-    "react-error-boundary": "^4.0.11"
+    "react-error-boundary": "^4.0.13"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "7.x",
+    "@openmrs/esm-patient-common-lib": "8.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

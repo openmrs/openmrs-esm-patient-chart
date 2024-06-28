@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .visitTypeOverviewWrapper {
 	margin: spacing.$spacing-05 0rem;
@@ -35,7 +35,7 @@
 	min-height: spacing.$spacing-10;
 	width: 100%;
 	@include type.type-style('body-compact-01');
-	
+
 }
 
 .radioButton {

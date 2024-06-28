@@ -62,6 +62,11 @@ export const configSchema = {
         _description: 'UUID of the lab test that requires a reason for ordering',
         _default: '',
       },
+      required: {
+        _type: Type.Boolean,
+        _description: 'Whether the order reason is required or not',
+        _default: false,
+      },
       orderReasons: {
         _type: Type.Array,
         _elements: {
@@ -87,6 +92,7 @@ export interface LabTestReason {
 }
 export interface OrderReason {
   labTestUuid: string;
+  required: boolean;
   orderReasons: Array<string>;
 }
 export interface ConfigObject {

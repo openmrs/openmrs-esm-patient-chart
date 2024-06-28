@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Header, HeaderGlobalBar, HeaderMenuButton, Tag, Tooltip } from '@carbon/react';
 import {
   age,
+  getPatientName,
   ConfigurableLink,
   useAssignedExtensions,
   useLayoutType,
@@ -15,11 +16,11 @@ import {
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
+import { CloseButton } from './close-button.component';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
+import RetrospectiveVisitLabel from './retrospective-visit-label.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
-import RetrospectiveVisitLabel from './retrospective-visit-label.component';
-import { CloseButton } from './close-button.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -48,7 +49,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     [t],
   );
 
-  const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
+  const name = patient ? getPatientName(patient) : '';
   const patientUuid = `${patient?.id}`;
   const { currentVisit } = useVisit(patientUuid);
   const patientNameIsTooLong = !isTablet && name.trim().length > 25;
@@ -63,7 +64,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     } else {
       return '';
     }
-  }, [queueEntry]);
+  }, [queueEntry, t]);
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
@@ -132,7 +133,10 @@ const VisitHeader: React.FC = () => {
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
-  const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
+  const toggleSideMenu = useCallback(
+    (state?: boolean) => setIsSideMenuExpanded((prevState) => (state !== undefined ? state : !prevState)),
+    [],
+  );
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {

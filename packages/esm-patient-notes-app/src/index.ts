@@ -3,12 +3,11 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
-  translateFrom,
+  restBaseUrl,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import notesOverviewComponent from './notes/notes-overview.component';
-import visitNotesActionButtonComponent from './visit-note-action-button.component';
-import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import notesOverviewExtension from './notes/notes-overview.extension';
+import visitNotesActionButtonExtension from './visit-note-action-button.extension';
 
 const moduleName = '@openmrs/esm-patient-notes-app';
 
@@ -22,21 +21,15 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/encounter.+',
+    pattern: `.+${restBaseUrl}/encounter.+`,
   });
 
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const notesOverview = getSyncLifecycle(notesOverviewComponent, options);
+export const notesOverview = getSyncLifecycle(notesOverviewExtension, options);
 
-export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonComponent, options);
+export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExtension, options);
 
 // t('visitNoteWorkspaceTitle', 'Visit Note')
-export const visitNotesForm = registerWorkspace({
-  name: 'visit-notes-form-workspace',
-  load: getAsyncLifecycle(() => import('./notes/visit-notes-form.component'), options),
-  title: translateFrom(moduleName, 'visitNoteWorkspaceTitle', 'Visit Note'),
-  type: 'visit-note',
-  canHide: true,
-});
+export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);

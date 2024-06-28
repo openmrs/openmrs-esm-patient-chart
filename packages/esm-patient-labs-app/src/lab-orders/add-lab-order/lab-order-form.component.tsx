@@ -1,8 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { type DefaultWorkspaceProps, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, type LabOrderBasketItem, prepLabOrderPostData, useOrderReasons } from '../api';
+import {
+  type LabOrderBasketItem,
+  type DefaultPatientWorkspaceProps,
+  launchPatientWorkspace,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
+import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -16,7 +21,7 @@ import {
   TextArea,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { priorityOptions } from './lab-order';
+import { ordersEqual, priorityOptions } from './lab-order';
 import { useTestTypes } from './useTestTypes';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,30 +30,9 @@ import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './lab-order-form.scss';
 
-export interface LabOrderFormProps {
+export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: LabOrderBasketItem;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
-  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
-  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
-
-const labOrderFormSchema = z.object({
-  instructions: z.string().optional(),
-  urgency: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-  }),
-  labReferenceNumber: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Lab reference number is required'),
-  }),
-  testType: z.object(
-    { label: z.string(), conceptUuid: z.string() },
-    {
-      required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-      invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
-    },
-  ),
-  orderReason: z.string().optional(),
-});
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
@@ -62,9 +46,38 @@ export function LabOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const config = useConfig<ConfigObject>();
+  const orderReasonRequired = (
+    config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
+  ).required;
+  const labOrderFormSchema = z.object({
+    instructions: z.string().optional(),
+    urgency: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+    }),
+    labReferenceNumber: z.string().optional(),
+    testType: z.object(
+      { label: z.string(), conceptUuid: z.string() },
+      {
+        required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
+        invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+      },
+    ),
+    orderReason: orderReasonRequired
+      ? z
+          .string({
+            required_error: translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          })
+          .refine(
+            (value) => !!value,
+            translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+          )
+      : z.string().optional(),
+  });
 
   const {
     control,
@@ -74,12 +87,9 @@ export function LabOrderForm({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      instructions: '',
-      labReferenceNumber: '',
       ...initialOrder,
     },
   });
-  const config = useConfig<ConfigObject>();
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
@@ -87,18 +97,28 @@ export function LabOrderForm({
 
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
-      data.careSetting = careSettingUuid;
-      data.orderer = session.currentProvider.uuid;
+      const finalizedOrder: LabOrderBasketItem = {
+        ...initialOrder,
+        ...data,
+      };
+      finalizedOrder.careSetting = careSettingUuid;
+      finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
-      const existingOrder = orders.find((order) => order.testType.conceptUuid == defaultValues.testType.conceptUuid);
-      const orderIndex = existingOrder ? orders.indexOf(existingOrder) : orders.length;
-      newOrders[orderIndex] = data;
+      const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
+
+      if (existingOrder) {
+        newOrders[orders.indexOf(existingOrder)] = {
+          ...finalizedOrder,
+        };
+      } else {
+        newOrders.push(finalizedOrder);
+      }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspace, session?.currentProvider?.uuid, defaultValues],
+    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
   );
 
   const cancelOrder = useCallback(() => {
@@ -116,7 +136,7 @@ export function LabOrderForm({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   return (
     <>
@@ -129,8 +149,10 @@ export function LabOrderForm({
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
+
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
+          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
@@ -148,7 +170,7 @@ export function LabOrderForm({
                         isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
                       }
                       onBlur={onBlur}
-                      disabled={isLoadingTestTypes}
+                      disabled={isLoadingTestTypes || isEditing}
                       onChange={({ selectedItem }) => onChange(selectedItem)}
                       invalid={errors.testType?.message}
                       invalidText={errors.testType?.message}
@@ -172,6 +194,7 @@ export function LabOrderForm({
                       maxLength={150}
                       value={value}
                       onChange={onChange}
+                      onBlur={onBlur}
                       invalid={errors.labReferenceNumber?.message}
                       invalidText={errors.labReferenceNumber?.message}
                     />
@@ -220,6 +243,8 @@ export function LabOrderForm({
                         items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                        invalid={errors.orderReason?.message}
+                        invalidText={errors.orderReason?.message}
                       />
                     )}
                   />

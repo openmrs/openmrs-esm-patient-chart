@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "fhir2": "^1.2.0",
+    "fhir2": ">=1.2",
     "webservices.rest": "^2.2.0"
   },
   "extensions": [
@@ -20,7 +20,8 @@
       "slot": "patient-chart-vitals-biometrics-dashboard-slot",
       "meta": {
         "title": "Vitals",
-        "view": "vitals"
+        "view": "vitals",
+        "columnSpan": 2
       },
       "order": 1
     },
@@ -44,7 +45,8 @@
       "slot": "patient-chart-vitals-biometrics-dashboard-slot",
       "meta": {
         "view": "biometrics",
-        "title": "Biometrics"
+        "title": "Biometrics",
+        "columnSpan": 2
       }
     },
     {
@@ -57,7 +59,7 @@
         "columns": 1,
         "path": "Vitals & Biometrics"
       }
-    }, 
+    },
     {
       "name": "weight-tile",
       "component": "weightTile",
@@ -65,5 +67,19 @@
       "order": 2
     }
   ],
-  "pages": []
+  "pages": [],
+  "workspaces": [
+    {
+      "name": "patient-vitals-biometrics-form-workspace",
+      "title": "recordVitalsAndBiometrics",
+      "component": "vitalsBiometricsFormWorkspace",
+      "type": "form"
+    }
+  ],
+  "modals": [
+    {
+      "name": "vitals-and-biometrics-delete-modal",
+      "component": "vitalsAndBiometricsDeleteModal"
+    }
+  ]
 }

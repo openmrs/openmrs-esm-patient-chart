@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type OpenmrsResource, useAbortController } from '@openmrs/esm-framework';
+import { omrsDateFormat } from '../../constants';
 
 export interface AppointmentPayload {
   patientUuid: string;
@@ -17,13 +18,17 @@ export interface AppointmentPayload {
   dateHonored?: string;
 }
 
-export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
+export const updateAppointmentStatus = async (
+  toStatus: string,
+  appointmentUuid: string,
+  abortController?: AbortController,
+) => {
+  const statusChangeTime = dayjs().format(omrsDateFormat);
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
+  return await openmrsFetch(url, {
+    body: { toStatus, onDate: statusChangeTime },
     method: 'POST',
-    signal: abortController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: appointment,
+    headers: { 'Content-Type': 'application/json' },
+    signal: abortController?.signal,
   });
-}
+};

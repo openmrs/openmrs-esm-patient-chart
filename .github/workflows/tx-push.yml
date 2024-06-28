@@ -1,9 +1,9 @@
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
 
-name: "Update Transifex on Push"
+name: 'Update Transifex on Push'
 
 jobs:
   push-translations-to-transifex:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Push source file using transifex client

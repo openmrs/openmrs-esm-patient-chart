@@ -7,7 +7,25 @@
     {
       "name": "patient-lists-action-menu",
       "component": "patientListsActionMenu",
-      "slot": "action-menu-chart-items-slot"
+      "slot": "action-menu-patient-chart-items-slot"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-lists",
+      "title": "patientListsWorkspaceTitle",
+      "component": "patientListsWorkspace",
+      "type": "patient-lists",
+      "canHide": false,
+      "width": "wider"
+    },
+    {
+      "name": "patient-list-details",
+      "title": "patientListDetailWorkspaceTitle",
+      "component": "patientListDetailsWorkspace",
+      "type": "patient-lists",
+      "canHide": false,
+      "width": "wider"
     }
   ]
 }

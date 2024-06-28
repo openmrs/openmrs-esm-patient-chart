@@ -33,7 +33,7 @@ export const DoseInput: React.FC<{
       ) : (
         <NumberInput
           id="doseNumber"
-          label={t('doseNumber', 'Dose number within series')}
+          label={t('doseNumberWithinSeries', 'Dose number within series')}
           min={0}
           onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
           value={field.value}

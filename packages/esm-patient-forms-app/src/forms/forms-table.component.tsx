@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Link,
@@ -12,10 +13,8 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tile,
 } from '@carbon/react';
 import styles from './forms-table.scss';
-import { useTranslation } from 'react-i18next';
 
 interface FormsTableProps {
   tableHeaders: Array<{

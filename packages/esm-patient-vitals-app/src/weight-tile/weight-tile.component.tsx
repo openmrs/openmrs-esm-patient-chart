@@ -2,10 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import { type ConfigObject } from '../config-schema';
 import styles from './weight-tile.scss';
-import { useVitalsAndBiometrics } from '../common';
 
 interface WeightTileInterface {
   patientUuid: string;
@@ -21,7 +20,7 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
   if (isLoading) {
     return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
   }
-  if (biometrics?.length) {
+  if (weightData?.length) {
     return (
       <div>
         <p className={styles.label}>{t('weight', 'Weight')}</p>

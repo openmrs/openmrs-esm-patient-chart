@@ -44,7 +44,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 }) => {
   const { t, i18n } = useTranslation();
   const { immunizationsConfig } = useConfig();
-  const displayText = t('immunizations', 'immunizations');
+  const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const locale = i18n.language.replace('_', '-');
   const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
@@ -62,7 +62,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
       return;
     }
     launchPatientWorkspace('immunization-form-workspace');
-  }, [currentVisit]);
+  }, [currentVisit, launchStartVisitPrompt]);
 
   const sortedImmunizations = orderBy(
     consolidatedImmunizations,
@@ -73,7 +73,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const tableHeader = useMemo(
     () => [
       { key: 'vaccine', header: t('vaccine', 'Vaccine') },
-      { key: 'recentVaccination', header: t('recentVaccination', 'Recent Vaccination') },
+      { key: 'recentVaccination', header: t('recentVaccination', 'Recent vaccination') },
       { key: 'add', header: '' },
     ],
     [t],
@@ -144,7 +144,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
         <DataTable rows={paginatedImmunizations} headers={tableHeader} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getExpandHeaderProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table aria-label="immunizations summary" {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />

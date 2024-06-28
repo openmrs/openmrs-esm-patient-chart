@@ -1,5 +1,4 @@
 export * from './allergies.mock';
-export * from './appointments.mock';
 export * from './chart-widgets-config.mock';
 export * from './conditions.mock';
 export * from './encounters.mock';
@@ -16,4 +15,4 @@ export * from './session.mock';
 export * from './visit-notes.mock';
 export * from './visitQueueEntry.mock';
 export * from './visits.mock';
-export * from './vitals.mock';
+export * from './vitals-and-biometrics.mock';

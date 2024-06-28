@@ -1,12 +1,12 @@
 import React, { Fragment, useId, useState } from 'react';
 import classNames from 'classnames';
 import { type Control, Controller } from 'react-hook-form';
-import { FormLabel, Layer, NumberInput, TextArea } from '@carbon/react';
+import { FormLabel, NumberInput, TextArea } from '@carbon/react';
 import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
-import { type VitalsBiometricsFormData } from './vitals-biometrics-form.component';
+import { type VitalsBiometricsFormData } from './vitals-biometrics-form.workspace';
 import styles from './vitals-biometrics-input.scss';
 
 type fieldId =
@@ -24,11 +24,6 @@ type fieldId =
 
 type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';
 type FieldTypes = 'number' | 'textarea';
-
-interface ResponsiveWrapperProps {
-  children: React.ReactNode;
-  isTablet: boolean;
-}
 
 interface VitalsAndBiometricsInputProps {
   control: Control<VitalsBiometricsFormData>;
@@ -77,7 +72,6 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
-
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
   function checkValidity(value, onChange) {
@@ -126,14 +120,18 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
           ) : null}
         </section>
         <section className={inputClasses} style={{ ...fieldStyles }}>
-          <div className={styles.centered}>
+          <div
+            className={classNames({
+              [styles.centered]: !isTablet || unitSymbol === 'mmHg',
+            })}
+          >
             {fieldProperties.map((fieldProperty) => {
               if (fieldProperty.type === 'number') {
                 const numberInputClasses = classNames(styles.numberInput, fieldProperty.className);
 
                 return (
                   <Fragment key={fieldProperty.id}>
-                    <ResponsiveWrapper isTablet={isTablet}>
+                    <ResponsiveWrapper>
                       <Controller
                         name={fieldProperty.id}
                         control={control}
@@ -173,7 +171,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
 
               if (fieldProperty.type === 'textarea') {
                 return (
-                  <ResponsiveWrapper key={fieldProperty.id} isTablet={isTablet}>
+                  <ResponsiveWrapper key={fieldProperty.id}>
                     <Controller
                       name={fieldProperty.id}
                       control={control}
@@ -216,9 +214,5 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
     </>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }: ResponsiveWrapperProps) {
-  return isTablet ? <Layer className={styles.layer}>{children} </Layer> : <Fragment>{children}</Fragment>;
-}
 
 export default VitalsAndBiometricsInput;

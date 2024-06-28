@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { Layer, Tile } from '@carbon/react';
-import { useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
+import { Tile } from '@carbon/react';
+import { useConfig, useConnectivity, usePatient, ResponsiveWrapper } from '@openmrs/esm-framework';
 import {
-  type DefaultWorkspaceProps,
+  type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
   launchFormEntryOrHtmlForms,
   useVisitOrOfflineVisit,
@@ -13,7 +13,7 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
+const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
@@ -21,10 +21,6 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
   const { patient, patientUuid } = usePatient();
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-
-  function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-    return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-  }
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
@@ -41,7 +37,7 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
         mutateForms,
       );
     },
-    [currentVisit, htmlFormEntryForms, patient, mutateForms],
+    [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
   );
 
   const sections = useMemo(() => {
@@ -55,7 +51,7 @@ const FormsDashboard: React.FC<DefaultWorkspaceProps> = () => {
 
   if (forms?.length === 0) {
     return (
-      <ResponsiveWrapper isTablet>
+      <ResponsiveWrapper>
         <Tile className={styles.emptyState}>
           <EmptyDataIllustration />
           <p className={styles.emptyStateContent}>{t('noFormsToDisplay', 'There are no forms to display.')}</p>

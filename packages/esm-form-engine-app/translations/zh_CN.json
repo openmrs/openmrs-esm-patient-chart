@@ -1,8 +1,15 @@
 {
+  "cancel": "取消",
   "closeThisPanel": "关闭此面板",
+  "collapseAll": "折叠所有",
+  "deleteQuestion": "删除问题",
+  "deleteQuestionConfirmation": "你确定要删除这个问题吗？",
+  "deleteQuestionExplainerText": "这个操作无法撤销",
   "errorTitle": "此表单出现错误",
+  "expandAll": "展开所有",
   "loading": "加载中",
-  "or": "或",
+  "or": "或者",
   "thisList": "这个列表",
+  "toggleCollapseOrExpand": "切换折叠或展开",
   "tryAgainMessage": "尝试打开另一个表单 "
 }

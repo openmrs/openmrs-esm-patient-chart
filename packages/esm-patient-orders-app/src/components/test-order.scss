@@ -1,0 +1,20 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import "../root";
+
+.testOrder {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid colors.$gray-20;
+  border-bottom: none;
+}
+
+.testCell {
+  padding-left: spacing.$spacing-05 !important;
+}
+
+.testType {
+  color: colors.$blue-60;
+}

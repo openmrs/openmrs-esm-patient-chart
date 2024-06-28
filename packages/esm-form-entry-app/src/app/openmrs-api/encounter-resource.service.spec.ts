@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { EncounterResourceService } from './encounter-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { OpenmrsApiModule } from './openmrs-api.module';
+import { restBaseUrl } from '@openmrs/esm-framework';
 
 describe('EncounterResourceService', () => {
   let httpMock: HttpTestingController;
@@ -97,7 +98,7 @@ describe('EncounterResourceService', () => {
         links: [
           {
             rel: 'self',
-            uri: 'https://amrs.ampath.or.ke:8443/amrs/ws/rest/v1/location',
+            uri: `https://amrs.ampath.or.ke:8443/amrs${restBaseUrl}/location`,
           },
         ],
       },
@@ -107,7 +108,7 @@ describe('EncounterResourceService', () => {
         links: [
           {
             rel: 'self',
-            uri: 'https://amrs.ampath.or.ke:8443/amrs/ws/rest/v1/encountertype',
+            uri: `https://amrs.ampath.or.ke:8443/amrs${restBaseUrl}/encountertype`,
           },
         ],
       },
@@ -196,7 +197,7 @@ describe('EncounterResourceService', () => {
         display: '',
         links: [
           {
-            uri: 'https://test1.ampath.or.ke:8443/amrs/ws/rest/v1/',
+            uri: `https://test1.ampath.or.ke:8443/amrs${restBaseUrl}`,
             rel: 'self',
           },
         ],
@@ -206,7 +207,7 @@ describe('EncounterResourceService', () => {
         display: 'Location-5',
         links: [
           {
-            uri: 'https://test1.ampath.or.ke:8443/amrs/ws/rest/v1',
+            uri: `https://test1.ampath.or.ke:8443/amrs${restBaseUrl}`,
             rel: 'self',
           },
         ],

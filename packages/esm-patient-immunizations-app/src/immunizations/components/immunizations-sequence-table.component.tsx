@@ -29,12 +29,12 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
 
   const tableHeader = useMemo(
     () => [
-      { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose Number') },
-      { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination Date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
+      { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
+      { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
+      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
       { key: 'edit', header: '' },
     ],
-    [t],
+    [t, sequences.length],
   );
 
   const tableRows = existingDoses?.map((dose) => {

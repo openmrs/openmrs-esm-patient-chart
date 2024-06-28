@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import fuzzy from 'fuzzy';
-import { type FetchResponse, openmrsFetch, useConfig, reportError } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, reportError } from '@openmrs/esm-framework';
 import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 
@@ -30,8 +30,8 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts
-        ? labOrderableConcepts.map((c) => `/ws/rest/v1/concept/${c}`)
-        : `/ws/rest/v1/concept?class=Test`,
+        ? labOrderableConcepts.map((c) => `${restBaseUrl}/concept/${c}`)
+        : `${restBaseUrl}/concept?class=Test`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -45,7 +45,7 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
     return labOrderableConcepts
       ? (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers)
       : (data as ConceptResults)?.data.results ?? ([] as Concept[]);
-  }, [data, isLoading, error]);
+  }, [data, isLoading, error, labOrderableConcepts]);
 
   return {
     data: results,
@@ -66,17 +66,19 @@ export function useTestTypes(searchTerm: string = ''): UseTestType {
   }, [error]);
 
   const testConcepts = useMemo(() => {
-    return data?.map((concept) => ({
-      label: concept.display,
-      conceptUuid: concept.uuid,
-    }));
+    return data
+      ?.map((concept) => ({
+        label: concept.display,
+        conceptUuid: concept.uuid,
+      }))
+      ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label));
   }, [data]);
 
   const filteredTestTypes = useMemo(() => {
     return searchTerm && !isLoading && !error
       ? fuzzy.filter(searchTerm, testConcepts, { extract: (c) => c.label }).map((result) => result.original)
       : testConcepts;
-  }, [testConcepts, searchTerm]);
+  }, [testConcepts, searchTerm, error, isLoading]);
 
   return {
     testTypes: filteredTestTypes,

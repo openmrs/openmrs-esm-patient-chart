@@ -213,7 +213,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           ({ encounter }) => {
             this.onPostResponse(encounter);
             const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-            this.changeState('submitted');
 
             if (!isOffline && encounter?.uuid) {
               this.encounterResourceService
@@ -235,18 +234,15 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               title: this.form.schema.display ?? this.form.schema.name,
               timeoutInMs: 5000,
             });
-
+            this.changeState('submitted');
             this.closeForm();
           },
           (error: Error) => {
             this.changeState('submissionError');
             showSnackbar({
-              isLowContrast: false,
+              isLowContrast: true,
               kind: 'error',
-              subtitle: this.translateService
-                .instant('formSubmissionFailed')
-                .replace('{error}', this.extractErrorMessagesFromResponse(error)),
-
+              subtitle: this.translateService.instant('formSubmissionFailed').replace('{error}', error.message),
               title: this.form.schema.display ?? this.form.schema.name,
               timeoutInMs: 5000,
             });
@@ -373,28 +369,5 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       obj[this.formUuid] = state;
       store.setState(obj);
     }
-  }
-
-  /**
-   * Extracts error messages from a given error response object.
-   * If fieldErrors are present, it extracts the error messages from each field.
-   * Otherwise, it returns the top-level error message.
-   *
-   * @param {object} errorObject - The error response object.
-   * @returns {string[]} An array of error messages.
-   */
-  private extractErrorMessagesFromResponse(errorObject) {
-    const error = errorObject?.error?.error;
-    const fieldErrors = errorObject?.responseBody?.error?.fieldErrors;
-
-    if (error) {
-      return error?.message;
-    }
-
-    if (!fieldErrors) {
-      return [errorObject?.responseBody?.error?.message ?? errorObject?.message];
-    }
-
-    return Object.values(fieldErrors).flatMap((errors: Array<Error>) => errors.map((error) => error.message));
   }
 }

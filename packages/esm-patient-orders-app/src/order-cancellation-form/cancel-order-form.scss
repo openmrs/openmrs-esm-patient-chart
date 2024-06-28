@@ -1,0 +1,88 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.productiveHeading03 {
+  @include type.type-style("heading-03");
+}
+
+.title {
+  @extend .productiveHeading03;
+  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
+}
+
+.orderDisplay {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.danger {
+  color: $danger;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: 1rem !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
+}
+
+.tablet {
+  padding: 1.5rem spacing.$spacing-05;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .form {
+  background-color: #ededed;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .form {
+  background-color: $ui-02;
+}
+
+.grid {
+  margin: spacing.$spacing-05;
+}
+
+.row {
+  margin: spacing.$spacing-03 0rem 0rem;
+  display: flex;
+  flex-flow: row wrap;
+  gap: spacing.$spacing-05;
+}
+
+.spacer {
+  margin-top: spacing.$spacing-05;
+}
+
+.noteInput {
+  width: 100%;
+}
+
+.errorNotification {
+  margin: spacing.$spacing-03 0;
+}
+
+.errorContainer {
+  margin: spacing.$spacing-05;
+}

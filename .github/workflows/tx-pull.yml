@@ -2,14 +2,14 @@ on:
   workflow_dispatch:
   schedule:
     # every day at 8 PM UTC
-    - cron: "30 20 * * *"
+    - cron: '30 20 * * *'
 
-name: "Scheduled Transifex Update"
+name: 'Scheduled Transifex Update'
 
 jobs:
   pull-translations-from-transifex:
     name: pull-translations-from-transifex
-    
+
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,11 +22,11 @@ jobs:
           token: ${{ secrets.TRANSIFEX_TOKEN }}
           args: pull --force --all
       - name: Create PR if necessary
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6.0.1
         with:
-          commit-message: "(chore) Update translations from Transifex"
-          title: "(chore) Update translations from Transifex"
-          body: "Automated updates of translations pulled from Transifex"
-          branch: "chore/update-transifex"
-          author: "OpenMRS Bot <infrastructure@openmrs.org>"
+          commit-message: '(chore) Update translations from Transifex'
+          title: '(chore) Update translations from Transifex'
+          body: 'Automated updates of translations pulled from Transifex'
+          branch: 'chore/update-transifex'
+          author: 'OpenMRS Bot <infrastructure@openmrs.org>'
           token: ${{ secrets.GITHUB_TOKEN }}

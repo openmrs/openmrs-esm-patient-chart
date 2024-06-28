@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type PatientVitals } from '../common';
+import { type PatientVitalsAndBiometrics } from '../common';
 import styles from './biometrics-chart.scss';
 
 enum ScaleTypes {
@@ -19,7 +19,7 @@ enum ScaleTypes {
 interface BiometricsChartProps {
   conceptUnits: Map<string, string>;
   config: ConfigObject;
-  patientBiometrics: Array<PatientVitals>;
+  patientBiometrics: Array<PatientVitalsAndBiometrics>;
 }
 
 interface BiometricChartData {
@@ -33,13 +33,13 @@ const chartColors = { weight: '#6929c4', height: '#6929c4', bmi: '#6929c4' };
 const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config }) => {
   const { t } = useTranslation();
   const { bmiUnit } = config.biometrics;
-  const [selectedBiometrics, setSelectedBiometrics] = React.useState<BiometricChartData>({
+  const [selectedBiometrics, setSelectedBiometrics] = useState<BiometricChartData>({
     title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
     value: 'weight',
     groupName: 'weight',
   });
 
-  const chartData = React.useMemo(
+  const chartData = useMemo(
     () =>
       patientBiometrics
         .filter((biometrics) => biometrics[selectedBiometrics.value])
@@ -58,7 +58,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     [patientBiometrics, selectedBiometrics.groupName, selectedBiometrics.value],
   );
 
-  const chartOptions = React.useMemo(() => {
+  const chartOptions = useMemo(() => {
     return {
       title: selectedBiometrics.title,
       axes: {
@@ -90,7 +90,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       },
       height: '400px',
     };
-  }, [selectedBiometrics]);
+  }, [selectedBiometrics, t]);
 
   return (
     <div className={styles.biometricChartContainer}>

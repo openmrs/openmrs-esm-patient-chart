@@ -2,7 +2,6 @@
   "add": "Añadir",
   "addImage": "Añadir imagen",
   "addVisitNote": "Añadir una nota de visita",
-  "changeImage": "Change image",
   "clinicalNoteLabel": "Escribir tus notas",
   "clinicalNotePlaceholder": "Escribe cualquier nota adicional aquí",
   "date": "Fecha",
@@ -11,7 +10,10 @@
   "emptyDiagnosisText": "No se ha seleccionado ningún diagnóstico. Introduce un diagnóstico a continuación",
   "enterPrimaryDiagnoses": "Ingresar diagnósticos principales",
   "enterSecondaryDiagnoses": "Ingresar diagnósticos secundarios",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "Imagen",
+  "imageRemoved": "Image removed",
   "imageUploadHelperText": "Subir una imagen o utilizar la cámara de este dispositivo para capturar una imagen",
   "noMatchingDiagnoses": "No se encontraron diagnósticos coincidentes",
   "note": "Nota",
@@ -19,6 +21,7 @@
   "primaryDiagnosis": "Diagnóstico principal",
   "primaryDiagnosisInputPlaceholder": "Elegir un diagnóstico principal",
   "saveAndClose": "Guardar y cerrar",
+  "saving": "Saving",
   "searchForPrimaryDiagnosis": "Buscar un diagnóstico principal",
   "searchForSecondaryDiagnosis": "Buscar un diagnóstico secundario",
   "secondaryDiagnosis": "Diagnóstico secundario",
@@ -30,5 +33,5 @@
   "visitNotes": "Notas de visita",
   "visitNoteSaved": "Nota de visita guardada",
   "visitNoteSaveError": "Error al guardar la nota de visita",
-  "visitNoteWorkspaceTitle": "Nota de visita"
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

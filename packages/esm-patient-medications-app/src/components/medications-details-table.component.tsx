@@ -16,11 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { CardHeader, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  type Order,
+  useOrderBasket,
+  useLaunchWorkspaceRequiringVisit,
+} from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
-import { age, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib/src/useLaunchWorkspaceRequiringVisit';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
@@ -185,7 +189,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       ) ?? [];
 
     return {
-      name: `${patient?.patient?.name?.[0]?.given?.join(' ')} ${patient?.patient?.name?.[0].family}`,
+      name: patient?.patient ? getPatientName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

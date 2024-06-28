@@ -1,5 +1,5 @@
 import useSWR, { mutate } from 'swr';
-import { type FetchResponse, openmrsFetch, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
@@ -22,7 +22,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
-  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -30,7 +30,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/order?patient=${patientUuid}`)),
+    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
     [patientUuid],
   );
 
@@ -56,7 +56,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
 export function prepMedicationOrderPostData(
   order: DrugOrderBasketItem,
   patientUuid: string,
-  encounterUuid: string,
+  encounterUuid: string | null,
 ): OrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {

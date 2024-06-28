@@ -1,28 +1,22 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  useVitalsConceptMetadata,
-  withUnit,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
-import { type ConfigObject } from '../config-schema';
+import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { launchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics } from '../common';
+import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../common';
+import { type ConfigObject } from '../config-schema';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
+import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 
 interface BiometricsBaseProps {
-  patientUuid: string;
   pageSize: number;
-  urlLabel: string;
   pageUrl: string;
+  patientUuid: string;
+  urlLabel: string;
 }
 
 const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
@@ -32,46 +26,68 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
 
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const { bmiUnit } = config.biometrics;
-  const { data: biometrics, isLoading, isError, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
+  const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchBiometricsForm = React.useCallback(
+  const launchBiometricsForm = useCallback(
     () => launchVitalsAndBiometricsForm(currentVisit, config),
     [config, currentVisit],
   );
 
-  const tableHeaders = [
-    { key: 'date', header: t('dateAndTime', 'Date and time') },
-    { key: 'weight', header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? '') },
-    { key: 'height', header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? '') },
-    { key: 'bmi', header: `${t('bmi', 'BMI')} (${bmiUnit})` },
+  const tableHeaders: Array<BiometricsTableHeader> = [
     {
-      key: 'muac',
+      key: 'dateRender',
+      header: t('dateAndTime', 'Date and time'),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => new Date(valueA.date).getTime() - new Date(valueB.date).getTime(),
+    },
+    {
+      key: 'weightRender',
+      header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.weight && valueB.weight ? valueA.weight - valueB.weight : 0),
+    },
+    {
+      key: 'heightRender',
+      header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
+    },
+    {
+      key: 'bmiRender',
+      header: `${t('bmi', 'BMI')} (${bmiUnit})`,
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
+    },
+    {
+      key: 'muacRender',
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => (valueA.muac && valueB.muac ? valueA.muac - valueB.muac : 0),
     },
   ];
 
-  const tableRows = useMemo(
+  const tableRows: Array<BiometricsTableRow> = useMemo(
     () =>
       biometrics?.map((biometricsData, index) => {
         return {
           ...biometricsData,
           id: `${index}`,
-          date: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
-          weight: biometricsData.weight ?? '--',
-          height: biometricsData.height ?? '--',
-          bmi: biometricsData.bmi ?? '--',
-          muac: biometricsData.muac ?? '--',
+          dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
+          weightRender: biometricsData.weight ?? '--',
+          heightRender: biometricsData.height ?? '--',
+          bmiRender: biometricsData.bmi ?? '--',
+          muacRender: biometricsData.muac ?? '--',
         };
       }),
     [biometrics],
   );
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (biometrics?.length) {
     return (
       <div className={styles.widgetCard}>

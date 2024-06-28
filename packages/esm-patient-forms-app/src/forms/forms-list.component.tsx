@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import fuzzy from 'fuzzy';
-import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
-import { formatDatetime, useLayoutType } from '@openmrs/esm-framework';
+import { DataTableSkeleton } from '@carbon/react';
+import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import type { CompletedFormInfo } from '../types';
 import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
-import type { CompletedFormInfo } from '../types';
 
 export type FormsListProps = {
   completedForms?: Array<CompletedFormInfo>;
@@ -14,10 +14,6 @@ export type FormsListProps = {
   sectionName?: string;
   handleFormOpen: (formUuid: string, encounterUuid: string, formName: string) => void;
 };
-
-function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
-  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
-}
 
 /*
  * For the benefit of our automated translations:
@@ -49,7 +45,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
       .filter(searchTerm, completedForms, { extract: (formInfo) => formInfo.form.display ?? formInfo.form.name })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [completedForms, searchTerm, locale]);
+  }, [completedForms, searchTerm]);
 
   const tableHeaders = useMemo(() => {
     return [
@@ -88,7 +84,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
 
   if (sectionName === 'forms') {
     return (
-      <ResponsiveWrapper isTablet>
+      <ResponsiveWrapper>
         <FormsTable
           tableHeaders={tableHeaders}
           tableRows={tableRows}
@@ -100,7 +96,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     );
   } else {
     return (
-      <ResponsiveWrapper isTablet>
+      <ResponsiveWrapper>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{t(sectionName)}</h4>
         </div>

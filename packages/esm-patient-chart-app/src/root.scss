@@ -1,13 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-
-:root {
-  --bottom-nav-height: 4rem;
-  --workspace-header-height: 3rem;
-  --tablet-workspace-window-height: calc(100vh - var(--omrs-navbar-height));
-  --desktop-workspace-window-height: calc(100vh - var(--omrs-navbar-height) - var(--workspace-header-height));
-}
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .patientChartWrapper {
   display: flex;
@@ -15,7 +8,7 @@
 }
 
 .patientChartWrapper {
-  &>nav {
+  & > nav {
     padding-bottom: 3rem;
     scrollbar-width: none;
   }
@@ -63,11 +56,11 @@
 }
 
 .text01 {
-  color: $ui-05;
+  color: colors.$gray-100;
 }
 
 .text02 {
-  color: $text-02;
+  color: colors.$gray-70;
 }
 
 .label01 {
@@ -83,11 +76,11 @@ html[dir='rtl'] {
     }
   }
   :global(.cds--side-nav) {
-      right: 0;
-      :global(.active-left-nav-link) {
-        border-right: 0.25rem solid var(--brand-01);
-        border-left: unset;
-      }
+    right: 0;
+    :global(.active-left-nav-link) {
+      border-right: 0.25rem solid var(--brand-01);
+      border-left: unset;
+    }
   }
 }
 

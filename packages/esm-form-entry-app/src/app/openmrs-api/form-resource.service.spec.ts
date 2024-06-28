@@ -39,7 +39,7 @@ describe('FormResourceService Unit Tests', () => {
 
     const req = httpMock.expectOne(winRef.openmrsRestBase.trim() + 'form/' + uuid + '?v=full');
     expect(req.request.method).toBe('GET');
-    expect(req.request.urlWithParams).toContain('/ws/rest/v1/form/form-uuid?v=full');
+    expect(req.request.urlWithParams).toContain(`/ws/rest/v1/form/form-uuid?v=full`);
   }));
 
   it('should make API call with correct URL when getFormMetaDataByUuid is invoked with v', fakeAsync(() => {

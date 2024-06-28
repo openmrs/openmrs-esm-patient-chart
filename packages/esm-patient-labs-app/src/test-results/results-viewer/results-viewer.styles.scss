@@ -1,7 +1,6 @@
-@use '@carbon/styles/scss/grid/_flexbox';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .resultsContainer {
   padding: 0;
@@ -40,9 +39,13 @@
   margin-left: auto;
 }
 
+.viewOptionsSwitcher {
+  max-width: 10rem;
+}
+
 .leftSection {
   width: 45%;
-  margin-right: spacing.$spacing-05;
+  margin-right: layout.$spacing-05;
 }
 
 .rightSection, .rightSectionHeader {
@@ -66,7 +69,7 @@
   min-width: 2.5rem;
 }
 
-.leftHeaderActions > :global(.cds--content-switcher), 
+.leftHeaderActions > :global(.cds--content-switcher),
 .viewOptsContentSwitcherContainer :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -93,7 +96,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   background-color: $openmrs-background-grey;
   position: sticky;
   top: 0;
@@ -114,12 +117,12 @@
 .floatingTreeButton {
   position: fixed;
   bottom: 5rem;
-  right: spacing.$spacing-05;
+  right: layout.$spacing-05;
   z-index: 99;
 
   button {
     background-color: $brand-01 !important;
-    padding: spacing.$spacing-05;
+    padding: layout.$spacing-05;
     border-radius: 50%;
   }
 
@@ -129,5 +132,20 @@
 }
 
 .panelViewTimeline {
-  margin-bottom: spacing.$spacing-07;
+  margin-bottom: layout.$spacing-07;
+}
+
+.button {
+  align-items: center;
+  margin-left: 1rem;
+
+  svg {
+    order: 1;
+    margin-right: layout.$spacing-03;
+    margin-left: 0 !important;
+  }
+
+  span {
+    order: 2;
+  }
 }

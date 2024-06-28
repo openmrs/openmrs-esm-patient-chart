@@ -6,13 +6,19 @@ dayjs.extend(isToday);
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
-import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit, useVitalsConceptMetadata, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { ConfigurableLink, formatDate, parseDate, useConfig, useWorkspaces } from '@openmrs/esm-framework';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import {
+  assessValue,
+  getReferenceRangesForConcept,
+  interpretBloodPressure,
+  useVitalsAndBiometrics,
+  useVitalsConceptMetadata,
+} from '../common';
 import { type ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
-import { assessValue, getReferenceRangesForConcept, interpretBloodPressure, useVitalsAndBiometrics } from '../common';
 
 interface VitalsHeaderProps {
   patientUuid: string;

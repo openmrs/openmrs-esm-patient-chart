@@ -1,7 +1,29 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 
+export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
+
+export interface ExtractedOrderErrorObject {
+  message: string;
+  fieldErrors: string[];
+  globalErrors: string[];
+}
+export interface OrderErrorObject {
+  responseBody?: {
+    error?: {
+      message?: string;
+      fieldErrors?: {
+        [fieldName: string]: {
+          message: string;
+          [key: string]: string;
+        }[];
+      };
+      globalErrors?: string[];
+    };
+  };
+}
+
 export interface OrderBasketItem {
-  action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | undefined;
+  action?: OrderAction;
   display: string;
   uuid?: string;
   orderer?: string;
@@ -15,11 +37,12 @@ export interface OrderBasketItem {
       };
     };
   };
+  extractedOrderError?: ExtractedOrderErrorObject;
   isOrderIncomplete?: boolean;
 }
 
 export interface OrderPost {
-  action?: 'NEW' | 'REVISE' | 'DISCONTINUE';
+  action?: OrderAction;
   patient?: string;
   careSetting?: string;
   orderer?: string;
@@ -45,6 +68,7 @@ export interface OrderPost {
   orderReasonNonCoded?: string;
   orderReason?: string;
   instructions?: string;
+  labReferenceNumber?: string;
 }
 
 export interface PatientOrderFetchResponse {
@@ -53,7 +77,7 @@ export interface PatientOrderFetchResponse {
 
 export interface Order {
   uuid: string;
-  action: string;
+  action: OrderAction;
   asNeeded: boolean;
   asNeededCondition?: string;
   autoExpireDate: string;
@@ -122,6 +146,7 @@ export interface Order {
   clinicalHistory: string;
   numberOfRepeats: string;
   type: string;
+  labReferenceNumber?: string;
 }
 
 export interface OrderTypeFetchResponse {
@@ -144,4 +169,45 @@ export interface Drug {
   display: string;
 }
 
-export type PostDataPrepFunction = (order: OrderBasketItem, patientUuid: string, encounterUuid: string) => OrderPost;
+export type PostDataPrepFunction = (
+  order: OrderBasketItem,
+  patientUuid: string,
+  encounterUuid: string | null,
+) => OrderPost;
+
+// Adopted from @openmrs/esm-patient-medications-app package. We should consider maintaining a single shared types file
+export interface DrugOrderBasketItem extends OrderBasketItem {
+  drug: Drug;
+  unit: any;
+  commonMedicationName: string;
+  dosage: number;
+  frequency: any;
+  route: any;
+  quantityUnits: any;
+  patientInstructions: string;
+  asNeeded: boolean;
+  asNeededCondition: string;
+  startDate: Date | string;
+  durationUnit: any;
+  duration: number | null;
+  pillsDispensed: number;
+  numRefills: number;
+  indication: string;
+  isFreeTextDosage: boolean;
+  freeTextDosage: string;
+  previousOrder?: string;
+  template?: any;
+}
+
+export interface LabOrderBasketItem extends OrderBasketItem {
+  testType?: {
+    label: string;
+    conceptUuid: string;
+  };
+  labReferenceNumber?: string;
+  urgency?: string;
+  instructions?: string;
+  previousOrder?: string;
+  orderReason?: string;
+  orderNumber?: string;
+}

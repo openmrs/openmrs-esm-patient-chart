@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import "../../../root.scss";
 
 .diagnosisLabel {
@@ -74,9 +74,9 @@
     max-height: fit-content;
     overflow-x: visible;
   }
-  
+
   > button :global(.cds--tabs .cds--tabs__nav-link) {
     border-bottom: none;
   }
 }
-  
+

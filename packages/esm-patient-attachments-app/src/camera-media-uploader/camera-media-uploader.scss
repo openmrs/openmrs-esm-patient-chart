@@ -1,9 +1,9 @@
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@import '@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 .cameraSection {
-  width: inherit;
+  width: 100%;
   background-color: $ui-02;
 }
 

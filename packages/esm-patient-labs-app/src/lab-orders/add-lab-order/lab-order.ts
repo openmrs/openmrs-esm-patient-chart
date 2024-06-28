@@ -1,4 +1,4 @@
-import { type LabOrderBasketItem } from '../api';
+import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type TestType } from './useTestTypes';
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
@@ -16,4 +16,10 @@ export function createEmptyLabOrder(testType: TestType, orderer: string): LabOrd
     testType,
     orderer,
   };
+}
+
+type LabOrderRequest = Pick<LabOrderBasketItem, 'action' | 'testType'>;
+
+export function ordersEqual(order1: LabOrderRequest, order2: LabOrderRequest) {
+  return order1.testType.conceptUuid === order2.testType.conceptUuid && order1.action === order2.action;
 }

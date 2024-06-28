@@ -2,7 +2,6 @@
   "add": "أضف",
   "addImage": "أضف صورة",
   "addVisitNote": "أضف ملاحظة للزيارة",
-  "changeImage": "Change image",
   "clinicalNoteLabel": "اكتب ملاحظاتك",
   "clinicalNotePlaceholder": "اكتب أي ملاحظات هنا",
   "date": "تاريخ",
@@ -11,7 +10,10 @@
   "emptyDiagnosisText": "لم يتم اختيار تشخيص — أدخل تشخيصًا أدناه",
   "enterPrimaryDiagnoses": "أدخل التشخيص الرئيسي",
   "enterSecondaryDiagnoses": "أدخل التشخيص الثانوي",
+  "error": "Error",
+  "errorFetchingConcepts": "There was a problem fetching concepts",
   "image": "صورة",
+  "imageRemoved": "Image removed",
   "imageUploadHelperText": "قم بتحميل صورة أو استخدم كاميرا هذا الجهاز لالتقاط صورة",
   "noMatchingDiagnoses": "لم يتم العثور على تشخيصات مطابقة",
   "note": "ملاحظة",
@@ -19,6 +21,7 @@
   "primaryDiagnosis": "التشخيص الرئيسي",
   "primaryDiagnosisInputPlaceholder": "اختر التشخيص الرئيسي",
   "saveAndClose": "حفظ وإغلاق",
+  "saving": "Saving",
   "searchForPrimaryDiagnosis": "ابحث عن التشخيص الرئيسي",
   "searchForSecondaryDiagnosis": "ابحث عن التشخيص الثانوي",
   "secondaryDiagnosis": "التشخيص الثانوي",
@@ -30,5 +33,5 @@
   "visitNotes": "ملاحظات الزيارة",
   "visitNoteSaved": "تم حفظ ملاحظة الزيارة",
   "visitNoteSaveError": "خطأ في حفظ ملاحظة الزيارة",
-  "visitNoteWorkspaceTitle": "ملاحظة الزيارة"
+  "visitNoteWorkspaceTitle": "Visit Note"
 }

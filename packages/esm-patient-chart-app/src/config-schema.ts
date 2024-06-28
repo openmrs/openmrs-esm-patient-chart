@@ -1,6 +1,10 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const esmPatientChartSchema = {
+  freeTextFieldConceptUuid: {
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _type: Type.ConceptUuid,
+  },
   visitDiagnosisConceptUuid: {
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
@@ -123,8 +127,15 @@ export const esmPatientChartSchema = {
     _description: 'The number of visits to load initially in the Visits Summary tab. Defaults to 5',
     _default: 5,
   },
+  showExtraVisitAttributesSlot: {
+    _type: Type.Boolean,
+    _description:
+      'Whether on start visit form should handle submission of the extra visit attributes from the extra visit attributes slot',
+    _default: false,
+  },
 };
 export interface ChartConfig {
+  freeTextFieldConceptUuid: string;
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
   showRecommendedVisitTypeTab: boolean;
@@ -146,4 +157,5 @@ export interface ChartConfig {
   };
   disableChangingVisitLocation: boolean;
   numberOfVisitsToLoad: number;
+  showExtraVisitAttributesSlot: boolean;
 }
