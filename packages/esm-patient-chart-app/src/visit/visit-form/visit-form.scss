@@ -1,26 +1,25 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '../../root.scss';
 
 .container {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 
   & section {
-    margin: spacing.$spacing-05 0;
+    margin: layout.$spacing-05 0;
   }
 }
 
 .heading {
-  @include type.type-style("heading-03");
-
-  margin: spacing.$spacing-05;
+  @include type.type-style('heading-03');
+  margin: layout.$spacing-05;
 }
 
 .sectionTitle {
-  @include type.type-style("heading-compact-02");
-  color: $text-02;
-  margin: 0 0 spacing.$spacing-03 0;
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin: 0 0 layout.$spacing-03 0;
 }
 
 .dateTimeSection {
@@ -28,11 +27,11 @@
 }
 
 .radioButton {
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
 }
 
 .headerGridRow {
-  border-bottom: 0.0625rem solid $grey-2;
+  border-bottom: 0.0625rem solid colors.$gray-20;
   margin: 0;
 }
 
@@ -45,8 +44,13 @@
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: calc(100vh - 6rem);
+  justify-content: start;
+  height: 100%;
+}
+
+.buttonSet {
+  margin-top: auto;
+  justify-self: end;
 }
 
 .button {
@@ -59,7 +63,7 @@
 
 .tablet {
   padding: 1.5rem 1rem;
-  background-color: $ui-02;
+  background-color: white;
 }
 
 .desktop {
@@ -79,12 +83,12 @@
 }
 
 .queueSection {
-  margin-top: spacing.$spacing-04;
+  margin-top: layout.$spacing-04;
 }
 
 .label {
-  @include type.type-style("label-01");
-  color: $text-02;
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -103,5 +107,15 @@
         flex-basis: 70%;
       }
     }
+  }
+
+  .form {
+    height: 100%;
+  }
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: 1rem !important;
   }
 }

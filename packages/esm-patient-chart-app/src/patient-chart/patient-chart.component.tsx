@@ -1,21 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
+  ActionMenu,
   ExtensionSlot,
+  WorkspaceContainer,
+  WorkspaceWindow,
   setCurrentVisit,
   setLeftNav,
   unsetLeftNav,
-  useConfig,
   usePatient,
+  useWorkspaces,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { changeWorkspaceContext, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { spaBasePath } from '../constants';
 import { type LayoutMode } from './chart-review/dashboard-view.component';
-import ActionMenu from './action-menu/action-menu.component';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
-import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
 
 const PatientChart: React.FC = () => {
@@ -34,10 +34,8 @@ const PatientChart: React.FC = () => {
   // Keep state updated with the current patient. Anything used outside the patient
   // chart (e.g., the current visit is used by the Active Visit Tag used in the
   // patient search) must be updated in the callback, which is called when the patient
-  // chart unmounts. Workspaces are only used inside the patient chart so we just
-  // need to update those when we enter a new patient chart.
+  // chart unmounts.
   useEffect(() => {
-    changeWorkspaceContext(patientUuid);
     return () => {
       setCurrentVisit(null, null);
     };
@@ -50,36 +48,38 @@ const PatientChart: React.FC = () => {
   }, [leftNavBasePath]);
 
   return (
-    <main className={classNames('omrs-main-content', styles.chartContainer)}>
-      <>
-        <div
-          className={classNames(
-            styles.innerChartContainer,
-            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
-          )}
-        >
-          <ExtensionSlot name="breadcrumbs-slot" />
-          {isLoadingPatient ? (
-            <Loader />
-          ) : (
-            <>
-              <aside>
-                <ExtensionSlot name="patient-header-slot" state={state} />
-                <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
-                <ExtensionSlot name="patient-info-slot" state={state} />
-              </aside>
-              <div className={styles.grid}>
-                <div className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}>
-                  <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
-                  <WorkspaceNotification />
+    <>
+      <main className={classNames('omrs-main-content', styles.chartContainer)}>
+        <>
+          <div
+            className={classNames(
+              styles.innerChartContainer,
+              workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
+            )}
+          >
+            {isLoadingPatient ? (
+              <Loader />
+            ) : (
+              <>
+                <aside>
+                  <ExtensionSlot name="patient-header-slot" state={state} />
+                  <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
+                  <ExtensionSlot name="patient-info-slot" state={state} />
+                </aside>
+                <div className={styles.grid}>
+                  <div
+                    className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
+                  >
+                    <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
-        <ActionMenu />
-      </>
-    </main>
+              </>
+            )}
+          </div>
+        </>
+      </main>
+      <WorkspaceContainer showSiderailAndBottomNav contextKey={`patient/${patientUuid}`} />
+    </>
   );
 };
 

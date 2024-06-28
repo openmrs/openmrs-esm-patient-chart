@@ -5,9 +5,8 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
   restBaseUrl,
-  translateFrom,
 } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import dashboardMeta from './dashboard.meta';
 import { configSchema } from './config-schema';
 import vitalsSummaryComponent from './vitals/vitals-summary.component';
@@ -61,9 +60,13 @@ export const vitalsAndBiometricsDashboardLink =
 
 export const weightTile = getAsyncLifecycle(() => import('./weight-tile/weight-tile.component'), options);
 
+export const vitalsAndBiometricsDeleteModal = getAsyncLifecycle(
+  () => import('./vitals-biometrics-form/delete-vitals-and-biometrics.modal'),
+  options,
+);
+
 // t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
-registerWorkspace({
-  name: 'patient-vitals-biometrics-form-workspace',
-  load: getAsyncLifecycle(() => import('./vitals-biometrics-form/vitals-biometrics-form.component'), options),
-  title: translateFrom(moduleName, 'recordVitalsAndBiometrics', 'Record Vitals and Biometrics'),
-});
+export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(
+  () => import('./vitals-biometrics-form/vitals-biometrics-form.workspace'),
+  options,
+);

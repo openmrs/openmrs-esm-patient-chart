@@ -1,0 +1,148 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.container {
+  margin: layout.$spacing-05;
+
+  & section {
+    margin: layout.$spacing-05 0;
+  }
+}
+
+.heading {
+  @include type.type-style("productive-heading-03");
+  color: $text-02;
+  margin: layout.$spacing-05;
+}
+
+.sectionTitle {
+  @include type.type-style("productive-heading-02");
+  color: $text-02;
+  margin: 0 0 layout.$spacing-03 0;
+}
+
+.conceptAnswerOverviewWrapper {
+	margin: layout.$spacing-03 0rem;
+	border: 0.0625rem solid $grey-2;
+  background-color: $ui-01;
+
+  :global(.cds--tile) {
+    border: none !important;
+  }
+}
+
+.errorOutline {
+  outline: 1px solid $danger;
+}
+
+.conceptAnswerOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+	position: relative;
+}
+
+.conceptAnswerOverviewWrapper div:nth-child(3) span * {
+	display: none;
+}
+
+.radioButtonGroup {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-top: layout.$spacing-03;
+	min-height: layout.$spacing-10;
+	width: 100%;
+	@include type.type-style('body-short-01');
+	color: $text-02;
+  background-color: $ui-01;
+}
+
+.radioButton {
+	padding: layout.$spacing-02 layout.$spacing-05;
+	margin: layout.$spacing-03 0;
+}
+
+.contentSwitcher {
+  height: layout.$spacing-09;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: layout.$spacing-03 layout.$spacing-05;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: 1rem;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset;
+  }
+}
+
+.conceptAnswerOverviewWrapperTablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: $ui-02;
+}
+
+.conceptAnswerOverviewWrapperDesktop {
+  padding: 0rem;
+}
+
+.warningContainer {
+  display: flex;
+  background-color: $warning-background;
+  padding: layout.$spacing-05;
+  align-items: center;
+}
+
+.warningIcon {
+  display: flex;
+  align-self: center;
+  fill: $inverse-support-03;
+  margin-right: layout.$spacing-03;
+  align-self: start;
+}
+
+.warningText {
+  font-size: 0.875rem;
+}
+
+.datePicker {
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.errorMessage {
+  @include type.type-style("label-02");
+  color: $danger;
+}
+
+.nonCodedCauseOfDeath {
+  margin: 1rem;
+}
+
+.skeleton {
+  :global(.cds--structured-list-tbody .cds--structured-list-row:last-child) {
+    border-bottom: none;
+  }
+}

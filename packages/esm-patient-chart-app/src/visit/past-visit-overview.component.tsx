@@ -15,11 +15,11 @@ import {
 import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { setCurrentVisit } from '@openmrs/esm-framework';
-import { type DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
 
-const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
 
@@ -27,10 +27,10 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
 
   const headerData: Array<typeof DataTableHeader> = useMemo(
     () => [
-      { key: 'startDate', header: t('startDate', 'Start Date') },
+      { key: 'startDate', header: t('startDate', 'Start date') },
       { key: 'visitType', header: t('type', 'Type') },
       { key: 'location', header: t('location', 'Location') },
-      { key: 'endDate', header: t('endDate_title', 'End Date'), colSpan: 2 },
+      { key: 'endDate', header: t('endDate_title', 'End date'), colSpan: 2 },
     ],
     [t],
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { ErrorState, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { CardHeader, EmptyState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
@@ -31,7 +31,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
   if (!currentVisit) {
     return (
       <EmptyState
-        headerTitle={t('currentVisit', 'currentVisit')}
+        headerTitle={t('currentVisit', 'Current visit')}
         displayText={t('noActiveVisitMessage', 'active visit')}
         launchForm={() => launchPatientWorkspace('start-visit-workspace-form')}
       />
@@ -40,7 +40,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
 
   return (
     <div className={styles.container}>
-      <CardHeader title={t('currentVisit', 'Current Visit')}>
+      <CardHeader title={t('currentVisit', 'Current visit')}>
         <span>{isValidating ? <InlineLoading /> : null}</span>
       </CardHeader>
       <div className={styles.visitSummaryCard}>

@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import conditionsOverviewComponent from './conditions/conditions-overview.component';
@@ -35,13 +35,12 @@ export const conditionsDashboardLink =
   );
 
 export const conditionDeleteConfirmationDialog = getAsyncLifecycle(
-  () => import('./conditions/delete-condition-modal.component'),
+  () => import('./conditions/delete-condition.modal'),
   options,
 );
 
 // t('recordCondition', 'Record a Condition')
-registerWorkspace({
-  name: 'conditions-form-workspace',
-  load: getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options),
-  title: translateFrom(moduleName, 'recordCondition', 'Record a Condition'),
-});
+export const conditionsFormWorkspace = getAsyncLifecycle(
+  () => import('./conditions/conditions-form.workspace'),
+  options,
+);

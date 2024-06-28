@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
+import { type FormSchema } from '@openmrs/openmrs-form-engine-lib';
 
 /**
  * Custom hook to fetch form schema based on its form UUID.
@@ -12,9 +12,11 @@ import { type OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 const useFormSchema = (formUuid: string) => {
   const url = formUuid ? `${restBaseUrl}/o3/forms/${formUuid}` : null;
 
-  const { data, error, isLoading } = useSWR<{ data: OHRIFormSchema }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: FormSchema }>(url, openmrsFetch);
 
-  return { schema: data?.data, error, isLoading };
+  const schema = { ...data?.data, encounterType: data?.data.encounterType['uuid'] };
+
+  return { schema, error, isLoading };
 };
 
 export default useFormSchema;

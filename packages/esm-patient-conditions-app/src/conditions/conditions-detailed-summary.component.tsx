@@ -19,9 +19,8 @@ import {
 import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { compare } from './utils';
+import { useConditions, type ConditionTableHeader, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -47,19 +46,28 @@ function ConditionsDetailedSummary({ patient }) {
     return conditions;
   }, [filter, conditions]);
 
-  const headers = useMemo(
+  const headers: Array<ConditionTableHeader> = useMemo(
     () => [
       {
         key: 'display',
         header: t('condition', 'Condition'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) => valueA.display?.localeCompare(valueB.display),
       },
       {
-        key: 'onsetDateTime',
+        key: 'onsetDateTimeRender',
         header: t('dateOfOnset', 'Date of onset'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) =>
+          valueA.onsetDateTime && valueB.onsetDateTime
+            ? new Date(valueA.onsetDateTime).getTime() - new Date(valueB.onsetDateTime).getTime()
+            : 0,
       },
       {
-        key: 'clinicalStatus',
+        key: 'status',
         header: t('status', 'Status'),
+        isSortable: true,
+        sortFunc: (valueA, valueB) => valueA.clinicalStatus?.localeCompare(valueB.clinicalStatus),
       },
     ],
     [t],
@@ -71,24 +79,24 @@ function ConditionsDetailedSummary({ patient }) {
         ...condition,
         id: condition.id,
         condition: condition.display,
-        onsetDateTime: {
-          sortKey: condition.onsetDateTime ?? '',
-          content: condition.onsetDateTime
-            ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
-            : '--',
-        },
+        abatementDateTime: condition.abatementDateTime,
+        onsetDateTimeRender: condition.onsetDateTime
+          ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+          : '--',
         status: condition.clinicalStatus,
       };
     });
   }, [filteredConditions]);
 
-  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
-    return sortDirection === sortStates.DESC
-      ? compare(cellB.sortKey, cellA.sortKey)
-      : compare(cellA.sortKey, cellB.sortKey);
-  };
+  const { sortedRows, sortRow } = useConditionsSorting(headers, tableRows);
 
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () =>
+      launchPatientWorkspace('conditions-form-workspace', {
+        formContext: 'creating',
+      }),
+    [],
+  );
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
@@ -124,7 +132,7 @@ function ConditionsDetailedSummary({ patient }) {
           </div>
         </CardHeader>
         <DataTable
-          rows={tableRows}
+          rows={sortedRows}
           sortRow={sortRow}
           headers={headers}
           isSortable

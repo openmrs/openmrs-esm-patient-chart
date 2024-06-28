@@ -3,10 +3,16 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, defineConfigSchema } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
-import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
+import {
+  formattedVitalsAndBiometrics,
+  mockConceptMetadata,
+  mockConceptRanges,
+  mockConceptUnits,
+  mockVitalsConfig,
+} from '__mocks__';
 import { mockPatient } from 'tools';
-import { saveVitalsAndBiometrics } from '../common';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
+import { saveVitalsAndBiometrics, updateVitalsAndBiometrics } from '../common';
+import VitalsAndBiometricsForm, { type VitalsBiometricsFormData } from './vitals-biometrics-form.workspace';
 
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
@@ -18,10 +24,13 @@ const respiratoryRateValue = 16;
 const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
-
+const mockVitalsBiometrics = formattedVitalsAndBiometrics[0];
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
 const mockedUseConfig = jest.mocked(useConfig);
+const mockedUpdateVitalsAndBiometrics = jest.mocked(updateVitalsAndBiometrics);
+const scrollIntoViewMock = jest.fn();
+Element.prototype.scrollIntoView = scrollIntoViewMock;
 
 jest.mock('../common', () => ({
   assessValue: jest.fn(),
@@ -30,6 +39,7 @@ jest.mock('../common', () => ({
   interpretBloodPressure: jest.fn(),
   invalidateCachedVitalsAndBiometrics: jest.fn(),
   saveVitalsAndBiometrics: jest.fn(),
+  updateVitalsAndBiometrics: jest.fn(),
   useVitalsAndBiometrics: jest.fn(),
   useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
     data: mockConceptUnits,
@@ -149,7 +159,6 @@ describe('VitalsBiometricsForm', () => {
         temperature: temperatureValue,
         weight: weightValue,
       }),
-      expect.anything(),
       new AbortController(),
       undefined,
     );
@@ -236,6 +245,62 @@ describe('VitalsBiometricsForm', () => {
     await user.click(saveButton);
     expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
   });
+
+  it('edits existing vitals and biometrics data', async () => {
+    const response: Partial<FetchResponse> = {
+      statusText: 'updated',
+      status: 200,
+      data: [],
+    };
+    mockedUpdateVitalsAndBiometrics.mockReturnValue(
+      Promise.resolve(response) as ReturnType<typeof updateVitalsAndBiometrics>,
+    );
+
+    const user = userEvent.setup();
+
+    renderEditVitalsBiometricsForm();
+    const newHeight = 80;
+    const height = screen.getByRole('spinbutton', { name: /height/i });
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.clear(height);
+    await user.type(height, newHeight.toString());
+    await user.click(saveButton);
+    expect(height).toHaveValue(80);
+
+    const updatedPayload: VitalsBiometricsFormData = {
+      systolicBloodPressure: mockVitalsBiometrics.systolic,
+      diastolicBloodPressure: mockVitalsBiometrics.diastolic,
+      respiratoryRate: mockVitalsBiometrics.respiratoryRate,
+      oxygenSaturation: mockVitalsBiometrics.spo2,
+      pulse: mockVitalsBiometrics.pulse,
+      temperature: mockVitalsBiometrics.temperature,
+      generalPatientNote: mockVitalsBiometrics.generalPatientNote,
+      weight: mockVitalsBiometrics.weight,
+      height: newHeight,
+      midUpperArmCircumference: mockVitalsBiometrics.muac,
+    };
+
+    expect(mockedUpdateVitalsAndBiometrics).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateVitalsAndBiometrics).toHaveBeenCalledWith(
+      mockVitalsConfig.concepts,
+      mockPatient.id,
+      expect.objectContaining(updatedPayload),
+      expect.anything(),
+      new AbortController(),
+      mockVitalsBiometrics.uuid,
+      undefined,
+    );
+
+    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: 'They are now visible on the Vitals and Biometrics page',
+        title: 'Vitals and Biometrics Updated',
+      }),
+    );
+  });
 });
 
 function renderForm() {
@@ -244,6 +309,21 @@ function renderForm() {
     closeWorkspaceWithSavedChanges: jest.fn(),
     patientUuid: mockPatient.id,
     promptBeforeClosing: () => {},
+    formContext: 'creating' as 'creating' | 'editing',
+  };
+  render(<VitalsAndBiometricsForm {...testProps} />);
+}
+
+function renderEditVitalsBiometricsForm() {
+  const testProps = {
+    closeWorkspace: () => {},
+    closeWorkspaceWithSavedChanges: jest.fn(),
+    patientUuid: mockPatient.id,
+    promptBeforeClosing: () => {},
+    encounterUuid: mockVitalsBiometrics.uuid,
+    vitalsBiometrics: formattedVitalsAndBiometrics,
+    formContext: 'editing' as 'creating' | 'editing',
+    formType: 'vitals' as 'vitals' | 'biometrics',
   };
   render(<VitalsAndBiometricsForm {...testProps} />);
 }

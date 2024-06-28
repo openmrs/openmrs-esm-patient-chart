@@ -1,7 +1,6 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import { usePagination } from '@openmrs/esm-framework';
-import { mockVisitNotes, formattedVisitNotes } from '__mocks__';
+import { mockVisitNotes } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
 import NotesMain from './notes-main.component';
@@ -14,7 +13,6 @@ const testProps = {
 };
 
 const mockUseVisitNotes = useVisitNotes as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -22,11 +20,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
     useVisit: jest.fn().mockReturnValue([{}]),
   };
 });
@@ -71,11 +64,6 @@ describe('NotesMain: ', () => {
 
   test("renders a tabular overview of the patient's encounters when present", async () => {
     mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
-    mockUsePagination.mockReturnValueOnce({
-      results: formattedVisitNotes.slice(0, 10),
-      goTo: () => {},
-      currentPage: 1,
-    });
 
     renderNotesMain();
 
@@ -91,17 +79,15 @@ describe('NotesMain: ', () => {
 
     const expectedTableRows = [
       /27 — Jan — 2022 Malaria, Primary respiratory tuberculosis, confirmed/,
-      /14 — Jan — 2022 Malaria/,
-      /14 — Jan — 2022 Hemorrhage in early pregnancy/,
-      /11 — Jan — 2022 Malaria/,
-      /08 — Sept — 2021 Malaria, confirmed, Human immunodeficiency virus \(HIV\) disease/,
+      /14 — Jan — 2022 Visit Diagnoses: Presumed diagnosis, Malaria, Primary/,
+      /14 — Jan — 2022 Visit Diagnoses: Presumed diagnosis, Hemorrhage in early pregnancy, Primary/,
     ];
 
     expectedTableRows.map((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
 
-    expect(screen.getAllByRole('row').length).toEqual(11);
+    expect(screen.getAllByRole('row').length).toEqual(7);
   });
 });
 

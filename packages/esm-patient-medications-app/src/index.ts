@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta, moduleName } from './dashboard.meta';
 import medicationsSummaryComponent from './medications-summary/medications-summary.component';
@@ -26,7 +26,7 @@ export const drugOrderPanel = getAsyncLifecycle(
 );
 
 export const medicationsDashboardLink =
-  // t('Medications', 'Medications')
+  // t('medications', 'Medications')
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
@@ -36,9 +36,7 @@ export const medicationsDashboardLink =
   );
 
 // t('addDrugOrderWorkspaceTitle', 'Add drug order')
-registerWorkspace({
-  name: 'add-drug-order',
-  type: 'order',
-  title: translateFrom(moduleName, 'addDrugOrderWorkspaceTitle', 'Add drug order'),
-  load: getAsyncLifecycle(() => import('./add-drug-order/add-drug-order.workspace'), options),
-});
+export const addDrugOrderWorkspace = getAsyncLifecycle(
+  () => import('./add-drug-order/add-drug-order.workspace'),
+  options,
+);

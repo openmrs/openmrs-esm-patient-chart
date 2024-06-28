@@ -2,6 +2,7 @@
   "add": "添加",
   "cancel": "取消",
   "doseNumber": "接种系列中的剂量编号",
+  "doseNumberWithinSeries": "Dose number within series",
   "edit": "编辑",
   "error": "错误",
   "errorSaving": "保存疫苗接种时出现错误",
@@ -9,7 +10,8 @@
   "goToSummary": "前往摘要",
   "immunization": "免疫接种",
   "immunizations": "免疫接种",
-  "Immunizations": "免疫接种",
+  "Immunizations": "免疫",
+  "immunizations__lower": "immunizations",
   "immunizationWorkspaceTitle": "免疫表单",
   "lotNumber": "批号",
   "manufacturer": "制造商",
@@ -18,12 +20,12 @@
   "save": "保存",
   "seeAll": "查看全部",
   "sequence": "序列",
-  "singleDoseOn": "Single Dose on",
+  "singleDoseOn": "单剂量给药于",
   "time": "时间",
   "timeFormat ": "时间格式",
   "vaccinationDate": "疫苗接种日期",
-  "vaccinationDateRequired": "Vaccination date required",
+  "vaccinationDateRequired": "疫苗接种日期是必填项",
   "vaccinationSaved": "疫苗接种保存成功",
   "vaccine": "疫苗",
-  "vaccineRequired": "Vaccine required"
+  "vaccineRequired": "疫苗名称是必选项"
 }

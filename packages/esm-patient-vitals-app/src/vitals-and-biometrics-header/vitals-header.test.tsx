@@ -1,11 +1,17 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import {
+  type WorkspacesInfo,
+  defineConfigSchema,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useWorkspaces,
+} from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
-import { configSchema } from '../config-schema';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
@@ -13,8 +19,11 @@ import VitalsHeader from './vitals-header.component';
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
 const mockedUseConfig = jest.mocked(useConfig);
-const mockLaunchWorkspace = jest.mocked(launchPatientWorkspace);
+const mockedLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
 const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockedUseWorkspaces = jest.mocked(useWorkspaces);
+
+mockedUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -23,7 +32,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
-    useWorkspaces: jest.fn().mockImplementation(() => ({ workspaces: [] })),
   };
 });
 
@@ -43,7 +51,10 @@ jest.mock('../common', () => {
 
 describe('VitalsHeader: ', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockVitalsConfig });
+    mockedUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      mockVitalsConfig,
+    });
     jest.clearAllMocks();
   });
 
@@ -98,8 +109,8 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
@@ -121,7 +132,7 @@ describe('VitalsHeader: ', () => {
         date: '2022-05-19T00:00:00.000Z',
         systolic: 165,
         diastolic: 150,
-        bloodPressureInterpretation: 'critically_high',
+        bloodPressureRenderInterpretation: 'critically_high',
         pulse: 76,
         spo2: undefined,
         temperature: 37,
@@ -144,7 +155,7 @@ describe('VitalsHeader: ', () => {
     const user = userEvent.setup();
 
     mockedUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
       vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
     });
 
@@ -156,7 +167,7 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         encounterUuid: '',
         formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',

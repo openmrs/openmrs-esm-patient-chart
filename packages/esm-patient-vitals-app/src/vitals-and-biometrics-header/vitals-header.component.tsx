@@ -6,8 +6,8 @@ dayjs.extend(isToday);
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
-import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { ConfigurableLink, formatDate, parseDate, useConfig, useWorkspaces } from '@openmrs/esm-framework';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import {
   assessValue,
   getReferenceRangesForConcept,

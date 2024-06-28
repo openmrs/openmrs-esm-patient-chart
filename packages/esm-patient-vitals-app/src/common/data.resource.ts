@@ -13,8 +13,14 @@ import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
-import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
-import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.component';
+import type {
+  Encounter,
+  FHIRSearchBundleResponse,
+  MappedVitals,
+  PatientVitalsAndBiometrics,
+  VitalsResponse,
+} from './types';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.workspace';
 
 const pageSize = 100;
 
@@ -50,6 +56,11 @@ interface VitalsConceptMetadataResponse {
   results: Array<{
     setMembers: Array<ConceptMetadata>;
   }>;
+}
+
+function getInterpretationKey(header: string) {
+  // Reason for `Render` string is to match the column header in the table
+  return `${header}RenderInterpretation`;
 }
 
 export function useVitalsConceptMetadata() {
@@ -111,8 +122,10 @@ const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>(
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
   const { conceptMetadata } = useVitalsConceptMetadata();
   const { concepts } = useConfig<ConfigObject>();
-  const biometricsConcepts = [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid];
-
+  const biometricsConcepts = useMemo(
+    () => [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
+    [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
+  );
   const conceptUuids = useMemo(
     () =>
       (mode === 'both'
@@ -123,7 +136,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
               (mode === 'biometrics' && biometricsConcepts.includes(uuid)),
           )
       ).join(','),
-    [concepts, biometricsConcepts],
+    [concepts, biometricsConcepts, mode],
   );
 
   const getPage = useCallback(
@@ -135,7 +148,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       page,
       prevPageData,
     }),
-    [swrKeyNeedle, mode, conceptUuids],
+    [mode, conceptUuids, patientUuid],
   );
 
   const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
@@ -152,28 +165,43 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     };
   }, [mutate]);
 
-  const getVitalsMapKey = (conceptUuid: string): string => {
-    switch (conceptUuid) {
-      case concepts.systolicBloodPressureUuid:
-        return 'systolic';
-      case concepts.diastolicBloodPressureUuid:
-        return 'diastolic';
-      case concepts.pulseUuid:
-        return 'pulse';
-      case concepts.temperatureUuid:
-        return 'temperature';
-      case concepts.oxygenSaturationUuid:
-        return 'spo2';
-      case concepts.respiratoryRateUuid:
-        return 'respiratoryRate';
-      case concepts.heightUuid:
-        return 'height';
-      case concepts.weightUuid:
-        return 'weight';
-      case concepts.midUpperArmCircumferenceUuid:
-        return 'muac';
-    }
-  };
+  const getVitalsMapKey = useCallback(
+    (conceptUuid: string): string => {
+      switch (conceptUuid) {
+        case concepts.systolicBloodPressureUuid:
+          return 'systolic';
+        case concepts.diastolicBloodPressureUuid:
+          return 'diastolic';
+        case concepts.pulseUuid:
+          return 'pulse';
+        case concepts.temperatureUuid:
+          return 'temperature';
+        case concepts.oxygenSaturationUuid:
+          return 'spo2';
+        case concepts.respiratoryRateUuid:
+          return 'respiratoryRate';
+        case concepts.heightUuid:
+          return 'height';
+        case concepts.weightUuid:
+          return 'weight';
+        case concepts.midUpperArmCircumferenceUuid:
+          return 'muac';
+        default:
+          return ''; // or throw an error for unknown conceptUuid
+      }
+    },
+    [
+      concepts.heightUuid,
+      concepts.midUpperArmCircumferenceUuid,
+      concepts.systolicBloodPressureUuid,
+      concepts.oxygenSaturationUuid,
+      concepts.diastolicBloodPressureUuid,
+      concepts.pulseUuid,
+      concepts.respiratoryRateUuid,
+      concepts.temperatureUuid,
+      concepts.weightUuid,
+    ],
+  );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
     const vitalsHashTable = data?.[0]?.data?.entry
@@ -182,18 +210,18 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       .map(vitalsProperties(conceptMetadata))
       ?.reduce((vitalsHashTable, vitalSign) => {
         const recordedDate = new Date(new Date(vitalSign.recordedDate)).toISOString();
-
         if (vitalsHashTable.has(recordedDate) && vitalsHashTable.get(recordedDate)) {
           vitalsHashTable.set(recordedDate, {
             ...vitalsHashTable.get(recordedDate),
             [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-            [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+            [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
           vitalSign.value &&
             vitalsHashTable.set(recordedDate, {
+              uuid: vitalSign.uuid,
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-              [getVitalsMapKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+              [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
         }
 
@@ -212,7 +240,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       }
 
       if (mode === 'both' || mode === 'vitals') {
-        result.bloodPressureInterpretation = interpretBloodPressure(
+        result.bloodPressureRenderInterpretation = interpretBloodPressure(
           vitalSigns.systolic,
           vitalSigns.diastolic,
           concepts,
@@ -222,7 +250,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
       return result;
     });
-  }, [data, conceptMetadata, getVitalsMapKey]);
+  }, [data, conceptMetadata, getVitalsMapKey, concepts, mode]);
 
   return {
     data: data ? formattedObs : undefined,
@@ -269,15 +297,25 @@ function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAn
  * @internal
  */
 function vitalsProperties(conceptMetadata: Array<ConceptMetadata> | undefined) {
-  return (resource: FHIRResource['resource']): MappedVitals => ({
-    code: resource?.code?.coding?.[0]?.code,
-    interpretation: assessValue(
-      resource?.valueQuantity?.value,
-      getReferenceRangesForConcept(resource?.code?.coding?.[0]?.code, conceptMetadata),
-    ),
-    recordedDate: resource?.effectiveDateTime,
-    value: resource?.valueQuantity?.value,
-  });
+  return (resource: FHIRResource['resource']): MappedVitals => {
+    const { code, effectiveDateTime, encounter, valueQuantity, valueString } = resource || {};
+    let uuid;
+    const idx = encounter?.reference.lastIndexOf('/') ?? -1;
+    if (idx >= 0) {
+      uuid = encounter.reference.slice(idx + 1);
+    }
+    const value = valueQuantity?.value || valueString;
+    return {
+      code: code?.coding?.[0]?.code,
+      interpretation: assessValue(
+        valueQuantity?.value,
+        getReferenceRangesForConcept(code?.coding?.[0]?.code, conceptMetadata),
+      ),
+      recordedDate: effectiveDateTime,
+      uuid,
+      value,
+    };
+  };
 }
 
 export function saveVitalsAndBiometrics(
@@ -286,7 +324,6 @@ export function saveVitalsAndBiometrics(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: VitalsBiometricsFormData,
-  encounterDatetime: Date,
   abortController: AbortController,
   location: string,
 ) {
@@ -298,7 +335,6 @@ export function saveVitalsAndBiometrics(
     signal: abortController.signal,
     body: {
       patient: patientUuid,
-      encounterDatetime: encounterDatetime,
       location: location,
       encounterType: encounterTypeUuid,
       form: formUuid,
@@ -332,6 +368,21 @@ export function updateVitalsAndBiometrics(
   });
 }
 
+export function deleteVitalsAndBiometrics(encounterUuid: string, encounter: Encounter) {
+  const abortController = new AbortController();
+
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      obs: encounter.obs,
+    },
+  });
+}
+
 function createObsObject(
   vitals: VitalsBiometricsFormData,
   concepts: ConfigObject['concepts'],
@@ -351,4 +402,21 @@ function createObsObject(
  */
 export async function invalidateCachedVitalsAndBiometrics() {
   vitalsHooksMutates.forEach((mutate) => mutate());
+}
+
+export function getEncounterByUuid(encounterUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,encounterDatetime,' +
+    'patient:(uuid,uuid,person,identifiers:full),' +
+    'visit:(uuid,visitType,display,startDatetime,stopDatetime),' +
+    'location:ref,encounterType:ref,' +
+    'encounterProviders:(uuid,display,provider:(uuid,display)),orders:full,' +
+    'obs:(uuid,obsDatetime,concept:(uuid,uuid,name:(display)),value:ref),' +
+    'diagnoses:(uuid,diagnosis,certainty,rank,voided,display))';
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}?v=${customRepresentation}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig, usePagination } from '@openmrs/esm-framework';
+import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
-import { configSchema } from '../config-schema';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
@@ -11,7 +11,6 @@ import BiometricsOverview from './biometrics-overview.component';
 defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 const mockedUseConfig = jest.mocked(useConfig);
 const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockUsePagination = jest.mocked(usePagination);
 
 jest.mock('../common', () => {
   const originalModule = jest.requireActual('../common');
@@ -29,7 +28,10 @@ jest.mock('../common', () => {
 
 describe('BiometricsOverview: ', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockBiometricsConfig });
+    mockedUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      mockBiometricsConfig,
+    });
     jest.clearAllMocks();
   });
 
@@ -76,21 +78,11 @@ describe('BiometricsOverview: ', () => {
   });
 
   it("renders a tabular overview of the patient's biometrics data when available", async () => {
+    const user = userEvent.setup();
+
     mockedUseVitalsAndBiometrics.mockReturnValue({
       data: formattedBiometrics,
     } as ReturnType<typeof useVitalsAndBiometrics>);
-
-    mockUsePagination.mockReturnValue({
-      currentPage: 1,
-      goTo: () => {},
-      results: formattedBiometrics.slice(0, 5),
-      totalPages: formattedBiometrics.length / 5,
-      paginated: true,
-      showNextButton: true,
-      showPreviousButton: false,
-      goToNext: () => {},
-      goToPrevious: () => {},
-    });
 
     renderBiometricsOverview();
 
@@ -101,14 +93,43 @@ describe('BiometricsOverview: ', () => {
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
+    const extractCellsExcludingActions = (row) => {
+      const cells = Array.from(row.querySelectorAll('td'));
+      return cells.filter((cell: HTMLElement) => cell.id !== 'actions');
+    };
+    const initialRows = screen.getAllByRole('row');
+    const initialCellsExcludingActions = initialRows.map(extractCellsExcludingActions);
 
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [/90 186 26.0 17/, /80 198 20.4 23/, /50/, /61 160 23.8/, /90 198 23.0 25/];
+    const expectedTableRows = [
+      /12 — Aug — 2021, 12:00 AM 90 186 26.0 17/,
+      /18 — Jun — 2021, 12:00 AM 80 198 20.4 23/,
+      /10 — Jun — 2021, 12:00 AM 50 -- -- --/,
+      /26 — May — 2021, 12:00 AM 61 160 23.8 --/,
+      /10 — May — 2021, 12:00 AM 90 198 23.0 25/,
+    ];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+
+    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
+
+    // Sorting in descending order
+    // Since the date order is already in descending order, the rows should be the same
+    await user.click(sortRowsButton);
+    // Sorting in ascending order
+    await user.click(sortRowsButton);
+    const initialSortedCellsExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
+    expect(initialSortedCellsExcludingActions).not.toEqual(initialCellsExcludingActions);
+
+    // Sorting order = NONE, hence it is still in the ascending order
+    await user.click(sortRowsButton);
+    // Sorting in descending order
+    await user.click(sortRowsButton);
+    const finalCellsSortedExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
+    expect(finalCellsSortedExcludingActions).toEqual(initialCellsExcludingActions);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
@@ -117,18 +138,6 @@ describe('BiometricsOverview: ', () => {
     mockedUseVitalsAndBiometrics.mockReturnValue({
       data: formattedBiometrics.slice(0, 2),
     } as ReturnType<typeof useVitalsAndBiometrics>);
-
-    mockUsePagination.mockReturnValue({
-      currentPage: 1,
-      goTo: () => {},
-      results: formattedBiometrics.slice(0, 5),
-      totalPages: formattedBiometrics.length / 5,
-      paginated: true,
-      showNextButton: true,
-      showPreviousButton: false,
-      goToNext: undefined,
-      goToPrevious: undefined,
-    });
 
     renderBiometricsOverview();
 

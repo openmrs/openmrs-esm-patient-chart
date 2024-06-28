@@ -65,13 +65,13 @@ test('Record vital signs', async ({ page }) => {
     await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success toast notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeVisible();
   });
 
   await test.step('And I should see the newly recorded vital signs on the page', async () => {
     await expect(headerRow).toContainText(/temp/i);
-    await expect(headerRow).toContainText(/blood pressure/i);
+    await expect(headerRow).toContainText(/bp/i);
     await expect(headerRow).toContainText(/pulse/i);
     await expect(headerRow).toContainText(/r. rate/i);
     await expect(headerRow).toContainText(/SPO2/i);

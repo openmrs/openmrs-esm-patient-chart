@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-vitals-app",
-  "version": "7.1.0",
+  "version": "8.0.1",
   "license": "MPL-2.0",
   "description": "Patient vitals microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-vitals-app.js",
@@ -17,7 +17,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -39,13 +39,13 @@
   "dependencies": {
     "@carbon/charts-react": "^1.5.2",
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^7.1.0",
+    "@openmrs/esm-patient-common-lib": "^8.0.1",
     "d3": "^7.6.1",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "7.x",
+    "@openmrs/esm-patient-common-lib": "8.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

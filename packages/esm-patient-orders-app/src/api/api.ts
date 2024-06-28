@@ -1,14 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import {
-  type FetchResponse,
-  openmrsFetch,
-  type OpenmrsResource,
-  parseDate,
-  type Visit,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
-import { type OrderPost, useVisitOrOfflineVisit, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
+import { useSystemVisitSetting, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -46,53 +39,6 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
       signal: abortController.signal,
     },
   );
-}
-
-export function createEmptyEncounter(
-  patientUuid: string,
-  orderEncounterType: string,
-  activeVisit: Visit | null,
-  sessionLocationUuid: string,
-  abortController?: AbortController,
-) {
-  const now = new Date();
-  const visitStartDate = parseDate(activeVisit?.startDatetime);
-  const visitEndDate = parseDate(activeVisit?.stopDatetime);
-  let encounterDate: Date;
-  if (!activeVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
-    now;
-  } else {
-    console.warn(
-      'createEmptyEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
-    );
-    visitStartDate;
-  }
-  const emptyEncounter = {
-    patient: patientUuid,
-    location: sessionLocationUuid,
-    encounterType: orderEncounterType,
-    encounterDatetime: encounterDate,
-    visit: activeVisit?.uuid,
-    obs: [],
-  };
-
-  return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: emptyEncounter,
-    signal: abortController?.signal,
-  }).then((res) => res?.data?.uuid);
-}
-
-export function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/order`, {
-    method: 'POST',
-    signal: abortController?.signal,
-    headers: { 'Content-Type': 'application/json' },
-    body,
-  });
 }
 
 export function useOrderEncounter(patientUuid: string): {

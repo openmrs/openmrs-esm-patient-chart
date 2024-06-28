@@ -4,12 +4,12 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
-  type DefaultWorkspaceProps,
-  launchPatientWorkspace,
+  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   type LabOrderBasketItem,
+  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './lab-order-form.component';
@@ -19,7 +19,7 @@ export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
 }
 
-export interface AddLabOrderWorkspace extends DefaultWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
+export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
 
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({
@@ -30,12 +30,12 @@ export default function AddLabOrderWorkspace({
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
 
-  const { patient, isLoading: isLoadingPatient } = usePatient();
+  const { patient, isLoading: isLoadingPatient, patientUuid } = usePatient();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
 
   const isTablet = useLayoutType() === 'tablet';
 
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = patient ? getPatientName(patient) : '';
 
   const cancelOrder = useCallback(() => {
     closeWorkspace({
@@ -73,6 +73,7 @@ export default function AddLabOrderWorkspace({
       ) : (
         <LabOrderForm
           initialOrder={currentLabOrder}
+          patientUuid={patientUuid}
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}

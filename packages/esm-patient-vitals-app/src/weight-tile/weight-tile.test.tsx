@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema } from '../config-schema';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { getByTextWithMarkup, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockVitalsSignsConcepts } from '__mocks__';
 import { useVitalsAndBiometrics } from '../common';
@@ -30,7 +30,10 @@ jest.mock('../common', () => {
 
 describe('WeightTile', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), mockBiometricsConfig });
+    mockedUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      mockBiometricsConfig,
+    });
     jest.clearAllMocks();
   });
 

@@ -23,12 +23,25 @@ const MediaUploaderComponent = () => {
         if (file.size > maxFileSize * 1024 * 1024) {
           setErrorNotification({
             title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
-            subtitle: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the size limit of')} ${maxFileSize} MB.`,
+            subtitle: `The file "${file.name}" ${t(
+              'fileSizeLimitExceeded',
+              'exceeds the size limit of',
+            )} ${maxFileSize} MB.`,
           });
         } else if (!isFileExtensionAllowed(file.name, allowedExtensions)) {
+          const lastExtension = allowedExtensions.pop();
+
           setErrorNotification({
-            title: t('fileExtensionNotAllowedText', 'File extension is not allowed'),
-            subtitle: `${file.name} ${t('allowedExtensionsAre', 'Allowed extensions are: ')} ${allowedExtensions}.`,
+            title: t('unsupportedFileType', 'Unsupported file type'),
+            subtitle: t(
+              'chooseAnAllowedFileType',
+              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{ lastExtension }}.',
+              {
+                fileName: file.name,
+                lastExtension: lastExtension,
+                supportedExtensions: allowedExtensions.join(', '),
+              },
+            ),
           });
         } else {
           // Convert MBs to bytes
@@ -49,13 +62,14 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, maxFileSize, t],
+    [setFilesToUpload, maxFileSize, t, allowedExtensions],
   );
 
   const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
     if (!allowedExtensions) {
       return true;
     }
+
     const fileExtension = fileName.split('.').pop();
     return allowedExtensions?.includes(fileExtension.toLowerCase());
   };

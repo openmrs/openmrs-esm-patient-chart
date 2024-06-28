@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
+  getPatientName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
@@ -18,6 +19,7 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
 
   useEffect(() => {
     const currentRef = patientBannerRef.current;
@@ -34,14 +36,15 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     };
   }, [patientBannerRef, setIsTabletViewport]);
 
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = patient ? getPatientName(patient) : '';
 
-  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
+  const maxDesktopWorkspaceWidthInPx = 520;
+  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= maxDesktopWorkspaceWidthInPx;
 
   return (
     <header
@@ -57,27 +60,39 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         </div>
         <PatientBannerPatientInfo patient={patient} />
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow ? (
-            <PatientBannerActionsMenu
-              patientUuid={patientUuid}
-              actionsSlotName={'patient-actions-slot'}
-              isDeceased={patient.deceasedBoolean}
+          <div className={styles.buttonRow}>
+            {!hideActionsOverflow ? (
+              <PatientBannerActionsMenu
+                actionsSlotName="patient-actions-slot"
+                isDeceased={patient.deceasedBoolean}
+                patientUuid={patientUuid}
+              />
+            ) : null}
+          </div>
+          {!showDetailsButtonBelowHeader ? (
+            <PatientBannerToggleContactDetailsButton
+              className={styles.toggleContactDetailsButton}
+              showContactDetails={showContactDetails}
+              toggleContactDetails={toggleContactDetails}
             />
           ) : null}
-          <PatientBannerToggleContactDetailsButton
-            className={styles.toggleContactDetailsButton}
-            toggleContactDetails={toggleContactDetails}
-            showContactDetails={showContactDetails}
-          />
         </div>
       </div>
+      {showDetailsButtonBelowHeader ? (
+        <PatientBannerToggleContactDetailsButton
+          className={styles.toggleContactDetailsButton}
+          showContactDetails={showContactDetails}
+          toggleContactDetails={toggleContactDetails}
+        />
+      ) : null}
       {showContactDetails && (
         <div
-          className={`${styles.contactDetails} ${styles[patient.deceasedBoolean && 'deceasedContactDetails']} ${
-            styles[isTabletViewport && 'tabletContactDetails']
-          }`}
+          className={classNames(styles.contactDetails, {
+            [styles.deceasedContactDetails]: patient.deceasedBoolean,
+            [styles.tabletContactDetails]: isTabletViewport,
+          })}
         >
-          <PatientBannerContactDetails patientId={patient?.id} deceased={isDeceased} />
+          <PatientBannerContactDetails deceased={isDeceased} patientId={patient?.id} />
         </div>
       )}
     </header>

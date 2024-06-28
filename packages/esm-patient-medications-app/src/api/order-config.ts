@@ -9,9 +9,16 @@ import {
   type QuantityUnit,
 } from '../types';
 
+export interface ConceptName {
+  uuid: string;
+  display: string;
+}
 export interface CommonConfigProps {
   uuid: string;
   display: string;
+  concept?: {
+    names: ConceptName[];
+  };
 }
 
 export interface OrderConfig {
@@ -37,6 +44,14 @@ export function useOrderConfig(): {
     `${restBaseUrl}/orderentryconfig`,
     openmrsFetch,
   );
+  const {
+    data: frequencyData,
+    error: frequencyError,
+    isLoading: frequencyLoading,
+  } = useSWRImmutable<{ data: OrderConfig }, Error>(
+    `${restBaseUrl}/orderentryconfig?v=custom:(uuid,display,concept:(names:(display,uuid)))`,
+    openmrsFetch,
+  );
 
   const results = useMemo(
     () => ({
@@ -57,16 +72,18 @@ export function useOrderConfig(): {
           valueCoded: uuid,
           value: display,
         })),
-        orderFrequencies: data?.data?.orderFrequencies?.map(({ uuid, display }) => ({
-          valueCoded: uuid,
-          value: display,
-        })),
+        orderFrequencies: frequencyData?.data?.orderFrequencies?.map(({ uuid, display, concept }) => {
+          return {
+            valueCoded: uuid,
+            value: display,
+            names: concept.names.map((name) => name.display),
+          };
+        }),
       },
-      isLoading,
-      error,
+      isLoading: isLoading || frequencyLoading,
+      error: error || frequencyError,
     }),
-    [data, error, isLoading],
+    [data, error, isLoading, frequencyData, frequencyError, frequencyLoading],
   );
-
   return results;
 }

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
-import { launchPatientChartWithWorkspaceOpen, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
 import { useFeatureFlag } from '@openmrs/esm-framework';
 import styles from './start-visit-dialog.scss';
 

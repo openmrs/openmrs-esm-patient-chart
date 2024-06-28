@@ -1,3 +1,5 @@
+import { type PatientVitalsAndBiometrics } from '../packages/esm-patient-vitals-app/src/common';
+
 export const mockBiometricsResponse = {
   resourceType: 'Bundle',
   id: '0b0f8529-3e6e-41d9-8007-0ef639fb893b',
@@ -6020,7 +6022,7 @@ export const formattedVitals = [
     diastolic: 89,
     systolic: 121,
     bmi: null,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '1',
@@ -6034,7 +6036,7 @@ export const formattedVitals = [
     temperature: 37,
     spo2: 90,
     bmi: 23,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '2',
@@ -6042,7 +6044,7 @@ export const formattedVitals = [
     diastolic: 80,
     systolic: 120,
     bmi: null,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
   },
   {
     id: '3',
@@ -6053,7 +6055,27 @@ export const formattedVitals = [
     pulse: 78,
     respiratoryRate: 65,
     bmi: 22.6,
-    bloodPressureInterpretation: 'normal',
+    bloodPressureRenderInterpretation: 'normal',
+  },
+];
+
+export const formattedVitalsAndBiometrics: Array<PatientVitalsAndBiometrics> = [
+  {
+    id: '0',
+    uuid: 'fd481c9f-f81f-4aaf-b00b-747900af9935',
+    date: '2024-04-21T09:31:27.000Z',
+    height: 12,
+    weight: 12,
+    bmi: 833.3,
+    bloodPressureRenderInterpretation: 'normal',
+    systolic: 1,
+    diastolic: 2,
+    pulse: 12,
+    respiratoryRate: 12,
+    spo2: 12,
+    temperature: 31,
+    muac: 12,
+    generalPatientNote: 'notes',
   },
 ];
 

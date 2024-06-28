@@ -33,10 +33,28 @@
     {
       "name": "clinical-form-action-menu",
       "component": "clinicalFormActionMenu",
-      "slot": "action-menu-chart-items-slot",
+      "slot": "action-menu-patient-chart-items-slot",
       "offline": true,
       "online": true,
       "order": 2
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-form-entry-workspace",
+      "title": "clinicalForm",
+      "component": "patientFormEntryWorkspace",
+      "type": "clinical-form",
+      "canMaximize": true,
+      "canHide": true,
+      "width": "wider"
+    },
+    {
+      "name": "clinical-forms-workspace",
+      "title": "clinicalForms",
+      "component": "clinicalFormsWorkspace",
+      "type": "clinical-forms",
+      "width": "wider"
     }
   ]
 }

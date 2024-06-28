@@ -38,5 +38,13 @@
       "slot": "order-basket-slot",
       "order": 1
     }
+  ],
+  "workspaces": [
+    {
+      "name": "add-drug-order",
+      "title": "addDrugOrderWorkspaceTitle",
+      "component": "addDrugOrderWorkspace",
+      "type": "order"
+    }
   ]
 }
