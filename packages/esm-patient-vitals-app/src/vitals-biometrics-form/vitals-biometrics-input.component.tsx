@@ -25,11 +25,6 @@ type fieldId =
 type AbnormalValue = 'critically_low' | 'critically_high' | 'high' | 'low';
 type FieldTypes = 'number' | 'textarea';
 
-interface ResponsiveWrapperProps {
-  children: React.ReactNode;
-  isTablet: boolean;
-}
-
 interface VitalsAndBiometricsInputProps {
   control: Control<VitalsBiometricsFormData>;
   fieldStyles?: React.CSSProperties;
@@ -77,7 +72,6 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
-
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
   function checkValidity(value, onChange) {
@@ -126,7 +120,11 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
           ) : null}
         </section>
         <section className={inputClasses} style={{ ...fieldStyles }}>
-          <div className={styles.centered}>
+          <div
+            className={classNames({
+              [styles.centered]: !isTablet || unitSymbol === 'mmHg',
+            })}
+          >
             {fieldProperties.map((fieldProperty) => {
               if (fieldProperty.type === 'number') {
                 const numberInputClasses = classNames(styles.numberInput, fieldProperty.className);

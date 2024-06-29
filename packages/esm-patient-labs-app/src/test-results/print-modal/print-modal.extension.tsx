@@ -19,6 +19,9 @@ import {
   Tile,
 } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 import {
   age,
   getPatientName,
@@ -96,14 +99,17 @@ function PrintModal({ patientUuid, closeDialog }) {
 
   const testResults = useMemo(() => {
     if (selectedFromDate && selectedToDate) {
+      const fromDate = dayjs(selectedFromDate).startOf('day');
+      const toDate = dayjs(selectedToDate).startOf('day');
+
       return panels
         .filter((panel) => {
-          const panelDate = new Date(panel.effectiveDateTime);
-          return panelDate >= new Date(selectedFromDate) && panelDate <= new Date(selectedToDate);
+          const panelDate = dayjs(panel.effectiveDateTime).startOf('day');
+          return panelDate.isBetween(fromDate, toDate, null, '[]');
         })
         .map((panel) => formatPanelForDisplay(panel));
     }
-    return panels.map((panel) => formatPanelForDisplay(panel));
+    return [];
   }, [panels, selectedFromDate, selectedToDate]);
 
   return (
@@ -130,6 +136,7 @@ function PrintModal({ patientUuid, closeDialog }) {
               className={styles.datePicker}
               dateFormat={datePickerFormat}
               datePickerType="single"
+              minDate={selectedFromDate}
               maxDate={new Date().toISOString()}
               onChange={([date]) => setSelectedToDate(date)}
               value={selectedToDate}
@@ -228,16 +235,14 @@ function PrintModal({ patientUuid, closeDialog }) {
           )}
         </div>
       </ModalBody>
-      {testResults?.length ? (
-        <ModalFooter>
-          <Button kind="secondary" onClick={closeDialog}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button kind="primary" onClick={handlePrint}>
-            {t('print', 'Print')}
-          </Button>
-        </ModalFooter>
-      ) : null}
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeDialog}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button disabled={!testResults?.length} kind="primary" onClick={handlePrint}>
+          {t('print', 'Print')}
+        </Button>
+      </ModalFooter>
     </>
   );
 }
