@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
 import { Printer } from '@carbon/react/icons';
 import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
-import { age, displayName, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
+import { age, getPatientName, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 
@@ -107,8 +107,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
       age: age(patient.birthDate),
       gender: getGender(patient.gender),
       identifiers: [...identifiers],
-      location: patient.address?.[0].city,
-      name: patient ? displayName(patient) : '',
+      location: patient?.address?.[0].city,
+      name: patient ? getPatientName(patient) : '',
     };
   }, [excludePatientIdentifierCodeTypes?.uuids, patient, t]);
 
