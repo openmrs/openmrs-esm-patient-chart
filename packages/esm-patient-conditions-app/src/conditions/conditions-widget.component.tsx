@@ -18,8 +18,6 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { z } from 'zod';
 import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -31,15 +29,10 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
+import { type ConditionsFormSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
-  schema: z.ZodObject<{
-    abatementDateTime: z.ZodNullable<z.ZodOptional<z.ZodDate>>;
-    clinicalStatus: z.ZodEffects<z.ZodString, string, string>;
-    conditionName: z.ZodEffects<z.ZodString, string, string>;
-    onsetDateTime: z.ZodNullable<z.ZodDate>;
-  }>;
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
   editing?: boolean;
@@ -57,7 +50,6 @@ interface RequiredFieldLabelProps {
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
-  schema,
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
   editing,
@@ -74,7 +66,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     formState: { errors },
     getValues,
     watch,
-  } = useFormContext<z.infer<typeof schema>>();
+  } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
   const searchInputRef = useRef(null);
   const clinicalStatus = watch('clinicalStatus');
@@ -122,7 +114,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       mutate();
 
       showSnackbar({
-        isLowContrast: true,
         kind: 'success',
         subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
         title: t('conditionSaved', 'Condition saved'),
@@ -161,20 +152,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      const res = await updateCondition(conditionToEdit?.id, payload);
+      await updateCondition(conditionToEdit?.id, payload);
+      mutate();
 
-      if (res.status === 200) {
-        mutate();
+      showSnackbar({
+        kind: 'success',
+        subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+        title: t('conditionUpdated', 'Condition updated'),
+      });
 
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
-          title: t('conditionUpdated', 'Condition updated'),
-        });
-
-        closeWorkspaceWithSavedChanges();
-      }
+      closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
@@ -261,9 +248,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && (
-                <p className={styles.errorMessage}>{errors?.conditionName?.message as string}</p>
-              )}
+              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
               {(() => {
                 if (!debouncedSearchTerm || selectedCondition) return null;
                 if (isSearching)
@@ -338,7 +323,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               </RadioButtonGroup>
             )}
           />
-          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message as string}</p>}
+          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">
@@ -376,7 +361,6 @@ function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
     <>
       <span>{label}</span>
-
       <span title={t('required', 'Required')} className={styles.required}>
         *
       </span>
