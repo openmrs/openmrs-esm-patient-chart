@@ -12,25 +12,27 @@ interface DeceasedPatientBannerTagProps {
 const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isDeceased = Boolean(patient?.deceasedDateTime);
-  const { causeOfDeath } = useCauseOfDeath(patient?.id);
+  const { causeOfDeath, nonCodedCauseOfDeath } = useCauseOfDeath(patient?.id);
+
+  if (!isDeceased) return null;
 
   return (
-    isDeceased && (
-      <DefinitionTooltip
-        align="bottom-left"
-        definition={
-          <div role="tooltip" className={styles.tooltipPadding}>
-            <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
-            <span>
-              {formatDatetime(parseDate(patient?.deceasedDateTime))}
-              {causeOfDeath ? ` ${t('from_lower', 'from')} ${causeOfDeath}` : null}
-            </span>
-          </div>
-        }
-      >
-        <Tag className={styles.tagOverride}>{t('deceased', 'Deceased')}</Tag>
-      </DefinitionTooltip>
-    )
+    <DefinitionTooltip
+      align="bottom-left"
+      definition={
+        <div role="tooltip" className={styles.tooltipPadding}>
+          <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
+          <span>
+            {formatDatetime(parseDate(patient?.deceasedDateTime))}
+            {nonCodedCauseOfDeath || causeOfDeath
+              ? ` ${t('from_lower', 'from')} ${nonCodedCauseOfDeath || causeOfDeath}`
+              : null}
+          </span>
+        </div>
+      }
+    >
+      <Tag className={styles.tagOverride}>{t('deceased', 'Deceased')}</Tag>
+    </DefinitionTooltip>
   );
 };
 
