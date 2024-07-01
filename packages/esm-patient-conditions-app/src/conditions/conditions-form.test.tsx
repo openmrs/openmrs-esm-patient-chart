@@ -2,8 +2,8 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showSnackbar } from '@openmrs/esm-framework';
-import { searchedCondition } from '__mocks__';
+import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm from './conditions-form.workspace';
@@ -29,15 +29,18 @@ const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 
 const testProps = {
+  condition: null,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
-  formContext: 'creating' as const,
+  promptBeforeClosing: jest.fn(),
+  formContext: 'creating' as 'creating' | 'editing',
 };
 
 const mockCreateCondition = createCondition as jest.Mock;
 const mockUseConditionsSearch = useConditionsSearch as jest.Mock;
-const mockshowSnackbar = showSnackbar as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -50,20 +53,26 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./conditions.resource', () => ({
-  createCondition: jest.fn(),
-  editCondition: jest.fn(),
-  useConditions: jest.fn().mockImplementation(() => ({
-    mutate: jest.fn(),
-  })),
-  useConditionsSearch: jest.fn().mockImplementation(() => ({
-    conditions: [],
-    error: null,
-    isSearching: false,
-  })),
-}));
+jest.mock('./conditions.resource', () => {
+  const originalModule = jest.requireActual('./conditions.resource');
 
-describe('Conditions Form', () => {
+  return {
+    ...originalModule,
+    createCondition: jest.fn(),
+    editCondition: jest.fn(),
+    useConditionsSearch: jest.fn().mockImplementation(() => ({
+      conditions: [],
+      error: null,
+      isSearching: false,
+    })),
+  };
+});
+
+describe('Conditions form', () => {
+  beforeEach(() => {
+    mockShowSnackbar.mockClear();
+  });
+
   it('renders the conditions form with all the relevant fields and values', () => {
     renderConditionsForm();
 
@@ -127,7 +136,8 @@ describe('Conditions Form', () => {
   it('renders a success toast notification upon successfully recording a condition', async () => {
     const user = userEvent.setup();
 
-    mockCreateCondition.mockReturnValue(Promise.resolve({ status: 201, body: 'Condition created' }));
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' });
     mockUseConditionsSearch.mockReturnValue({
       searchResults: searchedCondition,
       error: null,
@@ -142,11 +152,20 @@ describe('Conditions Form', () => {
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
     expect(cancelButton).not.toBeDisabled();
+
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.click(activeStatusInput);
     await user.type(onsetDateInput, '2020-05-05');
     await user.click(submitButton);
+
+    // TODO: Figure out why this isn't working
+    // expect(mockShowSnackbar).toHaveBeenCalled();
+    // expect(mockShowSnackbar).toHaveBeenCalledWith({
+    //   kind: 'success',
+    //   subtitle: 'It is now visible on the Conditions page',
+    //   title: 'Condition saved',
+    // });
   });
 
   it('renders an error notification if there was a problem recording a condition', async () => {
@@ -175,8 +194,77 @@ describe('Conditions Form', () => {
     expect(submitButton).not.toBeDisabled();
     await user.click(submitButton);
   });
+
+  it('validates the form against the provided zod schema before submitting it', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' });
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(submitButton);
+
+    expect(screen.getByText(/a condition is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
+
+    await user.type(conditionSearchInput, 'Headache');
+    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+    await user.click(submitButton);
+
+    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: 'Active' }));
+    await user.click(submitButton);
+
+    expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
+
+    expect(mockShowSnackbar).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'success',
+      subtitle: 'It is now visible on the Conditions page',
+      title: 'Condition saved',
+    });
+  });
+
+  it('launching the form with an existing condition prepopulates the form with the condition details', async () => {
+    const user = userEvent.setup();
+
+    const conditionToEdit = {
+      clinicalStatus: 'Active',
+      conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Hypertension',
+      abatementDateTime: undefined,
+      onsetDateTime: '2020-08-19T00:00:00+00:00',
+      recordedDate: '2020-08-19T18:34:48+00:00',
+      id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+    };
+
+    testProps.condition = conditionToEdit;
+    testProps.formContext = 'editing' as 'creating' | 'editing';
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
+    renderConditionsForm();
+
+    expect(screen.queryByRole('searchbox', { name: /Enter condition/i })).not.toBeInTheDocument();
+
+    const inactiveStatusInput = screen.getByRole('radio', { name: 'Inactive' });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.click(inactiveStatusInput);
+    await user.click(submitButton);
+  });
 });
 
 function renderConditionsForm() {
-  render(<ConditionsForm promptBeforeClosing={() => {}} {...testProps} />);
+  render(<ConditionsForm {...testProps} />);
 }
