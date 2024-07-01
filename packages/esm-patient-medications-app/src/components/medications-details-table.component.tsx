@@ -23,7 +23,7 @@ import {
   useLaunchWorkspaceRequiringVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
-import { age, displayName, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
@@ -189,7 +189,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       ) ?? [];
 
     return {
-      name: patient?.patient ? displayName(patient?.patient) : '',
+      name: patient?.patient ? getPatientName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

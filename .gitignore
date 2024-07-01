@@ -85,6 +85,10 @@ dist
 !.yarn/versions
 ~
 
+# Yalc, used as a `yarn link` alternative
+.yalc
+yalc.lock
+
 # i18next using moduleName as a namespace
 moduleName/
 

@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import {
   ActionMenu,
   ExtensionSlot,
+  WorkspaceContainer,
   WorkspaceWindow,
   setCurrentVisit,
   setLeftNav,
@@ -77,8 +78,7 @@ const PatientChart: React.FC = () => {
           </div>
         </>
       </main>
-      <WorkspaceWindow contextKey={`patient/${patientUuid}`} />
-      <ActionMenu />
+      <WorkspaceContainer showSiderailAndBottomNav contextKey={`patient/${patientUuid}`} />
     </>
   );
 };
