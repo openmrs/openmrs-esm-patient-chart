@@ -146,7 +146,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
   const createLabOrder = useCallback(
     (testType: TestType) => {
-      return createEmptyLabOrder(testType, session.currentProvider.uuid);
+      return createEmptyLabOrder(testType, session.currentProvider?.uuid);
     },
     [session.currentProvider.uuid],
   );

@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/colors';
-@use "@carbon/styles/scss/spacing";
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use "@carbon/layout";
+@use '@carbon/type';
 
 @media screen {
   .printPage {
@@ -18,21 +18,21 @@
 
 .patientDetails {
   @include type.type-style('body-compact-02');
-  margin: 0 spacing.$spacing-03;
+  margin: 0 layout.$spacing-03;
 }
 
 .patientInfo {
   color: colors.$gray-80;
   @include type.type-style('body-compact-02');
-} 
+}
 
 .name {
   @include type.type-style('heading-compact-02');
-  margin-right: spacing.$spacing-03;
+  margin-right: layout.$spacing-03;
 }
 
 .date {
-  margin-left: spacing.$spacing-06;
+  margin-left: layout.$spacing-06;
 }
 
 .gender {
@@ -41,38 +41,67 @@
 
 .printedBy {
   @include type.type-style('body-compact-01');
-  margin: 0 spacing.$spacing-02;
+  margin: 0 layout.$spacing-02;
   font-size: smaller;
 }
 
 .subheader {
   @include type.type-style('heading-03');
   color: colors.$gray-70;
-  padding: spacing.$spacing-03;
-  text-align: center;   
+  padding: layout.$spacing-03;
+  text-align: center;
 }
 
 @media print {
   @page {
     size: auto;
-    margin: spacing.$spacing-08;
+    margin: layout.$spacing-08;
   }
 }
 
-.datePickers {
+.datePickerContainers {
   display: flex;
-  margin-bottom: spacing.$spacing-03;
+  margin: layout.$spacing-03 0;
   justify-content: flex-start;
 }
 
 .modalBody {
-  max-height: 31.25rem;
   overflow-y: auto;
   background-color: colors.$white;
 }
 
-.emptyState {
-  text-align: center;
-  margin-top: spacing.$spacing-08;
-  margin-bottom: spacing.$spacing-08;
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  margin: 1rem 0;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
+  padding: 3rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}
+
+.printContainer {
+  margin: 2rem 0;
 }

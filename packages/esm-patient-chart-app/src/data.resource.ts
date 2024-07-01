@@ -7,34 +7,35 @@ interface CauseOfDeathFetchResponse {
   value: string;
 }
 
-interface DeathPayload {
-  deathDate?: Date;
-  dead: boolean;
-  causeOfDeath?: string;
-}
-
 export interface ConceptAnswer {
-  uuid: string;
-  name: string;
   display: string;
+  name: string;
+  uuid: string;
 }
 
 interface ConceptAnswersResponse {
   answers?: Array<ConceptAnswer>;
 }
 
-export function usePatientDeathConcepts() {
+interface CauseOfDeathPayload {
+  causeOfDeath?: string;
+  causeOfDeathNonCoded?: string;
+  dead: boolean;
+  deathDate?: Date;
+}
+
+export function useCausesOfDeath() {
   const { isCauseOfDeathLoading, isCauseOfDeathValidating, value: causeOfDeathConcept } = useCauseOfDeathConcept();
   const { isConceptLoading, isConceptAnswerValidating, conceptAnswers } = useConceptAnswers(causeOfDeathConcept);
 
   return {
-    conceptAnswers: conceptAnswers,
+    causesOfDeath: conceptAnswers,
     isLoading: isCauseOfDeathLoading || isConceptLoading,
     isValidating: isConceptAnswerValidating || isCauseOfDeathValidating,
   };
 }
 
-export function usePatientDeceased(patientUuid: string) {
+export function usePatientDeceasedStatus(patientUuid: string) {
   const { isLoading: isPatientLoading, patient } = usePatient(patientUuid);
 
   if (isPatientLoading) {
@@ -52,7 +53,9 @@ export function usePatientDeceased(patientUuid: string) {
   };
 }
 
-const changePatientDeathStatus = (personUuid: string, payload: DeathPayload, abortController: AbortController) => {
+const changePatientDeathStatus = (personUuid: string, payload: CauseOfDeathPayload) => {
+  const abortController = new AbortController();
+
   return openmrsFetch(`${restBaseUrl}/person/${personUuid}`, {
     headers: {
       'Content-type': 'application/json',
@@ -67,32 +70,28 @@ export function markPatientDeceased(
   deceasedDate: Date,
   personUuid: string,
   selectedCauseOfDeathValue: string | undefined,
-  abortController: AbortController,
+  nonCodedCauseOfDeath?: string | undefined,
 ) {
-  const payload: DeathPayload = {
-    causeOfDeath: selectedCauseOfDeathValue,
+  const payload: CauseOfDeathPayload = {
     dead: true,
+    deathDate: deceasedDate || null,
+    ...(nonCodedCauseOfDeath
+      ? { causeOfDeathNonCoded: nonCodedCauseOfDeath }
+      : {
+          causeOfDeath: selectedCauseOfDeathValue,
+        }),
   };
 
-  if (deceasedDate) {
-    payload.deathDate = new Date(deceasedDate.getFullYear(), deceasedDate.getMonth(), deceasedDate.getDay());
-  } else {
-    payload.deathDate = null;
-  }
-
-  return changePatientDeathStatus(personUuid, payload, abortController);
+  return changePatientDeathStatus(personUuid, payload);
 }
 
-export function markPatientAlive(personUuid: string, abortController: AbortController) {
-  return changePatientDeathStatus(
-    personUuid,
-    {
-      deathDate: null,
-      causeOfDeath: null,
-      dead: false,
-    },
-    abortController,
-  );
+export function markPatientAlive(personUuid: string) {
+  return changePatientDeathStatus(personUuid, {
+    causeOfDeath: null,
+    causeOfDeathNonCoded: null,
+    dead: false,
+    deathDate: null,
+  });
 }
 
 export function useConceptAnswers(conceptUuid: string) {
@@ -115,7 +114,7 @@ export function useConceptAnswers(conceptUuid: string) {
 }
 
 export function useCauseOfDeathConcept() {
-  const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }, Error>(
     `${restBaseUrl}/systemsetting/concept.causeOfDeath`,
     openmrsFetch,
     {
@@ -129,7 +128,8 @@ export function useCauseOfDeathConcept() {
       value: data?.data?.value ?? undefined,
       isCauseOfDeathLoading: isLoading,
       isCauseOfDeathValidating: isValidating,
+      error,
     };
-  }, [data, isLoading, isValidating]);
+  }, [data?.data?.value, error, isLoading, isValidating]);
   return result;
 }

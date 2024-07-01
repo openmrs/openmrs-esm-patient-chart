@@ -44,7 +44,7 @@ import {
 import { Add, Printer } from '@carbon/react/icons';
 import {
   age,
-  displayName,
+  getPatientName,
   formatDate,
   useConfig,
   useLayoutType,
@@ -235,7 +235,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       ) ?? [];
 
     return {
-      name: patient?.patient ? displayName(patient?.patient) : '',
+      name: patient?.patient ? getPatientName(patient?.patient) : '',
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,

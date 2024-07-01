@@ -28,7 +28,7 @@ import { type Control, Controller, useController, useForm } from 'react-hook-for
 import {
   ExtensionSlot,
   age,
-  displayName,
+  getPatientName,
   formatDate,
   parseDate,
   translateFrom,
@@ -318,7 +318,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
-  const patientName = patient ? displayName(patient) : '';
+  const patientName = patient ? getPatientName(patient) : '';
   const { maxDispenseDurationInDays } = useConfig();
 
   const observer = useRef(null);

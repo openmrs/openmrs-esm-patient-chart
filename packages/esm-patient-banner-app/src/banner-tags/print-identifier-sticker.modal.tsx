@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation, type TFunction } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, displayName, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { age, getPatientName, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import styles from './print-identifier-sticker-modal.scss';
+import styles from './print-identifier-sticker.scss';
 
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
@@ -72,7 +72,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       gender: getGender(patient.gender),
       id: patient.id,
       identifiers: [...identifiers],
-      name: patient ? displayName(patient) : '',
+      name: patient ? getPatientName(patient) : '',
       photo: patient.photo,
     };
   }, [excludePatientIdentifierCodeTypes?.uuids, patient, t]);
