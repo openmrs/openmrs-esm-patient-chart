@@ -66,11 +66,11 @@ test('Fill a clinical form', async ({ page }) => {
     await page.getByLabel(/plan/i).fill(plan);
   });
 
-  await test.step('If I click the `Order basket` button on the siderail', async () => {
+  await test.step('And I click the `Order basket` button on the siderail', async () => {
     await page.getByRole('button', { name: /order basket/i, exact: true }).click();
   });
 
-  await test.step('And I click the `Add +` button to order drugs ', async () => {
+  await test.step('And I click the `Add +` button to order drugs', async () => {
     await page.getByRole('button', { name: /add/i }).nth(1).click();
   });
 
@@ -78,7 +78,7 @@ test('Fill a clinical form', async ({ page }) => {
     await page.getByLabel(/clinical forms/i, { exact: true }).click();
   });
 
-  await test.step('Then I should see retained SOAP form inputs', async () => {
+  await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
     await expect(page.getByText(subjectiveFindings)).toBeVisible();
     await expect(page.getByText(objectiveFindings)).toBeVisible();
     await expect(page.getByText(assessment)).toBeVisible();
