@@ -58,18 +58,11 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
   const schema = createSchema(formContext, t);
 
   const defaultValues = {
-    abatementDateTime: isEditing
-      ? matchingCondition?.abatementDateTime
-        ? new Date(matchingCondition?.abatementDateTime)
-        : null
-      : null,
+    abatementDateTime:
+      isEditing && matchingCondition?.abatementDateTime ? new Date(matchingCondition?.abatementDateTime) : null,
     conditionName: '',
-    clinicalStatus: isEditing ? matchingCondition?.clinicalStatus?.toLowerCase() : '',
-    onsetDateTime: isEditing
-      ? matchingCondition?.onsetDateTime
-        ? new Date(matchingCondition?.onsetDateTime)
-        : null
-      : null,
+    clinicalStatus: isEditing ? matchingCondition?.clinicalStatus?.toLowerCase() ?? '' : '',
+    onsetDateTime: isEditing && matchingCondition?.onsetDateTime ? new Date(matchingCondition?.onsetDateTime) : null,
   };
 
   const methods = useForm<ConditionsFormSchema>({
@@ -90,10 +83,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
     setIsSubmittingForm(true);
   };
 
-  const onError = (e) => {
-    console.error('Error submitting condition: ', e);
-    setIsSubmittingForm(false);
-  };
+  const onError = () => setIsSubmittingForm(false);
 
   return (
     <FormProvider {...methods}>
@@ -101,7 +91,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
         <ConditionsWidget
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           conditionToEdit={condition}
-          editing={isEditing}
+          isEditing={isEditing}
           isSubmittingForm={isSubmittingForm}
           patientUuid={patientUuid}
           setErrorCreating={setErrorCreating}

@@ -35,7 +35,7 @@ import styles from './conditions-form.scss';
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
-  editing?: boolean;
+  isEditing?: boolean;
   isSubmittingForm: boolean;
   patientUuid: string;
   setErrorCreating?: (error: Error) => void;
@@ -52,7 +52,7 @@ interface RequiredFieldLabelProps {
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
-  editing,
+  isEditing,
   isSubmittingForm,
   patientUuid,
   setErrorCreating,
@@ -138,10 +138,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const handleUpdate = useCallback(async () => {
     const payload: FormFields = {
-      clinicalStatus: editing ? getValues('clinicalStatus') : editableClinicalStatus,
+      clinicalStatus: isEditing ? getValues('clinicalStatus') : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
-      abatementDateTime: editing
+      abatementDateTime: isEditing
         ? getValues('abatementDateTime')
           ? dayjs(getValues('abatementDateTime')).format()
           : editableAbatementDateTime
@@ -171,7 +171,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
-    editing,
+    isEditing,
     getValues,
     matchingCondition?.conceptId,
     mutate,
@@ -199,15 +199,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
         return;
       }
-      editing ? handleUpdate() : handleCreate();
+      isEditing ? handleUpdate() : handleCreate();
     }
-  }, [handleUpdate, editing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
+  }, [handleUpdate, isEditing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
 
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} t={t} />}>
-          {editing ? (
+          {isEditing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
             <>
@@ -235,7 +235,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                         setSearchTerm('');
                         setSelectedCondition(null);
                       }}
-                      disabled={editing}
+                      disabled={isEditing}
                       value={(() => {
                         if (selectedCondition) {
                           return selectedCondition.display;
