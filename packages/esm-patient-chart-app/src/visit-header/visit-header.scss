@@ -73,6 +73,12 @@
   }
 }
 
+.tagsFlexRow {
+  display: flex;
+  flex-flow: nowrap;
+  align-items: center;
+}
+
 .tooltipPatientInfo {
   @include type.type-style('body-short-01');
   color:$color-gray-30;
