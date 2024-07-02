@@ -36,6 +36,7 @@ import {
   usePagination,
   useSession,
   userHasAccess,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
@@ -59,17 +60,35 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
+interface FormEngineAppConfigObject {
+  printOptions: {
+    showPrintButton: boolean;
+    logo: {
+      alt: string;
+      name: string;
+      src: string;
+    };
+  };
+}
+
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid, mutateVisits }) => {
   const visitCount = 20;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
 
+  const [printOptions, setPrintOptions] = useState<FormEngineAppConfigObject>();
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
 
   useEffect(() => {
     getConfig('@openmrs/esm-patient-forms-app').then((config) => {
       setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
+    });
+  });
+
+  useEffect(() => {
+    getConfig('@openmrs/esm-form-engine-app').then((config) => {
+      setPrintOptions(config.printOptions as FormEngineAppConfigObject);
     });
   });
 
