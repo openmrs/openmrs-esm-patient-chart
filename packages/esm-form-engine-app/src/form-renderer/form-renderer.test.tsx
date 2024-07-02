@@ -19,6 +19,7 @@ jest.mock('../hooks/useFormSchema', () => ({
 describe('FormRenderer', () => {
   const defaultProps = {
     formUuid: 'test-form-uuid',
+    patient: { id: 'test-patient-id' },
     patientUuid: 'test-patient-uuid',
     closeWorkspace: jest.fn(),
     closeWorkspaceWithSavedChanges: jest.fn(),
