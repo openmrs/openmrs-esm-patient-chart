@@ -93,6 +93,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (enrollments?.length) {
+    const showInlineNotification =
+      availablePrograms?.length && eligiblePrograms?.length === 0 && noCompletedPrograms && !hideAddProgramButton;
+
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -109,7 +112,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             </Button>
           )}
         </CardHeader>
-        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+        {showInlineNotification && (
           <InlineNotification
             style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
             kind={'info'}
@@ -117,7 +120,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}
           />
-        ) : null}
+        )}
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
