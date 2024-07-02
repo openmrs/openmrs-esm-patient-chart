@@ -36,6 +36,12 @@ export const configSchema = {
       'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
     _default: 300,
   },
+  checkRequireOutpatientQuantityProperty: {
+    _type: Type.Boolean,
+    _default: false,
+    _description:
+      'Determines whether to check for the global property drugOrder.requireOutpatientQuantity. The global property value is then used to determine whether to making quantity, quantity units and number of refills required or not in the drug-order-form.',
+  },
 };
 
 export interface ConfigObject {
@@ -47,4 +53,5 @@ export interface ConfigObject {
   showPrintButton: boolean;
   maxDispenseDurationInDays: number;
   debounceDelayInMs: number;
+  checkRequireOutpatientQuantityProperty: boolean;
 }
