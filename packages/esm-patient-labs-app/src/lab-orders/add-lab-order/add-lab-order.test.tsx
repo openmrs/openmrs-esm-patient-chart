@@ -136,7 +136,6 @@ describe('AddLabOrder', () => {
           instructions: 'plz do it thx',
           labReferenceNumber: 'lba-000124',
           testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
-          careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
           orderer: 'test-provider-uuid',
         }),
       ]);
