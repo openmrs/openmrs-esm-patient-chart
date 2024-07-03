@@ -7,7 +7,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
-import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
+import { prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -54,30 +54,39 @@ export function LabOrderForm({
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
   ).required;
-  const labOrderFormSchema = z.object({
-    instructions: z.string().optional(),
-    urgency: z.string().refine((value) => value !== '', {
-      message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
-    }),
-    labReferenceNumber: z.string().optional(),
-    testType: z.object(
-      { label: z.string(), conceptUuid: z.string() },
-      {
-        required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-        invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
-      },
-    ),
-    orderReason: orderReasonRequired
-      ? z
-          .string({
-            required_error: translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-          })
-          .refine(
-            (value) => !!value,
-            translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-          )
-      : z.string().optional(),
-  });
+
+  const labOrderFormSchema = useMemo(
+    () =>
+      z.object({
+        instructions: z.string().optional(),
+        urgency: z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+        }),
+        labReferenceNumber: z.string().optional(),
+        testType: z.object(
+          { label: z.string(), conceptUuid: z.string() },
+          {
+            required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
+            invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+          },
+        ),
+        orderReason: orderReasonRequired
+          ? z
+              .string({
+                required_error: translateFrom(
+                  moduleName,
+                  'addLabOrderLabOrderReasonRequired',
+                  'Order reason is required',
+                ),
+              })
+              .refine(
+                (value) => !!value,
+                translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+              )
+          : z.string().optional(),
+      }),
+    [orderReasonRequired],
+  );
 
   const {
     control,
@@ -90,9 +99,11 @@ export function LabOrderForm({
       ...initialOrder,
     },
   });
+
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
+
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const handleFormSubmission = useCallback(
@@ -101,19 +112,23 @@ export function LabOrderForm({
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
+
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
 
       if (existingOrder) {
         newOrders[orders.indexOf(existingOrder)] = {
           ...finalizedOrder,
+          // Incomplete orders should be marked completed on saving the form
+          isOrderIncomplete: false,
         };
       } else {
         newOrders.push(finalizedOrder);
       }
+
       setOrders(newOrders);
+
       closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
