@@ -6,13 +6,7 @@ import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockUseVisits = useVisit as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
-const mockUseFeatureFlag = useFeatureFlag as jest.Mock;
-
-jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
-  OHRIForm: jest
-    .fn()
-    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
-}));
+const mockedUseFeatureFlag = useFeatureFlag as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework/mock'),
@@ -44,6 +38,7 @@ describe('CurrentVisitSummary', () => {
       isValidating: false,
       error: null,
     });
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
@@ -52,6 +47,7 @@ describe('CurrentVisitSummary', () => {
 
   test('renders a visit summary when for the active visit', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
     mockUseVisits.mockReturnValueOnce({
       currentVisit: {
         uuid: 'some-uuid',
