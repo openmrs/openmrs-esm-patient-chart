@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { useVisit, getConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { waitForLoadingToFinish } from 'tools';
+import { useVisit, getConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockUseVisits = useVisit as jest.Mock;
@@ -20,6 +20,18 @@ describe('CurrentVisitSummary', () => {
   });
 
   test('renders an empty state when there is no active visit', () => {
+    mockUseVisits.mockReturnValueOnce({
+      currentVisit: null,
+      isLoading: true,
+      isValidating: false,
+      error: null,
+    });
+
+    render(<CurrentVisitSummary patientUuid="some-uuid" />);
+    expect(screen.getByText('Loading current visit...')).toBeInTheDocument();
+  });
+
+  test('should display empty state when there is no active visit', () => {
     mockUseVisits.mockReturnValueOnce({
       currentVisit: null,
       isLoading: false,
@@ -56,6 +68,7 @@ describe('CurrentVisitSummary', () => {
       isValidating: false,
       error: null,
     });
+    mockUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
 
@@ -63,7 +76,7 @@ describe('CurrentVisitSummary', () => {
 
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
     expect(screen.getByText('Diagnoses')).toBeInTheDocument();
-    const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
+    const buttonNames = ['Notes', 'Tests', 'Medications'];
     buttonNames.forEach((buttonName) => {
       expect(screen.getByRole('tab', { name: buttonName })).toBeInTheDocument();
     });
