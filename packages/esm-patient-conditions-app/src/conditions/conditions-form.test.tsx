@@ -35,6 +35,7 @@ const testProps = {
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
   formContext: 'creating' as 'creating' | 'editing',
+  setTitle: jest.fn(),
 };
 
 const mockCreateCondition = createCondition as jest.Mock;

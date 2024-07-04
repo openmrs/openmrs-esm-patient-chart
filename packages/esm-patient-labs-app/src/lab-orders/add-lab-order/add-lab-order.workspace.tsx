@@ -77,6 +77,7 @@ export default function AddLabOrderWorkspace({
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
+          setTitle={() => {}}
         />
       )}
     </div>
