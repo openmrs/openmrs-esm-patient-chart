@@ -1,4 +1,5 @@
 {
+  "actionsMenu": "Actions Menu",
   "activeVisitRequired": "An active visit is required to make orders",
   "add": "Add",
   "addResults": "Add Results",
@@ -18,13 +19,11 @@
   "error": "Error",
   "errorCancellingOrder": "Error cancelling order",
   "errorSavingLabResults": "Error saving lab results",
-  "female": "Female",
   "indication": "Indication",
   "launchOrderBasket": "Launch order basket",
   "loading": "Loading",
   "loadingInitialValues": "Loading Initial Values",
   "loadingTestDetails": "Loading test details",
-  "male": "Male",
   "medicationDurationAndUnit": "for {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Indefinite duration",
   "medications": "Medications",
@@ -46,7 +45,6 @@
   "orders": "Orders",
   "Orders": "Orders",
   "orderType": "Order Type",
-  "other": "Other",
   "pleaseFillRequiredFields": "Please fill all the required fields",
   "print": "Print",
   "printedBy": "Printed by",
@@ -68,9 +66,9 @@
   "status": "Status",
   "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
   "successfullySavedLabResults": "Lab results for {{orderNumber}} have been successfully updated",
+  "Test Order_few": "Test Orders",
   "testType": "Test type",
   "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
-  "unknown": "Unknown",
   "unknownOrderType": "Unknown order type",
   "updated": "Updated"
 }
