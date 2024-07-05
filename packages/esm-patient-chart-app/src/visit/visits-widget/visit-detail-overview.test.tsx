@@ -112,7 +112,7 @@ describe('VisitDetailOverview', () => {
 
     expect(visitSummariesTab).toBeInTheDocument();
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
-    expect(screen.queryByText('/All encounters/i')).toBeNull();
+    expect(screen.queryByText('/All encounters/i')).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();

@@ -106,7 +106,7 @@ describe('ProgramsForm', () => {
 
     await user.tab();
 
-    expect(enrollButton).not.toBeDisabled();
+    expect(enrollButton).toBeEnabled();
 
     await user.click(enrollButton);
 
@@ -162,7 +162,7 @@ describe('ProgramsForm', () => {
     await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
     await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
-    expect(enrollButton).not.toBeDisabled();
+    expect(enrollButton).toBeEnabled();
 
     await user.click(enrollButton);
 
