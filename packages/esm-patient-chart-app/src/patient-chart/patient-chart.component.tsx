@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
-  ActionMenu,
   ExtensionSlot,
   WorkspaceContainer,
-  WorkspaceWindow,
   setCurrentVisit,
   setLeftNav,
   unsetLeftNav,

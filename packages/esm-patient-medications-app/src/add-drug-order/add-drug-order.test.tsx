@@ -56,6 +56,7 @@ function renderDrugSearch() {
       closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
       promptBeforeClosing={() => false}
       patientUuid={'mock-patient-uuid'}
+      setTitle={jest.fn()}
     />,
   );
 }

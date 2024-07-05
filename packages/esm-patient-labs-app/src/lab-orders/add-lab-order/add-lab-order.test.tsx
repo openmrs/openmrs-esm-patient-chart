@@ -64,6 +64,7 @@ function renderAddLabOrderWorkspace() {
       closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
+      setTitle={jest.fn()}
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };

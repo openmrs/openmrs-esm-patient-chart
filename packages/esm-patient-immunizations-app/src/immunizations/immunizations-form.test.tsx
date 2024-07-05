@@ -11,6 +11,7 @@ const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
+const mockSetTitle = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -86,6 +87,7 @@ const testProps = {
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   promptBeforeClosing: mockPromptBeforeClosing,
+  setTitle: mockSetTitle,
 };
 
 describe('Immunizations Form', () => {
