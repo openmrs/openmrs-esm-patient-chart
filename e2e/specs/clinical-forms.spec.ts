@@ -121,7 +121,6 @@ test('Fill a clinical form', async ({ page }) => {
 
 test('Form state is retained when moving between forms in the workspace', async ({ page }) => {
   const chartPage = new ChartPage(page);
-  const visitsPage = new VisitsPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
     await chartPage.goTo(patient.uuid);
