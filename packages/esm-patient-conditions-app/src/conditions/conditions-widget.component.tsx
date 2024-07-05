@@ -311,7 +311,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                invalid={errors?.clinicalStatus}
+                invalid={Boolean(errors?.clinicalStatus)}
                 name="clinicalStatus"
                 onBlur={onBlur}
                 onChange={onChange}
@@ -359,12 +359,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
 function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
-    <>
-      <span>{label}</span>
+    <span>
+      {label}
       <span title={t('required', 'Required')} className={styles.required}>
         *
       </span>
-    </>
+    </span>
   );
 }
 
