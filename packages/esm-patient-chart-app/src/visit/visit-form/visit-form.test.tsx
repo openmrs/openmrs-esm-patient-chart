@@ -44,6 +44,7 @@ const visitAttributes = {
 
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
+const mockSetTitle = jest.fn();
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -51,6 +52,7 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
   showVisitEndDateTimeFields: false,
+  setTitle: mockSetTitle,
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;

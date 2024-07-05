@@ -44,5 +44,5 @@ describe('sidemenu', () => {
 });
 
 function renderSideMenu() {
-  return render(<SideMenu />);
+  render(<SideMenu />);
 }

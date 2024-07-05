@@ -63,6 +63,7 @@ function renderFormEntry() {
     patientUuid: mockPatient.id,
     formInfo: { formUuid: 'some-form-uuid' },
     mutateForm: jest.fn(),
+    setTitle: jest.fn(),
   };
 
   render(<FormEntry {...testProps} />);

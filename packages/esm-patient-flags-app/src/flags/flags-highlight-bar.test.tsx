@@ -66,5 +66,5 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 });
 
 function renderFlagsHighlightBar() {
-  return render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
+  render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
 }
