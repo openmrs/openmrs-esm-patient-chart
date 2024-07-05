@@ -116,7 +116,8 @@ describe('<OrderBasketActionButton/>', () => {
       activeVisit: null,
       currentVisit: null,
     }));
-    const screen = render(<OrderBasketActionButton />);
+
+    render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();

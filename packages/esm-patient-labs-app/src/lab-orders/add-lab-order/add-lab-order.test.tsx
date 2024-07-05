@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, renderHook, screen, waitFor, within } from '@testing-library/react';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -58,7 +58,7 @@ function renderAddLabOrderWorkspace() {
     onWorkspaceClose();
   });
   const mockPromptBeforeClosing = jest.fn();
-  const renderResult = render(
+  const view = render(
     <AddLabOrderWorkspace
       closeWorkspace={mockCloseWorkspace}
       closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
@@ -67,7 +67,7 @@ function renderAddLabOrderWorkspace() {
       setTitle={jest.fn()}
     />,
   );
-  return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...renderResult };
+  return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
 }
 
 describe('AddLabOrder', () => {
@@ -106,7 +106,7 @@ describe('AddLabOrder', () => {
     await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
-    const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Order form');
+    const cd4OrderButton = screen.getAllByRole('button', { name: 'Order form' })[1];
     await user.click(cd4OrderButton);
 
     const testType = screen.getByRole('combobox', { name: 'Test type' });
@@ -155,7 +155,7 @@ describe('AddLabOrder', () => {
     await user.type(screen.getByRole('searchbox'), 'cd4');
     const cd4 = screen.getByText('CD4 COUNT');
     expect(cd4).toBeInTheDocument();
-    const cd4OrderButton = within(cd4.closest('div').parentElement).getByText('Add to basket');
+    const cd4OrderButton = screen.getAllByRole('button', { name: 'Add to basket' })[1];
     await user.click(cd4OrderButton);
     expect(hookResult.current.orders).toEqual([
       { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
@@ -196,6 +196,6 @@ describe('AddLabOrder', () => {
       },
     });
     renderAddLabOrderWorkspace();
-    expect(screen.getAllByText(/Error/i)[0]).toBeInTheDocument();
+    expect(screen.getByText(/Error/i)).toBeInTheDocument();
   });
 });

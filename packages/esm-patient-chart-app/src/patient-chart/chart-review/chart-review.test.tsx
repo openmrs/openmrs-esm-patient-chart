@@ -93,7 +93,7 @@ describe('ChartReview: ', () => {
 
     renderChartReview();
 
-    expect(screen.getByRole('heading').textContent).toMatch(/Patient summary/i);
+    expect(screen.getByRole('heading')).toHaveTextContent(/Patient summary/i);
   });
 });
 

@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { screen, render, within, renderHook, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

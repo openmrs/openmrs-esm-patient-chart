@@ -541,7 +541,7 @@ describe('Visit Form', () => {
 
     expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
     expect(screen.getByText(/Please refresh to try again/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Start visit/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: /Start visit/i })).toBeEnabled();
   });
 
   it('should show an error if a required visit attribute type is not provided', async () => {

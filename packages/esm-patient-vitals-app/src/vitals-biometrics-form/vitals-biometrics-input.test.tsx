@@ -160,7 +160,7 @@ describe('VitalsAndBiometricsInput', () => {
     expect(screen.getByTitle(/notes/i)).toBeInTheDocument();
   });
 
-  it('should validate the input based on the provided interpretation and reference range values', () => {
+  it('should validate the input based on the provided interpretation and reference range values', async () => {
     const config = useConfig();
 
     testProps.fieldProperties = [
@@ -181,7 +181,7 @@ describe('VitalsAndBiometricsInput', () => {
 
     renderVitalsBiometricsInput();
 
-    screen.findByRole('spinbutton');
+    await screen.findByRole('spinbutton');
 
     expect(screen.getByRole('spinbutton', { name: /heart rate/i })).toBeInTheDocument();
     const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
