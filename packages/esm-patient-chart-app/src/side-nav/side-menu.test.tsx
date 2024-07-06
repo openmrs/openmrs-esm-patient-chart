@@ -31,7 +31,7 @@ describe('sidemenu', () => {
 
     renderSideMenu();
 
-    expect(screen.getByText(/left nav menu/)).toBeTruthy();
+    expect(screen.getByText(/left nav menu/)).toBeInTheDocument();
   });
 
   it('is not rendered when viewport == tablet or viewport == small-desktop', () => {
@@ -44,5 +44,5 @@ describe('sidemenu', () => {
 });
 
 function renderSideMenu() {
-  return render(<SideMenu />);
+  render(<SideMenu />);
 }

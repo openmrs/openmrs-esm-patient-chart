@@ -11,9 +11,9 @@ import {
   useAllergicReactions,
   updatePatientAllergy,
 } from './allergy-form.resource';
-import AllergyForm from './allergy-form.workspace';
-import { AllergenType, ReactionSeverity } from '../../types';
+import { AllergenType } from '../../types';
 import { mockAllergy } from '__mocks__';
+import AllergyForm from './allergy-form.workspace';
 
 const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
 const mockUseAllergens = useAllergens as jest.Mock;
@@ -328,6 +328,7 @@ function renderAllergyForm() {
     formContext: 'creating' as 'creating' | 'editing',
     patient: mockPatient,
     patientUuid: mockPatient.id,
+    setTitle: jest.fn(),
   };
 
   render(<AllergyForm {...testProps} />);
@@ -342,6 +343,7 @@ function renderEditAllergyForm() {
     formContext: 'editing' as 'creating' | 'editing',
     patient: mockPatient,
     patientUuid: mockPatient.id,
+    setTitle: jest.fn(),
   };
 
   render(<AllergyForm {...testProps} />);
