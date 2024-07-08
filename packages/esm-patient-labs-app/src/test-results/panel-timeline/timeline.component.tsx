@@ -106,14 +106,14 @@ interface TimelineParams {
 }
 
 export const Timeline: React.FC<TimelineParams> = ({ parsedTime, rowData, panelName, sortedTimes, testUuid }) => {
-  const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
+  const [xIsScrolled, yIsScrolled, containerRef, currentTitle] = useScrollIndicator(0, 32);
   const { yearColumns, dayColumns, timeColumns } = parsedTime;
 
   if (yearColumns && dayColumns && timeColumns)
     return (
       <RecentResultsGrid>
         <PaddingContainer ref={containerRef}>
-          <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
+          <PanelNameCorner showShadow={xIsScrolled} panelName={currentTitle || panelName} />
           <DateHeaderGrid
             {...{
               timeColumns,
