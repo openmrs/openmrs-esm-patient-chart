@@ -46,8 +46,8 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
         .refine((date) => date >= dayjs().startOf('day').toDate(), {
           message: t('dateCannotBeBeforeToday', 'Date cannot be before today'),
         }),
-      reasonForCancellation: z.string({
-        required_error: t('reasonForCancellationRequired', 'Reason for cancellation is required'),
+      reasonForCancellation: z.string().min(1, {
+        message: t('reasonForCancellationRequired', 'Reason for cancellation is required'),
       }),
     });
   }, [t]);

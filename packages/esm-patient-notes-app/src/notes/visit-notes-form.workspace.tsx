@@ -78,8 +78,8 @@ interface DiagnosisSearchProps {
 
 const visitNoteFormSchema = z.object({
   noteDate: z.date(),
-  primaryDiagnosisSearch: z.string({
-    required_error: 'Choose at least one primary diagnosis',
+  primaryDiagnosisSearch: z.string().min(1, {
+    message: 'Choose at least one primary diagnosis',
   }),
   secondaryDiagnosisSearch: z.string().optional(),
   clinicalNote: z.string().optional(),
@@ -129,6 +129,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     mode: 'onSubmit',
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
+      primaryDiagnosisSearch: '',
       noteDate: new Date(),
     },
   });

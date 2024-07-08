@@ -130,8 +130,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         ...acc,
         [uuid]: required
           ? z
-              .string({
-                required_error: t('fieldRequired', 'This field is required'),
+              .string()
+              .min(1, {
+                message: t('fieldRequired', 'This field is required'),
               })
               .refine((value) => !!value, t('fieldRequired', 'This field is required'))
           : z.string().optional(),

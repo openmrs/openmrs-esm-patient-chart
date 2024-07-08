@@ -72,12 +72,9 @@ export function LabOrderForm({
         ),
         orderReason: orderReasonRequired
           ? z
-              .string({
-                required_error: translateFrom(
-                  moduleName,
-                  'addLabOrderLabOrderReasonRequired',
-                  'Order reason is required',
-                ),
+              .string()
+              .min(1, {
+                message: translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
               })
               .refine(
                 (value) => !!value,
