@@ -1,6 +1,5 @@
 @use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/theme';
 @use '@carbon/styles/scss/type';
 @use '@openmrs/esm-styleguide/src/vars' as openmrs;
 
@@ -66,7 +65,7 @@
     background-color: colors.$cyan-20;
   }
 
-  &[data-status='on-hold'] {
+  &[data-status='on hold'] {
     background-color: colors.$teal-20;
   }
 

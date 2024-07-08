@@ -20,7 +20,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tag,
   Tooltip,
 } from '@carbon/react';
 import {
@@ -92,6 +91,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
+  const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
 
   const {
     data: allOrders,
@@ -299,9 +299,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               ? t('orders', 'Orders')
               : // t('Drug Order_few', 'Drug Orders')
                 // t('Test Order_few', 'Test Orders')
-                t(`${(orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).name}`, {
+                t(selectedOrderName, {
                   count: 3,
-                  default: (orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).name,
+                  default: selectedOrderName,
                 })
           }
           launchForm={launchOrderBasket}
@@ -318,7 +318,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               {showPrintButton && (
                 <Button
                   kind="ghost"
-                  renderIcon={() => <PrinterIcon size={16} />}
+                  renderIcon={(props) => <PrinterIcon {...props} size={16} />}
                   iconDescription={t('print', 'Print')}
                   className={styles.printButton}
                   onClick={handlePrint}
@@ -329,7 +329,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               {showAddButton && (
                 <Button
                   kind="ghost"
-                  renderIcon={() => <AddIcon size={16} />}
+                  renderIcon={(props) => <AddIcon {...props} size={16} />}
                   iconDescription={t('launchOrderBasket', 'Launch order basket')}
                   onClick={launchOrderBasket}
                 >
