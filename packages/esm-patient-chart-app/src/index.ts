@@ -50,6 +50,11 @@ export function startupApp() {
     'Retrospective Data Entry',
     "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.",
   );
+  registerFeatureFlag(
+    'print-patient-identifier-sticker',
+    'Print patient identifier sticker',
+    'Features to support printing a patient identifier sticker',
+  );
 }
 
 export const root = getSyncLifecycle(patientChartPageComponent, { featureName: 'patient-chart', moduleName });
