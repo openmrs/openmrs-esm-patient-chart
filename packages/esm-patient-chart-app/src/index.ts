@@ -241,14 +241,6 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
   { featureName: 'active-visit-actions', moduleName },
 );
 
-export const activeVisitSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({
-    ...activeVisitDashboardMeta,
-    moduleName,
-  }),
-  { featureName: 'activeVisitSummaryTab', moduleName },
-);
-
 export const activeVisitDetailOverview = getSyncLifecycle(activeVisitDetailOverviewComponent, {
   featureName: 'active-visit-overview',
   moduleName,

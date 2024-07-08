@@ -1,5 +1,5 @@
 import React from 'react';
-import { ErrorState, useVisit } from '@openmrs/esm-framework';
+import { ErrorState, ExtensionSlot, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { launchPatientWorkspace, CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -40,6 +40,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
 
   return (
     <div className={styles.container}>
+      <ExtensionSlot name="active-visit-actions" />
       <CardHeader title={t('currentVisit', 'Current visit')}>
         <span>{isValidating ? <InlineLoading /> : null}</span>
       </CardHeader>

@@ -1,21 +1,57 @@
+import { launchPatientWorkspace, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import styles from './active-visit-buttons.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, MenuButton, MenuItem } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import type { Visit } from '@openmrs/esm-framework';
-import { showModal, useLayoutType } from '@openmrs/esm-framework';
+import { showModal, useLayoutType, useConfig } from '@openmrs/esm-framework';
 
-export interface ActiveVisitActionsInterface {
+interface ActiveVisitActionsInterface {
   visit: Visit;
   patientUuid: string;
 }
-const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, patientUuid }) => {
+
+interface ActiveVisitProps {
+  encounterUuid: string;
+  formUuid: string;
+  mutateform: any;
+  action: 'add' | 'edit';
+}
+
+const ActiveVisitActions: React.FC<ActiveVisitActionsInterface & ActiveVisitProps> = ({
+  patientUuid,
+  mutateform,
+  action,
+  visit,
+}) => {
+  const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isMobile = layout === 'phone';
+
+  const handleLaunchNotesForm = () => {
+    const title = 'Active Visit Note';
+    const formName = config.formName.structuredClinicalEncounterForm;
+
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: title,
+      mutateform: mutateform,
+      formInfo: {
+        encounterUuid: '',
+        formUuid: formName,
+        patientUuid: patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+        visitStartDatetime: '',
+        visitStopDatetime: '',
+        additionalProps: {
+          mode: action === 'add',
+        },
+      },
+    });
+  };
 
   const launchAllergiesFormWorkspace = useLaunchWorkspaceRequiringVisit('patient-allergy-form-workspace');
   const launchAppointmentsFormWorkspace = useLaunchWorkspaceRequiringVisit('appointments-form-workspace');
@@ -31,9 +67,10 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
     <div>
       {isTablet || isMobile ? (
         <div className={styles.buttonsContainer}>
-          <VisitActionsComponent patientUuid={patientUuid} />
+          <VisitActionsComponent patientUuid={patientUuid} visit={visit} />
 
           <MenuButton label={t('more', 'More')} kind="ghost">
+            <MenuItem kind="ghost" label={t('addNote', 'Add note')} onClick={handleLaunchNotesForm} renderIcon={Add} />
             <MenuItem
               kind="ghost"
               label={t('addNote', 'Add note')}
@@ -84,7 +121,7 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add visit note"
-            onClick={launchVisitNotesFormWorkspace}
+            onClick={handleLaunchNotesForm}
           >
             {t('addNote', 'Add note')}
           </Button>
@@ -97,7 +134,7 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
             {t('addLabOrPrescription', 'Add lab or prescription')}
           </Button>
 
-          <VisitActionsComponent patientUuid={patientUuid} />
+          <VisitActionsComponent patientUuid={patientUuid} visit={visit} />
 
           <MenuButton label={t('more', 'More')} kind="ghost">
             <MenuItem
@@ -138,11 +175,12 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
 };
 
 export default ActiveVisitActions;
-
 interface VisitActionsProps {
   patientUuid: string;
+  visit: Visit;
 }
-const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid }) => {
+
+const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid, visit }) => {
   const { t } = useTranslation();
 
   const openModal = useCallback(
@@ -150,9 +188,10 @@ const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid }) => 
       const dispose = showModal(modalName, {
         closeModal: () => dispose(),
         patientUuid,
+        visit,
       });
     },
-    [patientUuid],
+    [patientUuid, visit],
   );
 
   return (
@@ -171,8 +210,14 @@ const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid }) => 
       />
       <MenuItem
         kind="ghost"
-        label={t('deleteVisit', 'Delete visit')}
-        onClick={() => openModal('delete-visit-dialog')}
+        label={t('deleteVisit', 'Delete Visit')}
+        onClick={() => {
+          const dispose = showModal('delete-visit-dialog', {
+            patientUuid,
+            visit,
+            closeModal: () => dispose(),
+          });
+        }}
         renderIcon={Add}
       />
     </MenuButton>

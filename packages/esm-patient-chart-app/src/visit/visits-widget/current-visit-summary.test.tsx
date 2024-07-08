@@ -68,7 +68,7 @@ describe('CurrentVisitSummary', () => {
       isValidating: false,
       error: null,
     });
-    mockUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
+    mockedUseFeatureFlag.mockImplementation(() => ({ activeVisitsSummaryTab: false }));
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
 
