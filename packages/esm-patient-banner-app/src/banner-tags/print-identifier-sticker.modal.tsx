@@ -32,7 +32,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   const contentToPrintRef = useRef(null);
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
-  const headerTitle = getCoreTranslation('patientIdentifierSticker', 'Patient identifier sticker');
+  const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
