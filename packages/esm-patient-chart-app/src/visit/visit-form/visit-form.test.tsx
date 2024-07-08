@@ -44,6 +44,7 @@ const visitAttributes = {
 
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
+const mockSetTitle = jest.fn();
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -51,6 +52,7 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
   showVisitEndDateTimeFields: false,
+  setTitle: mockSetTitle,
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
@@ -539,7 +541,7 @@ describe('Visit Form', () => {
 
     expect(screen.getByText(/Part of the form did not load/i)).toBeInTheDocument();
     expect(screen.getByText(/Please refresh to try again/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Start visit/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: /Start visit/i })).toBeEnabled();
   });
 
   it('should show an error if a required visit attribute type is not provided', async () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import StopVisitOverflowMenuItem from './stop-visit.component';
-import { screen, render, cleanup } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
@@ -18,8 +18,8 @@ jest.mock('@openmrs/esm-framework', () => ({
 describe('StopVisitOverflowMenuItem', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    cleanup();
   });
+
   it('should be able to stop current visit', async () => {
     const user = userEvent.setup();
 

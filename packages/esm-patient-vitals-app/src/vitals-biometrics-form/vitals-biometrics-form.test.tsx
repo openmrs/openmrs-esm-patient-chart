@@ -310,7 +310,9 @@ function renderForm() {
     patientUuid: mockPatient.id,
     promptBeforeClosing: () => {},
     formContext: 'creating' as 'creating' | 'editing',
+    setTitle: jest.fn(),
   };
+
   render(<VitalsAndBiometricsForm {...testProps} />);
 }
 
@@ -324,6 +326,8 @@ function renderEditVitalsBiometricsForm() {
     vitalsBiometrics: formattedVitalsAndBiometrics,
     formContext: 'editing' as 'creating' | 'editing',
     formType: 'vitals' as 'vitals' | 'biometrics',
+    setTitle: jest.fn(),
   };
+
   render(<VitalsAndBiometricsForm {...testProps} />);
 }
