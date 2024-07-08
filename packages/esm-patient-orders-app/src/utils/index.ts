@@ -1,36 +1,5 @@
 import { type DrugOrderBasketItem, type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
 
-export function orderPriorityToColor(priority) {
-  switch (priority) {
-    case 'URGENT':
-      return '#FCD6D9';
-    case 'ROUTINE':
-      return '#A7EFBB';
-    default:
-      return 'grey';
-  }
-}
-
-export function orderStatusColor(status) {
-  switch (status) {
-    case 'RECEIVED':
-      return 'blue';
-    case 'IN_PROGRESS':
-      return 'cyan';
-    case 'ON_HOLD':
-      return 'teal';
-    case 'EXCEPTION':
-      return 'magenta';
-    case 'COMPLETED':
-      return 'green';
-    case 'DISCONTINUED':
-    case 'DECLINED':
-      return 'red';
-    default:
-      return 'gray';
-  }
-}
-
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
  * Requires the `<` and `>` operators to return something reasonable for the provided values.
@@ -56,9 +25,8 @@ export function compare<T>(x?: T, y?: T) {
  */
 export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOrderBasketItem {
   return {
-    uuid: order.uuid,
     display: order.drug?.display,
-    previousOrder: action === 'REVISE' ? order.uuid : null,
+    previousOrder: action !== 'NEW' ? order.uuid : null,
     action: action,
     drug: order.drug,
     dosage: order.dose,
@@ -103,10 +71,9 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
  */
 export function buildLabOrder(order: Order, action?: OrderAction) {
   return {
-    uuid: order.uuid,
     action: action,
     display: order.display,
-    previousOrder: action === 'REVISE' ? order.uuid : null,
+    previousOrder: action !== 'NEW' ? order.uuid : null,
     orderer: order.orderer.uuid,
     careSetting: order.careSetting.uuid,
     instructions: order.instructions,

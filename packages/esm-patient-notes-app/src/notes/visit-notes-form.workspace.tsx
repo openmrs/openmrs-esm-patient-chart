@@ -129,6 +129,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     mode: 'onSubmit',
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
+      primaryDiagnosisSearch: '',
       noteDate: new Date(),
     },
   });

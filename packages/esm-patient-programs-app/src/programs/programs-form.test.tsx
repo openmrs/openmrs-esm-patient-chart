@@ -14,6 +14,7 @@ const testProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
+  setTitle: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
@@ -106,7 +107,7 @@ describe('ProgramsForm', () => {
 
     await user.tab();
 
-    expect(enrollButton).not.toBeDisabled();
+    expect(enrollButton).toBeEnabled();
 
     await user.click(enrollButton);
 
@@ -162,7 +163,7 @@ describe('ProgramsForm', () => {
     await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
     await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
 
-    expect(enrollButton).not.toBeDisabled();
+    expect(enrollButton).toBeEnabled();
 
     await user.click(enrollButton);
 

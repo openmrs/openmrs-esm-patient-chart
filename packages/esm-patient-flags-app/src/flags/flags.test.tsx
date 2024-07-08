@@ -53,5 +53,5 @@ it('renders flags in the patient flags slot', async () => {
 });
 
 function renderFlags() {
-  return render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={() => {}} showHighlightBar={false} />);
+  render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={() => {}} showHighlightBar={false} />);
 }
