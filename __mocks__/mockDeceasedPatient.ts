@@ -19,7 +19,7 @@ export const mockDeceasedPatient = {
       value: '100732HE',
     },
     {
-      id: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+      id: 'ceda35a8-a445-455d-9928-ac088692190a',
       use: 'usual',
       system: 'OpenMRS ID',
       value: '100GEJ',
