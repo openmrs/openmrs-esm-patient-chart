@@ -25,6 +25,7 @@
 }
 
 .tablet {
+  margin: 0.5rem 0;
   padding: 1.5rem 1rem;
   background-color: $ui-02;
 }
@@ -56,7 +57,7 @@
   margin: 0.5rem 0rem 0rem;
   display: flex;
   flex-flow: row wrap;
-  gap: 1rem;
+  gap: 1rem 0.75rem;
 }
 
 .spacer {

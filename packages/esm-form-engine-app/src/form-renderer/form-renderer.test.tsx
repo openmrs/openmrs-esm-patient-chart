@@ -23,6 +23,7 @@ describe('FormRenderer', () => {
     closeWorkspace: jest.fn(),
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
+    setTitle: jest.fn(),
   };
 
   test('renders FormError component when there is an error', () => {

@@ -11,7 +11,8 @@
       "es2015.promise",
       "es2016.array.include",
       "es2018",
-      "es2020"
+      "es2020",
+      "es2022"
     ],
     "module": "esnext",
     "moduleResolution": "node",
@@ -19,11 +20,11 @@
     "paths": {
       "@openmrs/*": ["./node_modules/@openmrs/*"],
       "__mocks__": ["./__mocks__"],
-      "tools": ["./tools"],
+      "tools": ["./tools"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext",
     "typeRoots": ["./node_modules/@types", "./node_modules/testing-library"]
-  },
+  }
 }

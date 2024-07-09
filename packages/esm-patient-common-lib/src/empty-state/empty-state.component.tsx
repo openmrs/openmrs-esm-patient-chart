@@ -1,10 +1,9 @@
 import React from 'react';
-import { Layer, Link, Tile } from '@carbon/react';
+import { Button, Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
-import { Button } from '@carbon/react';
 
 export interface EmptyStateProps {
   displayText: string;

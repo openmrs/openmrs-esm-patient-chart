@@ -19,6 +19,7 @@ const testProps = {
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
+  setTitle: jest.fn(),
 };
 
 const mockFetchDiagnosisConceptsByName = fetchDiagnosisConceptsByName as jest.Mock;

@@ -82,7 +82,7 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.findByRole('heading', { name: /vitals/i }));
+    await screen.findByRole('heading', { name: /vitals/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
