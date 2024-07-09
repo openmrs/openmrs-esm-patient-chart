@@ -46,8 +46,21 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms } =
-    usePrograms(patientUuid);
+  const { enrollments, isLoading, isError, isValidating, availablePrograms } = usePrograms(patientUuid);
+
+  const eligiblePrograms = useMemo(() => {
+    if (!enrollments?.length) {
+      return availablePrograms;
+    }
+
+    const currentProgram = enrollments[enrollments.length - 1]?.program;
+    return currentProgram
+      ? [currentProgram]
+      : availablePrograms.filter((program) => {
+          const existingEnrollment = enrollments.find((enrollment) => enrollment.program.uuid === program.uuid);
+          return !existingEnrollment || existingEnrollment.dateCompleted !== null;
+        });
+  }, [availablePrograms, enrollments]);
 
   const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -88,13 +101,13 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   const isEnrolledInAllPrograms = useMemo(() => {
-    if (!eligiblePrograms?.length || !enrollments?.length) {
+    if (!availablePrograms?.length || !enrollments?.length) {
       return false;
     }
 
     const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
-    return activeEnrollments.length === eligiblePrograms.length;
-  }, [eligiblePrograms, enrollments]);
+    return activeEnrollments.length === availablePrograms.length;
+  }, [availablePrograms, enrollments]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
