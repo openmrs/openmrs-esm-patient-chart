@@ -148,7 +148,7 @@ describe('VitalsHeader: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+    expect(screen.getByTitle(/abnormal value/i)).toBeInTheDocument();
   });
 
   it('should launch Form Entry vitals and biometrics form', async () => {

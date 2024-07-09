@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import capitalize from 'lodash-es/capitalize';
-import orderBy from 'lodash-es/orderBy';
+import React, { type ReactElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { capitalize, lowerCase } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import {
@@ -21,7 +20,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tag,
   Tooltip,
 } from '@carbon/react';
 import {
@@ -41,17 +39,19 @@ import {
   getDrugOrderByUuid,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { Add, Printer } from '@carbon/react/icons';
 import {
   age,
+  getCoreTranslation,
   getPatientName,
   formatDate,
   useConfig,
   useLayoutType,
   usePagination,
   usePatient,
+  PrinterIcon,
+  AddIcon,
 } from '@openmrs/esm-framework';
-import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
+import { buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
@@ -88,10 +88,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
-  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
+  const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
 
   const {
     data: allOrders,
@@ -102,7 +102,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
 
   // launch respective order basket based on order type
   const openOrderForm = useCallback(
-    (orderItem) => {
+    (orderItem: Order) => {
       switch (orderItem.type) {
         case 'drugorder':
           launchAddDrugOrder();
@@ -163,20 +163,35 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const tableRows = useMemo(() => {
     return allOrders?.map((order) => ({
       id: order.uuid,
+      dateActivated: order.dateActivated,
       orderNumber: order.orderNumber,
       dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
       orderType: capitalize(order.orderType?.display ?? '--'),
       order: order.display,
       priority: (
-        <div style={{ background: orderPriorityToColor(order.urgency), textAlign: 'center', borderRadius: '1rem' }}>
-          {capitalize(order.urgency)}
+        <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
+          {
+            // t('ON_SCHEDULED_DATE', 'On scheduled date')
+            // t('ROUTINE', 'Routine')
+            // t('STAT', 'STAT')
+          }
+          {t(order.urgency, capitalize(order.urgency.replace('_', ' ')))}
         </div>
       ),
       orderedBy: order.orderer?.display,
       status: order.fulfillerStatus ? (
-        <Tag type={orderStatusColor(order.fulfillerStatus)} className={styles.singleLineText}>
-          {order.fulfillerStatus}
-        </Tag>
+        <div className={styles.statusPill} data-status={lowerCase(order.fulfillerStatus.replace('_', ' '))}>
+          {
+            // t('RECEIVED', 'Received')
+            // t('IN_PROGRESS', 'In progress')
+            // t('EXCEPTION', 'Exception')
+            // t('ON_HOLD', 'On hold')
+            // t('DECLINED', 'Declined')
+            // t('COMPLETED', 'Completed')
+            // t('DISCONTINUED', 'Discontinued')
+          }
+          {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replace('_', ' ')))}
+        </div>
       ) : (
         '--'
       ),
@@ -190,40 +205,21 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         />
       ),
     }));
-  }, [allOrders, isPrinting, launchOrderBasket, orders, setOrders, openOrderForm]);
+  }, [allOrders, isPrinting, launchOrderBasket, orders, setOrders, openOrderForm, t]);
 
-  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
-    return sortDirection === sortStates.DESC
-      ? compare(cellB.sortKey, cellA.sortKey)
-      : compare(cellA.sortKey, cellB.sortKey);
-  };
-
-  const sortDate = (myArray, order) =>
-    order === 'ASC'
-      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
-      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
-
-  const { key, order } = sortParams;
-  const sortedData =
-    key === 'dateOfOrder'
-      ? sortDate(tableRows, order)
-      : order === 'DESC'
-      ? orderBy(tableRows, [key], ['desc'])
-      : orderBy(tableRows, [key], ['asc']);
-
-  const { results: paginatedOrders, goTo, currentPage } = usePagination(sortedData, defaultPageSize);
+  const { results: paginatedOrders, goTo, currentPage } = usePagination(tableRows, defaultPageSize);
 
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
         case 'male':
-          return t('male', 'Male');
+          return getCoreTranslation('male');
         case 'female':
-          return t('female', 'Female');
+          return getCoreTranslation('female');
         case 'other':
-          return t('other', 'Other');
+          return getCoreTranslation('other');
         case 'unknown':
-          return t('unknown', 'Unknown');
+          return getCoreTranslation('unknown');
         default:
           return gender;
       }
@@ -241,7 +237,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
       location: patient?.patient?.address?.[0].city,
       identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
     };
-  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
+  }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
   const onBeforeGetContentResolve = useRef(null);
 
@@ -286,7 +282,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           items={[...[{ display: 'All' }], ...orderTypes]}
           selectedItem={orderTypes.find((x) => x.uuid === selectedOrderTypeUuid)}
           itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-          onChange={(e) => {
+          onChange={(e: { selectedItem: Order }) => {
             if (e.selectedItem.display === 'All') {
               setSelectedOrderTypeUuid(null);
               return;
@@ -301,7 +297,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           displayText={
             selectedOrderTypeUuid === null
               ? t('orders', 'Orders')
-              : (orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)).display + 's'
+              : // t('Drug Order_few', 'Drug Orders')
+                // t('Test Order_few', 'Test Orders')
+                t(selectedOrderName, {
+                  count: 3,
+                  default: selectedOrderName,
+                })
           }
           launchForm={launchOrderBasket}
         />
@@ -317,7 +318,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               {showPrintButton && (
                 <Button
                   kind="ghost"
-                  renderIcon={(props) => <Printer size={16} {...props} />}
+                  renderIcon={(props) => <PrinterIcon {...props} size={16} />}
                   iconDescription={t('print', 'Print')}
                   className={styles.printButton}
                   onClick={handlePrint}
@@ -328,7 +329,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               {showAddButton && (
                 <Button
                   kind="ghost"
-                  renderIcon={(props) => <Add size={16} {...props} />}
+                  renderIcon={(props) => <AddIcon {...props} size={16} />}
                   iconDescription={t('launchOrderBasket', 'Launch order basket')}
                   onClick={launchOrderBasket}
                 >
@@ -346,7 +347,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               headers={tableHeaders}
               rows={paginatedOrders}
               isSortable
-              sortRow={sortRow}
               overflowMenuOnHover={false}
               useZebraStyles
             >
@@ -365,32 +365,46 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                     <TableHead>
                       <TableRow>
                         <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                        {headers.map((header) => (
+                        {headers.map((header: { header: string }) => (
                           <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                         ))}
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
-                        <React.Fragment key={row.id}>
-                          <TableExpandRow className={styles.row} {...getRowProps({ row })}>
-                            {row.cells.map((cell) => (
-                              <TableCell className={styles.tableCell} key={cell.id}>
-                                <FormatCellDisplay rowDisplay={cell.value?.content ?? cell.value} />
-                              </TableCell>
-                            ))}
-                          </TableExpandRow>
-                          <TableExpandedRow
-                            colSpan={headers.length + 1}
-                            className="demo-expanded-td"
-                            {...getExpandedRowProps({
-                              row,
-                            })}
-                          >
-                            <ExpandedRowView row={row} />
-                          </TableExpandedRow>
-                        </React.Fragment>
-                      ))}
+                      {rows.map(
+                        (row: {
+                          id: number;
+                          cells: Array<{
+                            id: number;
+                            info: { header: string };
+                            value: ReactNode | { props: { orderItem: Order }; content: string };
+                          }>;
+                        }) => (
+                          <React.Fragment key={row.id}>
+                            <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                              {row.cells.map((cell) => (
+                                <TableCell className={styles.tableCell} key={cell.id}>
+                                  <FormatCellDisplay
+                                    rowDisplay={
+                                      typeof cell.value === 'object' && Object.hasOwn(cell.value, 'content')
+                                        ? cell.value['content']
+                                        : cell.value
+                                    }
+                                  />
+                                </TableCell>
+                              ))}
+                            </TableExpandRow>
+                            <TableExpandedRow
+                              colSpan={headers.length + 1}
+                              {...getExpandedRowProps({
+                                row,
+                              })}
+                            >
+                              <ExpandedRowView row={row} />
+                            </TableExpandedRow>
+                          </React.Fragment>
+                        ),
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -399,8 +413,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
             {!isPrinting && (
               <PatientChartPagination
                 pageNumber={currentPage}
-                totalItems={tableRows?.length}
-                currentItems={paginatedOrders?.length}
+                totalItems={tableRows.length}
+                currentItems={paginatedOrders.length}
                 pageSize={defaultPageSize}
                 onPageNumberChange={({ page }) => goTo(page)}
               />
@@ -412,24 +426,27 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   );
 };
 
-function FormatCellDisplay({ rowDisplay }: { readonly rowDisplay: string }) {
-  return (
-    <>
-      {typeof rowDisplay === 'string' && rowDisplay.length > 20 ? (
-        <Tooltip align="bottom" label={rowDisplay.concat(' test')}>
-          <>{rowDisplay.substring(0, 20).concat('...')}</>
-        </Tooltip>
-      ) : (
-        rowDisplay
-      )}
-    </>
+function FormatCellDisplay({ rowDisplay }: { readonly rowDisplay: string | ReactElement }) {
+  return typeof rowDisplay === 'string' && rowDisplay.length > 20 ? (
+    <Tooltip align="bottom" label={rowDisplay.concat(' test')}>
+      <>{rowDisplay.substring(0, 20).concat('...')}</>
+    </Tooltip>
+  ) : (
+    <>{rowDisplay}</>
   );
 }
 
-function ExpandedRowView({ row }: { readonly row: any }) {
+function ExpandedRowView({
+  row,
+}: {
+  readonly row: { cells: Array<{ info: { header: string }; value: ReactNode | { props: { orderItem: Order } } }> };
+}) {
   const { t } = useTranslation();
   let orderActions = row.cells.find((cell) => cell.info.header === 'actions');
-  let orderItem = orderActions.value?.props?.orderItem;
+  let orderItem =
+    typeof orderActions.value === 'object' && Object.hasOwn(orderActions.value, 'props')
+      ? orderActions.value?.['props']?.orderItem
+      : undefined;
 
   if (orderItem.type == 'drugorder') {
     return <MedicationRecord medication={orderItem} />;
@@ -495,7 +512,7 @@ function OrderBasketItemActions({
 
   return (
     <OverflowMenu
-      ariaLabel="Actions menu"
+      ariaLabel={t('actionsMenu', 'Actions Menu')}
       selectorPrimaryFocus={'#modify'}
       flipped
       size={isTablet ? 'lg' : 'md'}

@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -67,7 +68,7 @@ describe('BiometricsOverview: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.findByRole('heading', { name: /biometrics/i }));
+    await screen.findByRole('heading', { name: /biometrics/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
@@ -89,7 +90,7 @@ describe('BiometricsOverview: ', () => {
     await waitForLoadingToFinish();
 
     await screen.findByRole('heading', { name: /biometrics/i });
-    await screen.findByRole('table', { name: /biometrics/i });
+    screen.getByRole('table', { name: /biometrics/i });
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
