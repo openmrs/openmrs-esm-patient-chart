@@ -39,20 +39,27 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     defaultValues: {},
   });
 
-  if (!isLoadingEncounter && encounter?.obs.length > 0 && !isEditing) {
-    setObsUuid(encounter.obs.find((obs) => obs.order?.uuid === order.uuid).uuid);
-    setIsEditing(true);
-  }
-
-  if (isEditing && !obsUuid) {
-    setIsLoadingInitialValues(true);
-    fetchObservation(obsUuid).then((data) => {
-      if (data) {
-        setInitialValues(data);
+  useEffect(() => {
+    if (!isLoadingEncounter && encounter?.obs && encounter.obs.length > 0 && !isEditing) {
+      const matchingObs = encounter.obs.find((obs) => obs.order?.uuid === order.uuid);
+      if (matchingObs) {
+        setObsUuid(matchingObs.uuid);
+        setIsEditing(true);
       }
-      setIsLoadingInitialValues(false);
-    });
-  }
+    }
+  }, [isLoadingEncounter, encounter, order.uuid, isEditing]);
+
+  useEffect(() => {
+    if (isEditing && obsUuid) {
+      setIsLoadingInitialValues(true);
+      fetchObservation(obsUuid).then((data) => {
+        if (data) {
+          setInitialValues(data);
+        }
+        setIsLoadingInitialValues(false);
+      });
+    }
+  }, [isEditing, obsUuid]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
