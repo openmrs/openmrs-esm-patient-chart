@@ -86,16 +86,19 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }, [enrollments, t]);
 
   const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
-  const noCompletedPrograms = useMemo(() => {
-    return enrollments?.every((program) => !program.dateCompleted);
-  }, [enrollments]);
+
+  const isEnrolledInAllPrograms = useMemo(() => {
+    if (!eligiblePrograms?.length || !enrollments?.length) {
+      return false;
+    }
+
+    const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
+    return activeEnrollments.length === eligiblePrograms.length;
+  }, [eligiblePrograms, enrollments]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (enrollments?.length) {
-    const showInlineNotification =
-      availablePrograms?.length && eligiblePrograms?.length === 0 && noCompletedPrograms && !hideAddProgramButton;
-
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -106,13 +109,13 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add programs"
               onClick={launchProgramsForm}
-              disabled={availablePrograms?.length && eligiblePrograms?.length === 0 && noCompletedPrograms}
+              disabled={isEnrolledInAllPrograms}
             >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
-        {showInlineNotification && (
+        {isEnrolledInAllPrograms && (
           <InlineNotification
             style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
             kind={'info'}
