@@ -134,8 +134,8 @@ describe('ProgramsForm', () => {
       },
     };
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValue({ data: { results: mockCareProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValue({ data: { results: mockEnrolledProgramsResponse } });
     mockCreateProgramEnrollment.mockRejectedValueOnce(error);
 
     renderProgramsForm();
