@@ -171,7 +171,7 @@ const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: Pri
           {getCoreTranslation('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
         </p>
         <p>
-          {getCoreTranslation('dob', 'DOB')}: <strong>{patientDetails.dateOfBirth}</strong>
+          {t('dob', 'DOB')}: <strong>{patientDetails.dateOfBirth}</strong>
         </p>
         <p>
           {getCoreTranslation('age', 'Age')}: <strong>{patientDetails.age}</strong>
