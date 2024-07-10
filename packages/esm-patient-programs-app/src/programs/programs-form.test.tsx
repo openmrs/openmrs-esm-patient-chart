@@ -1,51 +1,42 @@
 import React from 'react';
-import { throwError } from 'rxjs';
-import { of } from 'rxjs/internal/observable/of';
-import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createErrorHandler, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { render, screen } from '@testing-library/react';
+import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { mockPatient } from 'tools';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { createProgramEnrollment, updateProgramEnrollment } from './programs.resource';
-import { mockPatient } from 'tools';
 import ProgramsForm from './programs-form.workspace';
 
-const testProps = {
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  patientUuid: mockPatient.id,
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-};
-
-const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockUpdateProgramEnrollment = updateProgramEnrollment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
+const mockCloseWorkspaceWithSavedChanges = jest.fn();
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  showSnackbar: jest.fn(),
+  useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
+}));
 
-  return {
-    ...originalModule,
-    createErrorHandler: jest.fn(),
-    showSnackbar: jest.fn(),
-    useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
-  };
-});
-
-jest.mock('./programs.resource', () => {
-  const originalModule = jest.requireActual('./programs.resource');
-
-  return {
-    ...originalModule,
-    createProgramEnrollment: jest.fn(),
-    updateProgramEnrollment: jest.fn(),
-  };
-});
+jest.mock('./programs.resource', () => ({
+  ...jest.requireActual('./programs.resource'),
+  createProgramEnrollment: jest.fn(),
+  updateProgramEnrollment: jest.fn(),
+  useEnrollments: jest.fn().mockReturnValue({
+    data: mockEnrolledProgramsResponse,
+    isLoading: false,
+    isError: false,
+    mutateEnrollments: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 describe('ProgramsForm', () => {
-  xit('renders a success toast notification upon successfully recording a program enrollment', async () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders a success toast notification upon successfully recording a program enrollment', async () => {
     const user = userEvent.setup();
 
     const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
@@ -53,18 +44,21 @@ describe('ProgramsForm', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
-    mockCreateProgramEnrollment.mockReturnValueOnce(of({ status: 201, statusText: 'Created' }));
+    mockCreateProgramEnrollment.mockResolvedValueOnce({ status: 201, statusText: 'Created' });
 
     renderProgramsForm();
 
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const enrollmentDateInput = screen.getByRole('textbox', { name: /date enrolled/i });
+    const enrollmentLocationInput = screen.getByRole('combobox', { name: /enrollment location/i });
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
-    const enrollmentDateInput = screen.getAllByRole('textbox', { name: '' })[0];
-    const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
-    const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
+
+    await user.click(enrollButton);
+    expect(screen.getByText(/programrequired/i)).toBeInTheDocument();
 
     await user.type(enrollmentDateInput, '2020-05-05');
-    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
-    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(enrollmentLocationInput, [inpatientWardUuid]);
 
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
 
@@ -81,34 +75,27 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
+    expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      isLowContrast: true,
       subtitle: 'It is now visible in the Programs table',
       kind: 'success',
       title: 'Program enrollment saved',
     });
   });
 
-  xit('updates a program enrollment', async () => {
+  it('updates a program enrollment', async () => {
     const user = userEvent.setup();
 
     renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
 
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
-    const dateCompletedGroup = screen.getByRole('group', { name: /Date completed/i });
-    const dateCompletedInput = within(dateCompletedGroup).getByRole('textbox');
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
 
-    mockUpdateProgramEnrollment.mockReturnValueOnce(of({ status: 200, statusText: 'OK' }));
+    mockUpdateProgramEnrollment.mockResolvedValueOnce({ status: 200, statusText: 'OK' });
 
-    await user.type(dateCompletedInput, '05/05/2020');
-
-    expect(dateCompletedInput).toHaveValue('05/05/2020');
-
+    await user.type(completionDateInput, '05/05/2020');
     await user.tab();
-
-    expect(enrollButton).toBeEnabled();
-
     await user.click(enrollButton);
 
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledTimes(1);
@@ -126,7 +113,6 @@ describe('ProgramsForm', () => {
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
-        isLowContrast: true,
         subtitle: 'Changes to the program are now visible in the Programs table',
         kind: 'success',
         title: 'Program enrollment updated',
@@ -134,7 +120,7 @@ describe('ProgramsForm', () => {
     );
   });
 
-  xit('renders an error notification if there was a problem recording a program enrollment', async () => {
+  it('renders an error notification if there was a problem recording a program enrollment', async () => {
     const user = userEvent.setup();
 
     const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
@@ -150,27 +136,25 @@ describe('ProgramsForm', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
-    mockCreateProgramEnrollment.mockReturnValueOnce(throwError(error));
+    mockCreateProgramEnrollment.mockRejectedValueOnce(error);
 
     renderProgramsForm();
 
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const enrollmentDateInput = screen.getByRole('textbox', { name: /date enrolled/i });
+    const enrollmentLocationInput = screen.getByRole('combobox', { name: /enrollment location/i });
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
-    const enrollmentDateInput = screen.getAllByRole('textbox', { name: '' })[0];
-    const selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
-    const selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];
 
     await user.type(enrollmentDateInput, '2020-05-05');
-    await user.selectOptions(selectProgramInput, [oncologyScreeningProgramUuid]);
-    await user.selectOptions(selectLocationInput, [inpatientWardUuid]);
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.selectOptions(enrollmentLocationInput, [inpatientWardUuid]);
 
     expect(enrollButton).toBeEnabled();
 
     await user.click(enrollButton);
 
-    expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      isLowContrast: false,
-      subtitle: 'Internal Server Error',
+      subtitle: 'An unknown error occurred',
       kind: 'error',
       title: 'Error saving program enrollment',
     });
@@ -178,5 +162,13 @@ describe('ProgramsForm', () => {
 });
 
 function renderProgramsForm(programEnrollmentUuidToEdit?: string) {
+  const testProps = {
+    closeWorkspace: jest.fn(),
+    closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
+    patientUuid: mockPatient.id,
+    promptBeforeClosing: jest.fn(),
+    setTitle: jest.fn(),
+  };
+
   render(<ProgramsForm {...testProps} programEnrollmentId={programEnrollmentUuidToEdit} />);
 }
