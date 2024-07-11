@@ -42,6 +42,13 @@ jest.mock('./conditions.resource', () => {
     ...originalModule,
     createCondition: jest.fn(),
     editCondition: jest.fn(),
+    useConditions: jest.fn().mockReturnValue({
+      conditions: [],
+      error: false,
+      isLoading: false,
+      mutate: jest.fn().mockResolvedValue(undefined),
+    }),
+
     useConditionsSearch: jest.fn().mockImplementation(() => ({
       conditions: [],
       error: null,
@@ -146,13 +153,12 @@ describe('Conditions form', () => {
     await user.type(onsetDateInput, '2020-05-05');
     await user.click(submitButton);
 
-    // TODO: Figure out why the following assertions are flaky
-    // expect(mockShowSnackbar).toHaveBeenCalled();
-    // expect(mockShowSnackbar).toHaveBeenCalledWith({
-    //   kind: 'success',
-    //   subtitle: 'It is now visible on the Conditions page',
-    //   title: 'Condition saved',
-    // });
+    expect(mockShowSnackbar).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'success',
+      subtitle: 'It is now visible on the Conditions page',
+      title: 'Condition saved',
+    });
   });
 
   it('renders an error notification if there was a problem recording a condition', async () => {
@@ -215,13 +221,12 @@ describe('Conditions form', () => {
     expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
 
-    // TODO: Figure out why the following assertions are flaky
-    // expect(mockShowSnackbar).toHaveBeenCalled();
-    // expect(mockShowSnackbar).toHaveBeenCalledWith({
-    //   kind: 'success',
-    //   subtitle: 'It is now visible on the Conditions page',
-    //   title: 'Condition saved',
-    // });
+    expect(mockShowSnackbar).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'success',
+      subtitle: 'It is now visible on the Conditions page',
+      title: 'Condition saved',
+    });
   });
 
   it('launching the form with an existing condition prepopulates the form with the condition details', async () => {

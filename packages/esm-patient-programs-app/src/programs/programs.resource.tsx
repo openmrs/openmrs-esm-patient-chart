@@ -72,7 +72,7 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   if (!payload && !payload.program) {
     return null;
   }
-  const { program, dateEnrolled, dateCompleted, location } = payload;
+  const { dateEnrolled, dateCompleted, location } = payload;
   return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {

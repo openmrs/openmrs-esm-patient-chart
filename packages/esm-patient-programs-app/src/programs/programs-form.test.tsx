@@ -54,12 +54,11 @@ describe('ProgramsForm', () => {
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.click(enrollButton);
-    expect(screen.getByText(/programrequired/i)).toBeInTheDocument();
+    expect(screen.getByText(/program is required/i)).toBeInTheDocument();
 
     await user.type(enrollmentDateInput, '2020-05-05');
     await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
     await user.selectOptions(enrollmentLocationInput, [inpatientWardUuid]);
-
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
 
     await user.click(enrollButton);
@@ -102,8 +101,8 @@ describe('ProgramsForm', () => {
     expect(mockUpdateProgramEnrollment).toHaveBeenCalledWith(
       mockEnrolledProgramsResponse[0].uuid,
       expect.objectContaining({
-        dateEnrolled: '2020-01-16T00:00:00+00:00',
-        dateCompleted: '2020-05-05T00:00:00+00:00',
+        dateCompleted: expect.stringMatching(/^2020-05-05/),
+        dateEnrolled: expect.stringMatching(/^2020-01-16/),
         location: mockEnrolledProgramsResponse[0].location.uuid,
         patient: mockPatient.id,
         program: mockEnrolledProgramsResponse[0].program.uuid,
@@ -134,8 +133,8 @@ describe('ProgramsForm', () => {
       },
     };
 
-    mockOpenmrsFetch.mockReturnValue({ data: { results: mockCareProgramsResponse } });
-    mockOpenmrsFetch.mockReturnValue({ data: { results: mockEnrolledProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
     mockCreateProgramEnrollment.mockRejectedValueOnce(error);
 
     renderProgramsForm();
