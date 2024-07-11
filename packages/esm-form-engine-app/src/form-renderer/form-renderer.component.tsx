@@ -72,7 +72,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   }
 
   return (
-    <>
+    <div className={styles.accordion__wrapper_override}>
       {schema && (
         <FormEngine
           encounterUUID={encounterUuid}
@@ -87,7 +87,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           visit={visit}
         />
       )}
-    </>
+    </div>
   );
 };
 

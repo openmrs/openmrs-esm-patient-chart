@@ -16,3 +16,10 @@
 .errorContainer {
   height: 100vh;
 }
+
+.accordion__wrapper_override {
+  // TODO: try removing this after carbon upgrade PR is merged.
+  :global(.cds--accordion__wrapper) {
+    max-block-size: unset !important;
+  }
+}
