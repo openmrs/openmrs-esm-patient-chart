@@ -72,7 +72,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   }
 
   return (
-    <div className={styles.accordion__wrapper_override}>
+    <div className={styles.formEngineContainer}>
       {schema && (
         <FormEngine
           encounterUUID={encounterUuid}
