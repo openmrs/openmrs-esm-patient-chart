@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
 import {
   Button,
   ButtonSet,
@@ -33,14 +35,13 @@ interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
   programEnrollmentId?: string;
 }
 
-const createProgramsFormSchema = (t: TFunction) => {
-  return z.object({
+const createProgramsFormSchema = (t: TFunction) =>
+  z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
     completionDate: z.date().nullable(),
     enrollmentLocation: z.string(),
   });
-};
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 
@@ -71,11 +72,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const eligiblePrograms = currentProgram
     ? [currentProgram]
-    : filter(availablePrograms, (program) => {
-        const existingEnrollment = enrollments.find((e) => e.program.uuid === program.uuid);
-
-        return !existingEnrollment || existingEnrollment.dateCompleted !== null;
-      });
+    : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
 
   const getLocationUuid = () => {
     if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
