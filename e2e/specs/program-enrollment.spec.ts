@@ -26,7 +26,7 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await expect(page.getByText('Record program enrollment', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I select the program named `Hiv Care and Treatment`', async () => {
+  await test.step('When I select the program named `HIV Care and Treatment`', async () => {
     await page.locator('#program').selectOption('64f950e6-1b07-4ac0-8e7e-f3e148f3463f');
   });
 
