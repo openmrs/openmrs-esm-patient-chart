@@ -57,126 +57,124 @@ export interface DrugOrderFormProps {
   promptBeforeClosing: (testFcn: () => boolean) => void;
 }
 
-const comboSchema = {
-  value: z.string(),
-  valueCoded: z.string(),
-  default: z.boolean().optional(),
-};
+const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean) => {
+  const comboSchema = {
+    value: z.string(),
+    valueCoded: z.string(),
+    default: z.boolean().optional(),
+  };
 
-const schemaFields = {
-  // t( 'freeDosageErrorMessage', 'Add free dosage note')
-  freeTextDosage: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'freeDosageErrorMessage', 'Add free dosage note'),
-  }),
-
-  // t( 'dosageRequiredErrorMessage', 'A dosage is required' )
-  dosage: z.number({
-    invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'A dosage is required'),
-  }),
-
-  // t( 'selectUnitErrorMessage', 'Please select a unit' )
-  unit: z.object(
-    { ...comboSchema },
-    {
-      invalid_type_error: translateFrom(moduleName, 'selectUnitErrorMessage', 'Please select a unit'),
-    },
-  ),
-
-  // t( 'selectRouteErrorMessage', 'Please select a route' )
-  route: z.object(
-    { ...comboSchema },
-    {
-      invalid_type_error: translateFrom(moduleName, 'selectRouteErrorMessage', 'Please select a route'),
-    },
-  ),
-
-  patientInstructions: z.string().nullable(),
-  asNeeded: z.boolean(),
-  asNeededCondition: z.string().nullable(),
-  duration: z.number().nullable(),
-  durationUnit: z.object({ ...comboSchema }).nullable(),
-  // t( 'pillDispensedErrorMessage', 'The quantity to dispense is required' )
-  pillsDispensed: z
-    .number({
-      invalid_type_error: translateFrom(
-        moduleName,
-        'pillDispensedErrorMessage',
-        'The quantity to dispense is required',
-      ),
-    })
-    .nullable(),
-  // t( 'selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit' )
-  quantityUnits: z
-    .object(
+  const baseSchemaFields = {
+    // t('freeDosageErrorMessage', 'Add free dosage note')
+    freeTextDosage: z.string().refine((value) => !!value, {
+      message: translateFrom(moduleName, 'freeDosageErrorMessage', 'Add free dosage note'),
+    }),
+    // t('dosageRequiredErrorMessage', 'A dosage is required')
+    dosage: z.number({
+      invalid_type_error: translateFrom(moduleName, 'dosageRequiredErrorMessage', 'A dosage is required'),
+    }),
+    // t('selectUnitErrorMessage', 'Please select a unit')
+    unit: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: translateFrom(
-          moduleName,
-          'selectQuantityUnitsErrorMessage',
-          'Dispensing requires a quantity unit',
-        ),
+        invalid_type_error: translateFrom(moduleName, 'selectUnitErrorMessage', 'Please select a unit'),
       },
-    )
-    .nullable(),
-  numRefills: z.number().nullable(),
-  // t( 'indicationErrorMessage', 'Please add an indication' )
-  indication: z.string().refine((value) => value !== '', {
-    message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
-  }),
-  startDate: z.date(),
-  // t( 'selectFrequencyErrorMessage', 'Please select a frequency' )
-  frequency: z.object(
-    { ...comboSchema },
-    {
-      invalid_type_error: translateFrom(moduleName, 'selectFrequencyErrorMessage', 'Please select a frequency'),
-    },
-  ),
-  requireOutpatientQuantity: z.boolean().optional(),
-};
+    ),
+    // t('selectRouteErrorMessage', 'Please select a route')
+    route: z.object(
+      { ...comboSchema },
+      {
+        invalid_type_error: translateFrom(moduleName, 'selectRouteErrorMessage', 'Please select a route'),
+      },
+    ),
+    patientInstructions: z.string().nullable(),
+    asNeeded: z.boolean(),
+    asNeededCondition: z.string().nullable(),
+    duration: z.number().nullable(),
+    durationUnit: z.object({ ...comboSchema }).nullable(),
+    // t('indicationErrorMessage', 'Please add an indication')
+    indication: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'indicationErrorMessage', 'Please add an indication'),
+    }),
+    startDate: z.date(),
+    // t('selectFrequencyErrorMessage', 'Please select a frequency')
+    frequency: z.object(
+      { ...comboSchema },
+      {
+        invalid_type_error: translateFrom(moduleName, 'selectFrequencyErrorMessage', 'Please select a frequency'),
+      },
+    ),
+  };
 
-const medicationOrderFormSchema = z
-  .discriminatedUnion('isFreeTextDosage', [
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(false),
-      freeTextDosage: z.string().optional(),
-    }),
-    z.object({
-      ...schemaFields,
-      isFreeTextDosage: z.literal(true),
-      dosage: z.number().nullable(),
-      unit: z.object({ ...comboSchema }).nullable(),
-      route: z.object({ ...comboSchema }).nullable(),
-      frequency: z.object({ ...comboSchema }).nullable(),
-    }),
-  ])
-  .superRefine((formValues, ctx) => {
-    if (formValues.requireOutpatientQuantity === true) {
-      if (!z.number().safeParse(formValues.pillsDispensed).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['pillsDispensed'],
+  const outpatientDrugOrderFields = {
+    // t('pillDispensedErrorMessage', 'The quantity to dispense is required')
+    pillsDispensed: z
+      .number()
+      .nullable()
+      .refine(
+        (value) => {
+          if (requireOutpatientQuantity && !value) {
+            return false;
+          }
+          return true;
+        },
+        {
           message: translateFrom(moduleName, 'pillDispensedErrorMessage', 'The quantity to dispense is required'),
-        });
-      }
-      if (!z.object({ ...comboSchema }).safeParse(formValues.quantityUnits).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['quantityUnits'],
+        },
+      ),
+    // t('selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit')
+    quantityUnits: z
+      .object(comboSchema)
+      .nullable()
+      .refine(
+        (value) => {
+          if (requireOutpatientQuantity && !value) {
+            return false;
+          }
+          return true;
+        },
+        {
           message: translateFrom(moduleName, 'selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit'),
-        });
-      }
-      if (!z.number().safeParse(formValues.numRefills).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['numRefills'],
+        },
+      ),
+    // t('numRefillsErrorMessage', 'The number of refills is required' )
+    numRefills: z
+      .number()
+      .nullable()
+      .refine(
+        (value) => {
+          if (requireOutpatientQuantity && !value) {
+            return false;
+          }
+          return true;
+        },
+        {
           message: translateFrom(moduleName, 'numRefillsErrorMessage', 'The number of refills is required'),
-        });
-      }
-    }
+        },
+      ),
+  };
+
+  const nonFreeTextDosageSchema = z.object({
+    ...baseSchemaFields,
+    ...outpatientDrugOrderFields,
+    isFreeTextDosage: z.literal(false),
+    freeTextDosage: z.string().optional(),
   });
 
-type MedicationOrderFormData = z.infer<typeof medicationOrderFormSchema>;
+  const freeTextDosageSchema = z.object({
+    ...baseSchemaFields,
+    ...outpatientDrugOrderFields,
+    isFreeTextDosage: z.literal(true),
+    dosage: z.number().nullable(),
+    unit: z.object(comboSchema).nullable(),
+    route: z.object(comboSchema).nullable(),
+    frequency: z.object(comboSchema).nullable(),
+  });
+
+  return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
+};
+
+type MedicationOrderFormData = z.infer<ReturnType<typeof createMedicationOrderFormSchema>>;
 
 function MedicationInfoHeader({
   orderBasketItem,
@@ -237,6 +235,11 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
+  const medicationOrderFormSchema = useMemo(
+    () => createMedicationOrderFormSchema(requireOutpatientQuantity),
+    [requireOutpatientQuantity],
+  );
+
   const {
     control,
     formState: { isDirty },
@@ -264,7 +267,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
       startDate: defaultStartDate,
-      requireOutpatientQuantity: requireOutpatientQuantity,
     },
   });
 

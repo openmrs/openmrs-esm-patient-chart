@@ -137,7 +137,8 @@ export function prepMedicationOrderPostData(
  * and number of refills for outpatient drug orders.
  *
  * @returns {Object} An object containing:
- * - requireOutpatientQuantity: A boolean indicating if outpatient quantity is required.
+ * - requireOutpatientQuantity: A boolean indicating whether to require quantity, quantity units,
+ * and number of refills for outpatient drug orders.
  * - error: Any error encountered during the fetch operation.
  * - isLoading: A boolean indicating if the fetch operation is in progress.
  */
