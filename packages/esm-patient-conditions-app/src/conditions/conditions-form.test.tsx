@@ -21,9 +21,9 @@ const testProps = {
   setTitle: jest.fn(),
 };
 
-const mockCreateCondition = createCondition as jest.Mock;
-const mockUseConditionsSearch = useConditionsSearch as jest.Mock;
-const mockShowSnackbar = showSnackbar as jest.Mock;
+const mockCreateCondition = jest.mocked(createCondition);
+const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
+const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -35,16 +35,22 @@ jest.mock('./conditions.resource', () => ({
   ...jest.requireActual('./conditions.resource'),
   createCondition: jest.fn(),
   editCondition: jest.fn(),
-  useConditionsSearch: jest.fn().mockImplementation(() => ({
-    conditions: [],
-    error: null,
-    isSearching: false,
-  })),
+  useConditionsSearch: jest.fn(),
 }));
 
 describe('Conditions form', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: [],
+      error: null,
+      isSearching: false,
+    });
+
+    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
   });
 
   it('renders the conditions form with all the relevant fields and values', () => {
@@ -115,8 +121,6 @@ describe('Conditions form', () => {
   it('renders a success notification upon successfully recording a condition', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
-    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' });
     mockUseConditionsSearch.mockReturnValue({
       searchResults: searchedCondition,
       error: null,
@@ -142,17 +146,23 @@ describe('Conditions form', () => {
     await user.type(onsetDateInput, '2020-05-05');
     await user.click(submitButton);
 
-    // TODO: Figure out why the following assertions are flaky
-    // expect(mockShowSnackbar).toHaveBeenCalled();
-    // expect(mockShowSnackbar).toHaveBeenCalledWith({
-    //   kind: 'success',
-    //   subtitle: 'It is now visible on the Conditions page',
-    //   title: 'Condition saved',
-    // });
+    expect(mockShowSnackbar).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      kind: 'success',
+      subtitle: 'It is now visible on the Conditions page',
+      title: 'Condition saved',
+    });
   });
 
   it('renders an error notification if there was a problem recording a condition', async () => {
     const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+
     renderConditionsForm();
 
     const submitButton = screen.getByRole('button', { name: /save & close/i });
@@ -168,7 +178,7 @@ describe('Conditions form', () => {
       },
     };
 
-    mockCreateCondition.mockImplementation(() => Promise.reject(error));
+    mockCreateCondition.mockRejectedValue(error);
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
     await user.type(onsetDateInput, '2020-05-05');
@@ -181,13 +191,15 @@ describe('Conditions form', () => {
   it('validates the form against the provided zod schema before submitting it', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
-    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' });
     mockUseConditionsSearch.mockReturnValue({
       searchResults: searchedCondition,
       error: null,
       isSearching: false,
     });
+    mockOpenmrsFetch.mockResolvedValue({
+      data: mockFhirConditionsResponse,
+      mutate: Promise.resolve(undefined),
+    } as unknown as FetchResponse);
 
     renderConditionsForm();
 
@@ -238,7 +250,7 @@ describe('Conditions form', () => {
     mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
     renderConditionsForm();
 
-    expect(screen.queryByRole('searchbox', { name: /Enter condition/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('searchbox', { name: /enter condition/i })).not.toBeInTheDocument();
 
     const inactiveStatusInput = screen.getByLabelText(/inactive/i);
     const submitButton = screen.getByRole('button', { name: /save & close/i });
