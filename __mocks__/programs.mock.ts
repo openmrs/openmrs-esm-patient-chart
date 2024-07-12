@@ -50,6 +50,10 @@ export const mockEnrolledProgramsResponse = [
       uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
       name: 'HIV Care and Treatment',
       allWorkflows: [],
+      concept: {
+        uuid: '70724784-438a-490e-a581-68b7d1f8f47f',
+        display: 'Human immunodeficiency virus (HIV) disease',
+      },
     },
     display: 'HIV Care and Treatment',
     location: {
@@ -68,6 +72,10 @@ export const mockEnrolledInAllProgramsResponse = [
       uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
       name: 'HIV Care and Treatment',
       allWorkflows: [],
+      concept: {
+        uuid: '70724784-438a-490e-a581-68b7d1f8f47f',
+        display: 'Human immunodeficiency virus (HIV) disease',
+      },
     },
     display: 'HIV Care and Treatment',
     location: {
