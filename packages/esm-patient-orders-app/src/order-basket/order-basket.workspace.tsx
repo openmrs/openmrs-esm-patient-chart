@@ -32,7 +32,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     activeVisitRequired,
     isLoading: isLoadingEncounterUuid,
     encounterUuid,
-    isOrderencounterType,
+    isOrderEncounterType,
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
   } = useOrderEncounter(patientUuid);
@@ -55,7 +55,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     const abortController = new AbortController();
     setCreatingEncounterError('');
     let orderEncounterUuid;
-    orderEncounterUuid = isOrderencounterType ? encounterUuid : orderEncounterUuid;
+    orderEncounterUuid = isOrderEncounterType ? encounterUuid : orderEncounterUuid;
     setIsSavingOrders(true);
     // If there's no encounter present, create an encounter along with the orders.
     if (!orderEncounterUuid) {
@@ -104,7 +104,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     orders,
     patientUuid,
     session,
-    isOrderencounterType,
+    isOrderEncounterType,
     t,
   ]);
 

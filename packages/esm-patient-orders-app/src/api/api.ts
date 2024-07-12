@@ -45,7 +45,7 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
 export function useOrderEncounter(patientUuid: string): {
   activeVisitRequired: boolean;
   isLoading: boolean;
-  isOrderencounterType: boolean;
+  isOrderEncounterType: boolean;
   error: Error;
   encounterUuid: string;
   mutate: Function;
@@ -70,7 +70,7 @@ export function useOrderEncounter(patientUuid: string): {
         isLoading: isLoadingSystemVisitSetting,
         error: errorFetchingSystemVisitSetting,
         encounterUuid: null,
-        isOrderencounterType: false,
+        isOrderEncounterType: false,
         mutate: () => {},
       };
     }
@@ -79,7 +79,8 @@ export function useOrderEncounter(patientUuid: string): {
           activeVisitRequired: true,
           isLoading: visit?.isLoading,
           encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
-          isOrderencounterType: visit?.currentVisit?.encounters?.[0]?.encounterType?.uuid == config?.orderEncounterType,
+          isOrderEncounterType:
+            visit?.currentVisit?.encounters?.[0]?.encounterType?.uuid === config?.orderEncounterType,
           error: visit?.error,
           mutate: visit?.mutate,
         }
@@ -87,8 +88,8 @@ export function useOrderEncounter(patientUuid: string): {
           activeVisitRequired: false,
           isLoading: todayEncounter?.isLoading,
           encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
-          isOrderencounterType:
-            todayEncounter?.data?.data?.results?.[0]?.encounterType?.uuid == config?.orderEncounterType,
+          isOrderEncounterType:
+            todayEncounter?.data?.data?.results?.[0]?.encounterType?.uuid === config?.orderEncounterType,
           error: todayEncounter?.error,
           mutate: todayEncounter?.mutate,
         };
