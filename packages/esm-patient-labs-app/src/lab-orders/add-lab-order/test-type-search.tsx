@@ -103,7 +103,13 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
           )}
           <div className={styles.resultsContainer}>
             {testTypes.map((testType) => (
-              <TestTypeSearchResultItem key={testType.conceptUuid} testType={testType} openOrderForm={openOrderForm} />
+              <>
+                <TestTypeSearchResultItem
+                  key={testType.conceptUuid}
+                  testType={testType}
+                  openOrderForm={openOrderForm}
+                />
+              </>
             ))}
           </div>
         </div>
