@@ -1,9 +1,8 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/type';
+@use '@carbon/layout';
 @use '@carbon/colors';
 @import '@openmrs/esm-styleguide/src/vars';
 @import "../../root";
-
 
 .orderForm {
   flex-grow: 1;
@@ -16,15 +15,15 @@
   }
 
   :global(.cds--css-grid-column) {
-    margin: 0 spacing.$spacing-03 !important;
+    margin: 0 !important;
   }
 
   :global(.cds--subgrid) {
-    margin: 0 calc(spacing.$spacing-03 * -1) !important;
+    margin: 0 calc(layout.$spacing-03 * -1) !important;
   }
 
   :global(.cds--number--nosteppers.cds--number input[type=number]) {
-    padding-right: spacing.$spacing-05;
+    padding-right: layout.$spacing-05;
   }
 
   :global(.cds--number__control-btn) {
@@ -33,7 +32,7 @@
 }
 
 .form {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .gridRow {
@@ -45,7 +44,7 @@
 }
 
 .field {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .buttonSet {
@@ -71,7 +70,7 @@
   }
 
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
+    padding: layout.$spacing-06 layout.$spacing-05;
     background-color: $ui-02;
   }
 

@@ -16,7 +16,6 @@ export interface TestTypeSearchProps {
 
 export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
@@ -103,13 +102,9 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
           )}
           <div className={styles.resultsContainer}>
             {testTypes.map((testType) => (
-              <>
-                <TestTypeSearchResultItem
-                  key={testType.conceptUuid}
-                  testType={testType}
-                  openOrderForm={openOrderForm}
-                />
-              </>
+              <React.Fragment key={testType.conceptUuid}>
+                <TestTypeSearchResultItem testType={testType} openOrderForm={openOrderForm} />
+              </React.Fragment>
             ))}
           </div>
         </div>
@@ -216,28 +211,26 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
 const TestTypeSearchSkeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
-  const tileClassName = `${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-    styles.skeletonTile
-  }`;
+  const tileClassName = classNames({
+    [styles.tabletSearchResultTile]: isTablet,
+    [styles.desktopSearchResultTile]: !isTablet,
+    [styles.skeletonTile]: true,
+  });
+  const buttonSize = isTablet ? 'md' : 'sm';
+  const dividerClassName = classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider);
+
   return (
     <div className={styles.searchResultSkeletonWrapper}>
       <div className={styles.orderBasketSearchResultsHeader}>
         <SkeletonText className={styles.searchResultCntSkeleton} />
-        <ButtonSkeleton size={isTablet ? 'md' : 'sm'} />
+        <ButtonSkeleton size={buttonSize} />
       </div>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
+      {[...Array(4)].map((_, index) => (
+        <Tile key={index} className={tileClassName}>
+          <SkeletonText />
+        </Tile>
+      ))}
+      <hr className={dividerClassName} />
     </div>
   );
 };
