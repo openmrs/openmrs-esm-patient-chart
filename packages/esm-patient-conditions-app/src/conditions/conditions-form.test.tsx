@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
@@ -146,7 +146,9 @@ describe('Conditions form', () => {
     await user.type(onsetDateInput, '2020-05-05');
     await user.click(submitButton);
 
-    expect(mockShowSnackbar).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalled();
+    });
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'It is now visible on the Conditions page',
@@ -223,7 +225,9 @@ describe('Conditions form', () => {
     expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
 
-    expect(mockShowSnackbar).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalled();
+    });
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'It is now visible on the Conditions page',
