@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, useConfig, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
 import { useSystemVisitSetting, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -44,11 +45,13 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
 export function useOrderEncounter(patientUuid: string): {
   activeVisitRequired: boolean;
   isLoading: boolean;
+  isOrderencounterType: boolean;
   error: Error;
   encounterUuid: string;
   mutate: Function;
 } {
   const { systemVisitEnabled, isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting } = useSystemVisitSetting();
+  const config = useConfig<ConfigObject>();
 
   const now = new Date();
   const nowDateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
@@ -67,6 +70,7 @@ export function useOrderEncounter(patientUuid: string): {
         isLoading: isLoadingSystemVisitSetting,
         error: errorFetchingSystemVisitSetting,
         encounterUuid: null,
+        isOrderencounterType: false,
         mutate: () => {},
       };
     }
@@ -75,6 +79,7 @@ export function useOrderEncounter(patientUuid: string): {
           activeVisitRequired: true,
           isLoading: visit?.isLoading,
           encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
+          isOrderencounterType: visit?.currentVisit?.encounters?.[0]?.encounterType?.uuid == config?.orderEncounterType,
           error: visit?.error,
           mutate: visit?.mutate,
         }
@@ -82,9 +87,11 @@ export function useOrderEncounter(patientUuid: string): {
           activeVisitRequired: false,
           isLoading: todayEncounter?.isLoading,
           encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
+          isOrderencounterType:
+            todayEncounter?.data?.data?.results?.[0]?.encounterType?.uuid == config?.orderEncounterType,
           error: todayEncounter?.error,
           mutate: todayEncounter?.mutate,
         };
-  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
+  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled, config]);
   return results;
 }
