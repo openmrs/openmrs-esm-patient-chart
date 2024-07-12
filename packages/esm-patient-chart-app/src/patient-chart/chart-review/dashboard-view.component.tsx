@@ -52,19 +52,6 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
     [patient, patientUuid, view],
   );
 
-  const wrapItem = useCallback(
-    (slot: ReactNode, extension: ExtensionData) => {
-      const { fullWidth = false } = widgetMetas[getExtensionNameFromId(extension.extensionId)];
-      const style = fullWidth ? { gridColumn: '1 / -1' } : {};
-      return (
-        <div className={styles.extension} style={style}>
-          {slot}
-        </div>
-      );
-    },
-    [widgetMetas],
-  );
-
   const [resolvedTitle, setResolvedTitle] = useState<string | undefined>();
 
   useEffect(() => {
@@ -83,9 +70,15 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
       <div className={styles.dashboardContainer}>
         <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
-          <Extension state={state} className={styles.extensionWrapper}>
-            {wrapItem}
-          </Extension>
+          {(extension) => {
+            const { fullWidth = false } = widgetMetas[getExtensionNameFromId(extension.id)];
+            const style = fullWidth ? { gridColumn: '1 / -1' } : {};
+            return (
+              <div className={styles.extension} style={style}>
+                <Extension state={state} className={styles.extensionWrapper} />
+              </div>
+            );
+          }}
         </ExtensionSlot>
       </div>
     </>
