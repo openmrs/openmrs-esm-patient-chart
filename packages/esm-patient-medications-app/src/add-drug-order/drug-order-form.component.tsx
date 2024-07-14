@@ -57,9 +57,9 @@ export interface DrugOrderFormProps {
 
 const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: TFunction) => {
   const comboSchema = {
+    default: z.boolean().optional(),
     value: z.string(),
     valueCoded: z.string(),
-    default: z.boolean().optional(),
   };
 
   const baseSchemaFields = {
@@ -813,8 +813,12 @@ const ControlledFieldInput = ({
 }: ControlledFieldInputProps) => {
   const {
     field: { onBlur, onChange, value, ref },
-    fieldState,
+    fieldState: { error },
   } = useController<MedicationOrderFormData>({ name: name, control });
+
+  const fieldErrorStyles = classNames({
+    [styles.fieldError]: error?.message,
+  });
 
   const handleChange = useCallback(
     (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
@@ -842,14 +846,14 @@ const ControlledFieldInput = ({
     if (type === 'number')
       return (
         <NumberInput
-          value={!!value ? value : 0}
+          className={fieldErrorStyles}
+          onBlur={onBlur}
           onChange={(e, { value }) => {
             const number = parseFloat(value);
             handleChange(isNaN(number) ? null : number);
           }}
-          className={fieldState?.error?.message && styles.fieldError}
-          onBlur={onBlur}
           ref={ref}
+          value={!!value ? value : 0}
           {...restProps}
         />
       );
@@ -857,11 +861,11 @@ const ControlledFieldInput = ({
     if (type === 'textArea')
       return (
         <TextArea
-          value={value}
-          onChange={(e) => handleChange(e.target.value)}
+          className={fieldErrorStyles}
           onBlur={onBlur}
+          onChange={(e) => handleChange(e.target.value)}
           ref={ref}
-          className={fieldState?.error?.message && styles.fieldError}
+          value={value}
           {...restProps}
         />
       );
@@ -869,11 +873,11 @@ const ControlledFieldInput = ({
     if (type === 'textInput')
       return (
         <TextInput
-          value={value}
+          className={fieldErrorStyles}
           onChange={(e) => handleChange(e.target.value)}
-          ref={ref}
           onBlur={onBlur}
-          className={fieldState?.error?.message && styles.fieldError}
+          ref={ref}
+          value={value}
           {...restProps}
         />
       );
@@ -881,22 +885,22 @@ const ControlledFieldInput = ({
     if (type === 'comboBox')
       return (
         <ComboBox
-          selectedItem={value}
-          onChange={({ selectedItem }) => handleChange(selectedItem)}
+          className={fieldErrorStyles}
           onBlur={onBlur}
+          onChange={({ selectedItem }) => handleChange(selectedItem)}
           ref={ref}
-          className={fieldState?.error?.message && styles.fieldError}
+          selectedItem={value}
           {...restProps}
         />
       );
 
     return null;
-  }, [fieldState?.error?.message, onBlur, ref, restProps, type, value, handleChange]);
+  }, [type, value, restProps, fieldErrorStyles, onBlur, ref, handleChange]);
 
   return (
     <>
       {component}
-      <FormLabel className={styles.errorLabel}>{fieldState?.error?.message}</FormLabel>
+      <FormLabel className={styles.errorLabel}>{error?.message}</FormLabel>
     </>
   );
 };
