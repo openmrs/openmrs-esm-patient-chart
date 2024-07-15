@@ -72,6 +72,16 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await form.getByLabel(/^duration$/i).fill('3');
   });
 
+  await test.step('And I set the quantity to dispense to 3', async () => {
+    await form.getByLabel(/^quantity to dispense$/i).clear();
+    await form.getByLabel(/^quantity to dispense$/i).fill('3');
+  });
+
+  await test.step('And I set the prescription refills to 1', async () => {
+    await form.getByLabel(/^prescription refills$/i).clear();
+    await form.getByLabel(/^prescription refills$/i).fill('1');
+  });
+
   await test.step('And I set the indication to `Headache`', async () => {
     await form.getByLabel(/indication/i).clear();
     await form.getByLabel(/indication/i).fill('Headache');
