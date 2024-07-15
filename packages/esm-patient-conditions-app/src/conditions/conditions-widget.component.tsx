@@ -111,7 +111,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await createCondition(payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
@@ -153,7 +153,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await updateCondition(conditionToEdit?.id, payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
