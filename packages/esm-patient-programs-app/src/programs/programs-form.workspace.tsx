@@ -1,7 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
 import {
   Button,
   ButtonSet,
@@ -19,14 +21,7 @@ import {
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  parseDate,
-  showSnackbar,
-  translateFrom,
-  useLayoutType,
-  useLocations,
-  useSession,
-} from '@openmrs/esm-framework';
+import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -34,23 +29,21 @@ import {
   useEnrollments,
   updateProgramEnrollment,
 } from './programs.resource';
-import { moduleName } from '../dashboard.meta';
 import styles from './programs-form.scss';
 
 interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
   programEnrollmentId?: string;
 }
 
-const programsFormSchema = z.object({
-  selectedProgram: z
-    .string()
-    .refine((value) => !!value, translateFrom(moduleName, 'programRequired', 'Program is required')),
-  enrollmentDate: z.date(),
-  completionDate: z.date().nullable(),
-  enrollmentLocation: z.string(),
-});
+const createProgramsFormSchema = (t: TFunction) =>
+  z.object({
+    selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
+    enrollmentDate: z.date(),
+    completionDate: z.date().nullable(),
+    enrollmentLocation: z.string(),
+  });
 
-export type ProgramsFormData = z.infer<typeof programsFormSchema>;
+export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({
   closeWorkspace,
@@ -67,6 +60,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
+  const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
+
   const currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid === programEnrollmentId)[0];
   const currentProgram = currentEnrollment
     ? {
@@ -77,11 +72,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const eligiblePrograms = currentProgram
     ? [currentProgram]
-    : filter(availablePrograms, (program) => {
-        const existingEnrollment = enrollments.find((e) => e.program.uuid === program.uuid);
-
-        return !existingEnrollment || existingEnrollment.dateCompleted !== null;
-      });
+    : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
 
   const getLocationUuid = () => {
     if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
@@ -165,7 +156,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           <Select
             aria-label="program name"
             id="program"
-            invalidText={t('required', 'Required')}
+            invalid={!!fieldState?.error}
             labelText={t('programName', 'Program name')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
