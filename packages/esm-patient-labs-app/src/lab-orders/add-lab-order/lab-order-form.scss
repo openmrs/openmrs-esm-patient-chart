@@ -1,8 +1,7 @@
-@use '@carbon/type';
-@use '@carbon/layout';
 @use '@carbon/colors';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../root";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .orderForm {
   flex-grow: 1;
