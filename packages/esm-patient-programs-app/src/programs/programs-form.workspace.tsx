@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import filter from 'lodash-es/filter';
-import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
 import {
   Button,
   ButtonSet,
@@ -72,7 +69,19 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const eligiblePrograms = currentProgram
     ? [currentProgram]
-    : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
+    : availablePrograms.filter((program) => {
+        const enrollment = enrollments.find((e) => e.program.uuid === program.uuid);
+        return !enrollment || enrollment.dateCompleted !== null;
+      });
+
+  const isEnrolledInAllPrograms = useMemo(() => {
+    if (!availablePrograms?.length || !enrollments?.length) {
+      return false;
+    }
+
+    const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
+    return activeEnrollments.length === availablePrograms.length;
+  }, [availablePrograms, enrollments]);
 
   const getLocationUuid = () => {
     if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
@@ -243,7 +252,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const formGroups = [
     {
-      style: { maxWidth: isTablet ? '50%' : 'fit-content' },
+      style: { maxWidth: isTablet && '50%' },
       legendText: '',
       value: programSelect,
     },
@@ -267,10 +276,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack className={styles.formContainer} gap={7}>
-        {!eligiblePrograms.length && (
+        {isEnrolledInAllPrograms && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-            kind={'error'}
+            className={styles.notification}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        )}
+        {!availablePrograms.length && (
+          <InlineNotification
+            className={styles.notification}
+            kind="error"
             lowContrast
             subtitle={t('configurePrograms', 'Please configure programs to continue.')}
             title={t('noProgramsConfigured', 'No programs configured')}
