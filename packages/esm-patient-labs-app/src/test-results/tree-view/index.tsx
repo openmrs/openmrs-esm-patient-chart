@@ -20,7 +20,7 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
   const { t } = useTranslation();
 
-  if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
+  if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
 
   if (roots?.length) {
     return (

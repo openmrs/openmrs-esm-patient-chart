@@ -1,12 +1,12 @@
 import React from 'react';
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
-import AddLabOrderWorkspace from './add-lab-order.workspace';
 import userEvent from '@testing-library/user-event';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
 import { age, closeWorkspace, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { createEmptyLabOrder } from './lab-order';
+import AddLabOrderWorkspace from './add-lab-order.workspace';
 
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -40,10 +40,11 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-const mocklaunchPatientWorkspace = jest.fn();
+const mockLaunchPatientWorkspace = jest.fn();
+
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchPatientWorkspace: (...args) => mocklaunchPatientWorkspace(...args),
+  launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => ({
@@ -95,6 +96,7 @@ describe('AddLabOrder', () => {
 
   beforeEach(() => {
     _resetOrderBasketStore();
+    jest.clearAllMocks();
   });
 
   test('happy path fill and submit form', async () => {
@@ -104,9 +106,9 @@ describe('AddLabOrder', () => {
     );
     const { mockCloseWorkspaceWithSavedChanges } = renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
-    const cd4 = screen.getByText('CD4 COUNT');
-    expect(cd4).toBeInTheDocument();
-    const cd4OrderButton = screen.getAllByRole('button', { name: 'Order form' })[1];
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
     await user.click(cd4OrderButton);
 
     const testType = screen.getByRole('combobox', { name: 'Test type' });
@@ -143,7 +145,7 @@ describe('AddLabOrder', () => {
     });
 
     expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
-    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('from lab search, click add directly to order basket', async () => {
@@ -153,16 +155,22 @@ describe('AddLabOrder', () => {
     );
     renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
-    const cd4 = screen.getByText('CD4 COUNT');
-    expect(cd4).toBeInTheDocument();
-    const cd4OrderButton = screen.getAllByRole('button', { name: 'Add to basket' })[1];
-    await user.click(cd4OrderButton);
-    expect(hookResult.current.orders).toEqual([
-      { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
-    ]);
+    await screen.findByText('CD4 COUNT');
+
+    const cd4AddToBasketButton = screen.getByRole('button', { name: /add to basket/i });
+    await user.click(cd4AddToBasketButton);
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([
+        { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
+      ]);
+    });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockCloseWorkspace).toHaveBeenCalledWith('add-lab-order', {
+      ignoreChanges: true,
+      onWorkspaceClose: expect.any(Function),
+    });
   });
 
   test('back to order basket', async () => {
@@ -172,7 +180,7 @@ describe('AddLabOrder', () => {
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mocklaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('should display a patient header on tablet', () => {

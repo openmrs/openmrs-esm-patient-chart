@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import fuzzy from 'fuzzy';
 import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, reportError } from '@openmrs/esm-framework';
 import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
@@ -57,7 +56,7 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   };
 }
 
-export function useTestTypes(searchTerm: string = ''): UseTestType {
+export function useTestTypes(): UseTestType {
   const { labOrderableConcepts } = useConfig<ConfigObject>().orders;
 
   const { data, isLoading, error } = useTestConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
@@ -80,14 +79,8 @@ export function useTestTypes(searchTerm: string = ''): UseTestType {
     [data],
   );
 
-  const filteredTestTypes = useMemo(() => {
-    return searchTerm && !isLoading && !error
-      ? fuzzy.filter(searchTerm, testConcepts, { extract: (c) => c.label }).map((result) => result.original)
-      : testConcepts;
-  }, [testConcepts, searchTerm, error, isLoading]);
-
   return {
-    testTypes: filteredTestTypes,
+    testTypes: testConcepts,
     isLoading: isLoading,
     error: error,
   };
