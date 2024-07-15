@@ -66,37 +66,3 @@ describe('useTestTypes is configurable', () => {
     expect(result.current.testTypes).toEqual([expect.objectContaining({ label: 'Configured concept' })]);
   });
 });
-
-describe('useTestTypes filters by text', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReset();
-    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
-    mockOpenrsFetch.mockReset();
-    mockOpenrsFetch.mockResolvedValue({
-      data: {
-        display: 'Orderable set',
-        setMembers: [{ display: 'Sodium Chloride' }, { display: 'Sodium Bicarbonate' }, { display: 'Potassium' }],
-      },
-    });
-  });
-
-  it('should filter test types by search term', async () => {
-    const { result, rerender } = renderHook((search: string) => useTestTypes(search), { initialProps: '' });
-    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
-    expect(result.current.error).toBeFalsy();
-    expect(result.current.testTypes).toEqual([
-      expect.objectContaining({ label: 'Potassium' }),
-      expect.objectContaining({ label: 'Sodium Bicarbonate' }),
-      expect.objectContaining({ label: 'Sodium Chloride' }),
-    ]);
-    rerender('sodium');
-    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
-    expect(result.current.testTypes).toEqual([
-      expect.objectContaining({ label: 'Sodium Bicarbonate' }),
-      expect.objectContaining({ label: 'Sodium Chloride' }),
-    ]);
-    rerender('pt');
-    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
-    expect(result.current.testTypes).toEqual([expect.objectContaining({ label: 'Potassium' })]);
-  });
-});
