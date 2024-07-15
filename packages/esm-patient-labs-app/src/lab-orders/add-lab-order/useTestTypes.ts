@@ -41,9 +41,15 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
 
   const results = useMemo(() => {
     if (isLoading || error) return null;
-    return labOrderableConcepts
+    const rawResults = labOrderableConcepts
       ? (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers)
       : (data as ConceptResults)?.data.results ?? ([] as Concept[]);
+
+    const uniqueResults = Array.from(new Set(rawResults.map((item) => item.uuid))).map((uuid) =>
+      rawResults.find((item) => item.uuid === uuid),
+    );
+
+    return uniqueResults;
   }, [data, isLoading, error, labOrderableConcepts]);
 
   return {
