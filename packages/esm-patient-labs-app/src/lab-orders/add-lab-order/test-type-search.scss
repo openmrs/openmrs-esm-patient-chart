@@ -65,7 +65,7 @@
 
 .searchResultSkeletonWrapper {
   margin: spacing.$spacing-03 1rem spacing.$spacing-03;
-  
+
   :global(.cds--skeleton__text) {
     margin: 0;
   }
@@ -99,10 +99,6 @@
   color: $interactive-01;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.resultsContainer {
-  overflow-y: scroll;
 }
 
 .resultsContainer::-webkit-scrollbar {
