@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import fuzzy from 'fuzzy';
 import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, reportError } from '@openmrs/esm-framework';
 import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
@@ -30,8 +29,11 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts
-        ? labOrderableConcepts.map((c) => `${restBaseUrl}/concept/${c}`)
-        : `${restBaseUrl}/concept?class=Test`,
+        ? labOrderableConcepts.map(
+            (c) =>
+              `${restBaseUrl}/concept/${c}?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
+          )
+        : `${restBaseUrl}/concept?class=Test?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -54,7 +56,7 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   };
 }
 
-export function useTestTypes(searchTerm: string = ''): UseTestType {
+export function useTestTypes(): UseTestType {
   const { labOrderableConcepts } = useConfig<ConfigObject>().orders;
 
   const { data, isLoading, error } = useTestConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
@@ -65,23 +67,20 @@ export function useTestTypes(searchTerm: string = ''): UseTestType {
     }
   }, [error]);
 
-  const testConcepts = useMemo(() => {
-    return data
-      ?.map((concept) => ({
-        label: concept.display,
-        conceptUuid: concept.uuid,
-      }))
-      ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label));
-  }, [data]);
-
-  const filteredTestTypes = useMemo(() => {
-    return searchTerm && !isLoading && !error
-      ? fuzzy.filter(searchTerm, testConcepts, { extract: (c) => c.label }).map((result) => result.original)
-      : testConcepts;
-  }, [testConcepts, searchTerm, error, isLoading]);
+  const testConcepts = useMemo(
+    () =>
+      data
+        ?.map((concept) => ({
+          label: concept.display,
+          conceptUuid: concept.uuid,
+        }))
+        ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label))
+        ?.filter((item, pos, array) => !pos || array[pos - 1].conceptUuid !== item.conceptUuid),
+    [data],
+  );
 
   return {
-    testTypes: filteredTestTypes,
+    testTypes: testConcepts,
     isLoading: isLoading,
     error: error,
   };

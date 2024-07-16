@@ -3,6 +3,7 @@
   "active": "活跃",
   "activePrograms": "活跃项目",
   "add": "添加",
+  "addPrograms": "Add programs",
   "cancel": "取消",
   "carePrograms": "护理项目",
   "chooseProgram": "选择一个项目",
@@ -24,10 +25,11 @@
   "programEnrollmentSaveError": "保存项目登记时出现错误",
   "programEnrollmentWorkspaceTitle": "记录项目登记",
   "programName": "项目名称",
+  "programRequired": "Program is required",
   "programs": "项目登记",
   "Programs": "项目",
-  "required": "必填",
   "saveAndClose": "保存并关闭",
+  "saving": "Saving",
   "seeAll": "查看全部",
   "status": "状态"
 }

@@ -3,6 +3,7 @@
   "active": "نشط",
   "activePrograms": "البرامج النشطة",
   "add": "أضف",
+  "addPrograms": "Add programs",
   "cancel": "إلغاء",
   "carePrograms": "برامج الرعاية",
   "chooseProgram": "اختر برنامجًا",
@@ -24,10 +25,11 @@
   "programEnrollmentSaveError": "خطأ في حفظ التسجيل في البرنامج",
   "programEnrollmentWorkspaceTitle": "Record program enrollment",
   "programName": "اسم البرنامج",
+  "programRequired": "Program is required",
   "programs": "تسجيلات البرنامج",
   "Programs": "البرامج",
-  "required": "مطلوب",
   "saveAndClose": "حفظ وإغلاق",
+  "saving": "Saving",
   "seeAll": "عرض الكل",
   "status": "الحالة"
 }
