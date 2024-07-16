@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import fuzzy from 'fuzzy';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
@@ -74,13 +73,9 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
       return testTypes;
     }
 
-    return (
-      searchTerm &&
-      fuzzy
-        .filter(searchTerm, testTypes, { extract: (c) => c.label })
-        .sort((r1, r2) => r1.score - r2.score)
-        .map((result) => result.original)
-    );
+    if (searchTerm && searchTerm.trim() !== '') {
+      return testTypes.filter((testType) => testType.label.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
   }, [searchTerm, testTypes]);
 
   if (isLoading) {
