@@ -52,7 +52,9 @@ describe('useTestTypes is configurable', () => {
       orders: { labOrderableConcepts: [] },
     });
     const { result } = renderHook(() => useTestTypes());
-    expect(mockOpenrsFetch).toHaveBeenCalledWith('/ws/rest/v1/concept?class=Test');
+    expect(mockOpenrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/concept?class=Test?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))',
+    );
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBeFalsy();
     expect(result.current.testTypes).toEqual([expect.objectContaining({ label: 'Test concept' })]);

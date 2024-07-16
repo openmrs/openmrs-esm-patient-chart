@@ -29,8 +29,11 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts
-        ? labOrderableConcepts.map((c) => `${restBaseUrl}/concept/${c}`)
-        : `${restBaseUrl}/concept?class=Test`,
+        ? labOrderableConcepts.map(
+            (c) =>
+              `${restBaseUrl}/concept/${c}?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
+          )
+        : `${restBaseUrl}/concept?class=Test?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -64,14 +67,17 @@ export function useTestTypes(): UseTestType {
     }
   }, [error]);
 
-  const testConcepts = useMemo(() => {
-    return data
-      ?.map((concept) => ({
-        label: concept.display,
-        conceptUuid: concept.uuid,
-      }))
-      ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label));
-  }, [data]);
+  const testConcepts = useMemo(
+    () =>
+      data
+        ?.map((concept) => ({
+          label: concept.display,
+          conceptUuid: concept.uuid,
+        }))
+        ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label))
+        ?.filter((item, pos, array) => !pos || array[pos - 1].conceptUuid !== item.conceptUuid),
+    [data],
+  );
 
   return {
     testTypes: testConcepts,
