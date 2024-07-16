@@ -47,6 +47,7 @@
   "modify": "កែប្រែ",
   "none": "គ្មាន",
   "noResultsForDrugSearch": "គ្មានលទ្ធផលដែលត្រូវបង្ហាញសម្រាប់ \"{{searchTerm}}\"",
+  "numRefillsErrorMessage": "The number of refills is required",
   "onDate": "នៅលើ",
   "orderActionDiscontinue": "បញ្ឈប់",
   "orderActionIncomplete": "Incomplete",
