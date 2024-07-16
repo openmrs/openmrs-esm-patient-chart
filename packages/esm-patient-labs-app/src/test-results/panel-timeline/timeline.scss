@@ -4,7 +4,6 @@
 
 .grid {
   width: fit-content;
-  background-color: $color-gray-30;
   display: grid;
   grid-auto-rows: auto;
   gap: 1px;
@@ -65,16 +64,18 @@
 }
 
 .padding-container {
-  padding: 0px 0 0 0;
+  padding: 0px 0px 0px 0;
   box-sizing: border-box;
-
+  background-color: $openmrs-background-grey;
   display: grid;
   grid-auto-flow: row;
   column-gap: 1px;
   row-gap: 0px;
-  background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
   border-collapse: collapse;
+
+  width: fit-content;
+  max-width: 100%;
 }
 
 .padding-container::-webkit-scrollbar {
@@ -109,10 +110,6 @@
     width: auto;
     left: 0;
   }
-}
-
-.shadow {
-  box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
 }
 
 .trendline-link {
@@ -190,9 +187,10 @@
 
 .recent-results-grid {
   display: grid;
-  background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
+  width: 100%;
+  display: flex;
 }
 
 .recent-results-grid::-webkit-scrollbar {
