@@ -1,26 +1,27 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
-import { screen, render, within, renderHook, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render, within, renderHook, waitFor } from '@testing-library/react';
 import { getByTextWithMarkup } from 'tools';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import AddDrugOrderWorkspace from './add-drug-order.workspace';
 import { mockDrugSearchResultApiData, mockDrugOrderTemplateApiData, mockPatientDrugOrdersApiData } from '__mocks__';
-import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { closeWorkspace, useSession } from '@openmrs/esm-framework';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
-mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
-
+const mockLaunchPatientWorkspace = jest.fn();
 const mockUseSession = useSession as jest.Mock;
+const usePatientOrdersMock = jest.fn();
+
+mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
 mockUseSession.mockReturnValue({
   currentProvider: {
     uuid: 'mock-provider-uuid',
   },
 });
 
-const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
@@ -42,10 +43,12 @@ jest.mock('./drug-search/drug-search.resource', () => ({
   useDebounce: jest.fn().mockImplementation((x) => x),
 }));
 
-const usePatientOrdersMock = jest.fn();
 jest.mock('../api/api', () => ({
   ...jest.requireActual('../api/api'),
   usePatientOrders: () => usePatientOrdersMock(),
+  useRequireOutpatientQuantity: jest
+    .fn()
+    .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
 }));
 
 function renderDrugSearch() {
@@ -166,7 +169,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const indicationField = screen.getByRole('textbox', { name: 'Indication' });
     await user.type(indicationField, 'Hypertension');
     const saveFormButton = screen.getByText(/Save order/i);
-    fireEvent.click(saveFormButton);
+    await user.click(saveFormButton);
 
     await waitFor(() =>
       expect(hookResult.current.orders).toEqual([
