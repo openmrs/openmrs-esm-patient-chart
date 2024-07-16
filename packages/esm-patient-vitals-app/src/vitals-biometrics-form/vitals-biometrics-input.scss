@@ -34,6 +34,21 @@
   padding: 0;
   color: $ui-05;
 
+  input {
+    border: none;
+    text-align: center;
+    @include type.type-style('heading-04');
+    font-family: ibm plex sans, system-ui, -apple-system, BlinkMacSystemFont, '.sfnstext-regular', sans-serif;
+    min-width: auto !important;
+
+    &:focus {
+      outline: none;
+    }
+  }
+  ::placeholder {
+    color: $text-03;
+  }
+
   // TODO: Move to styleguide overrides
   :global(.cds--number input[type="number"]) {
     border: none !important;
