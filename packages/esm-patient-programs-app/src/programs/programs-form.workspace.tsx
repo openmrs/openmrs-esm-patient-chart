@@ -74,15 +74,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         return !enrollment || enrollment.dateCompleted !== null;
       });
 
-  const isEnrolledInAllPrograms = useMemo(() => {
-    if (!availablePrograms?.length || !enrollments?.length) {
-      return false;
-    }
-
-    const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
-    return activeEnrollments.length === availablePrograms.length;
-  }, [availablePrograms, enrollments]);
-
   const getLocationUuid = () => {
     if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
       return session?.sessionLocation?.uuid;
@@ -276,14 +267,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack className={styles.formContainer} gap={7}>
-        {isEnrolledInAllPrograms && (
-          <InlineNotification
-            className={styles.notification}
-            lowContrast
-            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-            title={t('fullyEnrolled', 'Enrolled in all programs')}
-          />
-        )}
         {!availablePrograms.length && (
           <InlineNotification
             className={styles.notification}

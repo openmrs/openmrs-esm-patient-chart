@@ -1,6 +1,6 @@
 @use '@carbon/type';
 @use '@carbon/layout';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .loading {
   margin-left: 1rem;
