@@ -105,6 +105,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {hideAddProgramButton ? null : (
             <Button
+              disabled={isEnrolledInAllPrograms}
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription={t('addPrograms', 'Add programs')}
