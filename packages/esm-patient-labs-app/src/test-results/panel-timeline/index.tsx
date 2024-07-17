@@ -14,7 +14,7 @@ const PanelTimelineComponent: React.FC<PanelTimelineComponentProps> = ({ activeP
   const rows: Array<ObsRecord> = activePanel ? [activePanel, ...activePanel?.relatedObs] : [];
   const mappedObservations = Object.fromEntries(rows.map((obs) => [obs.name, groupedObservations[obs.conceptUuid]]));
   const allTimes = []
-    .concat(...Object.values(mappedObservations).map((obsRecords) => obsRecords.map((obs) => obs.effectiveDateTime)))
+    .concat(...Object.values(mappedObservations).map((obsRecords) => obsRecords.map((obs) => obs.issued)))
     .sort((time1, time2) => Date.parse(time2) - Date.parse(time1));
 
   const parsedTime = parseTime(allTimes);
@@ -22,7 +22,7 @@ const PanelTimelineComponent: React.FC<PanelTimelineComponentProps> = ({ activeP
   const timelineData: Record<string, Array<ObsRecord>> = Object.fromEntries(
     Object.entries(mappedObservations).map(([title, observations]) => [
       title,
-      allTimes.map((time) => observations.find((obs) => obs.effectiveDateTime === time)),
+      allTimes.map((time) => observations.find((obs) => obs.issued === time)),
     ]),
   );
   if (!activePanel) {
