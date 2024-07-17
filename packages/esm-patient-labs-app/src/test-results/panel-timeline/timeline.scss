@@ -82,6 +82,10 @@
   display: none;
 }
 
+.shadow {
+  box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
+}
+
 .time-slot-inner {
   background-color: $ui-03;
   padding: 3px 10px;
