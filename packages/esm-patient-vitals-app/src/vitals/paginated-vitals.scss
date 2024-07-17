@@ -2,12 +2,6 @@
 @use '@carbon/type';
 @use '@carbon/layout';
 
-.paginatedVitals {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .tableContainer {
   flex: 1;
 }
@@ -33,7 +27,7 @@
 .criticallyHigh > span, .criticallyLow > span {
   border: 2px solid colors.$red-60 !important;
   padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
-} 
+}
 
 .high > span, .low > span {
   border: 1.5px solid colors.$black-100 !important;

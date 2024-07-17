@@ -9,7 +9,7 @@
       "component": "medicationsSummary",
       "slot": "patient-chart-medications-dashboard-slot",
       "meta": {
-        "columnSpan": 2
+        "fullWidth": false
       }
     },
     {
@@ -17,7 +17,7 @@
       "component": "activeMedications",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       },
       "order": 4
     },

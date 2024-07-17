@@ -113,7 +113,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const rows = isPrinting ? sortedData : paginatedVitals;
 
   return (
-    <div className={styles.paginatedVitals}>
+    <>
       <DataTable
         rows={rows}
         headers={tableHeaders}
@@ -168,7 +168,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
           dashboardLinkLabel={urlLabel}
         />
       ) : null}
-    </div>
+    </>
   );
 };
 

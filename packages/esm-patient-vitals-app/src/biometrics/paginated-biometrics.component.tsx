@@ -72,7 +72,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   return (
-    <div className={styles.paginatedBiometrics}>
+    <>
       <DataTable
         rows={paginatedBiometrics}
         headers={tableHeaders}
@@ -124,7 +124,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         dashboardLinkUrl={pageUrl}
         dashboardLinkLabel={urlLabel}
       />
-    </div>
+    </>
   );
 };
 

@@ -24,7 +24,6 @@ export interface DashboardConfig {
   slot: string;
   title: string | (() => string | Promise<string>);
   path: string;
-  columns: number;
   hideDashboardTitle?: boolean;
   layoutMode?: LayoutMode;
 }

@@ -9,12 +9,18 @@
       "name": "conditions-overview-widget",
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "conditionsOverview",
-      "order": 3
+      "order": 3,
+      "meta": {
+        "fullWidth": false
+      }
     },
     {
       "name": "conditions-details-widget",
       "slot": "patient-chart-conditions-dashboard-slot",
-      "component": "conditionsDetailedSummary"
+      "component": "conditionsDetailedSummary",
+      "meta": {
+        "fullWidth": false
+      }
     },
     {
       "name": "conditions-summary-dashboard",

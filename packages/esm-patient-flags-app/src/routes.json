@@ -27,7 +27,10 @@
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "flagsOverview",
       "order": 0,
-      "featureFlag": "patientFlags"
+      "featureFlag": "patientFlags",
+      "meta": {
+        "fullWidth": false
+      }
     }
   ],
   "pages": []
