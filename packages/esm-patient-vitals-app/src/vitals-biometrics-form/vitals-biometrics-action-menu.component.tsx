@@ -20,7 +20,7 @@ export const VitalsAndBiometricsActionMenu = ({ formType, rowId }: VitalsActionM
   const isTablet = useLayoutType() === 'tablet';
   const launchEditVitalForm = useCallback(() => {
     launchPatientWorkspace(patientVitalsBiometricsFormWorkspace, {
-      workSpaceTitle: t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics'),
+      workspaceTitle: t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics'),
       vitalsBiometrics,
       encounterUuid,
       formContext: 'editing',
