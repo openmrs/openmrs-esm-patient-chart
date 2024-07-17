@@ -20,6 +20,8 @@ interface TestTypeSearchResultItemProps {
   t: TFunction;
   testType: TestType;
   openOrderForm: (searchResult: LabOrderBasketItem) => void;
+  orders: Array<LabOrderBasketItem>;
+  setOrders: (value: LabOrderBasketItem[] | (() => LabOrderBasketItem[])) => void;
 }
 
 export interface TestTypeSearchProps {
@@ -67,6 +69,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { testTypes, isLoading, error } = useTestTypes();
+  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
 
   const filteredTestTypes = useMemo(() => {
     if (!searchTerm) {
@@ -117,14 +120,29 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
             </div>
           )}
           <div className={styles.resultsContainer}>
-            {filteredTestTypes.map((testType) => (
-              <TestTypeSearchResultItem
-                key={testType.conceptUuid}
-                openOrderForm={openOrderForm}
-                t={t}
-                testType={testType}
-              />
-            ))}
+            {orders.length
+              ? filteredTestTypes
+                  .filter((testType) => orders.some((order) => order.testType?.conceptUuid === testType.conceptUuid))
+                  .map((eachItem) => (
+                    <TestTypeSearchResultItem
+                      key={eachItem.conceptUuid}
+                      openOrderForm={openOrderForm}
+                      t={t}
+                      testType={eachItem}
+                      orders={orders}
+                      setOrders={setOrders}
+                    />
+                  ))
+              : filteredTestTypes.map((testType) => (
+                  <TestTypeSearchResultItem
+                    key={testType.conceptUuid}
+                    openOrderForm={openOrderForm}
+                    t={t}
+                    testType={testType}
+                    orders={orders}
+                    setOrders={setOrders}
+                  />
+                ))}
           </div>
         </div>
 
@@ -153,10 +171,15 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
   );
 }
 
-const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, testType, openOrderForm }) => {
+const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
+  t,
+  testType,
+  openOrderForm,
+  orders,
+  setOrders,
+}) => {
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
 
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
