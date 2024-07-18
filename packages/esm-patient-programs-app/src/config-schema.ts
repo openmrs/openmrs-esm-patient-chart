@@ -8,6 +8,5 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
-  customUrl: string;
   hideAddProgramButton: boolean;
 }
