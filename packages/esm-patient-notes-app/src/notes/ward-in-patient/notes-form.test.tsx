@@ -18,6 +18,7 @@ const testProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
+  onWorkspaceClose: jest.fn(),
 };
 
 const mockSaveVisitNote = saveVisitNote as jest.Mock;

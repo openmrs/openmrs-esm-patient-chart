@@ -28,10 +28,15 @@ const noteFormSchema = z.object({
   }),
 });
 
-const WardPatientNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
+interface WardPatientNotesFormProps extends DefaultPatientWorkspaceProps {
+  onWorkspaceClose: () => void;
+}
+
+const WardPatientNotesForm: React.FC<WardPatientNotesFormProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
+  onWorkspaceClose,
 }) => {
   const { t } = useTranslation();
   const session = useSession();
@@ -81,7 +86,7 @@ const WardPatientNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
     saveVisitNote(abortController, notePayload)
       .then(() => {
-        closeWorkspaceWithSavedChanges();
+        closeWorkspaceWithSavedChanges({ onWorkspaceClose });
         showSnackbar({
           isLowContrast: true,
           subtitle: t('visitNoteNowVisible', 'It is now visible on the Visits page'),
