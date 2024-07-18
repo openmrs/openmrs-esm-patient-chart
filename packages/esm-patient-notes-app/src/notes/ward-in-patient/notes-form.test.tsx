@@ -37,7 +37,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./visit-notes.resource', () => ({
+jest.mock('../visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: jest.fn(),
   useLocationUuid: jest.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
@@ -84,15 +84,19 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   renderWardPatientNotesForm();
 
-  const submitButton = screen.getByRole('button', { name: /Save/i });
+  const note = screen.getByRole('textbox', { name: /Write your notes/i });
+  await userEvent.clear(note);
+  await userEvent.type(note, 'Sample clinical note');
+  expect(note).toHaveValue('Sample clinical note');
 
+  const submitButton = screen.getByRole('button', { name: /Save/i });
   await userEvent.click(submitButton);
 
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
 });
 
-test('renders an error snackbar if there was a problem recording a condition', async () => {
+test('renders an error snackbar if there was a problem recording a visit note', async () => {
   const error = {
     message: 'Internal Server Error',
     response: {
@@ -109,7 +113,7 @@ test('renders an error snackbar if there was a problem recording a condition', a
   await userEvent.type(note, 'Sample clinical note');
   expect(note).toHaveValue('Sample clinical note');
 
-  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  const submitButton = screen.getByRole('button', { name: /Save/i });
 
   await userEvent.click(submitButton);
 
