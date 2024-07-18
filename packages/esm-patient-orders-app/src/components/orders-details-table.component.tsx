@@ -91,7 +91,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
-  const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
+  const selectedOrderType = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.display;
 
   const {
     data: allOrders,
@@ -292,6 +292,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         />
       )}
       {!tableRows.length ? (
+        // TODO: Fix pluralization here
         <EmptyState
           headerTitle={headerTitle}
           displayText={
@@ -299,9 +300,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
               ? t('orders', 'Orders')
               : // t('Drug Order_few', 'Drug Orders')
                 // t('Test Order_few', 'Test Orders')
-                t(selectedOrderName, {
+                t(selectedOrderType, {
                   count: 3,
-                  default: selectedOrderName,
+                  default: selectedOrderType,
                 })
           }
           launchForm={launchOrderBasket}
