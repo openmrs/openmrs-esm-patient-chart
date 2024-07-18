@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -23,6 +23,7 @@ type NotesFormData = z.infer<typeof noteFormSchema>;
 
 const noteFormSchema = z.object({
   wardClinicalNote: z.string().refine((val) => val.trim().length > 0, {
+    //t('clinicalNoteErrorMessage','Clinical note is required')
     message: translateFrom(moduleName, 'clinicalNoteErrorMessage', 'Clinical note is required'),
   }),
 });
@@ -56,64 +57,52 @@ const WardPatientNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
 
-  const onSubmit = useCallback(
-    (data: NotesFormData) => {
-      const { wardClinicalNote } = data;
-      setIsSubmitting(true);
+  const onSubmit = (data: NotesFormData) => {
+    const { wardClinicalNote } = data;
+    setIsSubmitting(true);
 
-      const notePayload = {
-        encounterDatetime: dayjs(new Date()).format(),
-        patient: patientUuid,
-        location: locationUuid,
-        encounterType: encounterTypeUuid,
-        encounterProviders: [
-          {
-            encounterRole: clinicianEncounterRole,
-            provider: providerUuid,
-          },
-        ],
-        obs: wardClinicalNote
-          ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: wardClinicalNote }]
-          : [],
-      };
+    const notePayload = {
+      encounterDatetime: dayjs(new Date()).format(),
+      patient: patientUuid,
+      location: locationUuid,
+      encounterType: encounterTypeUuid,
+      encounterProviders: [
+        {
+          encounterRole: clinicianEncounterRole,
+          provider: providerUuid,
+        },
+      ],
+      obs: wardClinicalNote
+        ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: wardClinicalNote }]
+        : [],
+    };
 
-      const abortController = new AbortController();
+    const abortController = new AbortController();
 
-      saveVisitNote(abortController, notePayload)
-        .then(() => {
-          closeWorkspaceWithSavedChanges();
-          showSnackbar({
-            isLowContrast: true,
-            subtitle: t('visitNoteNowVisible', 'It is now visible on the Visits page'),
-            kind: 'success',
-            title: t('visitNoteSaved', 'Visit note saved'),
-          });
-        })
-        .catch((err) => {
-          createErrorHandler();
-
-          showSnackbar({
-            title: t('visitNoteSaveError', 'Error saving visit note'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: err?.message,
-          });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
+    saveVisitNote(abortController, notePayload)
+      .then(() => {
+        closeWorkspaceWithSavedChanges();
+        showSnackbar({
+          isLowContrast: true,
+          subtitle: t('visitNoteNowVisible', 'It is now visible on the Visits page'),
+          kind: 'success',
+          title: t('visitNoteSaved', 'Visit note saved'),
         });
-    },
-    [
-      clinicianEncounterRole,
-      closeWorkspaceWithSavedChanges,
-      encounterNoteTextConceptUuid,
-      encounterTypeUuid,
-      locationUuid,
-      patientUuid,
-      providerUuid,
-      t,
-    ],
-  );
+      })
+      .catch((err) => {
+        createErrorHandler();
+
+        showSnackbar({
+          title: t('visitNoteSaveError', 'Error saving visit note'),
+          kind: 'error',
+          isLowContrast: false,
+          subtitle: err?.message,
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
 
   const onError = (errors) => console.error(errors);
 
@@ -153,11 +142,7 @@ const WardPatientNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         </Row>
       </Stack>
       <Button kind="primary" className={styles.saveButton} disabled={isSubmitting} type="submit">
-        {isSubmitting ? (
-          <InlineLoading description={t('saving', 'Saving') + '...'} />
-        ) : (
-          <span>{t('save', 'Save')}</span>
-        )}
+        {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
       </Button>
     </Form>
   );

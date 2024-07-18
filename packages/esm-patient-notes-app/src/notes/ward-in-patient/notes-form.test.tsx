@@ -32,8 +32,8 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     createErrorHandler: jest.fn(),
     showSnackbar: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ConfigMock),
-    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
+    useConfig: jest.fn().mockReturnValue(() => ConfigMock),
+    useSession: jest.fn().mockReturnValue(() => mockSessionDataResponse),
   };
 });
 
