@@ -111,7 +111,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await createCondition(payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
@@ -153,7 +153,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await updateCondition(conditionToEdit?.id, payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
@@ -337,7 +337,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       id="endDate"
                       datePickerType="single"
                       dateFormat="d/m/Y"
-                      minDate={new Date(watch('abatementDateTime')).toISOString()}
+                      minDate={new Date(watch('onsetDateTime')).toISOString()}
                       maxDate={dayjs().utc().format()}
                       placeholder="dd/mm/yyyy"
                       onChange={([date]) => onChange(date)}

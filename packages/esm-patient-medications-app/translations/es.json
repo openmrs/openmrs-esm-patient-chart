@@ -47,6 +47,7 @@
   "modify": "Modificar",
   "none": "Ninguno",
   "noResultsForDrugSearch": "No hay resultados para \"{{searchTerm}}\"",
+  "numRefillsErrorMessage": "The number of refills is required",
   "onDate": "en",
   "orderActionDiscontinue": "Interrumpir",
   "orderActionIncomplete": "Incomplete",
