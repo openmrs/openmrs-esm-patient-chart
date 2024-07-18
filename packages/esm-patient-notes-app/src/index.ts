@@ -33,3 +33,8 @@ export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExt
 
 // t('visitNoteWorkspaceTitle', 'Visit Note')
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
+
+export const wardPatientNotesForm = getAsyncLifecycle(
+  () => import('./notes/ward-in-patient/notes-form.component'),
+  options,
+);

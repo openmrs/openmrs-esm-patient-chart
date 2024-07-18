@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "No visit note to display",
   "primaryDiagnosis": "Primary diagnosis",
   "primaryDiagnosisInputPlaceholder": "Choose a primary diagnosis",
+  "save": "Save",
   "saveAndClose": "Save and close",
   "saving": "Saving",
   "searchForPrimaryDiagnosis": "Search for a primary diagnosis",
@@ -33,5 +34,6 @@
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved",
   "visitNoteSaveError": "Error saving visit note",
-  "visitNoteWorkspaceTitle": "Visit Note"
+  "visitNoteWorkspaceTitle": "Visit Note",
+  "wardClinicalNotePlaceholder": "Write any notes here"
 }

@@ -54,6 +54,7 @@ export interface ConceptNames {
   name: string;
   conceptNameType: string;
 }
+
 export interface ConceptMapping {
   conceptMapType: {
     uuid: string;
@@ -178,7 +179,7 @@ export interface VisitNotePayload {
   location: string; // the location at which the encounter occurred (REQUIRED)
   encounterProviders: Array<{ encounterRole: string; provider: string }>; // array of providers and their role within the encounter. At least 1 provider is required
   obs: Array<ObsPayload>; // array of observations and values for the encounter
-  form: string; // target form uuid to be filled for the encounter
+  form?: string; // target form uuid to be filled for the encounter
   orders?: Array<any>; // list of orders created during the encounter
   visit?: string; // when creating an encounter for a specific visit, this specifies the visit
 }

@@ -18,6 +18,12 @@
       "component": "visitNotesActionButton",
       "slot": "action-menu-patient-chart-items-slot",
       "order": 1
+    },
+    {
+      "name": "ward-patient-notes-form",
+      "component": "wardPatientNotesForm",
+      "slot": "ward-patient-notes-workspace-slot",
+      "order": 1
     }
   ],
   "workspaces": [

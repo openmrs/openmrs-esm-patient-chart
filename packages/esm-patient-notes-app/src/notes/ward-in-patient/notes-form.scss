@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@import "../visit-notes-form";
+
+.row {
+  margin: 0.5rem 0 0;
+}
+
+.saveButton {
+  margin-left: layout.$spacing-04;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+}
