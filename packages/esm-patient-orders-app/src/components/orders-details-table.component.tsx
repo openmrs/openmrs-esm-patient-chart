@@ -50,6 +50,7 @@ import {
   usePatient,
   PrinterIcon,
   AddIcon,
+  closeWorkspace,
 } from '@openmrs/esm-framework';
 import { buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
@@ -83,7 +84,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchAddLabsOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -107,14 +107,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         case 'drugorder':
           launchAddDrugOrder();
           break;
-        case 'testorder':
-          launchAddLabsOrder();
-          break;
         default:
           launchOrderBasket();
       }
     },
-    [launchAddDrugOrder, launchAddLabsOrder, launchOrderBasket],
+    [launchAddDrugOrder, launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -478,6 +475,13 @@ function OrderBasketItemActions({
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
+  const openEditLabForm = useCallback((order: OrderBasketItem) => {
+    closeWorkspace('order-basket', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
+    });
+  }, []);
+
   const handleModifyClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
       getDrugOrderByUuid(orderItem.uuid).then((res) => {
@@ -488,10 +492,9 @@ function OrderBasketItemActions({
       });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrderItems(labsOrderBasket, [...items, labItem]);
-      openOrderForm({ order: labItem });
+      openEditLabForm(labItem);
     }
-  }, [orderItem, openOrderForm, items, setOrderItems]);
+  }, [orderItem, openOrderForm, openEditLabForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
