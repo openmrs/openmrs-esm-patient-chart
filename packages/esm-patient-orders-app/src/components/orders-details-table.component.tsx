@@ -50,7 +50,6 @@ import {
   usePatient,
   PrinterIcon,
   AddIcon,
-  closeWorkspace,
 } from '@openmrs/esm-framework';
 import { buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
@@ -475,11 +474,8 @@ function OrderBasketItemActions({
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
-  const openEditLabForm = useCallback((order: OrderBasketItem) => {
-    closeWorkspace('order-basket', {
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
-    });
+  const openLabOrderForm = useCallback((order: OrderBasketItem) => {
+    launchPatientWorkspace('add-lab-order', { order });
   }, []);
 
   const handleModifyClick = useCallback(() => {
@@ -492,9 +488,9 @@ function OrderBasketItemActions({
       });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      openEditLabForm(labItem);
+      openLabOrderForm(labItem);
     }
-  }, [orderItem, openOrderForm, openEditLabForm, items, setOrderItems]);
+  }, [orderItem, openOrderForm, openLabOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
