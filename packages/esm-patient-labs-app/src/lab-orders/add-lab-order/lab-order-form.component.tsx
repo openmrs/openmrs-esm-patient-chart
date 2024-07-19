@@ -153,6 +153,8 @@ export function LabOrderForm({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
+  const responsiveSize = isTablet ? 'lg' : 'sm';
+
   return (
     <>
       {errorLoadingTestTypes && (
@@ -185,7 +187,7 @@ export function LabOrderForm({
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       id="labReferenceNumberInput"
-                      size={isTablet ? 'lg' : 'md'}
+                      size={responsiveSize}
                       labelText={t('labReferenceNumber', 'Lab reference number')}
                       maxLength={150}
                       value={value}
@@ -207,7 +209,7 @@ export function LabOrderForm({
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <ComboBox
-                      size={isTablet ? 'lg' : 'md'}
+                      size={responsiveSize}
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
                       selectedItem={priorityOptions.find((option) => option.value === value) || null}
@@ -231,7 +233,7 @@ export function LabOrderForm({
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <ComboBox
-                        size={isTablet ? 'lg' : 'md'}
+                        size={responsiveSize}
                         id="orderReasonInput"
                         titleText={t('orderReason', 'Order reason')}
                         selectedItem={''}
@@ -258,7 +260,7 @@ export function LabOrderForm({
                     <TextArea
                       enableCounter
                       id="additionalInstructionsInput"
-                      size={isTablet ? 'lg' : 'md'}
+                      size={responsiveSize}
                       labelText={t('additionalInstructions', 'Additional instructions')}
                       value={value}
                       onChange={onChange}
