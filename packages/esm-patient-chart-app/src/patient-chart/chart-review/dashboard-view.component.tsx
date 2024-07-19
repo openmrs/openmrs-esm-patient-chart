@@ -10,6 +10,7 @@ import {
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
 
 /**
  * The layout mode dictates the width occuppied by the chart dashboard widgets.
@@ -70,10 +71,9 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       <div className={styles.dashboardContainer}>
         <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
           {(extension) => {
-            const { fullWidth = false } = widgetMetas[getExtensionNameFromId(extension.id)];
-            const style = fullWidth ? { gridColumn: '1 / -1' } : {};
+            const { fullWidth = false } = widgetMetas[extension.id];
             return (
-              <div className={styles.extension} style={style}>
+              <div className={classNames(styles.extension, fullWidth && styles.fullWidth)}>
                 <Extension state={state} className={styles.extensionWrapper} />
               </div>
             );
