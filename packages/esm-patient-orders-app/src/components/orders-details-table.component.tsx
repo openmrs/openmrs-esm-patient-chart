@@ -83,6 +83,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchModifyLabOrder = useCallback((order: OrderBasketItem) => {
+    launchPatientWorkspace('add-lab-order', { order });
+  }, []);
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -106,11 +109,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
         case 'drugorder':
           launchAddDrugOrder();
           break;
+        case 'testorder':
+          launchModifyLabOrder(buildLabOrder(orderItem, 'REVISE'));
+          break;
         default:
           launchOrderBasket();
       }
     },
-    [launchAddDrugOrder, launchOrderBasket],
+    [launchAddDrugOrder, launchModifyLabOrder, launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -474,10 +480,6 @@ function OrderBasketItemActions({
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
-  const openLabOrderForm = useCallback((order: OrderBasketItem) => {
-    launchPatientWorkspace('add-lab-order', { order });
-  }, []);
-
   const handleModifyClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
       getDrugOrderByUuid(orderItem.uuid).then((res) => {
@@ -488,9 +490,9 @@ function OrderBasketItemActions({
       });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      openLabOrderForm(labItem);
+      openOrderForm({ order: labItem });
     }
-  }, [orderItem, openOrderForm, openLabOrderForm, items, setOrderItems]);
+  }, [orderItem, openOrderForm, items, setOrderItems]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
