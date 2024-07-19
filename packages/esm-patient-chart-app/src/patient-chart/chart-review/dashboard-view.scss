@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
-@import "../../root.scss";
+@use "../../root.scss" as *;
 
 .dashboardTitle {
   @include type.type-style("heading-03");
