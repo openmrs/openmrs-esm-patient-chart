@@ -83,9 +83,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchModifyLabOrder = useCallback((order: OrderBasketItem) => {
-    launchPatientWorkspace('add-lab-order', { order });
-  }, []);
+  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -110,7 +108,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           launchAddDrugOrder();
           break;
         case 'testorder':
-          launchModifyLabOrder(buildLabOrder(orderItem, 'REVISE'));
+          launchModifyLabOrder({ order: buildLabOrder(orderItem, 'REVISE') });
           break;
         default:
           launchOrderBasket();
