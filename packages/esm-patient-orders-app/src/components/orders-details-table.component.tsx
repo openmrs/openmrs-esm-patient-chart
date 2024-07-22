@@ -247,28 +247,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     };
   }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
-  const onBeforeGetContentResolve = useRef(null);
-
-  useEffect(() => {
-    if (isPrinting && onBeforeGetContentResolve.current) {
-      onBeforeGetContentResolve.current();
-    }
-  }, [isPrinting, onBeforeGetContentResolve]);
-
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
+    contentRef: contentToPrintRef,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: () =>
-      new Promise((resolve) => {
-        if (patient && patient?.patient && title) {
-          onBeforeGetContentResolve.current = resolve;
-          setIsPrinting(true);
-        }
-      }),
-    onAfterPrint: () => {
-      onBeforeGetContentResolve.current = null;
-      setIsPrinting(false);
+    onBeforePrint: () => {
+      setIsPrinting(true);
+      return Promise.resolve();
     },
+    onAfterPrint: () => setIsPrinting(false),
   });
 
   const orderTypesToDisplay = useMemo(

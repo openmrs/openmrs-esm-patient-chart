@@ -1,24 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { useReactToPrint } from 'react-to-print';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient } from 'tools';
-import PrintIdentifierSticker from './print-identifier-sticker.modal';
+import PrintIdentifierStickerModal from './print-identifier-sticker.modal';
 
 const mockCloseModal = jest.fn();
-const mockUseReactToPrint = jest.mocked(useReactToPrint);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-
-jest.mock('react-to-print', () => {
-  const originalModule = jest.requireActual('react-to-print');
-
-  return {
-    ...originalModule,
-    useReactToPrint: jest.fn(),
-  };
-});
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -26,39 +15,32 @@ mockUseConfig.mockReturnValue({
 });
 
 describe('PrintIdentifierSticker', () => {
-  test('renders the component', () => {
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
-
-    expect(screen.getByText(/Print Identifier Sticker/i)).toBeInTheDocument();
-    expect(screen.getByText('John Wilson')).toBeInTheDocument();
-    expect(screen.getByText('100GEJ')).toBeInTheDocument();
-    expect(screen.getByText('1972-04-04')).toBeInTheDocument();
-  });
-
-  test('calls closeModal when cancel button is clicked', async () => {
+  test('renders a modal with patient details and print options', async () => {
     const user = userEvent.setup();
 
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
+    render(<PrintIdentifierStickerModal patient={mockPatient} closeModal={mockCloseModal} />);
 
-    const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    expect(cancelButton).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /print identifier sticker/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /show preview/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /print/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /no. of patient id sticker columns/i })).toHaveValue(3);
+    expect(screen.getByRole('spinbutton', { name: /no. of patient id sticker rows per page/i })).toHaveValue(5);
+    expect(screen.getByRole('spinbutton', { name: /no. of patient id stickers/i })).toHaveValue(30);
 
-    await user.click(cancelButton);
-    expect(mockCloseModal).toHaveBeenCalled();
-  });
-
-  test('calls the print function when print button is clicked', async () => {
-    const handlePrint = jest.fn();
-    mockUseReactToPrint.mockReturnValue(handlePrint);
-
-    const user = userEvent.setup();
-
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
-
-    const printButton = screen.getByRole('button', { name: /Print/i });
-    expect(printButton).toBeInTheDocument();
-
-    await user.click(printButton);
-    expect(handlePrint).toHaveBeenCalled();
+    const modalBody = screen.getByRole('region');
+    expect(modalBody).toHaveTextContent(/john wilson/i);
+    expect(modalBody).toHaveTextContent(/old identification number/i);
+    expect(modalBody).toHaveTextContent(/100732he/i);
+    expect(modalBody).toHaveTextContent(/openmrs id/i);
+    expect(modalBody).toHaveTextContent(/100gej/i);
+    expect(modalBody).toHaveTextContent(/sex/i);
+    expect(modalBody).toHaveTextContent(/male/i);
+    expect(modalBody).toHaveTextContent(/dob/i);
+    expect(modalBody).toHaveTextContent(/1972-04-04/i);
+    expect(modalBody).toHaveTextContent(/age/i);
+    expect(modalBody).toHaveTextContent(/52 yrs/i);
+    await user.click(screen.getByRole('button', { name: /show preview/i }));
+    expect(screen.getByRole('button', { name: /hide preview/i })).toBeInTheDocument();
   });
 });
