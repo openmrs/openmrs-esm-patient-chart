@@ -111,9 +111,10 @@ describe('AddLabOrder', () => {
     const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
     await user.click(cd4OrderButton);
 
-    const testType = screen.getByRole('combobox', { name: 'Test type' });
-    expect(testType).toBeInTheDocument();
-    expect(testType).toHaveValue('CD4 COUNT');
+    const testTypeLabel = screen.getByText('Test type');
+    const testTypeValue = screen.getByText('CD4 COUNT');
+    expect(testTypeLabel).toBeInTheDocument();
+    expect(testTypeValue).toBeInTheDocument();
 
     const labReferenceNumber = screen.getByRole('textbox', { name: 'Lab reference number' });
     expect(labReferenceNumber).toBeInTheDocument();
