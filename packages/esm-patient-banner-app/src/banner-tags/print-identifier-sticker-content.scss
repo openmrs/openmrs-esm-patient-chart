@@ -1,0 +1,21 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
+
+.printContainer {
+  height: 11rem;
+  width: 13rem;
+  background-color: $ui-01;
+}
+
+.pageBreak {
+  page-break-after: always;
+}
+
+.labelsContainer {
+  display: grid;
+  column-gap: 1.3rem;
+  row-gap: 1rem;
+  place-items: center;
+  background-color: white;
+}

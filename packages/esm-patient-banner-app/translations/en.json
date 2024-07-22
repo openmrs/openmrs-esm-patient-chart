@@ -7,8 +7,10 @@
   "countyDistrict": "District",
   "district": "District",
   "dob": "DOB",
+  "hidePreview": "Hide Preview",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "Postal code",
+  "preview": "Preview",
   "state": "State",
   "stateProvince": "State"
 }
