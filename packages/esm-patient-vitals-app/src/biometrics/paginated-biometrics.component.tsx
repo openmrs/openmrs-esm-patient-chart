@@ -13,7 +13,6 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
-import { VitalsAndBiometricsActionMenu } from '../vitals-biometrics-form/vitals-biometrics-action-menu.component';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<BiometricsTableRow>;
@@ -95,7 +94,6 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -104,9 +102,6 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
-                    <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu rowId={row.id} formType="biometrics" />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .loading {
   margin-left: 1rem;
@@ -42,6 +42,12 @@
 
 .errorMessage {
   @include type.type-style("label-02");
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
   color: $danger;
+}
+
+.notification {
+  margin: 0;
+  min-width: 100%;
+  padding: 0;
 }
