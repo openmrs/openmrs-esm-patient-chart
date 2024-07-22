@@ -83,7 +83,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const isTablet = useLayoutType() === 'tablet';
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchAddLabsOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
+  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -108,13 +108,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
           launchAddDrugOrder();
           break;
         case 'testorder':
-          launchAddLabsOrder();
+          launchModifyLabOrder({ order: buildLabOrder(orderItem, 'REVISE') });
           break;
         default:
           launchOrderBasket();
       }
     },
-    [launchAddDrugOrder, launchAddLabsOrder, launchOrderBasket],
+    [launchAddDrugOrder, launchModifyLabOrder, launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -488,7 +488,6 @@ function OrderBasketItemActions({
       });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrderItems(labsOrderBasket, [...items, labItem]);
       openOrderForm({ order: labItem });
     }
   }, [orderItem, openOrderForm, items, setOrderItems]);
