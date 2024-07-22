@@ -2,6 +2,7 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@import '../../root.scss';
 
 .orderForm {
   flex-grow: 1;
@@ -59,6 +60,11 @@
 
 .errorNotification {
   margin: 0.5rem 0;
+}
+
+.testTypeLabel {
+  @include type.type-style("label-01");
+  color: $text-02;
 }
 
 /* Tablet */
