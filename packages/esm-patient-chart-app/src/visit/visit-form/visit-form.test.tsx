@@ -10,6 +10,7 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
+  useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -58,9 +59,10 @@ const testProps = {
 const mockSaveVisit = saveVisit as jest.Mock;
 const mockUpdateVisit = updateVisit as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedUseVisitAttributeType = useVisitAttributeType as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig);
+const mockUseVisitAttributeType = useVisitAttributeType as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
+const mockUseVisitTypes = useVisitTypes as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -74,9 +76,7 @@ jest.mock('@openmrs/esm-framework', () => {
     restBaseUrl: '/ws/rest/v1',
     saveVisit: jest.fn(),
     updateVisit: jest.fn(),
-    openmrsFetch: jest.fn(),
     toOmrsIsoString: jest.fn(),
-    useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
     usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
@@ -173,7 +173,7 @@ jest.mock('../hooks/useLocations', () => {
 
 describe('Visit Form', () => {
   beforeAll(() => {
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
       visitAttributeTypes: [
         {
@@ -188,6 +188,8 @@ describe('Visit Form', () => {
         },
       ],
     });
+
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
   });
 
   beforeEach(() => {
@@ -531,7 +533,7 @@ describe('Visit Form', () => {
   });
 
   it('should show an inline error notification if an optional visit attribute type field fails to load', async () => {
-    mockedUseVisitAttributeType.mockReturnValue({
+    mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
       data: visitAttributes.punctuality,
@@ -547,7 +549,7 @@ describe('Visit Form', () => {
   it('should show an error if a required visit attribute type is not provided', async () => {
     const user = userEvent.setup();
 
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
       visitAttributeTypes: [
         {
@@ -586,12 +588,12 @@ describe('Visit Form', () => {
   });
 
   it('should disable the submit button show an inline error notification if required visit attribute fields fail to load', async () => {
-    mockedUseVisitAttributeType.mockReturnValue({
+    mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
       data: visitAttributes.punctuality,
     });
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,

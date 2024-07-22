@@ -24,7 +24,6 @@ const mockPromptBeforeClosing = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
   useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
 }));
 

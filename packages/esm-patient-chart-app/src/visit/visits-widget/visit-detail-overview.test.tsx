@@ -1,7 +1,7 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, getConfig, useConfig } from '@openmrs/esm-framework';
+import { screen } from '@testing-library/react';
+import { openmrsFetch, getConfig, useConfig, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
@@ -13,6 +13,7 @@ const testProps = {
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
+const mockUserHasAccess = userHasAccess as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -20,16 +21,16 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     getVisitsForPatient: jest.fn(),
-    createErrorHandler: jest.fn(),
-    useLayoutType: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ({ numberOfVisitsToLoad: 5 })),
     userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
-    useConnectedExtensions: jest.fn(() => []),
   };
 });
 
 describe('VisitDetailOverview', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseConfig.mockReturnValue({ numberOfVisitsToLoad: 5 });
+  });
+
   it('renders an empty state view if encounters data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });

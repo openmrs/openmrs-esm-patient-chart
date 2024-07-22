@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -20,6 +20,7 @@ const mockUseAllergens = useAllergens as jest.Mock;
 const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
 const mockShowSnackbar = showSnackbar as jest.Mock;
 const mockUpdatePatientAllergy = updatePatientAllergy as jest.Mock;
+const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('./allergy-form.resource', () => {
   const originalModule = jest.requireActual('./allergy-form.resource');
@@ -48,24 +49,21 @@ mockUseAllergens.mockReturnValue({
   isLoading: false,
   allergens: mockAllergens,
 });
+
 mockUseAllergicReactions.mockReturnValue({
   isLoading: false,
   allergicReactions: mockAllergicReactions,
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ({
-      concepts: mockConcepts,
-    })),
-  };
-});
-
 describe('AllergyForm ', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUseConfig.mockReturnValue({
+      concepts: mockConcepts,
+    });
+  });
+
   it('renders the allergy form with all the expected fields and values', async () => {
     renderAllergyForm();
     const user = userEvent.setup();

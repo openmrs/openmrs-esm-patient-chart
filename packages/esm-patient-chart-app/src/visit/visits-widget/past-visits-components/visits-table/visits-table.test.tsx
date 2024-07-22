@@ -12,9 +12,9 @@ const testProps = {
   visits: mockEncounters,
 };
 
-const mockedShowModal = showModal as jest.Mock;
-const mockedGetConfig = getConfig as jest.Mock;
-const mockedUserHasAccess = userHasAccess as jest.Mock;
+const mockShowModal = showModal as jest.Mock;
+const mockGetConfig = getConfig as jest.Mock;
+const mockUserHasAccess = userHasAccess as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -27,10 +27,13 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('EncounterList', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders an empty state when no encounters are available', async () => {
     testProps.visits = [];
-
-    mockedGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderVisitsTable();
 
@@ -93,7 +96,7 @@ describe('Delete Encounter', () => {
     const user = userEvent.setup();
     testProps.visits = mockEncounters;
 
-    mockedUserHasAccess.mockReturnValue(true);
+    mockUserHasAccess.mockReturnValue(true);
 
     renderVisitsTable();
 
@@ -107,8 +110,8 @@ describe('Delete Encounter', () => {
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger Delete this encounter/i }));
 
-    expect(mockedShowModal).toHaveBeenCalledTimes(1);
-    expect(mockedShowModal).toHaveBeenCalledWith(
+    expect(mockShowModal).toHaveBeenCalledTimes(1);
+    expect(mockShowModal).toHaveBeenCalledWith(
       'delete-encounter-modal',
       expect.objectContaining({
         encounterTypeName: 'POC Consent Form',

@@ -26,11 +26,6 @@ const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-}));
-
 jest.mock('./conditions.resource', () => ({
   ...jest.requireActual('./conditions.resource'),
   createCondition: jest.fn(),

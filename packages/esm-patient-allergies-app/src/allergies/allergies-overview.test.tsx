@@ -12,15 +12,6 @@ const testProps = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    attach: jest.fn(),
-  };
-});
-
 describe('AllergiesOverview: ', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });

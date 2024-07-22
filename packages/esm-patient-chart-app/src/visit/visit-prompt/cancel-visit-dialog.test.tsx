@@ -20,8 +20,6 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    useVisit: jest.fn(),
-    openmrsFetch: jest.fn(),
     restBaseUrl: '/ws/rest/v1',
   };
 });

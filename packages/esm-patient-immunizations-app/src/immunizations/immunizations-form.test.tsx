@@ -5,45 +5,21 @@ import ImmunizationsForm from './immunizations-form.workspace';
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
 import { immunizationFormSub } from './utils';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, useSession, useVisit } from '@openmrs/esm-framework';
 
 const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 const mockSetTitle = jest.fn();
+const mockUseConfig = useConfig as jest.Mock;
+const mockUseSession = useSession as jest.Mock;
+const mockUseVisit = useVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   toOmrsIsoString: jest.fn(),
   toDateObjectStrict: jest.fn(),
-  useConfig: jest.fn(() => ({
-    immunizationsConfig: {
-      vaccinesConceptSet: 'CIEL:984',
-      sequenceDefinitions: [
-        {
-          vaccineConceptUuid: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          sequences: [
-            { sequenceLabel: 'Dose-1', sequenceNumber: 1 },
-            { sequenceLabel: 'Dose-2', sequenceNumber: 2 },
-            { sequenceLabel: 'Dose-3', sequenceNumber: 3 },
-            { sequenceLabel: 'Dose-4', sequenceNumber: 4 },
-            { sequenceLabel: 'Booster-1', sequenceNumber: 11 },
-            { sequenceLabel: 'Booster-2', sequenceNumber: 12 },
-          ],
-        },
-      ],
-    },
-  })),
-  useSession: jest.fn(() => ({
-    sessionLocation: { uuid: '8d94f852-c2cc-11de-8d13-0010c6dffd0f' },
-    currentProvider: { uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1' },
-  })),
-  useVisit: jest.fn(() => ({
-    currentVisit: {
-      uuid: '78d8f281-e7bb-4b5e-a056-2b46a7fe5555',
-    },
-  })),
 }));
 
 jest.mock('../hooks/useImmunizationsConceptSet', () => ({
@@ -93,6 +69,36 @@ const testProps = {
 describe('Immunizations Form', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    mockUseConfig.mockReturnValue({
+      immunizationsConfig: {
+        vaccinesConceptSet: 'CIEL:984',
+        sequenceDefinitions: [
+          {
+            vaccineConceptUuid: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            sequences: [
+              { sequenceLabel: 'Dose-1', sequenceNumber: 1 },
+              { sequenceLabel: 'Dose-2', sequenceNumber: 2 },
+              { sequenceLabel: 'Dose-3', sequenceNumber: 3 },
+              { sequenceLabel: 'Dose-4', sequenceNumber: 4 },
+              { sequenceLabel: 'Booster-1', sequenceNumber: 11 },
+              { sequenceLabel: 'Booster-2', sequenceNumber: 12 },
+            ],
+          },
+        ],
+      },
+    });
+
+    mockUseSession.mockReturnValue({
+      sessionLocation: { uuid: '8d94f852-c2cc-11de-8d13-0010c6dffd0f' },
+      currentProvider: { uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1' },
+    });
+
+    mockUseVisit.mockReturnValue({
+      currentVisit: {
+        uuid: '78d8f281-e7bb-4b5e-a056-2b46a7fe5555',
+      },
+    });
   });
 
   it('should render ImmunizationsForm component', () => {

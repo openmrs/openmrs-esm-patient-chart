@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  age,
   getHistory,
   goBackInHistory,
   navigate,
@@ -12,11 +13,12 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { getByTextWithMarkup, mockPatient, mockPatientWithLongName } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
+const mockAge = age as jest.Mock;
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;
@@ -27,15 +29,10 @@ const mockGoBackInHistory = goBackInHistory as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
+
   return {
     ...originalModule,
-    age: jest.fn().mockReturnValue('20'),
-    getHistory: jest.fn(() => []),
-    goBackInHistory: jest.fn(),
-    LeftNavMenu: jest.fn().mockImplementation(() => <div>Left Nav Menu</div>),
     translateFrom: (module, key, defaultValue, options) => defaultValue,
-    useAssignedExtensions: jest.fn(),
-    useOnClickOutside: jest.fn(),
   };
 });
 
@@ -47,8 +44,10 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-describe('Visit Header', () => {
+describe('Visit header', () => {
   beforeEach(() => {
+    mockAge.mockReturnValue('20');
+    mockGetHistory.mockReturnValue([]);
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockGoBackInHistory.mockClear();
   });

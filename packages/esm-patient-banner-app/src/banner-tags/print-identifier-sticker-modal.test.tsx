@@ -2,11 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useReactToPrint } from 'react-to-print';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockedCloseModal = jest.fn();
 const mockedUseReactToPrint = jest.mocked(useReactToPrint);
+const mockedUseConfig = jest.mocked(useConfig);
 
 jest.mock('react-to-print', () => {
   const originalModule = jest.requireActual('react-to-print');
@@ -17,18 +19,15 @@ jest.mock('react-to-print', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockImplementation(() => ({
-      printIdentifierStickerFields: ['name', 'identifier', 'age', 'dateOfBirth', 'gender'],
-    })),
-  };
-});
-
 describe('PrintIdentifierSticker', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockedUseConfig.mockReturnValue({
+      printIdentifierStickerFields: ['name', 'identifier', 'age', 'dateOfBirth', 'gender'],
+    });
+  });
+
   test('renders the component', () => {
     renderPrintIdentifierSticker();
 
@@ -65,6 +64,7 @@ describe('PrintIdentifierSticker', () => {
     expect(handlePrint).toHaveBeenCalled();
   });
 });
+
 function renderPrintIdentifierSticker() {
   render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockedCloseModal} />);
 }

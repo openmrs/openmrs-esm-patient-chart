@@ -1,7 +1,7 @@
 import React from 'react';
-import { of, throwError } from 'rxjs';
-import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render } from '@testing-library/react';
+import { of, throwError } from 'rxjs';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.component';
@@ -13,17 +13,16 @@ const endVisitPayload = {
   visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
 };
 
-const mockedCloseModal = jest.fn();
-const mockedMutate = jest.fn();
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockedUpdateVisit = jest.mocked(updateVisit);
-const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
+const mockCloseModal = jest.fn();
+const mockMutate = jest.fn();
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseVisit = jest.mocked(useVisit) as jest.Mock;
+const mockUpdateVisit = jest.mocked(updateVisit);
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
     ...originalModule,
-    showSnackbar: jest.fn(),
     updateVisit: jest.fn(),
   };
 });
@@ -32,8 +31,8 @@ describe('End visit dialog', () => {
   test('displays a success snackbar when the visit is ended successfully', async () => {
     const user = userEvent.setup();
 
-    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockedMutate });
-    mockedUpdateVisit.mockReturnValueOnce(
+    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
+    mockUpdateVisit.mockReturnValueOnce(
       of({
         status: 200,
         data: {
@@ -66,7 +65,7 @@ describe('End visit dialog', () => {
 
     expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
 
-    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
       subtitle: 'Facility Visit ended successfully',
       kind: 'success',
@@ -77,8 +76,8 @@ describe('End visit dialog', () => {
   test('displays an error snackbar if there was a problem ending a visit', async () => {
     const user = userEvent.setup();
 
-    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockedMutate });
-    mockedUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
+    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
+    mockUpdateVisit.mockImplementationOnce(() => throwError(() => new Error('Internal error message')));
 
     renderEndVisitDialog();
 
@@ -95,7 +94,7 @@ describe('End visit dialog', () => {
 
     expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
 
-    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'Internal error message',
       kind: 'error',
       title: 'Error ending visit',
@@ -105,5 +104,5 @@ describe('End visit dialog', () => {
 });
 
 function renderEndVisitDialog() {
-  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockedCloseModal} />);
+  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 }

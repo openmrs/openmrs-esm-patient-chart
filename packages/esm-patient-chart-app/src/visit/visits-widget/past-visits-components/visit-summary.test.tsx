@@ -1,31 +1,28 @@
 import React from 'react';
-import { getConfig } from '@openmrs/esm-framework';
-import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
+import { ExtensionSlot, getConfig, useConfig } from '@openmrs/esm-framework';
+import { screen, render } from '@testing-library/react';
 import { mockPatient } from 'tools';
+import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
 import VisitSummary from './visit-summary.component';
 
-const mockVisit = visitOverviewDetailMockData.data.results[0];
+const mockExtensionSlot = ExtensionSlot as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.name),
-    useConfig: jest.fn(() => {
-      return {
-        notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
-        visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      };
-    }),
-    useConnectedExtensions: jest.fn(() => []),
-  };
-});
+const mockUseConfig = useConfig as jest.Mock;
+const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 describe('VisitSummary', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUseConfig.mockReturnValue({
+      notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
+      visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    });
+
+    mockExtensionSlot.mockImplementation((ext) => ext.name);
+  });
+
   it('should display empty state for notes, test and medication summary', async () => {
     const user = userEvent.setup();
     mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));

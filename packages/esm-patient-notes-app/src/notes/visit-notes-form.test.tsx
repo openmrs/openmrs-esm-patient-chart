@@ -1,7 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { of } from 'rxjs/internal/observable/of';
 import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
 import {
@@ -25,22 +24,10 @@ const testProps = {
 const mockFetchDiagnosisConceptsByName = fetchDiagnosisConceptsByName as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = useConfig as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig);
 const mockUseSession = useSession as jest.Mock;
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    createErrorHandler: jest.fn(),
-    showSnackbar: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ConfigMock),
-    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
-  };
-});
 
 jest.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: jest.fn(),
@@ -58,6 +45,13 @@ jest.mock('./visit-notes.resource', () => ({
     mutateVisits: jest.fn(),
   })),
 }));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+
+  mockUseConfig.mockReturnValue(ConfigMock);
+  mockUseSession.mockReturnValue(mockSessionDataResponse);
+});
 
 test('renders the visit notes form with all the relevant fields and values', () => {
   mockFetchDiagnosisConceptsByName.mockResolvedValue([]);

@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { launchFormEntryOrHtmlForms, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit, mockForms } from '__mocks__';
@@ -11,18 +11,6 @@ const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    isDesktop: jest.fn(),
-    showModal: jest.fn(),
-    useConfig: jest.fn(),
-    useConnectivity: jest.fn(),
-  };
-});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');

@@ -97,18 +97,7 @@ jest.mock('../common', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockReturnValue({
-      concepts: {
-        pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      },
-    }),
-  };
-});
+const mockUseConfig = jest.mocked(useConfig);
 
 const testProps = {
   control: undefined,
@@ -121,6 +110,14 @@ const testProps = {
 };
 
 describe('VitalsAndBiometricsInput', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      concepts: {
+        pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+    });
+  });
+
   it('renders number inputs based correctly on the props provided', () => {
     testProps.fieldProperties = [
       {

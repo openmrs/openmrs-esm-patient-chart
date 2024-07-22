@@ -1,16 +1,15 @@
 import { isDesktop } from './utils';
 import { isDesktop as actualIsDesktopFn } from '@openmrs/esm-framework';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    isDesktop: jest.fn().mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop'),
-  };
-});
+const mockIsDesktop = jest.mocked(actualIsDesktopFn);
 
 describe('isDesktop', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockIsDesktop.mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop');
+  });
+
   it('is true when layout = tablet', () => {
     expect(isDesktop('tablet')).toBeFalsy();
   });

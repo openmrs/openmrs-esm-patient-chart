@@ -14,16 +14,6 @@ const testProps = {
 
 const mockUseVisitNotes = useVisitNotes as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    useVisit: jest.fn().mockReturnValue([{}]),
-  };
-});
-
 jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
 });

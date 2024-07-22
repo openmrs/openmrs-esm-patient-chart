@@ -17,15 +17,6 @@ jest.mock('../hooks/use-forms', () => ({
   }),
 }));
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn(),
-  };
-});
-
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 

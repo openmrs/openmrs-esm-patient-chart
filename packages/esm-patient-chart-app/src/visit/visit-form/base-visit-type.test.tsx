@@ -1,6 +1,6 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render } from '@testing-library/react';
 import { useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import BaseVisitType from './base-visit-type.component';
@@ -8,12 +8,6 @@ import BaseVisitType from './base-visit-type.component';
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const mockUseVisitTypes = useVisitTypes as jest.Mock;
-const mockGoToPage = jest.fn();
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  useVisitTypes: jest.fn(),
-}));
 
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
