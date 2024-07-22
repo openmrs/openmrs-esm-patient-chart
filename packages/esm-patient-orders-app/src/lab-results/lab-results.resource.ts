@@ -110,48 +110,36 @@ export function fetchObservation(obsUuid: string) {
   });
 }
 
-const addObservation = async (encounterUuid: string, obsPayload: any, abortController: any) => {
-  const saveResultObs = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: obsPayload,
-  });
-
-  return saveResultObs.status;
-};
-
-const editObservation = async (obsUuid: string, obsPayload: any, abortController: any) => {
-  const editResultObs = await openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: obsPayload,
-  });
-
-  return editResultObs.status;
-};
-
 // TODO: the calls to update order and observations for results should be transactional to allow for rollback
 export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
-  obsUuid: string,
   obsPayload: any,
   fulfillerPayload: any,
+  orderPayload: any,
   abortController: AbortController,
 ) {
-  const saveObs = obsUuid
-    ? editObservation(obsUuid, obsPayload, abortController)
-    : addObservation(encounterUuid, obsPayload, abortController);
+  const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: orderPayload,
+  });
 
-  saveObs.then((obsStatus) => {
-    if (obsStatus === 200 || obsStatus === 201) {
-      return openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
+  if (updateOrderCall.status === 201) {
+    const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortController.signal,
+      body: obsPayload,
+    });
+
+    if (saveEncounter.status === 200 || saveEncounter.status === 201) {
+      const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +147,8 @@ export async function updateOrderResult(
         signal: abortController.signal,
         body: fulfillerPayload,
       });
+      return fulfillOrder;
     }
-    throw new Error('Saving of test results failed');
-  });
+  }
+  throw new Error('Failed to update order');
 }
