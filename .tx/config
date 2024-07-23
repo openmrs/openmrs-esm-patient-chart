@@ -100,15 +100,6 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-immunizations-app
 
-[o:openmrs:p:openmrs3:r:esm-patient-labs-app]
-file_filter            = packages/esm-patient-labs-app/translations/<lang>.json
-source_file            = packages/esm-patient-labs-app/translations/en.json
-source_lang            = en
-type                   = KEYVALUEJSON
-replace_edited_strings = false
-keep_translations      = false
-resource_name          = esm-patient-labs-app
-
 [o:openmrs:p:openmrs3:r:esm-patient-lists-app]
 file_filter            = packages/esm-patient-lists-app/translations/<lang>.json
 source_file            = packages/esm-patient-lists-app/translations/en.json
@@ -153,6 +144,15 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-programs-app
+
+[o:openmrs:p:openmrs3:r:esm-patient-tests-app]
+file_filter            = packages/esm-patient-tests-app/translations/<lang>.json
+source_file            = packages/esm-patient-tests-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-patient-tests-app
 
 [o:openmrs:p:openmrs3:r:esm-patient-vitals-app]
 file_filter            = packages/esm-patient-vitals-app/translations/<lang>.json
