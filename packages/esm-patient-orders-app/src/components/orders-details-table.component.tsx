@@ -11,6 +11,7 @@ import {
   Layer,
   OverflowMenu,
   OverflowMenuItem,
+  Search,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +22,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbarContent,
+  Tile,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -112,7 +115,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
-
   const {
     data: allOrders,
     error: error,
@@ -384,76 +386,103 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                         getTableContainerProps,
                         getTableProps,
                         headers,
+                        onInputChange,
                         rows,
                       }) => (
-                        <TableContainer {...getTableContainerProps}>
-                          <Table className={styles.table} {...getTableProps()}>
-                            <TableHead>
-                              <TableRow>
-                                <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                                {headers.map((header: { header: string }) => (
-                                  <TableHeader key={header.header} {...getHeaderProps({ header })}>
-                                    {header.header}
-                                  </TableHeader>
-                                ))}
-                                <TableExpandHeader />
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {rows.map((row: DataTableRow) => {
-                                const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
+                        <>
+                          <TableContainer {...getTableContainerProps}>
+                            <div className={styles.toolBarContent}>
+                              <TableToolbarContent>
+                                <Layer>
+                                  <Search
+                                    expanded
+                                    onChange={onInputChange}
+                                    placeholder={t('searchTable', 'Search table')}
+                                    size="lg"
+                                  />
+                                </Layer>
+                              </TableToolbarContent>
+                            </div>
+                            <Table className={styles.table} {...getTableProps()}>
+                              <TableHead>
+                                <TableRow>
+                                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                                  {headers.map((header: { header: string }) => (
+                                    <TableHeader key={header.header} {...getHeaderProps({ header })}>
+                                      {header.header}
+                                    </TableHeader>
+                                  ))}
+                                  <TableExpandHeader />
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {rows.map((row: DataTableRow) => {
+                                  const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
 
-                                return (
-                                  <React.Fragment key={row.id}>
-                                    <TableExpandRow className={styles.row} {...getRowProps({ row })}>
-                                      {row.cells.map((cell) => (
-                                        <TableCell className={styles.tableCell} key={cell.id}>
-                                          {cell.value['content'] ?? cell.value}
+                                  return (
+                                    <React.Fragment key={row.id}>
+                                      <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                                        {row.cells.map((cell) => (
+                                          <TableCell className={styles.tableCell} key={cell.id}>
+                                            {cell.value['content'] ?? cell.value}
+                                          </TableCell>
+                                        ))}
+                                        <TableCell className="cds--table-column-menu">
+                                          <OrderBasketItemActions
+                                            items={orders}
+                                            openOrderBasket={launchOrderBasket}
+                                            openOrderForm={() => openOrderForm(matchingOrder)}
+                                            orderItem={matchingOrder}
+                                            setOrderItems={setOrders}
+                                            responsiveSize={responsiveSize}
+                                          />
                                         </TableCell>
-                                      ))}
-                                      <TableCell className="cds--table-column-menu">
-                                        <OrderBasketItemActions
-                                          items={orders}
-                                          openOrderBasket={launchOrderBasket}
-                                          openOrderForm={() => openOrderForm(matchingOrder)}
-                                          orderItem={matchingOrder}
-                                          setOrderItems={setOrders}
-                                          responsiveSize={responsiveSize}
-                                        />
-                                      </TableCell>
-                                    </TableExpandRow>
-                                    {row.isExpanded ? (
-                                      <TableExpandedRow
-                                        colSpan={headers.length + 2}
-                                        {...getExpandedRowProps({
-                                          row,
-                                        })}
-                                      >
-                                        <>
-                                          {(() => {
-                                            if (matchingOrder?.type === 'drugorder') {
-                                              return <MedicationRecord medication={matchingOrder} />;
-                                            } else if (matchingOrder?.type === 'testorder') {
-                                              return <TestOrder testOrder={matchingOrder} />;
-                                            } else {
-                                              return (
-                                                <span className={styles.unknownOrderTypeText}>
-                                                  {t('unknownOrderType', 'Unknown order type')}
-                                                </span>
-                                              );
-                                            }
-                                          })()}
-                                        </>
-                                      </TableExpandedRow>
-                                    ) : (
-                                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                                    )}
-                                  </React.Fragment>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
+                                      </TableExpandRow>
+                                      {row.isExpanded ? (
+                                        <TableExpandedRow
+                                          colSpan={headers.length + 2}
+                                          {...getExpandedRowProps({
+                                            row,
+                                          })}
+                                        >
+                                          <>
+                                            {(() => {
+                                              if (matchingOrder?.type === 'drugorder') {
+                                                return <MedicationRecord medication={matchingOrder} />;
+                                              } else if (matchingOrder?.type === 'testorder') {
+                                                return <TestOrder testOrder={matchingOrder} />;
+                                              } else {
+                                                return (
+                                                  <span className={styles.unknownOrderTypeText}>
+                                                    {t('unknownOrderType', 'Unknown order type')}
+                                                  </span>
+                                                );
+                                              }
+                                            })()}
+                                          </>
+                                        </TableExpandedRow>
+                                      ) : (
+                                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                                      )}
+                                    </React.Fragment>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                          {rows.length === 0 ? (
+                            <div className={styles.tileContainer}>
+                              <Tile className={styles.emptyStateTile}>
+                                <div className={styles.tileContent}>
+                                  <p className={styles.content}>
+                                    {t('noMatchingOrdersToDisplay', 'No matching orders to display')}
+                                  </p>
+                                  <p className={styles.helperText}>{t('checkFilters', 'Check the filters above')}</p>
+                                </div>
+                              </Tile>
+                            </div>
+                          ) : null}
+                        </>
                       )}
                     </DataTable>
                     {!isPrinting && (

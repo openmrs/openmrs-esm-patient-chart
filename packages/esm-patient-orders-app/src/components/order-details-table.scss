@@ -126,3 +126,34 @@
     border-top: none !important;
   }
 }
+
+.toolBarContent {
+  background-color: colors.$gray-10;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-70;
+  padding: layout.$spacing-11 0;
+}
+
+.emptyStateTile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helperText {
+  @include type.type-style('helper-text-02');
+}
