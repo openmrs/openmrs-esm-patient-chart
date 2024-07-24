@@ -215,22 +215,6 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
     }
   }, [handleScroll]);
 
-  const onIntersect = (entries) => {
-    entries.forEach((entry) => {
-      if (entry.intersectionRatio > 0.5) {
-        // setPanelName(parent.display);
-      }
-    });
-  };
-
-  const observer = new IntersectionObserver(onIntersect, {
-    root: null,
-    threshold: 0.5,
-  });
-  if (titleRef.current) {
-    observer.observe(titleRef.current);
-  }
-
   return (
     <>
       <div>
