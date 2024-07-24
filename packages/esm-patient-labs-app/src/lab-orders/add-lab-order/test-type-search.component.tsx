@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { closeWorkspace, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
@@ -10,13 +10,24 @@ import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './lab-order';
 import styles from './test-type-search.scss';
 
+interface TestTypeSearchResultsProps {
+  searchTerm: string;
+  openOrderForm: (searchResult: LabOrderBasketItem) => void;
+  focusAndClearSearchInput: () => void;
+}
+
+interface TestTypeSearchResultItemProps {
+  t: TFunction;
+  testType: TestType;
+  openOrderForm: (searchResult: LabOrderBasketItem) => void;
+}
+
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: LabOrderBasketItem) => void;
 }
 
 export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
@@ -52,16 +63,20 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
   );
 }
 
-interface TestTypeSearchResultsProps {
-  searchTerm: string;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
-  focusAndClearSearchInput: () => void;
-}
-
 function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchInput }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { testTypes, isLoading, error } = useTestTypes(searchTerm);
+  const { testTypes, isLoading, error } = useTestTypes();
+
+  const filteredTestTypes = useMemo(() => {
+    if (!searchTerm) {
+      return testTypes;
+    }
+
+    if (searchTerm && searchTerm.trim() !== '') {
+      return testTypes.filter((testType) => testType.label.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+  }, [searchTerm, testTypes]);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -84,61 +99,65 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
     );
   }
 
-  return (
-    <>
-      {testTypes?.length ? (
+  if (filteredTestTypes?.length) {
+    return (
+      <>
         <div className={styles.container}>
           {searchTerm && (
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
                 {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
-                  count: testTypes?.length,
+                  count: filteredTestTypes?.length,
                   searchTerm,
                 })}
               </span>
               <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
-                {t('clearSearchResults', 'Clear Results')}
+                {t('clearSearchResults', 'Clear results')}
               </Button>
             </div>
           )}
           <div className={styles.resultsContainer}>
-            {testTypes.map((testType) => (
-              <TestTypeSearchResultItem key={testType.conceptUuid} testType={testType} openOrderForm={openOrderForm} />
+            {filteredTestTypes.map((testType) => (
+              <TestTypeSearchResultItem
+                key={testType.conceptUuid}
+                openOrderForm={openOrderForm}
+                t={t}
+                testType={testType}
+              />
             ))}
           </div>
         </div>
-      ) : (
-        <Tile className={styles.emptyState}>
-          <div>
-            <h4 className={styles.productiveHeading01}>
-              {t('noResultsForTestTypeSearch', 'No results to display for "{{searchTerm}}"', {
-                searchTerm,
-              })}
-            </h4>
-            <p className={styles.bodyShort01}>
-              <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
-                {t('searchAgain', 'search again')}
-              </span>{' '}
-              <span>{t('usingADifferentTerm', 'using a different term')}</span>
-            </p>
-          </div>
-        </Tile>
-      )}
-      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
-    </>
+
+        <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
+      </>
+    );
+  }
+
+  return (
+    <Tile className={styles.emptyState}>
+      <div>
+        <h4 className={styles.productiveHeading01}>
+          {t('noResultsForTestTypeSearch', 'No results to display for "{{searchTerm}}"', {
+            searchTerm,
+          })}
+        </h4>
+        <p className={styles.bodyShort01}>
+          <span>{t('tryTo', 'Try to')}</span>{' '}
+          <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
+            {t('searchAgain', 'search again')}
+          </span>{' '}
+          <span>{t('usingADifferentTerm', 'using a different term')}</span>
+        </p>
+      </div>
+    </Tile>
   );
 }
 
-interface TestTypeSearchResultItemProps {
-  testType: TestType;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
-}
-
-const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ testType, openOrderForm }) => {
+const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, testType, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
+
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
     [orders, testType],
@@ -146,12 +165,10 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
   const createLabOrder = useCallback(
     (testType: TestType) => {
-      return createEmptyLabOrder(testType, session.currentProvider.uuid);
+      return createEmptyLabOrder(testType, session.currentProvider?.uuid);
     },
     [session.currentProvider.uuid],
   );
-
-  const { t } = useTranslation();
 
   const addToBasket = useCallback(() => {
     const labOrder = createLabOrder(testType);
@@ -170,7 +187,6 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
   return (
     <Tile
       className={classNames(styles.searchResultTile, { [styles.tabletSearchResultTile]: isTablet })}
-      key={testType.conceptUuid}
       role="listitem"
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
@@ -183,7 +199,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
           <Button
             kind="danger--ghost"
             renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
-            onClick={() => removeFromBasket()}
+            onClick={removeFromBasket}
           >
             {t('removeFromBasket', 'Remove from basket')}
           </Button>
@@ -191,7 +207,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
           <Button
             kind="ghost"
             renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
-            onClick={() => addToBasket()}
+            onClick={addToBasket}
           >
             {t('directlyAddToBasket', 'Add to basket')}
           </Button>
@@ -210,28 +226,26 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
 
 const TestTypeSearchSkeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
-  const tileClassName = `${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-    styles.skeletonTile
-  }`;
+  const tileClassName = classNames({
+    [styles.tabletSearchResultTile]: isTablet,
+    [styles.desktopSearchResultTile]: !isTablet,
+    [styles.skeletonTile]: true,
+  });
+  const buttonSize = isTablet ? 'md' : 'sm';
+  const dividerClassName = classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider);
+
   return (
     <div className={styles.searchResultSkeletonWrapper}>
       <div className={styles.orderBasketSearchResultsHeader}>
         <SkeletonText className={styles.searchResultCntSkeleton} />
-        <ButtonSkeleton size={isTablet ? 'md' : 'sm'} />
+        <ButtonSkeleton size={buttonSize} />
       </div>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
+      {[...Array(4)].map((_, index) => (
+        <Tile key={index} className={tileClassName}>
+          <SkeletonText />
+        </Tile>
+      ))}
+      <hr className={dividerClassName} />
     </div>
   );
 };

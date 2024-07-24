@@ -3,6 +3,7 @@
   "active": "Actif",
   "activePrograms": "Programmes actifs",
   "add": "Ajouter",
+  "addPrograms": "Add programs",
   "cancel": "Annuller",
   "carePrograms": "Programmes de soins",
   "chooseProgram": "Choisissez un programme",
@@ -24,10 +25,11 @@
   "programEnrollmentSaveError": "Erreur d'enregistrement dans le programme",
   "programEnrollmentWorkspaceTitle": "Record program enrollment",
   "programName": "Nom du programme",
+  "programRequired": "Program is required",
   "programs": "programmes",
   "Programs": "Programs",
-  "required": "Requis",
   "saveAndClose": "Sauvegarder et fermer",
+  "saving": "Saving",
   "seeAll": "Voir tout",
   "status": "Statut"
 }

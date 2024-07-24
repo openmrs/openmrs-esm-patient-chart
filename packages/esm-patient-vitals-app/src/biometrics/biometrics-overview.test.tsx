@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -67,7 +68,7 @@ describe('BiometricsOverview: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.findByRole('heading', { name: /biometrics/i }));
+    await screen.findByRole('heading', { name: /biometrics/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
@@ -89,16 +90,12 @@ describe('BiometricsOverview: ', () => {
     await waitForLoadingToFinish();
 
     await screen.findByRole('heading', { name: /biometrics/i });
-    await screen.findByRole('table', { name: /biometrics/i });
+    screen.getByRole('table', { name: /biometrics/i });
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
-    const extractCellsExcludingActions = (row) => {
-      const cells = Array.from(row.querySelectorAll('td'));
-      return cells.filter((cell: HTMLElement) => cell.id !== 'actions');
-    };
-    const initialRows = screen.getAllByRole('row');
-    const initialCellsExcludingActions = initialRows.map(extractCellsExcludingActions);
+
+    const initialRowElements = screen.getAllByRole('row');
 
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
@@ -121,15 +118,15 @@ describe('BiometricsOverview: ', () => {
     await user.click(sortRowsButton);
     // Sorting in ascending order
     await user.click(sortRowsButton);
-    const initialSortedCellsExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
-    expect(initialSortedCellsExcludingActions).not.toEqual(initialCellsExcludingActions);
+
+    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
 
     // Sorting order = NONE, hence it is still in the ascending order
     await user.click(sortRowsButton);
     // Sorting in descending order
     await user.click(sortRowsButton);
-    const finalCellsSortedExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
-    expect(finalCellsSortedExcludingActions).toEqual(initialCellsExcludingActions);
+
+    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

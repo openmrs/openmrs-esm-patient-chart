@@ -1,35 +1,35 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading01 {
   @include type.type-style("heading-compact-01");
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .productiveHeading02 {
   @include type.type-style("heading-compact-02");
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .productiveHeading03 {
   @include type.type-style("heading-03");
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .productiveHeading04 {
   @include type.type-style("heading-04");
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .productiveHeading05 {
   @include type.type-style("heading-05");
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .productiveHeading06 {
   @include type.type-style("heading-06");
-  margin-bottom: spacing.$spacing-06;
+  margin-bottom: layout.$spacing-06;
 }
 
 .bodyShort01 {

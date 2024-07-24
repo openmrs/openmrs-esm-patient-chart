@@ -11,7 +11,7 @@ import {
   type LabOrderBasketItem,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { TestTypeSearch } from './test-type-search';
+import { TestTypeSearch } from './test-type-search.component';
 import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
 
@@ -77,6 +77,7 @@ export default function AddLabOrderWorkspace({
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
+          setTitle={() => {}}
         />
       )}
     </div>

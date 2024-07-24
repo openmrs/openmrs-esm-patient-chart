@@ -13,13 +13,7 @@ import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
-import type {
-  Encounter,
-  FHIRSearchBundleResponse,
-  MappedVitals,
-  PatientVitalsAndBiometrics,
-  VitalsResponse,
-} from './types';
+import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.workspace';
 
 const pageSize = 100;
@@ -126,6 +120,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     () => [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
     [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
   );
+
   const conceptUuids = useMemo(
     () =>
       (mode === 'both'
@@ -210,6 +205,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       .map(vitalsProperties(conceptMetadata))
       ?.reduce((vitalsHashTable, vitalSign) => {
         const recordedDate = new Date(new Date(vitalSign.recordedDate)).toISOString();
+
         if (vitalsHashTable.has(recordedDate) && vitalsHashTable.get(recordedDate)) {
           vitalsHashTable.set(recordedDate, {
             ...vitalsHashTable.get(recordedDate),
@@ -219,7 +215,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         } else {
           vitalSign.value &&
             vitalsHashTable.set(recordedDate, {
-              uuid: vitalSign.uuid,
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
@@ -297,25 +292,15 @@ function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAn
  * @internal
  */
 function vitalsProperties(conceptMetadata: Array<ConceptMetadata> | undefined) {
-  return (resource: FHIRResource['resource']): MappedVitals => {
-    const { code, effectiveDateTime, encounter, valueQuantity, valueString } = resource || {};
-    let uuid;
-    const idx = encounter?.reference.lastIndexOf('/') ?? -1;
-    if (idx >= 0) {
-      uuid = encounter.reference.slice(idx + 1);
-    }
-    const value = valueQuantity?.value || valueString;
-    return {
-      code: code?.coding?.[0]?.code,
-      interpretation: assessValue(
-        valueQuantity?.value,
-        getReferenceRangesForConcept(code?.coding?.[0]?.code, conceptMetadata),
-      ),
-      recordedDate: effectiveDateTime,
-      uuid,
-      value,
-    };
-  };
+  return (resource: FHIRResource['resource']): MappedVitals => ({
+    code: resource?.code?.coding?.[0]?.code,
+    interpretation: assessValue(
+      resource?.valueQuantity?.value,
+      getReferenceRangesForConcept(resource?.code?.coding?.[0]?.code, conceptMetadata),
+    ),
+    recordedDate: resource?.effectiveDateTime,
+    value: resource?.valueQuantity?.value,
+  });
 }
 
 export function saveVitalsAndBiometrics(
@@ -368,21 +353,6 @@ export function updateVitalsAndBiometrics(
   });
 }
 
-export function deleteVitalsAndBiometrics(encounterUuid: string, encounter: Encounter) {
-  const abortController = new AbortController();
-
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: {
-      obs: encounter.obs,
-    },
-  });
-}
-
 function createObsObject(
   vitals: VitalsBiometricsFormData,
   concepts: ConfigObject['concepts'],
@@ -402,21 +372,4 @@ function createObsObject(
  */
 export async function invalidateCachedVitalsAndBiometrics() {
   vitalsHooksMutates.forEach((mutate) => mutate());
-}
-
-export function getEncounterByUuid(encounterUuid: string) {
-  const customRepresentation =
-    'custom:(uuid,encounterDatetime,' +
-    'patient:(uuid,uuid,person,identifiers:full),' +
-    'visit:(uuid,visitType,display,startDatetime,stopDatetime),' +
-    'location:ref,encounterType:ref,' +
-    'encounterProviders:(uuid,display,provider:(uuid,display)),orders:full,' +
-    'obs:(uuid,obsDatetime,concept:(uuid,uuid,name:(display)),value:ref),' +
-    'diagnoses:(uuid,diagnosis,certainty,rank,voided,display))';
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}?v=${customRepresentation}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
 }

@@ -66,6 +66,25 @@ test('Fill a clinical form', async ({ page }) => {
     await page.getByLabel(/plan/i).fill(plan);
   });
 
+  await test.step('And I click the `Order basket` button on the siderail', async () => {
+    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
+  });
+
+  await test.step('And I click the `Add +` button to order drugs', async () => {
+    await page.getByRole('button', { name: /add/i }).nth(1).click();
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
+    await expect(page.getByText(subjectiveFindings)).toBeVisible();
+    await expect(page.getByText(objectiveFindings)).toBeVisible();
+    await expect(page.getByText(assessment)).toBeVisible();
+    await expect(page.getByText(plan)).toBeVisible();
+  });
+
   await test.step('And I click on the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save/i }).click();
   });
@@ -97,6 +116,52 @@ test('Fill a clinical form', async ({ page }) => {
     await expect(page.getByText(objectiveFindings)).toBeVisible();
     await expect(page.getByText(assessment)).toBeVisible();
     await expect(page.getByText(plan)).toBeVisible();
+  });
+});
+
+test('Form state is retained when moving between forms in the workspace', async ({ page }) => {
+  const chartPage = new ChartPage(page);
+
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see `Soap note template` listed in the clinical forms workspace', async () => {
+    await expect(page.getByRole('cell', { name: /soap note template/i, exact: true })).toBeVisible();
+  });
+
+  await test.step('When I click the `Soap note template` link to launch the form', async () => {
+    await page.getByText(/soap note template/i).click();
+  });
+
+  await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
+    await expect(page.getByText(/soap note template/i)).toBeVisible();
+  });
+
+  await test.step('When I fill the `Subjective findings` and `Objective findings` questions', async () => {
+    await page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
+    await page.getByLabel(/objective findings/i).fill(objectiveFindings);
+  });
+
+  await test.step('And I click the `Order basket` button on the siderail', async () => {
+    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
+  });
+
+  await test.step('And I click the `Add +` button to order drugs', async () => {
+    await page.getByRole('button', { name: /add/i }).nth(1).click();
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
+    await expect(page.getByText(subjectiveFindings)).toBeVisible();
+    await expect(page.getByText(objectiveFindings)).toBeVisible();
   });
 });
 

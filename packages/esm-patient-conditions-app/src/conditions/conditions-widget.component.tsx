@@ -29,13 +29,13 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionSchema } from './conditions-form.workspace';
+import { type ConditionsFormSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   conditionToEdit?: ConditionDataTableRow;
-  editing?: boolean;
+  isEditing?: boolean;
   isSubmittingForm: boolean;
   patientUuid: string;
   setErrorCreating?: (error: Error) => void;
@@ -52,7 +52,7 @@ interface RequiredFieldLabelProps {
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
-  editing,
+  isEditing,
   isSubmittingForm,
   patientUuid,
   setErrorCreating,
@@ -66,7 +66,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     formState: { errors },
     getValues,
     watch,
-  } = useFormContext<ConditionSchema>();
+  } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
   const searchInputRef = useRef(null);
   const clinicalStatus = watch('clinicalStatus');
@@ -110,20 +110,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      const res = await createCondition(payload);
+      await createCondition(payload);
+      await mutate();
 
-      if (res.status === 201) {
-        mutate();
+      showSnackbar({
+        kind: 'success',
+        subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+        title: t('conditionSaved', 'Condition saved'),
+      });
 
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
-          title: t('conditionSaved', 'Condition saved'),
-        });
-
-        closeWorkspaceWithSavedChanges();
-      }
+      closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
@@ -142,10 +138,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   const handleUpdate = useCallback(async () => {
     const payload: FormFields = {
-      clinicalStatus: editing ? getValues('clinicalStatus') : editableClinicalStatus,
+      clinicalStatus: isEditing ? getValues('clinicalStatus') : editableClinicalStatus,
       conceptId: matchingCondition?.conceptId,
       display: displayName,
-      abatementDateTime: editing
+      abatementDateTime: isEditing
         ? getValues('abatementDateTime')
           ? dayjs(getValues('abatementDateTime')).format()
           : editableAbatementDateTime
@@ -156,20 +152,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      const res = await updateCondition(conditionToEdit?.id, payload);
+      await updateCondition(conditionToEdit?.id, payload);
+      await mutate();
 
-      if (res.status === 200) {
-        mutate();
+      showSnackbar({
+        kind: 'success',
+        subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+        title: t('conditionUpdated', 'Condition updated'),
+      });
 
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('conditionNowVisible', 'It is now visible on the Conditions page'),
-          title: t('conditionUpdated', 'Condition updated'),
-        });
-
-        closeWorkspaceWithSavedChanges();
-      }
+      closeWorkspaceWithSavedChanges();
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
@@ -179,7 +171,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
-    editing,
+    isEditing,
     getValues,
     matchingCondition?.conceptId,
     mutate,
@@ -207,15 +199,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
         return;
       }
-      editing ? handleUpdate() : handleCreate();
+      isEditing ? handleUpdate() : handleCreate();
     }
-  }, [handleUpdate, editing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
+  }, [handleUpdate, isEditing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
 
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={<RequiredFieldLabel label={t('condition', 'Condition')} t={t} />}>
-          {editing ? (
+          {isEditing ? (
             <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
             <>
@@ -243,7 +235,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                         setSearchTerm('');
                         setSelectedCondition(null);
                       }}
-                      disabled={editing}
+                      disabled={isEditing}
                       value={(() => {
                         if (selectedCondition) {
                           return selectedCondition.display;
@@ -319,7 +311,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                invalid={errors?.clinicalStatus}
+                invalid={Boolean(errors?.clinicalStatus)}
                 name="clinicalStatus"
                 onBlur={onBlur}
                 onChange={onChange}
@@ -345,7 +337,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       id="endDate"
                       datePickerType="single"
                       dateFormat="d/m/Y"
-                      minDate={new Date(watch('abatementDateTime')).toISOString()}
+                      minDate={new Date(watch('onsetDateTime')).toISOString()}
                       maxDate={dayjs().utc().format()}
                       placeholder="dd/mm/yyyy"
                       onChange={([date]) => onChange(date)}
@@ -367,13 +359,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
 function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
-    <>
-      <span>{label}</span>
-
+    <span>
+      {label}
       <span title={t('required', 'Required')} className={styles.required}>
         *
       </span>
-    </>
+    </span>
   );
 }
 

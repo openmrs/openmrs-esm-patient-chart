@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .loading {
   margin-left: 1rem;
@@ -14,6 +14,10 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+
+  :global(.cds--inline-loading__text) {
+    @include type.type-style('body-01');
+  }
 }
 
 .tablet {
@@ -38,6 +42,12 @@
 
 .errorMessage {
   @include type.type-style("label-02");
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
   color: $danger;
+}
+
+.notification {
+  margin: 0;
+  min-width: 100%;
+  padding: 0;
 }

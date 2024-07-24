@@ -124,7 +124,7 @@ export interface Order {
   quantityUnits: OpenmrsResource;
   route: OpenmrsResource;
   scheduleDate: null;
-  urgency: string;
+  urgency: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
 
   // additional properties
   accessionNumber: string;
@@ -139,7 +139,7 @@ export interface Order {
     changedBy: string;
     dateChanged: string;
   };
-  fulfillerStatus: string;
+  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONINTUED';
   fulfillerComment: string;
   specimenSource: string;
   laterality: string;

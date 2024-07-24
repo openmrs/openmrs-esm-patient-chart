@@ -58,6 +58,7 @@ function renderFormDashboard() {
       closeWorkspace={jest.fn()}
       closeWorkspaceWithSavedChanges={jest.fn()}
       patientUuid=""
+      setTitle={jest.fn()}
     />,
   );
 }

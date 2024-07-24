@@ -115,7 +115,7 @@ test('clicking the Record active medications link opens the order basket form', 
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
   renderActiveMedications();
   await waitForLoadingToFinish();
-  const orderLink = await screen.getByText('Record active medications');
+  const orderLink = screen.getByText('Record active medications');
   fireEvent.click(orderLink);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });
@@ -124,7 +124,7 @@ test('clicking the Add button opens the order basket form', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
   renderActiveMedications();
   await waitForLoadingToFinish();
-  const button = await screen.getByRole('button', { name: /Add/i });
+  const button = screen.getByRole('button', { name: /Add/i });
   fireEvent.click(button);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });

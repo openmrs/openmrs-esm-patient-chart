@@ -20,6 +20,7 @@ const testProps = {
     startDate: '2023-11-14T23:45:51.000+0000',
     type: 'My List',
   },
+  setTitle: jest.fn(),
 };
 
 const mockPatientListData = [

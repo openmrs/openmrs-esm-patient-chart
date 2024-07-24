@@ -47,6 +47,7 @@
   "modify": "שנה",
   "none": "אין",
   "noResultsForDrugSearch": "אין תוצאות להצגה עבור \"{{searchTerm}}\"",
+  "numRefillsErrorMessage": "The number of refills is required",
   "onDate": "עַל",
   "orderActionDiscontinue": "הפסק",
   "orderActionIncomplete": "Incomplete",
