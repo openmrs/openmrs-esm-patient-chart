@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
+import { useOrderConceptByUuid, updateOrderResult, useLabEncounter, useObservation } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import styles from './lab-results-form.scss';
 import { mutate } from 'swr';
@@ -29,6 +29,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const { encounter, isLoading: isLoadingEncounter, mutate: mutateLabOrders } = useLabEncounter(order.encounter.uuid);
+  const { data, isLoading: isLoadingObs, error: isErrorObs } = useObservation(obsUuid);
 
   const {
     control,
@@ -54,8 +55,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     const loadInitialValues = async () => {
       if (isEditing && obsUuid) {
         setIsLoadingInitialValues(true);
-        const data = await fetchObservation(obsUuid);
-        if (data) {
+        if (data && !isLoadingObs) {
           setInitialValues(data);
         }
         setIsLoadingInitialValues(false);
@@ -63,7 +63,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     };
 
     loadInitialValues();
-  }, [isEditing, obsUuid]);
+  }, [isEditing, obsUuid, data, isLoadingObs]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);

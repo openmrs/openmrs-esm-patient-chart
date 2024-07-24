@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { type Encounter } from '../types/encounter';
+import { type Observation, type Encounter } from '../types/encounter';
+import { type OrderDiscontinuationPayload } from '../types/order';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -101,13 +102,17 @@ export function useLabEncounter(encounterUuid: string) {
   };
 }
 
-export function fetchObservation(obsUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`).then(({ data }) => {
-    if (data) {
-      return data;
-    }
-    return null;
-  });
+export function useObservation(obsUuid: string) {
+  const url = `${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(url, openmrsFetch);
+  return {
+    data: data?.data,
+    isLoading,
+    error,
+    isValidating,
+    mutate,
+  };
 }
 
 // TODO: the calls to update order and observations for results should be transactional to allow for rollback
@@ -116,7 +121,7 @@ export async function updateOrderResult(
   encounterUuid: string,
   obsPayload: any,
   fulfillerPayload: any,
-  orderPayload: any,
+  orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
   const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
@@ -138,7 +143,7 @@ export async function updateOrderResult(
       body: obsPayload,
     });
 
-    if (saveEncounter.status === 200 || saveEncounter.status === 201) {
+    if (saveEncounter.ok) {
       const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {
