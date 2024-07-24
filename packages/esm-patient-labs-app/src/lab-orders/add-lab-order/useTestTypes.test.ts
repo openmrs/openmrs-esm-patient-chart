@@ -45,10 +45,6 @@ mockOpenrsFetch.mockImplementation((url: string) => {
 });
 
 describe('useTestTypes is configurable', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should return all Test concepts when no labOrderableConcepts are provided', async () => {
     const { result } = renderHook(() => useTestTypes());
     expect(mockOpenrsFetch).toHaveBeenCalledWith(

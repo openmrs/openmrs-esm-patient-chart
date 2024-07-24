@@ -7,7 +7,7 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 
 describe('Side menu', () => {
   it('is rendered when viewport == large-desktop', () => {
-    mockUseLayoutType.mockImplementationOnce(() => 'large-desktop');
+    mockUseLayoutType.mockReturnValue('large-desktop');
     renderSideMenu();
 
     expect(screen.getByText(/left nav menu/i)).toBeInTheDocument();

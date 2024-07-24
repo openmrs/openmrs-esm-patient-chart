@@ -86,8 +86,7 @@ describe('End visit dialog', () => {
 
   test('displays an error snackbar if there was a problem ending a visit', async () => {
     const user = userEvent.setup();
-
-    mockUpdateVisit.mockImplementationOnce(() => throwError(() => new Error('Internal error message')));
+    mockUpdateVisit.mockReturnValue(throwError(() => new Error('Internal error message')));
 
     renderEndVisitDialog();
 
@@ -103,7 +102,6 @@ describe('End visit dialog', () => {
     await user.click(endVisitButton);
 
     expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
-
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'Internal error message',
       kind: 'error',
