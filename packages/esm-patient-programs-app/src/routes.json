@@ -8,7 +8,7 @@
       "name": "programs-overview-widget",
       "component": "programsOverview",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       },
       "order": 6
     },
@@ -16,9 +16,6 @@
       "name": "programs-details-widget",
       "slot": "patient-chart-programs-dashboard-slot",
       "component": "programsDetailedSummary",
-      "meta": {
-        "columnSpan": 1
-      },
       "order": 6
     },
     {
@@ -27,8 +24,7 @@
       "component": "programsDashboardLink",
       "meta": {
         "slot": "patient-chart-programs-dashboard-slot",
-        "columns": 1,
-        "path": "Programs"  
+        "path": "Programs"
       },
       "order": 10
     }
@@ -42,3 +38,4 @@
     }
   ]
 }
+

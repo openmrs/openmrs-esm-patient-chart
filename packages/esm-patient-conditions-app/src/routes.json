@@ -11,7 +11,7 @@
       "component": "conditionsOverview",
       "order": 3,
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       }
     },
     {
@@ -19,7 +19,7 @@
       "slot": "patient-chart-conditions-dashboard-slot",
       "component": "conditionsDetailedSummary",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       }
     },
     {
@@ -29,7 +29,6 @@
       "order": 7,
       "meta": {
         "slot": "patient-chart-conditions-dashboard-slot",
-        "columns": 1,
         "path": "Conditions"
       }
     },
