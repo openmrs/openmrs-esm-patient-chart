@@ -12,10 +12,10 @@ import { dashboardMeta } from './test-results/dashboard.meta';
 import externalOverviewComponent from './test-results/overview/external-overview.extension';
 import resultsViewerComponent from './test-results/results-viewer';
 
-const moduleName = '@openmrs/esm-patient-labs-app';
+const moduleName = '@openmrs/esm-patient-tests-app';
 
 const options = {
-  featureName: 'patient-labs',
+  featureName: 'patient-tests',
   moduleName,
 };
 

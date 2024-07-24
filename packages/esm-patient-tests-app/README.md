@@ -1,17 +1,17 @@
-# esm-patient-labs-app
+# esm-patient-tests-app
 
-Functionality for viewing test results and ordering labs.
+Functionality for viewing test results and ordering tests, whether lab tests, radiology, or otherwise.
 
 ## Test Results
 
 It provides tabular and chart-based overviews of the test results available for a patient. 
 
 IMPORTANT NOTE: To have data show up in this view, your concepts just need to have "Type: Test" or "Type: LabSet". 
-If you are seeing strange things showing up, like Temperature, in the Test Results viewer, then you probably just need to change the Type for your Temperature concept to something other than "Test", like finding. 
+If you are seeing strange things showing up, like Temperature, in the Test Results viewer, then you probably just need to change the Type for your Temperature concept to something other than "Test", such as "Finding." 
 
 
 ## How to Configure the Lab Filter View
-The Lab Filter feature enables you to set up custom filter views - eg based on standard medical hierarchies, or even based on your own custom ideas (e.g. "Our Favorite HIV-Related Tests"), like this:
+The Lab Filter feature enables you to set up custom filter views - eg based on standard medical hierarchies, or even based on your own custom concepts (e.g. "Our Favorite HIV-Related Tests"), like this:
 
 <img width="300" alt="image" src="https://user-images.githubusercontent.com/67400059/161005725-18b38112-d2bd-4ae1-8a01-f797cb69aa57.png">
 
@@ -62,4 +62,4 @@ Review your concepts to see that the hierarchy all looks right in the Dictionary
 
 ### 5. Update the config-schema file with your ConvSet codes
 Go here to add the UUIDs for each of your ConvSet concepts which you want to show up in the Lab Results filters: 
-https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-labs-app/src/config-schema.ts#L3
+https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-tests-app/src/config-schema.ts#L3
