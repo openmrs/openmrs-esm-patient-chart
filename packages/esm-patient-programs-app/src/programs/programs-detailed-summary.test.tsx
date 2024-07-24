@@ -9,15 +9,6 @@ import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-  };
-});
-
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 

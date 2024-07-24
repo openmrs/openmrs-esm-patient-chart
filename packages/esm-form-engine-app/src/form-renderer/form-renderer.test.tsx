@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import FormRenderer from './form-renderer.component';
 import useFormSchema from '../hooks/useFormSchema';
 
-const mockUseFormSchema = useFormSchema as jest.Mock;
+const mockUseFormSchema = jest.mocked(useFormSchema);
 
 jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
   FormEngine: jest
@@ -43,7 +43,9 @@ describe('FormRenderer', () => {
   });
 
   test('renders a form preview from the engine when a schema is available', async () => {
-    mockUseFormSchema.mockReturnValue({ schema: { id: 'test-schema' }, isLoading: false, error: null });
+    mockUseFormSchema.mockReturnValue({ schema: { uuid: 'test-schema' }, isLoading: false, error: null } as ReturnType<
+      typeof useFormSchema
+    >);
 
     render(<FormRenderer {...defaultProps} />);
     await expect(screen.getByText(/form engine lib/i)).toBeInTheDocument();

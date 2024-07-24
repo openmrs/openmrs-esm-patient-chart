@@ -66,7 +66,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const isDesktop = isDesktopLayout(layout);
   const isTablet = !isDesktop;
 
-  const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
+  const { conditions, error, isLoading, isValidating } = useConditions(patientUuid);
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
@@ -137,7 +137,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>

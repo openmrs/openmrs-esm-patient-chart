@@ -13,7 +13,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
   };
 });
-
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
@@ -53,7 +52,7 @@ function slotMetaFromStore(store, slotName) {
   );
 }
 
-describe('ChartReview: ', () => {
+describe('ChartReview', () => {
   test(`renders a grid-based layout`, () => {
     const mockStore = {
       slots: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
@@ -12,30 +12,26 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseVisitNotes = useVisitNotes as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
+const mockUseVisitNotes = jest.mocked(useVisitNotes);
+const mockUseConfig = jest.mocked(useConfig);
 
 jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    useVisit: jest.fn().mockReturnValue([{}]),
-  };
-});
-
-describe('NotesOverview: ', () => {
+describe('NotesOverview', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(ConfigMock);
   });
 
   test('renders an empty state view if visit note data is unavailable', async () => {
-    mockUseVisitNotes.mockReturnValueOnce({ data: { results: [] } });
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
 
     renderNotesOverview();
 
@@ -47,6 +43,7 @@ describe('NotesOverview: ', () => {
 
   test('renders an error state view if there is a problem fetching visit note data', async () => {
     const error = {
+      name: 'Error',
       message: 'You are not logged in',
       response: {
         status: 401,
@@ -54,7 +51,13 @@ describe('NotesOverview: ', () => {
       },
     };
 
-    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: [],
+      error: error,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
 
     renderNotesOverview();
 
@@ -69,7 +72,13 @@ describe('NotesOverview: ', () => {
   });
 
   test("renders a tabular overview of the patient's visit notes when present", async () => {
-    mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: mockVisitNotes,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
 
     renderNotesOverview();
 

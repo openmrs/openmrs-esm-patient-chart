@@ -96,7 +96,7 @@ export function useLabEncounter(encounterUuid: string) {
   return {
     encounter: data?.data,
     isLoading,
-    isError: error,
+    error: error,
     isValidating,
     mutate,
   };
