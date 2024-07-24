@@ -41,17 +41,10 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   const [treeDataFiltered, setTreeDataFiltered] = useState(roots);
   const [showSearchInput, setShowSearchInput] = useState(false);
 
-  const handleInputChange = useCallback(
-    (searchTerm) => {
-      const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
-      setTreeDataFiltered(filteredData);
-    },
-    [roots, searchTerm],
-  );
-
   useEffect(() => {
-    handleInputChange(searchTerm);
-  }, [searchTerm, handleInputChange]);
+    const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
+    setTreeDataFiltered(filteredData);
+  }, [searchTerm, roots]);
 
   return (
     <div className={!tablet ? styles.stickyFilterSet : ''}>
