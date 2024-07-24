@@ -1,7 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { openmrsFetch, getConfig, useConfig, userHasAccess } from '@openmrs/esm-framework';
+import { openmrsFetch, getConfig, useConfig, userHasAccess, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
@@ -10,27 +11,22 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
 const mockGetConfig = getConfig as jest.Mock;
-const mockUserHasAccess = userHasAccess as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  getVisitsForPatient: jest.fn(),
+  userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
+}));
 
-  return {
-    ...originalModule,
-    getVisitsForPatient: jest.fn(),
-    userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-  };
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+  numberOfVisitsToLoad: 5,
 });
 
 describe('VisitDetailOverview', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockUseConfig.mockReturnValue({ numberOfVisitsToLoad: 5 });
-  });
-
   it('renders an empty state view if encounters data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
@@ -70,7 +66,10 @@ describe('VisitDetailOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: true }));
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      showAllEncountersTab: true,
+    });
 
     renderVisitDetailOverview();
 
@@ -103,7 +102,10 @@ describe('VisitDetailOverview', () => {
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    mockUseConfig.mockImplementation(() => ({ showAllEncountersTab: false }));
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      showAllEncountersTab: false,
+    });
 
     renderVisitDetailOverview();
 

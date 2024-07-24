@@ -1,15 +1,16 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { showModal, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showModal, useConfig } from '@openmrs/esm-framework';
 import { launchFormEntryOrHtmlForms, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockCurrentVisit, mockForms } from '__mocks__';
 import { mockPatient } from 'tools';
 import FormView from './form-view.component';
 
 const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;
-const mockShowModal = showModal as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
+const mockShowModal = jest.mocked(showModal);
+const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -24,6 +25,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  htmlFormEntryForms: [],
+});
+
 describe('FormView', () => {
   test('should display `start-visit-dialog` when no visit has been started', async () => {
     const user = userEvent.setup();
@@ -31,7 +37,6 @@ describe('FormView', () => {
     mockUseVisitOrOfflineVisit.mockReturnValueOnce({
       currentVisit: null,
     });
-    mockUseConfig.mockReturnValue({ htmlFormEntryForms: [] });
 
     renderFormView();
 
@@ -46,7 +51,6 @@ describe('FormView', () => {
   test('should launch form-entry patient-workspace window when visit is started', async () => {
     const user = userEvent.setup();
 
-    mockUseConfig.mockReturnValue({ htmlFormEntryForms: [] });
     mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
       error: null,
@@ -59,7 +63,7 @@ describe('FormView', () => {
 
     await user.click(pocForm);
 
-    expect(mockLaunchFormEntryOrHtmlForms).toBeCalled();
+    expect(mockLaunchFormEntryOrHtmlForms).toHaveBeenCalled();
   });
 });
 

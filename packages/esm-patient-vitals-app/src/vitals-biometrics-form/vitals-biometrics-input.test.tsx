@@ -1,9 +1,12 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { assessValue, getReferenceRangesForConcept } from '../common';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockConceptUnits } from '__mocks__';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
+
+const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
 
 const overridenMetadata = [
   {
@@ -97,9 +100,7 @@ jest.mock('../common', () => {
   };
 });
 
-const mockUseConfig = jest.mocked(useConfig);
-
-const testProps = {
+const defaultProps = {
   control: undefined,
   isWithinNormalRange: true,
   fieldProperties: [],
@@ -109,27 +110,26 @@ const testProps = {
   unitSymbol: '',
 };
 
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  concepts: {
+    pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+} as ConfigObject);
+
 describe('VitalsAndBiometricsInput', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReturnValue({
-      concepts: {
-        pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      },
-    });
-  });
-
   it('renders number inputs based correctly on the props provided', () => {
-    testProps.fieldProperties = [
-      {
-        id: 'pulse',
-        name: 'Heart rate',
-        type: 'number',
-      },
-    ];
-    testProps.label = 'Heart rate';
-    testProps.unitSymbol = 'bpm';
-
-    renderVitalsBiometricsInput();
+    renderVitalsBiometricsInput({
+      fieldProperties: [
+        {
+          id: 'pulse',
+          name: 'Heart rate',
+          type: 'number',
+        },
+      ],
+      label: 'Heart rate',
+      unitSymbol: 'bpm',
+    });
 
     const heartRateInput = screen.getByRole('spinbutton', { name: /heart rate/i });
     expect(heartRateInput).toBeInTheDocument();
@@ -139,17 +139,17 @@ describe('VitalsAndBiometricsInput', () => {
   });
 
   it('renders textarea inputs correctly based on the props provided', () => {
-    testProps.fieldProperties = [
-      {
-        id: 'generalPatientNote',
-        name: 'Notes',
-        type: 'textarea',
-      },
-    ];
-    testProps.placeholder = 'Type any additional notes here';
-    testProps.label = 'Notes';
-
-    renderVitalsBiometricsInput();
+    renderVitalsBiometricsInput({
+      fieldProperties: [
+        {
+          id: 'generalPatientNote',
+          name: 'Notes',
+          type: 'textarea',
+        },
+      ],
+      placeholder: 'Type any additional notes here',
+      label: 'Notes',
+    });
 
     const noteInput = screen.getByRole('textbox', { name: /notes/i });
     expect(noteInput).toBeInTheDocument();
@@ -160,23 +160,20 @@ describe('VitalsAndBiometricsInput', () => {
   it('should validate the input based on the provided interpretation and reference range values', async () => {
     const config = useConfig();
 
-    testProps.fieldProperties = [
-      {
-        id: 'pulse',
-        name: 'Heart rate',
-        min: 0,
-        max: 230,
-        type: 'number',
-      },
-    ];
-    testProps.interpretation = assessValue(
-      300,
-      getReferenceRangesForConcept(config.concepts.pulseUuid, overridenMetadata),
-    );
-    testProps.label = 'Heart rate';
-    testProps.unitSymbol = 'bpm';
-
-    renderVitalsBiometricsInput();
+    renderVitalsBiometricsInput({
+      fieldProperties: [
+        {
+          id: 'pulse',
+          name: 'Heart rate',
+          min: 0,
+          max: 230,
+          type: 'number',
+        },
+      ],
+      interpretation: assessValue(300, getReferenceRangesForConcept(config.concepts.pulseUuid, overridenMetadata)),
+      label: 'Heart rate',
+      unitSymbol: 'bpm',
+    });
 
     await screen.findByRole('spinbutton');
 
@@ -187,6 +184,6 @@ describe('VitalsAndBiometricsInput', () => {
   });
 });
 
-function renderVitalsBiometricsInput() {
-  render(<VitalsAndBiometricsInput {...testProps} />);
+function renderVitalsBiometricsInput(props = {}) {
+  render(<VitalsAndBiometricsInput {...defaultProps} {...props} />);
 }

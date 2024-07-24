@@ -3,11 +3,11 @@ import { isDesktop as actualIsDesktopFn } from '@openmrs/esm-framework';
 
 const mockIsDesktop = jest.mocked(actualIsDesktopFn);
 
+mockIsDesktop.mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop');
+
 describe('isDesktop', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    mockIsDesktop.mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop');
   });
 
   it('is true when layout = tablet', () => {

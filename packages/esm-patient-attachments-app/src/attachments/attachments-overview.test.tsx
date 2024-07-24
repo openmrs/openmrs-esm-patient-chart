@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import AttachmentsOverview from './attachments-overview.component';
 import { useAttachments } from '@openmrs/esm-framework';
 
-const mockedUseAttachments = jest.mocked(useAttachments);
+const mockUseAttachments = jest.mocked(useAttachments);
 
 it('renders a loading skeleton when attachments are loading', () => {
-  mockedUseAttachments.mockReturnValue({
+  mockUseAttachments.mockReturnValue({
     data: [],
     error: null,
     isLoading: true,
@@ -21,7 +21,7 @@ it('renders a loading skeleton when attachments are loading', () => {
 });
 
 it('renders an empty state if attachments are not available', () => {
-  mockedUseAttachments.mockReturnValue({
+  mockUseAttachments.mockReturnValue({
     data: [],
     error: null,
     isLoading: false,

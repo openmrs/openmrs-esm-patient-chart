@@ -4,7 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { screen, render, within, renderHook, waitFor } from '@testing-library/react';
 import { getByTextWithMarkup } from 'tools';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import { mockDrugSearchResultApiData, mockDrugOrderTemplateApiData, mockPatientDrugOrdersApiData } from '__mocks__';
+import {
+  mockDrugSearchResultApiData,
+  mockDrugOrderTemplateApiData,
+  mockPatientDrugOrdersApiData,
+  mockSessionDataResponse,
+} from '__mocks__';
 import { closeWorkspace, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -12,15 +17,13 @@ import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockLaunchPatientWorkspace = jest.fn();
-const mockUseSession = useSession as jest.Mock;
+const mockUseSession = jest.mocked(useSession);
+const mockUseDrugSearch = jest.mocked(useDrugSearch);
+const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
 const usePatientOrdersMock = jest.fn();
 
 mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
-mockUseSession.mockReturnValue({
-  currentProvider: {
-    uuid: 'mock-provider-uuid',
-  },
-});
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -68,16 +71,16 @@ describe('AddDrugOrderWorkspace drug search', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
 
-    (useDrugSearch as jest.Mock).mockImplementation(() => ({
+    mockUseDrugSearch.mockImplementation(() => ({
       isLoading: false,
       drugs: mockDrugSearchResultApiData,
       error: null,
     }));
 
-    (useDrugTemplate as jest.Mock).mockImplementation((drugUuid) => ({
+    mockUseDrugTemplate.mockImplementation((drugUuid) => ({
       templates: mockDrugOrderTemplateApiData[drugUuid] ?? [],
       isLoading: false,
-      error: false,
+      error: null,
     }));
 
     usePatientOrdersMock.mockReturnValue({
@@ -182,7 +185,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
           startDate: expect.any(Date),
           indication: 'Hypertension',
           careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
-          orderer: 'mock-provider-uuid',
+          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]),
     );

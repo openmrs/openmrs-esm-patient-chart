@@ -12,7 +12,7 @@ const testProps = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-describe('AllergiesOverview: ', () => {
+describe('AllergiesOverview', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
     renderAllergiesOverview();

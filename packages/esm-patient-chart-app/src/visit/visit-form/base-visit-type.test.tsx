@@ -7,7 +7,7 @@ import BaseVisitType from './base-visit-type.component';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
-const mockUseVisitTypes = useVisitTypes as jest.Mock;
+const mockUseVisitTypes = jest.mocked(useVisitTypes);
 
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),

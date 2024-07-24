@@ -5,13 +5,13 @@ import { useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import CancelVisitOverflowMenuItem from './cancel-visit.component';
 
-const mockUseVisit = useVisit as jest.Mock;
+const mockUseVisit = jest.mocked(useVisit);
 
 describe('CancelVisitOverflowMenuItem', () => {
   it('should launch cancel visit dialog box', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValueOnce({ currentVisit: mockCurrentVisit });
+    mockUseVisit.mockReturnValueOnce({ currentVisit: mockCurrentVisit } as ReturnType<typeof useVisit>);
 
     render(<CancelVisitOverflowMenuItem patientUuid="some-uuid" />);
 

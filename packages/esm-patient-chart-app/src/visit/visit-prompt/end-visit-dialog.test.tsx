@@ -16,7 +16,7 @@ const endVisitPayload = {
 const mockCloseModal = jest.fn();
 const mockMutate = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseVisit = jest.mocked(useVisit) as jest.Mock;
+const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -28,10 +28,21 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('End visit dialog', () => {
+  beforeEach(() => {
+    mockUseVisit.mockReturnValue({
+      activeVisit: mockCurrentVisit,
+      currentVisit: mockCurrentVisit,
+      currentVisitIsRetrospective: false,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+  });
+
   test('displays a success snackbar when the visit is ended successfully', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(
       of({
         status: 200,
@@ -76,7 +87,6 @@ describe('End visit dialog', () => {
   test('displays an error snackbar if there was a problem ending a visit', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockImplementationOnce(() => throwError(() => new Error('Internal error message')));
 
     renderEndVisitDialog();

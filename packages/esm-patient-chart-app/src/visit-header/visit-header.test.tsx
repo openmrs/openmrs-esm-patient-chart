@@ -18,14 +18,14 @@ import { getByTextWithMarkup, mockPatient, mockPatientWithLongName } from 'tools
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
 
-const mockAge = age as jest.Mock;
-const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
-const mockUsePatient = usePatient as jest.Mock;
-const mockUseVisit = useVisit as jest.Mock;
-const mockUseLayoutType = useLayoutType as jest.Mock;
-const mockShowModal = showModal as jest.Mock;
-const mockGetHistory = getHistory as jest.Mock;
-const mockGoBackInHistory = goBackInHistory as jest.Mock;
+const mockAge = jest.mocked(age);
+const mockUseAssignedExtensions = jest.mocked(useAssignedExtensions);
+const mockUsePatient = jest.mocked(usePatient);
+const mockUseVisit = jest.mocked(useVisit);
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockShowModal = jest.mocked(showModal);
+const mockGetHistory = jest.mocked(getHistory);
+const mockGoBackInHistory = jest.mocked(goBackInHistory);
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -48,8 +48,15 @@ describe('Visit header', () => {
   beforeEach(() => {
     mockAge.mockReturnValue('20');
     mockGetHistory.mockReturnValue([]);
-    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
-    mockGoBackInHistory.mockClear();
+    mockUseAssignedExtensions.mockReturnValue([
+      {
+        id: 'someId',
+        moduleName: '@openmrs/esm-test-module',
+        name: 'patient-chart-visit-header',
+        meta: {},
+        config: null,
+      },
+    ]);
   });
 
   test('should display visit header and left nav bar hamburger icon', async () => {
@@ -61,7 +68,15 @@ describe('Visit header', () => {
       error: null,
       patientUuid: mockPatient.id,
     });
-    mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
+    mockUseVisit.mockReturnValue({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      error: null,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
+    });
     mockUseLayoutType.mockReturnValue('tablet');
 
     render(<VisitHeader />);
@@ -100,8 +115,16 @@ describe('Visit header', () => {
       error: null,
       patientUuid: mockPatient.id,
     });
-    mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
-    mockUseLayoutType.mockReturnValue('desktop');
+    mockUseVisit.mockReturnValue({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      error: null,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
+    });
+    mockUseLayoutType.mockReturnValue('small-desktop');
 
     render(<VisitHeader />);
 
@@ -118,8 +141,16 @@ describe('Visit header', () => {
       error: null,
       patientUuid: mockPatient.id,
     });
-    mockUseVisit.mockReturnValue({ isValidating: false, currentVisit: mockCurrentVisit });
-    mockUseLayoutType.mockReturnValue('desktop');
+    mockUseVisit.mockReturnValue({
+      activeVisit: mockCurrentVisit,
+      currentVisit: mockCurrentVisit,
+      currentVisitIsRetrospective: false,
+      error: null,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
+    });
+    mockUseLayoutType.mockReturnValue('small-desktop');
 
     render(<VisitHeader />);
 

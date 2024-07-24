@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { type FetchResponse, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -11,28 +11,25 @@ import {
   useAllergicReactions,
   updatePatientAllergy,
 } from './allergy-form.resource';
-import { AllergenType } from '../../types';
 import { mockAllergy } from '__mocks__';
+import { type AllergiesConfigObject, configSchema } from '../../config-schema';
+import { AllergenType } from '../../types';
 import AllergyForm from './allergy-form.workspace';
 
-const mockSaveAllergy = saveAllergy as jest.Mock<Promise<FetchResponse>>;
-const mockUseAllergens = useAllergens as jest.Mock;
-const mockUseAllergicReactions = useAllergicReactions as jest.Mock;
-const mockShowSnackbar = showSnackbar as jest.Mock;
-const mockUpdatePatientAllergy = updatePatientAllergy as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
+const mockSaveAllergy = jest.mocked(saveAllergy);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUpdatePatientAllergy = jest.mocked(updatePatientAllergy);
+const mockUseAllergens = jest.mocked(useAllergens);
+const mockUseAllergicReactions = jest.mocked(useAllergicReactions);
+const mockUseConfig = jest.mocked<() => AllergiesConfigObject>(useConfig);
 
-jest.mock('./allergy-form.resource', () => {
-  const originalModule = jest.requireActual('./allergy-form.resource');
-
-  return {
-    ...originalModule,
-    saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
-    updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
-    useAllergens: jest.fn(),
-    useAllergicReactions: jest.fn(),
-  };
-});
+jest.mock('./allergy-form.resource', () => ({
+  ...jest.requireActual('./allergy-form.resource'),
+  saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
+  updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
+  useAllergens: jest.fn(),
+  useAllergicReactions: jest.fn(),
+}));
 
 const mockConcepts = {
   drugAllergenUuid: '162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -45,28 +42,26 @@ const mockConcepts = {
   otherConceptUuid: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 };
 
-mockUseAllergens.mockReturnValue({
-  isLoading: false,
-  allergens: mockAllergens,
-});
-
-mockUseAllergicReactions.mockReturnValue({
-  isLoading: false,
-  allergicReactions: mockAllergicReactions,
-});
-
-describe('AllergyForm ', () => {
+describe('AllergyForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
+    mockUseAllergens.mockReturnValue({
+      isLoading: false,
+      allergens: mockAllergens,
+    });
+    mockUseAllergicReactions.mockReturnValue({
+      isLoading: false,
+      allergicReactions: mockAllergicReactions,
+    });
     mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
       concepts: mockConcepts,
     });
   });
 
   it('renders the allergy form with all the expected fields and values', async () => {
-    renderAllergyForm();
     const user = userEvent.setup();
+
+    renderAllergyForm();
 
     const allergensContainer = screen.getByTestId('allergens-container');
     const allergenInput = screen.queryByPlaceholderText(/select the allergen/i);
@@ -92,8 +87,9 @@ describe('AllergyForm ', () => {
   });
 
   it('enable the save button when all required fields are filled', async () => {
-    renderAllergyForm();
     const user = userEvent.setup();
+
+    renderAllergyForm();
 
     const allergen = mockAllergens[0];
     const reaction = mockAllergicReactions[0];
@@ -124,10 +120,10 @@ describe('AllergyForm ', () => {
   });
 
   it('calls the saveAllergy function with the correct payload', async () => {
-    mockSaveAllergy.mockClear();
+    const user = userEvent.setup();
+
     renderAllergyForm();
 
-    const user = userEvent.setup();
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
@@ -157,9 +153,10 @@ describe('AllergyForm ', () => {
   });
 
   it('displays a custom input and a warning message when select other allergen', async () => {
+    const user = userEvent.setup();
+
     renderAllergyForm();
 
-    const user = userEvent.setup();
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
     const allergensContainer = screen.getByTestId('allergens-container');
 
@@ -176,10 +173,10 @@ describe('AllergyForm ', () => {
   });
 
   it('calls the saveAllergy function with the correct payload when select other allergen', async () => {
-    mockSaveAllergy.mockClear();
+    const user = userEvent.setup();
+
     renderAllergyForm();
 
-    const user = userEvent.setup();
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
     const allergensContainer = screen.getByTestId('allergens-container');
     const customAllergen = 'some other allergen';
@@ -213,12 +210,10 @@ describe('AllergyForm ', () => {
   });
 
   it('renders a success notification after successful submission', async () => {
-    mockSaveAllergy.mockClear();
-    mockShowSnackbar.mockClear();
+    const user = userEvent.setup();
 
     renderAllergyForm();
 
-    const user = userEvent.setup();
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
@@ -242,8 +237,8 @@ describe('AllergyForm ', () => {
   });
 
   it('renders an error snackbar upon an invalid submission', async () => {
-    mockSaveAllergy.mockClear();
-    mockShowSnackbar.mockClear();
+    const user = userEvent.setup();
+
     mockSaveAllergy.mockRejectedValue({
       message: 'Internal Server Error',
       response: {
@@ -254,7 +249,6 @@ describe('AllergyForm ', () => {
 
     renderAllergyForm();
 
-    const user = userEvent.setup();
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
     const allergen = mockAllergens[0];
@@ -276,11 +270,12 @@ describe('AllergyForm ', () => {
       kind: 'error',
     });
   });
-  it('Edit Allergy should call the saveAllergy function with updated payload', async () => {
-    mockSaveAllergy.mockClear();
-    renderEditAllergyForm();
 
+  it('Edit Allergy should call the saveAllergy function with updated payload', async () => {
     const user = userEvent.setup();
+
+    renderAllergyForm({ allergy: mockAllergy, formContext: 'editing' });
+
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
     const commentInput = screen.getByLabelText(/Date of onset and comments/i);
 
@@ -317,8 +312,8 @@ describe('AllergyForm ', () => {
   });
 });
 
-function renderAllergyForm() {
-  const testProps = {
+function renderAllergyForm(props = {}) {
+  const defaultProps = {
     closeWorkspace: () => {},
     closeWorkspaceWithSavedChanges: () => {},
     promptBeforeClosing: () => {},
@@ -329,20 +324,5 @@ function renderAllergyForm() {
     setTitle: jest.fn(),
   };
 
-  render(<AllergyForm {...testProps} />);
-}
-
-function renderEditAllergyForm() {
-  const testProps = {
-    closeWorkspace: () => {},
-    closeWorkspaceWithSavedChanges: () => {},
-    promptBeforeClosing: () => {},
-    allergy: mockAllergy,
-    formContext: 'editing' as 'creating' | 'editing',
-    patient: mockPatient,
-    patientUuid: mockPatient.id,
-    setTitle: jest.fn(),
-  };
-
-  render(<AllergyForm {...testProps} />);
+  render(<AllergyForm {...defaultProps} {...props} />);
 }

@@ -6,13 +6,13 @@ import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
-const testProps = {
+const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
   visits: mockEncounters,
 };
 
-const mockShowModal = showModal as jest.Mock;
+const mockShowModal = jest.mocked(showModal);
 const mockGetConfig = getConfig as jest.Mock;
 const mockUserHasAccess = userHasAccess as jest.Mock;
 
@@ -27,15 +27,10 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('EncounterList', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders an empty state when no encounters are available', async () => {
-    testProps.visits = [];
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    renderVisitsTable();
+    renderVisitsTable({ visits: [] });
 
     await screen.findByTitle(/empty data illustration/i);
     expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
@@ -43,9 +38,8 @@ describe('EncounterList', () => {
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
-    testProps.visits = mockEncounters;
 
-    renderVisitsTable();
+    renderVisitsTable({ visits: mockEncounters });
 
     await screen.findByRole('table');
 
@@ -94,11 +88,10 @@ describe('EncounterList', () => {
 describe('Delete Encounter', () => {
   it('Clicking the `Delete` button deletes an encounter', async () => {
     const user = userEvent.setup();
-    testProps.visits = mockEncounters;
 
     mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable();
+    renderVisitsTable({ visits: mockEncounters });
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -120,6 +113,6 @@ describe('Delete Encounter', () => {
   });
 });
 
-function renderVisitsTable() {
-  renderWithSwr(<VisitsTable {...testProps} />);
+function renderVisitsTable(props = {}) {
+  renderWithSwr(<VisitsTable {...defaultProps} {...props} />);
 }

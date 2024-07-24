@@ -11,6 +11,7 @@ import {
   updateVisit,
   useConfig,
   useVisitTypes,
+  type FetchResponse,
   type Visit,
 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -19,13 +20,12 @@ import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
 const visitUuid = 'test_visit_uuid';
-
 const visitAttributes = {
   punctuality: {
     uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
     name: 'Punctuality',
     display: 'Punctuality',
-    datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype',
+    datatypeClassname: 'org.openmrs.customdatatype.datatype.ConceptDatatype' as const,
     datatypeConfig: '',
     preferredHandlerClassname: 'default',
     description: '',
@@ -56,32 +56,34 @@ const testProps = {
   setTitle: mockSetTitle,
 };
 
-const mockSaveVisit = saveVisit as jest.Mock;
-const mockUpdateVisit = updateVisit as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUseConfig = jest.mocked(useConfig);
-const mockUseVisitAttributeType = useVisitAttributeType as jest.Mock;
+const mockSaveVisit = jest.mocked(saveVisit);
+const mockUpdateVisit = jest.mocked(updateVisit);
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockGetStartedVisitGetter = jest.fn();
-const mockUseVisitTypes = useVisitTypes as jest.Mock;
+const mockUseVisitTypes = jest.mocked(useVisitTypes);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  useActivePatientEnrollment: jest.fn().mockReturnValue({
+    activePatientEnrollment: [],
+    isLoading: false,
+  }),
+}));
 
-  return {
-    ...originalModule,
-
-    get getStartedVisit() {
-      return mockGetStartedVisitGetter();
-    },
-    restBaseUrl: '/ws/rest/v1',
-    saveVisit: jest.fn(),
-    updateVisit: jest.fn(),
-    toOmrsIsoString: jest.fn(),
-    toDateObjectStrict: jest.fn(),
-    useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
-    usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
-  };
-});
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  get getStartedVisit() {
+    return mockGetStartedVisitGetter();
+  },
+  restBaseUrl: '/ws/rest/v1',
+  saveVisit: jest.fn(),
+  updateVisit: jest.fn(),
+  toOmrsIsoString: jest.fn(),
+  toDateObjectStrict: jest.fn(),
+  usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
+}));
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
   useVisitAttributeType: jest.fn((attributeUuid) => {
@@ -135,18 +137,6 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
   })),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    useActivePatientEnrollment: jest.fn().mockReturnValue({
-      activePatientEnrollment: [],
-      isLoading: false,
-    }),
-  };
-});
-
 jest.mock('../hooks/useDefaultLocation', () => {
   const requireActual = jest.requireActual('../hooks/useDefaultLocation');
 
@@ -171,31 +161,27 @@ jest.mock('../hooks/useLocations', () => {
   };
 });
 
-describe('Visit Form', () => {
-  beforeAll(() => {
-    mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
-      visitAttributeTypes: [
-        {
-          uuid: visitAttributes.punctuality.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-        {
-          uuid: visitAttributes.insurancePolicyNumber.uuid,
-          required: false,
-          displayInThePatientBanner: true,
-        },
-      ],
-    });
+mockUseVisitTypes.mockReturnValue(mockVisitTypes);
 
-    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+  visitAttributeTypes: [
+    {
+      uuid: visitAttributes.punctuality.uuid,
+      required: false,
+      displayInThePatientBanner: true,
+    },
+    {
+      uuid: visitAttributes.insurancePolicyNumber.uuid,
+      required: false,
+      displayInThePatientBanner: true,
+    },
+  ],
+});
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+mockUseVisitTypes.mockReturnValue(mockVisitTypes);
 
+describe('Visit form', () => {
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
@@ -248,7 +234,7 @@ describe('Visit Form', () => {
             display: 'Facility Visit',
           },
         },
-      }),
+      } as FetchResponse<{ visitType: { display: string } }>),
     );
 
     renderVisitForm();
@@ -287,7 +273,7 @@ describe('Visit Form', () => {
   it('starts a new visit with attributes upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({});
+    mockOpenmrsFetch.mockResolvedValue({} as unknown as FetchResponse);
 
     renderVisitForm();
 
@@ -317,7 +303,7 @@ describe('Visit Form', () => {
             display: 'Facility Visit',
           },
         },
-      }),
+      } as FetchResponse<{ uuid: string; visitType: { display: string } }>),
     );
 
     await user.click(saveButton);
@@ -357,7 +343,7 @@ describe('Visit Form', () => {
   it('updates visit attributes when editing an existing visit', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({});
+    mockOpenmrsFetch.mockResolvedValue({} as unknown as FetchResponse);
 
     renderVisitForm(mockVisitWithAttributes);
 
@@ -431,7 +417,7 @@ describe('Visit Form', () => {
   it('deletes visit attributes if the value of the field is cleared when editing an existing visit', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({});
+    mockOpenmrsFetch.mockResolvedValue({} as FetchResponse);
 
     renderVisitForm(mockVisitWithAttributes);
 
@@ -568,7 +554,7 @@ describe('Visit Form', () => {
             display: 'Facility Visit',
           },
         },
-      }),
+      } as FetchResponse<{ visitType: { display: string } }>),
     );
 
     renderVisitForm();
@@ -593,7 +579,9 @@ describe('Visit Form', () => {
       error: new Error('failed to load'),
       data: visitAttributes.punctuality,
     });
+
     mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema,
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,
@@ -601,7 +589,7 @@ describe('Visit Form', () => {
           displayInThePatientBanner: true,
         },
       ],
-    });
+    } as ChartConfig);
 
     renderVisitForm();
 
