@@ -18,17 +18,32 @@ interface FilterSetProps {
 }
 
 function filterTreeNode(inputValue, treeNode) {
-  // If the tree node's display value contains the user input, or any of its children's display contains the user input, return true
-  if (
-    treeNode &&
-    (treeNode.display.toLowerCase().includes(inputValue.toLowerCase()) ||
-      (treeNode.subSets && treeNode.subSets.some((child) => filterTreeNode(inputValue, child))))
-  ) {
-    return true;
+  if (!treeNode) {
+    return null;
   }
 
-  // Otherwise, return false
-  return false;
+  const matchesInput = treeNode.display.toLowerCase().includes(inputValue.toLowerCase());
+
+  if (matchesInput) {
+    return treeNode;
+  }
+
+  let filteredSubSets = [];
+
+  if (treeNode.subSets) {
+    filteredSubSets = treeNode.subSets
+      .map((child) => filterTreeNode(inputValue, child))
+      .filter((child) => child !== null);
+  }
+
+  if (filteredSubSets.length > 0) {
+    return {
+      ...treeNode,
+      subSets: filteredSubSets,
+    };
+  }
+
+  return null;
 }
 
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
@@ -44,7 +59,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   const handleInputChange = useCallback(
     (e) => {
       setSearchTerm(searchTerm);
-      const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
+      const filteredData = roots.map((node) => filterTreeNode(searchTerm, node)).filter((node) => node !== null);
       setTreeDataFiltered(filteredData);
     },
     [roots, searchTerm],
