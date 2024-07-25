@@ -20,7 +20,7 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const cardTitle = t('recentResults', 'Recent Results');
-  const { overviewData, loaded, error } = useOverviewData(patientUuid);
+  const { overviewData, loaded } = useOverviewData(patientUuid);
 
   return (
     <RecentResultsGrid>

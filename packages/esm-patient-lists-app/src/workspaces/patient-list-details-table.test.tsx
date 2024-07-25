@@ -3,7 +3,7 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PatientListDetailsTable from './patient-list-details-table.component';
 
-const testProps = {
+const defaultProps = {
   listMembers: [],
   isLoading: false,
 };
@@ -18,18 +18,18 @@ it('renders an empty state if there are no patients in the list', () => {
 it('renders a tabular overview of the patients enrolled in a list', async () => {
   const user = userEvent.setup();
 
-  testProps.listMembers = [
-    {
-      identifier: '10006KH',
-      membershipUuid: '04634dbe-ebe9-41b1-81f3-666e3530cc7c',
-      name: 'Rahul Ajay Jawale',
-      sex: 'M',
-      startDate: '16-Nov-2023',
-      patientUuid: '39772438-7097-403e-bfc4-5570817232c6',
-    },
-  ];
-
-  renderPatientListDetailsTable();
+  renderPatientListDetailsTable({
+    listMembers: [
+      {
+        identifier: '10006KH',
+        membershipUuid: '04634dbe-ebe9-41b1-81f3-666e3530cc7c',
+        name: 'Rahul Ajay Jawale',
+        sex: 'M',
+        startDate: '16-Nov-2023',
+        patientUuid: '39772438-7097-403e-bfc4-5570817232c6',
+      },
+    ],
+  });
 
   const columnHeaders = [/name/, /identifier/, /sex/, /start date/];
 
@@ -52,6 +52,6 @@ it('renders a tabular overview of the patients enrolled in a list', async () => 
   expect(screen.getByRole('link', { name: /rahul ajay jawale/i })).toBeInTheDocument();
 });
 
-function renderPatientListDetailsTable() {
-  render(<PatientListDetailsTable {...testProps} />);
+function renderPatientListDetailsTable(props = {}) {
+  render(<PatientListDetailsTable {...defaultProps} {...props} />);
 }

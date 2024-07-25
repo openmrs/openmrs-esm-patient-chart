@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { usePatientLists } from '../patient-lists.resource';
 import PatientListsWorkspace from './patient-lists.workspace';
 
-const mockedUsePatientLists = jest.mocked(usePatientLists);
+const mockUsePatientLists = jest.mocked(usePatientLists);
 
 jest.mock('../patient-lists.resource', () => {
   const original = jest.requireActual('../patient-lists.resource');
@@ -16,7 +16,7 @@ jest.mock('../patient-lists.resource', () => {
 });
 
 it('renders an empty state if patient list data is unavailable', async () => {
-  mockedUsePatientLists.mockReturnValue({
+  mockUsePatientLists.mockReturnValue({
     isLoading: false,
     error: null,
     patientLists: [],
@@ -31,7 +31,7 @@ it('renders an empty state if patient list data is unavailable', async () => {
 it('renders a tabular overview of the available patient lists', async () => {
   const user = userEvent.setup();
 
-  mockedUsePatientLists.mockReturnValue({
+  mockUsePatientLists.mockReturnValue({
     isLoading: false,
     error: null,
     patientLists: [

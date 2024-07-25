@@ -24,7 +24,6 @@ const mockPromptBeforeClosing = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
   useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
 }));
 
@@ -35,32 +34,28 @@ jest.mock('./programs.resource', () => ({
   useEnrollments: jest.fn(),
 }));
 
+mockUseAvailablePrograms.mockReturnValue({
+  data: mockCareProgramsResponse,
+  eligiblePrograms: [],
+  error: null,
+  isLoading: false,
+});
+
+mockUseEnrollments.mockReturnValue({
+  data: mockEnrolledProgramsResponse,
+  error: null,
+  isLoading: false,
+  isValidating: false,
+  activeEnrollments: [],
+  mutateEnrollments: jest.fn(),
+});
+
+mockCreateProgramEnrollment.mockResolvedValue({
+  status: 201,
+  statusText: 'Created',
+} as unknown as FetchResponse);
+
 describe('ProgramsForm', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockUseAvailablePrograms.mockReturnValue({
-      data: mockCareProgramsResponse,
-      eligiblePrograms: [],
-      error: null,
-      isLoading: false,
-    });
-
-    mockUseEnrollments.mockReturnValue({
-      data: mockEnrolledProgramsResponse,
-      error: null,
-      isLoading: false,
-      isValidating: false,
-      activeEnrollments: [],
-      mutateEnrollments: jest.fn(),
-    });
-
-    mockCreateProgramEnrollment.mockResolvedValue({
-      status: 201,
-      statusText: 'Created',
-    } as unknown as FetchResponse);
-  });
-
   it('renders a success toast notification upon successfully recording a program enrollment', async () => {
     const user = userEvent.setup();
 

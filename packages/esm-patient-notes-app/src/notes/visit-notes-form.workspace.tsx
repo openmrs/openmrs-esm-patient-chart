@@ -664,7 +664,7 @@ function DiagnosisSearch({
               size={isTablet ? 'lg' : 'md'}
               id={name}
               labelText={labelText}
-              className={error && styles.diagnosisErrorOutline}
+              className={error && styles.diagnoserrorOutline}
               placeholder={placeholder}
               renderIcon={error && ((props) => <WarningFilled fill="red" {...props} />)}
               onChange={(e) => {

@@ -1,16 +1,15 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptMetadata, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
@@ -42,17 +41,14 @@ jest.mock('../common', () => {
   };
 });
 
-describe('VitalsOverview', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
-      mockVitalsConfig,
-    });
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  mockVitalsConfig,
+} as ConfigObject);
 
+describe('VitalsOverview', () => {
   it('renders an empty state view if vitals data is unavailable', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
@@ -74,7 +70,7 @@ describe('VitalsOverview', () => {
       },
     } as unknown as Error;
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       error: mockError,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
@@ -95,7 +91,7 @@ describe('VitalsOverview', () => {
   it("renders a tabular overview of the patient's vital signs", async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
@@ -141,7 +137,7 @@ describe('VitalsOverview', () => {
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 

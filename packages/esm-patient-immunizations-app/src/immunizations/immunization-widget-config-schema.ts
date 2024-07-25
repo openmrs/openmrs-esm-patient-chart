@@ -1,6 +1,6 @@
 import { Type } from '@openmrs/esm-framework';
 
-export default {
+export const immunizationWidgetSchema = {
   immunizationConceptSet: {
     _type: Type.String,
     _default: 'CIEL:984',

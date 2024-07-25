@@ -112,7 +112,7 @@ export function usePastVisits(patientUuid: string) {
 
   return {
     data: data ? data.data.results : null,
-    isError: error,
+    error: error,
     isLoading,
     isValidating,
   };

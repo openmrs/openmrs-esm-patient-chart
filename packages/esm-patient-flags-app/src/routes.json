@@ -26,11 +26,11 @@
       "name": "patient-flags-overview",
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "flagsOverview",
-      "meta": {
-        "columnSpan": 4
-      },
       "order": 0,
-      "featureFlag": "patientFlags"
+      "featureFlag": "patientFlags",
+      "meta": {
+        "fullWidth": false
+      }
     }
   ],
   "pages": []

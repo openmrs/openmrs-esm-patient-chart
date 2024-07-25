@@ -32,7 +32,7 @@ function ConditionsDetailedSummary({ patient }) {
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { conditions, error, isLoading, isValidating } = useConditions(patient.id);
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -101,7 +101,7 @@ function ConditionsDetailedSummary({ patient }) {
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>

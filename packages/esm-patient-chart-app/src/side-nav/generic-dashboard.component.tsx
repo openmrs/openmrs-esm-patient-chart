@@ -19,15 +19,6 @@ export const genericDashboardConfigSchema = {
     _default: '',
     _type: Type.String,
   },
-  columns: {
-    _default: 1,
-    _type: Type.Number,
-    _description:
-      'The number of columns that widgets in the dashboard ' +
-      "can use to display themselves in. Note that '2' will not " +
-      'necessarily result in a two-column layout—rather that widgets ' +
-      'will be able to occupy either one or both of those columns.',
-  },
 };
 
 export interface GenericDashboardConfig {

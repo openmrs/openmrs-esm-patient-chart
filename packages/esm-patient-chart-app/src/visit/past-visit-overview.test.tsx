@@ -5,7 +5,7 @@ import { openmrsFetch, setCurrentVisit } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import PastVisitOverview from './past-visit-overview.component';
 
-const testProps = {
+const defaultProps = {
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
@@ -48,11 +48,6 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockSetCurrentVisit = setCurrentVisit as jest.Mock;
 
 describe('PastVisitOverview', () => {
-  beforeEach(() => {
-    testProps.closeWorkspace.mockClear();
-    mockSetCurrentVisit.mockClear();
-  });
-
   it(`renders a tabular overview view of the patient's past visits data`, async () => {
     const user = userEvent.setup();
 
@@ -76,7 +71,7 @@ describe('PastVisitOverview', () => {
 
     await user.click(cancelButton);
 
-    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it(`will enter retrospective entry mode for a specific visit`, async () => {
@@ -88,11 +83,11 @@ describe('PastVisitOverview', () => {
     expect(editButtons.length).toBe(2);
     await user.click(editButtons[1]);
 
-    expect(mockSetCurrentVisit).toBeCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
-    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockSetCurrentVisit).toHaveBeenCalledWith(mockPatient.id, mockPastVisits.data.results[1].uuid);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });
 
 function renderPastVisitOverview() {
-  renderWithSwr(<PastVisitOverview {...testProps} />);
+  renderWithSwr(<PastVisitOverview {...defaultProps} />);
 }

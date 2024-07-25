@@ -47,7 +47,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms } = usePrograms(patientUuid);
+  const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
   const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -97,7 +97,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }, [availablePrograms, enrollments]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>

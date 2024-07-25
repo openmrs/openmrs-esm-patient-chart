@@ -10,7 +10,7 @@
       "online": true,
       "offline": true,
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       }
     }
   ]

@@ -1,24 +1,24 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ActionMenuButton, useConnectivity, useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
+import { ActionMenuButton, useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
 import ClinicalFormActionButton from './clinical-form-action-button.component';
 
-const mockedUseLayoutType = useLayoutType as jest.Mock;
-const mockedUseWorkspaces = useWorkspaces as jest.Mock;
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseWorkspaces = useWorkspaces as jest.Mock;
+const mockActionMenuButton = jest.mocked(ActionMenuButton);
 
-const MockActionMenuButton = ActionMenuButton as jest.Mock;
-
-MockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
+mockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
   <button onClick={handler}>
     {tagContent} {label}
   </button>
 ));
 
-mockedUseWorkspaces.mockImplementation(() => ({
+mockUseWorkspaces.mockImplementation(() => ({
   active: true,
   windowState: 'normal',
   workspaces: [
     {
+      canHide: false,
       name: 'clinical-forms-workspace',
       title: 'Clinical forms',
       preferredWindowSize: 'normal',
@@ -57,14 +57,14 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 test('should display clinical form action button on tablet view', () => {
-  mockedUseLayoutType.mockReturnValue('tablet');
+  mockUseLayoutType.mockReturnValue('tablet');
 
   render(<ClinicalFormActionButton />);
   expect(screen.getByRole('button', { name: /Clinical forms/i })).toBeInTheDocument();
 });
 
 test('should display clinical form action button on desktop view', () => {
-  mockedUseLayoutType.mockReturnValue('desktop');
+  mockUseLayoutType.mockReturnValue('small-desktop');
 
   render(<ClinicalFormActionButton />);
   const clinicalActionButton = screen.getByRole('button', { name: /Form/i });

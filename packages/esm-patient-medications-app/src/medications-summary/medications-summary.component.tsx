@@ -45,7 +45,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   }, [allOrders]);
 
   return (
-    <>
+    <div>
       <div style={{ marginBottom: '1.5rem' }}>
         {(() => {
           const displayText = t('activeMedicationsDisplayText', 'Active medications');
@@ -72,7 +72,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
       </div>
-      <div style={{ marginTop: '1.5rem' }}>
+      <div>
         {(() => {
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
@@ -98,6 +98,6 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
         })()}
       </div>
-    </>
+    </div>
   );
 }
