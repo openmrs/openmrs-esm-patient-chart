@@ -1,4 +1,5 @@
 {
+  "activeVisitType": "{{visitType}} Visit",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
@@ -67,6 +68,7 @@
   "errorUpdatingVisitDetails": "Error updating visit details",
   "errorWhenRestoringVisit": "Error occured when restoring {{visit}}",
   "failedDeleting": "couldn't be deleted",
+  "failedToLoadActiveVisits": "Failed loading active visits",
   "failedToLoadCurrentVisit": "Failed loading current visit",
   "female": "Female",
   "fieldRequired": "This field is required",
