@@ -8,8 +8,8 @@ import NotesMain from './notes-main.component';
 const testProps = {
   patientUuid: mockPatient.id,
   pageSize: 10,
-  urlLabel: window.spaBase + patientChartBasePath + '/summary',
   pageUrl: 'Go to Summary',
+  urlLabel: window.spaBase + patientChartBasePath + '/summary',
 };
 
 const mockUseVisitNotes = jest.mocked(useVisitNotes);
@@ -28,7 +28,7 @@ describe('NotesMain', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesMain();
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('NotesMain', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesMain();
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('NotesMain', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesMain();
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /visit notes/i })).toBeInTheDocument();
@@ -99,7 +99,3 @@ describe('NotesMain', () => {
     expect(screen.getAllByRole('row').length).toEqual(7);
   });
 });
-
-function renderNotesMain() {
-  renderWithSwr(<NotesMain {...testProps} />);
-}

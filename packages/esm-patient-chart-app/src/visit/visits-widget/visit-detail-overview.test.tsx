@@ -7,10 +7,6 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-};
-
 const mockGetConfig = getConfig as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
@@ -31,7 +27,7 @@ describe('VisitDetailOverview', () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    renderVisitDetailOverview();
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -51,7 +47,7 @@ describe('VisitDetailOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderVisitDetailOverview();
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -71,7 +67,7 @@ describe('VisitDetailOverview', () => {
       showAllEncountersTab: true,
     });
 
-    renderVisitDetailOverview();
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -107,7 +103,7 @@ describe('VisitDetailOverview', () => {
       showAllEncountersTab: false,
     });
 
-    renderVisitDetailOverview();
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -128,7 +124,3 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
   });
 });
-
-function renderVisitDetailOverview() {
-  renderWithSwr(<VisitDetailOverview {...testProps} />);
-}

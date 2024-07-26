@@ -8,12 +8,6 @@ import ChartReview from './chart-review.component';
 const mockUseExtensionStore = useExtensionStore as jest.Mock;
 const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
 
-const defaultProps = {
-  patient: mockPatient,
-  patientUuid: mockPatient.id,
-  view: 'Patient Summary',
-};
-
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
@@ -76,16 +70,12 @@ describe('ChartReview', () => {
     mockUseExtensionStore.mockReturnValue(mockStore);
     mockUseExtensionSlotMeta.mockImplementation((slotName) => slotMetaFromStore(mockStore, slotName));
 
-    renderChartReview();
+    render(
+      <BrowserRouter>
+        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="Patient Summary" />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByRole('heading')).toHaveTextContent(/Patient summary/i);
   });
 });
-
-function renderChartReview() {
-  render(
-    <BrowserRouter>
-      <ChartReview {...defaultProps} />
-    </BrowserRouter>,
-  );
-}

@@ -8,6 +8,13 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
+const testProps = {
+  patientUuid: mockPatient.id,
+  pageSize: 5,
+  pageUrl: '',
+  urlLabel: '',
+};
+
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
@@ -52,7 +59,7 @@ describe('VitalsOverview', () => {
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     await screen.findByRole('heading', { name: /vitals/i });
@@ -74,7 +81,7 @@ describe('VitalsOverview', () => {
       error: mockError,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -95,7 +102,7 @@ describe('VitalsOverview', () => {
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
@@ -141,7 +148,7 @@ describe('VitalsOverview', () => {
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -161,14 +168,3 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
   });
 });
-
-function renderVitalsOverview() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-    pageSize: 5,
-    pageUrl: '',
-    urlLabel: '',
-  };
-
-  renderWithSwr(<VitalsOverview {...testProps} />);
-}

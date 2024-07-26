@@ -14,7 +14,7 @@ it('renders a loading skeleton when attachments are loading', () => {
     mutate: jest.fn(),
   });
 
-  renderAttachmentsOverview();
+  render(<AttachmentsOverview patientUuid="test-uuid" />);
 
   expect(screen.getByRole('progressbar')).toBeInTheDocument();
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -29,12 +29,8 @@ it('renders an empty state if attachments are not available', () => {
     mutate: jest.fn(),
   });
 
-  renderAttachmentsOverview();
+  render(<AttachmentsOverview patientUuid="test-uuid" />);
 
   expect(screen.getByText(/There are no attachments to display for this patient/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /record attachments/i })).toBeInTheDocument();
 });
-
-function renderAttachmentsOverview() {
-  render(<AttachmentsOverview patientUuid="test-uuid" />);
-}

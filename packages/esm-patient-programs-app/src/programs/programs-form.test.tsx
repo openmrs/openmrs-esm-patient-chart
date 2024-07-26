@@ -22,6 +22,14 @@ const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
+const testProps = {
+  closeWorkspace: mockCloseWorkspace,
+  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: mockPromptBeforeClosing,
+  setTitle: jest.fn(),
+};
+
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
@@ -140,13 +148,5 @@ describe('ProgramsForm', () => {
 });
 
 function renderProgramsForm(programEnrollmentUuidToEdit?: string) {
-  const testProps = {
-    closeWorkspace: mockCloseWorkspace,
-    closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: mockPromptBeforeClosing,
-    setTitle: jest.fn(),
-  };
-
   render(<ProgramsForm {...testProps} programEnrollmentId={programEnrollmentUuidToEdit} />);
 }

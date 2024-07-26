@@ -17,6 +17,15 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
+const testProps = {
+  closeWorkspace: () => {},
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: () => {},
+  formContext: 'creating' as 'creating' | 'editing',
+  setTitle: jest.fn(),
+};
+
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -43,7 +52,7 @@ mockUseConfig.mockReturnValue({
 
 describe('VitalsBiometricsForm', () => {
   it('renders the vitals and biometrics form', async () => {
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     expect(screen.getByText(/vitals/i)).toBeInTheDocument();
     expect(screen.getByText(/biometrics/i)).toBeInTheDocument();
@@ -76,7 +85,7 @@ describe('VitalsBiometricsForm', () => {
   it("computes a patient's BMI from the given height and weight values", async () => {
     const user = userEvent.setup();
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -99,7 +108,7 @@ describe('VitalsBiometricsForm', () => {
 
     mockSavePatientVitals.mockResolvedValue(response as ReturnType<typeof saveVitalsAndBiometrics>);
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -175,7 +184,8 @@ describe('VitalsBiometricsForm', () => {
 
     mockSavePatientVitals.mockRejectedValueOnce(error);
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
+
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
     const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
@@ -210,7 +220,8 @@ describe('VitalsBiometricsForm', () => {
   it('Display an inline error notification on submit if value of vitals entered is invalid', async () => {
     const user = userEvent.setup();
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
+
     const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
     const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
     const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
@@ -234,16 +245,3 @@ describe('VitalsBiometricsForm', () => {
     expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
   });
 });
-
-function renderForm() {
-  const testProps = {
-    closeWorkspace: () => {},
-    closeWorkspaceWithSavedChanges: jest.fn(),
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: () => {},
-    formContext: 'creating' as 'creating' | 'editing',
-    setTitle: jest.fn(),
-  };
-
-  render(<VitalsAndBiometricsForm {...testProps} />);
-}

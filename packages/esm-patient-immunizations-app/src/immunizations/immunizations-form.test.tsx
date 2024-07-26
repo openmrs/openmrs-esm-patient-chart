@@ -103,7 +103,7 @@ mockUseVisit.mockReturnValue({
 
 describe('Immunizations Form', () => {
   it('should render ImmunizationsForm component', () => {
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     expect(screen.getByRole('textbox', { name: /Vaccination Date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('Immunizations Form', () => {
         expect(field).not.toBeInTheDocument();
       }
     }
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     verifyDoseFieldType('sequence-coded', false);
     verifyDoseFieldType('number', false);
@@ -151,7 +151,7 @@ describe('Immunizations Form', () => {
   it('should save immunization data on submit', async () => {
     const user = userEvent.setup();
 
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     const formValues = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -229,7 +229,7 @@ describe('Immunizations Form', () => {
       },
     });
 
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     const vaccinationDateField = screen.getByRole('textbox', { name: /Vaccination Date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
@@ -284,10 +284,6 @@ describe('Immunizations Form', () => {
     });
   });
 });
-
-function renderImmunizationForm() {
-  render(<ImmunizationsForm {...testProps} />);
-}
 
 async function selectOption(dropdown: HTMLElement, optionLabel: string) {
   const user = userEvent.setup();

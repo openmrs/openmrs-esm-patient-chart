@@ -65,7 +65,7 @@ describe('Cancel visit', () => {
     });
     mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -113,7 +113,7 @@ describe('Cancel visit', () => {
 
     mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -136,7 +136,3 @@ describe('Cancel visit', () => {
     });
   });
 });
-
-function renderCancelVisitDialog() {
-  render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
-}

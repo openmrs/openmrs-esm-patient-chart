@@ -9,6 +9,11 @@ import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinis
 import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
 
+const testProps = {
+  basePath: patientChartBasePath,
+  patientUuid: mockPatient.id,
+};
+
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
@@ -37,7 +42,7 @@ describe('BiometricsOverview', () => {
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -60,7 +65,7 @@ describe('BiometricsOverview', () => {
       error: mockError,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -81,7 +86,7 @@ describe('BiometricsOverview', () => {
       data: formattedBiometrics,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -132,7 +137,7 @@ describe('BiometricsOverview', () => {
       data: formattedBiometrics.slice(0, 2),
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     await screen.findByRole('table', { name: /biometrics/i });
@@ -150,12 +155,3 @@ describe('BiometricsOverview', () => {
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
   });
 });
-
-function renderBiometricsOverview() {
-  const testProps = {
-    basePath: patientChartBasePath,
-    patientUuid: mockPatient.id,
-  };
-
-  renderWithSwr(<BiometricsOverview {...testProps} />);
-}

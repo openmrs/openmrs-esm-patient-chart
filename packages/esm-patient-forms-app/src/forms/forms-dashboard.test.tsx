@@ -37,20 +37,16 @@ describe('FormsDashboard', () => {
       error: null,
     });
 
-    renderFormDashboard();
+    render(
+      <FormsDashboard
+        promptBeforeClosing={jest.fn()}
+        closeWorkspace={jest.fn()}
+        closeWorkspaceWithSavedChanges={jest.fn()}
+        patientUuid=""
+        setTitle={jest.fn()}
+      />,
+    );
 
     expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
   });
 });
-
-function renderFormDashboard() {
-  render(
-    <FormsDashboard
-      promptBeforeClosing={jest.fn()}
-      closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid=""
-      setTitle={jest.fn()}
-    />,
-  );
-}

@@ -51,7 +51,7 @@ describe('End visit dialog', () => {
       }),
     );
 
-    renderEndVisitDialog();
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     const closeModalButton = screen.getByRole('button', { name: /close/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -85,7 +85,7 @@ describe('End visit dialog', () => {
     const user = userEvent.setup();
     mockUpdateVisit.mockReturnValue(throwError(() => new Error('Internal error message')));
 
-    renderEndVisitDialog();
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(
       screen.getByText(
@@ -107,7 +107,3 @@ describe('End visit dialog', () => {
     });
   });
 });
-
-function renderEndVisitDialog() {
-  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
-}
