@@ -1,16 +1,14 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { getByTextWithMarkup, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockVitalsSignsConcepts } from '__mocks__';
 import { useVitalsAndBiometrics } from '../common';
 import WeightTile from './weight-tile.component';
 
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
-
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
@@ -28,17 +26,14 @@ jest.mock('../common', () => {
   };
 });
 
-describe('WeightTile', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
-      mockBiometricsConfig,
-    });
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  mockBiometricsConfig,
+} as ConfigObject);
 
+describe('WeightTile', () => {
   it('renders an empty state when weight data is not available', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
@@ -51,7 +46,7 @@ describe('WeightTile', () => {
   });
 
   it("renders a summary of the patient's weight data when available", async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedBiometrics,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 

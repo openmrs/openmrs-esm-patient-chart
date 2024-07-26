@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -35,19 +35,19 @@ interface ProgramsDetailedSummaryProps {
 
 interface ProgramEditButtonProps {
   programEnrollmentId: string;
+  t: TFunction;
 }
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { hideAddProgramButton } = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
-  const { hideAddProgramButton } = useConfig<ConfigObject>();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms } =
-    usePrograms(patientUuid);
+  const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
   const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -71,9 +71,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows = useMemo(() => {
-    return enrollments?.map((program) => {
-      return {
+  const tableRows = useMemo(
+    () =>
+      enrollments?.map((program) => ({
         id: program.uuid,
         display: program.display,
         location: program.location?.display ?? '--',
@@ -81,14 +81,23 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         status: program.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
           : t('active', 'Active'),
-      };
-    });
-  }, [enrollments, t]);
+      })),
+    [enrollments, t],
+  );
 
   const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
+  const isEnrolledInAllPrograms = useMemo(() => {
+    if (!availablePrograms?.length || !enrollments?.length) {
+      return false;
+    }
+
+    const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
+    return activeEnrollments.length === availablePrograms.length;
+  }, [availablePrograms, enrollments]);
+
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -96,25 +105,24 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {hideAddProgramButton ? null : (
             <Button
+              disabled={isEnrolledInAllPrograms}
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription="Add programs"
+              iconDescription={t('addPrograms', 'Add programs')}
               onClick={launchProgramsForm}
-              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
             >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
-        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+        {isEnrolledInAllPrograms && (
           <InlineNotification
             style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-            kind={'info'}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}
           />
-        ) : null}
+        )}
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
@@ -142,7 +150,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} />
+                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} t={t} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -157,10 +165,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 
-function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
+function ProgramEditButton({ programEnrollmentId, t }: ProgramEditButtonProps) {
   const isTablet = useLayoutType() === 'tablet';
-  const { t } = useTranslation();
-  const launchEditProgramsForm = React.useCallback(
+  const launchEditProgramsForm = useCallback(
     () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
     [programEnrollmentId],
   );

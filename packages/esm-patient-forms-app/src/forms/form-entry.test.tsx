@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
 import { useConnectivity, usePatient } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
@@ -7,9 +7,9 @@ import { mockPatient } from 'tools';
 import FormEntry from './form-entry.workspace';
 
 const mockFormEntrySub = jest.fn();
+const mockUseConnectivity = jest.mocked(useConnectivity);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
-const mockUsePatient = usePatient as jest.Mock;
-const mockUseConnectivity = useConnectivity as jest.Mock;
+const mockUsePatient = jest.mocked(usePatient);
 
 const mockCurrentVisit = {
   uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
@@ -40,8 +40,13 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('FormEntry', () => {
-  it('renders an extension where the form entry widget plugs in', () => {
-    mockUsePatient.mockReturnValue({ patient: mockPatient });
+  it('renders an extension where the form entry widget plugs in', async () => {
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      error: null,
+      isLoading: false,
+    });
     mockUseVisitOrOfflineVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
     mockUseConnectivity.mockReturnValue(true);
     mockFormEntrySub.mockReturnValue(
@@ -50,8 +55,8 @@ describe('FormEntry', () => {
 
     renderFormEntry();
 
-    // FIXME: Figure out why this test is failing
-    // expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
+    await screen.findByText(/form-widget-slot/);
+    expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
   });
 });
 
@@ -63,6 +68,7 @@ function renderFormEntry() {
     patientUuid: mockPatient.id,
     formInfo: { formUuid: 'some-form-uuid' },
     mutateForm: jest.fn(),
+    setTitle: jest.fn(),
   };
 
   render(<FormEntry {...testProps} />);

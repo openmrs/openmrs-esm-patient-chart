@@ -129,6 +129,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     mode: 'onSubmit',
     resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
+      primaryDiagnosisSearch: '',
       noteDate: new Date(),
     },
   });
@@ -663,7 +664,7 @@ function DiagnosisSearch({
               size={isTablet ? 'lg' : 'md'}
               id={name}
               labelText={labelText}
-              className={error && styles.diagnosisErrorOutline}
+              className={error && styles.diagnoserrorOutline}
               placeholder={placeholder}
               renderIcon={error && ((props) => <WarningFilled fill="red" {...props} />)}
               onChange={(e) => {

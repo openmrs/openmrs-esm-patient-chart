@@ -3,7 +3,7 @@
 @use '@carbon/type';
 
 .container {
-  height: var(--desktop-workspace-window-height);
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -211,7 +211,7 @@
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
-    height: var(--tablet-workspace-window-height);
+    height: 100%;
   }
 
   .orderForm {
@@ -240,5 +240,6 @@
 
 .errorLabel {
   color: colors.$red-60;
+  margin-top: layout.$spacing-02;
 }
 

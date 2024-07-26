@@ -1,14 +1,4 @@
 import { isDesktop } from './utils';
-import { isDesktop as actualIsDesktopFn } from '@openmrs/esm-framework';
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    isDesktop: jest.fn().mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop'),
-  };
-});
 
 describe('isDesktop', () => {
   it('is true when layout = tablet', () => {

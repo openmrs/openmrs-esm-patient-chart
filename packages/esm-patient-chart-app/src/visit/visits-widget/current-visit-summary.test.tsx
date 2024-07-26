@@ -4,8 +4,8 @@ import { useVisit, getConfig } from '@openmrs/esm-framework';
 import { waitForLoadingToFinish } from 'tools';
 import CurrentVisitSummary from './current-visit-summary.component';
 
-const mockUseVisits = useVisit as jest.Mock;
-const mockGetConfig = getConfig as jest.Mock;
+const mockUseVisits = jest.mocked(useVisit);
+const mockGetConfig = jest.mocked(getConfig);
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework/mock'),
@@ -14,16 +14,15 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('CurrentVisitSummary', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   test('renders an empty state when there is no active visit', () => {
     mockUseVisits.mockReturnValueOnce({
+      activeVisit: null,
       currentVisit: null,
+      currentVisitIsRetrospective: false,
+      error: null,
       isLoading: false,
       isValidating: false,
-      error: null,
+      mutate: jest.fn(),
     });
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);
@@ -34,6 +33,7 @@ describe('CurrentVisitSummary', () => {
   test('renders a visit summary when for the active visit', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseVisits.mockReturnValueOnce({
+      activeVisit: null,
       currentVisit: {
         uuid: 'some-uuid',
         display: 'Visit 1',
@@ -49,9 +49,11 @@ describe('CurrentVisitSummary', () => {
         },
         encounters: [],
       },
+      currentVisitIsRetrospective: false,
+      error: null,
       isLoading: false,
       isValidating: false,
-      error: null,
+      mutate: jest.fn(),
     });
 
     render(<CurrentVisitSummary patientUuid="some-uuid" />);

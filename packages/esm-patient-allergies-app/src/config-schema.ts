@@ -12,6 +12,7 @@ export interface AllergiesConfigObject {
     otherConceptUuid: string;
   };
 }
+
 export const configSchema = {
   concepts: {
     drugAllergenUuid: {

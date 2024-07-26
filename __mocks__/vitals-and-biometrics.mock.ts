@@ -1,5 +1,3 @@
-import { type PatientVitalsAndBiometrics } from '../packages/esm-patient-vitals-app/src/common';
-
 export const mockBiometricsResponse = {
   resourceType: 'Bundle',
   id: '0b0f8529-3e6e-41d9-8007-0ef639fb893b',
@@ -5987,12 +5985,12 @@ export const mockFhirVitalsResponse = {
 };
 
 export const mockBiometricsConfig = {
-  biometrics: { bmiUnit: 'kg / m²' },
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+  biometrics: { bmiUnit: 'kg / m²' },
 };
 
 export const mockVitalsConfig = {
-  biometrics: { bmiUnit: 'kg / m²' },
+  biometrics: { bmiUnit: 'kg / m²', heightUnit: 'm', weightUnit: 'kg' },
   concepts: {
     diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -6007,8 +6005,12 @@ export const mockVitalsConfig = {
   },
   vitals: {
     encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
-    formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
+    formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
     useFormEngine: false,
+    logo: null,
+    showPrintButton: false,
+    formName: 'Vitals',
+    useMuacColors: false,
   },
 };
 
@@ -6056,26 +6058,6 @@ export const formattedVitals = [
     respiratoryRate: 65,
     bmi: 22.6,
     bloodPressureRenderInterpretation: 'normal',
-  },
-];
-
-export const formattedVitalsAndBiometrics: Array<PatientVitalsAndBiometrics> = [
-  {
-    id: '0',
-    uuid: 'fd481c9f-f81f-4aaf-b00b-747900af9935',
-    date: '2024-04-21T09:31:27.000Z',
-    height: 12,
-    weight: 12,
-    bmi: 833.3,
-    bloodPressureRenderInterpretation: 'normal',
-    systolic: 1,
-    diastolic: 2,
-    pulse: 12,
-    respiratoryRate: 12,
-    spo2: 12,
-    temperature: 31,
-    muac: 12,
-    generalPatientNote: 'notes',
   },
 ];
 

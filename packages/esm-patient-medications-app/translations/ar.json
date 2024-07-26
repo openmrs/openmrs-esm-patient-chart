@@ -47,6 +47,7 @@
   "modify": "تعديل",
   "none": "لا شيء",
   "noResultsForDrugSearch": "لا توجد نتائج لـ \"{{searchTerm}}\"",
+  "numRefillsErrorMessage": "The number of refills is required",
   "onDate": "في",
   "orderActionDiscontinue": "إيقاف",
   "orderActionIncomplete": "Incomplete",

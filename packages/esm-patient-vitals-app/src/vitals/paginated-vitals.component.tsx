@@ -16,7 +16,6 @@ import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
-import { VitalsAndBiometricsActionMenu } from '../vitals-biometrics-form/vitals-biometrics-action-menu.component';
 
 interface PaginatedVitalsProps {
   pageSize: number;
@@ -113,7 +112,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const rows = isPrinting ? sortedData : paginatedVitals;
 
   return (
-    <div>
+    <>
       <DataTable
         rows={rows}
         headers={tableHeaders}
@@ -123,7 +122,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         isSortable
       >
         {({ rows, headers, getTableProps, getHeaderProps }) => (
-          <TableContainer>
+          <TableContainer className={styles.tableContainer}>
             <Table className={styles.table} aria-label="vitals" {...getTableProps()}>
               <TableHead>
                 <TableRow>
@@ -132,7 +131,6 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -141,15 +139,13 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                     {row.cells.map((cell) => {
                       const vitalsObj = paginatedVitals.find((obj) => obj.id === row.id);
                       const vitalSignInterpretation = vitalsObj && vitalsObj[cell.id.substring(2) + 'Interpretation'];
+
                       return (
                         <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={vitalSignInterpretation}>
                           {cell.value?.content ?? cell.value}
                         </StyledTableCell>
                       );
                     })}
-                    <TableCell className="cds--table-column-menu">
-                      <VitalsAndBiometricsActionMenu rowId={row.id} formType={'vitals'} />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -168,7 +164,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
           dashboardLinkLabel={urlLabel}
         />
       ) : null}
-    </div>
+    </>
   );
 };
 

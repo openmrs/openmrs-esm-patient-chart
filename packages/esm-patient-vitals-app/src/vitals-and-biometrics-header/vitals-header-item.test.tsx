@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import VitalsHeaderItem from './vitals-header-item.component';
 
-describe('VitalsHeaderItem: ', () => {
+describe('VitalsHeaderItem', () => {
   it('renders a vital sign in the vitals header', () => {
     renderVitalsHeaderItem();
 

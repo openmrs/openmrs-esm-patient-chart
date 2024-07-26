@@ -13,7 +13,7 @@ const testProps = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-describe('ImmunizationOverview: ', () => {
+describe('ImmunizationOverview', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 

@@ -13,7 +13,7 @@ import type {
 
 interface UseVisitNotes {
   visitNotes: Array<PatientNote> | null;
-  isError: Error;
+  error: Error;
   isLoading: boolean;
   isValidating?: boolean;
   mutateVisitNotes: () => void;
@@ -57,7 +57,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 
   return {
     visitNotes: data ? formattedVisitNotes : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutateVisitNotes: mutate,

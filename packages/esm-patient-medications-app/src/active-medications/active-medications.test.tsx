@@ -1,6 +1,7 @@
 import React from 'react';
 import { launchWorkspace, openmrsFetch, useSession } from '@openmrs/esm-framework';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ActiveMedications from './active-medications.component';
@@ -13,9 +14,9 @@ function renderActiveMedications() {
 const testProps = {
   patientUuid: mockPatient.id,
 };
-const mockUseSession = useSession as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
+const mockUseSession = jest.mocked(useSession);
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspace(name);
@@ -38,10 +39,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-describe('ActiveMedications: ', () => {
-  beforeEach(() => {
-    mockLaunchWorkspace.mockClear();
-  });
+describe('ActiveMedications', () => {
   test('renders an empty state view when there are no active medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
@@ -112,19 +110,21 @@ describe('ActiveMedications: ', () => {
 });
 
 test('clicking the Record active medications link opens the order basket form', async () => {
+  const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
   renderActiveMedications();
   await waitForLoadingToFinish();
-  const orderLink = await screen.getByText('Record active medications');
-  fireEvent.click(orderLink);
+  const orderLink = screen.getByText('Record active medications');
+  await user.click(orderLink);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });
 
 test('clicking the Add button opens the order basket form', async () => {
+  const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
   renderActiveMedications();
   await waitForLoadingToFinish();
-  const button = await screen.getByRole('button', { name: /Add/i });
-  fireEvent.click(button);
+  const button = screen.getByRole('button', { name: /Add/i });
+  await user.click(button);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });

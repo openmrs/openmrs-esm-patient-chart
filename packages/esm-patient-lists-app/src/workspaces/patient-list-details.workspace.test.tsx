@@ -3,9 +3,9 @@ import { screen, render } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import PatientListDetailsWorkspace from './patient-list-details.workspace';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-const testProps = {
+const defaultProps = {
   patientUuid: '',
   promptBeforeClosing: jest.fn(),
   closeWorkspace: jest.fn(),
@@ -20,7 +20,12 @@ const testProps = {
     startDate: '2023-11-14T23:45:51.000+0000',
     type: 'My List',
   },
+  setTitle: jest.fn(),
 };
+
+function renderPatientListDetails() {
+  render(<PatientListDetailsWorkspace {...defaultProps} />);
+}
 
 const mockPatientListData = [
   {
@@ -108,17 +113,13 @@ const mockPatientListData = [
 ];
 
 it('renders the patient list details workspace', async () => {
-  mockedOpenmrsFetch.mockResolvedValue({ data: { results: mockPatientListData } });
+  mockOpenmrsFetch.mockResolvedValue({ data: { results: mockPatientListData } });
 
   renderPatientListDetails();
 
-  await screen.findByRole('heading', { name: testProps.list.description });
+  await screen.findByRole('heading', { name: defaultProps.list.description });
 
   expect(screen.getByRole('button', { name: /back to patient lists/i })).toBeInTheDocument();
   expect(screen.getByText(/2 patients/i)).toBeInTheDocument();
   expect(screen.getByText(/created on/i)).toBeInTheDocument();
 });
-
-function renderPatientListDetails() {
-  render(<PatientListDetailsWorkspace {...testProps} />);
-}

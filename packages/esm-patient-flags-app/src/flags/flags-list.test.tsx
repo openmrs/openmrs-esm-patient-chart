@@ -5,7 +5,7 @@ import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsList from './flags-list.component';
 
-const mockedUsePatientFlags = usePatientFlags as jest.Mock;
+const mockUsePatientFlags = usePatientFlags as jest.Mock;
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');
@@ -17,7 +17,7 @@ jest.mock('./hooks/usePatientFlags', () => {
 });
 
 it('renders an Edit form that enables users to toggle flags on or off', async () => {
-  mockedUsePatientFlags.mockReturnValue({
+  mockUsePatientFlags.mockReturnValue({
     flags: mockPatientFlags,
     isLoading: false,
     error: null,
@@ -40,12 +40,13 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
 });
 
 function renderFlagsList() {
-  return render(
+  render(
     <FlagsList
       closeWorkspace={jest.fn()}
       closeWorkspaceWithSavedChanges={jest.fn()}
       patientUuid={mockPatient.id}
       promptBeforeClosing={jest.fn()}
+      setTitle={jest.fn()}
     />,
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -17,11 +17,10 @@ import {
 import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
-import styles from './allergies-detailed-summary.scss';
-import { ReactionSeverity } from '../types';
+import { useAllergies } from './allergy-intolerance.resource';
 import { AllergiesActionMenu } from './allergies-action-menu.component';
+import styles from './allergies-detailed-summary.scss';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -31,12 +30,12 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
-  const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
   const tableHeaders = [
     { key: 'display', header: t('allergen', 'Allergen') },
@@ -51,27 +50,10 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
   ];
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return allergies?.map((allergy) => ({
       ...allergy,
-      reactionSeverity: {
-        content: (
-          <span className={styles.allergyCriticality}>
-            {allergy.reactionSeverity === ReactionSeverity.SEVERE && (
-              <svg className="omrs-icon omrs-margin-right-4" fill="rgba(181, 7, 6, 1)" style={{ height: '1.25rem' }}>
-                <use xlinkHref="#omrs-icon-important-notification" />
-              </svg>
-            )}
-            <span
-              className={classNames({
-                [styles.allergySeverityHigh]: allergy.reactionSeverity === ReactionSeverity.SEVERE,
-              })}
-            >
-              {allergy.reactionSeverity}
-            </span>
-          </span>
-        ),
-      },
+      reactionSeverity: allergy.reactionSeverity?.toUpperCase() ?? '--',
       lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
       reaction: allergy.reactionManifestations?.join(', '),
       note: allergy?.note ?? '--',
@@ -79,7 +61,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   }, [allergies]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>

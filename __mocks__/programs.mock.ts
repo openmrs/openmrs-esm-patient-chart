@@ -50,6 +50,10 @@ export const mockEnrolledProgramsResponse = [
       uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
       name: 'HIV Care and Treatment',
       allWorkflows: [],
+      concept: {
+        uuid: '70724784-438a-490e-a581-68b7d1f8f47f',
+        display: 'Human immunodeficiency virus (HIV) disease',
+      },
     },
     display: 'HIV Care and Treatment',
     location: {
@@ -57,6 +61,58 @@ export const mockEnrolledProgramsResponse = [
       display: 'Amani Hospital',
     },
     dateEnrolled: '2020-01-16T00:00:00.000+0000',
+    dateCompleted: null,
+  },
+];
+
+export const mockEnrolledInAllProgramsResponse = [
+  {
+    uuid: '8ba6c08f-66d9-4a18-a233-5f658b1755bf',
+    program: {
+      uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
+      name: 'HIV Care and Treatment',
+      allWorkflows: [],
+      concept: {
+        uuid: '70724784-438a-490e-a581-68b7d1f8f47f',
+        display: 'Human immunodeficiency virus (HIV) disease',
+      },
+    },
+    display: 'HIV Care and Treatment',
+    location: {
+      uuid: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
+      display: 'Amani Hospital',
+    },
+    dateEnrolled: '2020-01-16T00:00:00.000+0000',
+    dateCompleted: null,
+  },
+  {
+    uuid: '700b7914-9dc9-4569-8fe3-6db6c80af4c5',
+    program: {
+      uuid: '11b129ca-a5e7-4025-84bf-b92a173e20de',
+      name: 'Oncology Screening and Diagnosis',
+      allWorkflows: [],
+    },
+    display: 'Oncology Screening and Diagnosis',
+    location: {
+      uuid: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
+      display: 'Amani Hospital',
+    },
+    dateEnrolled: '2021-03-16T00:00:00.000+0000',
+    dateCompleted: null,
+  },
+  {
+    uuid: '874e5326-faa0-4d4b-a891-9a0e3a16f30f',
+    program: {
+      uuid: 'b2f65a51-2f87-4faa-a8c6-327a0c1d2e17',
+      name: 'HIV Differentiated Care',
+      allWorkflows: [],
+    },
+    display: 'HIV Differentiated Care',
+    location: {
+      uuid: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
+      display: 'Amani Hospital',
+    },
+    dateEnrolled: '2021-02-16T00:00:00.000+0000',
     dateCompleted: null,
   },
 ];

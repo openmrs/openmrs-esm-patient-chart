@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation, type TFunction } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, displayName, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { age, getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
 
@@ -48,13 +48,13 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     const getGender = (gender: string): string => {
       switch (gender) {
         case 'male':
-          return t('male', 'Male');
+          return getCoreTranslation('male', 'Male');
         case 'female':
-          return t('female', 'Female');
+          return getCoreTranslation('female', 'Female');
         case 'other':
-          return t('other', 'Other');
+          return getCoreTranslation('other', 'Other');
         case 'unknown':
-          return t('unknown', 'Unknown');
+          return getCoreTranslation('unknown', 'Unknown');
         default:
           return gender;
       }
@@ -72,10 +72,10 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       gender: getGender(patient.gender),
       id: patient.id,
       identifiers: [...identifiers],
-      name: patient ? displayName(patient) : '',
+      name: patient ? getPatientName(patient) : '',
       photo: patient.photo,
     };
-  }, [excludePatientIdentifierCodeTypes?.uuids, patient, t]);
+  }, [excludePatientIdentifierCodeTypes?.uuids, patient]);
 
   const handleBeforeGetContent = useCallback(
     () =>
@@ -94,21 +94,20 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     closeModal();
   }, [closeModal]);
 
-  const handlePrintError = useCallback(
-    (errorLocation, error) => {
-      onBeforeGetContentResolve.current = null;
+  const handlePrintError = useCallback((errorLocation, error) => {
+    onBeforeGetContentResolve.current = null;
 
-      showSnackbar({
-        isLowContrast: false,
-        kind: 'error',
-        title: t('printError', 'Print error'),
-        subtitle: t('printErrorExplainer', 'An error occurred in "{{errorLocation}}": ', { errorLocation }) + error,
-      });
+    showSnackbar({
+      isLowContrast: false,
+      kind: 'error',
+      title: getCoreTranslation('printError', 'Print error'),
+      subtitle:
+        getCoreTranslation('printErrorExplainer', 'An error occurred in "{{errorLocation}}": ', { errorLocation }) +
+        error,
+    });
 
-      setIsPrinting(false);
-    },
-    [t],
-  );
+    setIsPrinting(false);
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
@@ -120,7 +119,10 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={t('printIdentifierSticker', 'Print identifier sticker')} />
+      <ModalHeader
+        closeModal={closeModal}
+        title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
+      />
       <ModalBody>
         <div ref={contentToPrintRef}>
           <style type="text/css" media="print">
@@ -139,13 +141,13 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} disabled={isPrinting} onClick={handlePrint} kind="primary">
           {isPrinting ? (
-            <InlineLoading className={styles.loader} description={t('printing', 'Printing') + '...'} />
+            <InlineLoading className={styles.loader} description={getCoreTranslation('printing', 'Printing') + '...'} />
           ) : (
-            t('print', 'Print')
+            getCoreTranslation('print', 'Print')
           )}
         </Button>
       </ModalFooter>
@@ -166,13 +168,13 @@ const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: Pri
           );
         })}
         <p>
-          {t('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
+          {getCoreTranslation('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
         </p>
         <p>
           {t('dob', 'DOB')}: <strong>{patientDetails.dateOfBirth}</strong>
         </p>
         <p>
-          {t('age', 'Age')}: <strong>{patientDetails.age}</strong>
+          {getCoreTranslation('age', 'Age')}: <strong>{patientDetails.age}</strong>
         </p>
       </div>
     </div>

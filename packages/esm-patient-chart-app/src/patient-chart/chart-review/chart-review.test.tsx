@@ -13,7 +13,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
   };
 });
-
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
@@ -53,7 +52,7 @@ function slotMetaFromStore(store, slotName) {
   );
 }
 
-describe('ChartReview: ', () => {
+describe('ChartReview', () => {
   test(`renders a grid-based layout`, () => {
     const mockStore = {
       slots: {
@@ -63,9 +62,6 @@ describe('ChartReview: ', () => {
               name: 'charts-summary-dashboard',
               meta: {
                 slot: 'patient-chart-summary-dashboard-slot',
-                config: {
-                  columns: 4,
-                },
                 path: 'Patient Summary',
                 title: 'Patient Summary',
               },
@@ -74,9 +70,6 @@ describe('ChartReview: ', () => {
               name: 'test-results-summary-dashboard',
               meta: {
                 slot: 'patient-chart-test-results-dashboard-slot',
-                config: {
-                  columns: 1,
-                },
                 path: 'Test Results',
                 title: 'Test Results',
               },
@@ -93,7 +86,7 @@ describe('ChartReview: ', () => {
 
     renderChartReview();
 
-    expect(screen.getByRole('heading').textContent).toMatch(/Patient summary/i);
+    expect(screen.getByRole('heading')).toHaveTextContent(/Patient summary/i);
   });
 });
 

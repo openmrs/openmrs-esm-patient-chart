@@ -7,11 +7,11 @@ import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
 
-const mockedUseLayoutType = useLayoutType as jest.Mock;
-const mockUsePatient = usePatient as jest.Mock;
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUsePatient = jest.mocked(usePatient);
 const mockUseWorkspaces = useWorkspaces as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
-const MockActionMenuButton = ActionMenuButton as jest.Mock;
+const MockActionMenuButton = jest.mocked(ActionMenuButton);
 
 MockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
   <button onClick={handler}>
@@ -69,6 +69,9 @@ jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
   return { useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit() };
 });
 
+mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
+mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
+
 describe('<OrderBasketActionButton/>', () => {
   beforeAll(() => {
     orderBasketStore.setState({
@@ -80,15 +83,9 @@ describe('<OrderBasketActionButton/>', () => {
     });
   });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockUsePatient.mockReturnValue({ patientUuid: mockPatient.id });
-    mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
-  });
-
   it('should display tablet view action button', async () => {
     const user = userEvent.setup();
-    mockedUseLayoutType.mockReturnValue('tablet');
+    mockUseLayoutType.mockReturnValue('tablet');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
@@ -99,7 +96,7 @@ describe('<OrderBasketActionButton/>', () => {
 
   it('should display desktop view action button', async () => {
     const user = userEvent.setup();
-    mockedUseLayoutType.mockReturnValue('desktop');
+    mockUseLayoutType.mockReturnValue('small-desktop');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
@@ -110,13 +107,14 @@ describe('<OrderBasketActionButton/>', () => {
 
   it('should prompt user to start visit if no currentVisit found', async () => {
     const user = userEvent.setup();
-    mockedUseLayoutType.mockReturnValue('desktop');
+    mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
     mockUseVisitOrOfflineVisit.mockImplementation(() => ({
       activeVisit: null,
       currentVisit: null,
     }));
-    const screen = render(<OrderBasketActionButton />);
+
+    render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
@@ -126,7 +124,7 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display a count tag when orders are present on the desktop view', () => {
-    mockedUseLayoutType.mockReturnValue('desktop');
+    mockUseLayoutType.mockReturnValue('small-desktop');
     const { result } = renderHook(useOrderBasket);
     expect(result.current.orders).toHaveLength(1); // sanity check
     render(<OrderBasketActionButton />);
@@ -136,7 +134,7 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display the count tag when orders are present on the tablet view', () => {
-    mockedUseLayoutType.mockReturnValue('tablet');
+    mockUseLayoutType.mockReturnValue('tablet');
     render(<OrderBasketActionButton />);
 
     expect(screen.getByRole('button', { name: /1 order basket/i })).toBeInTheDocument();

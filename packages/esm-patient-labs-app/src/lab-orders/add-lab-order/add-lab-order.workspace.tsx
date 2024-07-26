@@ -4,14 +4,14 @@ import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { age, displayName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   type LabOrderBasketItem,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { TestTypeSearch } from './test-type-search';
+import { TestTypeSearch } from './test-type-search.component';
 import { LabOrderForm } from './lab-order-form.component';
 import styles from './add-lab-order.scss';
 
@@ -35,7 +35,7 @@ export default function AddLabOrderWorkspace({
 
   const isTablet = useLayoutType() === 'tablet';
 
-  const patientName = patient ? displayName(patient) : '';
+  const patientName = patient ? getPatientName(patient) : '';
 
   const cancelOrder = useCallback(() => {
     closeWorkspace({
@@ -77,6 +77,7 @@ export default function AddLabOrderWorkspace({
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
+          setTitle={() => {}}
         />
       )}
     </div>

@@ -11,7 +11,6 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-test-results-dashboard-slot",
-        "columns": 1,
         "path": "Results Viewer",
         "hideDashboardTitle": true
       },
@@ -20,18 +19,12 @@
     {
       "name": "test-results-filtered-overview",
       "slot": "test-results-filtered-overview-slot",
-      "component": "externalOverview",
-      "meta": {
-        "columnSpan": 4
-      }
+      "component": "externalOverview"
     },
     {
       "name": "results-viewer",
       "slots": ["patient-chart-results-viewer-slot", "patient-chart-test-results-dashboard-slot"],
-      "component": "resultsViewer",
-      "meta": {
-        "columnSpan": 4
-      }
+      "component": "resultsViewer"
     },
     {
       "name": "print-modal",
