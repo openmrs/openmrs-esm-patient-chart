@@ -29,7 +29,7 @@ function renderVisitNotesForm(props = {}) {
 const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
 const mockSaveVisitNote = jest.mocked(saveVisitNote);
 const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseSession = jest.mocked(useSession);
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));

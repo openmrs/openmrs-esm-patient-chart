@@ -8,7 +8,7 @@ import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from
 import VisitSummary from './visit-summary.component';
 const mockExtensionSlot = ExtensionSlot as jest.Mock;
 const mockGetConfig = jest.mocked(getConfig);
-const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 describe('VisitSummary', () => {

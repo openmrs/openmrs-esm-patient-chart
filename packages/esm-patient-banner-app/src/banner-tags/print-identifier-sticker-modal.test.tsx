@@ -9,7 +9,7 @@ import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockCloseModal = jest.fn();
 const mockUseReactToPrint = jest.mocked(useReactToPrint);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('react-to-print', () => {
   const originalModule = jest.requireActual('react-to-print');

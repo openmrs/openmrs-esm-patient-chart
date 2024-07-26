@@ -8,41 +8,33 @@ import ChartReview from './chart-review.component';
 const mockUseExtensionStore = useExtensionStore as jest.Mock;
 const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
 
+const defaultProps = {
+  patient: mockPatient,
+  patientUuid: mockPatient.id,
+  view: 'Patient Summary',
+};
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
   };
 });
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  useExtensionStore: jest.fn(),
+  useExtensionSlotMeta: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    useExtensionStore: jest.fn(),
-    useExtensionSlotMeta: jest.fn(),
-  };
-});
-
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom');
-
-  return {
-    ...originalModule,
-    Redirect: jest.fn(),
-    useMatch: jest.fn().mockReturnValue({
-      params: {
-        url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
-        view: 'Patient Summary',
-      },
-    }),
-  };
-});
-
-const testProps = {
-  patient: mockPatient,
-  patientUuid: mockPatient.id,
-  view: 'Patient Summary',
-};
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Redirect: jest.fn(),
+  useMatch: jest.fn().mockReturnValue({
+    params: {
+      url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
+      view: 'Patient Summary',
+    },
+  }),
+}));
 
 function slotMetaFromStore(store, slotName) {
   return Object.fromEntries(
@@ -93,7 +85,7 @@ describe('ChartReview', () => {
 function renderChartReview() {
   render(
     <BrowserRouter>
-      <ChartReview {...testProps} />
+      <ChartReview {...defaultProps} />
     </BrowserRouter>,
   );
 }

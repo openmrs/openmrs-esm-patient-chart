@@ -9,7 +9,7 @@ import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinis
 import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 jest.mock('../common', () => {

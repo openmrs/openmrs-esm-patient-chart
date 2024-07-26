@@ -21,7 +21,7 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdatePatientAllergy = jest.mocked(updatePatientAllergy);
 const mockUseAllergens = jest.mocked(useAllergens);
 const mockUseAllergicReactions = jest.mocked(useAllergicReactions);
-const mockUseConfig = jest.mocked<() => AllergiesConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<AllergiesConfigObject>);
 
 jest.mock('./allergy-form.resource', () => ({
   ...jest.requireActual('./allergy-form.resource'),

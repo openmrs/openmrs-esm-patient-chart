@@ -19,7 +19,7 @@ const temperatureValue = 37;
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../common', () => ({
   assessValue: jest.fn(),

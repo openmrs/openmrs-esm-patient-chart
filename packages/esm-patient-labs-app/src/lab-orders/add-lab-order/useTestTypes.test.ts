@@ -13,7 +13,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 const mockOpenrsFetch = openmrsFetch as jest.Mock;
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseSWRImmutable = useSWRImmutable as jest.Mock;
 
 mockUseSWRImmutable.mockImplementation((keyFcn: () => any, fetcher: any) => {

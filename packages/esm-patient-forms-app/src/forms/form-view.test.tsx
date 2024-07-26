@@ -10,7 +10,7 @@ import FormView from './form-view.component';
 
 const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;
 const mockShowModal = jest.mocked(showModal);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {

@@ -12,7 +12,7 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({

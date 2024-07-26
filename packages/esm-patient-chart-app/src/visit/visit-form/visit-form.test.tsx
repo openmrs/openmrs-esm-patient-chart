@@ -10,6 +10,7 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
+  usePatient,
   useVisitTypes,
   type FetchResponse,
   type Visit,
@@ -59,10 +60,11 @@ const testProps = {
 const mockSaveVisit = jest.mocked(saveVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockGetStartedVisitGetter = jest.fn();
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
+const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -161,27 +163,31 @@ jest.mock('../hooks/useLocations', () => {
   };
 });
 
-mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-
-mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
-  visitAttributeTypes: [
-    {
-      uuid: visitAttributes.punctuality.uuid,
-      required: false,
-      displayInThePatientBanner: true,
-    },
-    {
-      uuid: visitAttributes.insurancePolicyNumber.uuid,
-      required: false,
-      displayInThePatientBanner: true,
-    },
-  ],
-});
-
-mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-
 describe('Visit form', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+    mockUsePatient.mockReturnValue({
+      error: null,
+      isLoading: false,
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+    });
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+  });
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
