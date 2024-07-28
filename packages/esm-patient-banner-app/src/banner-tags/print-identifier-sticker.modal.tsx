@@ -20,17 +20,14 @@ const PrintIdentifierStickerModal: React.FC<PrintIdentifierStickerModalProps> = 
     useConfig<ConfigObject>();
   const contentToPrintRef = useRef(null);
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
+  const [numberOfLabelColumns, setNumberOfLabelColumns] = useState<number>(numberOfPatientIdStickerColumns);
+  const [numberOfLabelRowsPerPage, setNumberOfLabelRowsPerPage] = useState<number>(numberOfPatientIdStickerRowsPerPage);
+  const [numberOfLabels, setNumberOfLabels] = useState<number>(numberOfPatientIdStickers);
   const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
 
-  const labels = Array.from({ length: numberOfPatientIdStickers });
-  const maxLabelsPerPage = numberOfPatientIdStickerRowsPerPage * numberOfPatientIdStickerColumns;
-  const pages = [];
-
-  for (let i = 0; i < labels.length; i += maxLabelsPerPage) {
-    pages.push(labels.slice(i, i + maxLabelsPerPage));
-  }
+  const labels = Array.from({ length: numberOfLabels });
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
@@ -85,6 +82,30 @@ const PrintIdentifierStickerModal: React.FC<PrintIdentifierStickerModalProps> = 
         title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
       />
       <ModalBody>
+        <NumberInput
+          id="numberOfColumnsInput"
+          label={t('numberOfLabelColumns', 'Number of patient Id sticker columns')}
+          min={1}
+          onChange={(event) => setNumberOfLabelColumns(parseInt(event.target.value || 1))}
+          value={numberOfLabelColumns}
+          hideSteppers={true}
+        />
+        <NumberInput
+          id="numberOfRowsPerPageInput"
+          label={t('numberOfLabelRowsPerPage', 'Number of patient Id sticker rows per page')}
+          min={1}
+          onChange={(event) => setNumberOfLabelRowsPerPage(parseInt(event.target.value || 1))}
+          value={numberOfLabelRowsPerPage}
+          hideSteppers={true}
+        />
+        <NumberInput
+          id="numberOfLabels"
+          label={t('numberOfLabels', 'Number of Patient Id Stickers')}
+          min={1}
+          onChange={(event) => setNumberOfLabels(parseInt(event.target.value || 1))}
+          value={numberOfLabels}
+          hideSteppers={true}
+        />
         <div className={styles.stickerContent}>
           <IdentifierSticker patient={patient} />
           <span>
@@ -109,8 +130,8 @@ const PrintIdentifierStickerModal: React.FC<PrintIdentifierStickerModalProps> = 
       <div className={`${styles.previewContainer} ${!isPreviewVisible ? styles.hideResultsPreview : ''}`}>
         <div ref={contentToPrintRef}>
           <PrintIdentifierStickerContent
-            numberOfLabelRowsPerPage={numberOfPatientIdStickerRowsPerPage}
-            numberOfLabelColumns={numberOfPatientIdStickerColumns}
+            numberOfLabelRowsPerPage={numberOfLabelRowsPerPage}
+            numberOfLabelColumns={numberOfLabelColumns}
             labels={labels}
             patient={patient}
           />

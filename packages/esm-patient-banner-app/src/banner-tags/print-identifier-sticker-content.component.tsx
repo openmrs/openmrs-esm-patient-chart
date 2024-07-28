@@ -19,6 +19,10 @@ const PrintIdentifierStickerContent: React.FC<PrintIdentifierStickerContentProps
 }) => {
   const { printIdentifierStickerWidth, printIdentifierStickerHeight, printIdentifierStickerPaperSize } =
     useConfig<ConfigObject>();
+
+  if (numberOfLabelColumns < 1 || numberOfLabelRowsPerPage < 1 || labels.length < 1) {
+    return;
+  }
   const maxLabelsPerPage = numberOfLabelRowsPerPage * numberOfLabelColumns;
   const pages = [];
 
