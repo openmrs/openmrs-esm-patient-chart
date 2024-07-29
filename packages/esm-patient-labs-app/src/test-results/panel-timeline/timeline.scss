@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .grid {
@@ -46,6 +47,10 @@
     @include type.type-style('body-compact-01');
     color: $text-02;
   }
+}
+.timeline-data-cell:hover { 
+  background-color: colors.$blue-10;
+  box-shadow: 0 0 0 1px colors.$blue-30;
 }
 
 .row-start-cell {
@@ -139,12 +144,14 @@
 
 .high,
 .low {
-  box-shadow: 0 0 0 1px #000000;
+  background-color: colors.$orange-10;
+  box-shadow: 0 0 0 1px colors.$orange-20;
 }
 
 .critically-high,
 .critically-low {
-  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+  background-color: colors.$red-20;
+  box-shadow: 0 0 0 1px colors.$red-20-hover;
 }
 
 .off-scale-low {
