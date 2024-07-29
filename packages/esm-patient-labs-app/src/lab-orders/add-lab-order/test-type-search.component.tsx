@@ -86,7 +86,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
     return (
       <Tile className={styles.emptyState}>
         <div>
-          <h4 className={styles.productiveHeading01}>
+          <h4 className={styles.heading}>
             {t('errorFetchingTestTypes', 'Error fetching results for "{{searchTerm}}"', {
               searchTerm,
             })}
@@ -136,7 +136,7 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
   return (
     <Tile className={styles.emptyState}>
       <div>
-        <h4 className={styles.productiveHeading01}>
+        <h4 className={styles.heading}>
           {t('noResultsForTestTypeSearch', 'No results to display for "{{searchTerm}}"', {
             searchTerm,
           })}
@@ -191,7 +191,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
         <p>
-          <span className={styles.productiveHeading01}>{testType.label}</span>{' '}
+          <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
       </div>
       <div className={styles.searchResultActions}>

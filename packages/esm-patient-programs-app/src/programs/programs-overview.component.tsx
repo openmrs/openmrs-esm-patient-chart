@@ -116,7 +116,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             kind={'info'}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}

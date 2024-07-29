@@ -61,7 +61,7 @@ const UploadStatusComponent: React.FC = () => {
     <div className={styles.cameraSection}>
       <ModalHeader
         closeModal={closeModal}
-        className={styles.productiveHeading03}
+        className={styles.modalHeader}
         title={t('addAttachment_title', 'Add Attachment')}
       />
       <ModalBody>

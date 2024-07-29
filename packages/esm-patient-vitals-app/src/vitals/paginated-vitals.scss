@@ -1,6 +1,6 @@
 @use '@carbon/colors';
-@use '@carbon/type';
 @use '@carbon/layout';
+@use '@carbon/type';
 
 .tableContainer {
   flex: 1;
@@ -14,56 +14,60 @@
   }
 }
 
-.criticallyLow, .criticallyHigh, .low, .high {
+.criticallyLow,
+.criticallyHigh,
+.low,
+.high {
   td:nth-child(2) {
-    @include type.type-style("heading-compact-01");
+    @include type.type-style('heading-compact-01');
   }
 }
 
-.criticallyHigh, .criticallyLow {
+.criticallyHigh,
+.criticallyLow {
   border-top: 1px solid colors.$red-20-hover !important;
   background-color: colors.$red-20 !important;
 }
 
-.high, .low {
+.high,
+.low {
   border-top: 1px solid colors.$orange-20 !important;
   background-color: colors.$orange-10 !important;
-
 }
 
 .criticallyLow {
   td:nth-child(2)::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
 .criticallyHigh {
   td:nth-child(2)::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
 .low {
   td:nth-child(2)::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
 .high {
   td:nth-child(2)::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
 
 .off-scale-low {
   td:nth-child(2)::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
 .off-scale-high {
   td:nth-child(2)::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
@@ -77,17 +81,17 @@
 }
 
 .criticallyLow::after {
-  content: " ↓↓";
+  content: ' ↓↓';
 }
 
 .criticallyHigh::after {
-  content: " ↑↑";
+  content: ' ↑↑';
 }
 
 .low::after {
-  content: " ↓";
+  content: ' ↓';
 }
 
 .high::after {
-  content: " ↑";
+  content: ' ↑';
 }

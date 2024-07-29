@@ -47,8 +47,8 @@ export interface HeaderedQuickInfoProps {
 const HeaderedQuickInfo: React.FC<HeaderedQuickInfoProps> = ({ header, children, isLoading = false }) => {
   return (
     <div>
-      <h4 className={styles.label01}>{header}</h4>
-      {isLoading ? <SkeletonText heading /> : <span className={styles.productiveHeading04}>{children}</span>}
+      <h4 className={styles.label}>{header}</h4>
+      {isLoading ? <SkeletonText heading /> : <span className={styles.heading}>{children}</span>}
     </div>
   );
 };

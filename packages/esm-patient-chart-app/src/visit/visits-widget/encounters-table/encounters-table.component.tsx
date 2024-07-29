@@ -2,15 +2,16 @@ import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
-  DataTable,
   type DataTableHeader,
+  DataTable,
+  InlineLoading,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
-  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -18,7 +19,6 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-  InlineLoading,
 } from '@carbon/react';
 import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';

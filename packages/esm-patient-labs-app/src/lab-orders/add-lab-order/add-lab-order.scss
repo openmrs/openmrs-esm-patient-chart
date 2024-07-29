@@ -1,7 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../root";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   position: relative;
@@ -12,11 +11,11 @@
 }
 
 .patientHeader {
-  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
   background-color: $ui-01;
 
   span:first-of-type {
-    margin-right: spacing.$spacing-03;
+    margin-right: layout.$spacing-03;
   }
 
   .text02 {
@@ -25,16 +24,16 @@
 }
 
 .backButton {
-  padding: spacing.$spacing-03;
+  padding: layout.$spacing-03;
 
   button {
     display: flex;
     padding-left: 0 !important;
-    margin: 0 spacing.$spacing-05;
+    margin: 0 layout.$spacing-05;
 
     svg {
       order: 1;
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
       margin-left: 0 !important;
     }
 
@@ -42,4 +41,12 @@
       order: 2;
     }
   }
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+}
+
+.text02 {
+  color: $text-02;
 }

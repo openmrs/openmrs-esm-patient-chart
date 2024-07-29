@@ -7,7 +7,7 @@
   display: flex;
   flex-flow: row wrap;
   flex-direction: column;
-  margin: 0.5rem 0rem;
+  margin: layout.$spacing-03 0;
   min-inline-size: max-content;
 }
 
@@ -40,7 +40,7 @@
 
 .value-container {
   @extend .label-container;
-  margin-top: 0.25rem;
+  margin-top: layout.$spacing-02;
 }
 
 .label {
@@ -51,8 +51,8 @@
 
 .danger-icon {
   color: $danger;
-  height: 0.25rem;
-  width: 0.25rem;
+  height: layout.$spacing-02;
+  width: layout.$spacing-02;
 }
 
 .value {
@@ -65,10 +65,13 @@
 }
 
 .pad-right {
-  margin-right: 2px;
+  margin-right: layout.$spacing-01;
 }
 
-.critically-low, .critically-high, .low, .high {
+.critically-low,
+.critically-high,
+.low,
+.high {
   &::after {
     @include type.type-style('heading-compact-01');
     color: $text-02;
@@ -76,17 +79,17 @@
 }
 
 .low::after {
-  content: " ↓";
+  content: ' ↓';
 }
 
 .critically-low::after {
-  content: " ↓↓";
+  content: ' ↓↓';
 }
 
 .high::after {
-  content: " ↑";
+  content: ' ↑';
 }
 
 .critically-high::after {
-  content: " ↑↑";
+  content: ' ↑↑';
 }
