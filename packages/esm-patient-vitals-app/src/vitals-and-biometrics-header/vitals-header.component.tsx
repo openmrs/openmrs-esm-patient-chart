@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
+dayjs.extend(duration);
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
@@ -57,6 +59,23 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     const hasActiveVisit = Boolean(currentVisit?.uuid);
     const vitalsTakenToday = Boolean(dayjs(latestVitals?.date).isToday());
     const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
+    const now = dayjs();
+    const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
+    let overdueVitalsTagContent = '';
+
+    switch (true) {
+      case vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount <= 7:
+        overdueVitalsTagContent = t('daysOldVitals', 'These vitals are {{count}} days old', {
+          count: vitalsOverdueDayCount,
+        });
+        break;
+      case vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14:
+        overdueVitalsTagContent = t('overOneWeekOldVitals', 'These vitals are over one week old');
+        break;
+      default:
+        overdueVitalsTagContent = t('outOfDateVitals', 'These vitals are out of date');
+        break;
+    }
 
     return (
       <div className={styles['background']}>
@@ -71,7 +90,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
                 <Tag type="red">
                   <span className={styles.overdueIndicator}>
                     <Time />
-                    {t('overdue', 'Overdue')}
+                    {`${t('overdue', 'Overdue')}: ${overdueVitalsTagContent}`}
                   </span>
                 </Tag>
               </div>
