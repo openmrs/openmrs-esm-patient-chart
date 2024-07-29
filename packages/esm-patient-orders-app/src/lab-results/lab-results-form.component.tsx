@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
+import { useOrderConceptByUuid, updateOrderResult, useLabEncounter, useObservation } from './lab-results.resource';
 import ResultFormField from './result-form-field.component';
 import styles from './lab-results-form.scss';
+import { mutate } from 'swr';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
@@ -27,7 +28,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [initialValues, setInitialValues] = useState(null);
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
-  const { encounter, isLoading: isLoadingEncounter, mutate } = useLabEncounter(order.encounter.uuid);
+  const { encounter, isLoading: isLoadingEncounter, mutate: mutateLabOrders } = useLabEncounter(order.encounter.uuid);
+  const { data, isLoading: isLoadingObs, error: isErrorObs } = useObservation(obsUuid);
 
   const {
     control,
@@ -40,26 +42,28 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   });
 
   useEffect(() => {
-    if (!isLoadingEncounter && encounter?.obs && encounter.obs.length > 0 && !isEditing) {
-      const matchingObs = encounter.obs.find((obs) => obs.order?.uuid === order.uuid);
-      if (matchingObs) {
-        setObsUuid(matchingObs.uuid);
+    if (!isLoadingEncounter && encounter?.obs.length > 0 && !isEditing) {
+      const obs = encounter.obs.find((obs) => obs.concept?.uuid === order?.concept.uuid);
+      if (obs) {
+        setObsUuid(obs.uuid);
         setIsEditing(true);
       }
     }
-  }, [isLoadingEncounter, encounter, order.uuid, isEditing]);
+  }, [isLoadingEncounter, encounter, isEditing, order]);
 
   useEffect(() => {
-    if (isEditing && obsUuid) {
-      setIsLoadingInitialValues(true);
-      fetchObservation(obsUuid).then((data) => {
-        if (data) {
+    const loadInitialValues = async () => {
+      if (isEditing && obsUuid) {
+        setIsLoadingInitialValues(true);
+        if (data && !isLoadingObs) {
           setInitialValues(data);
         }
         setIsLoadingInitialValues(false);
-      });
-    }
-  }, [isEditing, obsUuid]);
+      }
+    };
+
+    loadInitialValues();
+  }, [isEditing, obsUuid, data, isLoadingObs]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -131,6 +135,17 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
     const obsPayload = { obs: obsValue };
 
+    const orderDiscontinuationPayload = {
+      previousOrder: order.uuid,
+      type: 'testorder',
+      action: 'DISCONTINUE',
+      careSetting: order.careSetting.uuid,
+      encounter: order.encounter.uuid,
+      patient: order.patient.uuid,
+      concept: order.concept.uuid,
+      orderer: order.orderer,
+    };
+
     const resultsStatusPayload = {
       fulfillerStatus: 'COMPLETED',
       fulfillerComment: 'Test Results Entered',
@@ -139,16 +154,20 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     updateOrderResult(
       order.uuid,
       order.encounter.uuid,
-      obsUuid,
       obsPayload,
       resultsStatusPayload,
+      orderDiscontinuationPayload,
       abortController,
     ).then(
       () => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
-        mutate();
-
+        mutateLabOrders();
+        mutate(
+          (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
+          undefined,
+          { revalidate: true },
+        );
         showSnackbar({
           title: t('saveLabResults', 'Save lab results'),
           kind: 'success',

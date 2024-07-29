@@ -1,33 +1,37 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { formatDatetime } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 import VisitTag from './visit-tag.extension';
 
-const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
+const mockUseVisitOrOfflineVisit = jest.mocked(useVisitOrOfflineVisit);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...(jest.requireActual('@openmrs/esm-patient-common-lib') as any),
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useVisitOrOfflineVisit: jest.fn(),
 }));
 
-describe('VisitBannerTag: ', () => {
+describe('VisitBannerTag', () => {
   it('renders an active visit tag when an active visit is ongoing', () => {
     mockUseVisitOrOfflineVisit.mockReturnValue({
       activeVisit: mockCurrentVisit,
       currentVisit: mockCurrentVisit,
       currentVisitIsRetrospective: false,
       error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
     });
+
     const patient = { ...mockPatient, deceasedDateTime: null };
     render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
 
     const visitMetadata =
       mockCurrentVisit.visitType.display +
       ' Started: ' +
-      formatDatetime(mockCurrentVisit.startDatetime, { mode: 'wide' });
+      formatDatetime(parseDate(mockCurrentVisit.startDatetime), { mode: 'wide' });
 
     expect(
       screen.getByRole('tooltip', {
@@ -44,9 +48,15 @@ describe('VisitBannerTag: ', () => {
       currentVisit: mockCurrentVisit,
       currentVisitIsRetrospective: false,
       error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
     });
+
     const patient = { ...mockPatient, deceasedDateTime: '2002-04-04' };
+
     render(<VisitTag patientUuid={mockPatient.id} patient={patient} />);
+
     expect(screen.queryByRole('button', { name: /Active Visit/i })).not.toBeInTheDocument();
   });
 });

@@ -1,45 +1,23 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { LeftNavMenu, useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
 import SideMenu from './side-menu.component';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+const mockUseLayoutType = jest.mocked(useLayoutType);
 
-  return {
-    ...originalModule,
-    isDesktop: jest.fn().mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop'),
-  };
-});
-
-global.window.matchMedia = jest.fn().mockImplementation(() => {
-  return {
-    matches: false,
-    addListener: () => {},
-    removeListener: () => {},
-  };
-});
-
-const mockedLeftNavMenu = LeftNavMenu as any as jest.Mock;
-const mockedUseLayoutType = useLayoutType as jest.Mock;
-
-mockedLeftNavMenu.mockReturnValue('left nav menu');
-
-describe('sidemenu', () => {
+describe('Side menu', () => {
   it('is rendered when viewport == large-desktop', () => {
-    mockedUseLayoutType.mockImplementationOnce(() => 'large-desktop');
-
+    mockUseLayoutType.mockReturnValue('large-desktop');
     renderSideMenu();
 
-    expect(screen.getByText(/left nav menu/)).toBeInTheDocument();
+    expect(screen.getByText(/left nav menu/i)).toBeInTheDocument();
   });
 
   it('is not rendered when viewport == tablet or viewport == small-desktop', () => {
-    mockedUseLayoutType.mockImplementationOnce(() => 'tablet');
-
+    mockUseLayoutType.mockReturnValue('tablet');
     renderSideMenu();
 
-    expect(screen.queryByText(/left nav menu/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/left nav menu/i)).not.toBeInTheDocument();
   });
 });
 

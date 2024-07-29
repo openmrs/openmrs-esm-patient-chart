@@ -3,16 +3,26 @@ import userEvent from '@testing-library/user-event';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
-import { age, closeWorkspace, useConfig, useLayoutType, usePatient, useSession } from '@openmrs/esm-framework';
+import {
+  closeWorkspace,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useLayoutType,
+  usePatient,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { configSchema, type ConfigObject } from '../../config-schema';
+import { mockSessionDataResponse } from '__mocks__';
+import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './lab-order';
 import AddLabOrderWorkspace from './add-lab-order.workspace';
 
-const mockUseConfig = useConfig as jest.Mock;
-const mockUseSession = useSession as jest.Mock;
-const mockUsePatient = usePatient as jest.Mock;
-const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUsePatient = jest.mocked(usePatient);
+const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
@@ -71,32 +81,21 @@ function renderAddLabOrderWorkspace() {
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
 }
 
-describe('AddLabOrder', () => {
-  beforeAll(() => {
-    mockUseConfig.mockReturnValue({
-      orders: {
-        careSettingUuid: 'test-care-setting-uuid',
-        labOrderTypeUUID: 'test-lab-order-type-uuid',
-      },
-    });
-    mockUseSession.mockReturnValue({
-      currentProvider: {
-        uuid: 'test-provider-uuid',
-      },
-    });
-    mockUsePatient.mockReturnValue({
-      patient: {
-        uuid: ptUuid,
-        gender: 'M',
-        birthDate: '1990-01-01',
-      },
-      isLoading: false,
-    });
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  orders: {
+    labOrderTypeUuid: 'test-lab-order-type-uuid',
+    labOrderableConcepts: [],
+  },
+});
 
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
+mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
+
+describe('AddLabOrder', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
-    jest.clearAllMocks();
   });
 
   test('happy path fill and submit form', async () => {
@@ -136,11 +135,13 @@ describe('AddLabOrder', () => {
     await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
         expect.objectContaining({
+          action: 'NEW',
+          display: 'CD4 COUNT',
           urgency: 'STAT',
           instructions: 'plz do it thx',
           labReferenceNumber: 'lba-000124',
           testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
-          orderer: 'test-provider-uuid',
+          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]);
     });
@@ -163,7 +164,10 @@ describe('AddLabOrder', () => {
 
     await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
-        { ...createEmptyLabOrder(mockTestTypes[1], 'test-provider-uuid'), isOrderIncomplete: true },
+        {
+          ...createEmptyLabOrder(mockTestTypes[1], mockSessionDataResponse.data.currentProvider.uuid),
+          isOrderIncomplete: true,
+        },
       ]);
     });
 
@@ -187,9 +191,10 @@ describe('AddLabOrder', () => {
   test('should display a patient header on tablet', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     renderAddLabOrderWorkspace();
-    const ptAge = age('1990-01-01');
-    expect(screen.getByText(RegExp(`M\\s*.*${ptAge}`))).toBeInTheDocument();
-    expect(screen.getByText('01 — Jan — 1990')).toBeInTheDocument();
+    expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
+    expect(screen.getByText(/male/i)).toBeInTheDocument();
+    expect(screen.getByText(/52 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
   });
 
   test('should display an error message if test types fail to load', () => {

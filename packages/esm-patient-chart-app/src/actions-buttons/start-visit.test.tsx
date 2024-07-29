@@ -1,22 +1,27 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useConfig, usePatient, useVisit } from '@openmrs/esm-framework';
+import { screen, render } from '@testing-library/react';
+import {
+  getDefaultsFromConfigSchema,
+  useConfig,
+  usePatient,
+  useVisit,
+  type VisitReturnType,
+} from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig, esmPatientChartSchema } from '../config-schema';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
 
-const mockUsePatient = usePatient as jest.Mock;
-const mockUseVisit = useVisit as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
+const mockUsePatient = jest.mocked(usePatient);
+const mockUseVisit = jest.mocked(useVisit);
 
 jest.mock('@openmrs/esm-framework', () => ({
-  usePatient: jest.fn(),
-  useVisit: jest.fn(),
-  getGlobalStore: jest.fn(),
+  ...jest.requireActual('@openmrs/esm-framework'),
   createGlobalStore: jest.fn(),
   createUseStore: jest.fn(),
-  useConfig: jest.fn(),
+  getGlobalStore: jest.fn(),
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -28,32 +33,49 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+});
+
+mockUseVisit.mockReturnValue({
+  currentVisit: null,
+} as VisitReturnType);
+
 describe('StartVisitOverflowMenuItem', () => {
-  it('should launch start visit form', async () => {
+  it('should launch the start visit form', async () => {
     const user = userEvent.setup();
-    mockUseConfig.mockReturnValue({ startVisitLabel: '' });
-    mockUseVisit.mockReturnValue({ currentVisit: null });
-    mockUsePatient.mockReturnValue({ patient: mockPatient });
 
-    render(<StartVisitOverflowMenuItem patientUuid="some-patient-uuid" />);
+    mockUsePatient.mockReturnValue({
+      error: null,
+      isLoading: false,
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+    });
 
-    const startVisitButton = screen.getByRole('menuitem', { name: /Start visit/ });
+    render(<StartVisitOverflowMenuItem patientUuid={mockPatient.id} />);
+
+    const startVisitButton = screen.getByRole('menuitem', { name: /start visit/i });
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);
-
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
 
-  it('should not show start visit button for deceased patient', () => {
-    mockUseConfig.mockReturnValue({ startVisitLabel: '' });
-    mockUseVisit.mockReturnValue({ currentVisit: null });
-    mockUsePatient.mockReturnValue({ patient: { ...mockPatient, deceasedDateTime: '2023-05-07T10:20:30Z' } });
+  it('should not show start visit button for a deceased patient', () => {
+    mockUsePatient.mockReturnValue({
+      error: null,
+      isLoading: false,
+      patientUuid: mockPatient.id,
+      patient: {
+        ...mockPatient,
+        deceasedDateTime: '2023-05-07T10:20:30Z',
+      },
+    });
 
-    render(<StartVisitOverflowMenuItem patientUuid="some-patient-uuid" />);
+    render(<StartVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const startVisitButton = screen.queryByRole('menuitem', { name: /Start visit/ });
+    const startVisitButton = screen.queryByRole('menuitem', { name: /start visit/i });
     expect(startVisitButton).not.toBeInTheDocument();
   });
 });

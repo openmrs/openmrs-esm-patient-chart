@@ -7,7 +7,7 @@ import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import Flags from './flags.component';
 
-const mockedUsePatientFlags = usePatientFlags as jest.Mock;
+const mockUsePatientFlags = jest.mocked(usePatientFlags);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -30,13 +30,15 @@ jest.mock('./hooks/usePatientFlags', () => {
 it('renders flags in the patient flags slot', async () => {
   const user = userEvent.setup();
 
-  mockedUsePatientFlags.mockReturnValue({
+  mockUsePatientFlags.mockReturnValue({
+    error: null,
     flags: mockPatientFlags,
     isLoading: false,
-    error: null,
+    isValidating: false,
+    mutate: jest.fn(),
   });
 
-  renderFlags();
+  render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={jest.fn()} showHighlightBar={false} />);
 
   const flags = screen.getAllByRole('button', { name: /flag/i });
   expect(flags).toHaveLength(3);
@@ -51,7 +53,3 @@ it('renders flags in the patient flags slot', async () => {
 
   expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
 });
-
-function renderFlags() {
-  render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={() => {}} showHighlightBar={false} />);
-}

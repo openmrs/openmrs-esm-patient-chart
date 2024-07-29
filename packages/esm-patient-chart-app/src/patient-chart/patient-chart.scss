@@ -27,6 +27,10 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   max-width: 60rem;
 }
 
+:global(.omrs-breakpoint-gt-small-desktop) .widthContained {
+  max-width: 80rem;
+}
+
 .chartContainer {
   flex: 1;
   display: flex;

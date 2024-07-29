@@ -13,11 +13,11 @@ const testProps = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-describe('ImmunizationOverview: ', () => {
+describe('ImmunizationOverview', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
-    renderImmunizationsOverview();
+    renderWithSwr(<ImmunizationsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -39,7 +39,7 @@ describe('ImmunizationOverview: ', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderImmunizationsOverview();
+    renderWithSwr(<ImmunizationsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -56,7 +56,7 @@ describe('ImmunizationOverview: ', () => {
   it('renders a tabular overview of recently administered immunizations if available', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockPatientImmunizationsSearchResponse });
 
-    renderImmunizationsOverview();
+    renderWithSwr(<ImmunizationsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -77,7 +77,3 @@ describe('ImmunizationOverview: ', () => {
     expect(screen.getByText(/1–3 of 3 items/i)).toBeInTheDocument();
   });
 });
-
-function renderImmunizationsOverview() {
-  renderWithSwr(<ImmunizationsOverview {...testProps} />);
-}

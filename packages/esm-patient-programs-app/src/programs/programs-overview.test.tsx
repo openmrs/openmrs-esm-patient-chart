@@ -1,6 +1,6 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
@@ -27,7 +27,7 @@ describe('ProgramsOverview', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -46,7 +46,7 @@ describe('ProgramsOverview', () => {
     };
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -59,7 +59,7 @@ describe('ProgramsOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -90,7 +90,7 @@ describe('ProgramsOverview', () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledInAllProgramsResponse } });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -102,7 +102,3 @@ describe('ProgramsOverview', () => {
     expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
   });
 });
-
-function renderProgramsOverview() {
-  renderWithSwr(<ProgramsOverview {...testProps} />);
-}

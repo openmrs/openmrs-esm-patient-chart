@@ -1,14 +1,12 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showSnackbar, useConfig, defineConfigSchema } from '@openmrs/esm-framework';
-import { configSchema } from '../config-schema';
+import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import { saveVitalsAndBiometrics } from '../common';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
-import { saveVitalsAndBiometrics } from '../common';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
-
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
 
 const heightValue = 180;
 const muacValue = 23;
@@ -19,9 +17,18 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockedSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
-const mockedUseConfig = jest.mocked(useConfig);
+const testProps = {
+  closeWorkspace: () => {},
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: () => {},
+  formContext: 'creating' as 'creating' | 'editing',
+  setTitle: jest.fn(),
+};
+
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockSavePatientVitals = jest.mocked(saveVitalsAndBiometrics);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../common', () => ({
   assessValue: jest.fn(),
@@ -38,14 +45,14 @@ jest.mock('../common', () => ({
   })),
 }));
 
-describe('VitalsBiometricsForm', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue(mockVitalsConfig);
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  ...mockVitalsConfig,
+});
 
+describe('VitalsBiometricsForm', () => {
   it('renders the vitals and biometrics form', async () => {
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     expect(screen.getByText(/vitals/i)).toBeInTheDocument();
     expect(screen.getByText(/biometrics/i)).toBeInTheDocument();
@@ -78,7 +85,7 @@ describe('VitalsBiometricsForm', () => {
   it("computes a patient's BMI from the given height and weight values", async () => {
     const user = userEvent.setup();
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -99,9 +106,9 @@ describe('VitalsBiometricsForm', () => {
       data: [],
     };
 
-    mockedSavePatientVitals.mockReturnValue(Promise.resolve(response) as ReturnType<typeof saveVitalsAndBiometrics>);
+    mockSavePatientVitals.mockResolvedValue(response as ReturnType<typeof saveVitalsAndBiometrics>);
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -133,8 +140,8 @@ describe('VitalsBiometricsForm', () => {
 
     await user.click(saveButton);
 
-    expect(mockedSavePatientVitals).toHaveBeenCalledTimes(1);
-    expect(mockedSavePatientVitals).toHaveBeenCalledWith(
+    expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
+    expect(mockSavePatientVitals).toHaveBeenCalledWith(
       mockVitalsConfig.vitals.encounterTypeUuid,
       mockVitalsConfig.vitals.formUuid,
       mockVitalsConfig.concepts,
@@ -153,8 +160,8 @@ describe('VitalsBiometricsForm', () => {
       undefined,
     );
 
-    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
-    expect(mockedShowSnackbar).toHaveBeenCalledWith(
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         isLowContrast: true,
         kind: 'success',
@@ -175,9 +182,10 @@ describe('VitalsBiometricsForm', () => {
       },
     };
 
-    mockedSavePatientVitals.mockRejectedValueOnce(error);
+    mockSavePatientVitals.mockRejectedValueOnce(error);
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
+
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
     const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
@@ -200,8 +208,8 @@ describe('VitalsBiometricsForm', () => {
 
     await user.click(saveButton);
 
-    expect(mockedShowSnackbar).toHaveBeenCalledTimes(1);
-    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: false,
       kind: 'error',
       subtitle: 'Some of the values entered are invalid',
@@ -212,7 +220,8 @@ describe('VitalsBiometricsForm', () => {
   it('Display an inline error notification on submit if value of vitals entered is invalid', async () => {
     const user = userEvent.setup();
 
-    renderForm();
+    render(<VitalsAndBiometricsForm {...testProps} />);
+
     const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
     const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
     const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
@@ -236,16 +245,3 @@ describe('VitalsBiometricsForm', () => {
     expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
   });
 });
-
-function renderForm() {
-  const testProps = {
-    closeWorkspace: () => {},
-    closeWorkspaceWithSavedChanges: jest.fn(),
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: () => {},
-    formContext: 'creating' as 'creating' | 'editing',
-    setTitle: jest.fn(),
-  };
-
-  render(<VitalsAndBiometricsForm {...testProps} />);
-}
