@@ -34,13 +34,13 @@ function filterTreeNode(inputValue, treeNode) {
     filteredSubSets = treeNode.subSets
       .map((child) => filterTreeNode(inputValue, child))
       .filter((child) => child !== null);
-  }
 
-  if (filteredSubSets.length > 0) {
-    return {
-      ...treeNode,
-      subSets: filteredSubSets,
-    };
+    if (filteredSubSets.length > 0) {
+      return {
+        ...treeNode,
+        subSets: filteredSubSets,
+      };
+    }
   }
 
   return null;
