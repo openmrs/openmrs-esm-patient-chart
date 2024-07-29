@@ -88,8 +88,7 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
+    expect(screen.getByText(/overdue: these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {

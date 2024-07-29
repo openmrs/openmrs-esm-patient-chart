@@ -63,6 +63,7 @@
 .overdueIndicator {
   display: flex;
   align-items: center;
+  min-inline-size: max-content;
 
   svg {
     margin-right: 0.25rem;
