@@ -48,20 +48,33 @@
 .nestedAccordion {
   background-color: $openmrs-background-grey;
   margin: layout.$spacing-02 0;
+
   @media (min-width: $breakpoint-small-desktop-min) {
     background-color: $ui-background;
+    margin: spacing.$spacing-02 0;
+  }
+
+  //can we group these two?
+  :global(.cds--accordion__item) {
+    border: none;
+  }
+
+  :global(.cds--accordion__item:last-child) {
+    border: none;
   }
 }
 
 // our special accordion rules
-.nestedAccordion > :global(.cds--accordion--start) > :global(.cds--accordion__item--active) {
+.nestedAccordion> :global(.cds--accordion--start)> :global(.cds--accordion__item--active) {
   border-left: 0.375rem solid var(--brand-01);
+
   @media (max-width: $breakpoint-tablet-max) {
     margin: layout.$spacing-06 0;
   }
 }
 
 .nestedAccordion :global {
+
   // extending carbon's accordion to handle nested accordions
   // accordion content
   .cds--accordion__content {
@@ -69,16 +82,17 @@
     margin: 0;
   }
 
-  .cds--accordion__item > .cds--accordion__content {
+  .cds--accordion__item>.cds--accordion__content {
     display: none;
   }
 
-  .cds--accordion__item--active > .cds--accordion__content {
+  .cds--accordion__item--active>.cds--accordion__content {
     display: block;
   }
 
   .cds--accordion__title {
     margin-left: layout.$spacing-04;
+
     @media (min-width: $breakpoint-small-desktop-min) {
       margin-left: layout.$spacing-03;
     }
@@ -86,23 +100,24 @@
 
   .cds--accordion__arrow {
     margin: layout.$spacing-03 0 0 layout.$spacing-05;
+
     @media (min-width: $breakpoint-small-desktop-min) {
       margin: layout.$spacing-03 0 0 0.6rem;
     }
   }
 
   @media (min-width: $breakpoint-small-desktop-min) {
-    .cds--accordion__item > button {
+    .cds--accordion__item>button {
       padding: 0;
     }
   }
 
   // Chevron transformations
-  .cds--accordion__item > button[aria-expanded='false'] > .cds--accordion__arrow {
+  .cds--accordion__item>button[aria-expanded='false']>.cds--accordion__arrow {
     transform: rotate(90deg);
   }
 
-  .cds--accordion__item--active > .cds--accordion__heading > .cds--accordion__arrow {
+  .cds--accordion__item--active>.cds--accordion__heading>.cds--accordion__arrow {
     /*rtl:ignore*/
     transform: rotate(-90deg);
     fill: var(--brand-01);

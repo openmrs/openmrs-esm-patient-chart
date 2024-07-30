@@ -33,7 +33,6 @@ function filterTreeNode(inputValue, treeNode) {
 
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
   const { roots } = useContext(FilterContext);
-  const config = useConfig<ConfigObject>();
   const tablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
   const { resetTree } = useContext(FilterContext);
@@ -80,13 +79,57 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
         {treeDataFiltered?.length > 0 ? (
           treeDataFiltered?.map((root, index) => (
             <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-              <FilterNode root={root} level={0} open={config.resultsViewerConcepts[index].defaultOpen} />
+              <FilterNodeParent //will rename
+                root={root}
+                itemNumber={index}
+              />
             </div>
           ))
         ) : (
           <FilterEmptyState clearFilter={() => setSearchTerm('')} />
         )}
       </div>
+    </div>
+  );
+};
+
+interface filterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
+  //move to top of page
+  itemNumber: number;
+}
+
+const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
+  const config = useConfig<ConfigObject>();
+  const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
+
+  if (!root.subSets) return; //What can we return in this instance?
+
+  const filterParent = root.subSets.map((node) => {
+    return (
+      <FilterNode
+        root={node}
+        level={0}
+        open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
+      />
+    );
+  });
+
+  return (
+    <div>
+      <div style={{ display: 'flex', borderBottom: '1px solid #d1d1d1', padding: '0.5rem 0', marginBottom: '0.5rem' }}>
+        {/* move styles to stylesheet */}
+        <div style={{ flexGrow: '1' }}>{root.display}</div>
+        <div
+          tabIndex={0}
+          onClick={() => setExpandAll((previousValue) => !previousValue)}
+          style={{ flexGrow: '1', color: '#0E61FE' }}
+          // add hover styles
+        >
+          {/* will refactor */}
+          {!expandAll ? `Expand all` : `Collapse all`}
+        </div>
+      </div>
+      {filterParent}
     </div>
   );
 };
