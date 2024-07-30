@@ -3,9 +3,8 @@ import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
-import { Printer, Renew } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
@@ -15,9 +14,9 @@ import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import Trendline from '../trendline/trendline.component';
 import type { ConfigObject } from '../../config-schema';
 import styles from './results-viewer.scss';
+import { type viewOpts } from '../../types';
 
 type panelOpts = 'tree' | 'panel';
-type viewOpts = 'split' | 'full';
 
 interface RefreshDataButtonProps {
   isTablet: boolean;
@@ -59,26 +58,17 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, loading }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [view, setView] = useState<viewOpts>('split');
-  const config = useConfig() as ConfigObject;
+  const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount } = useContext(FilterContext);
+  const { totalResultsCount, resetTree } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
-  const showPrintButton = config.showPrintButton;
   const responsiveSize = isTablet ? 'lg' : 'md';
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
       to: testResultsBasePath(`/patient/${patientUuid}/chart`),
-    });
-  }, [patientUuid]);
-
-  const openPrintModal = useCallback(() => {
-    const dispose = showModal('print-modal', {
-      patientUuid,
-      closeDialog: () => dispose(),
     });
   }, [patientUuid]);
 
@@ -94,11 +84,10 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
             >
-              <Switch name="panel" text={t('panel', 'Panel')} />
-              <Switch name="tree" text={t('tree', 'Tree')} />
+              <Switch name="panel" text={t('individualTests', 'Individual tests')} />
+              <Switch name="tree" text={t('overTime', 'Over time')} />
             </ContentSwitcher>
           </div>
-          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
         {selectedSection === 'tree' ? (
           <TreeViewWrapper
@@ -107,6 +96,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             type={type}
             expanded={isExpanded}
             testUuid={testUuid}
+            view={view}
           />
         ) : selectedSection === 'panel' ? (
           <PanelView
@@ -134,82 +124,45 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     <div className={styles.resultsContainer}>
       <div className={styles.resultsHeader}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
-          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-            totalResultsCount ? `(${totalResultsCount})` : ''
-          }`}</h4>
-          <div className={styles.leftHeaderActions}>
-            <ContentSwitcher
-              size={responsiveSize}
-              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
-              onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
-            >
-              <Switch name="panel" text={t('panel', 'Panel')} />
-              <Switch name="tree" text={t('tree', 'Tree')} />
-            </ContentSwitcher>
-            {showPrintButton && (
-              <Button
-                className={styles.button}
-                kind="ghost"
-                size={isTablet ? 'md' : 'sm'}
-                renderIcon={Printer}
-                iconDescription="Print results"
-                onClick={openPrintModal}
-              >
-                <span>{t('print', 'Print')}</span>
-              </Button>
-            )}
-          </div>
+          <h4>{t('tests', 'Tests')}</h4>
+          <Button
+            className={styles.button}
+            kind="ghost"
+            size={isTablet ? 'md' : 'sm'}
+            onClick={resetTree} //TO-DO (undo selections fix)
+          >
+            <span>{t('reset', 'Reset')}</span>
+          </Button>
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
+            <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
+              totalResultsCount ? `(${totalResultsCount})` : ''
+            }`}</h4>
             <ContentSwitcher
               className={styles.viewOptionsSwitcher}
               onChange={({ name }: { name: viewOpts }) => setView(name)}
               selectedIndex={isExpanded ? 1 : 0}
               size={responsiveSize}
             >
-              <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-              <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+              <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
+              <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
             </ContentSwitcher>
           </div>
-          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
       </div>
       <div className={styles.flex}>
-        {selectedSection === 'tree' ? (
-          <TreeViewWrapper
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            expanded={isExpanded}
-            testUuid={testUuid}
-          />
-        ) : selectedSection === 'panel' ? (
-          <PanelView
-            expanded={isExpanded}
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            testUuid={testUuid}
-          />
-        ) : null}
+        <TreeViewWrapper
+          patientUuid={patientUuid}
+          basePath={basePath}
+          type={type}
+          expanded={false}
+          testUuid={testUuid}
+          view={view}
+        />
       </div>
     </div>
   );
 };
-
-function RefreshDataButton({ isTablet, t }: RefreshDataButtonProps) {
-  return (
-    <Button
-      className={styles.button}
-      kind="ghost"
-      renderIcon={Renew}
-      size={isTablet ? 'md' : 'sm'}
-      onClick={() => window.location.reload()}
-    >
-      <span>{t('refreshData', 'Refresh data')}</span>
-    </Button>
-  );
-}
 
 export default RoutedResultsViewer;
