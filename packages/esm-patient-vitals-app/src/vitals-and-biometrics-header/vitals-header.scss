@@ -57,12 +57,13 @@
 }
 
 .tag {
-  margin-left: 0.5rem;
+  margin-left: 0.25rem;
 }
 
 .overdueIndicator {
   display: flex;
   align-items: center;
+  min-inline-size: max-content;
 
   svg {
     margin-right: 0.25rem;
@@ -102,7 +103,7 @@
 }
 
 .link {
-  margin-left: 0.5rem;
+  margin-left: 0.25rem;
   @extend .body-text;
   text-decoration-line: none;
   color: $interactive-01;
