@@ -35,6 +35,10 @@
       "component": "labOrderPanel",
       "slot": "order-basket-slot",
       "order": 2
+    },
+    {
+      "name": "results-viewer-dialog",
+      "component": "resultsViewerDialog"
     }
   ],
   "pages": [],

@@ -71,6 +71,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
   const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
+  const [showResultsTable, setShowResultsTable] = useState(false);
 
   const [upperRange, lowerRange] = useMemo(() => {
     if (obs.length === 0) {
@@ -235,7 +236,19 @@ const Trendline: React.FC<TrendlineProps> = ({
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
-      <DrawTable {...{ tableData, tableHeaderData }} />
+
+      {showResultsTable ? (
+        <>
+          <Button kind="ghost" onClick={() => setShowResultsTable(false)} className={styles['show-hide-table']}>
+            {t('hideResultsTable', 'Hide results table')}
+          </Button>
+          <DrawTable {...{ tableData, tableHeaderData }} />
+        </>
+      ) : (
+        <Button kind="ghost" onClick={() => setShowResultsTable(true)} className={styles['show-hide-table']}>
+          {t('showResultsTable', 'Show results table')}
+        </Button>
+      )}
     </div>
   );
 };
