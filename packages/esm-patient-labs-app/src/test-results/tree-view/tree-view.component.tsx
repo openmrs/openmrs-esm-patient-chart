@@ -10,7 +10,7 @@ import styles from '../results-viewer/results-viewer.styles.scss';
 import { useTranslation } from 'react-i18next';
 import TabletOverlay from '../tablet-overlay';
 import usePanelData from '../panel-view/usePanelData';
-import PanelTimelineComponent from '../panel-timeline';
+import PanelTimelineComponent from '../panel-timeline/panel-timeline-component';
 
 interface TreeViewProps {
   patientUuid: string;

@@ -1,4 +1,4 @@
-import GroupedTimeline from './grouped-timeline';
+import GroupedTimeline from './grouped-timeline.component';
 import styles from './grouped-timeline.styles.scss';
 import useGetManyObstreeData from './useObstreeData';
 
