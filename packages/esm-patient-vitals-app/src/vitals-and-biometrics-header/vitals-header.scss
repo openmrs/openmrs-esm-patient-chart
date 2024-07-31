@@ -2,26 +2,34 @@
 @use '@carbon/type';
 @import '@openmrs/esm-styleguide/src/vars';
 
-.vitals-header {
+.container {
+  background-color: $openmrs-background-grey;
+}
+
+.vitalsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: layout.$spacing-09;
-  margin-left: layout.$spacing-05;
+  min-height: layout.$spacing-09;
+  margin: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
   outline: none;
   pointer-events: visibleFill;
 }
 
-.container {
+.headerItems {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-flow: row wrap;
+  gap: layout.$spacing-02;
 }
 
-.background {
-  background-color: $openmrs-background-grey;
+.heading {
+  @include type.type-style("heading-compact-02");
+  margin-right: layout.$spacing-03;
+  color: $text-02;
 }
 
-.row-container {
+.rowContainer {
   width: 100%;
   border-bottom: 1px solid $ui-03;
   padding-bottom: 0.75rem;
@@ -35,8 +43,7 @@
   max-width: 100vw;
 }
 
-
-:global(.omrs-breakpoint-lt-desktop), .workspace-open {
+:global(.omrs-breakpoint-lt-desktop), .workspaceOpen {
   .row {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -56,10 +63,6 @@
   flex-wrap: wrap;
 }
 
-.tag {
-  margin-left: 0.25rem;
-}
-
 .overdueIndicator {
   display: flex;
   align-items: center;
@@ -70,12 +73,13 @@
   }
 }
 
-.button-container {
+.buttonContainer {
   display: flex;
   align-items: center;
+  justify-content: right;
 }
 
-.arrow-up-button {
+.arrowUpButton {
   display: flex;
   align-items: baseline;
   justify-content: center;
@@ -83,28 +87,22 @@
   margin-left: 0.5rem;
 }
 
-.arrow-up-icon:not([disabled]) svg {
+.arrowUpIcon:not([disabled]) svg {
   fill: $color-blue-60-2;
 }
 
-.heading {
-  @include type.type-style("heading-compact-02");
-  margin-right: layout.$spacing-03;
-  color: $text-02;
-}
-
-.record-vitals {
+.recordVitals {
   @include type.type-style('body-compact-01');
 }
 
-.body-text {
+.bodyText {
   @include type.type-style('label-01');
   color: $text-02;
 }
 
 .link {
   margin-left: 0.25rem;
-  @extend .body-text;
+  @extend .bodyText;
   text-decoration-line: none;
   color: $interactive-01;
 }
