@@ -47,10 +47,11 @@
     @include type.type-style('body-compact-01');
     color: $text-02;
   }
-}
-.timeline-data-cell:hover { 
-  background-color: colors.$blue-10;
-  box-shadow: 0 0 0 1px colors.$blue-30;
+
+  &:hover {
+    background-color: colors.$blue-10;
+    border-top: 2px colors.$blue-30;
+  }
 }
 
 .row-start-cell {
@@ -88,7 +89,7 @@
 
 .time-slot-inner {
   background-color: $ui-03;
-  padding: 3px 10px;
+  padding: 1px 10px;
   justify-self: stretch;
   align-self: stretch;
   display: grid;
@@ -107,7 +108,6 @@
   left: 0px;
   top: 0px;
   z-index: 3;
-  padding: 0rem 1rem;
 
   span {
     @include type.type-style('heading-compact-01');
@@ -127,7 +127,7 @@
 
 .range-units {
   @include type.type-style('helper-text-01');
- //  color: $text-05; // WIP
+  color: colors.$gray-70;
 }
 
 .off-scale-high,
@@ -145,13 +145,13 @@
 .high,
 .low {
   background-color: colors.$orange-10;
-  box-shadow: 0 0 0 1px colors.$orange-20;
+  border-top: 1px solid colors.$orange-20;
 }
 
 .critically-high,
 .critically-low {
   background-color: colors.$red-20;
-  box-shadow: 0 0 0 1px colors.$red-20-hover;
+  border-top: 1px solid colors.$red-20-hover;
 }
 
 .off-scale-low {
@@ -200,6 +200,7 @@
   background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
+  border: 1px solid colors.$gray-50;
 }
 
 .recent-results-grid::-webkit-scrollbar {

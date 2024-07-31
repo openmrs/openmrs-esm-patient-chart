@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '@openmrs/esm-styleguide/src/vars';
@@ -64,6 +65,11 @@
     @include type.type-style('body-compact-01');
     color: $text-02;
   }
+
+  &:hover {
+    background-color: colors.$blue-10;
+    border-top: 2px colors.$blue-30;
+  }
 }
 
 
@@ -87,14 +93,12 @@
   }
 }
 
-
 .rowHeader {
   overflow: hidden;
   align-self: flex-start;
   background-color: $ui-03;
   padding: 0.6rem 1rem;
 }
-
 
 .rowStartCell {
   @extend .timelineCell;
@@ -167,7 +171,7 @@
 
 .rangeUnits {
   @include type.type-style('helper-text-01');
- //  color: $text-05; // WIP
+  color: colors.$gray-70;
 }
 
 .offScaleHigh,
@@ -184,12 +188,14 @@
 
 .high,
 .low {
-  box-shadow: 0 0 0 1px #000000;
+  background-color: colors.$orange-10;
+  border-top: 1px solid colors.$orange-20;
 }
 
 .criticallyHigh,
 .criticallyLow {
-  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+  background-color: colors.$red-20;
+  border-top: 1px solid colors.$red-20-hover;
 }
 
 .offScaleLow {

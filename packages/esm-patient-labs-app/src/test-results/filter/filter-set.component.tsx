@@ -1,13 +1,13 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Accordion, AccordionItem, Button, Checkbox, Layer, Search } from '@carbon/react';
+import { Accordion, AccordionItem, Button, Checkbox, Search } from '@carbon/react';
 import { TreeViewAlt, Close, Search as SearchIcon } from '@carbon/react/icons';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
-import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
+import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
 import FilterContext from './filter-context';
-import styles from './filter-set.styles.scss';
 import { type ConfigObject } from '../../config-schema';
+import styles from './filter-set.styles.scss';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
@@ -69,9 +69,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
           </div>
         ) : (
           <div className={styles.filterTreeSearchHeader}>
-            <Layer>
-              <Search size="sm" value={searchTerm} onChange={(evt) => setSearchTerm(evt.target.value)} />
-            </Layer>
+            <Search autoFocus size="sm" value={searchTerm} onChange={(evt) => setSearchTerm(evt.target.value)} />
             <Button kind="secondary" size="sm" onClick={() => {}}>
               {t('search', 'Search')}
             </Button>

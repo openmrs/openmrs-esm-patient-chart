@@ -1,26 +1,16 @@
 import React from 'react';
 import classNames from 'classnames';
-import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { type ParsedTimeType } from '../filter/filter-types';
 import type { ObsRecord } from '../../types';
 import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';
 
-const RecentResultsGrid = (props) => {
-  return <div {...props} className={styles['recent-results-grid']} />;
-};
-
 interface PanelNameCornerProps {
   showShadow: boolean;
   panelName: string;
 }
-
-const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
-  <TimeSlots className={classNames(styles['corner-grid-element'], { [styles.shadow]: showShadow })}>
-    {panelName}
-  </TimeSlots>
-);
 
 interface DateHeaderGridProps {
   timeColumns: Array<string>;
@@ -28,6 +18,32 @@ interface DateHeaderGridProps {
   dayColumns: Array<Record<string, number | string>>;
   showShadow: boolean;
 }
+
+interface DataRowsProps {
+  rowData: Record<string, Array<ObsRecord>>;
+  timeColumns: Array<string>;
+  sortedTimes: Array<string>;
+  showShadow: boolean;
+  testUuid: string;
+}
+
+interface TimelineParams {
+  parsedTime: ParsedTimeType;
+  rowData: Record<string, Array<ObsRecord>>;
+  panelName: string;
+  sortedTimes: Array<string>;
+  testUuid: string;
+}
+
+const RecentResultsGrid = (props) => {
+  return <div {...props} className={styles['recent-results-grid']} />;
+};
+
+const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
+  <TimeSlots className={classNames(styles['corner-grid-element'], { [styles.shadow]: showShadow })}>
+    {panelName}
+  </TimeSlots>
+);
 
 const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumns, dayColumns, showShadow }) => (
   <Grid
@@ -38,6 +54,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumn
       top: '0px',
       zIndex: 2,
       boxShadow: showShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      margin: 0,
     }}
   >
     {yearColumns.map(({ year, size }) => {
@@ -64,14 +81,6 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumn
   </Grid>
 );
 
-interface DataRowsProps {
-  rowData: Record<string, Array<ObsRecord>>;
-  timeColumns: Array<string>;
-  sortedTimes: Array<string>;
-  showShadow: boolean;
-  testUuid: string;
-}
-
 const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, testUuid }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
@@ -96,14 +105,6 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
     })}
   </Grid>
 );
-
-interface TimelineParams {
-  parsedTime: ParsedTimeType;
-  rowData: Record<string, Array<ObsRecord>>;
-  panelName: string;
-  sortedTimes: Array<string>;
-  testUuid: string;
-}
 
 export const Timeline: React.FC<TimelineParams> = ({ parsedTime, rowData, panelName, sortedTimes, testUuid }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);

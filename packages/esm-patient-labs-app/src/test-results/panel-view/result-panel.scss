@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/grid/_flexbox';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
@@ -6,7 +7,7 @@
 .labSetPanel {
   width: 100%;
   margin-bottom: spacing.$spacing-05;
-  border: 1px solid #eeeeee;
+  border: 1px solid colors.$gray-20;
   cursor: pointer;
   text-decoration: none;
   color: $text-02;
@@ -51,12 +52,18 @@
 
 .high,
 .low {
-    border: 2px solid black !important;
+  td {
+    background-color: colors.$orange-10;
+    border-top: 1px solid colors.$orange-20;
+  }
 }
 
 .critically-high,
 .critically-low {
-  border: 2px solid $danger !important;
+  td {
+    background-color: colors.$red-20;
+    border-top: 1px solid colors.$red-20-hover;
+  }
 }
 
 .off-scale-low {
@@ -110,5 +117,11 @@
   }
   span::after {
     content: " ↑";
+  }
+}
+
+.table {
+  td {
+    border-bottom: none !important;
   }
 }
