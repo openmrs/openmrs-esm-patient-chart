@@ -4,7 +4,6 @@
 
 .grid {
   width: fit-content;
-  background-color: $color-gray-30;
   display: grid;
   grid-auto-rows: auto;
   gap: 1px;
@@ -75,6 +74,9 @@
   background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
   border-collapse: collapse;
+  
+  width: fit-content;
+  max-width: 100%;
 }
 
 .padding-container::-webkit-scrollbar {
@@ -190,7 +192,6 @@
 
 .recent-results-grid {
   display: grid;
-  background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
 }
