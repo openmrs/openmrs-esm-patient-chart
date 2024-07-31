@@ -185,7 +185,7 @@
     },
     {
       "name": "visit-attribute-tags",
-      "slot": "patient-banner-tags-slot",
+      "slot": "visit-header-tags-slot",
       "component": "visitAttributeTags",
       "online": true,
       "offline": true
