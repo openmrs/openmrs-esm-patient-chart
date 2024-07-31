@@ -17,6 +17,10 @@ interface FilterSetProps {
   hideFilterSetHeader?: boolean;
 }
 
+interface filterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
+  itemNumber: number;
+}
+
 function filterTreeNode(inputValue, treeNode) {
   // If the tree node's display value contains the user input, or any of its children's display contains the user input, return true
   if (
@@ -33,12 +37,8 @@ function filterTreeNode(inputValue, treeNode) {
 
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
   const { roots } = useContext(FilterContext);
-  const tablet = useLayoutType() === 'tablet';
-  const { t } = useTranslation();
-  const { resetTree } = useContext(FilterContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [treeDataFiltered, setTreeDataFiltered] = useState(roots);
-  const [showSearchInput, setShowSearchInput] = useState(false);
 
   useEffect(() => {
     const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
@@ -46,43 +46,12 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   }, [searchTerm, roots]);
 
   return (
-    <div className={!tablet ? styles.stickyFilterSet : ''}>
-      {!hideFilterSetHeader &&
-        (!showSearchInput ? (
-          <div className={styles.filterSetHeader}>
-            <h4>{t('tree', 'Tree')}</h4>
-            <div className={styles.filterSetActions}>
-              <Button
-                kind="ghost"
-                size="sm"
-                onClick={resetTree}
-                renderIcon={(props) => <TreeViewAlt size={16} {...props} />}
-              >
-                {t('resetTreeText', 'Reset tree')}
-              </Button>
-
-              <Button kind="ghost" size="sm" renderIcon={SearchIcon} onClick={() => setShowSearchInput(true)}>
-                {t('search', 'Search')}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.filterTreeSearchHeader}>
-            <Search autoFocus size="sm" value={searchTerm} onChange={(evt) => setSearchTerm(evt.target.value)} />
-            <Button kind="secondary" size="sm" onClick={() => {}}>
-              {t('search', 'Search')}
-            </Button>
-            <Button hasIconOnly renderIcon={Close} size="sm" kind="ghost" onClick={() => setShowSearchInput(false)} />
-          </div>
-        ))}
+    <div>
       <div className={styles.filterSetContent}>
         {treeDataFiltered?.length > 0 ? (
           treeDataFiltered?.map((root, index) => (
-            <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-              <FilterNodeParent //will rename
-                root={root}
-                itemNumber={index}
-              />
+            <div className={`${styles.nestedAccordion} ${styles.nestedAccordionTablet}`} key={`filter-node-${index}`}>
+              <FilterNodeParent root={root} itemNumber={index} />
             </div>
           ))
         ) : (
@@ -93,16 +62,13 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   );
 };
 
-interface filterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
-  //move to top of page
-  itemNumber: number;
-}
-
 const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
   const config = useConfig<ConfigObject>();
+  const { t } = useTranslation();
+  const tablet = useLayoutType() === 'tablet';
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
 
-  if (!root.subSets) return; //What can we return in this instance?
+  if (!root.subSets) return;
 
   const filterParent = root.subSets.map((node) => {
     return (
@@ -116,18 +82,16 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
 
   return (
     <div>
-      <div style={{ display: 'flex', borderBottom: '1px solid #d1d1d1', padding: '0.5rem 0', marginBottom: '0.5rem' }}>
-        {/* move styles to stylesheet */}
-        <div style={{ flexGrow: '1' }}>{root.display}</div>
-        <div
-          tabIndex={0}
-          onClick={() => setExpandAll((previousValue) => !previousValue)}
-          style={{ flexGrow: '1', color: '#0E61FE' }}
-          // add hover styles
+      <div className={`${styles.treeNodeHeader} ${tablet ? styles.treeNodeHeaderTablet : ''}`}>
+        <h5>{t(root.display)}</h5>
+        <Button
+          className={styles.button}
+          kind="ghost"
+          size="sm"
+          onClick={() => setExpandAll((prevValue) => !prevValue)}
         >
-          {/* will refactor */}
-          {!expandAll ? `Expand all` : `Collapse all`}
-        </div>
+          <span>{t(!expandAll ? `Expand all` : `Collapse all`)}</span>
+        </Button>
       </div>
       {filterParent}
     </div>

@@ -1,43 +1,44 @@
-@use '@carbon/layout';
-@use '@carbon/type';
-@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@import '@openmrs/esm-styleguide/src/vars';
 
-.stickyFilterSet {
-  position: sticky;
-  top: 6.5rem;
-  overflow-y: hidden;
-}
+// .stickyFilterSet {
+//   position: sticky;
+//   top: 6.5rem;
+//   overflow-y: hidden;
+// }
 
-.filterSetHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: layout.$spacing-03;
-  background-color: $openmrs-background-grey;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+// .filterSetHeader {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: spacing.$spacing-03;
+//   background-color: $openmrs-background-grey;
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
 
-  h4 {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
+//   h4 {
+//     @include type.type-style("heading-compact-02");
+//     color: $text-02;
+//   }
 
-  .filterSetActions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-}
+//   .filterSetActions {
+//     display: flex;
+//     justify-content: flex-end;
+//     align-items: center;
+//   }
+// }
 
-.filterTreeSearchHeader {
-  display: flex;
-  margin-bottom: layout.$spacing-03;
-  background-color: $openmrs-background-grey;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
+// .filterTreeSearchHeader {
+//   display: flex;
+//   margin-bottom: spacing.$spacing-03;
+//   background-color: $openmrs-background-grey;
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+// }
 
 .filterSetContent {
   max-height: calc(100vh - 9.5rem);
@@ -62,6 +63,24 @@
   :global(.cds--accordion__item:last-child) {
     border: none;
   }
+}
+
+.treeNodeHeader {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid colors.$gray-20;
+  padding: spacing.$spacing-03 0;
+  margin-bottom: spacing.$spacing-03;
+  align-items: center;
+}
+
+.treeNodeHeaderTablet {
+  padding-left: spacing.$spacing-05;
+  margin-bottom: 0;
+}
+
+.nestedAccordionTablet {
+  margin-bottom: spacing.$spacing-05;
 }
 
 // our special accordion rules

@@ -33,6 +33,7 @@
 .leftHeaderSection {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .viewOptsContentSwitcherContainer {
@@ -44,7 +45,8 @@
 }
 
 .leftSection {
-  width: 45%;
+  //determine appropriate way to tackle div sizing for the two containers on the homepage and handle the spacing on the side
+  width: 300px;
   margin-right: layout.$spacing-05;
 }
 
@@ -66,11 +68,12 @@
 }
 
 .leftHeaderActions {
+  // leftHeaderActions class apply also on tablet mode, cleanup after
   display: flex;
   min-width: layout.$spacing-08;
 }
 
-.leftHeaderActions > :global(.cds--content-switcher),
+.leftHeaderActions> :global(.cds--content-switcher),
 .viewOptsContentSwitcherContainer :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -94,6 +97,7 @@
 }
 
 .filterSetHeader {
+  //deprecated
   display: flex;
   justify-content: space-between;
   align-items: center;

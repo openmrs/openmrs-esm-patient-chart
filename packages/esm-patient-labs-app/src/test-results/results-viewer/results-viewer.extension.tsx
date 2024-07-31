@@ -62,11 +62,11 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const [view, setView] = useState<viewOpts>('split');
   const config = useConfig() as ConfigObject;
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount } = useContext(FilterContext);
+  const { totalResultsCount, resetTree } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
-  const showPrintButton = config.showPrintButton;
+  const showPrintButton = config.showPrintButton; //cleanup config as well when cleaning up
   const responsiveSize = isTablet ? 'lg' : 'md';
 
   const navigateBackFromTrendlineView = useCallback(() => {
@@ -80,9 +80,10 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
       patientUuid,
       closeDialog: () => dispose(),
     });
-  }, [patientUuid]);
+  }, [patientUuid]); //to delete
 
   if (isTablet) {
+    // will handle tablet mode once finished cleanup
     return (
       <div className={styles.resultsContainer}>
         <div className={styles.resultsHeader}>
@@ -134,31 +135,15 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     <div className={styles.resultsContainer}>
       <div className={styles.resultsHeader}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
-          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-            totalResultsCount ? `(${totalResultsCount})` : ''
-          }`}</h4>
-          <div className={styles.leftHeaderActions}>
-            <ContentSwitcher
-              size={responsiveSize}
-              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
-              onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
-            >
-              <Switch name="panel" text={t('panel', 'Panel')} />
-              <Switch name="tree" text={t('tree', 'Tree')} />
-            </ContentSwitcher>
-            {showPrintButton && (
-              <Button
-                className={styles.button}
-                kind="ghost"
-                size={isTablet ? 'md' : 'sm'}
-                renderIcon={Printer}
-                iconDescription="Print results"
-                onClick={openPrintModal}
-              >
-                <span>{t('print', 'Print')}</span>
-              </Button>
-            )}
-          </div>
+          <h4>Tests</h4>
+          <Button
+            className={styles.button}
+            kind="ghost"
+            size={isTablet ? 'md' : 'sm'}
+            onClick={resetTree} //TO-DO (undo selections fix)
+          >
+            <span>{t('reset', 'Reset')}</span>
+          </Button>
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
