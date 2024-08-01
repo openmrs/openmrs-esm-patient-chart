@@ -182,12 +182,21 @@ const VisitHeader: React.FC = () => {
           <>
             <ExtensionSlot name="visit-header-right-slot" />
             {!isLoading && !currentVisit && !isDeceased && (
-              <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
+              <Button
+                className={styles.startVisitButton}
+                onClick={launchStartVisitForm}
+                size="lg"
+                aria-label={t('startAVisit', 'Start a visit')}
+              >
                 {t('startAVisit', 'Start a visit')}
               </Button>
             )}
             {!isLoading && !!currentVisit && (
-              <Button onClick={() => openModal(patient?.id)} className={styles.startVisitButton}>
+              <Button
+                onClick={() => openModal(patient?.id)}
+                className={styles.startVisitButton}
+                aria-label={t('endVisit', 'End visit')}
+              >
                 {t('endVisit', 'End visit')}
               </Button>
             )}
