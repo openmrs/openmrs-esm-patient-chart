@@ -60,13 +60,11 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
-  const config = useConfig() as ConfigObject;
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount, resetTree } = useContext(FilterContext);
+  const { totalResultsCount } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
-  const showPrintButton = config.showPrintButton; //cleanup config as well when cleaning up
   const responsiveSize = isTablet ? 'lg' : 'md';
 
   const navigateBackFromTrendlineView = useCallback(() => {
@@ -75,15 +73,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     });
   }, [patientUuid]);
 
-  const openPrintModal = useCallback(() => {
-    const dispose = showModal('print-modal', {
-      patientUuid,
-      closeDialog: () => dispose(),
-    });
-  }, [patientUuid]); //to delete
-
   if (isTablet) {
-    // will handle tablet mode once finished cleanup
     return (
       <div className={styles.resultsContainer}>
         <div className={styles.resultsHeader}>
@@ -140,7 +130,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             className={styles.button}
             kind="ghost"
             size={isTablet ? 'md' : 'sm'}
-            onClick={resetTree} //TO-DO (undo selections fix)
+            onClick={''} //TO-DO (undo selections fix)
           >
             <span>{t('reset', 'Reset')}</span>
           </Button>
