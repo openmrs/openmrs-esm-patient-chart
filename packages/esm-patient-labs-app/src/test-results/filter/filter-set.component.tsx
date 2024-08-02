@@ -34,7 +34,7 @@ function filterTreeNode(inputValue, treeNode) {
   return false;
 }
 
-const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
+const FilterSet: React.FC<FilterSetProps> = () => {
   const { roots } = useContext(FilterContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [treeDataFiltered, setTreeDataFiltered] = useState(roots);

@@ -3,43 +3,6 @@
 @use '@carbon/colors';
 @import '@openmrs/esm-styleguide/src/vars';
 
-// .stickyFilterSet {
-//   position: sticky;
-//   top: 6.5rem;
-//   overflow-y: hidden;
-// }
-
-// .filterSetHeader {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-bottom: spacing.$spacing-03;
-//   background-color: $openmrs-background-grey;
-//   position: sticky;
-//   top: 0;
-//   z-index: 1;
-
-//   h4 {
-//     @include type.type-style("heading-compact-02");
-//     color: $text-02;
-//   }
-
-//   .filterSetActions {
-//     display: flex;
-//     justify-content: flex-end;
-//     align-items: center;
-//   }
-// }
-
-// .filterTreeSearchHeader {
-//   display: flex;
-//   margin-bottom: spacing.$spacing-03;
-//   background-color: $openmrs-background-grey;
-//   position: sticky;
-//   top: 0;
-//   z-index: 1;
-// }
-
 .filterSetContent {
   max-height: calc(100vh - 9.5rem);
   overflow-y: auto;
@@ -55,7 +18,6 @@
     margin: spacing.$spacing-02 0;
   }
 
-  //can we group these two?
   :global(.cds--accordion__item) {
     border: none;
   }
