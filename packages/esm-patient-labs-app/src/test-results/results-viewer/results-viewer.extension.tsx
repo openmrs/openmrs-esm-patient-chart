@@ -14,10 +14,10 @@ import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import Trendline from '../trendline/trendline.component';
 import type { ConfigObject } from '../../config-schema';
-import styles from './results-viewer.scss';
+import styles from './results-viewer.styles.scss';
+import { type viewOpts } from '../../types';
 
 type panelOpts = 'tree' | 'panel';
-type viewOpts = 'split' | 'full';
 
 interface RefreshDataButtonProps {
   isTablet: boolean;
@@ -59,7 +59,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, loading }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [view, setView] = useState<viewOpts>('split');
+  const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
   const { totalResultsCount, resetTree } = useContext(FilterContext);
   const { type, testUuid } = useParams();
@@ -98,6 +98,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             type={type}
             expanded={isExpanded}
             testUuid={testUuid}
+            view={view}
           />
         ) : selectedSection === 'panel' ? (
           <PanelView
@@ -137,17 +138,19 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
+            <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
+              totalResultsCount ? `(${totalResultsCount})` : ''
+            }`}</h4>
             <ContentSwitcher
               className={styles.viewOptionsSwitcher}
               onChange={({ name }: { name: viewOpts }) => setView(name)}
               selectedIndex={isExpanded ? 1 : 0}
               size={responsiveSize}
             >
-              <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-              <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+              <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
+              <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
             </ContentSwitcher>
           </div>
-          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
       </div>
       <div className={styles.flex}>
@@ -156,17 +159,12 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             patientUuid={patientUuid}
             basePath={basePath}
             type={type}
-            expanded={isExpanded}
+            expanded={false}
             testUuid={testUuid}
+            view={view}
           />
         ) : selectedSection === 'panel' ? (
-          <PanelView
-            expanded={isExpanded}
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            testUuid={testUuid}
-          />
+          <PanelView expanded={false} patientUuid={patientUuid} basePath={basePath} type={type} testUuid={testUuid} />
         ) : null}
       </div>
     </div>

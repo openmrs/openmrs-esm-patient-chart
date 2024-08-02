@@ -37,11 +37,19 @@
 }
 
 .viewOptsContentSwitcherContainer {
-  margin-left: auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  justify-content: space-between;
+}
+
+.viewOptionsText {
+  margin-top: layout.$spacing-03;
+  justify-self: start;
 }
 
 .viewOptionsSwitcher {
-  max-width: 10rem;
+  text-align: right;
+  justify-self: end;
 }
 
 .leftSection {

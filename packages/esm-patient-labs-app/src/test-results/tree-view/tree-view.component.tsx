@@ -11,6 +11,7 @@ import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
+import { type viewOpts } from '../../types';
 
 interface TreeViewProps {
   patientUuid: string;
@@ -19,9 +20,10 @@ interface TreeViewProps {
   loading: boolean;
   expanded: boolean;
   type: string;
+  view?: viewOpts;
 }
 
-const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, loading, expanded, type }) => {
+const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, loading, expanded, type, view }) => {
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const { t } = useTranslation();
@@ -79,15 +81,17 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
           <DataTableSkeleton />
         ) : someChecked ? (
           <GroupedTimeline />
-        ) : (
-          // If no filter is selected from the filter view
-          // All the test results recorded for the patient needs to be shown
+        ) : // If no filter is selected from the filter view
+        // All the test results recorded for the patient needs to be shown
+        view === 'individual-test' ? (
+          <p>Coming soon</p>
+        ) : view === 'over-time' ? (
           panels.map((panel) => (
             <div className={styles.panelViewTimeline}>
               <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={panel} />
             </div>
           ))
-        )}
+        ) : null}
       </div>
     </>
   );
