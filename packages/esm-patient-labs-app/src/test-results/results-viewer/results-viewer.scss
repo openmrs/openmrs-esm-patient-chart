@@ -45,7 +45,6 @@
 }
 
 .leftSection {
-  //determine appropriate way to tackle div sizing for the two containers on the homepage and handle the spacing on the side
   width: 300px;
   margin-right: layout.$spacing-05;
 }
@@ -68,7 +67,6 @@
 }
 
 .leftHeaderActions {
-  // leftHeaderActions class apply also on tablet mode, cleanup after
   display: flex;
   min-width: layout.$spacing-08;
 }
@@ -97,7 +95,6 @@
 }
 
 .filterSetHeader {
-  //deprecated
   display: flex;
   justify-content: space-between;
   align-items: center;

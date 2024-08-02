@@ -61,7 +61,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount } = useContext(FilterContext);
+  const { totalResultsCount, resetTree } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
@@ -130,7 +130,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             className={styles.button}
             kind="ghost"
             size={isTablet ? 'md' : 'sm'}
-            onClick={''} //TO-DO (undo selections fix)
+            onClick={resetTree} //TO-DO (undo selections fix)
           >
             <span>{t('reset', 'Reset')}</span>
           </Button>

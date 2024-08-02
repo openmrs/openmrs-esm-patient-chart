@@ -69,6 +69,7 @@
 
   .cds--accordion__item--active>.cds--accordion__content {
     display: block;
+    padding-right: spacing.$spacing-05
   }
 
   .cds--accordion__title {

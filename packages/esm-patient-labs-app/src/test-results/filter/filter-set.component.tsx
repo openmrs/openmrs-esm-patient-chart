@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Accordion, AccordionItem, Button, Checkbox, Search } from '@carbon/react';
+import { Accordion, AccordionItem, Button, Checkbox } from '@carbon/react';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
