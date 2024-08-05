@@ -1,4 +1,5 @@
 @use '@carbon/type';
+@use '@carbon/layout';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -10,24 +11,30 @@
 }
 
 .abnormal-value {
-  border: 1px solid $ui-05;
-  background-color: white;
+  border: solid 1px #ffc69e;
+  background-color: #fff2e8;
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: fit-content;
-  padding: 0rem 0.25rem;
+  gap: layout.$spacing-02;
+  padding: layout.$spacing-02;
 }
 
 .critical-value {
   @extend .abnormal-value;
-  border: 2px solid $danger;
+  border: solid 1px #da1e28;
+  background-color: #ffd7d9;
 }
 
 .label-container {
+  flex-grow: 0;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: center;
   display: flex;
-  justify-content: space-between;
+  gap: layout.$spacing-02;
+  padding: 0;
 }
 
 .value-container {
