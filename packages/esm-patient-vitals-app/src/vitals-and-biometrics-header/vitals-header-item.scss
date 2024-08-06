@@ -1,7 +1,7 @@
+@use '@carbon/colors';
 @use '@carbon/type';
 @use '@carbon/layout';
-@use '@carbon/colors';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   display: flex;
@@ -24,7 +24,7 @@
 
 .critical-value {
   @extend .abnormal-value;
-  border: solid 1px colors.$red-60;
+  border: 1px solid colors.$red-60;
   background-color: colors.$red-20;
 }
 
