@@ -18,8 +18,9 @@
       "webpack-env"
     ],
     "lib": [
+      "dom",
       "es2015",
-      "dom"
+      "es2022",
     ],
     "skipLibCheck": true,
     "useDefineForClassFields": false,
