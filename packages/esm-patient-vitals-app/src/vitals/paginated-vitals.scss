@@ -9,12 +9,8 @@
 .table {
   td {
     white-space: nowrap;
-    padding: layout.$spacing-02;
-    > span {
-      width: 100%;
-      height: 100%;
-      display: inline-block;
-    }
+    border-bottom: none !important;
+    border-top: 1px solid colors.$gray-20;
   }
 }
 
@@ -24,18 +20,15 @@
   }
 }
 
-.criticallyHigh > span, .criticallyLow > span {
-  border: 2px solid colors.$red-60 !important;
-  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
+.criticallyHigh, .criticallyLow {
+  border-top: 1px solid colors.$red-20-hover !important;
+  background-color: colors.$red-20 !important;
 }
 
-.high > span, .low > span {
-  border: 1.5px solid colors.$black-100 !important;
-  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
-}
+.high, .low {
+  border-top: 1px solid colors.$orange-20 !important;
+  background-color: colors.$orange-10 !important;
 
-.normal > span {
-  padding-left: layout.$spacing-05;
 }
 
 .criticallyLow {
@@ -83,18 +76,18 @@
   @include type.type-style('heading-compact-01');
 }
 
-.criticallyLow > span::after {
+.criticallyLow::after {
   content: " ↓↓";
 }
 
-.criticallyHigh > span::after {
+.criticallyHigh::after {
   content: " ↑↑";
 }
 
-.low > span::after {
+.low::after {
   content: " ↓";
 }
 
-.high > span::after {
+.high::after {
   content: " ↑";
 }

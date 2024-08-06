@@ -39,35 +39,15 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
-        return (
-          <TableCell className={styles.criticallyHigh}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
       case 'critically_low':
-        return (
-          <TableCell className={styles.criticallyLow}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
       case 'high':
-        return (
-          <TableCell className={styles.high}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.high}>{children}</TableCell>;
       case 'low':
-        return (
-          <TableCell className={styles.low}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.low}>{children}</TableCell>;
       default:
-        return (
-          <TableCell className={styles.normal}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell>{children}</TableCell>;
     }
   };
 
