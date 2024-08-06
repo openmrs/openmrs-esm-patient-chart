@@ -1,0 +1,67 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
+@import '@openmrs/esm-styleguide/src/vars';
+
+.individual-results-value {}
+
+.off-scale-high,
+.off-scale-low,
+.critically-high,
+.critically-low,
+.high,
+.low {
+  p {
+    @include type.type-style('heading-compact-01');
+
+  }
+}
+
+.high,
+.low {
+  background-color: colors.$orange-10;
+  border-top: 1px solid colors.$orange-20;
+  height: 100%;
+}
+
+.critically-high,
+.critically-low {
+  background-color: colors.$red-20;
+  border-top: 1px solid colors.$red-20-hover;
+}
+
+.off-scale-low {
+  p::after {
+    content: " ↓↓↓";
+  }
+}
+
+.off-scale-high {
+  p::after {
+    content: " ↑↑↑";
+  }
+}
+
+.critically-low {
+  p::after {
+    content: " ↓↓";
+  }
+}
+
+.critically-high {
+  p::after {
+    content: " ↑↑";
+  }
+}
+
+.low {
+  p::after {
+    content: " ↓";
+  }
+}
+
+.high {
+  p::after {
+    content: " ↑";
+  }
+}

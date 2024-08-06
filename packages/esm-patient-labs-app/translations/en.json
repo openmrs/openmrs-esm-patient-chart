@@ -22,8 +22,9 @@
   "errorFetchingTestTypes": "Error fetching results for \"{{searchTerm}}\"",
   "errorLoadingTestTypes": "Error occured when loading test types",
   "female": "Female",
-  "full": "Full",
   "goToDrugOrderForm": "Order form",
+  "individualResults": "Individual Results",
+  "individualTests": "Individual tests",
   "labOrders": "Lab orders",
   "labReferenceNumber": "Lab reference number",
   "male": "Male",
@@ -42,6 +43,7 @@
   "ordered": "Ordered",
   "orderReason": "Order reason",
   "other": "Other",
+  "overTime": "Over time",
   "panel": "Panel",
   "panels": "panels",
   "pleaseRequiredFields": "Please fill all required fields",
@@ -73,7 +75,6 @@
   "searchResultsTextFor_other": "{{count}} search results for {{searchTerm}}",
   "seeAllResults": "See all results",
   "showTree": "Show tree",
-  "split": "Split",
   "startDate": "Start date",
   "testName": "Test name",
   "testResults": "test results",
@@ -98,5 +99,6 @@
   "unknown": "Unknown",
   "usingADifferentTerm": "using a different term",
   "value": "Value",
-  "view": "View"
+  "view": "View",
+  "viewTimeline": "View timeline"
 }

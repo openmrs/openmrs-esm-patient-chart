@@ -12,6 +12,7 @@ import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
 import { type viewOpts } from '../../types';
+import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 
 interface TreeViewProps {
   patientUuid: string;
@@ -84,7 +85,9 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
         ) : // If no filter is selected from the filter view
         // All the test results recorded for the patient needs to be shown
         view === 'individual-test' ? (
-          <p>Coming soon</p>
+          <div className={styles.panelViewTimeline}>
+            <IndividualResultsTable panels={panels} isLoading={isLoadingPanelData} />
+          </div>
         ) : view === 'over-time' ? (
           panels.map((panel) => (
             <div className={styles.panelViewTimeline}>
