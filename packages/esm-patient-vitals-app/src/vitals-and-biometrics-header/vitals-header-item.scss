@@ -1,5 +1,6 @@
 @use '@carbon/type';
 @use '@carbon/layout';
+@use '@carbon/colors';
 @import '@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -11,8 +12,8 @@
 }
 
 .abnormal-value {
-  border: solid 1px #ffc69e;
-  background-color: #fff2e8;
+  border: solid 1px colors.$orange-20-hover;
+  background-color: colors.$orange-10;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -23,8 +24,8 @@
 
 .critical-value {
   @extend .abnormal-value;
-  border: solid 1px #da1e28;
-  background-color: #ffd7d9;
+  border: solid 1px colors.$red-60;
+  background-color: colors.$red-20;
 }
 
 .label-container {

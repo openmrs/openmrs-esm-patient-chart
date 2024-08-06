@@ -10,7 +10,7 @@
   td {
     white-space: nowrap;
     border-bottom: none !important;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid colors.$gray-20;
   }
 }
 
@@ -21,13 +21,13 @@
 }
 
 .criticallyHigh, .criticallyLow {
-  border-top: 1px solid #ffc2c5 !important;
-  background-color: #ffd7d9 !important;
+  border-top: 1px solid colors.$red-20-hover !important;
+  background-color: colors.$red-20 !important;
 }
 
 .high, .low {
-  border-top: 1px solid #ffd9be !important;
-  background-color: #fff2e8 !important;
+  border-top: 1px solid colors.$orange-20 !important;
+  background-color: colors.$orange-10 !important;
 
 }
 
