@@ -285,7 +285,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   }
 
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} data-openmrs-role="Vitals and Biometrics Form">
       <div className={styles.grid}>
         <Stack>
           <Column>
