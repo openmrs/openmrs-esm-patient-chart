@@ -64,7 +64,7 @@ const IndividualResultValue: React.FC<{ panel: Record<string, any> }> = ({ panel
 
   return (
     <div className={classNames(styles['individual-results-value'], additionalClassname)}>
-      <p>{`${value} ${valueQuantity.unit}`}</p>
+      <p>{`${value} ${valueQuantity?.unit || ''}`}</p>
     </div>
   );
 };
@@ -77,6 +77,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ panels,
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const headerTitle = t('individualResults', 'Individual Results');
 
+  // console.log(panels);
   const tableHeaders = [
     { key: 'testName', header: t('testName', 'Test Name') },
     {
@@ -88,6 +89,8 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ panels,
 
   function extractReferenceRangeFromPanel(panel) {
     //will add typings
+    if (!panel.referenceRange?.length) return '--';
+
     const { high, low } = panel.referenceRange[0];
     if (!high || !low) return '--';
 
