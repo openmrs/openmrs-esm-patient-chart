@@ -3,22 +3,26 @@ import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { ComboBox } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useFormContext, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 import { type Location, type OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
+import { type VisitFormData } from './visit-form.resource';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import { useLocations } from '../hooks/useLocations';
-import { type VisitFormData } from './visit-form.resource';
 import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
 
-const LocationSelector = () => {
+interface LocationSelectorProps {
+  control: Control<VisitFormData>;
+}
+
+const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
   const { t } = useTranslation();
   const session = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const selectedSessionLocation = useSession().sessionLocation;
-  const { locations, isLoading: isLoadingLocations, error } = useLocations(searchTerm);
+  const { locations } = useLocations(searchTerm);
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
-  const config = useConfig() as ChartConfig;
+  const config = useConfig<ChartConfig>();
   const disableChangingVisitLocation = config?.disableChangingVisitLocation;
   const locationsToShow: Array<OpenmrsResource> =
     !loadingDefaultFacility && !isEmpty(defaultFacility)
@@ -28,8 +32,6 @@ const LocationSelector = () => {
       : selectedSessionLocation
       ? [selectedSessionLocation]
       : [];
-
-  const { control } = useFormContext<VisitFormData>();
 
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
@@ -41,21 +43,21 @@ const LocationSelector = () => {
       <div className={classNames(styles.selectContainer, styles.sectionField)}>
         {!disableChangingVisitLocation ? (
           <Controller
-            name="visitLocation"
             control={control}
+            name="visitLocation"
             render={({ field: { onBlur, onChange, value } }) => (
               <ComboBox
-                titleText={t('selectLocation', 'Select a location')}
                 aria-label={t('selectLocation', 'Select a location')}
                 id="location"
-                invalidText="Required"
+                invalidText={t('required', 'Required')}
                 items={locationsToShow}
-                selectedItem={value}
-                onChange={({ selectedItem }) => onChange(selectedItem)}
+                itemToString={(location: Location) => location?.display}
                 onBlur={onBlur}
-                itemToString={(loc: Location) => loc?.display}
-                onInputChange={(loc) => handleSearch(loc)}
+                onChange={({ selectedItem }) => onChange(selectedItem)}
+                onInputChange={(searchTerm) => handleSearch(searchTerm)}
                 readOnly={disableChangingVisitLocation}
+                selectedItem={value}
+                titleText={t('selectLocation', 'Select a location')}
               />
             )}
           />
