@@ -1,6 +1,5 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
-@use '@carbon/type';
 
 .widgetCard {
   background-color: colors.$white;
@@ -29,7 +28,7 @@
   }
 }
 
-.customRow tbody{
+.customRow tbody {
   white-space: nowrap;
 }
 

@@ -1,4 +1,5 @@
-@import "../root.scss";
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .caption {
   position: absolute;
@@ -25,7 +26,7 @@
 
 .pdfThumbnail {
   cursor: pointer;
-  background-color: $color-gray-30;
+  background-color: vars.$color-gray-30;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,8 +53,8 @@
 .infoIcon {
   visibility: hidden;
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: layout.$spacing-02;
+  top: layout.$spacing-02;
   cursor: pointer;
 }
 
@@ -65,7 +66,7 @@
   visibility: hidden;
   width: 170px;
   background-color: black;
-  color: #fff;
+  color: white;
   text-align: center;
   border-radius: 6px;
   padding: 5px 0;

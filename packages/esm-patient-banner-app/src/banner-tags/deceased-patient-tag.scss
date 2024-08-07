@@ -1,7 +1,8 @@
 @use '@carbon/colors';
+@use '@carbon/layout';
 
 .tooltipPadding {
-  padding: 0.25rem;
+  padding: layout.$spacing-02;
 }
 
 .tooltipSmallText {

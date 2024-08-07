@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionItem, Button, Checkbox, Search } from '@carbon/react';
 import { TreeViewAlt, Close, Search as SearchIcon } from '@carbon/react/icons';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
 import FilterContext from './filter-context';
-import { type ConfigObject } from '../../config-schema';
-import styles from './filter-set.styles.scss';
+import styles from './filter-set.scss';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);

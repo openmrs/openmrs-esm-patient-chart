@@ -24,7 +24,7 @@
 }
 
 .heading {
-  @include type.type-style("heading-compact-02");
+  @include type.type-style('heading-compact-02');
   margin-right: layout.$spacing-03;
   color: $text-02;
 }
@@ -32,22 +32,23 @@
 .rowContainer {
   width: 100%;
   border-bottom: 1px solid $ui-03;
-  padding-bottom: 0.75rem;
+  padding-bottom: layout.$spacing-04;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0rem 1rem;
+  margin: 0 layout.$spacing-05;
   max-width: 100vw;
 }
 
-:global(.omrs-breakpoint-lt-desktop), .workspaceOpen {
+:global(.omrs-breakpoint-lt-desktop),
+.workspaceOpen {
   .row {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: 5rem;
+    column-gap: layout.$spacing-11;
   }
 }
 
@@ -58,18 +59,13 @@
   min-height: layout.$spacing-09;
 }
 
-.container-row {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .overdueIndicator {
   display: flex;
   align-items: center;
   min-inline-size: max-content;
 
   svg {
-    margin-right: 0.25rem;
+    margin-right: layout.$spacing-02;
   }
 }
 
@@ -79,20 +75,26 @@
   justify-content: right;
 }
 
-.arrowUpButton {
+.recordVitalsButton {
+  @include type.type-style('body-compact-01');
+
+  &:not([disabled]) svg {
+    fill: $color-blue-60-2;
+  }
+}
+
+.recordVitalsIconButton {
   display: flex;
   align-items: baseline;
   justify-content: center;
   cursor: pointer;
-  margin-left: 0.5rem;
+  margin-left: layout.$spacing-03;
 }
 
-.arrowUpIcon:not([disabled]) svg {
-  fill: $color-blue-60-2;
-}
-
-.recordVitals {
-  @include type.type-style('body-compact-01');
+.heading {
+  @include type.type-style('heading-compact-02');
+  margin-right: layout.$spacing-03;
+  color: $text-02;
 }
 
 .bodyText {
@@ -101,7 +103,7 @@
 }
 
 .link {
-  margin-left: 0.25rem;
+  margin-left: layout.$spacing-02;
   @extend .bodyText;
   text-decoration-line: none;
   color: $interactive-01;

@@ -107,13 +107,13 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles.buttonContainer}>
             <Button
+              className={styles.recordVitalsButton}
               kind="ghost"
-              className={classNames(styles.recordVitals, styles.arrowUpIcon)}
-              size="sm"
               onClick={launchVitalsAndBiometricsForm}
+              size="sm"
             >
               {t('recordVitals', 'Record vitals')}
-              <ArrowRight size={16} className={styles.arrowUpButton} title={'ArrowRight'} />
+              <ArrowRight size={16} className={styles.recordVitalsIconButton} />
             </Button>
           </div>
         </div>
@@ -201,14 +201,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
       </span>
 
       <div className={styles.container}>
-        <Button
-          className={classNames(styles.recordVitals, styles.arrowUpIcon)}
-          onClick={launchVitalsAndBiometricsForm}
-          kind="ghost"
-          size="sm"
-        >
+        <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
           {t('recordVitals', 'Record vitals')}
-          <ArrowRight size={16} className={styles.arrowUpButton} title={'ArrowRight'} />
+          <ArrowRight size={16} className={styles.recordVitalsIconButton} />
         </Button>
       </div>
     </div>
