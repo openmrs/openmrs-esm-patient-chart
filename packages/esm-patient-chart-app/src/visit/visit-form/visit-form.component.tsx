@@ -652,7 +652,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
         {showPatientHeader && patient && (
           <ExtensionSlot
             name="patient-header-slot"

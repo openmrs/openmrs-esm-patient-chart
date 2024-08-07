@@ -108,6 +108,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
           <div className={styles.buttonContainer}>
             <Button
               className={styles.recordVitalsButton}
+              data-openmrs-role="Record Vitals"
               kind="ghost"
               onClick={launchVitalsAndBiometricsForm}
               size="sm"
