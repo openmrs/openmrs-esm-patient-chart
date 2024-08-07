@@ -27,11 +27,40 @@ export const configSchema = {
       _type: Type.String,
     },
   },
-  printIdentifierStickerSize: {
+  printIdentifierStickerPaperSize: {
     _type: Type.String,
     _description:
       'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
-    _default: '4in 6in',
+    _default: 'A4',
+  },
+
+  printIdentifierStickerHeight: {
+    _type: Type.String,
+    _description:
+      'Specifies the height of each Identifier sticker on the printing page. You should define the units (eg 15px, 5rem ...)',
+    _default: '10rem',
+  },
+
+  printIdentifierStickerWidth: {
+    _type: Type.String,
+    _description:
+      'Specifies the width of each Identifier sticker on the printing page. You should define the units (eg 15px, 5rem ...)',
+    _default: '13rem',
+  },
+  numberOfPatientIdStickers: {
+    _type: Type.Number,
+    _description: 'Specifies the number of patient idenifier stickers to print.',
+    _default: '30',
+  },
+  numberOfPatientIdStickerRowsPerPage: {
+    _type: Type.Number,
+    _description: 'Specifies the number of rows of the patient idenifier stickers to appear on each printed page.',
+    _default: '5',
+  },
+  numberOfPatientIdStickerColumns: {
+    _type: Type.Number,
+    _description: 'Specifies the number of columns of the patient idenifier stickers to appear on the printed page.',
+    _default: '3',
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
@@ -45,6 +74,11 @@ export interface ConfigObject {
     uuids: Array<string>;
   };
   printIdentifierStickerFields: Array<string>;
-  printIdentifierStickerSize: string;
+  printIdentifierStickerPaperSize: string;
+  numberOfPatientIdStickers: number;
+  numberOfPatientIdStickerRowsPerPage: number;
+  numberOfPatientIdStickerColumns: number;
   useRelationshipNameLink: boolean;
+  printIdentifierStickerHeight: string;
+  printIdentifierStickerWidth: string;
 }

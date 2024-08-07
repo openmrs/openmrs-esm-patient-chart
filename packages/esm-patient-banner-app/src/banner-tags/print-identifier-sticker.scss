@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .stickerContainer {
   padding: 0.5rem 1rem;
@@ -36,21 +37,41 @@
   }
 }
 
-.detailsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem 0;
-  margin-top: 0.5rem;
-}
-
 .loader {
   :global(.cds--inline-loading__text) {
     @include type.type-style('body-01');
   }
 }
 
+.previewContainer {
+  max-height: 10rem;
+  overflow-y: scroll;
+  background-color: white;
+  width: 96%;
+  border: 1px solid $ui-03;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+}
+
+.labelNumberInput {
+  padding: 1rem;
+}
+
+.stickerContent {
+  display: inline-flex;
+  width: -webkit-fill-available;
+  justify-content: space-between;
+}
+
+.hideResultsPreview {
+  display: none;
+}
+
 @media print {
-  html, body {
+
+  html,
+  body {
     height: 100vh;
     margin: 0 !important;
     padding: 0 !important;

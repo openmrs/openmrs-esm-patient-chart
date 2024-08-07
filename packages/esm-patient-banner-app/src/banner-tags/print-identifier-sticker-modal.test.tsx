@@ -30,9 +30,9 @@ describe('PrintIdentifierSticker', () => {
     render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
 
     expect(screen.getByText(/Print Identifier Sticker/i)).toBeInTheDocument();
-    expect(screen.getByText('John Wilson')).toBeInTheDocument();
-    expect(screen.getByText('100GEJ')).toBeInTheDocument();
-    expect(screen.getByText('1972-04-04')).toBeInTheDocument();
+    expect(screen.getAllByText(/John Wilson/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/100GEJ/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/1972-04-04/i)[0]).toBeInTheDocument();
   });
 
   test('calls closeModal when cancel button is clicked', async () => {

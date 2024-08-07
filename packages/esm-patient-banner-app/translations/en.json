@@ -7,8 +7,13 @@
   "countyDistrict": "District",
   "district": "District",
   "dob": "DOB",
+  "hidePreview": "Hide Preview",
+  "numberOfLabelColumns": "Number of patient Id sticker columns",
+  "numberOfLabelRowsPerPage": "Number of patient Id sticker rows per page",
+  "numberOfLabels": "Number of patient Id stickers",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "Postal code",
+  "preview": "Preview",
   "state": "State",
   "stateProvince": "State"
 }
