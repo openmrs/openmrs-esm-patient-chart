@@ -188,7 +188,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
       {!showSearchFields ? (
         <>
           <div className={styles.flex}>
-            <h4 className={styles.productiveHeading02}>
+            <h4 className={styles.heading}>
               {!searchTerm
                 ? t('panel', 'Panel')
                 : t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {

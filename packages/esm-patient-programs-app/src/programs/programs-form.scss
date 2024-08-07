@@ -3,13 +3,13 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .loading {
-  margin-left: 1rem;
-  width: 2rem;
-  min-height: 2.5rem;
+  margin-left: layout.$spacing-05;
+  width: layout.$spacing-07;
+  min-height: layout.$spacing-08;
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -21,16 +21,16 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .formContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .form {
@@ -41,7 +41,7 @@
 }
 
 .errorMessage {
-  @include type.type-style("label-02");
+  @include type.type-style('label-02');
   margin-top: layout.$spacing-03;
   color: $danger;
 }

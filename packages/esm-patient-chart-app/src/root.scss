@@ -9,7 +9,7 @@
 
 .patientChartWrapper {
   & > nav {
-    padding-bottom: 3rem;
+    padding-bottom: layout.$spacing-09;
     scrollbar-width: none;
   }
 
@@ -22,65 +22,24 @@
 :global(.omrs-breakpoint-lt-desktop) {
   .patientChartWrapper {
     :global(.cds--side-nav) {
-      height: calc(100vh - 3rem - var(--bottom-nav-height));
+      height: calc(100vh - layout.$spacing-09 - var(--bottom-nav-height));
     }
   }
-}
-
-.caption01 {
-  @include type.type-style("legal-01");
-}
-
-.productiveHeading01 {
-  @include type.type-style("heading-compact-01");
-}
-
-.productiveHeading02 {
-  @include type.type-style("heading-compact-02");
-}
-
-.productiveHeading03 {
-  @include type.type-style("heading-03");
-}
-
-.productiveHeading04 {
-  @include type.type-style("heading-04");
-}
-
-.bodyLong01 {
-  @include type.type-style("body-01");
-}
-
-.bodyShort02 {
-  @include type.type-style("body-compact-02");
-}
-
-.text01 {
-  color: colors.$gray-100;
-}
-
-.text02 {
-  color: colors.$gray-70;
-}
-
-.label01 {
-  @include type.type-style("label-01")
 }
 
 // Overriding styles for RTL support
 html[dir='rtl'] {
   :global(.cds--date-picker-input__wrapper) {
     svg {
-      left: 1rem;
+      left: layout.$spacing-05;
       right: unset;
     }
   }
   :global(.cds--side-nav) {
     right: 0;
     :global(.active-left-nav-link) {
-      border-right: 0.25rem solid var(--brand-01);
+      border-right: layout.$spacing-02 solid var(--brand-01);
       border-left: unset;
     }
   }
 }
-

@@ -1,7 +1,7 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .timelineHeader {
   position: sticky;
@@ -31,7 +31,8 @@
   align-items: center;
 }
 
-.dayColumn, .yearColumn {
+.dayColumn,
+.yearColumn {
   @include type.type-style('heading-compact-01');
   color: $text-02;
 }
@@ -54,7 +55,7 @@
   display: grid;
   justify-items: center;
   align-items: center;
-  padding: 0.5rem;
+  padding: layout.$spacing-03;
 }
 
 .timelineDataCell {
@@ -71,7 +72,6 @@
     border-top: 2px colors.$blue-30;
   }
 }
-
 
 .gridContainer {
   padding: 0;
@@ -97,7 +97,7 @@
   overflow: hidden;
   align-self: flex-start;
   background-color: $ui-03;
-  padding: 0.6rem 1rem;
+  padding: 0.6rem layout.$spacing-05;
 }
 
 .rowStartCell {
@@ -111,7 +111,7 @@
   gap: 0.5px;
   justify-items: baseline;
   align-items: center;
-  padding: 1rem;
+  padding: layout.$spacing-05;
 }
 
 .timelineCellZebra {
@@ -147,7 +147,7 @@
   left: 0px;
   top: 0px;
   z-index: 3;
-  padding: 0rem 1rem;
+  padding: 0 layout.$spacing-05;
 
   div {
     @include type.type-style('heading-compact-01');
@@ -159,7 +159,7 @@
 }
 
 .shadow {
-  box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
+  box-shadow: layout.$spacing-03 0 20px 0 rgba(0, 0, 0, 0.15);
 }
 
 .trendlineLink {
@@ -182,7 +182,6 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-
   }
 }
 
@@ -200,37 +199,37 @@
 
 .offScaleLow {
   p::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
 .offScaleHigh {
   p::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
 .criticallyLow {
   p::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
 .criticallyHigh {
   p::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
 .low {
   p::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
 .high {
   p::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
 

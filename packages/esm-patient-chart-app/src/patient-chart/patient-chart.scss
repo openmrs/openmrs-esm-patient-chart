@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
-$actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
+$actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
 
 .grid {
   display: grid;
@@ -20,7 +20,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   height: 90%;
   width: 100%;
   margin: 0 auto;
-  padding-bottom: spacing.$spacing-10;
+  padding-bottom: layout.$spacing-10;
 }
 
 .widthContained {
@@ -36,13 +36,11 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-right: spacing.$spacing-01;
 }
 
 :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
   margin-left: var(--omrs-sidenav-width);
 }
-
 
 .innerChartContainer {
   display: flex;
@@ -54,12 +52,11 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   padding-right: 0;
 }
 
-
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .chartContainer {
     padding-right: unset;
-    padding-left: spacing.$spacing-01;
+    padding-left: layout.$spacing-01;
   }
 
   :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {

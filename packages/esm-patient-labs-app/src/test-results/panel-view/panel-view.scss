@@ -1,24 +1,23 @@
-@use '@carbon/styles/scss/grid/_flexbox';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import '../results-viewer/results-viewer.styles.scss';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .panelViewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
-  top: 6rem;
+  top: layout.$spacing-12;
   background-color: $ui-01;
   z-index: 99;
-  padding: spacing.$spacing-03 0;
+  padding: layout.$spacing-03 0;
 }
 
 .flex {
   display: flex;
   flex: 1;
-  align-items: center
+  align-items: center;
 }
 
 .productiveHeading02 {
@@ -31,17 +30,36 @@
 }
 
 .headerMargin {
-  margin-top: spacing.$spacing-09;
+  margin-top: layout.$spacing-09;
 }
 
 .headerMarginTablet {
-  margin-top: 4rem;
+  margin-top: layout.$spacing-10;
 }
 
 .tabletSearch {
-  margin: - spacing.$spacing-05
+  margin: -(layout.$spacing-05);
 }
 
 .clearButton {
-  margin-left: spacing.$spacing-03;
+  margin-left: layout.$spacing-03;
+}
+
+.leftSection {
+  width: 45%;
+  margin-right: layout.$spacing-05;
+}
+
+.rightSection,
+.rightSectionHeader {
+  width: 55%;
+
+  &.fullView {
+    width: 100%;
+  }
+}
+
+.flex {
+  display: flex;
+  flex: 1;
 }

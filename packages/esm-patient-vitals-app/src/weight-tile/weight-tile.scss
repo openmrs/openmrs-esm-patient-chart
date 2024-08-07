@@ -1,5 +1,5 @@
 @use '@carbon/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label {
   @include type.type-style('label-01');

@@ -1,11 +1,9 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/colors';
-@use '@openmrs/esm-styleguide/src/vars' as *;
-@use "../../root.scss" as *;
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .dashboardTitle {
-  @include type.type-style("heading-03");
-  margin: 1rem 0rem 1rem 1.3125rem;
+  @include type.type-style('heading-03');
+  margin: layout.$spacing-05 0 layout.$spacing-05 1.3125rem;
 }
 
 .dashboard {
@@ -23,7 +21,7 @@
 
 // Using 1100px here to account for the widget loading area, this ensures it collapses when the
 // workspace opens and lacks sufficient space.
-@container dashboard (width > 1100px){
+@container dashboard (width > 1100px) {
   .dashboard {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -44,7 +42,7 @@
 }
 
 .fullWidth {
-  grid-column: 1 / -1
+  grid-column: 1 / -1;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .dashboard {
@@ -64,12 +62,12 @@
 }
 
 :global(.omrs-breakpoint-lt-tablet) .dashboard > div {
-  margin: 2px 0px;
+  margin: layout.$spacing-01 0px;
 }
 
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .dashboardTitle {
-    margin: 1rem 1.3125rem 1rem 0rem;
+    margin: layout.$spacing-05 1.3125rem layout.$spacing-05 0;
   }
 }

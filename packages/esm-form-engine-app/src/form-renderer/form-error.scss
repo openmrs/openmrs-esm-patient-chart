@@ -1,16 +1,16 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 @use '@carbon/colors';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 
 .errorContainer {
   display: flex;
   justify-content: center;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .formErrorCard {
   background-color: colors.$gray-10;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   min-width: 23rem;
   display: flex;
   align-items: center;
@@ -18,28 +18,27 @@
 }
 
 .errorTitle {
-  @include type.type-style("heading-compact-02");
-  margin-bottom: spacing.$spacing-04;
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-04;
 }
 
 .errorMessage {
-  @include type.type-style("body-long-01");
-  margin-bottom: spacing.$spacing-05;
+  @include type.type-style('body-long-01');
+  margin-bottom: layout.$spacing-05;
   color: colors.$gray-70;
   display: flex;
   align-items: center;
 
-  &>button {
-    padding: 0 0 0 spacing.$spacing-01 !important;
+  & > button {
+    padding-left: layout.$spacing-01 !important;
   }
 }
-
 
 .separator {
   @include type.type-style('body-01');
   color: colors.$gray-90;
   width: 12rem;
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
   overflow: hidden;
   text-align: center;
   color: colors.$gray-70;
@@ -48,7 +47,7 @@
 .separator::before,
 .separator::after {
   background-color: colors.$gray-40;
-  content: "";
+  content: '';
   display: inline-block;
   height: 1px;
   position: relative;
@@ -57,18 +56,18 @@
 }
 
 .separator::before {
-  right: 1rem;
+  right: layout.$spacing-05;
   margin-left: -50%;
 }
 
 .separator::after {
-  left: 1rem;
+  left: layout.$spacing-05;
   margin-right: -50%;
 }
 
 .list {
-  margin-left: spacing.$spacing-02;
-  color:colors.$blue-60;
+  margin-left: layout.$spacing-02;
+  color: colors.$blue-60;
   text-decoration: underline;
   cursor: pointer;
 }

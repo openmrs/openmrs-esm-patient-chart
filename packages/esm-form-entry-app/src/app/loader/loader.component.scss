@@ -1,4 +1,6 @@
+@use '@carbon/layout';
+
 .spinner {
-  min-height: 1rem;
+  min-height: layout.$spacing-05;
   width: fit-content;
 }

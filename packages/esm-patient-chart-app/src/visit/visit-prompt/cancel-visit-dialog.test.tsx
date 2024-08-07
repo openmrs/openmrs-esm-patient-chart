@@ -15,11 +15,6 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  restBaseUrl: '/ws/rest/v1',
-}));
-
 jest.mock('../queue-entry/queue.resource', () => ({
   ...jest.requireActual('../queue-entry/queue.resource'),
   useVisitQueueEntry: jest.fn(),

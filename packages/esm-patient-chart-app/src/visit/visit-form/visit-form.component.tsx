@@ -61,7 +61,7 @@ import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { useVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selection.component';
+import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
@@ -652,7 +652,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
         {showPatientHeader && patient && (
           <ExtensionSlot
             name="patient-header-slot"
@@ -712,7 +712,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             )}
 
             {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
-            <LocationSelector />
+            <LocationSelector control={control} />
 
             {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
           to true. */}

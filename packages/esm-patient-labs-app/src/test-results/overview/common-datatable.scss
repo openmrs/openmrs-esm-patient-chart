@@ -1,16 +1,16 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tableContainer :global(.cds--data-table-header) {
-  padding: 0.75rem 1rem 0.25rem 1rem;
+  padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-02 layout.$spacing-05;
 
   *:not(:first-child) {
-    margin: 0.25rem 0rem;
+    margin: layout.$spacing-02 0;
   }
 
   h4 {
-    @include type.type-style("heading-compact-02");
+    @include type.type-style('heading-compact-02');
     max-width: 50%;
   }
 }
@@ -24,56 +24,63 @@
 }
 
 tr {
-  &.critically-low, &.critically-high, &.low, &.high {
+  &.critically-low,
+  &.critically-high,
+  &.low,
+  &.high {
     td:nth-child(2) {
-      @include type.type-style("heading-compact-01");
+      @include type.type-style('heading-compact-01');
       color: $ui-05;
     }
   }
 
-  &.critically-low, &.critically-high, &.off-scale-high, &.off-scale-low {
-    outline: 2px solid $danger;
+  &.critically-low,
+  &.critically-high,
+  &.off-scale-high,
+  &.off-scale-low {
+    outline: layout.$spacing-01 solid $danger;
     outline-offset: -1px;
   }
 
-  &.low, &.high {
+  &.low,
+  &.high {
     outline: 1px solid black;
     outline-offset: -1px;
   }
 
   &.critically-low {
     td:nth-child(2)::after {
-      content: " ↓↓";
+      content: ' ↓↓';
     }
   }
 
   &.critically-high {
     td:nth-child(2)::after {
-      content: " ↑↑";
+      content: ' ↑↑';
     }
   }
 
   &.low {
     td:nth-child(2)::after {
-      content: " ↓";
+      content: ' ↓';
     }
   }
 
   &.high {
     td:nth-child(2)::after {
-      content: " ↑";
+      content: ' ↑';
     }
   }
 
   &.off-scale-low {
     td:nth-child(2)::after {
-      content: " ↓↓↓";
+      content: ' ↓↓↓';
     }
   }
 
   &.off-scale-high {
     td:nth-child(2)::after {
-      content: " ↑↑↑";
+      content: ' ↑↑↑';
     }
   }
 }
@@ -84,39 +91,41 @@ tr {
 .criticallyLow,
 .high,
 .low {
-    @include type.type-style('heading-compact-01');
-  }
+  @include type.type-style('heading-compact-01');
+}
 
 .high,
 .low {
-  box-shadow: 0 0 0 1px #000000;
+  box-shadow: 0 0 0 1px black;
 }
 
 .criticallyHigh,
 .criticallyLow {
-  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+  box-shadow:
+    0 0 0 1px $danger,
+    inset 0 0 0 1px $danger;
 }
 
 .offScaleLow::after {
-  content: " ↓↓↓";
+  content: ' ↓↓↓';
 }
 
 .offScaleHigh::after {
-  content: " ↑↑↑";
+  content: ' ↑↑↑';
 }
 
 .criticallyLow::after {
-  content: " ↓↓";
+  content: ' ↓↓';
 }
 
 .criticallyHigh::after {
-  content: " ↑↑";
+  content: ' ↑↑';
 }
 
 .low::after {
-  content: " ↓";
+  content: ' ↓';
 }
 
 .high::after {
-  content: " ↑";
+  content: ' ↑';
 }

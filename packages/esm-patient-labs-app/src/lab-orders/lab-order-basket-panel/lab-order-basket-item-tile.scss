@@ -1,15 +1,14 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../root";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .clickableTileDesktop {
-  padding: 0.5rem 0.75rem;
+  padding: layout.$spacing-03 layout.$spacing-04;
   border-bottom: 1px solid $ui-03;
 }
 
 .clickableTileTablet {
-  padding: 0.75rem 1rem;
+  padding: layout.$spacing-04 layout.$spacing-05;
   background-color: $ui-02;
   border-bottom: 1px solid $ui-03;
 }
@@ -22,22 +21,22 @@
 
 .label {
   display: inline-block;
-  @include type.type-style("label-01");
-  margin-bottom: 0.5rem;
+  @include type.type-style('label-01');
+  margin-bottom: layout.$spacing-03;
 }
 
 .orderActionNewLabel {
   @extend .label;
   color: black;
-  background-color: #C4F4CC;
-  padding: 0 0.25rem;
+  background-color: #c4f4cc;
+  padding: 0 layout.$spacing-02;
 }
 
 .orderActionIncompleteLabel {
   @extend .label;
   color: white;
   background-color: $danger;
-  padding: 0 0.25rem;
+  padding: 0 layout.$spacing-02;
 }
 
 .orderActionRenewLabel {
@@ -62,7 +61,7 @@
 }
 
 .name {
-  @include type.type-style("heading-compact-01");
+  @include type.type-style('heading-compact-01');
   color: black;
 }
 
@@ -70,4 +69,16 @@
   svg {
     fill: $danger !important;
   }
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.clipTextWithEllipsis {
+  font-size: layout.$spacing-05;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }

@@ -1,13 +1,14 @@
-@use '@carbon/styles/scss/spacing';
-@use '~@carbon/styles/scss/colors';
-@import "../root.scss";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .previewContainer {
   display: grid;
   grid-template-columns: 1fr 16rem;
   position: fixed;
   width: 100vw;
-  top: 3rem;
+  top: layout.$spacing-09;
   bottom: 0;
   left: 0;
   z-index: 5001;
@@ -22,7 +23,7 @@
 
 .rightPanel {
   background-color: colors.$gray-80;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   color: $ui-01;
 }
 
@@ -51,7 +52,7 @@
 
 .overflowMenu {
   &:hover {
-    background-color: hsla(0,0%,55%,.12) !important;
+    background-color: hsla(0, 0%, 55%, 0.12) !important;
   }
 
   svg {
@@ -60,7 +61,7 @@
 }
 
 .imageDescription {
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
 }
 
 .menuItem {
@@ -68,7 +69,7 @@
 }
 
 .title {
-  @extend .productiveHeading02;
+  @include type.type-style('heading-compact-02');
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

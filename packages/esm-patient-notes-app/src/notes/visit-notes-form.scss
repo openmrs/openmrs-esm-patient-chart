@@ -3,17 +3,17 @@
 @use '@carbon/type';
 
 .heading {
-  @include type.type-style("heading-03");
-  margin-bottom: 0.5rem;
+  @include type.type-style('heading-03');
+  margin-bottom: layout.$spacing-03;
 }
 
 .columnLabel {
-  @include type.type-style("heading-compact-02");
+  @include type.type-style('heading-compact-02');
   color: colors.$gray-70;
 }
 
 .diagnosis {
-  padding: 0.75rem;
+  padding: layout.$spacing-04;
   border-top: 0.0625rem solid colors.$gray-20;
 }
 
@@ -37,19 +37,19 @@
 }
 
 .diagnosesText {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
   color: colors.$gray-70;
-  margin-bottom: 1rem;
+  margin-bottom: layout.$spacing-05;
 }
 
 .emptyResults {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
   color: colors.$gray-70;
-  min-height: 1rem;
+  min-height: layout.$spacing-05;
 }
 
 .imgUploadHelperText {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
   color: colors.$gray-70;
 }
 
@@ -67,7 +67,7 @@
 .imgThumbnailGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, 7rem);
-  gap: 1rem;
+  gap: layout.$spacing-05;
   margin-top: layout.$spacing-05;
 }
 
@@ -80,8 +80,8 @@
 
 .removeButton {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: layout.$spacing-02;
+  right: layout.$spacing-02;
   background-color: transparent;
   border: none;
   padding: 0;
@@ -95,7 +95,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -103,11 +103,11 @@
 }
 
 .spinner {
-  min-height: 1rem;
+  min-height: layout.$spacing-05;
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: white;
 }
 
@@ -123,11 +123,11 @@
 .dataGridRow {
   display: grid;
   grid-template-columns: 50% 10% 1fr;
-  margin: 0.5rem 1rem;
+  margin: layout.$spacing-03 layout.$spacing-05;
 }
 
 .formContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .form {
@@ -143,12 +143,12 @@
 }
 
 .row {
-  margin: 0.5rem 0 2.5rem;
+  margin: layout.$spacing-03 0 layout.$spacing-08;
 }
 
 .skeleton {
-  margin-top: 0.25rem;
-  height: 2rem;
+  margin-top: layout.$spacing-02;
+  height: layout.$spacing-07;
 }
 
 .errorMessage {
@@ -156,7 +156,7 @@
   margin-top: layout.$spacing-03;
 }
 
-.diagnoserrorOutline{
+.diagnoserrorOutline {
   :global(.cds--search-input):focus {
     outline: 2.5px solid colors.$red-60;
   }
@@ -169,7 +169,7 @@
 }
 
 .errorMessage {
-  @include type.type-style("label-02");
+  @include type.type-style('label-02');
   color: colors.$red-60;
 }
 
@@ -180,7 +180,7 @@
 
   .row {
     display: flex;
-    gap: 4rem;
+    gap: layout.$spacing-10;
 
     :global(.cds--col-sm-1) {
       flex-basis: 30%;
@@ -194,23 +194,23 @@
   }
 
   .diagnosis {
-    padding: 1rem 0.75rem;
+    padding: layout.$spacing-05 layout.$spacing-04;
   }
 
   .skeleton {
-    height: 2.5rem;
+    height: layout.$spacing-08;
   }
 }
 
 .errorNotification {
-  margin-top: 0.25rem;
+  margin-top: layout.$spacing-02;
 }
 
 .tag {
-  margin-right: 0.5rem;
+  margin-right: layout.$spacing-03;
   margin-left: 0;
 }
 
 .uploadButton {
-  margin-top: 1rem;
+  margin-top: layout.$spacing-05;
 }

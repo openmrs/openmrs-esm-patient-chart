@@ -12,7 +12,7 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import FilterContext from '../filter/filter-context';
-import styles from './grouped-timeline.styles.scss';
+import styles from './grouped-timeline.scss';
 
 const TimeSlots: React.FC<{
   children?: React.ReactNode;

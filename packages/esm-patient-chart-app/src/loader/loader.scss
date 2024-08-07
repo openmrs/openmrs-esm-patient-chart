@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .loading {
   display: flex;
   background-color: $openmrs-background-grey;
   justify-content: center;
-  min-height: spacing.$spacing-09;
+  min-height: layout.$spacing-09;
 }

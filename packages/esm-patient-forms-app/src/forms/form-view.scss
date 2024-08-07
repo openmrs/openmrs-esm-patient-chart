@@ -1,10 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .heading {
-  @include type.type-style("heading-compact-01");
+  @include type.type-style('heading-compact-01');
 }
 
 .text02 {
@@ -12,11 +11,11 @@
 }
 
 .bodyShort01 {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
 }
 
 .bodyLong01 {
-  @include type.type-style("body-01");
+  @include type.type-style('body-01');
 }
 
 .formContainer {
@@ -36,13 +35,13 @@
 
 .formResultsLabel {
   @include type.type-style('body-compact-01');
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   color: $text-02;
 }
 
 .tileContainer {
   background-color: $ui-02;
-  margin: 3rem;
+  margin: layout.$spacing-09;
 }
 
 .tile {
@@ -63,18 +62,18 @@
 
 .tile {
   text-align: center;
-  margin-top: 0.25rem;
+  margin-top: layout.$spacing-02;
 }
 
 .content {
-  @include type.type-style("heading-compact-01");
+  @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }
 
 .helper {
-  @extend .bodyLong01;
+  @include type.type-style('body-01');
   color: $color-gray-70;
-  margin: 0.5rem 0;
+  margin: layout.$spacing-03 0;
 }

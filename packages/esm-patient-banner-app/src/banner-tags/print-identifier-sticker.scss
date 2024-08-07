@@ -2,11 +2,11 @@
 @use '@carbon/type';
 
 .stickerContainer {
-  padding: 0.5rem 1rem;
+  padding: layout.$spacing-03 layout.$spacing-05;
 }
 
 .row {
-  margin: layout.$spacing-03 0rem 0rem;
+  margin: layout.$spacing-03 0 0;
   display: flex;
   flex-flow: row wrap;
   gap: layout.$spacing-05;
@@ -25,22 +25,22 @@
 }
 
 .patientName {
-  font-size: 1.5rem;
+  font-size: layout.$spacing-06;
   font-weight: bolder;
   margin-bottom: 5px;
 }
 
 .button {
   :global(.cds--inline-loading) {
-    min-height: 1rem !important;
+    min-height: layout.$spacing-05 !important;
   }
 }
 
 .detailsGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem 0;
-  margin-top: 0.5rem;
+  gap: layout.$spacing-03 0;
+  margin-top: layout.$spacing-03;
 }
 
 .loader {
@@ -50,7 +50,8 @@
 }
 
 @media print {
-  html, body {
+  html,
+  body {
     height: 100vh;
     margin: 0 !important;
     padding: 0 !important;

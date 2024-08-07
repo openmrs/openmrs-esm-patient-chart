@@ -4,14 +4,8 @@ import { useVisit, getConfig } from '@openmrs/esm-framework';
 import { waitForLoadingToFinish } from 'tools';
 import CurrentVisitSummary from './current-visit-summary.component';
 
-const mockUseVisits = jest.mocked(useVisit);
 const mockGetConfig = jest.mocked(getConfig);
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework/mock'),
-  useVisits: jest.fn(),
-  getConfig: jest.fn(),
-}));
+const mockUseVisits = jest.mocked(useVisit);
 
 describe('CurrentVisitSummary', () => {
   test('renders an empty state when there is no active visit', () => {

@@ -1,9 +1,9 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@import "../root.scss";
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .overview {
-  background-color: $ui-02;
+  background-color: vars.$ui-02;
 }
 
 .attachmentHeaderActionItems {
@@ -15,16 +15,16 @@
     max-width: max-content;
 
     :global(.cds--content-switcher__label) {
-      height: spacing.$spacing-05;
+      height: layout.$spacing-05;
     }
   }
 }
 
 .divider {
   width: 1px;
-  height: spacing.$spacing-05;
+  height: layout.$spacing-05;
   color: colors.$gray-20;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .validatingDataIcon {
@@ -33,5 +33,3 @@
   flex: 1 1 0%;
   justify-content: center;
 }
-
-

@@ -1,7 +1,6 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
@@ -14,7 +13,7 @@
   }
 
   p {
-    padding: spacing.$spacing-02 0;
+    padding: layout.$spacing-02 0;
   }
 }
 
@@ -25,25 +24,25 @@
 }
 
 .startDateColumn {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  min-height: spacing.$spacing-11;
-  padding-bottom: spacing.$spacing-02;
+  min-height: layout.$spacing-11;
+  padding-bottom: layout.$spacing-02;
 
   span {
-    margin: 0rem;
+    margin: 0;
   }
 }
 
 .dosage {
-  @include type.type-style("heading-compact-01");
+  @include type.type-style('heading-compact-01');
 }
 
 .tooltip {
-  margin: 0rem -0.5rem -0.625rem;
+  margin: 0 (-(layout.$spacing-03)) -0.625rem;
 }
 
 .menuItem {
@@ -54,3 +53,10 @@
   justify-content: flex-end;
 }
 
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.bodyLong01 {
+  @include type.type-style('body-01');
+}

@@ -117,7 +117,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         </CardHeader>
         {isEnrolledInAllPrograms && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}

@@ -11,12 +11,6 @@ const mockGetConfig = getConfig as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  getVisitsForPatient: jest.fn(),
-  userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-}));
-
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(esmPatientChartSchema),
   numberOfVisitsToLoad: 5,

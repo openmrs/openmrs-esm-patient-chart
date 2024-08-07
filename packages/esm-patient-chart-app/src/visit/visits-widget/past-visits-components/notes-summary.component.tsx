@@ -2,8 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { Note } from '../visit.resource';
-import styles from '../visit-detail-overview.scss';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {
   notes: Array<Note>;

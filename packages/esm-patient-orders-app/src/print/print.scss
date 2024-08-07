@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/colors';
-@use "@carbon/styles/scss/spacing";
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 @media screen {
   .printPage {
@@ -12,7 +12,7 @@
 @media print {
   @page {
     size: auto;
-    margin: spacing.$spacing-08;
+    margin: layout.$spacing-08;
     font-size: smaller;
   }
 
@@ -25,26 +25,26 @@
 
   .patientDetails {
     @include type.type-style('body-compact-02');
-    margin: 0 spacing.$spacing-03;
+    margin: 0 layout.$spacing-03;
   }
 
   .patientInfo {
     color: colors.$gray-80;
     @include type.type-style('body-compact-02');
-  } 
+  }
 
   .name {
     @include type.type-style('heading-compact-02');
-    margin-right: spacing.$spacing-03;
+    margin-right: layout.$spacing-03;
   }
 
   .footer {
-    font-size: spacing.$spacing-04;
+    font-size: layout.$spacing-04;
     display: flex;
   }
 
   .date {
-    margin-left: spacing.$spacing-06;
+    margin-left: layout.$spacing-06;
   }
 
   .gender {
@@ -53,14 +53,14 @@
 
   .printedBy {
     @include type.type-style('body-compact-01');
-    margin: 0 spacing.$spacing-02;
+    margin: 0 layout.$spacing-02;
     font-size: smaller;
   }
 
   .subheader {
     @include type.type-style('heading-03');
     color: colors.$gray-70;
-    padding: spacing.$spacing-03;
-    text-align: center;   
+    padding: layout.$spacing-03;
+    text-align: center;
   }
 }

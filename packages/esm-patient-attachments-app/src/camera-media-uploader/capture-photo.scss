@@ -1,29 +1,31 @@
+@use '@carbon/layout';
+
 .container {
   display: flex;
   align-items: center;
 }
 
 .buttonCssReset {
-	max-width: 4rem;
-	padding: 0;
-	margin: 0;
-	border: none;
-	background: none;
-	cursor: pointer;
+  max-width: layout.$spacing-10;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .placeholderIconContainer {
-	width: 4rem;
-	height: 4rem;
-	background-color: #D8D8D8;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  width: layout.$spacing-10;
+  height: layout.$spacing-10;
+  background-color: #d8d8d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .actionButton {
   flex: 1;
-  margin-left: 1rem;
+  margin-left: layout.$spacing-05;
 }
 
 .preview {

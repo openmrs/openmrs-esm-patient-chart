@@ -1,12 +1,12 @@
 @use '@carbon/colors';
+@use '@carbon/layout';
 @use '@carbon/styles/scss/grid/_flexbox';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .labSetPanel {
   width: 100%;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
   cursor: pointer;
   text-decoration: none;
@@ -15,11 +15,11 @@
 }
 
 .activePanel {
-  border: 2px solid var(--brand-03);
+  border: layout.$spacing-01 solid var(--brand-03);
 }
 
 .panelHeader {
-  padding: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-03 spacing.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-05 layout.$spacing-03 layout.$spacing-05;
   background-color: $ui-02;
 }
 
@@ -28,9 +28,9 @@
 }
 
 .panelHeader::after {
-  content: "";
+  content: '';
   display: block;
-  width: 2rem;
+  width: layout.$spacing-07;
   padding-top: 0.188rem;
   border-bottom: 0.375rem solid var(--brand-03);
 }
@@ -71,7 +71,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
@@ -80,7 +80,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
@@ -89,7 +89,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
@@ -98,7 +98,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
@@ -107,7 +107,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
@@ -116,7 +116,7 @@
     font-weight: 600;
   }
   span::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
 

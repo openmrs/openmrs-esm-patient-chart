@@ -19,11 +19,6 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  updateVisit: jest.fn(),
-}));
-
 describe('End visit dialog', () => {
   beforeEach(() => {
     mockUseVisit.mockReturnValue({

@@ -1,7 +1,9 @@
+@use '@carbon/layout';
+
 .tableCell {
-  padding: 0rem 1.5rem !important;
+  padding: 0 layout.$spacing-06 !important;
 }
 
 .sequenceTable {
-  margin: 0.5rem 0;
+  margin: layout.$spacing-03 0;
 }

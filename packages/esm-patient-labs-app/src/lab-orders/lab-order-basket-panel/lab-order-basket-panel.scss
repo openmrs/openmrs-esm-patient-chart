@@ -1,19 +1,19 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .desktopTile {
-  border-left: 4px solid #6929c4;
+  border-left: layout.$spacing-02 solid colors.$purple-70;
   background-color: $ui-02;
-  border-top: 1px solid #e8daff;
+  border-top: 1px solid colors.$purple-20;
   border-right: none;
   padding: 0;
 }
 
 .tabletTile {
   @extend .desktopTile;
-  border-top: 1px solid #612EBD;
+  border-top: 1px solid #612ebd;
 }
 
 .collapsedTile {
@@ -45,7 +45,7 @@
 }
 
 .tabletTile .container {
-  padding: spacing.$spacing-03;
+  padding: layout.$spacing-03;
 
   h4 {
     @include type.type-style('heading-03');
@@ -54,13 +54,13 @@
 }
 
 .heading {
-  margin-left: spacing.$spacing-03;
+  margin-left: layout.$spacing-03;
 }
 
 .iconAndLabel {
   display: flex;
   align-items: center;
-  margin: spacing.$spacing-03;
+  margin: layout.$spacing-03;
 }
 
 .buttonContainer {

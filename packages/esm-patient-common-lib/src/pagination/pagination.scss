@@ -1,50 +1,55 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyShort01 {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
 }
 
-.desktop, .tablet {
+.desktop,
+.tablet {
   @include type.type-style('body-compact-01');
   display: flex;
   justify-content: space-between;
   color: $text-02;
   background-color: $ui-02;
-  padding-left: 1rem;
+  padding-left: layout.$spacing-05;
   align-items: center;
   border-top: 1px solid $ui-03;
 }
 
 .desktop :global(.cds--pagination) {
-  min-height: 0rem;
-  height: 2rem;
+  min-height: 0;
+  height: layout.$spacing-07;
   width: auto;
   border: none;
 
-  & :global(.cds--select-input), :global(.cds--btn), :global(.cds--pagination__right) {
-    min-height: 0rem;
-    height: 2rem;
+  & :global(.cds--select-input),
+  :global(.cds--btn),
+  :global(.cds--pagination__right) {
+    min-height: 0;
+    height: layout.$spacing-07;
   }
 }
 
 .tablet :global(.cds--pagination) {
-  min-height: 0rem;
-  height: 3rem;
+  min-height: 0;
+  height: layout.$spacing-09;
   width: auto;
   border: none;
 
-  & :global(.cds--select-input), :global(.cds--btn), :global(.cds--pagination__right) {
-    min-height: 0rem;
-    height: 3rem;
+  & :global(.cds--select-input),
+  :global(.cds--btn),
+  :global(.cds--pagination__right) {
+    min-height: 0;
+    height: layout.$spacing-09;
   }
 }
 
 .configurableLink {
   text-decoration: none;
   @extend .bodyShort01;
-  padding: 0 spacing.$spacing-03;
+  padding: 0 layout.$spacing-03;
 }
 
 .pagination {

@@ -1,9 +1,13 @@
-@use '@carbon/styles/scss/spacing';
-@import "../root.scss";
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
+
+.modalHeader {
+  @include type.type-style('heading-compact-02');
+}
 
 .cameraSection {
   width: inherit;
-  background-color: $ui-02;
+  background-color: vars.$ui-02;
 }
 
 .uploadingFilesSection {
@@ -13,14 +17,14 @@
   align-items: center;
   height: 25rem;
   overflow-y: auto;
-  border: 1px dashed $ui-04;
+  border: 1px dashed vars.$ui-04;
 }
 
 .buttonSet {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  button{
+  button {
     max-width: unset !important;
   }
 }

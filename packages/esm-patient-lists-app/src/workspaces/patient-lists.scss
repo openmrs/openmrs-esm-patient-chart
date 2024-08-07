@@ -1,5 +1,4 @@
 // Zeplin screen: https://zpl.io/2GPjdzE
-
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
@@ -16,7 +15,7 @@
 
 .dataTableSkeleton {
   background-color: transparent;
-  padding: 0rem;
+  padding: 0;
 }
 
 .tableContainer {
@@ -30,14 +29,14 @@
 
   :global(.cds--table-toolbar) {
     position: relative;
-    height: 2rem;
-    min-height: 0rem;
+    height: layout.$spacing-07;
+    min-height: 0;
     overflow: visible;
     top: 0;
   }
 
   &:global(.cds--data-table-container) {
-    padding-top: 0rem;
+    padding-top: 0;
   }
 }
 
@@ -55,7 +54,7 @@
 
 .search {
   input {
-    padding: 0 4rem !important;
+    padding: 0 layout.$spacing-10 !important;
   }
 
   :global(.cds--search-close:focus) {
@@ -82,13 +81,13 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-70;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContainer {
   background-color: colors.$white-0;
   border-top: 1px solid colors.$gray-70;
-  padding: 4rem 0;
+  padding: layout.$spacing-10 0;
 }
 
 .tile {
@@ -108,13 +107,13 @@
 }
 
 .emptyStateTile {
-  padding: 1.5rem 0;
+  padding: layout.$spacing-06 0;
   text-align: center;
 }
 
 .emptyStateContent {
   @extend .content;
-  @include type.type-style("heading-compact-01");
+  @include type.type-style('heading-compact-01');
   color: colors.$gray-70;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;

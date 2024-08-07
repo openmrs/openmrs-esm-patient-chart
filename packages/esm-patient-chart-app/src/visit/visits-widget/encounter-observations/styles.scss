@@ -1,11 +1,11 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 
 .observation {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: spacing.$spacing-03;
-  margin-block: spacing.$spacing-05;
-  margin-inline: 0 spacing.$spacing-05;
+  grid-gap: layout.$spacing-03;
+  margin-block: layout.$spacing-05;
+  margin-inline: 0 layout.$spacing-05;
 }
 
 .observation > span {
@@ -18,5 +18,5 @@
 }
 
 .childConcept {
-  padding-inline-start: 0.8rem;
+  padding-inline-start: layout.$spacing-04;
 }

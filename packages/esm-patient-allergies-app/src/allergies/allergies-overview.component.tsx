@@ -91,7 +91,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                   <TableRow>
                     {headers.map((header) => (
                       <TableHeader
-                        className={classNames(styles.productiveHeading01, styles.text02)}
+                        className={styles.tableHeader}
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,

@@ -1,7 +1,5 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
 
 .testOrder {
   display: flex;
@@ -12,7 +10,7 @@
 }
 
 .testCell {
-  padding-left: spacing.$spacing-05 !important;
+  padding-left: layout.$spacing-05 !important;
 }
 
 .testType {

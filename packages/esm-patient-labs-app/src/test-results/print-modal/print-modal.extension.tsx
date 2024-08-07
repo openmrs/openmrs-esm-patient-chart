@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import classNames from 'classnames';
 import {
   Button,
   DataTable,
@@ -195,7 +194,7 @@ function PrintModal({ patientUuid, closeDialog }) {
                       <TableRow>
                         {headers.map((header) => (
                           <TableHeader
-                            className={classNames(styles.productiveHeading01, styles.text02)}
+                            className={styles.heading}
                             {...getHeaderProps({
                               header,
                               isSortable: header.isSortable,

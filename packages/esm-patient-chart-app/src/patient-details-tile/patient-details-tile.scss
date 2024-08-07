@@ -1,24 +1,24 @@
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container:after {
-	content: '';
-	height: 100%;
-	width: 1px;
-	position: absolute;
-	right: 0;
-	top: 0;
-	background-color: $color-gray-30;
-	margin: 0 1rem;
+  content: '';
+  height: 100%;
+  width: 1px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: $color-gray-30;
+  margin: 0 layout.$spacing-05;
 }
 
 .details {
-	margin-top: 5px;
-	@include type.type-style('body-compact-01');
-	color: $text-02;
+  margin-top: 5px;
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }
 
 .name {
-	@include type.type-style('body-compact-02');
-
+  @include type.type-style('body-compact-02');
 }

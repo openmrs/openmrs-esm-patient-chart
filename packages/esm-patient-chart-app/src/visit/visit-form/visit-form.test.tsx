@@ -62,7 +62,6 @@ const mockUpdateVisit = jest.mocked(updateVisit);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
-const mockGetStartedVisitGetter = jest.fn();
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 const mockUsePatient = jest.mocked(usePatient);
 
@@ -72,19 +71,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
     activePatientEnrollment: [],
     isLoading: false,
   }),
-}));
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  get getStartedVisit() {
-    return mockGetStartedVisitGetter();
-  },
-  restBaseUrl: '/ws/rest/v1',
-  saveVisit: jest.fn(),
-  updateVisit: jest.fn(),
-  toOmrsIsoString: jest.fn(),
-  toDateObjectStrict: jest.fn(),
-  usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
 }));
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
