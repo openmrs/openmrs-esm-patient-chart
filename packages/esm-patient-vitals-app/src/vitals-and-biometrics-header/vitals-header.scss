@@ -44,7 +44,7 @@
 }
 
 :global(.omrs-breakpoint-lt-desktop),
-.workspace-open {
+.workspaceOpen {
   .row {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -57,11 +57,6 @@
   background-color: $openmrs-background-grey;
   justify-content: center;
   min-height: layout.$spacing-09;
-}
-
-.container-row {
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .overdueIndicator {
@@ -80,7 +75,15 @@
   justify-content: right;
 }
 
-.arrowUpButton {
+.recordVitalsButton {
+  @include type.type-style('body-compact-01');
+
+  &:not([disabled]) svg {
+    fill: $color-blue-60-2;
+  }
+}
+
+.recordVitalsIconButton {
   display: flex;
   align-items: baseline;
   justify-content: center;
@@ -88,18 +91,10 @@
   margin-left: layout.$spacing-03;
 }
 
-.arrowUpIcon:not([disabled]) svg {
-  fill: $color-blue-60-2;
-}
-
 .heading {
   @include type.type-style('heading-compact-02');
   margin-right: layout.$spacing-03;
   color: $text-02;
-}
-
-.record-vitals {
-  @include type.type-style('body-compact-01');
 }
 
 .bodyText {
@@ -109,7 +104,7 @@
 
 .link {
   margin-left: layout.$spacing-02;
-  @extend .body-text;
+  @extend .bodyText;
   text-decoration-line: none;
   color: $interactive-01;
 }
