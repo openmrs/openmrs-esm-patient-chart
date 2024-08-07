@@ -43,7 +43,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN || 'o3' }}
+          server-token: ''
 
       - name: Run lint, type checks and tests
         run: yarn verify
@@ -81,7 +81,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN || 'o3' }}
+          server-token: ''
 
       - name: Version
         run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
@@ -151,7 +151,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN || 'o3' }}
+          server-token: ''
 
       - name: Build
         run: yarn turbo run build --color --concurrency=5
