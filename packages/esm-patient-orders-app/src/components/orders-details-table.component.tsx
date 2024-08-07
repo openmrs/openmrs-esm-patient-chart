@@ -105,7 +105,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
     (orderItem: Order) => {
       switch (orderItem.type) {
         case 'drugorder':
-          launchAddDrugOrder();
+          launchAddDrugOrder({ order: buildMedicationOrder(orderItem, 'REVISE') });
           break;
         case 'testorder':
           launchModifyLabOrder({ order: buildLabOrder(orderItem, 'REVISE') });
@@ -480,14 +480,19 @@ function OrderBasketItemActions({
 
   const handleModifyClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
-      getDrugOrderByUuid(orderItem.uuid).then((res) => {
-        let medicationOrder = res.data;
-        const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
-        setOrderItems(medicationsOrderBasket, [...items, medicationItem]);
-        openOrderForm({ order: medicationItem });
-      });
+      getDrugOrderByUuid(orderItem.uuid)
+        .then((res) => {
+          const medicationOrder = res.data;
+          const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
+          setOrderItems(medicationsOrderBasket, [...items, medicationItem]);
+          openOrderForm({ order: medicationItem });
+        })
+        .catch((error) => {
+          console.error('Error modifying drug order:', error);
+        });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
+      setOrderItems(labsOrderBasket, [...items, labItem]);
       openOrderForm({ order: labItem });
     }
   }, [orderItem, openOrderForm, items, setOrderItems]);
