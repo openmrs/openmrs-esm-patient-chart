@@ -36,7 +36,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-right: layout.$spacing-01;
 }
 
 :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
