@@ -1,26 +1,14 @@
 {
   "address1": "អាសយដ្ឋានជួរទី១",
   "address2": "អសយដ្ឋានជួរទី 2",
-  "age": "Age",
-  "cancel": "Cancel",
   "city": "ទីក្រុង",
   "cityVillage": "ទីក្រុង",
   "country": "ប្រទេស",
   "countyDistrict": "ស្រុក/ខ័ណ្ឌ",
   "district": "ស្រុក/ខ័ណ្ឌ",
   "dob": "DOB",
-  "female": "Female",
-  "male": "Male",
-  "other": "Other",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "លេខកូដតំបន់",
-  "print": "Print",
-  "printError": "Print error",
-  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
-  "printIdentifierSticker": "Print identifier sticker",
-  "printing": "Printing",
-  "sex": "Sex",
   "state": "រដ្ឋ",
-  "stateProvince": "រដ្ឋ",
-  "unknown": "Unknown"
+  "stateProvince": "រដ្ឋ"
 }

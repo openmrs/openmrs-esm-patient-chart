@@ -1,26 +1,14 @@
 {
   "address1": "Address line 1",
   "address2": "Address line 2",
-  "age": "Age",
-  "cancel": "Cancel",
   "city": "City",
   "cityVillage": "City",
   "country": "Country",
   "countyDistrict": "District",
   "district": "District",
   "dob": "DOB",
-  "female": "Female",
-  "male": "Male",
-  "other": "Other",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "Postal code",
-  "print": "Print",
-  "printError": "Print error",
-  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
-  "printIdentifierSticker": "Print identifier sticker",
-  "printing": "Printing",
-  "sex": "Sex",
   "state": "State",
-  "stateProvince": "State",
-  "unknown": "Unknown"
+  "stateProvince": "State"
 }
