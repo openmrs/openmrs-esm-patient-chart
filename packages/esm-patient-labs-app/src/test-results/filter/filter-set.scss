@@ -1,4 +1,4 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 @use '@carbon/styles/scss/type';
 @use '@carbon/colors';
 @import '@openmrs/esm-styleguide/src/vars';
@@ -14,8 +14,7 @@
   margin: layout.$spacing-02 0;
 
   @media (min-width: $breakpoint-small-desktop-min) {
-    background-color: $ui-background;
-    margin: spacing.$spacing-02 0;
+    margin: layout.$spacing-02 0;
   }
 
   :global(.cds--accordion__item) {
@@ -31,22 +30,22 @@
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid colors.$gray-20;
-  padding: spacing.$spacing-03 0;
-  margin-bottom: spacing.$spacing-03;
+  padding: layout.$spacing-03 0;
+  margin-bottom: layout.$spacing-03;
   align-items: center;
 }
 
 .treeNodeHeaderTablet {
-  padding-left: spacing.$spacing-05;
+  padding-left: layout.$spacing-05;
   margin-bottom: 0;
 }
 
 .nestedAccordionTablet {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 // our special accordion rules
-.nestedAccordion> :global(.cds--accordion--start)> :global(.cds--accordion__item--active) {
+.nestedAccordion > :global(.cds--accordion--start) > :global(.cds--accordion__item--active) {
   border-left: 0.375rem solid var(--brand-01);
 
   @media (max-width: $breakpoint-tablet-max) {
@@ -55,7 +54,6 @@
 }
 
 .nestedAccordion :global {
-
   // extending carbon's accordion to handle nested accordions
   // accordion content
   .cds--accordion__content {
@@ -63,13 +61,13 @@
     margin: 0;
   }
 
-  .cds--accordion__item>.cds--accordion__content {
+  .cds--accordion__item > .cds--accordion__content {
     display: none;
   }
 
-  .cds--accordion__item--active>.cds--accordion__content {
+  .cds--accordion__item--active > .cds--accordion__content {
     display: block;
-    padding-right: spacing.$spacing-05
+    padding-right: layout.$spacing-05;
   }
 
   .cds--accordion__title {
@@ -89,17 +87,17 @@
   }
 
   @media (min-width: $breakpoint-small-desktop-min) {
-    .cds--accordion__item>button {
+    .cds--accordion__item > button {
       padding: 0;
     }
   }
 
   // Chevron transformations
-  .cds--accordion__item>button[aria-expanded='false']>.cds--accordion__arrow {
+  .cds--accordion__item > button[aria-expanded='false'] > .cds--accordion__arrow {
     transform: rotate(90deg);
   }
 
-  .cds--accordion__item--active>.cds--accordion__heading>.cds--accordion__arrow {
+  .cds--accordion__item--active > .cds--accordion__heading > .cds--accordion__arrow {
     /*rtl:ignore*/
     transform: rotate(-90deg);
     fill: var(--brand-01);

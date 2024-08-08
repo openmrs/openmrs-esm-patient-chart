@@ -1,9 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/colors';
-@import '@openmrs/esm-styleguide/src/vars';
-
-.individual-results-value {}
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .off-scale-high,
 .off-scale-low,
@@ -13,15 +11,19 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-
   }
+}
+
+.testClass {
+  //to be deleted(only for testing...)
+  background-color: aqua;
+  color: red;
 }
 
 .high,
 .low {
   background-color: colors.$orange-10;
   border-top: 1px solid colors.$orange-20;
-  height: 100%;
 }
 
 .critically-high,
@@ -32,36 +34,36 @@
 
 .off-scale-low {
   p::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
 .off-scale-high {
   p::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
 .critically-low {
   p::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
 .critically-high {
   p::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
 .low {
   p::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
 .high {
   p::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
