@@ -20,6 +20,11 @@ export const medicationsSummary = getSyncLifecycle(medicationsSummaryComponent, 
 
 export const activeMedications = getSyncLifecycle(activeMedicationsComponent, options);
 
+export const revisedMedications = getAsyncLifecycle(
+  () => import('./revised-medications/revised-medications.component'),
+  options,
+);
+
 export const drugOrderPanel = getAsyncLifecycle(
   () => import('./drug-order-basket-panel/drug-order-basket-panel.extension'),
   options,
