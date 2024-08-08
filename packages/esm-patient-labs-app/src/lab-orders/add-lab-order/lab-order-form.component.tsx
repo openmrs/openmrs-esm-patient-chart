@@ -154,6 +154,7 @@ export function LabOrderForm({
   }, [isDirty, promptBeforeClosing]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
+  const [hasPrice, setHasPrice] = useState(true);
 
   return (
     <>
@@ -169,7 +170,7 @@ export function LabOrderForm({
 
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
-          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
+          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder, setHasPrice }} />
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
@@ -190,6 +191,7 @@ export function LabOrderForm({
                       size={responsiveSize}
                       labelText={t('labReferenceNumber', 'Lab reference number')}
                       maxLength={150}
+                      disabled={!hasPrice}
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
@@ -212,6 +214,7 @@ export function LabOrderForm({
                       size={responsiveSize}
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
+                      disabled={!hasPrice}
                       selectedItem={priorityOptions.find((option) => option.value === value) || null}
                       items={priorityOptions}
                       onBlur={onBlur}
@@ -238,6 +241,7 @@ export function LabOrderForm({
                         titleText={t('orderReason', 'Order reason')}
                         selectedItem={''}
                         itemToString={(item) => item?.display}
+                        disabled={!hasPrice}
                         items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
@@ -263,6 +267,7 @@ export function LabOrderForm({
                       size={responsiveSize}
                       labelText={t('additionalInstructions', 'Additional instructions')}
                       value={value}
+                      disabled={!hasPrice}
                       onChange={onChange}
                       onBlur={onBlur}
                       maxCount={500}
@@ -292,7 +297,7 @@ export function LabOrderForm({
             <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
               {t('discard', 'Discard')}
             </Button>
-            <Button className={styles.button} kind="primary" type="submit" size="xl">
+            <Button className={styles.button} kind="primary" type="submit" disabled={!hasPrice} size="xl">
               {t('saveOrder', 'Save order')}
             </Button>
           </ButtonSet>
