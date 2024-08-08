@@ -1,38 +1,35 @@
 import React, { useMemo, useState } from 'react';
-import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  type DataTableHeader,
-  type DataTableRow,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './paginated-vitals.scss';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
+import styles from './paginated-vitals.scss';
 
 interface PaginatedVitalsProps {
+  isPrinting?: boolean;
   pageSize: number;
   pageUrl: string;
-  urlLabel: string;
-  tableRows: Array<VitalsTableRow>;
   tableHeaders: Array<VitalsTableHeader>;
-  isPrinting?: boolean;
+  tableRows: Array<VitalsTableRow>;
+  urlLabel: string;
 }
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
-  tableRows,
+  isPrinting,
   pageSize,
   pageUrl,
-  urlLabel,
   tableHeaders,
-  isPrinting,
+  tableRows,
+  urlLabel,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
