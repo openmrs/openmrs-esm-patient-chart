@@ -14,12 +14,11 @@
 }
 
 .grid:not(:first-child) {
-  border-right: 0.5px solid colors.$gray-30;
-  ;
+  border: 0.5px solid colors.$gray-30;
 }
 
 .grid:hover {
-  border-right: none;
+  border: none;
 }
 
 .day-column,
@@ -204,10 +203,8 @@
 
 .recent-results-grid {
   display: grid;
-  background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
-  border: 1px solid colors.$gray-50;
 }
 
 .recent-results-grid::-webkit-scrollbar {
