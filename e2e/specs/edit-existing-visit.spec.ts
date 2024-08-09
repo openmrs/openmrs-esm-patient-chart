@@ -44,7 +44,9 @@ test('Edit an existing visit', async ({ page }) => {
   });
 
   await test.step('And when I change the visit details and submit the form', async () => {
-    // TODO: Make it possible to select a different location
+    await chartPage.page.getByRole('button', { name: /clear selected item/i }).click();
+    await chartPage.page.getByRole('combobox', { name: /select a location/i }).click();
+    await chartPage.page.getByRole('option', { name: /inpatient ward/i }).click();
     await chartPage.page.getByText(/home visit/i).click();
     await expect(chartPage.page.getByLabel(/home visit/i)).toBeChecked();
     await chartPage.page.getByRole('button', { name: /update visit/i }).click();
@@ -58,8 +60,8 @@ test('Edit an existing visit', async ({ page }) => {
   await test.step('And I should see the updated visit details', async () => {
     await expect(chartPage.page.getByRole('button', { name: /active visit/i })).toBeVisible();
     await chartPage.page.getByLabel(/active visit/i).click();
-    await expect(chartPage.page.getByRole('tooltip')).toContainText('Home Visit');
-    await expect(chartPage.page.getByRole('tooltip')).toContainText('Started: Today');
+    await expect(chartPage.page.getByRole('tooltip')).toContainText(/home visit/i);
+    await expect(chartPage.page.getByRole('tooltip')).toContainText(/started: today/i);
   });
 });
 
