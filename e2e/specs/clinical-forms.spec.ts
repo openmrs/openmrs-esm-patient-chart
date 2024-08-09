@@ -207,6 +207,8 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I should see the entered data retained in the form', async () => {
+    await page.locator('#ManualInputWhiteBloodCells').waitFor();
+    await expect(page.getByRole('spinbutton', { name: /white blood cells/i })).toHaveValue('5000');
     await expect(page.getByRole('spinbutton', { name: /white blood cells/i })).toHaveValue('5000');
     await expect(page.getByRole('spinbutton', { name: /platelets/i })).toHaveValue('180000');
     await expect(page.getByRole('spinbutton', { name: /neutrophils/i })).toHaveValue('35');
