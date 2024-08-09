@@ -19,21 +19,21 @@ import { testResultsBasePath } from '../helpers';
 
 import styles from './individual-results-table.scss';
 
-interface IndividualResultsTableProps {
-  panels: any; //add types
-  isLoading: boolean;
-  // error: any; //for now
-}
+// interface IndividualResultsTableProps {
+//   panels: any; //add types
+//   isLoading: boolean;
+//   // error: any; //for now
+// }
 
-const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ panels, isLoading }) => {
+const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const patientUuid = getPatientUuidFromUrl();
+
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
-  const headerTitle = t('individualResults', 'Individual Results');
+  const headerTitle = t(parent.display);
 
-  // console.log(panels);
   const tableHeaders = [
     { key: 'testName', header: t('testName', 'Test Name') },
     {
@@ -58,41 +58,29 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ panels,
     }
   };
 
-  function extractReferenceRangeFromPanel(panel) {
-    //will add typings
-    if (!panel.referenceRange?.length) return '--';
-
-    const { high, low } = panel.referenceRange[0];
-    if (!high || !low) return '--';
-
-    return `${low.value} - ${high.value} ${panel.valueQuantity.unit}`;
-  }
-
   const tableRows = useMemo(() => {
-    const rowData = panels.map((panel) => {
-      const range = extractReferenceRangeFromPanel(panel);
-
+    const rowData = subRows.map((row, index) => {
       return {
-        ...panel,
+        ...row,
+        id: index,
         testName: (
           <ConfigurableLink
-            // className={styles.configurableLink} //styles not picking
             style={{ textDecoration: 'none' }}
-            to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${panel.conceptUuid}`}
+            to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${row.conceptUuid}`}
           >
-            {panel.name}
+            {row.display}
           </ConfigurableLink>
         ),
-        value: `${panel.value} ${panel.valueQuantity?.unit || ''}`,
-        referenceRange: range,
+        value: `${row.entries[0]?.value || '--'} ${row.units || '--'}`,
+        referenceRange: `${row.range || '--'} ${row.units || '--'}`,
       };
     });
 
     return rowData;
-  }, [panels, patientUuid]);
+  }, [patientUuid, subRows]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (panels?.length) {
+  if (subRows?.length) {
     return (
       <div>
         <CardHeader title={headerTitle}>
@@ -158,6 +146,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ panels,
     );
   }
   // return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAllergiesForm} />;
+  // return <>No data to show</>;
 };
 
 export default IndividualResultsTable;
