@@ -59,6 +59,7 @@
   "saveDrugOrderFailed": "Error ordering {{orderName}}",
   "saveLabResults": "Save lab results",
   "saving": "Saving",
+  "searchTable": "Search Table",
   "selectOrderType": "Select order type",
   "signAndClose": "Sign and close",
   "startAVisitToRecordOrders": "Start a visit to order",

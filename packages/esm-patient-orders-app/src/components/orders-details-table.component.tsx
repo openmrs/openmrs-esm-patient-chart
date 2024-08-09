@@ -21,6 +21,9 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  Layer,
+  TableToolbarContent,
+  Search,
 } from '@carbon/react';
 import {
   type DrugOrderBasketItem,
@@ -92,7 +95,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
-
   const {
     data: allOrders,
     error: error,
@@ -359,8 +361,21 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ title, patientUuid, sh
                 getTableProps,
                 headers,
                 rows,
+                onInputChange,
               }) => (
                 <TableContainer {...getTableContainerProps}>
+                  <div className={styles.toolBarContent}>
+                    <TableToolbarContent>
+                      <Layer>
+                        <Search
+                          expanded
+                          onChange={onInputChange}
+                          placeholder={t('searchTable', 'Search Table')}
+                          size="lg"
+                        />
+                      </Layer>
+                    </TableToolbarContent>
+                  </div>
                   <Table className={styles.table} {...getTableProps()}>
                     <TableHead>
                       <TableRow>
