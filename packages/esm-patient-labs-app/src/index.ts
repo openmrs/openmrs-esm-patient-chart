@@ -54,3 +54,8 @@ export const addLabOrderWorkspace = getAsyncLifecycle(
   () => import('./lab-orders/add-lab-order/add-lab-order.workspace'),
   options,
 );
+
+export const resultsViewerDialog = getAsyncLifecycle(
+  () => import('./test-results/panel-timeline/results-dialog.comoponent'),
+  options,
+);
