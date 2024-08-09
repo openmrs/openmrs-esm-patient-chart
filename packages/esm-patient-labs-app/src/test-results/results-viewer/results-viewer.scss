@@ -2,6 +2,29 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+:global(.omrs-breakpoint-gt-small-desktop .-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
+  max-width: 150rem;
+}
+
+@media (min-width: 1200px) {
+  :global(.-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
+    max-width: 150rem;
+  }
+}
+
+:global(.cds--data-table td, .cds--data-table th) {
+  vertical-align: top;
+}
+
+// need to figure out why global overrides for the data tables aren't working
+:global(.cds--data-table--md td) {
+  padding-top: 0.1rem;
+}
+
+// .configurableLink {
+//   text-decoration: none;
+// }
+
 .resultsContainer {
   padding: 0;
   width: 100%;
@@ -33,24 +56,33 @@
 .leftHeaderSection {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .viewOptsContentSwitcherContainer {
-  margin-left: auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  justify-content: space-between;
+}
+
+.viewOptionsText {
+  margin-top: layout.$spacing-03;
+  justify-self: start;
 }
 
 .viewOptionsSwitcher {
-  max-width: 10rem;
+  text-align: right;
+  justify-self: end;
 }
 
 .leftSection {
-  width: 45%;
+  width: 350px;
   margin-right: layout.$spacing-05;
 }
 
 .rightSection,
 .rightSectionHeader {
-  width: 55%;
+  width: 75%;
 
   &.fullView {
     width: 100%;
@@ -58,7 +90,7 @@
 }
 
 .rightSectionHeader {
-  display: flex;
+  // display: flex;
 }
 
 .rightSection :global(.cds--skeleton) {

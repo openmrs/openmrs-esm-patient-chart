@@ -15,9 +15,9 @@ import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import Trendline from '../trendline/trendline.component';
 import type { ConfigObject } from '../../config-schema';
 import styles from './results-viewer.scss';
+import { type viewOpts } from '../../types';
 
 type panelOpts = 'tree' | 'panel';
-type viewOpts = 'split' | 'full';
 
 interface RefreshDataButtonProps {
   isTablet: boolean;
@@ -59,26 +59,17 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, loading }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [view, setView] = useState<viewOpts>('split');
-  const config = useConfig() as ConfigObject;
+  const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount } = useContext(FilterContext);
+  const { totalResultsCount, resetTree } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
-  const showPrintButton = config.showPrintButton;
   const responsiveSize = isTablet ? 'lg' : 'md';
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
       to: testResultsBasePath(`/patient/${patientUuid}/chart`),
-    });
-  }, [patientUuid]);
-
-  const openPrintModal = useCallback(() => {
-    const dispose = showModal('print-modal', {
-      patientUuid,
-      closeDialog: () => dispose(),
     });
   }, [patientUuid]);
 
@@ -107,6 +98,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             type={type}
             expanded={isExpanded}
             testUuid={testUuid}
+            view={view}
           />
         ) : selectedSection === 'panel' ? (
           <PanelView
@@ -134,45 +126,31 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     <div className={styles.resultsContainer}>
       <div className={styles.resultsHeader}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
-          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-            totalResultsCount ? `(${totalResultsCount})` : ''
-          }`}</h4>
-          <div className={styles.leftHeaderActions}>
-            <ContentSwitcher
-              size={responsiveSize}
-              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
-              onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
-            >
-              <Switch name="panel" text={t('panel', 'Panel')} />
-              <Switch name="tree" text={t('tree', 'Tree')} />
-            </ContentSwitcher>
-            {showPrintButton && (
-              <Button
-                className={styles.button}
-                kind="ghost"
-                size={isTablet ? 'md' : 'sm'}
-                renderIcon={Printer}
-                iconDescription="Print results"
-                onClick={openPrintModal}
-              >
-                <span>{t('print', 'Print')}</span>
-              </Button>
-            )}
-          </div>
+          <h4>Tests</h4>
+          <Button
+            className={styles.button}
+            kind="ghost"
+            size={isTablet ? 'md' : 'sm'}
+            onClick={resetTree} //TO-DO (undo selections fix)
+          >
+            <span>{t('reset', 'Reset')}</span>
+          </Button>
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
+            <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
+              totalResultsCount ? `(${totalResultsCount})` : ''
+            }`}</h4>
             <ContentSwitcher
               className={styles.viewOptionsSwitcher}
               onChange={({ name }: { name: viewOpts }) => setView(name)}
               selectedIndex={isExpanded ? 1 : 0}
               size={responsiveSize}
             >
-              <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-              <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+              <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
+              <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
             </ContentSwitcher>
           </div>
-          <RefreshDataButton isTablet={isTablet} t={t} />
         </div>
       </div>
       <div className={styles.flex}>
@@ -181,17 +159,12 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             patientUuid={patientUuid}
             basePath={basePath}
             type={type}
-            expanded={isExpanded}
+            expanded={false}
             testUuid={testUuid}
+            view={view}
           />
         ) : selectedSection === 'panel' ? (
-          <PanelView
-            expanded={isExpanded}
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            testUuid={testUuid}
-          />
+          <PanelView expanded={false} patientUuid={patientUuid} basePath={basePath} type={type} testUuid={testUuid} />
         ) : null}
       </div>
     </div>

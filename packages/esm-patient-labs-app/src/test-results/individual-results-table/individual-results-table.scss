@@ -1,0 +1,69 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
+
+.off-scale-high,
+.off-scale-low,
+.critically-high,
+.critically-low,
+.high,
+.low {
+  p {
+    @include type.type-style('heading-compact-01');
+  }
+}
+
+.testClass {
+  //to be deleted(only for testing...)
+  background-color: aqua;
+  color: red;
+}
+
+.high,
+.low {
+  background-color: colors.$orange-10;
+  border-top: 1px solid colors.$orange-20;
+}
+
+.critically-high,
+.critically-low {
+  background-color: colors.$red-20;
+  border-top: 1px solid colors.$red-20-hover;
+}
+
+.off-scale-low {
+  p::after {
+    content: ' ↓↓↓';
+  }
+}
+
+.off-scale-high {
+  p::after {
+    content: ' ↑↑↑';
+  }
+}
+
+.critically-low {
+  p::after {
+    content: ' ↓↓';
+  }
+}
+
+.critically-high {
+  p::after {
+    content: ' ↑↑';
+  }
+}
+
+.low {
+  p::after {
+    content: ' ↓';
+  }
+}
+
+.high {
+  p::after {
+    content: ' ↑';
+  }
+}
