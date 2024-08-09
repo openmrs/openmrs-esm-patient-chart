@@ -86,3 +86,9 @@
 .range-tabs :global(.cds--tabs--scrollable__nav-link) {
   width: 7rem;
 }
+
+.tabPanel {
+  :global(.cds--tab--list) {
+    width: 100%;
+  }
+}

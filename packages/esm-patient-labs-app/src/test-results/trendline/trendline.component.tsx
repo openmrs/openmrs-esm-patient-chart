@@ -109,8 +109,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   const tableData: Array<{
     id: string;
-    date: string;
-    time: string;
+    dateTime: string;
     value:
       | number
       | {
@@ -139,8 +138,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     tableData.push({
       id: `${idx}`,
-      date: formatDate(parseDate(obs.obsDatetime)),
-      time: formatTime(parseDate(obs.obsDatetime)),
+      dateTime: obs.obsDatetime,
       value: {
         value: parseFloat(obs.value),
         interpretation: obs.interpretation,
@@ -198,12 +196,8 @@ const Trendline: React.FC<TrendlineProps> = ({
   const tableHeaderData = useMemo(
     () => [
       {
-        header: t('date', 'Date'),
-        key: 'date',
-      },
-      {
-        header: t('timeOfTest', 'Time of Test'),
-        key: 'time',
+        header: t('dateTime', 'Date and time'),
+        key: 'dateTime',
       },
       {
         header: `${t('value', 'Value')} (${leftAxisTitle})`,
