@@ -119,6 +119,57 @@ test('Fill a clinical form', async ({ page }) => {
   });
 });
 
+test('Clinical form should save inputs even if the encounter time is after the current time', async ({ page }) => {
+  const chartPage = new ChartPage(page);
+  const visitsPage = new VisitsPage(page);
+  await page.clock.fastForward('00:01'); // Advances the time by 1 minute in the testing environment.
+
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see `Laboratory Test Results` listed in the clinical forms workspace', async () => {
+    await expect(page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
+  });
+
+  await test.step('When I click the `Laboratory Test Results` link to launch the form', async () => {
+    await page.getByText(/laboratory test results/i).click();
+  });
+
+  await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
+    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+  });
+
+  await test.step('And when I fill the `White Blood Cells (WBC)` result as `5000', async () => {
+    await page.locator('#ManualInputWhiteBloodCells').fill('5500');
+  });
+
+  await test.step('And I fill the `Neutrophils` result as `35`', async () => {
+    await page.locator('#ManualEntryNeutrophilsMicroscopic').fill('35');
+  });
+
+  await test.step('And I fill the `Hematocrit` result as `18`', async () => {
+    await page.locator('#ManualEntryHematocrit').fill('18');
+  });
+
+  await test.step('And I click on the `Save` button', async () => {
+    await page.getByRole('button', { name: /save/i }).click();
+  });
+
+  await test.step('Then I should not see any error messages', async () => {
+    await expect(page.getByText('error')).not.toBeVisible();
+  });
+
+  await test.step('And I should see a success notification', async () => {
+    await expect(page.getByText(/record created/i)).toBeVisible();
+    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+  });
+});
+
 test('Form state is retained when moving between forms in the workspace', async ({ page }) => {
   const chartPage = new ChartPage(page);
 
