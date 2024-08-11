@@ -9,7 +9,7 @@ import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockCloseModal = jest.fn();
 const mockUseReactToPrint = jest.mocked(useReactToPrint);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('react-to-print', () => {
   const originalModule = jest.requireActual('react-to-print');
@@ -27,7 +27,7 @@ mockUseConfig.mockReturnValue({
 
 describe('PrintIdentifierSticker', () => {
   test('renders the component', () => {
-    renderPrintIdentifierSticker();
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
 
     expect(screen.getByText(/Print Identifier Sticker/i)).toBeInTheDocument();
     expect(screen.getByText('John Wilson')).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('PrintIdentifierSticker', () => {
   test('calls closeModal when cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    renderPrintIdentifierSticker();
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     expect(cancelButton).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('PrintIdentifierSticker', () => {
 
     const user = userEvent.setup();
 
-    renderPrintIdentifierSticker();
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
 
     const printButton = screen.getByRole('button', { name: /Print/i });
     expect(printButton).toBeInTheDocument();
@@ -62,7 +62,3 @@ describe('PrintIdentifierSticker', () => {
     expect(handlePrint).toHaveBeenCalled();
   });
 });
-
-function renderPrintIdentifierSticker() {
-  render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
-}

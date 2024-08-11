@@ -1,6 +1,7 @@
 @use '@carbon/colors';
-@use "@carbon/layout";
+@use '@carbon/layout';
 @use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 @media screen {
   .printPage {
@@ -73,14 +74,14 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-70;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContainer {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
   background-color: colors.$white;
   border: 1px solid colors.$gray-20;
-  padding: 3rem 0;
+  padding: layout.$spacing-09 0;
 }
 
 .tile {
@@ -103,5 +104,11 @@
 }
 
 .printContainer {
-  margin: 2rem 0;
+  margin: layout.$spacing-07 0;
+}
+
+.heading {
+  @include type.type-style('heading-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
 }

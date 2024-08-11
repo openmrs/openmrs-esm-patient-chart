@@ -16,11 +16,11 @@ import {
 import type { ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
+import type { VitalsTableHeader, VitalsTableRow } from './types';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
-import type { VitalsTableHeader, VitalsTableRow } from './types';
 
 interface VitalsOverviewProps {
   patientUuid: string;

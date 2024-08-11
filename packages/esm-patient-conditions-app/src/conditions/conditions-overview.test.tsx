@@ -8,11 +8,7 @@ import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-};
-
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
@@ -29,7 +25,7 @@ describe('ConditionsOverview', () => {
   it('renders an empty state view if conditions data is unavailable', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -51,7 +47,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -66,7 +62,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockResolvedValueOnce({ data: mockFhirConditionsResponse } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -98,7 +94,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -110,7 +106,3 @@ describe('ConditionsOverview', () => {
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
   });
 });
-
-function renderConditionsOverview() {
-  renderWithSwr(<ConditionsOverview {...testProps} />);
-}

@@ -8,12 +8,12 @@
 
 .dataTableSkeleton {
   background-color: transparent;
-  padding: 0rem;
+  padding: 0;
 }
 
 .tile {
   border: 1px solid colors.$gray-20;
-  padding: 1.5rem 0;
+  padding: layout.$spacing-06 0;
   margin: 0 layout.$spacing-05;
   text-align: center;
 }
@@ -54,7 +54,7 @@
 .filterEmptyStateContent {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-70;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .filterEmptyStateHelper {

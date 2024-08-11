@@ -42,7 +42,6 @@ export const Grid: React.FC<{
     style={{
       ...style,
       gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, 5em)`,
-      margin: '1px',
     }}
     className={styles['grid']}
     {...props}

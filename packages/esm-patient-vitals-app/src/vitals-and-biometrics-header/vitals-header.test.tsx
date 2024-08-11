@@ -10,7 +10,12 @@ import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const testProps = {
+  patientUuid: mockPatient.id,
+  showRecordVitalsButton: true,
+};
+
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
@@ -52,7 +57,7 @@ describe('VitalsHeader', () => {
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -66,7 +71,7 @@ describe('VitalsHeader', () => {
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -83,14 +88,13 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
+    expect(screen.getByText(/overdue: these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {
     const user = userEvent.setup();
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -107,7 +111,7 @@ describe('VitalsHeader', () => {
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -133,7 +137,7 @@ describe('VitalsHeader', () => {
       data: abnormalVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -148,7 +152,7 @@ describe('VitalsHeader', () => {
       vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
     } as ConfigObject);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -165,12 +169,3 @@ describe('VitalsHeader', () => {
     });
   });
 });
-
-function renderVitalsHeader() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-    showRecordVitalsButton: true,
-  };
-
-  renderWithSwr(<VitalsHeader {...testProps} />);
-}

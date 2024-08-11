@@ -7,7 +7,7 @@ import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockVit
 import { useVitalsAndBiometrics } from '../common';
 import WeightTile from './weight-tile.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
@@ -37,7 +37,7 @@ describe('WeightTile', () => {
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderWeightTile();
+    renderWithSwr(<WeightTile patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -50,7 +50,7 @@ describe('WeightTile', () => {
       data: formattedBiometrics,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderWeightTile();
+    renderWithSwr(<WeightTile patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -58,11 +58,3 @@ describe('WeightTile', () => {
     expect(getByTextWithMarkup(/90 kg/i)).toBeInTheDocument();
   });
 });
-
-function renderWeightTile() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-  };
-
-  renderWithSwr(<WeightTile {...testProps} />);
-}

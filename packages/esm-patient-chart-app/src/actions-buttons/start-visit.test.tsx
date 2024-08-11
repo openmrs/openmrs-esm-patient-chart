@@ -13,16 +13,9 @@ import { type ChartConfig, esmPatientChartSchema } from '../config-schema';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
 
-const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseVisit = jest.mocked(useVisit);
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  createGlobalStore: jest.fn(),
-  createUseStore: jest.fn(),
-  getGlobalStore: jest.fn(),
-}));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');

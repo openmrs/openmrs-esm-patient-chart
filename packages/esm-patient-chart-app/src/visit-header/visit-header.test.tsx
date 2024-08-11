@@ -25,24 +25,11 @@ const mockUseVisit = jest.mocked(useVisit);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockShowModal = jest.mocked(showModal);
 const mockGetHistory = jest.mocked(getHistory);
-const mockGoBackInHistory = jest.mocked(goBackInHistory);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    translateFrom: (module, key, defaultValue, options) => defaultValue,
-  };
-});
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  launchPatientWorkspace: jest.fn(),
+}));
 
 describe('Visit header', () => {
   beforeEach(() => {

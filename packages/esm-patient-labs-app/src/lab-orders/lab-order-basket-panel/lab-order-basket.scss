@@ -1,5 +1,4 @@
-@use '@carbon/styles/scss/spacing';
-@import "../../root";
+@use '@carbon/layout';
 
 .container {
   display: flex;
@@ -9,12 +8,12 @@
 }
 
 .orderBasketContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .orderBasketContainer :global(.cds--btn-set .cds--btn) {
   max-width: 50%;
-  height: 4rem;
+  height: layout.$spacing-10;
 }
 
 .spinner :global(.cds--loading__stroke) {
@@ -26,16 +25,16 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -49,6 +48,7 @@
   min-height: 100vh;
 }
 
-.inlineNotification, .actionNotification {
+.inlineNotification,
+.actionNotification {
   max-width: unset !important;
 }

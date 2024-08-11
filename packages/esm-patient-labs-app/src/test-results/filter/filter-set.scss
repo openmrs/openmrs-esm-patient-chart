@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .stickyFilterSet {
   position: sticky;
@@ -12,14 +12,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   background-color: $openmrs-background-grey;
   position: sticky;
   top: 0;
   z-index: 1;
 
   h4 {
-    @include type.type-style("heading-compact-02");
+    @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 
@@ -32,7 +32,7 @@
 
 .filterTreeSearchHeader {
   display: flex;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   background-color: $openmrs-background-grey;
   position: sticky;
   top: 0;
@@ -47,7 +47,7 @@
 // background of filter, and spacing between containers
 .nestedAccordion {
   background-color: $openmrs-background-grey;
-  margin: spacing.$spacing-02 0;
+  margin: layout.$spacing-02 0;
   @media (min-width: $breakpoint-small-desktop-min) {
     background-color: $ui-background;
   }
@@ -55,9 +55,9 @@
 
 // our special accordion rules
 .nestedAccordion > :global(.cds--accordion--start) > :global(.cds--accordion__item--active) {
-  border-left: 0.3rem solid var(--brand-01);
+  border-left: 0.375rem solid var(--brand-01);
   @media (max-width: $breakpoint-tablet-max) {
-    margin: 1.5rem 0;
+    margin: layout.$spacing-06 0;
   }
 }
 
@@ -78,16 +78,16 @@
   }
 
   .cds--accordion__title {
-    margin: 0 0 0 0.8rem;
+    margin-left: layout.$spacing-04;
     @media (min-width: $breakpoint-small-desktop-min) {
-      margin: 0 0 0 0.5rem;
+      margin-left: layout.$spacing-03;
     }
   }
 
   .cds--accordion__arrow {
-    margin: 0.4rem 0 0 1rem;
+    margin: layout.$spacing-03 0 0 layout.$spacing-05;
     @media (min-width: $breakpoint-small-desktop-min) {
-      margin: 0.4rem 0 0 0.6rem;
+      margin: layout.$spacing-03 0 0 0.6rem;
     }
   }
 
@@ -98,9 +98,9 @@
   }
 
   // Chevron transformations
-  .cds--accordion__item > button[aria-expanded="false"] > .cds--accordion__arrow {
+  .cds--accordion__item > button[aria-expanded='false'] > .cds--accordion__arrow {
     transform: rotate(90deg);
-}
+  }
 
   .cds--accordion__item--active > .cds--accordion__heading > .cds--accordion__arrow {
     /*rtl:ignore*/
@@ -109,13 +109,14 @@
   }
 
   .cds--checkbox-label-text {
-    padding: 0 0 0 .75rem;
+    padding-left: layout.$spacing-04;
   }
 }
 
 .filterItem {
-  padding: 0.5rem 1rem 0.5rem 4rem;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03 layout.$spacing-10;
+
   @media (min-width: $breakpoint-small-desktop-min) {
-    padding: 0.2rem 0 0.2rem 4rem;
+    padding: 0.2rem 0 0.2rem layout.$spacing-10;
   }
 }

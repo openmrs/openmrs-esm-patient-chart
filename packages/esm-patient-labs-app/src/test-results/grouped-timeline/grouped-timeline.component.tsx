@@ -12,7 +12,7 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import FilterContext from '../filter/filter-context';
-import styles from './grouped-timeline.styles.scss';
+import styles from './grouped-timeline.scss';
 
 const TimeSlots: React.FC<{
   children?: React.ReactNode;
@@ -260,12 +260,13 @@ export const GroupedTimeline = () => {
   }, [rowData]);
 
   if (rowData && rowData?.length === 0) {
-    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data Timeline')} />;
+    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
   }
+
   if (activeTests && timelineData && loaded) {
     return (
-      <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
-        <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
+      <div className={styles.timelineHeader}>
+        <div className={styles.timelineHeader}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid

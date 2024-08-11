@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
@@ -33,7 +33,7 @@ describe('NotesOverview', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesOverview();
+    renderWithSwr(<NotesOverview {...testProps} />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('NotesOverview', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesOverview();
+    renderWithSwr(<NotesOverview {...testProps} />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('NotesOverview', () => {
       mutateVisitNotes: jest.fn(),
     });
 
-    renderNotesOverview();
+    renderWithSwr(<NotesOverview {...testProps} />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -103,7 +103,3 @@ describe('NotesOverview', () => {
     );
   });
 });
-
-function renderNotesOverview() {
-  renderWithSwr(<NotesOverview {...testProps} />);
-}

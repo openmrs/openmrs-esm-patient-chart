@@ -6,6 +6,16 @@ import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import FormEntry from './form-entry.workspace';
 
+const testProps = {
+  closeWorkspace: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  promptBeforeClosing: jest.fn(),
+  patientUuid: mockPatient.id,
+  formInfo: { formUuid: 'some-form-uuid' },
+  mutateForm: jest.fn(),
+  setTitle: jest.fn(),
+};
+
 const mockFormEntrySub = jest.fn();
 const mockUseConnectivity = jest.mocked(useConnectivity);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
@@ -53,23 +63,9 @@ describe('FormEntry', () => {
       new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
     );
 
-    renderFormEntry();
+    render(<FormEntry {...testProps} />);
 
     await screen.findByText(/form-widget-slot/);
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();
   });
 });
-
-function renderFormEntry() {
-  const testProps = {
-    closeWorkspace: jest.fn(),
-    closeWorkspaceWithSavedChanges: jest.fn(),
-    promptBeforeClosing: jest.fn(),
-    patientUuid: mockPatient.id,
-    formInfo: { formUuid: 'some-form-uuid' },
-    mutateForm: jest.fn(),
-    setTitle: jest.fn(),
-  };
-
-  render(<FormEntry {...testProps} />);
-}

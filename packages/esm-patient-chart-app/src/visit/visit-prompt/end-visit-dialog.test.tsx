@@ -19,14 +19,6 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    updateVisit: jest.fn(),
-  };
-});
-
 describe('End visit dialog', () => {
   beforeEach(() => {
     mockUseVisit.mockReturnValue({
@@ -54,7 +46,7 @@ describe('End visit dialog', () => {
       }),
     );
 
-    renderEndVisitDialog();
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     const closeModalButton = screen.getByRole('button', { name: /close/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -88,7 +80,7 @@ describe('End visit dialog', () => {
     const user = userEvent.setup();
     mockUpdateVisit.mockReturnValue(throwError(() => new Error('Internal error message')));
 
-    renderEndVisitDialog();
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(
       screen.getByText(
@@ -110,7 +102,3 @@ describe('End visit dialog', () => {
     });
   });
 });
-
-function renderEndVisitDialog() {
-  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
-}

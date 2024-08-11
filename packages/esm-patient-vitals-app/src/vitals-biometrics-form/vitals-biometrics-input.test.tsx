@@ -6,7 +6,7 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { mockConceptUnits } from '__mocks__';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 const overridenMetadata = [
   {

@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@use '@openmrs/esm-styleguide/src/vars' as openmrs;
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
@@ -14,12 +14,12 @@
   }
 
   p {
-    padding: spacing.$spacing-02 0;
+    padding: layout.$spacing-02 0;
   }
 }
 
 .tooltip {
-  margin: 0rem -0.5rem -0.625rem;
+  margin: 0 -(layout.$spacing-03) -0.625rem;
 }
 
 .menuItem {
@@ -33,8 +33,8 @@
 .priorityPill {
   @include type.type-style('label-01');
   background-color: colors.$gray-20;
-  border-radius: spacing.$spacing-05;
-  padding: spacing.$spacing-01;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-01;
   text-align: center;
 
   &[data-urgency='routine'] {
@@ -49,9 +49,9 @@
 .statusPill {
   @include type.type-style('label-01');
   background-color: colors.$gray-20;
-  border-radius: spacing.$spacing-05;
-  padding: spacing.$spacing-01;
-  padding-inline: spacing.$spacing-03;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-01;
+  padding-inline: layout.$spacing-03;
   text-align: center;
 
   white-space: nowrap;
@@ -86,11 +86,11 @@
 
 .tile {
   text-align: center;
-  border-bottom: 1px solid openmrs.$ui-03;
+  border-bottom: 1px solid vars.$ui-03;
 
   .message {
     @include type.type-style('heading-compact-01');
-    color: openmrs.$text-02;
+    color: vars.$text-02;
   }
 }
 

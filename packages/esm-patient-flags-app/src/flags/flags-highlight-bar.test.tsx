@@ -38,7 +38,7 @@ it('renders a highlights bar showing a summary of the available flags', async ()
     mutate: jest.fn(),
   } as unknown as ReturnType<typeof usePatientFlags>);
 
-  renderFlagsHighlightBar();
+  render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
 
   const riskFlag = screen.getByRole('button', { name: /risk flag/i });
   expect(riskFlag).toBeInTheDocument();
@@ -66,7 +66,3 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 
   expect(screen.getAllByRole('button', { name: /flag/i })).not.toEqual(5);
 });
-
-function renderFlagsHighlightBar() {
-  render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
-}

@@ -1,8 +1,8 @@
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyShort01 {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
 }
 
 .widgetCard {
@@ -13,7 +13,7 @@
 
 .contextSwitcherContainer {
   width: 60%;
-  margin-right: 1rem;
+  margin-right: layout.$spacing-05;
 }
 
 .desktopContentSwitcher {

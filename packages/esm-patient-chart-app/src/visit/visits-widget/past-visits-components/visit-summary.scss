@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../../root.scss";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .diagnosisLabel {
   @include type.type-style('heading-compact-01');
@@ -12,8 +12,8 @@
 .diagnosesList {
   display: flex;
   flex-flow: row wrap;
-  padding-bottom: 0.5rem;
-  margin: 0 1rem;
+  padding-bottom: layout.$spacing-03;
+  margin: 0 layout.$spacing-05;
   border-bottom: 1px solid $ui-03;
 }
 
@@ -21,7 +21,7 @@
   background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
-  padding: 1rem 0rem;
+  padding: layout.$spacing-05 0;
 
   :global(.cds--tabs) {
     min-height: 8rem;
@@ -29,20 +29,20 @@
 }
 
 .verticalTabs {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
   scroll-behavior: smooth;
 
   > ul {
     flex-direction: column !important;
   }
 
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
-    margin-left: 0rem;
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0;
   }
 
   :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
     border-bottom: 0 !important;
-    border-left: 2px solid $color-gray-30;
+    border-left: layout.$spacing-01 solid $color-gray-30;
   }
 }
 
@@ -50,21 +50,22 @@
   outline: 0;
   outline-offset: 0;
 
-  &:active, &:focus {
-    outline: spacing.$spacing-01 solid var(--brand-03) !important;
+  &:active,
+  &:focus {
+    outline: layout.$spacing-01 solid var(--brand-03) !important;
   }
 
-  &[aria-selected="true"] {
+  &[aria-selected='true'] {
     border-left: 3px solid var(--brand-03);
     border-bottom: none;
     font-weight: 600;
-    margin-left: 0rem !important;
+    margin-left: 0 !important;
   }
 
-  &[aria-selected="false"] {
+  &[aria-selected='false'] {
     border-bottom: none;
-    border-left: spacing.$spacing-01 solid $ui-03;
-    margin-left: 0rem !important;
+    border-left: layout.$spacing-01 solid $ui-03;
+    margin-left: 0 !important;
   }
 }
 
@@ -80,3 +81,10 @@
   }
 }
 
+.text02 {
+  color: colors.$gray-70;
+}
+
+.bodyLong01 {
+  @include type.type-style('body-01');
+}

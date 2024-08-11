@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .listWrapper {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .flagTile {
@@ -12,18 +12,18 @@
   justify-content: space-between;
   border: 1px solid #ededed;
   background-color: colors.$gray-10;
-  padding: spacing.$spacing-03;
+  padding: layout.$spacing-03;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
-  .flagTile {  
-    margin-bottom: spacing.$spacing-03;
+  .flagTile {
+    margin-bottom: layout.$spacing-03;
   }
 }
 
 :global(.omrs-breakpoint-gt-tablet) {
   .flagTile {
-    margin-bottom: spacing.$spacing-02;
+    margin-bottom: layout.$spacing-02;
   }
 }
 
@@ -31,7 +31,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   font-size: 0.875rem;
 }
 
@@ -43,13 +43,13 @@
 .flagTitle {
   @include type.type-style('body-01');
   color: colors.$gray-100;
-  margin-right: spacing.$spacing-02;
+  margin-right: layout.$spacing-02;
 }
 
 .type {
   @include type.type-style('label-01');
   color: colors.$gray-70;
-  margin-left: spacing.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .secondRow {
@@ -66,7 +66,7 @@
 .label {
   @include type.type-style('label-01');
   color: colors.$gray-70;
-  margin-bottom: spacing.$spacing-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 .value {
@@ -90,7 +90,7 @@
 }
 
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -101,12 +101,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - spacing.$spacing-12);
+  height: calc(100vh - layout.$spacing-12);
   background-color: colors.$white;
 }
 
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -114,7 +114,7 @@
 }
 
 .tabletButtonSet {
-  padding: spacing.$spacing-06 spacing.$spacing-05;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: colors.$white;
 }
 
@@ -134,7 +134,7 @@
   gap: 0;
 
   :global(.cds--dropdown--inline .cds--list-box__menu) {
-    min-width: spacing.$spacing-13;
+    min-width: layout.$spacing-13;
     max-width: 12rem;
     left: -4.375rem;
   }
@@ -144,7 +144,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   text-align: center;
 }
 
@@ -158,9 +158,9 @@
 }
 
 .content {
-  max-width: spacing.$spacing-13;
+  max-width: layout.$spacing-13;
   @include type.type-style('heading-compact-02');
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .helper {
@@ -171,5 +171,5 @@
   display: flex;
   justify-content: center;
   background-color: colors.$gray-10;
-  min-height: spacing.$spacing-09;
+  min-height: layout.$spacing-09;
 }

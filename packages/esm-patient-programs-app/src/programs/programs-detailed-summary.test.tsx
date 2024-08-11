@@ -22,7 +22,7 @@ describe('ProgramsDetailedSummary', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsDetailedSummary patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -42,7 +42,7 @@ describe('ProgramsDetailedSummary', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsDetailedSummary patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -59,7 +59,7 @@ describe('ProgramsDetailedSummary', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsDetailedSummary patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -96,7 +96,7 @@ describe('ProgramsDetailedSummary', () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledInAllProgramsResponse } });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsDetailedSummary patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -108,10 +108,3 @@ describe('ProgramsDetailedSummary', () => {
     expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
   });
 });
-
-function renderProgramsOverview() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-  };
-  renderWithSwr(<ProgramsDetailedSummary {...testProps} />);
-}

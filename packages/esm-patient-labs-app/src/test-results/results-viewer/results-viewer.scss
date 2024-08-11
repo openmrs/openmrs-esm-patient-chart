@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .resultsContainer {
   padding: 0;
@@ -22,11 +22,11 @@
 }
 
 .resultsHeader {
-  padding: 0.5rem 0;
+  padding: layout.$spacing-03 0;
   z-index: 10;
   background-color: $openmrs-background-grey;
   position: sticky;
-  top: 3rem;
+  top: layout.$spacing-09;
   display: flex;
 }
 
@@ -48,7 +48,8 @@
   margin-right: layout.$spacing-05;
 }
 
-.rightSection, .rightSectionHeader {
+.rightSection,
+.rightSectionHeader {
   width: 55%;
 
   &.fullView {
@@ -66,7 +67,7 @@
 
 .leftHeaderActions {
   display: flex;
-  min-width: 2.5rem;
+  min-width: layout.$spacing-08;
 }
 
 .leftHeaderActions > :global(.cds--content-switcher),
@@ -84,7 +85,7 @@
 
   .trendlineOverlayHeaderTitle {
     @include type.type-style('heading-compact-02');
-    margin-right: 4px;
+    margin-right: layout.$spacing-02;
   }
 
   .trendlineOverlayHeaderReferenceRange {
@@ -103,7 +104,7 @@
   z-index: 1;
 
   h4 {
-    @include type.type-style("heading-compact-02");
+    @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 
@@ -116,7 +117,7 @@
 
 .floatingTreeButton {
   position: fixed;
-  bottom: 5rem;
+  bottom: layout.$spacing-11;
   right: layout.$spacing-05;
   z-index: 99;
 
@@ -137,7 +138,7 @@
 
 .button {
   align-items: center;
-  margin-left: 1rem;
+  margin-left: layout.$spacing-05;
 
   svg {
     order: 1;

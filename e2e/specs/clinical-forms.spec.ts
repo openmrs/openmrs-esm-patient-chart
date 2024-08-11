@@ -165,6 +165,74 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 });
 
+test('Form state is retained when minimizing a form in the workspace', async ({ page }) => {
+  const chartPage = new ChartPage(page);
+
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see `Laboratory Test Results` listed in the clinical forms workspace', async () => {
+    await expect(page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
+  });
+
+  await test.step('When I click the `Laboratory Test Results` link to launch the form', async () => {
+    await page.getByText(/laboratory test results/i).click();
+  });
+
+  await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
+    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+  });
+
+  await test.step('And I maximize the form', async () => {
+    await page.getByLabel('maximize').click();
+  });
+
+  await test.step('And I fill the `White Blood Cells (WBC)` result as `5000', async () => {
+    await page.locator('#ManualInputWhiteBloodCells').fill('5000');
+  });
+
+  await test.step('And I fill the `Platelets` result as `180000`', async () => {
+    await page.locator('#ManualEntryPlatelets').fill('180000');
+  });
+
+  await test.step('And I fill the `Neutrophils` result as `35`', async () => {
+    await page.locator('#ManualEntryNeutrophilsMicroscopic').fill('35');
+  });
+
+  await test.step('When I minimize the form in the workspace', async () => {
+    await page.getByLabel('Minimize').click();
+  });
+
+  await test.step('And then maximize the form in the workspace', async () => {
+    await page.getByLabel('Maximize').click();
+  });
+
+  await test.step('Then I should see the entered data retained in the form', async () => {
+    const whiteBloodCells = await page.locator('#ManualInputWhiteBloodCells');
+    await expect(whiteBloodCells).toHaveValue('5000');
+
+    const platelets = await page.locator('#ManualEntryPlatelets');
+    await expect(platelets).toHaveValue('180000');
+
+    const neutrophils = page.locator('#ManualEntryNeutrophilsMicroscopic');
+    await expect(neutrophils).toHaveValue('35');
+  });
+
+  await test.step('When I click on the `Save` button', async () => {
+    await page.getByRole('button', { name: /save/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/record created/i)).toBeVisible();
+    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+  });
+});
+
 test.afterEach(async ({ api }) => {
   await endVisit(api, visit.uuid);
   await deletePatient(api, patient.uuid);

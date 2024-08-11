@@ -47,7 +47,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+          server-token: ''
 
       - name: Build apps
         run: yarn turbo run build --color --concurrency=5

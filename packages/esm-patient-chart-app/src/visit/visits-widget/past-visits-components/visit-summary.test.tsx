@@ -6,9 +6,10 @@ import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema'
 import { mockPatient } from 'tools';
 import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
 import VisitSummary from './visit-summary.component';
+
 const mockExtensionSlot = ExtensionSlot as jest.Mock;
 const mockGetConfig = jest.mocked(getConfig);
-const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 describe('VisitSummary', () => {
@@ -25,7 +26,7 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    renderVisitSummary();
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
@@ -88,7 +89,3 @@ describe('VisitSummary', () => {
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 });
-
-function renderVisitSummary() {
-  render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
-}

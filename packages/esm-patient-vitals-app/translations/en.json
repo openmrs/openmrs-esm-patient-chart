@@ -13,6 +13,8 @@
   "checkForValidity": "Some of the values entered are invalid",
   "date": "Date",
   "dateAndTime": "Date and time",
+  "daysOldVitals_one": "These vitals are {{count}} day old",
+  "daysOldVitals_other": "These vitals are {{count}} days old",
   "diastolic": "diastolic",
   "discard": "Discard",
   "error": "Error",
@@ -26,7 +28,9 @@
   "noDataRecorded": "No data has been recorded for this patient",
   "notes": "Notes",
   "other": "Other",
+  "outOfDateVitals": "These vitals are out of date",
   "overdue": "Overdue",
+  "overOneWeekOldVitals": "These vitals are over one week old",
   "oxygenSaturation": "Oxygen saturation",
   "pleaseFillField": "Please fill at least one field",
   "print": "Print",
@@ -54,7 +58,7 @@
   "vitalsAndBiometricsRecorded": "Vitals and Biometrics saved",
   "vitalsAndBiometricsSaveError": "Error saving vitals and biometrics",
   "vitalsHistory": "Vitals history",
-  "vitalSignDisplayed": "Vital Sign Displayed",
+  "vitalSignDisplayed": "Vital sign displayed",
   "vitalSigns": "Vital signs",
   "weight": "Weight"
 }

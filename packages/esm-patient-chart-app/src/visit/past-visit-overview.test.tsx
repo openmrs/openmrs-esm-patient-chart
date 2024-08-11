@@ -53,7 +53,7 @@ describe('PastVisitOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
 
-    renderPastVisitOverview();
+    renderWithSwr(<PastVisitOverview {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -77,7 +77,7 @@ describe('PastVisitOverview', () => {
   it(`will enter retrospective entry mode for a specific visit`, async () => {
     const user = userEvent.setup();
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
-    renderPastVisitOverview();
+    renderWithSwr(<PastVisitOverview {...defaultProps} />);
     await waitForLoadingToFinish();
     const editButtons = screen.queryAllByLabelText('Edit this visit');
     expect(editButtons.length).toBe(2);
@@ -87,7 +87,3 @@ describe('PastVisitOverview', () => {
     expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });
-
-function renderPastVisitOverview() {
-  renderWithSwr(<PastVisitOverview {...defaultProps} />);
-}

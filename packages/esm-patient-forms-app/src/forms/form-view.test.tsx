@@ -10,7 +10,7 @@ import FormView from './form-view.component';
 
 const mockLaunchFormEntryOrHtmlForms = launchFormEntryOrHtmlForms as jest.Mock;
 const mockShowModal = jest.mocked(showModal);
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -38,7 +38,16 @@ describe('FormView', () => {
       currentVisit: null,
     });
 
-    renderFormView();
+    render(
+      <FormView
+        patientUuid={mockPatient.id}
+        forms={mockForms}
+        pageSize={5}
+        pageUrl={'/some-url'}
+        patient={mockPatient}
+        urlLabel="some-url-label"
+      />,
+    );
 
     const pocForm = await screen.findByText('POC COVID 19 Assessment Form v1.1');
     expect(pocForm).toBeInTheDocument();
@@ -56,7 +65,16 @@ describe('FormView', () => {
       error: null,
     });
 
-    renderFormView();
+    render(
+      <FormView
+        patientUuid={mockPatient.id}
+        forms={mockForms}
+        pageSize={5}
+        pageUrl={'/some-url'}
+        patient={mockPatient}
+        urlLabel="some-url-label"
+      />,
+    );
 
     const pocForm = await screen.findByText('POC COVID 19 Assessment Form v1.1');
     expect(pocForm).toBeInTheDocument();
@@ -66,16 +84,3 @@ describe('FormView', () => {
     expect(mockLaunchFormEntryOrHtmlForms).toHaveBeenCalled();
   });
 });
-
-function renderFormView() {
-  render(
-    <FormView
-      patientUuid={mockPatient.id}
-      forms={mockForms}
-      pageSize={5}
-      pageUrl={'/some-url'}
-      patient={mockPatient}
-      urlLabel="some-url-label"
-    />,
-  );
-}

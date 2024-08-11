@@ -28,6 +28,7 @@
           "options": {
             "allowedCommonJsDependencies": [
               "core-js",
+              "dayjs",
               "dompurify",
               "html2canvas",
               "lodash",
