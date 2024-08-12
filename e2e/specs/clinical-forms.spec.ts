@@ -208,7 +208,6 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('And I should see the original form state retained', async () => {
-    // await expect(page.getByText(/loading/i)).not.toBeVisible();
     await expect(page.getByLabel(/white blood cells/i)).toHaveValue('5000');
     await expect(page.getByLabel(/platelets/i)).toHaveValue('180000');
     await expect(page.getByLabel(/neutrophils/i)).toHaveValue('35');
