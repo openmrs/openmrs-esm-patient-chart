@@ -227,7 +227,7 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
     await page.getByLabel(/clinical forms/i, { exact: true }).click();
   });
 
-  await test.step('Then I should see `Laboratory Test Results` listed in the clinical forms workspace', async () => {
+  await test.step('Then I should see the `Laboratory Test Results` form listed in the clinical forms workspace', async () => {
     await expect(page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
   });
 
@@ -240,38 +240,28 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('And I maximize the form', async () => {
-    await page.getByLabel('maximize').click();
+    await page.getByRole('button', { name: /maximize/i }).click();
   });
 
-  await test.step('And I fill the `White Blood Cells (WBC)` result as `5000', async () => {
-    await page.locator('#ManualInputWhiteBloodCells').fill('5000');
+  await test.step('And I fill in values for the `White Blood Cells (WBC)`, `Platelets`, and `Neutrophils` questions', async () => {
+    await page.locator('#ManualInputWhiteBloodCells').waitFor();
+    await page.getByRole('spinbutton', { name: /white blood cells/i }).fill('5000');
+    await page.getByRole('spinbutton', { name: /platelets/i }).fill('180000');
+    await page.getByRole('spinbutton', { name: /neutrophils/i }).fill('35');
   });
 
-  await test.step('And I fill the `Platelets` result as `180000`', async () => {
-    await page.locator('#ManualEntryPlatelets').fill('180000');
+  await test.step('Then I minimize the form in the workspace', async () => {
+    await page.getByRole('button', { name: /minimize/i }).click();
   });
 
-  await test.step('And I fill the `Neutrophils` result as `35`', async () => {
-    await page.locator('#ManualEntryNeutrophilsMicroscopic').fill('35');
+  await test.step('And then I maximize the form in the workspace', async () => {
+    await page.getByRole('button', { name: /maximize/i }).click();
   });
 
-  await test.step('When I minimize the form in the workspace', async () => {
-    await page.getByLabel('Minimize').click();
-  });
-
-  await test.step('And then maximize the form in the workspace', async () => {
-    await page.getByLabel('Maximize').click();
-  });
-
-  await test.step('Then I should see the entered data retained in the form', async () => {
-    const whiteBloodCells = await page.locator('#ManualInputWhiteBloodCells');
-    await expect(whiteBloodCells).toHaveValue('5000');
-
-    const platelets = await page.locator('#ManualEntryPlatelets');
-    await expect(platelets).toHaveValue('180000');
-
-    const neutrophils = page.locator('#ManualEntryNeutrophilsMicroscopic');
-    await expect(neutrophils).toHaveValue('35');
+  await test.step('And I should see the original form state retained', async () => {
+    await expect(page.getByLabel(/white blood cells/i)).toHaveValue('5000');
+    await expect(page.getByLabel(/platelets/i)).toHaveValue('180000');
+    await expect(page.getByLabel(/neutrophils/i)).toHaveValue('35');
   });
 
   await test.step('When I click on the `Save` button', async () => {
