@@ -1,8 +1,8 @@
 import React from 'react';
 import { ModalHeader, ModalBody } from '@carbon/react';
 import Trendline from '../trendline/trendline.component';
-import { basePath } from '@openmrs/esm-patient-chart-app/src/constants';
 import { useTranslation } from 'react-i18next';
+import { basePath } from '../../constants';
 
 interface TimelineResultsProps {
   closeDeleteModal: () => void;
