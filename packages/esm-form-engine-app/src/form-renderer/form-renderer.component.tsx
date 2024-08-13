@@ -32,8 +32,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
-    !encounterUuid && launchPatientWorkspace('clinical-forms-workspace');
-  }, [closeWorkspace, encounterUuid]);
+  }, [closeWorkspace]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
