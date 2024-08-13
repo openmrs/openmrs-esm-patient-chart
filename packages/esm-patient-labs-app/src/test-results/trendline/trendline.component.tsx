@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
-import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { formatDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
@@ -233,13 +233,13 @@ const Trendline: React.FC<TrendlineProps> = ({
 
       {showResultsTable ? (
         <>
-          <Button kind="ghost" onClick={() => setShowResultsTable(false)} className={styles['show-hide-table']}>
+          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
             {t('hideResultsTable', 'Hide results table')}
           </Button>
           <DrawTable {...{ tableData, tableHeaderData }} />
         </>
       ) : (
-        <Button kind="ghost" onClick={() => setShowResultsTable(true)} className={styles['show-hide-table']}>
+        <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
           {t('showResultsTable', 'Show results table')}
         </Button>
       )}
