@@ -51,7 +51,7 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
-    await page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
+    await page.getByLabel(/subjective findings/i).fill(subjectiveFindings);
   });
 
   await test.step('And I fill the `Objective findings` question', async () => {
@@ -160,6 +160,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
+    await page.locator('#SOAPSubjectiveFindings').waitFor();
     await expect(page.getByText(subjectiveFindings)).toBeVisible();
     await expect(page.getByText(objectiveFindings)).toBeVisible();
   });
