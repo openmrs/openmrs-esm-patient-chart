@@ -29,11 +29,14 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
+  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose
+    ? additionalProps?.openClinicalFormsWorkspaceOnFormClose
+    : true;
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
-    !encounterUuid && launchPatientWorkspace('clinical-forms-workspace');
-  }, [closeWorkspace, encounterUuid]);
+    !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchPatientWorkspace('clinical-forms-workspace');
+  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
