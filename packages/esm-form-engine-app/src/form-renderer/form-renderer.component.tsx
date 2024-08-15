@@ -29,9 +29,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
-  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose
-    ? additionalProps?.openClinicalFormsWorkspaceOnFormClose
-    : true;
+  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
