@@ -5,6 +5,7 @@ import {
   type FormEntryProps,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
+import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
 
 interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
   mutateForm: () => void;
@@ -19,8 +20,16 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   mutateForm,
   formInfo,
 }) => {
-  const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid, additionalProps } =
-    formInfo || {};
+  const {
+    encounterUuid,
+    formUuid,
+    visitStartDatetime,
+    visitStopDatetime,
+    visitTypeUuid,
+    visitUuid,
+    htmlForm,
+    additionalProps,
+  } = formInfo || {};
   const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
@@ -82,7 +91,21 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
 
   return (
     <div>
-      {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
+      {showForm && formInfo && patientUuid && patient && htmlForm && encounterUuid && (
+        <HtmlFormEntryWrapper
+          closeWorkspace={closeWorkspace}
+          src={`${window.openmrsBase}/htmlformentryui/htmlform/${htmlForm.formEditUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=post-message:close-workspace`}
+        />
+      )}
+      {showForm && formInfo && patientUuid && patient && htmlForm && !encounterUuid && (
+        <HtmlFormEntryWrapper
+          closeWorkspace={closeWorkspace}
+          src={`${window.openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=post-message:close-workspace`}
+        />
+      )}
+      {showForm && formInfo && patientUuid && patient && !htmlForm && (
+        <ExtensionSlot name="form-widget-slot" state={state} />
+      )}
     </div>
   );
 };
