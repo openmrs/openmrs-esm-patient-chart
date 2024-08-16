@@ -18,7 +18,13 @@ import {
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  parseDate,
+  showSnackbar,
+  useLayoutType,
+  useSession,
+  getCoreTranslation,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -26,6 +32,7 @@ import {
   useEnrollments,
   updateProgramEnrollment,
 } from './programs.resource';
+import LocationPicker from '@openmrs/esm-framework';//Location Picker : Adjust the import path as necessary
 import styles from './programs-form.scss';
 
 interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
@@ -52,7 +59,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
@@ -74,13 +80,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         return !enrollment || enrollment.dateCompleted !== null;
       });
 
-  const getLocationUuid = () => {
-    if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
-      return session?.sessionLocation?.uuid;
-    }
-    return currentEnrollment?.location.uuid ?? null;
-  };
-
   const {
     control,
     handleSubmit,
@@ -93,7 +92,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       selectedProgram: currentEnrollment?.program.uuid ?? '',
       enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
-      enrollmentLocation: getLocationUuid() ?? '',
+      enrollmentLocation: session?.sessionLocation?.uuid ?? '',
     },
   });
 
@@ -217,26 +216,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       )}
     />
   );
-
+// Implementation of the location picker :
   const enrollmentLocation = (
     <Controller
       name="enrollmentLocation"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <Select
-          aria-label="enrollment location"
-          id="location"
-          labelText={t('enrollmentLocation', 'Enrollment location')}
-          onChange={(event) => onChange(event.target.value)}
-          value={value}
-        >
-          {availableLocations?.length > 0 &&
-            availableLocations.map((location) => (
-              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                {location.display}
-              </SelectItem>
-            ))}
-        </Select>
+        <LocationPicker 
+          selectedLocationUuid={value}
+          onChange={onChange}
+          hideWelcomeMessage={true}
+          currentLocationUuid={session?.sessionLocation?.uuid}
+        />
       )}
     />
   );
