@@ -5,7 +5,10 @@
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
-  border-bottom: none;
+
+  > .desktop {
+    border-top: none !important;
+  }
 }
 
 .row {
@@ -19,11 +22,15 @@
 }
 
 .tooltip {
-  margin: 0 -(layout.$spacing-03) -0.625rem;
+  margin: 0 (-(layout.$spacing-03)) -0.625rem;
 }
 
 .menuItem {
   max-width: none;
+}
+
+.dropdownContainer {
+  min-width: max-content;
 }
 
 .buttons {
@@ -95,7 +102,27 @@
 }
 
 .table {
-  td:after {
-    display: none;
+  td {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.layer {
+  height: 100%;
+}
+
+.unknownOrderTypeText {
+  @include type.type-style('body-compact-01');
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
   }
 }
