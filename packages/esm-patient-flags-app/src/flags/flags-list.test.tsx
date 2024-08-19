@@ -5,7 +5,7 @@ import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsList from './flags-list.component';
 
-const mockedUsePatientFlags = usePatientFlags as jest.Mock;
+const mockUsePatientFlags = usePatientFlags as jest.Mock;
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');
@@ -17,13 +17,21 @@ jest.mock('./hooks/usePatientFlags', () => {
 });
 
 it('renders an Edit form that enables users to toggle flags on or off', async () => {
-  mockedUsePatientFlags.mockReturnValue({
+  mockUsePatientFlags.mockReturnValue({
     flags: mockPatientFlags,
     isLoading: false,
     error: null,
   });
 
-  renderFlagsList();
+  render(
+    <FlagsList
+      closeWorkspace={jest.fn()}
+      closeWorkspaceWithSavedChanges={jest.fn()}
+      patientUuid={mockPatient.id}
+      promptBeforeClosing={jest.fn()}
+      setTitle={jest.fn()}
+    />,
+  );
 
   const searchbox = screen.getByRole('searchbox', { name: /search for a flag/i });
   const clearSearchInputButton = screen.getByRole('button', { name: /clear search input/i });
@@ -38,14 +46,3 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   expect(screen.getByText(/needs follow up/i)).toBeInTheDocument();
   expect(screen.getByText(/social/i)).toBeInTheDocument();
 });
-
-function renderFlagsList() {
-  return render(
-    <FlagsList
-      closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      promptBeforeClosing={jest.fn()}
-    />,
-  );
-}

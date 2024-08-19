@@ -1,8 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { of } from 'rxjs/internal/observable/of';
-import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -11,35 +10,29 @@ import {
   mockFetchProviderByUuidResponse,
   mockSessionDataResponse,
 } from '__mocks__';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.workspace';
 
-const testProps = {
+const defaultProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
+  setTitle: jest.fn(),
 };
 
-const mockFetchDiagnosisConceptsByName = fetchDiagnosisConceptsByName as jest.Mock;
-const mockSaveVisitNote = saveVisitNote as jest.Mock;
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = useConfig as jest.Mock;
-const mockUseSession = useSession as jest.Mock;
+function renderVisitNotesForm(props = {}) {
+  render(<VisitNotesForm {...defaultProps} {...props} />);
+}
+
+const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
+const mockSaveVisitNote = jest.mocked(saveVisitNote);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    createErrorHandler: jest.fn(),
-    showSnackbar: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ConfigMock),
-    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
-  };
-});
 
 jest.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: jest.fn(),
@@ -57,6 +50,12 @@ jest.mock('./visit-notes.resource', () => ({
     mutateVisits: jest.fn(),
   })),
 }));
+
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  ...ConfigMock,
+});
 
 test('renders the visit notes form with all the relevant fields and values', () => {
   mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
@@ -115,7 +114,7 @@ test('closes the form and the workspace when the cancel button is clicked', asyn
   const cancelButton = screen.getByRole('button', { name: /Discard/i });
   await userEvent.click(cancelButton);
 
-  expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+  expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
 });
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
@@ -138,7 +137,9 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
     patient: mockPatient.id,
   };
 
-  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' });
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as ReturnType<
+    typeof saveVisitNote
+  >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
@@ -193,16 +194,10 @@ test('renders an error snackbar if there was a problem recording a condition', a
 
   await userEvent.click(submitButton);
 
-  expect(mockedShowSnackbar).toHaveBeenCalledWith({
+  expect(mockShowSnackbar).toHaveBeenCalledWith({
     isLowContrast: false,
     kind: 'error',
     subtitle: 'Internal Server Error',
     title: 'Error saving visit note',
   });
 });
-
-function renderVisitNotesForm() {
-  mockUseConfig.mockReturnValue(ConfigMock);
-  mockUseSession.mockReturnValue(mockSessionDataResponse);
-  render(<VisitNotesForm {...testProps} />);
-}

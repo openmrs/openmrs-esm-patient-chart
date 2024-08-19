@@ -1,10 +1,9 @@
 import React from 'react';
-import { Layer, Link, Tile } from '@carbon/react';
+import { Button, Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
-import { Button } from '@carbon/react';
 
 export interface EmptyStateProps {
   displayText: string;
@@ -17,7 +16,7 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <Layer>
+    <Layer className={styles.layer}>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{props.headerTitle}</h4>

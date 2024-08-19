@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .topNavHeader {
   top: var(--omrs-offline-banner-height);
@@ -13,13 +13,13 @@
 }
 
 .navLogo {
-  margin-right: spacing.$spacing-06;
-  margin-left: spacing.$spacing-04;
+  margin-right: layout.$spacing-06;
+  margin-left: layout.$spacing-04;
 }
 
 .navLogoTablet {
-  margin-right: spacing.$spacing-04;
-  margin-left: spacing.$spacing-02;
+  margin-right: layout.$spacing-04;
+  margin-left: layout.$spacing-02;
 }
 
 .startVisitButton {
@@ -34,14 +34,14 @@
   display: flex;
   align-items: center;
   color: $ui-02;
-  padding: spacing.$spacing-04 spacing.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05;
 
   &:hover {
     background-color: colors.$teal-90;
   }
 
   :global(.cds--popover--bottom .cds--popover-content) {
-    text-align: center
+    text-align: center;
   }
 
   .patientName {
@@ -51,13 +51,13 @@
 
   .longPatientNameBtn {
     @extend .patientName;
-    margin-right: spacing.$spacing-05;
-    padding-right: 0.5rem;
+    margin-right: layout.$spacing-05;
+    padding-right: layout.$spacing-03;
   }
 
   .tooltipPatientName {
     @include type.type-style('productive-heading-01');
-    color:$ui-02;
+    color: $ui-02;
   }
 
   .longPatientNameBtn {
@@ -69,7 +69,7 @@
   .patientInfo {
     color: $color-gray-30;
     @include type.type-style('body-compact-01');
-    margin: 0 spacing.$spacing-03 0;
+    margin: 0 layout.$spacing-03 0;
   }
 }
 
@@ -81,8 +81,8 @@
 
 .tooltipPatientInfo {
   @include type.type-style('body-short-01');
-  color:$color-gray-30;
-  margin-top:spacing.$spacing-03;
+  color: $color-gray-30;
+  margin-top: layout.$spacing-03;
 }
 
 .tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
@@ -96,8 +96,8 @@
 }
 
 .tag {
-  margin: 0.25rem 0;
-  min-width: 4rem;
+  margin: layout.$spacing-02 0;
+  min-width: layout.$spacing-10;
 }
 
 .priorityTag {
@@ -105,5 +105,5 @@
   @include type.type-style('label-01');
   color: #943d00;
   background-color: #ffc9a3;
-  min-width: 4rem;
+  min-width: layout.$spacing-10;
 }

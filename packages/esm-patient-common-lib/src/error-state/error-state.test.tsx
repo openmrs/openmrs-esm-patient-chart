@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ErrorState } from '.';
 
-describe('ErrorState: ', () => {
+describe('ErrorState', () => {
   it('renders an error state widget card', () => {
     const testError = {
       response: {

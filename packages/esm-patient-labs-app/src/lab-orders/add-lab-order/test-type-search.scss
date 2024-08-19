@@ -1,11 +1,10 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "../../root";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 /** For TestTypeSearchResults */
-
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05;
+  margin: layout.$spacing-03 layout.$spacing-05;
 }
 
 .divider {
@@ -15,11 +14,11 @@
 }
 
 .desktopDivider {
-  margin: spacing.$spacing-07 auto spacing.$spacing-05;
+  margin: layout.$spacing-07 auto layout.$spacing-05;
 }
 
 .tabletDivider {
-  margin: spacing.$spacing-08 auto spacing.$spacing-06;
+  margin: layout.$spacing-08 auto layout.$spacing-06;
 }
 
 .searchResultsCount {
@@ -30,7 +29,7 @@
 .orderBasketSearchResultsHeader {
   display: flex;
   justify-content: space-between;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   align-items: center;
 }
 
@@ -43,7 +42,7 @@
   justify-content: space-between;
   border: 1px solid $grey-2;
   &:not(:last-of-type) {
-    margin-bottom: spacing.$spacing-03;
+    margin-bottom: layout.$spacing-03;
   }
 }
 
@@ -53,25 +52,25 @@
 }
 
 .searchResultTileContent {
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: layout.$spacing-03 layout.$spacing-05;
 }
 
 .searchResultActions {
   border-top: 1px solid $grey-2;
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
 }
 
 .searchResultSkeletonWrapper {
-  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
-  
+  margin: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03;
+
   :global(.cds--skeleton__text) {
     margin: 0;
   }
 
   .searchResultCntSkeleton {
-    margin-right: spacing.$spacing-07;
+    margin-right: layout.$spacing-07;
   }
 
   .skeletonTile {
@@ -81,11 +80,11 @@
 }
 
 .emptyState {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: spacing.$spacing-07;
+  padding: layout.$spacing-07;
   border: 1px solid $ui-03;
   text-align: center;
   background-color: $ui-01;
@@ -101,15 +100,24 @@
   cursor: pointer;
 }
 
-.resultsContainer {
-  overflow-y: scroll;
-}
-
 .resultsContainer::-webkit-scrollbar {
-  width: spacing.$spacing-03;
+  width: layout.$spacing-03;
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
   background: $ui-04;
-  border-radius: spacing.$spacing-02;
+  border-radius: layout.$spacing-02;
+}
+
+.heading {
+  @include type.type-style('heading-01');
+  margin-bottom: layout.$spacing-03;
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.text02 {
+  color: $text-02;
 }

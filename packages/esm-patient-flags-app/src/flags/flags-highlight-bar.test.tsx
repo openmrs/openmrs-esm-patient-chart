@@ -7,7 +7,7 @@ import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsHighlightBar from './flags-highlight-bar.component';
 
-const mockedUsePatientFlags = usePatientFlags as jest.Mock;
+const mockUsePatientFlags = jest.mocked(usePatientFlags);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -30,13 +30,15 @@ jest.mock('./hooks/usePatientFlags', () => {
 it('renders a highlights bar showing a summary of the available flags', async () => {
   const user = userEvent.setup();
 
-  mockedUsePatientFlags.mockReturnValue({
+  mockUsePatientFlags.mockReturnValue({
     flags: mockPatientFlags,
-    isLoading: false,
     error: null,
-  });
+    isLoading: false,
+    isValidating: false,
+    mutate: jest.fn(),
+  } as unknown as ReturnType<typeof usePatientFlags>);
 
-  renderFlagsHighlightBar();
+  render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
 
   const riskFlag = screen.getByRole('button', { name: /risk flag/i });
   expect(riskFlag).toBeInTheDocument();
@@ -64,7 +66,3 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 
   expect(screen.getAllByRole('button', { name: /flag/i })).not.toEqual(5);
 });
-
-function renderFlagsHighlightBar() {
-  return render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
-}

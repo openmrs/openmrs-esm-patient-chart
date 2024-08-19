@@ -1,6 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .grid {
   width: fit-content;
@@ -12,7 +13,8 @@
   align-items: center;
 }
 
-.day-column, .year-column {
+.day-column,
+.year-column {
   @include type.type-style('heading-compact-01');
   color: $text-02;
 }
@@ -35,7 +37,7 @@
   display: grid;
   justify-items: center;
   align-items: center;
-  padding: 0.5rem;
+  padding: layout.$spacing-03;
 }
 
 .timeline-data-cell {
@@ -45,6 +47,11 @@
   p {
     @include type.type-style('body-compact-01');
     color: $text-02;
+  }
+
+  &:hover {
+    background-color: colors.$blue-10;
+    border-top: 2px colors.$blue-30;
   }
 }
 
@@ -57,7 +64,7 @@
   gap: 0.5px;
   justify-items: baseline;
   align-items: center;
-  padding: 1rem;
+  padding: layout.$spacing-05;
 }
 
 .timeline-cell-zebra {
@@ -83,7 +90,7 @@
 
 .time-slot-inner {
   background-color: $ui-03;
-  padding: 3px 10px;
+  padding: 1px 10px;
   justify-self: stretch;
   align-self: stretch;
   display: grid;
@@ -102,7 +109,6 @@
   left: 0px;
   top: 0px;
   z-index: 3;
-  padding: 0rem 1rem;
 
   span {
     @include type.type-style('heading-compact-01');
@@ -112,7 +118,7 @@
 }
 
 .shadow {
-  box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
+  box-shadow: layout.$spacing-03 0 20px 0 rgba(0, 0, 0, 0.15);
 }
 
 .trendline-link {
@@ -122,7 +128,7 @@
 
 .range-units {
   @include type.type-style('helper-text-01');
- //  color: $text-05; // WIP
+  color: colors.$gray-70;
 }
 
 .off-scale-high,
@@ -133,53 +139,54 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-
   }
 }
 
 .high,
 .low {
-  box-shadow: 0 0 0 1px #000000;
+  background-color: colors.$orange-10;
+  border-top: 1px solid colors.$orange-20;
 }
 
 .critically-high,
 .critically-low {
-  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+  background-color: colors.$red-20;
+  border-top: 1px solid colors.$red-20-hover;
 }
 
 .off-scale-low {
   p::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
 .off-scale-high {
   p::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
 .critically-low {
   p::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
 .critically-high {
   p::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
 .low {
   p::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
 .high {
   p::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
 
@@ -193,8 +200,19 @@
   background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
+  border: 1px solid colors.$gray-50;
 }
 
 .recent-results-grid::-webkit-scrollbar {
   display: none;
+}
+
+.trendline-link-view {
+  @include type.type-style('helper-text-01');
+  color: colors.$blue-60;
+  cursor: pointer;
+}
+
+.trendline-link-view:hover {
+  text-decoration: underline;
 }

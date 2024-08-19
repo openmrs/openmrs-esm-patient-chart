@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import StartVisitDialog from './start-visit-dialog.component';
 
-const testProps = {
+const defaultProps = {
   patientUuid: 'some-uuid',
   closeModal: jest.fn(),
   visitType: null,
@@ -41,9 +41,7 @@ describe('StartVisit', () => {
   test('should launch edit past visit form', async () => {
     const user = userEvent.setup();
 
-    testProps.visitType = 'past';
-
-    renderStartVisitDialog();
+    renderStartVisitDialog({ visitType: 'past' });
 
     expect(
       screen.getByText(
@@ -59,6 +57,6 @@ describe('StartVisit', () => {
   });
 });
 
-function renderStartVisitDialog() {
-  render(<StartVisitDialog {...testProps} />);
+function renderStartVisitDialog(props = {}) {
+  render(<StartVisitDialog {...defaultProps} {...props} />);
 }

@@ -1,4 +1,4 @@
-@import "../../root";
+@use '@carbon/layout';
 
 .searchPopupContainer {
   position: relative;
@@ -14,7 +14,7 @@
   min-height: 0;
   position: absolute;
   width: 100%;
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 layout.$spacing-01 6px 0 rgba(0, 0, 0, 0.3);
   z-index: 1;
 }
 

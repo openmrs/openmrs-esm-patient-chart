@@ -1,62 +1,62 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label01 {
-  @include type.type-style("label-01");
+  @include type.type-style('label-01');
 }
 
 .bodyShort01 {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
 }
 
 .graphContainer {
   display: flex;
-  margin: 0rem spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   flex-direction: row;
   justify-content: space-between;
 }
 
 .conceptPickerTabs {
   flex-grow: 1;
-  margin: spacing.$spacing-03 0;
-  padding-right: spacing.$spacing-05;
+  margin: layout.$spacing-03 0;
+  padding-right: layout.$spacing-05;
 }
 
 .lineChartContainer {
   flex-grow: 4;
-  padding: 0 spacing.$spacing-05 spacing.$spacing-09;
+  padding: 0 layout.$spacing-05 layout.$spacing-09;
 
   :global(.cds--cc--layout-row) {
     height: 0;
   }
 
   :global(.layout-child) {
-    margin-top: spacing.$spacing-03;
+    margin-top: layout.$spacing-03;
   }
 }
 
 .conceptLabel {
   @extend .label01;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
   display: inline-block;
 }
 
 .verticalTabs {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
   scroll-behavior: smooth;
 
   > ul {
     flex-direction: column !important;
   }
 
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
-    margin-left: 0rem;
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0;
   }
 
   :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
     border-bottom: 0 !important;
-    border-left: 2px solid $color-gray-30;
+    border-left: layout.$spacing-01 solid $color-gray-30;
   }
 }
 
@@ -64,21 +64,22 @@
   outline: 0;
   outline-offset: 0;
 
-  &:active, &:focus {
-    outline: 2px solid var(--brand-03) !important;
+  &:active,
+  &:focus {
+    outline: layout.$spacing-01 solid var(--brand-03) !important;
   }
 
-  &[aria-selected="true"] {
+  &[aria-selected='true'] {
     border-left: 3px solid var(--brand-03);
     border-bottom: none;
     font-weight: 600;
-    margin-left: 0rem !important;
+    margin-left: 0 !important;
   }
 
-  &[aria-selected="false"] {
+  &[aria-selected='false'] {
     border-bottom: none;
-    border-left: 2px solid $ui-03;
-    margin-left: 0rem !important;
+    border-left: layout.$spacing-01 solid $ui-03;
+    margin-left: 0 !important;
   }
 }
 

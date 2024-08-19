@@ -4,7 +4,10 @@ export const configSchema = {
   contactAttributeTypes: {
     _type: Type.Array,
     _description: 'The UUIDs of person attribute types that store contact information',
-    _default: [],
+    _default: [
+      // Telephone number
+      '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+    ],
     _elements: {
       _type: Type.UUID,
     },
@@ -33,11 +36,6 @@ export const configSchema = {
       'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
     _default: '4in 6in',
   },
-  showPrintIdentifierStickerButton: {
-    _type: Type.Boolean,
-    _description: "Whether to display the 'Print identifier sticker' button in the patient banner",
-    _default: false,
-  },
   useRelationshipNameLink: {
     _type: Type.Boolean,
     _description: "Whether to use the relationship name as a link to the associated person's patient chart.",
@@ -51,6 +49,5 @@ export interface ConfigObject {
   };
   printIdentifierStickerFields: Array<string>;
   printIdentifierStickerSize: string;
-  showPrintIdentifierStickerButton: boolean;
   useRelationshipNameLink: boolean;
 }

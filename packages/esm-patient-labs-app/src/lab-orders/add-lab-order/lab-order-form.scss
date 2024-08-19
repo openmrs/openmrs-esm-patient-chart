@@ -1,9 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/colors';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../root";
-
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .orderForm {
   flex-grow: 1;
@@ -16,15 +13,15 @@
   }
 
   :global(.cds--css-grid-column) {
-    margin: 0 spacing.$spacing-03 !important;
+    margin: 0 !important;
   }
 
   :global(.cds--subgrid) {
-    margin: 0 calc(spacing.$spacing-03 * -1) !important;
+    margin: 0 calc(layout.$spacing-03 * -1) !important;
   }
 
-  :global(.cds--number--nosteppers.cds--number input[type=number]) {
-    padding-right: spacing.$spacing-05;
+  :global(.cds--number--nosteppers.cds--number input[type='number']) {
+    padding-right: layout.$spacing-05;
   }
 
   :global(.cds--number__control-btn) {
@@ -33,7 +30,7 @@
 }
 
 .form {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .gridRow {
@@ -45,7 +42,7 @@
 }
 
 .field {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .buttonSet {
@@ -56,27 +53,36 @@
 }
 
 .errorContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .errorNotification {
-  margin: 0.5rem 0;
+  margin: layout.$spacing-03 0;
+}
+
+.testTypeLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
 }
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: calc(100vh - 6rem - var(--workspace-header-height));
+    height: calc(100vh - layout.$spacing-12 - var(--workspace-header-height));
     background-color: #ededed;
   }
 
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
+    padding: layout.$spacing-06 layout.$spacing-05;
     background-color: $ui-02;
   }
 
   .errorContainer {
-    margin: 1rem;
-    margin-bottom: calc(var(--bottom-nav-height) + 1rem);
+    margin: layout.$spacing-05;
+    margin-bottom: calc(var(--bottom-nav-height) + layout.$spacing-05);
   }
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
 }

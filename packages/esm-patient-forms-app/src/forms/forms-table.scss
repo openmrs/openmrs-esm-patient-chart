@@ -1,10 +1,9 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
-  padding: 2rem;
+  padding: layout.$spacing-07;
   background-color: $ui-01;
 }
 
@@ -20,7 +19,7 @@
 .toolbarWrapper {
   position: relative;
   display: flex;
-  height: spacing.$spacing-09;
+  height: layout.$spacing-09;
   justify-content: flex-end;
 }
 
@@ -31,7 +30,7 @@
 
 .search {
   input {
-    padding: 0 4rem !important;
+    padding: 0 layout.$spacing-10 !important;
   }
 
   :global(.cds--search-close:focus) {
@@ -51,22 +50,22 @@
 }
 
 .heading {
-  margin-bottom: 1.5rem;
+  margin-bottom: layout.$spacing-06;
 }
 
 .toolbar {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 3rem;
-  margin-bottom: 0.5rem;
+  min-height: layout.$spacing-09;
+  margin-bottom: layout.$spacing-03;
 }
 
 .emptyContainer {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 1rem;
+  padding: layout.$spacing-05;
 }
 
 .tableContainer {
@@ -80,14 +79,14 @@
 
   :global(.cds--table-toolbar) {
     position: relative;
-    height: 2rem;
-    min-height: 0rem;
+    height: layout.$spacing-07;
+    min-height: 0;
     overflow: visible;
     top: 0;
   }
 
   &:global(.cds--data-table-container) {
-    padding-top: 0rem;
+    padding-top: 0;
   }
 }
 
@@ -99,14 +98,14 @@
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
   }
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: layout.$spacing-11 0;
 }
 
 .tile {
@@ -117,7 +116,7 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContent {
@@ -127,9 +126,9 @@
 }
 
 .heading:after {
-  content: "";
+  content: '';
   display: block;
-  width: 2rem;
+  width: layout.$spacing-07;
   padding-top: 0.188rem;
   border-bottom: 0.375rem solid var(--brand-03);
 }

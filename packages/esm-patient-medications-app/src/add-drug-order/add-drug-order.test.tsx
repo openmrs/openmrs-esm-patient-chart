@@ -1,25 +1,30 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
-import { screen, render, within, renderHook, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render, within, renderHook, waitFor } from '@testing-library/react';
 import { getByTextWithMarkup } from 'tools';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import AddDrugOrderWorkspace from './add-drug-order.workspace';
-import { mockDrugSearchResultApiData, mockDrugOrderTemplateApiData, mockPatientDrugOrdersApiData } from '__mocks__';
-import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  mockDrugSearchResultApiData,
+  mockDrugOrderTemplateApiData,
+  mockPatientDrugOrdersApiData,
+  mockSessionDataResponse,
+} from '__mocks__';
 import { closeWorkspace, useSession } from '@openmrs/esm-framework';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
-mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
-
-const mockUseSession = useSession as jest.Mock;
-mockUseSession.mockReturnValue({
-  currentProvider: {
-    uuid: 'mock-provider-uuid',
-  },
-});
-
 const mockLaunchPatientWorkspace = jest.fn();
+const mockUseSession = jest.mocked(useSession);
+const mockUseDrugSearch = jest.mocked(useDrugSearch);
+const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
+const usePatientOrdersMock = jest.fn();
+
+mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
@@ -41,38 +46,28 @@ jest.mock('./drug-search/drug-search.resource', () => ({
   useDebounce: jest.fn().mockImplementation((x) => x),
 }));
 
-const usePatientOrdersMock = jest.fn();
 jest.mock('../api/api', () => ({
   ...jest.requireActual('../api/api'),
   usePatientOrders: () => usePatientOrdersMock(),
+  useRequireOutpatientQuantity: jest
+    .fn()
+    .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
 }));
-
-function renderDrugSearch() {
-  render(
-    <AddDrugOrderWorkspace
-      order={undefined as any}
-      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-      promptBeforeClosing={() => false}
-      patientUuid={'mock-patient-uuid'}
-    />,
-  );
-}
 
 describe('AddDrugOrderWorkspace drug search', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
 
-    (useDrugSearch as jest.Mock).mockImplementation(() => ({
+    mockUseDrugSearch.mockImplementation(() => ({
       isLoading: false,
       drugs: mockDrugSearchResultApiData,
       error: null,
     }));
 
-    (useDrugTemplate as jest.Mock).mockImplementation((drugUuid) => ({
+    mockUseDrugTemplate.mockImplementation((drugUuid) => ({
       templates: mockDrugOrderTemplateApiData[drugUuid] ?? [],
       isLoading: false,
-      error: false,
+      error: null,
     }));
 
     usePatientOrdersMock.mockReturnValue({
@@ -83,7 +78,18 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('looks ok', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    render(
+      <AddDrugOrderWorkspace
+        order={undefined as any}
+        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+        promptBeforeClosing={() => false}
+        patientUuid={'mock-patient-uuid'}
+        setTitle={jest.fn()}
+      />,
+    );
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     await screen.findAllByRole('listitem');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
@@ -106,7 +112,18 @@ describe('AddDrugOrderWorkspace drug search', () => {
       data: [mockPatientDrugOrdersApiData[0]],
     });
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    render(
+      <AddDrugOrderWorkspace
+        order={undefined as any}
+        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+        promptBeforeClosing={() => false}
+        patientUuid={'mock-patient-uuid'}
+        setTitle={jest.fn()}
+      />,
+    );
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
     const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('div').parentElement;
@@ -115,7 +132,18 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can add items directly to the basket', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    render(
+      <AddDrugOrderWorkspace
+        order={undefined as any}
+        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+        promptBeforeClosing={() => false}
+        patientUuid={'mock-patient-uuid'}
+        setTitle={jest.fn()}
+      />,
+    );
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
@@ -137,7 +165,18 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can open the drug form ', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    render(
+      <AddDrugOrderWorkspace
+        order={undefined as any}
+        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+        promptBeforeClosing={() => false}
+        patientUuid={'mock-patient-uuid'}
+        setTitle={jest.fn()}
+      />,
+    );
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
@@ -151,7 +190,18 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can open an item in the medication form and on saving, it should add the order in the order basket store', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    render(
+      <AddDrugOrderWorkspace
+        order={undefined as any}
+        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+        promptBeforeClosing={() => false}
+        patientUuid={'mock-patient-uuid'}
+        setTitle={jest.fn()}
+      />,
+    );
+
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
@@ -164,7 +214,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const indicationField = screen.getByRole('textbox', { name: 'Indication' });
     await user.type(indicationField, 'Hypertension');
     const saveFormButton = screen.getByText(/Save order/i);
-    fireEvent.click(saveFormButton);
+    await user.click(saveFormButton);
 
     await waitFor(() =>
       expect(hookResult.current.orders).toEqual([
@@ -177,7 +227,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
           startDate: expect.any(Date),
           indication: 'Hypertension',
           careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
-          orderer: 'mock-provider-uuid',
+          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]),
     );

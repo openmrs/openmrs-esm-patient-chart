@@ -9,7 +9,7 @@
       "name": "notes-overview-widget",
       "component": "notesOverview",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       },
       "order": 5
     },

@@ -1,13 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  type WorkspacesInfo,
-  defineConfigSchema,
-  getDefaultsFromConfigSchema,
-  useConfig,
-  useWorkspaces,
-} from '@openmrs/esm-framework';
+import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
@@ -16,14 +10,17 @@ import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
+const testProps = {
+  patientUuid: mockPatient.id,
+  showRecordVitalsButton: true,
+};
 
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
-const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockedUseWorkspaces = jest.mocked(useWorkspaces);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
+const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseWorkspaces = jest.mocked(useWorkspaces);
 
-mockedUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
+mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -49,21 +46,18 @@ jest.mock('../common', () => {
   };
 });
 
-describe('VitalsHeader: ', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
-      mockVitalsConfig,
-    });
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  mockVitalsConfig,
+} as ConfigObject);
 
+describe('VitalsHeader', () => {
   it('renders an empty state view when there are no vitals data to show', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -73,11 +67,11 @@ describe('VitalsHeader: ', () => {
   });
 
   it('renders the most recently recorded values in the vitals header', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -94,14 +88,13 @@ describe('VitalsHeader: ', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
+    expect(screen.getByText(/overdue: these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {
     const user = userEvent.setup();
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -109,16 +102,16 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -140,26 +133,26 @@ describe('VitalsHeader: ', () => {
       },
     ];
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: abnormalVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+    expect(screen.getByTitle(/abnormal value/i)).toBeInTheDocument();
   });
 
   it('should launch Form Entry vitals and biometrics form', async () => {
     const user = userEvent.setup();
 
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
       vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
-    });
+    } as ConfigObject);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -167,21 +160,12 @@ describe('VitalsHeader: ', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockedLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         encounterUuid: '',
-        formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
+        formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
       },
       workspaceTitle: 'Triage',
     });
   });
 });
-
-function renderVitalsHeader() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-    showRecordVitalsButton: true,
-  };
-
-  renderWithSwr(<VitalsHeader {...testProps} />);
-}

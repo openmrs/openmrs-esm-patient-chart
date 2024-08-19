@@ -1,6 +1,5 @@
 import useSWR from 'swr';
-import { map as rxjsMap } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type PatientProgram, type Program, type ProgramsFetchResponse } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
 import filter from 'lodash-es/filter';
@@ -25,7 +24,7 @@ export function useEnrollments(patientUuid: string) {
 
   return {
     data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     activeEnrollments,
@@ -48,16 +47,10 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
 
   return {
     data: availablePrograms,
-    isError: error,
+    error,
     isLoading,
     eligiblePrograms,
   };
-}
-
-export function getPatientProgramByUuid(programUuid: string) {
-  return openmrsObservableFetch<PatientProgram>(`${restBaseUrl}/programenrollment/${programUuid}`).pipe(
-    rxjsMap(({ data }) => data),
-  );
 }
 
 export function createProgramEnrollment(payload, abortController) {
@@ -65,7 +58,7 @@ export function createProgramEnrollment(payload, abortController) {
     return null;
   }
   const { program, patient, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`${restBaseUrl}/programenrollment`, {
+  return openmrsFetch(`${restBaseUrl}/programenrollment`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -79,8 +72,8 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   if (!payload && !payload.program) {
     return null;
   }
-  const { program, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
+  const { dateEnrolled, dateCompleted, location } = payload;
+  return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -93,14 +86,14 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
 export const usePrograms = (patientUuid: string) => {
   const {
     data: enrollments,
-    isError: enrollError,
+    error: enrollError,
     isLoading: enrolLoading,
     isValidating,
     activeEnrollments,
   } = useEnrollments(patientUuid);
   const { data: availablePrograms, eligiblePrograms } = useAvailablePrograms(enrollments);
 
-  const status = { isLoading: enrolLoading, isError: enrollError };
+  const status = { isLoading: enrolLoading, error: enrollError };
   return {
     enrollments,
     ...status,

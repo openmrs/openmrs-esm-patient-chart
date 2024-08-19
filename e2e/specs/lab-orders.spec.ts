@@ -14,6 +14,7 @@ test.beforeEach(async ({ api }) => {
 
 test('Record a lab order', async ({ page }) => {
   const ordersPage = new OrdersPage(page);
+  const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
   await test.step('When I visit the orders page', async () => {
     await ordersPage.goTo(patient.uuid);
@@ -24,7 +25,7 @@ test('Record a lab order', async ({ page }) => {
   });
 
   await test.step('And I click the `Add +` button on the Lab orders tile', async () => {
-    await page.getByRole('button', { name: /add/i }).nth(1).click();
+    await orderBasket.getByRole('button', { name: /add/i }).nth(1).click();
   });
 
   await test.step('Then I type `Blood urea nitrogen` into the search bar', async () => {
@@ -62,7 +63,7 @@ test('Record a lab order', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly added lab order in the list', async () => {
-    await expect(page.getByLabel('testorders').getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
   });
 });
 

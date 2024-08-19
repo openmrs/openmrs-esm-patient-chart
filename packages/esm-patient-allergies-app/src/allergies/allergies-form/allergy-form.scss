@@ -1,7 +1,5 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import '../../root.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .header {
   border-bottom: 0.0625rem solid $grey-2;
@@ -11,7 +9,7 @@
 .content {
   display: grid;
   grid-template-columns: 50% 10% 1fr;
-  margin: 0.5rem 1rem;
+  margin: layout.$spacing-03 layout.$spacing-05;
 }
 
 .wrapperContainer fieldset {
@@ -25,7 +23,7 @@
 }
 
 .radio {
-  margin: 1rem 0rem;
+  margin: layout.$spacing-05 0;
 
   label {
     justify-content: flex-start;
@@ -34,12 +32,12 @@
 
 .checkbox {
   &:not(:first-child) {
-    margin: 0.3rem 0rem;
+    margin: 0.3rem 0;
   }
 }
 
 .input {
-  margin: 0rem 1rem 1rem;
+  margin: 0 layout.$spacing-05 layout.$spacing-05;
 }
 
 .checkboxContainer {
@@ -48,7 +46,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -56,12 +54,12 @@
 }
 
 .desktopButtons {
-  margin-top: 2rem;
+  margin-top: layout.$spacing-07;
 }
 
 .tabletButtons {
-  margin-top: 2rem;
-  padding: 1.5rem 1rem;
+  margin-top: layout.$spacing-07;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
@@ -71,7 +69,7 @@
 }
 
 .formContent {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .form {

@@ -12,8 +12,8 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import styles from './paginated-biometrics.scss';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
-import { VitalsAndBiometricsActionMenu } from '../vitals-biometrics-form/vitals-biometrics-action-menu.component';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<BiometricsTableRow>;
@@ -71,7 +71,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   return (
-    <div>
+    <>
       <DataTable
         rows={paginatedBiometrics}
         headers={tableHeaders}
@@ -81,7 +81,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         isSortable
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <TableContainer>
+          <TableContainer className={styles.tableContainer}>
             <Table aria-label="biometrics" {...getTableProps()}>
               <TableHead>
                 <TableRow>
@@ -95,7 +95,6 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -104,9 +103,6 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
-                    <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu rowId={row.id} formType="biometrics" />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -123,7 +119,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         dashboardLinkUrl={pageUrl}
         dashboardLinkLabel={urlLabel}
       />
-    </div>
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import classNames from 'classnames';
 import {
   Button,
   DataTable,
@@ -93,7 +92,7 @@ function PrintModal({ patientUuid, closeDialog }) {
       age: age(patient?.patient?.birthDate),
       gender: getGender(patient?.patient?.gender),
       location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
@@ -195,7 +194,7 @@ function PrintModal({ patientUuid, closeDialog }) {
                       <TableRow>
                         {headers.map((header) => (
                           <TableHeader
-                            className={classNames(styles.productiveHeading01, styles.text02)}
+                            className={styles.heading}
                             {...getHeaderProps({
                               header,
                               isSortable: header.isSortable,

@@ -111,7 +111,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await createCondition(payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
@@ -153,7 +153,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     try {
       await updateCondition(conditionToEdit?.id, payload);
-      mutate();
+      await mutate();
 
       showSnackbar({
         kind: 'success',
@@ -311,7 +311,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             render={({ field: { onChange, value, onBlur } }) => (
               <RadioButtonGroup
                 className={styles.radioGroup}
-                invalid={errors?.clinicalStatus}
+                invalid={Boolean(errors?.clinicalStatus)}
                 name="clinicalStatus"
                 onBlur={onBlur}
                 onChange={onChange}
@@ -337,7 +337,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       id="endDate"
                       datePickerType="single"
                       dateFormat="d/m/Y"
-                      minDate={new Date(watch('abatementDateTime')).toISOString()}
+                      minDate={new Date(watch('onsetDateTime')).toISOString()}
                       maxDate={dayjs().utc().format()}
                       placeholder="dd/mm/yyyy"
                       onChange={([date]) => onChange(date)}
@@ -359,12 +359,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
 function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
   return (
-    <>
-      <span>{label}</span>
+    <span>
+      {label}
       <span title={t('required', 'Required')} className={styles.required}>
         *
       </span>
-    </>
+    </span>
   );
 }
 

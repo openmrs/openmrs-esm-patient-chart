@@ -1,25 +1,18 @@
 import React from 'react';
 import { launchWorkspace, openmrsFetch, useSession } from '@openmrs/esm-framework';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ActiveMedications from './active-medications.component';
 
-function renderActiveMedications() {
-  mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-  renderWithSwr(<ActiveMedications {...testProps} />);
-}
-
-const testProps = {
-  patientUuid: mockPatient.id,
-};
-const mockUseSession = useSession as jest.Mock;
+const mockUseSession = jest.mocked(useSession);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspace(name);
 });
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -38,14 +31,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-describe('ActiveMedications: ', () => {
-  beforeEach(() => {
-    mockLaunchWorkspace.mockClear();
-  });
+describe('ActiveMedications', () => {
   test('renders an empty state view when there are no active medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderActiveMedications();
+    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -66,7 +56,7 @@ describe('ActiveMedications: ', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderActiveMedications();
+    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -79,7 +69,7 @@ describe('ActiveMedications: ', () => {
   test('renders a tabular overview of the active medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-    renderActiveMedications();
+    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -112,19 +102,25 @@ describe('ActiveMedications: ', () => {
 });
 
 test('clicking the Record active medications link opens the order basket form', async () => {
+  const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
-  renderActiveMedications();
+
+  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+
   await waitForLoadingToFinish();
-  const orderLink = await screen.getByText('Record active medications');
-  fireEvent.click(orderLink);
+  const orderLink = screen.getByText('Record active medications');
+  await user.click(orderLink);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });
 
 test('clicking the Add button opens the order basket form', async () => {
+  const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
-  renderActiveMedications();
+
+  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+
   await waitForLoadingToFinish();
-  const button = await screen.getByRole('button', { name: /Add/i });
-  fireEvent.click(button);
+  const button = screen.getByRole('button', { name: /Add/i });
+  await user.click(button);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });

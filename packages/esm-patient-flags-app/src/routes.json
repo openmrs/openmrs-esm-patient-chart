@@ -10,7 +10,7 @@
       "meta": {
         "title": {
           "key": "editPatientFlags",
-          "default":"Edit patient flags"
+          "default": "Edit patient flags"
         }
       },
       "featureFlag": "patientFlags"
@@ -26,12 +26,18 @@
       "name": "patient-flags-overview",
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "flagsOverview",
-      "meta": {
-        "columnSpan": 4
-      },
       "order": 0,
-      "featureFlag": "patientFlags"
+      "featureFlag": "patientFlags",
+      "meta": {
+        "fullWidth": false
+      }
     }
   ],
-  "pages": []
+  "featureFlags": [
+    {
+      "flagName": "patientFlags",
+      "label": "Patient Flags",
+      "description": "Visual components that enable healthcare providers to see relevant patient information with a glance in the Patient chart. Flags are displayed in the Patient Summary, just below the patient banner, and can link users to other areas of the chart to perform relevant actions during a visit."
+    }
+  ]
 }

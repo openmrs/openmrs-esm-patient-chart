@@ -47,7 +47,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+          server-token: ''
 
       - name: Build apps
         run: yarn turbo run build --color --concurrency=5
@@ -75,14 +75,14 @@ jobs:
           overwrite: true
 
       - name: Capture Server Logs
-        if: '!cancelled()'
+        if: always()
         uses: jwalton/gh-docker-logs@v2
         with:
           dest: './logs'
 
       - name: Upload Logs as Artifact
         uses: actions/upload-artifact@v4
-        if: '!cancelled()'
+        if: always()
         with:
           name: server-logs
           path: './logs'

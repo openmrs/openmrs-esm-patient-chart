@@ -8,31 +8,27 @@ import NotesMain from './notes-main.component';
 const testProps = {
   patientUuid: mockPatient.id,
   pageSize: 10,
-  urlLabel: window.spaBase + patientChartBasePath + '/summary',
   pageUrl: 'Go to Summary',
+  urlLabel: window.spaBase + patientChartBasePath + '/summary',
 };
 
-const mockUseVisitNotes = useVisitNotes as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    useVisit: jest.fn().mockReturnValue([{}]),
-  };
-});
+const mockUseVisitNotes = jest.mocked(useVisitNotes);
 
 jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
 });
 
-describe('NotesMain: ', () => {
+describe('NotesMain', () => {
   test('renders an empty state view if encounter data is unavailable', async () => {
-    mockUseVisitNotes.mockReturnValueOnce({ data: { results: [] } });
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
 
-    renderNotesMain();
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -41,16 +37,23 @@ describe('NotesMain: ', () => {
   });
 
   test('renders an error state view if there is a problem fetching encounter data', async () => {
-    const error = {
-      message: 'You are not logged in',
+    const mockError = {
+      message: '401 Unauthorized',
       response: {
         status: 401,
         statusText: 'Unauthorized',
       },
-    };
-    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
+    } as unknown as Error;
 
-    renderNotesMain();
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: null,
+      error: mockError,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
+
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
@@ -63,9 +66,15 @@ describe('NotesMain: ', () => {
   });
 
   test("renders a tabular overview of the patient's encounters when present", async () => {
-    mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
+    mockUseVisitNotes.mockReturnValueOnce({
+      visitNotes: mockVisitNotes,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutateVisitNotes: jest.fn(),
+    });
 
-    renderNotesMain();
+    renderWithSwr(<NotesMain {...testProps} />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /visit notes/i })).toBeInTheDocument();
@@ -90,7 +99,3 @@ describe('NotesMain: ', () => {
     expect(screen.getAllByRole('row').length).toEqual(7);
   });
 });
-
-function renderNotesMain() {
-  renderWithSwr(<NotesMain {...testProps} />);
-}

@@ -1,12 +1,11 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 
   & section {
-    margin: spacing.$spacing-05 0;
+    margin: layout.$spacing-05 0;
   }
 }
 
@@ -18,7 +17,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -26,12 +25,12 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .dateTimeSection {

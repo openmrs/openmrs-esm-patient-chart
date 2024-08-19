@@ -5,13 +5,12 @@ import { type LayoutType, useLayoutType, useWorkspaces, ActionMenuButton } from 
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import VisitNoteActionButton from './visit-note-action-button.extension';
 
+const mockActionMenuButton = jest.mocked(ActionMenuButton);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseLaunchWorkspaceRequiringVisit = jest.mocked(useLaunchWorkspaceRequiringVisit);
 const mockUseWorkspaces = useWorkspaces as jest.Mock;
 
-const MockActionMenuButton = ActionMenuButton as jest.Mock;
-
-MockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
+mockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
   <button onClick={handler}>
     {tagContent} {label}
   </button>

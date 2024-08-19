@@ -54,3 +54,11 @@ export const addLabOrderWorkspace = getAsyncLifecycle(
   () => import('./lab-orders/add-lab-order/add-lab-order.workspace'),
   options,
 );
+
+export const timelineResultsModal = getAsyncLifecycle(
+  () => import('./test-results/panel-timeline/timeline-results.modal'),
+  {
+    featureName: 'Timeline results',
+    moduleName,
+  },
+);

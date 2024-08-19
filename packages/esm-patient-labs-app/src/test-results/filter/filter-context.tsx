@@ -1,5 +1,4 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import isObject from 'lodash/isObject';
 import { parseTime } from '../panel-timeline/helpers';
 import {
@@ -42,7 +41,6 @@ export interface FilterProviderProps {
 
 const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { t } = useTranslation();
 
   const actions = useMemo(
     () => ({
@@ -72,7 +70,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
       };
     }
     const tests: ReducerState['tests'] = activeTests?.length
-      ? Object.fromEntries(Object.entries(state.tests).filter(([name, entry]) => activeTests.includes(name)))
+      ? Object.fromEntries(Object.entries(state.tests).filter(([name]) => activeTests.includes(name)))
       : state.tests;
 
     const allTimes = [

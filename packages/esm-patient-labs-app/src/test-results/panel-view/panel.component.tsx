@@ -90,15 +90,12 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
   );
 
   return (
-    <Layer>
-      <div
-        className={classNames(styles.labSetPanel, {
-          [styles.activePanel]: activePanel?.conceptUuid === panel.conceptUuid,
-        })}
-        onClick={() => setActivePanel(panel)}
-        role="button"
-        tabIndex={0}
-      >
+    <Layer
+      className={classNames(styles.labSetPanel, {
+        [styles.activePanel]: activePanel?.conceptUuid === panel.conceptUuid,
+      })}
+    >
+      <div onClick={() => setActivePanel(panel)} role="button" tabIndex={0}>
         <div className={styles.panelHeader}>
           <h2 className={styles.productiveHeading02}>{panel.name}</h2>
           <p className={styles.subtitleText}>
@@ -112,7 +109,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
         <DataTable rows={rowsData} headers={headers}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
+              <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
