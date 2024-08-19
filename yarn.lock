@@ -4216,8 +4216,8 @@ __metadata:
   resolution: "@openmrs/esm-form-engine-app@workspace:packages/esm-form-engine-app"
   dependencies:
     "@carbon/react": "npm:^1.12.0"
+    "@openmrs/esm-form-engine-lib": "npm:next"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    "@openmrs/openmrs-form-engine-lib": "npm:next"
     lodash-es: "npm:^4.17.21"
     react-error-boundary: "npm:^4.0.13"
     webpack: "npm:^5.88.2"
@@ -4231,6 +4231,30 @@ __metadata:
     swr: 2.x
   languageName: unknown
   linkType: soft
+
+"@openmrs/esm-form-engine-lib@npm:next":
+  version: 2.1.0-pre.1373
+  resolution: "@openmrs/esm-form-engine-lib@npm:2.1.0-pre.1373"
+  dependencies:
+    "@carbon/react": "npm:>1.47.0 <1.50.0"
+    classnames: "npm:^2.5.1"
+    lodash-es: "npm:^4.17.21"
+    react-error-boundary: "npm:^4.0.13"
+    react-hook-form: "npm:^7.52.0"
+    react-markdown: "npm:^7.1.2"
+    react-waypoint: "npm:^10.3.0"
+    react-webcam: "npm:^7.2.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 8.x
+    dayjs: 1.x
+    i18next: 23.x
+    react: 18.x
+    react-i18next: 11.x
+    swr: 2.x
+  checksum: 10/fca2352c0b81d189a4c9733d31f7073b5da59b21c6504f914d6999a6a43f0694357b4b0351978bfada16fa1b05323bb4d3e56b26d7c2f67c2371d3010f0827cf
+  languageName: node
+  linkType: hard
 
 "@openmrs/esm-form-entry-app@workspace:packages/esm-form-entry-app":
   version: 0.0.0-use.local
@@ -4938,30 +4962,6 @@ __metadata:
     shelljs: ^0.7.8
     tree-model: ^1.0.7
   checksum: 10/a5e5e34002e0863581db2fa8930e0b09758b352c38653eda476cca3e4977d5c1d61e81db057ca314193fc800dfb78e7bd6f81fc8670e4388e484a10199d242c4
-  languageName: node
-  linkType: hard
-
-"@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 2.1.0-pre.1358
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:2.1.0-pre.1358"
-  dependencies:
-    "@carbon/react": "npm:>1.47.0 <1.50.0"
-    classnames: "npm:^2.5.1"
-    lodash-es: "npm:^4.17.21"
-    react-error-boundary: "npm:^4.0.13"
-    react-hook-form: "npm:^7.52.0"
-    react-markdown: "npm:^7.1.2"
-    react-waypoint: "npm:^10.3.0"
-    react-webcam: "npm:^7.2.0"
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": 8.x
-    dayjs: 1.x
-    i18next: 23.x
-    react: 18.x
-    react-i18next: 11.x
-    swr: 2.x
-  checksum: 10/4ca9ecaf29b1fb98a855f86b7a1eda6c15c5489b68af556cda7328cfaf832651997c56526f00f5c2a3724e6e301acb8fc1aa690a38639fa51ffd449d48d22fd4
   languageName: node
   linkType: hard
 
