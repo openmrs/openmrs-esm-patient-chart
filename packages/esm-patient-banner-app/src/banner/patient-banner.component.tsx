@@ -48,11 +48,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   return (
     <header
+      aria-label="patient banner"
       className={classNames(
         styles.container,
         isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer,
       )}
-      data-openmrs-role="patient banner"
       role="banner"
       ref={patientBannerRef}
     >
