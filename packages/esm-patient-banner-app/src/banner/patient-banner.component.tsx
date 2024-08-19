@@ -53,6 +53,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer,
       )}
       data-openmrs-role="patient banner"
+      role="banner"
       ref={patientBannerRef}
     >
       <div className={styles.patientBanner}>
