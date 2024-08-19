@@ -31,12 +31,20 @@
   padding: 0;
 }
 
-.bottomButton {
+.actionButton {
   height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset;
+  }
 }
 
 .inlineNotification,
