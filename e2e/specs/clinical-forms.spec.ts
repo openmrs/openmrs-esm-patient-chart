@@ -144,7 +144,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
     await expect(page.getByText(/laboratory test results/i)).toBeVisible();
   });
 
-  await test.step('And when I fill the `White Blood Cells (WBC)` result as `5000', async () => {
+  await test.step('When I fill the `White Blood Cells (WBC)` result as `5000', async () => {
     await page.locator('#ManualInputWhiteBloodCells').fill('5500');
   });
 
