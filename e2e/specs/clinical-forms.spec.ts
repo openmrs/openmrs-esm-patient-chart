@@ -119,10 +119,10 @@ test('Fill a clinical form', async ({ page }) => {
   });
 });
 
-test('Clinical form should save inputs even if the encounter time is after the current time', async ({ page }) => {
+test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
-  await page.clock.fastForward('00:01'); // Advances the time by 1 minute in the testing environment.
+  await page.clock.fastForward('01:00'); // Advances the time by 1 minute in the testing environment.
 
   await test.step('When I visit the chart summary page', async () => {
     await chartPage.goTo(patient.uuid);
@@ -160,13 +160,13 @@ test('Clinical form should save inputs even if the encounter time is after the c
     await page.getByRole('button', { name: /save/i }).click();
   });
 
-  await test.step('Then I should not see any error messages', async () => {
-    await expect(page.getByText('error')).not.toBeVisible();
-  });
-
-  await test.step('And I should see a success notification', async () => {
+  await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/record created/i)).toBeVisible();
     await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+  });
+
+  await test.step('And I should not see any error messages', async () => {
+    await expect(page.getByText('error')).not.toBeVisible();
   });
 });
 
