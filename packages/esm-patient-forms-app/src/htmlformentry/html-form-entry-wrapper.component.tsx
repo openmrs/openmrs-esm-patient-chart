@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './html-form-entry-wrapper.scss';
 
 interface HtmlFormEntryWrapperProps {
@@ -7,28 +7,28 @@ interface HtmlFormEntryWrapperProps {
 }
 
 const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorkspace, src }) => {
-  useEffect(() => {
-    const iframe = document.querySelector('iframe');
-    iframe.addEventListener('load', () => {
-      // hide the header and breadcrumbs
-      const dashboard = iframe.contentDocument;
-      dashboard.querySelector('header')?.remove();
-      dashboard.querySelector('.patient-header')?.remove();
-      dashboard.querySelector('#breadcrumbs')?.remove();
-      iframe.style.display = 'block';
-    });
+  const iframeRef = useRef<HTMLIFrameElement>();
 
-    // register a listener to close the workspace when HFE sends a "close-workspace" message
-    window.addEventListener('message', (event) => {
-      if (event.data === 'close-workspace') {
-        closeWorkspace();
-      }
-    });
+  useEffect(() => {
+    const callback = (event) => event?.data === 'close-workspace' && closeWorkspace();
+    window.addEventListener('message', callback);
+    return () => window.removeEventListener('message', callback); // cleanup on unmount
   }, [closeWorkspace]);
 
   return (
     <div>
-      <iframe src={src} className={styles.wrapper}></iframe>
+      <iframe
+        ref={iframeRef}
+        src={src}
+        className={styles.wrapper}
+        onLoad={() => {
+          const dashboard = iframeRef.current.contentDocument;
+          dashboard.querySelector('header')?.remove();
+          dashboard.querySelector('.patient-header')?.remove();
+          dashboard.querySelector('#breadcrumbs')?.remove();
+          iframeRef.current.style.display = 'block';
+        }}
+      ></iframe>
     </div>
   );
 };
