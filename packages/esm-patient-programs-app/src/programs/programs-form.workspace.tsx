@@ -61,25 +61,30 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
-  const currentEnrollment = useMemo(
-    () => programEnrollmentId && enrollments.find((e) => e.uuid === programEnrollmentId),
-    [programEnrollmentId, enrollments]
-  );
+ const enrollments = useEnrollments();
+  const availablePrograms = useAvailablePrograms();
 
-  const currentProgram = useMemo(
-    () => currentEnrollment ? { display: currentEnrollment.program.name, ...currentEnrollment.program } : null,
-    [currentEnrollment]
-  );
+  const currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid === programEnrollmentId)[0];
+  const currentProgram = currentEnrollment
+    ? {
+        display: currentEnrollment.program.name,
+        ...currentEnrollment.program,
+      }
+    : null;
 
-  const eligiblePrograms = useMemo(
-    () => currentProgram
-      ? [currentProgram]
-      : availablePrograms.filter((program) => {
-          const enrollment = enrollments.find((e) => e.program.uuid === program.uuid);
-          return !enrollment || enrollment.dateCompleted !== null;
-        }),
-    [availablePrograms, enrollments, currentProgram]
-  );
+  const eligiblePrograms = currentProgram
+    ? [currentProgram]
+    : availablePrograms.filter((program) => {
+        const enrollment = enrollments.find((e) => e.program.uuid === program.uuid);
+        return !enrollment || enrollment.dateCompleted !== null;
+      });
+
+  const getLocationUuid = () => {
+    if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
+      return session?.sessionLocation?.uuid;
+    }
+    return currentEnrollment?.location.uuid ?? null;
+  };
 
   const {
     control,
