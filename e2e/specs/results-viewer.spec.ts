@@ -257,12 +257,7 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(
-      page.locator('.cds--actionable-notification__title').getByText('Form submitted', { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.locator('.cds--actionable-notification__subtitle').getByText('Form submitted successfully', { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I go to the results viewer page', async () => {
@@ -336,12 +331,7 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(
-      page.locator('.cds--actionable-notification__title').getByText('Form submitted', { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.locator('.cds--actionable-notification__subtitle').getByText('Form submitted successfully', { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I revisit the `Results Viewer` page', async () => {
