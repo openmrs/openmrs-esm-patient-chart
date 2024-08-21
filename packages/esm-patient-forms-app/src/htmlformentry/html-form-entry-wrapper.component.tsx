@@ -22,7 +22,7 @@ const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorksp
     dashboard.querySelector('.patient-header')?.remove();
     dashboard.querySelector('#breadcrumbs')?.remove();
     iframe.style.display = 'block';
-    iframe.height = dashboard.body.scrollHeight + 30 + 'px'; // set iframe height to the height of the form, with some padding
+    iframe.height = dashboard.body.scrollHeight + 50 + 'px'; // set iframe height to the height of the form, with some padding
   }, []);
 
   return (
