@@ -78,7 +78,7 @@ export function buildLabOrder(order: Order, action?: OrderAction) {
     careSetting: order.careSetting.uuid,
     instructions: order.instructions,
     urgency: order.urgency,
-    labReferenceNumber: order.labReferenceNumber,
+    accessionNumber: order.accessionNumber,
     testType: {
       label: order.concept.display,
       conceptUuid: order.concept.uuid,
