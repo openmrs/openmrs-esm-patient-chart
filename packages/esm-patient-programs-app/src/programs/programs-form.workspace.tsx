@@ -31,7 +31,7 @@ import {
   useEnrollments,
   updateProgramEnrollment,
 } from './programs.resource';
-import LocationPicker from '@openmrs/esm-framework'; // Verify the import path
+import { LocationPicker } from '@openmrs/esm-framework'; // Verify the import path
 import styles from './programs-form.scss';
 
 interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
