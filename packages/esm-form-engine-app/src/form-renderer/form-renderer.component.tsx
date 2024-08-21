@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
+import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import { showModal, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
