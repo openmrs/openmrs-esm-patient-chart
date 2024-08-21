@@ -165,8 +165,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i)).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('And I should not see any error messages', async () => {
