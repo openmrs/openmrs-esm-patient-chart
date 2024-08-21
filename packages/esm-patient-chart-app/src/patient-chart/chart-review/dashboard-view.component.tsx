@@ -1,12 +1,6 @@
-import React, { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMatch } from 'react-router-dom';
-import {
-  Extension,
-  type ExtensionData,
-  ExtensionSlot,
-  getExtensionNameFromId,
-  useExtensionSlotMeta,
-} from '@openmrs/esm-framework';
+import { Extension, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
@@ -71,7 +65,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       <div className={styles.dashboardContainer}>
         <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
           {(extension) => {
-            const { fullWidth = false } = widgetMetas[extension.id];
+            const { fullWidth = false } = widgetMetas[extension.id] || {};
             return (
               <div className={classNames(styles.extension, fullWidth && styles.fullWidth)}>
                 <Extension state={state} className={styles.extensionWrapper} />
