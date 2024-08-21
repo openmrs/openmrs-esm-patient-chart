@@ -59,7 +59,7 @@ import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
-import { useVisits } from '../visits-widget/visit.resource';
+import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
@@ -97,6 +97,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
+  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
   const allVisitTypes = useConditionalVisitTypes();
 
@@ -482,6 +483,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       if (status === 201) {
                         mutateCurrentVisit();
                         mutateVisits();
+                        mutateInfiniteVisits();
                         mutateQueueEntry();
                         showSnackbar({
                           kind: 'success',
@@ -506,6 +508,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     () => {
                       mutateCurrentVisit();
                       mutateVisits();
+                      mutateInfiniteVisits();
                       mutateAppointments();
                       showSnackbar({
                         isLowContrast: true,
@@ -537,6 +540,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     if (!attributesResponses.includes(undefined)) {
                       mutateCurrentVisit();
                       mutateVisits();
+                      mutateInfiniteVisits();
                       closeWorkspace({ ignoreChanges: true });
                       showSnackbar({
                         isLowContrast: true,
@@ -623,6 +627,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateQueueEntry,
       mutateVisits,
+      mutateInfiniteVisits,
       patientUuid,
       priority,
       queueLocation,
