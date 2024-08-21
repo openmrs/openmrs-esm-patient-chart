@@ -23,6 +23,7 @@ import {
   showSnackbar,
   useLayoutType,
   useSession,
+  LocationPicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -31,7 +32,6 @@ import {
   useEnrollments,
   updateProgramEnrollment,
 } from './programs.resource';
-import { LocationPicker, LocationPickerProps } from 'packages/framework/esm-styleguide/src/location-picker/location-picker.component.tsx'; // Verify the import path //importing of the locationpicker 
 import styles from './programs-form.scss';
 
 interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
