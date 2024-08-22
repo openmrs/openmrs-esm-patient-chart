@@ -4,7 +4,10 @@ export const configSchema = {
   contactAttributeTypes: {
     _type: Type.Array,
     _description: 'The UUIDs of person attribute types that store contact information',
-    _default: [],
+    _default: [
+      // Telephone number
+      '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+    ],
     _elements: {
       _type: Type.UUID,
     },

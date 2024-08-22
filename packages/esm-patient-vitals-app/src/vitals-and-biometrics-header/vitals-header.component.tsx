@@ -78,22 +78,20 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     }
 
     return (
-      <div className={styles['background']}>
-        <div className={styles['vitals-header']} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
-          <span className={styles.container}>
+      <div className={styles.container}>
+        <div className={styles.vitalsHeader} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
+          <div className={styles.headerItems}>
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-            <span className={styles['body-text']}>
+            <span className={styles.bodyText}>
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
             {vitalsOverdue ? (
-              <div className={styles.tag}>
-                <Tag type="red">
-                  <span className={styles.overdueIndicator}>
-                    <Time />
-                    {`${t('overdue', 'Overdue')}: ${overdueVitalsTagContent}`}
-                  </span>
-                </Tag>
-              </div>
+              <Tag type="red">
+                <span className={styles.overdueIndicator}>
+                  <Time />
+                  {`${t('overdue', 'Overdue')}: ${overdueVitalsTagContent}`}
+                </span>
+              </Tag>
             ) : null}
             <ConfigurableLink
               className={styles.link}
@@ -101,27 +99,28 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             >
               {t('vitalsHistory', 'Vitals history')}
             </ConfigurableLink>
-          </span>
+          </div>
           {isValidating ? (
             <div className={styles.backgroundDataFetchingIndicator}>
               <span>{isValidating ? <InlineLoading /> : null}</span>
             </div>
           ) : null}
-          <div className={styles['button-container']}>
+          <div className={styles.buttonContainer}>
             <Button
-              className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
+              className={styles.recordVitalsButton}
+              data-openmrs-role="Record Vitals"
               kind="ghost"
-              size="sm"
               onClick={launchVitalsAndBiometricsForm}
+              size="sm"
             >
               {t('recordVitals', 'Record vitals')}
-              <ArrowRight size={16} className={styles['arrow-up-button']} title={'ArrowRight'} />
+              <ArrowRight size={16} className={styles.recordVitalsIconButton} />
             </Button>
           </div>
         </div>
         <div
-          className={classNames(styles['row-container'], {
-            [styles['workspace-open']]: isWorkspaceOpen(),
+          className={classNames(styles.rowContainer, {
+            [styles.workspaceOpen]: isWorkspaceOpen(),
           })}
         >
           <div className={styles.row}>
@@ -196,21 +195,16 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div className={styles['vitals-header']}>
+    <div className={styles.vitalsHeader}>
       <span className={styles.container}>
         <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-        <span className={styles['body-text']}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
+        <span className={styles.bodyText}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
       </span>
 
       <div className={styles.container}>
-        <Button
-          className={classNames(styles['record-vitals'], styles['arrow-up-icon'])}
-          onClick={launchVitalsAndBiometricsForm}
-          kind="ghost"
-          size="sm"
-        >
+        <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
           {t('recordVitals', 'Record vitals')}
-          <ArrowRight size={16} className={styles['arrow-up-button']} title={'ArrowRight'} />
+          <ArrowRight size={16} className={styles.recordVitalsIconButton} />
         </Button>
       </div>
     </div>

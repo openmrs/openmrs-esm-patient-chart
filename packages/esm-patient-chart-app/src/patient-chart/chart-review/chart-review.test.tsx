@@ -1,23 +1,23 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
-import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
+import {
+  type AssignedExtension,
+  type ExtensionSlotState,
+  useExtensionStore,
+  useExtensionSlotMeta,
+} from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
-const mockUseExtensionStore = useExtensionStore as jest.Mock;
-const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
+const mockUseExtensionStore = jest.mocked(useExtensionStore);
+const mockUseExtensionSlotMeta = jest.mocked(useExtensionSlotMeta);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
   };
 });
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useExtensionStore: jest.fn(),
-  useExtensionSlotMeta: jest.fn(),
-}));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -39,7 +39,7 @@ function slotMetaFromStore(store, slotName) {
 }
 
 describe('ChartReview', () => {
-  test(`renders a grid-based layout`, () => {
+  test('renders a grid-based layout', () => {
     const mockStore = {
       slots: {
         'patient-chart-dashboard-slot': {
@@ -60,14 +60,15 @@ describe('ChartReview', () => {
                 title: 'Test Results',
               },
             },
-          ],
+          ] as unknown as AssignedExtension[],
         },
         'patient-chart-summary-dashboard-slot': {
           assignedExtensions: [],
         },
-      },
+      } as Record<string, ExtensionSlotState>,
     };
-    mockUseExtensionStore.mockReturnValue(mockStore);
+
+    mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
     mockUseExtensionSlotMeta.mockImplementation((slotName) => slotMetaFromStore(mockStore, slotName));
 
     render(

@@ -1,73 +1,50 @@
 import React, { useMemo, useState } from 'react';
-import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  type DataTableHeader,
-  type DataTableRow,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './paginated-vitals.scss';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
+import styles from './paginated-vitals.scss';
 
 interface PaginatedVitalsProps {
+  isPrinting?: boolean;
   pageSize: number;
   pageUrl: string;
-  urlLabel: string;
-  tableRows: Array<VitalsTableRow>;
   tableHeaders: Array<VitalsTableHeader>;
-  isPrinting?: boolean;
+  tableRows: Array<VitalsTableRow>;
+  urlLabel: string;
 }
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
-  tableRows,
+  isPrinting,
   pageSize,
   pageUrl,
-  urlLabel,
   tableHeaders,
-  isPrinting,
+  tableRows,
+  urlLabel,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
-        return (
-          <TableCell className={styles.criticallyHigh}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
       case 'critically_low':
-        return (
-          <TableCell className={styles.criticallyLow}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
       case 'high':
-        return (
-          <TableCell className={styles.high}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.high}>{children}</TableCell>;
       case 'low':
-        return (
-          <TableCell className={styles.low}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.low}>{children}</TableCell>;
       default:
-        return (
-          <TableCell className={styles.normal}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell>{children}</TableCell>;
     }
   };
 

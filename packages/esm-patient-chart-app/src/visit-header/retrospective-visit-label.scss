@@ -1,5 +1,7 @@
+@use '@carbon/layout';
+
 .tooltipBox {
-  padding: 0.25rem;
+  padding: layout.$spacing-02;
 }
 
 .tooltipSmallText {
@@ -7,11 +9,11 @@
 }
 
 .heading {
-  margin-bottom: 0.5rem; 
+  margin-bottom: layout.$spacing-03;
 }
 
 .definitionToolTip {
-  & > button{
+  & > button {
     border-bottom: none;
   }
 }

@@ -25,12 +25,6 @@ const mockUseVisit = jest.mocked(useVisit);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockShowModal = jest.mocked(showModal);
 const mockGetHistory = jest.mocked(getHistory);
-const mockGoBackInHistory = jest.mocked(goBackInHistory);
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  translateFrom: (module, key, defaultValue, options) => defaultValue,
-}));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),

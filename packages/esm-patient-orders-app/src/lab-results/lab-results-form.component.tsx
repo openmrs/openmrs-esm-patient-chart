@@ -202,7 +202,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 errors={errors}
               />
             ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
+              <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
           </Stack>
         )}

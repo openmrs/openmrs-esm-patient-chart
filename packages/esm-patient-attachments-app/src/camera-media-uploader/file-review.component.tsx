@@ -1,4 +1,4 @@
-import React, { type SyntheticEvent, useCallback, useEffect, useState, useContext } from 'react';
+import React, { type SyntheticEvent, useCallback, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, TextArea, TextInput } from '@carbon/react';
 import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
@@ -43,7 +43,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
 
   return (
     <div className={styles.filePreviewContainer}>
-      <ModalHeader closeModal={closeModal} className={styles.productiveHeading03}>
+      <ModalHeader closeModal={closeModal} className={styles.modalHeader}>
         {t('addAttachment_title', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </ModalHeader>

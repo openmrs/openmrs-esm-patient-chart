@@ -1,9 +1,8 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { ConfigurableLink, formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, showModal } from '@openmrs/esm-framework';
 import { type OBSERVATION_INTERPRETATION, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import { type ParsedTimeType } from '../filter/filter-types';
-import { testResultsBasePath } from '../helpers';
 import type { ObsRecord } from '../../types';
 import styles from './timeline.scss';
 
@@ -42,7 +41,6 @@ export const Grid: React.FC<{
     style={{
       ...style,
       gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, 5em)`,
-      margin: '1px',
     }}
     className={styles['grid']}
     {...props}
@@ -116,6 +114,15 @@ export const TimelineCell: React.FC<{
 
 export const RowStartCell = ({ title, range, units, shadow = false, testUuid, isString = false }) => {
   const patientUuid = getPatientUuidFromUrl();
+  const launchResultsDialog = (patientUuid: string, title: string, testUuid: string) => {
+    const dispose = showModal('timeline-results-modal', {
+      closeDeleteModal: () => dispose(),
+      patientUuid,
+      title,
+      testUuid,
+    });
+  };
+
   return (
     <div
       className={styles['row-start-cell']}
@@ -125,9 +132,12 @@ export const RowStartCell = ({ title, range, units, shadow = false, testUuid, is
     >
       <span className={styles['trendline-link']}>
         {!isString ? (
-          <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+          <span
+            className={styles['trendline-link-view']}
+            onClick={() => launchResultsDialog(patientUuid, title, testUuid)}
+          >
             {title}
-          </ConfigurableLink>
+          </span>
         ) : (
           title
         )}

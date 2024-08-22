@@ -27,11 +27,11 @@ import {
   userHasAccess,
   useSession,
 } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import styles from './offline-forms.styles.scss';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import styles from './offline-forms.scss';
 
 export interface OfflineFormsProps {}
 

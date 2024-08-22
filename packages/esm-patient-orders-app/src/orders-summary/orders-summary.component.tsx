@@ -12,12 +12,7 @@ const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid }) => {
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>
-      <OrderDetailsTable
-        title={ordersDisplayText}
-        patientUuid={patientUuid}
-        showAddButton={true}
-        showPrintButton={false}
-      />
+      <OrderDetailsTable patientUuid={patientUuid} showAddButton showPrintButton={false} title={ordersDisplayText} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { FormEngine } from '@openmrs/openmrs-form-engine-lib';
+import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import { showModal, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
@@ -29,11 +29,12 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
+  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
-    !encounterUuid && launchPatientWorkspace('clinical-forms-workspace');
-  }, [closeWorkspace, encounterUuid]);
+    !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchPatientWorkspace('clinical-forms-workspace');
+  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
