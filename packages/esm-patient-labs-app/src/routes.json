@@ -37,6 +37,12 @@
       "order": 2
     }
   ],
+  "modals": [
+    {
+      "name": "timeline-results-modal",
+      "component": "timelineResultsModal"
+    }
+  ],
   "pages": [],
   "workspaces": [
     {
