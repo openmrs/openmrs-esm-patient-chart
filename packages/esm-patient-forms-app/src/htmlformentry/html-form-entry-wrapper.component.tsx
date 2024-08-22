@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import styles from './html-form-entry-wrapper.scss';
 
 interface HtmlFormEntryWrapperProps {
-  closeWorkspace: () => void;
+  closeWorkspaceWithSavedChanges: () => void;
   src: string;
 }
 
-const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorkspace, src }) => {
+const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorkspaceWithSavedChanges, src }) => {
   const iframeRef = useRef<HTMLIFrameElement>();
 
   useEffect(() => {
-    const callback = (event) => event?.data === 'close-workspace' && closeWorkspace();
+    const callback = (event) => event?.data === 'close-workspace' && closeWorkspaceWithSavedChanges();
     window.addEventListener('message', callback);
     return () => window.removeEventListener('message', callback); // cleanup on unmount
-  }, [closeWorkspace]);
+  }, [closeWorkspaceWithSavedChanges]);
 
   const onLoad = useCallback(() => {
     const iframe = iframeRef.current;

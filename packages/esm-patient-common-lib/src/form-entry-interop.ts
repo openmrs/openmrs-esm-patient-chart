@@ -22,18 +22,23 @@ export function launchFormEntryOrHtmlForms(
 ) {
   if (visitUuid) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
-    launchFormEntry(
-      formUuid,
-      patientUuid,
-      encounterUuid,
-      formName,
-      visitUuid,
-      visitTypeUuid,
-      visitStartDatetime,
-      visitStopDatetime,
-      htmlForm,
-      mutateForms,
-    );
+
+    if (htmlForm) {
+      launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm);
+    } else {
+      launchFormEntry(
+        formUuid,
+        patientUuid,
+        encounterUuid,
+        formName,
+        visitUuid,
+        visitTypeUuid,
+        visitStartDatetime,
+        visitStopDatetime,
+        htmlForm,
+        mutateForms,
+      );
+    }
   } else {
     launchStartVisitPrompt();
   }
@@ -62,6 +67,17 @@ export function launchFormEntry(
       visitUuid: visitUuid,
       visitStartDatetime,
       visitStopDatetime,
+      htmlForm,
+    },
+  });
+}
+
+export function launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm) {
+  launchPatientWorkspace('patient-html-form-entry-workspace', {
+    workspaceTitle: formName,
+    formInfo: {
+      encounterUuid,
+      visitUuid,
       htmlForm,
     },
   });
