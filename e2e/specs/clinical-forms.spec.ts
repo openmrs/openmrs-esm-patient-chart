@@ -90,8 +90,7 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i, { exact: true })).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('And if I navigate to the visits dashboard', async () => {
@@ -161,8 +160,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i)).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('And I should not see any error messages', async () => {
@@ -270,8 +268,7 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i)).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 });
 
