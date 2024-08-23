@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 
@@ -56,5 +57,18 @@
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
+  }
+
+  .printedBy {
+    @include type.type-style('body-compact-01');
+    margin: 0 layout.$spacing-02;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .subheader {
+    @include type.type-style('heading-03');
+    color: colors.$gray-70;
+    padding: layout.$spacing-03;
   }
 }

@@ -2,13 +2,22 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation, type TFunction } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import {
+  age,
+  getPatientName,
+  showSnackbar,
+  useConfig,
+  getCoreTranslation,
+  useSession,
+  formatDate,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
 
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
   patient: fhir.Patient;
+  subheader: string;
 }
 
 interface PrintComponentProps extends Partial<ConfigObject> {
@@ -25,7 +34,7 @@ interface PrintComponentProps extends Partial<ConfigObject> {
   t: TFunction;
 }
 
-const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
+const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient, subheader }) => {
   const { t } = useTranslation();
   const { printIdentifierStickerFields, printIdentifierStickerSize, excludePatientIdentifierCodeTypes } =
     useConfig<ConfigObject>();
@@ -33,6 +42,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
+  const session = useSession();
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
@@ -122,16 +132,26 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       <ModalHeader
         closeModal={closeModal}
         title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
-      />
+      >
+        <div className={styles.subheader}>
+          <h4>{subheader}</h4>
+        </div>
+      </ModalHeader>
       <ModalBody>
         <div ref={contentToPrintRef}>
           <style type="text/css" media="print">
             {`
-              @page {
-                size: ${printIdentifierStickerSize};
-              }
-            `}
+        @page {
+          size: ${printIdentifierStickerSize};
+        }
+      `}
           </style>
+          <div className={styles.printedBy}>
+            {t('printedBy', 'Printed by')}
+            <span className={styles.printedBy}>
+              {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
+            </span>
+          </div>
           <PrintComponent
             patientDetails={patientDetails}
             printIdentifierStickerFields={printIdentifierStickerFields}
@@ -160,13 +180,11 @@ const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: Pri
     <div className={styles.stickerContainer}>
       {printIdentifierStickerFields.includes('name') && <div className={styles.patientName}>{patientDetails.name}</div>}
       <div className={styles.detailsGrid}>
-        {patientDetails.identifiers.map((identifier) => {
-          return (
-            <p key={identifier?.id}>
-              {identifier?.type?.text}: <strong>{identifier?.value}</strong>
-            </p>
-          );
-        })}
+        {patientDetails.identifiers.map((identifier) => (
+          <p key={identifier?.id}>
+            {identifier?.type?.text}: <strong>{identifier?.value}</strong>
+          </p>
+        ))}
         <p>
           {getCoreTranslation('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
         </p>
