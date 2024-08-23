@@ -44,7 +44,7 @@ const createProgramsFormSchema = (t: TFunction) =>
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
     completionDate: z.date().nullable(),
-    enrollmentLocation: z.string().nonempty(t('locationRequired', 'Location is required')),
+    enrollmentLocation: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -80,6 +80,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         return !enrollment || enrollment.dateCompleted !== null;
       });
 
+      const getLocationUuid = () => {
+        if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
+          return session?.sessionLocation?.uuid;
+        }
+        return currentEnrollment?.location.uuid ?? null;
+      };
   const {
     control,
     handleSubmit,
@@ -92,7 +98,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       selectedProgram: currentEnrollment?.program.uuid ?? '',
       enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
-      enrollmentLocation: session?.sessionLocation?.uuid ?? '',
+      enrollmentLocation: getLocationUuid() ?? '',
     },
   });
 
@@ -163,7 +169,9 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
             {eligiblePrograms?.length > 0 &&
               eligiblePrograms.map((program) => (
-                <SelectItem key={program.uuid} text={program.display} value={program.uuid} />
+                <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                {program.display}
+              </SelectItem>
               ))}
           </Select>
           <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
@@ -247,7 +255,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: completionDate,
     },
     {
-      style: { width: '70%' },
+      style: { width: '100%' },
       legendText: '',
       value: enrollmentLocation,
     },
