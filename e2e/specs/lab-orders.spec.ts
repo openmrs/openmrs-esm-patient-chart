@@ -63,7 +63,7 @@ test('Record a lab order', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly added lab order in the list', async () => {
-    await expect(page.getByLabel('testorders').getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
   });
 });
 

@@ -5,7 +5,10 @@
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
-  border-bottom: none;
+
+  > .desktop {
+    border-top: none !important;
+  }
 }
 
 .row {
@@ -19,11 +22,15 @@
 }
 
 .tooltip {
-  margin: 0 -(layout.$spacing-03) -0.625rem;
+  margin: 0 (-(layout.$spacing-03)) -0.625rem;
 }
 
 .menuItem {
   max-width: none;
+}
+
+.dropdownContainer {
+  min-width: max-content;
 }
 
 .buttons {
@@ -95,7 +102,58 @@
 }
 
 .table {
-  td:after {
-    display: none;
+  td {
+    &::after {
+      display: none;
+    }
   }
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.layer {
+  height: 100%;
+}
+
+.unknownOrderTypeText {
+  @include type.type-style('body-compact-01');
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}
+
+.toolBarContent {
+  background-color: colors.$gray-10;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-70;
+  padding: layout.$spacing-11 0;
+}
+
+.emptyStateTile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helperText {
+  @include type.type-style('helper-text-02');
 }

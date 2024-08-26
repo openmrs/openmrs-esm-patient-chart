@@ -111,7 +111,7 @@ export function prepMedicationOrderPostData(
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
-      concept: order.drug.concept.uuid,
+      concept: order?.drug?.concept?.uuid,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {

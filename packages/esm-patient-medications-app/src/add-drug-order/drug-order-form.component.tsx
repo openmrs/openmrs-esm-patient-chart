@@ -848,6 +848,7 @@ const ControlledFieldInput = ({
       return (
         <NumberInput
           className={fieldErrorStyles}
+          disableWheel
           onBlur={onBlur}
           onChange={(e, { value }) => {
             const number = parseFloat(value);
