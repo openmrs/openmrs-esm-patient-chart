@@ -50,6 +50,15 @@
       "width": "wider"
     },
     {
+      "name": "patient-html-form-entry-workspace",
+      "title": "clinicalForm",
+      "component": "patientHtmlFormEntryWorkspace",
+      "type": "clinical-form",
+      "canMaximize": true,
+      "canHide": false,
+      "width": "extra-wide"
+    },
+    {
       "name": "clinical-forms-workspace",
       "title": "clinicalForms",
       "component": "clinicalFormsWorkspace",
