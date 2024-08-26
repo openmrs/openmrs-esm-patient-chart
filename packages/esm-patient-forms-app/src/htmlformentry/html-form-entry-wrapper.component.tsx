@@ -9,12 +9,14 @@ interface HtmlFormEntryWrapperProps {
 const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorkspaceWithSavedChanges, src }) => {
   const iframeRef = useRef<HTMLIFrameElement>();
 
+  // set up a listener to listen for a message from HFE-UI to close the workspace
   useEffect(() => {
     const callback = (event) => event?.data === 'close-workspace' && closeWorkspaceWithSavedChanges();
     window.addEventListener('message', callback);
     return () => window.removeEventListener('message', callback); // cleanup on unmount
   }, [closeWorkspaceWithSavedChanges]);
 
+  // hide the headers and breadcrumbs of the O2 page on load
   const onLoad = useCallback(() => {
     const iframe = iframeRef.current;
     const dashboard = iframeRef.current.contentDocument;

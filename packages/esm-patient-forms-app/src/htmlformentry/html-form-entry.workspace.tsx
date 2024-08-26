@@ -21,9 +21,11 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { encounterUuid, visitUuid, htmlForm } = formInfo || {};
 
-  // we always want to prompt the user before closing the workspace
+  // we always want to prompt the user before closing/hiding the workspace because we can't guarantee maintaining the state of the form
   promptBeforeClosing(() => true);
 
+  // urls for entering a new form and editing an existing form; note that we specify the returnUrl as post-message:close-workspace,
+  // which tells HFE-UI to send a message to the parent window to close the workspace when the form is saved or cancelled
   const url = `${window.openmrsBase}/htmlformentryui/htmlform/${
     htmlForm.formUiPage
   }.page?patientId=${patientUuid}&visitId=${visitUuid ?? currentVisit?.uuid ?? null}&definitionUiResource=${
