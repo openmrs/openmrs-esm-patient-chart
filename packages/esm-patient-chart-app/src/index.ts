@@ -12,7 +12,12 @@ import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.compo
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 import { moduleName } from './constants';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
-import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import {
+  summaryDashboardMeta,
+  encountersDashboardMeta,
+  hivPatientSummaryDashboardMeta,
+  programManagementDashboardMeta,
+} from './dashboard.meta';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
@@ -30,6 +35,9 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
+import { PatientSummaryCardContainer } from './patient-summary/patient-summary.component';
+import { ProgramManagement } from './patient-summary/program-management.component';
+import HIVSummaryOverviewList from './patient-summary/patient-hiv-encounter-summary.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -111,6 +119,19 @@ export const stopVisitPatientSearchActionButton = getSyncLifecycle(stopVisitActi
   featureName: 'patient-actions-slot',
   moduleName,
 });
+// export const patientSummaryCardContainer = getSyncLifecycle(PatientSummaryCardContainer, {
+//   featureName: 'encounter-tiles-group',
+//   moduleName,
+// });
+export const patientSummaryCardContainer = getSyncLifecycle(HIVSummaryOverviewList, {
+  featureName: 'encounter-tiles-group',
+  moduleName,
+});
+
+export const programManagementComponent = getSyncLifecycle(ProgramManagement, {
+  featureName: 'encounter-list-table-tabs',
+  moduleName,
+});
 
 export const cancelVisitPatientSearchActionButton = getSyncLifecycle(cancelVisitActionButtonComponent, {
   featureName: 'patient-actions-slot-cancel-visit-button',
@@ -131,6 +152,22 @@ export const encountersSummaryDashboardLink =
     }),
     { featureName: 'encounter', moduleName },
   );
+
+export const hivPatientSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...hivPatientSummaryDashboardMeta,
+    moduleName,
+  }),
+  { featureName: 'hiv-patient-summary', moduleName },
+);
+
+export const hivPatientManagementDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...programManagementDashboardMeta,
+    moduleName,
+  }),
+  { featureName: 'hiv-patient-summary', moduleName },
+);
 
 export const currentVisitSummary = getSyncLifecycle(currentVisitSummaryComponent, {
   featureName: 'current-visit-summary',
