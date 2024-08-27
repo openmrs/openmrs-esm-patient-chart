@@ -32,6 +32,11 @@ export function startupApp() {
 // t('clinicalForm', 'Clinical form')
 export const patientFormEntryWorkspace = getAsyncLifecycle(() => import('./forms/form-entry.workspace'), options);
 
+export const patientHtmlFormEntryWorkspace = getAsyncLifecycle(
+  () => import('./htmlformentry/html-form-entry.workspace'),
+  options,
+);
+
 // t('clinicalForms', 'Clinical forms')
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
 

@@ -1,5 +1,3 @@
-import { navigate } from '@openmrs/esm-framework';
-import isEmpty from 'lodash-es/isEmpty';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
 interface HtmlFormEntryForm {
@@ -24,7 +22,10 @@ export function launchFormEntryOrHtmlForms(
 ) {
   if (visitUuid) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlForm)) {
+
+    if (htmlForm) {
+      launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm);
+    } else {
       launchFormEntry(
         formUuid,
         patientUuid,
@@ -34,18 +35,9 @@ export function launchFormEntryOrHtmlForms(
         visitTypeUuid,
         visitStartDatetime,
         visitStopDatetime,
+        htmlForm,
         mutateForms,
       );
-    } else {
-      if (encounterUuid) {
-        navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formEditUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-        });
-      } else {
-        navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-        });
-      }
     }
   } else {
     launchStartVisitPrompt();
@@ -61,6 +53,7 @@ export function launchFormEntry(
   visitTypeUuid?: string,
   visitStartDatetime?: string,
   visitStopDatetime?: string,
+  htmlForm?: HtmlFormEntryForm,
   mutateForm?: () => void,
 ) {
   launchPatientWorkspace('patient-form-entry-workspace', {
@@ -74,6 +67,18 @@ export function launchFormEntry(
       visitUuid: visitUuid,
       visitStartDatetime,
       visitStopDatetime,
+      htmlForm,
+    },
+  });
+}
+
+export function launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm) {
+  launchPatientWorkspace('patient-html-form-entry-workspace', {
+    workspaceTitle: formName,
+    formInfo: {
+      encounterUuid,
+      visitUuid,
+      htmlForm,
     },
   });
 }
