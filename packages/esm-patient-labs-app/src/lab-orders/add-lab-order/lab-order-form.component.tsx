@@ -154,8 +154,6 @@ export function LabOrderForm({
   }, [isDirty, promptBeforeClosing]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
-  const [hasPrice, setHasPrice] = useState(true);
-
   return (
     <>
       {errorLoadingTestTypes && (
@@ -170,7 +168,7 @@ export function LabOrderForm({
 
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
-          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder, setHasPrice }} />
+          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
