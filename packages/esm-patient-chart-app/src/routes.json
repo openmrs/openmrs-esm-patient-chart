@@ -37,6 +37,42 @@
       "offline": true
     },
     {
+      "name": "hiv-patient-summary-widget",
+      "component": "patientSummaryCardContainer",
+      "slot": "encounter-tiles-group",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "hiv-patient-summary-dashboard",
+      "component": "hivPatientSummaryDashboardLink",
+      "online": true,
+      "offline": true,
+      "order": 6,
+      "meta": {
+        "slot": "encounter-tiles-group",
+        "path": "hiv-patient-summary"
+      }
+    },
+    {
+      "name": "hiv-program-management-widget",
+      "component": "programManagementComponent",
+      "slot": "encounter-list-table-tabs",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "hiv-program-management-dashboard",
+      "component": "hivPatientManagementDashboardLink",
+      "online": true,
+      "offline": true,
+      "order": 6,
+      "meta": {
+        "slot": "encounter-list-table-tabs",
+        "path": "hiv-program-management"
+      }
+    },
+    {
       "name": "stop-visit-button",
       "component": "stopVisitActionButton",
       "slot": "patient-actions-slot",
