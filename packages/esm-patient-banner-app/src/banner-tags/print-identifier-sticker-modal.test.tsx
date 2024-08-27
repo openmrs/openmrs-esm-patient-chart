@@ -26,19 +26,22 @@ mockUseConfig.mockReturnValue({
 });
 
 describe('PrintIdentifierSticker', () => {
+  const subheaderText = 'Sample Subheader';
+
   test('renders the component', () => {
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} subheader={subheaderText} />);
 
     expect(screen.getByText(/Print Identifier Sticker/i)).toBeInTheDocument();
     expect(screen.getByText('John Wilson')).toBeInTheDocument();
     expect(screen.getByText('100GEJ')).toBeInTheDocument();
     expect(screen.getByText('1972-04-04')).toBeInTheDocument();
+    expect(screen.getByText(subheaderText)).toBeInTheDocument();
   });
 
   test('calls closeModal when cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} subheader={subheaderText} />);
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     expect(cancelButton).toBeInTheDocument();
@@ -53,7 +56,7 @@ describe('PrintIdentifierSticker', () => {
 
     const user = userEvent.setup();
 
-    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} />);
+    render(<PrintIdentifierSticker patient={mockPatient} closeModal={mockCloseModal} subheader={subheaderText} />);
 
     const printButton = screen.getByRole('button', { name: /Print/i });
     expect(printButton).toBeInTheDocument();
