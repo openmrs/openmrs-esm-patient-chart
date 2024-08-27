@@ -1,7 +1,6 @@
-/** @module @category UI */
 import React, { useMemo } from 'react';
 import { Tile, Column } from '@carbon/react';
-import styles from './summary-card.scss';
+import styles from './tile.scss';
 
 export interface SummaryCardProps {
   columns: Array<SummaryCardColumn>;
@@ -57,7 +56,7 @@ function SummaryItem({ column }: { column: SummaryCardColumn }) {
       <div className={styles.tileBoxColumn}>
         <span className={styles.tileTitle}> {column.header} </span>
         <span className={styles.tileValue}>{column.value}</span>
-        {column.summary && <span className={styles.tileSummary}>{column.summary}</span>}
+        {column.summary && <span className={styles.tileTitle}>{column.summary}</span>}
       </div>
     </div>
   );

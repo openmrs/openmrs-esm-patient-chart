@@ -3,27 +3,27 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .title {
-  @extend .productiveHeading03;
+  @include type.productiveHeading03;
 }
 
 .title:after {
   content: '';
   display: block;
-  width: $spacing-07;
-  padding-top: $spacing-01;
-  border-bottom: $spacing-03 solid $brand-teal-01;
+  width: layout.$spacing-07;
+  padding-top: layout.$spacing-01;
+  border-bottom: layout.$spacing-03 solid $brand-teal-01;
 }
 
 .cardTitle {
   display: flex;
   justify-content: space-between;
-  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
 }
 
 .tile {
   height: 100%;
-  padding: $spacing-01 0 $spacing-05 $spacing-05;
-  margin: $spacing-03;
+  padding: layout.$spacing-01 0 layout.$spacing-05 layout.$spacing-05;
+  margin: layout.$spacing-03;
   border: solid 1px #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
 }
 
 .columnContainer {
-  margin: 0px 0px $spacing-06 $spacing-06;
+  margin: 0px 0px layout.$spacing-06 layout.$spacing-06;
   font-size: 14px;
   font-weight: 500;
   font-stretch: normal;
@@ -56,8 +56,8 @@
 }
 
 .tileSubTitle {
-  height: $spacing-05;
-  font-size: $body-compact-01-font-size;
+  height: layout.$spacing-05;
+  font-size: 16px;
   line-height: 1.33;
   letter-spacing: 0.32px;
   color: #525252;
@@ -66,21 +66,21 @@
 
 .tileValue {
   display: block;
-  font-size: $productive-heading-03-font-size;
+  font-size: 20px;
   line-height: 1.29;
-  color: $text-primary; /* #161616 */
-  margin: $spacing-05 $spacing-10 $spacing-06 0;
+  color: #161616;
+  margin: layout.$spacing-05 layout.$spacing-10 layout.$spacing-06 0;
 }
 
 .tabletTileTitle {
-  margin: 0px 0px $spacing-03 $spacing-06;
-  font-size: $body-compact-01-font-size;
+  margin: 0px 0px layout.$spacing-03 layout.$spacing-06;
+  font-size: 14px;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
   line-height: 1.29;
   letter-spacing: 0.16px;
-  color: $text-secondary; /* #525252 */
+  color: #525252;
   display: flex;
   flex-direction: row;
 }
