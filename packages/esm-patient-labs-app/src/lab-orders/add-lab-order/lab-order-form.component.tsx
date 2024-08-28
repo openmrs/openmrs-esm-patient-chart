@@ -153,6 +153,8 @@ export function LabOrderForm({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
+  const responsiveSize = isTablet ? 'lg' : 'sm';
+
   return (
     <>
       {errorLoadingTestTypes && (
@@ -171,27 +173,8 @@ export function LabOrderForm({
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
-                <Controller
-                  name="testType"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <ComboBox
-                      size="lg"
-                      id="testTypeInput"
-                      titleText={t('testType', 'Test type')}
-                      selectedItem={value}
-                      items={testTypes}
-                      placeholder={
-                        isLoadingTestTypes ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
-                      }
-                      onBlur={onBlur}
-                      disabled={isLoadingTestTypes || isEditing}
-                      onChange={({ selectedItem }) => onChange(selectedItem)}
-                      invalid={errors.testType?.message}
-                      invalidText={errors.testType?.message}
-                    />
-                  )}
-                />
+                <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
+                <p className={styles.bodyShort02}>{initialOrder?.testType?.label}</p>
               </InputWrapper>
             </Column>
           </Grid>
@@ -204,7 +187,7 @@ export function LabOrderForm({
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       id="labReferenceNumberInput"
-                      size="lg"
+                      size={responsiveSize}
                       labelText={t('labReferenceNumber', 'Lab reference number')}
                       maxLength={150}
                       value={value}
@@ -226,7 +209,7 @@ export function LabOrderForm({
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <ComboBox
-                      size="lg"
+                      size={responsiveSize}
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
                       selectedItem={priorityOptions.find((option) => option.value === value) || null}
@@ -250,7 +233,7 @@ export function LabOrderForm({
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <ComboBox
-                        size="lg"
+                        size={responsiveSize}
                         id="orderReasonInput"
                         titleText={t('orderReason', 'Order reason')}
                         selectedItem={''}
@@ -277,7 +260,7 @@ export function LabOrderForm({
                     <TextArea
                       enableCounter
                       id="additionalInstructionsInput"
-                      size="lg"
+                      size={responsiveSize}
                       labelText={t('additionalInstructions', 'Additional instructions')}
                       value={value}
                       onChange={onChange}

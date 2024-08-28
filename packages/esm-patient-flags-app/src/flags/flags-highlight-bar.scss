@@ -1,21 +1,21 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@use '@carbon/layout';
 
 .flagSummary {
-  padding: spacing.$spacing-03;
+  padding: layout.$spacing-03;
   border-bottom: 1px solid colors.$gray-20;
 }
 
 .flagIcon {
-  margin-right: spacing.$spacing-02;
+  margin-right: layout.$spacing-02;
 }
 
-.arrow { 
-  margin-left: spacing.$spacing-05;
+.arrow {
+  margin-left: layout.$spacing-05;
 }
 
 .flagsHighlightTag {
-  padding: 0 spacing.$spacing-03;
+  padding: 0 layout.$spacing-03;
   border: none;
   span {
     display: flex;
@@ -25,14 +25,14 @@
 }
 
 .highlightBarContainer {
-  padding: 0 spacing.$spacing-03;
+  padding: 0 layout.$spacing-03;
   border-bottom: 1px solid colors.$gray-20;
 }
 
 .loader {
   align-items: center;
   display: flex;
-  min-height: spacing.$spacing-05;
-  padding: spacing.$spacing-05;
+  min-height: layout.$spacing-05;
+  padding: layout.$spacing-05;
   width: 100%;
 }

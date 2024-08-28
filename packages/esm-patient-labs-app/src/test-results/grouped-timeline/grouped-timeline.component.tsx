@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { ConfigurableLink, usePatient } from '@openmrs/esm-framework';
 import { Grid, ShadowBox } from '../panel-timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
@@ -12,7 +12,7 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import FilterContext from '../filter/filter-context';
-import styles from './grouped-timeline.styles.scss';
+import styles from './grouped-timeline.scss';
 
 const TimeSlots: React.FC<{
   children?: React.ReactNode;
@@ -188,7 +188,6 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   const {
     data: {
       parsedTime: { timeColumns, sortedTimes },
-      rowData,
     },
   } = timelineData;
 
@@ -215,22 +214,6 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
       return () => div.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
-
-  const onIntersect = (entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.intersectionRatio > 0.5) {
-        // setPanelName(parent.display);
-      }
-    });
-  };
-
-  const observer = new IntersectionObserver(onIntersect, {
-    root: null,
-    threshold: 0.5,
-  });
-  if (titleRef.current) {
-    observer.observe(titleRef.current);
-  }
 
   return (
     <>
@@ -263,7 +246,6 @@ export const GroupedTimeline = () => {
   const [xScroll, setXScroll] = useState(0);
   const { t } = useTranslation();
   let shownGroups = 0;
-  const tablet = useLayoutType() === 'tablet';
 
   const {
     data: {
@@ -278,12 +260,13 @@ export const GroupedTimeline = () => {
   }, [rowData]);
 
   if (rowData && rowData?.length === 0) {
-    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data Timeline')} />;
+    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
   }
+
   if (activeTests && timelineData && loaded) {
     return (
-      <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
-        <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
+      <div className={styles.timelineHeader}>
+        <div className={styles.timelineHeader}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid

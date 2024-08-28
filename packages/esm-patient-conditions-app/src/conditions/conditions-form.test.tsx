@@ -11,7 +11,7 @@ import ConditionsForm from './conditions-form.workspace';
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 
-const testProps = {
+const defaultProps = {
   condition: null,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
@@ -21,15 +21,14 @@ const testProps = {
   setTitle: jest.fn(),
 };
 
+function renderConditionsForm(props = {}) {
+  render(<ConditionsForm {...defaultProps} {...props} />);
+}
+
 const mockCreateCondition = jest.mocked(createCondition);
 const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-}));
 
 jest.mock('./conditions.resource', () => ({
   ...jest.requireActual('./conditions.resource'),
@@ -38,21 +37,16 @@ jest.mock('./conditions.resource', () => ({
   useConditionsSearch: jest.fn(),
 }));
 
+mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+mockUseConditionsSearch.mockReturnValue({
+  searchResults: [],
+  error: null,
+  isSearching: false,
+});
+
+mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
+
 describe('Conditions form', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
-
-    mockUseConditionsSearch.mockReturnValue({
-      searchResults: [],
-      error: null,
-      isSearching: false,
-    });
-
-    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
-  });
-
   it('renders the conditions form with all the relevant fields and values', () => {
     renderConditionsForm();
 
@@ -80,7 +74,7 @@ describe('Conditions form', () => {
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
-    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('setting the status of a condition to "inactive" reveals the end date input field', async () => {
@@ -198,16 +192,13 @@ describe('Conditions form', () => {
       error: null,
       isSearching: false,
     });
-    mockOpenmrsFetch.mockResolvedValue({
-      data: mockFhirConditionsResponse,
-      mutate: Promise.resolve(undefined),
-    } as unknown as FetchResponse);
+
+    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
 
     renderConditionsForm();
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     const submitButton = screen.getByRole('button', { name: /save & close/i });
-
     await user.click(submitButton);
 
     expect(screen.getByText(/a condition is required/i)).toBeInTheDocument();
@@ -248,11 +239,9 @@ describe('Conditions form', () => {
       id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
     };
 
-    testProps.condition = conditionToEdit;
-    testProps.formContext = 'editing' as 'creating' | 'editing';
-
     mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
-    renderConditionsForm();
+
+    renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
 
     expect(screen.queryByRole('searchbox', { name: /enter condition/i })).not.toBeInTheDocument();
 
@@ -263,7 +252,3 @@ describe('Conditions form', () => {
     await user.click(submitButton);
   });
 });
-
-function renderConditionsForm() {
-  render(<ConditionsForm {...testProps} />);
-}

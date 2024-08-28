@@ -468,6 +468,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                           label={t('editDoseComboBoxTitle', 'Dose')}
                           min={0}
                           hideSteppers={true}
+                          step={0.01}
                         />
                       </div>
                     </InputWrapper>
@@ -847,6 +848,7 @@ const ControlledFieldInput = ({
       return (
         <NumberInput
           className={fieldErrorStyles}
+          disableWheel
           onBlur={onBlur}
           onChange={(e, { value }) => {
             const number = parseFloat(value);

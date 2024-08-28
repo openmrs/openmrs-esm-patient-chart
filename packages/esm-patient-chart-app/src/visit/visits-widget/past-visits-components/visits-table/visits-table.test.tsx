@@ -6,33 +6,21 @@ import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
-const testProps = {
+const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
   visits: mockEncounters,
 };
 
-const mockedShowModal = showModal as jest.Mock;
-const mockedGetConfig = getConfig as jest.Mock;
-const mockedUserHasAccess = userHasAccess as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    getConfig: jest.fn().mockResolvedValue({ htmlFormEntryForms: [] }),
-    userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-  };
-});
+const mockShowModal = jest.mocked(showModal);
+const mockGetConfig = getConfig as jest.Mock;
+const mockUserHasAccess = userHasAccess as jest.Mock;
 
 describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', async () => {
-    testProps.visits = [];
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    mockedGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-
-    renderVisitsTable();
+    renderVisitsTable({ visits: [] });
 
     await screen.findByTitle(/empty data illustration/i);
     expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
@@ -40,9 +28,8 @@ describe('EncounterList', () => {
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
-    testProps.visits = mockEncounters;
 
-    renderVisitsTable();
+    renderVisitsTable({ visits: mockEncounters });
 
     await screen.findByRole('table');
 
@@ -91,11 +78,10 @@ describe('EncounterList', () => {
 describe('Delete Encounter', () => {
   it('Clicking the `Delete` button deletes an encounter', async () => {
     const user = userEvent.setup();
-    testProps.visits = mockEncounters;
 
-    mockedUserHasAccess.mockReturnValue(true);
+    mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable();
+    renderVisitsTable({ visits: mockEncounters });
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -107,8 +93,8 @@ describe('Delete Encounter', () => {
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger Delete this encounter/i }));
 
-    expect(mockedShowModal).toHaveBeenCalledTimes(1);
-    expect(mockedShowModal).toHaveBeenCalledWith(
+    expect(mockShowModal).toHaveBeenCalledTimes(1);
+    expect(mockShowModal).toHaveBeenCalledWith(
       'delete-encounter-modal',
       expect.objectContaining({
         encounterTypeName: 'POC Consent Form',
@@ -117,6 +103,6 @@ describe('Delete Encounter', () => {
   });
 });
 
-function renderVisitsTable() {
-  renderWithSwr(<VisitsTable {...testProps} />);
+function renderVisitsTable(props = {}) {
+  renderWithSwr(<VisitsTable {...defaultProps} {...props} />);
 }

@@ -1,2 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@import "../root.scss";
+@use '@carbon/type';
+
+.modalHeader {
+  @include type.type-style('heading-compact-02');
+}
+
+.bodyText {
+  @include type.type-style('body-long-01');
+}

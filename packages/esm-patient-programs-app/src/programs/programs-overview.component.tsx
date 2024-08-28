@@ -53,7 +53,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
 
-  const { activeEnrollments, availablePrograms, eligiblePrograms, enrollments, isError, isLoading, isValidating } =
+  const { activeEnrollments, availablePrograms, eligiblePrograms, enrollments, error, isLoading, isValidating } =
     usePrograms(patientUuid);
 
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
@@ -96,7 +96,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   }, [paginatedEnrollments, t]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -116,7 +116,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             kind={'info'}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}

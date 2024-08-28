@@ -1,10 +1,9 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { mockEnrolledProgramsResponse } from '__mocks__';
-
+import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsOverview from './programs-overview.component';
 
@@ -28,7 +27,7 @@ describe('ProgramsOverview', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -47,7 +46,7 @@ describe('ProgramsOverview', () => {
     };
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -60,7 +59,7 @@ describe('ProgramsOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
 
-    renderProgramsOverview();
+    renderWithSwr(<ProgramsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -81,12 +80,25 @@ describe('ProgramsOverview', () => {
     expect(screen.getByRole('row', { name: /HIV Care and Treatment/i })).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
+    expect(addButton).toBeEnabled();
     await user.click(addButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
   });
-});
 
-function renderProgramsOverview() {
-  renderWithSwr(<ProgramsOverview {...testProps} />);
-}
+  it('renders a notification when the patient is enrolled in all available programs', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledInAllProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
+
+    renderWithSwr(<ProgramsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('row', { name: /hiv care and treatment/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv differentiated care/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /oncology screening and diagnosis/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add/i })).toBeDisabled();
+    expect(screen.getByText(/enrolled in all programs/i)).toBeInTheDocument();
+    expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
+  });
+});

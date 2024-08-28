@@ -257,8 +257,7 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i, { exact: true })).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I go to the results viewer page', async () => {
@@ -332,8 +331,7 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record updated/i, { exact: true })).toBeVisible();
-    await expect(page.getByText(/the patient encounter was updated/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I revisit the `Results Viewer` page', async () => {

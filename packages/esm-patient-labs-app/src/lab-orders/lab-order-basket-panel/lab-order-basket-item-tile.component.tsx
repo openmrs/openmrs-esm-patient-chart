@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './lab-order-basket-item-tile.scss';
 import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import styles from './lab-order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: LabOrderBasketItem;

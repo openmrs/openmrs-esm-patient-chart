@@ -9,3 +9,4 @@ export const formEncounterUrlPoc = `${restBaseUrl}/form?v=custom:${customFormRep
 
 export const clinicalFormsWorkspace = 'clinical-forms-workspace';
 export const formEntryWorkspace = 'patient-form-entry-workspace';
+export const htmlFormEntryWorkspace = 'patient-html-form-entry-workspace';

@@ -16,7 +16,7 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <Layer>
+    <Layer className={styles.layer}>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{props.headerTitle}</h4>

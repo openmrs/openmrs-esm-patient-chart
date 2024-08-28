@@ -1,9 +1,10 @@
 @use '@carbon/colors';
+@use '@carbon/layout';
 @use '@carbon/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .condition {
-  padding: 0.75rem;
+  padding: layout.$spacing-04;
   border-top: 0.0625rem solid $grey-2;
 
   &:first-of-type {
@@ -27,9 +28,9 @@
 }
 
 .emptyResults {
-  @include type.type-style("body-compact-01");
+  @include type.type-style('body-compact-01');
   color: $text-02;
-  min-height: 1rem;
+  min-height: layout.$spacing-05;
   border: 1px solid $ui-03;
 }
 
@@ -41,11 +42,11 @@
 }
 
 .formContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -53,47 +54,47 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .loader {
-  padding: 1rem 0.5rem;
+  padding: layout.$spacing-05 layout.$spacing-03;
 }
 
 .conditionLabel {
-  @include type.type-style("label-02");
+  @include type.type-style('label-02');
 }
 
 .errorContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .conditionsError {
   :global(.cds--search-input):focus {
-    outline: 2px solid $danger
+    outline: layout.$spacing-01 solid $danger;
   }
 
   :global(.cds--search-magnifier) {
     svg {
-      fill: $danger
+      fill: $danger;
     }
   }
 }
 
 .errorMessage {
-  @include type.type-style("label-02");
+  @include type.type-style('label-02');
   color: $danger;
-  margin-top: 0.5rem;
+  margin-top: layout.$spacing-03;
 }
 
 .radioGroup {
   :global(.cds--radio-button-wrapper) {
-    margin-block-end: .375rem !important;
+    margin-block-end: 0.375rem !important;
   }
 
   :global(.cds--radio-button__validation-msg) {
@@ -103,11 +104,11 @@
 
 .spinner {
   &:global(.cds--inline-loading) {
-    min-height: 1rem;
+    min-height: layout.$spacing-05;
   }
 }
 
 .required {
   color: colors.$red-60;
-  margin-left: 0.125rem;
+  margin-left: layout.$spacing-01;
 }

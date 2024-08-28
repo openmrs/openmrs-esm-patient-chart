@@ -47,7 +47,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms } = usePrograms(patientUuid);
+  const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
   const tableHeaders: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -97,7 +97,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }, [availablePrograms, enrollments]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -105,6 +105,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {hideAddProgramButton ? null : (
             <Button
+              disabled={isEnrolledInAllPrograms}
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription={t('addPrograms', 'Add programs')}
@@ -116,7 +117,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         </CardHeader>
         {isEnrolledInAllPrograms && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}

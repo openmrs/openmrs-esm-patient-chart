@@ -1,74 +1,50 @@
 import React, { useMemo, useState } from 'react';
-import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  type DataTableHeader,
-  type DataTableRow,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './paginated-vitals.scss';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
-import { VitalsAndBiometricsActionMenu } from '../vitals-biometrics-form/vitals-biometrics-action-menu.component';
+import styles from './paginated-vitals.scss';
 
 interface PaginatedVitalsProps {
+  isPrinting?: boolean;
   pageSize: number;
   pageUrl: string;
-  urlLabel: string;
-  tableRows: Array<VitalsTableRow>;
   tableHeaders: Array<VitalsTableHeader>;
-  isPrinting?: boolean;
+  tableRows: Array<VitalsTableRow>;
+  urlLabel: string;
 }
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
-  tableRows,
+  isPrinting,
   pageSize,
   pageUrl,
-  urlLabel,
   tableHeaders,
-  isPrinting,
+  tableRows,
+  urlLabel,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
-        return (
-          <TableCell className={styles.criticallyHigh}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
       case 'critically_low':
-        return (
-          <TableCell className={styles.criticallyLow}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
       case 'high':
-        return (
-          <TableCell className={styles.high}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.high}>{children}</TableCell>;
       case 'low':
-        return (
-          <TableCell className={styles.low}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell className={styles.low}>{children}</TableCell>;
       default:
-        return (
-          <TableCell className={styles.normal}>
-            <span>{children}</span>
-          </TableCell>
-        );
+        return <TableCell>{children}</TableCell>;
     }
   };
 
@@ -113,7 +89,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const rows = isPrinting ? sortedData : paginatedVitals;
 
   return (
-    <div>
+    <>
       <DataTable
         rows={rows}
         headers={tableHeaders}
@@ -123,7 +99,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         isSortable
       >
         {({ rows, headers, getTableProps, getHeaderProps }) => (
-          <TableContainer>
+          <TableContainer className={styles.tableContainer}>
             <Table className={styles.table} aria-label="vitals" {...getTableProps()}>
               <TableHead>
                 <TableRow>
@@ -132,7 +108,6 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -141,15 +116,13 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                     {row.cells.map((cell) => {
                       const vitalsObj = paginatedVitals.find((obj) => obj.id === row.id);
                       const vitalSignInterpretation = vitalsObj && vitalsObj[cell.id.substring(2) + 'Interpretation'];
+
                       return (
                         <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={vitalSignInterpretation}>
                           {cell.value?.content ?? cell.value}
                         </StyledTableCell>
                       );
                     })}
-                    <TableCell className="cds--table-column-menu">
-                      <VitalsAndBiometricsActionMenu rowId={row.id} formType={'vitals'} />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -168,7 +141,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
           dashboardLinkLabel={urlLabel}
         />
       ) : null}
-    </div>
+    </>
   );
 };
 

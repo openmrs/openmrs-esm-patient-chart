@@ -2,10 +2,6 @@ import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export * from './test-results';
 
-export interface DashbardConfig {
-  columns: number;
-}
-
 export interface DashboardLinkConfig {
   path: string;
   title: string;
@@ -14,7 +10,6 @@ export interface DashboardLinkConfig {
 
 export interface DashboardConfig extends DashboardLinkConfig {
   slot: string;
-  config: DashbardConfig;
 }
 
 export interface PatientProgram {

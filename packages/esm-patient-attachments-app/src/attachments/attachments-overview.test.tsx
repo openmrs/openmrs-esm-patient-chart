@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import AttachmentsOverview from './attachments-overview.component';
 import { useAttachments } from '@openmrs/esm-framework';
 
-const mockedUseAttachments = jest.mocked(useAttachments);
+const mockUseAttachments = jest.mocked(useAttachments);
 
 it('renders a loading skeleton when attachments are loading', () => {
-  mockedUseAttachments.mockReturnValue({
+  mockUseAttachments.mockReturnValue({
     data: [],
     error: null,
     isLoading: true,
@@ -14,14 +14,14 @@ it('renders a loading skeleton when attachments are loading', () => {
     mutate: jest.fn(),
   });
 
-  renderAttachmentsOverview();
+  render(<AttachmentsOverview patientUuid="test-uuid" />);
 
   expect(screen.getByRole('progressbar')).toBeInTheDocument();
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
 });
 
 it('renders an empty state if attachments are not available', () => {
-  mockedUseAttachments.mockReturnValue({
+  mockUseAttachments.mockReturnValue({
     data: [],
     error: null,
     isLoading: false,
@@ -29,12 +29,8 @@ it('renders an empty state if attachments are not available', () => {
     mutate: jest.fn(),
   });
 
-  renderAttachmentsOverview();
+  render(<AttachmentsOverview patientUuid="test-uuid" />);
 
   expect(screen.getByText(/There are no attachments to display for this patient/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /record attachments/i })).toBeInTheDocument();
 });
-
-function renderAttachmentsOverview() {
-  render(<AttachmentsOverview patientUuid="test-uuid" />);
-}

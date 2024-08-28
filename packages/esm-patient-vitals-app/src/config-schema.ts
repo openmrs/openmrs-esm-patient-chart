@@ -116,7 +116,6 @@ export interface ConfigObject {
     weightUuid: string;
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
-    generalPatientNoteUuid: string;
   };
   vitals: {
     useFormEngine: boolean;

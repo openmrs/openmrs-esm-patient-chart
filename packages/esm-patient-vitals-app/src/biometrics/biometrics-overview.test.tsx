@@ -2,16 +2,20 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import BiometricsOverview from './biometrics-overview.component';
 
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const testProps = {
+  basePath: patientChartBasePath,
+  patientUuid: mockPatient.id,
+};
+
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 jest.mock('../common', () => {
   const originalModule = jest.requireActual('../common');
@@ -27,21 +31,18 @@ jest.mock('../common', () => {
   };
 });
 
-describe('BiometricsOverview: ', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
-      mockBiometricsConfig,
-    });
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  ...mockBiometricsConfig,
+} as ConfigObject);
 
+describe('BiometricsOverview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -60,11 +61,11 @@ describe('BiometricsOverview: ', () => {
       },
     } as unknown as Error;
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       error: mockError,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -81,11 +82,11 @@ describe('BiometricsOverview: ', () => {
   it("renders a tabular overview of the patient's biometrics data when available", async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedBiometrics,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -94,12 +95,8 @@ describe('BiometricsOverview: ', () => {
     expect(screen.getByRole('tab', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
-    const extractCellsExcludingActions = (row) => {
-      const cells = Array.from(row.querySelectorAll('td'));
-      return cells.filter((cell: HTMLElement) => cell.id !== 'actions');
-    };
-    const initialRows = screen.getAllByRole('row');
-    const initialCellsExcludingActions = initialRows.map(extractCellsExcludingActions);
+
+    const initialRowElements = screen.getAllByRole('row');
 
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
@@ -122,25 +119,25 @@ describe('BiometricsOverview: ', () => {
     await user.click(sortRowsButton);
     // Sorting in ascending order
     await user.click(sortRowsButton);
-    const initialSortedCellsExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
-    expect(initialSortedCellsExcludingActions).not.toEqual(initialCellsExcludingActions);
+
+    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
 
     // Sorting order = NONE, hence it is still in the ascending order
     await user.click(sortRowsButton);
     // Sorting in descending order
     await user.click(sortRowsButton);
-    const finalCellsSortedExcludingActions = screen.getAllByRole('row').map(extractCellsExcludingActions);
-    expect(finalCellsSortedExcludingActions).toEqual(initialCellsExcludingActions);
+
+    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedBiometrics.slice(0, 2),
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderBiometricsOverview();
+    renderWithSwr(<BiometricsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     await screen.findByRole('table', { name: /biometrics/i });
@@ -158,12 +155,3 @@ describe('BiometricsOverview: ', () => {
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
   });
 });
-
-function renderBiometricsOverview() {
-  const testProps = {
-    basePath: patientChartBasePath,
-    patientUuid: mockPatient.id,
-  };
-
-  renderWithSwr(<BiometricsOverview {...testProps} />);
-}

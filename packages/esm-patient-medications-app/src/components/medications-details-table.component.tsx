@@ -21,9 +21,18 @@ import {
   type Order,
   useOrderBasket,
   useLaunchWorkspaceRequiringVisit,
+  PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import { Add, User, Printer } from '@carbon/react/icons';
-import { age, getPatientName, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import {
+  age,
+  getPatientName,
+  formatDate,
+  useConfig,
+  useLayoutType,
+  usePatient,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
@@ -53,6 +62,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   showReorderButton,
   patientUuid,
 }) => {
+  const pageSize = 5;
   const { t } = useTranslation();
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
@@ -64,6 +74,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   const [isPrinting, setIsPrinting] = useState(false);
 
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
+  const { results, goTo, currentPage } = usePagination(medications, pageSize);
 
   const tableHeaders = [
     {
@@ -80,7 +91,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     },
   ];
 
-  const tableRows = medications?.map((medication, id) => ({
+  const tableRows = results?.map((medication, id) => ({
     id: `${id}`,
     details: {
       sortKey: medication.drug?.display,
@@ -306,6 +317,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </TableContainer>
           )}
         </DataTable>
+        <PatientChartPagination
+          pageNumber={currentPage}
+          totalItems={medications.length}
+          currentItems={results.length}
+          pageSize={pageSize}
+          onPageNumberChange={({ page }) => goTo(page)}
+        />
       </div>
     </div>
   );

@@ -7,13 +7,13 @@ import {
   restBaseUrl,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import dashboardMeta from './dashboard.meta';
 import { configSchema } from './config-schema';
-import vitalsSummaryComponent from './vitals/vitals-summary.component';
-import vitalsMainComponent from './vitals/vitals-main.component';
-import vitalsHeaderComponent from './vitals-and-biometrics-header/vitals-header.component';
-import biometricsOverviewComponent from './biometrics/biometrics-overview.component';
 import biometricsDetailedSummaryComponent from './biometrics/biometrics-main.component';
+import biometricsOverviewComponent from './biometrics/biometrics-overview.component';
+import dashboardMeta from './dashboard.meta';
+import vitalsHeaderComponent from './vitals-and-biometrics-header/vitals-header.component';
+import vitalsMainComponent from './vitals/vitals-main.component';
+import vitalsSummaryComponent from './vitals/vitals-summary.component';
 
 const moduleName = '@openmrs/esm-patient-vitals-app';
 
@@ -59,11 +59,6 @@ export const vitalsAndBiometricsDashboardLink =
   );
 
 export const weightTile = getAsyncLifecycle(() => import('./weight-tile/weight-tile.component'), options);
-
-export const vitalsAndBiometricsDeleteModal = getAsyncLifecycle(
-  () => import('./vitals-biometrics-form/delete-vitals-and-biometrics.modal'),
-  options,
-);
 
 // t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
 export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(

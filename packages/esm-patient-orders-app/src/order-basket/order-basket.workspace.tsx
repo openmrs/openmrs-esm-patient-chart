@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
-import { ActionableNotification, Button, ButtonSet, InlineNotification } from '@carbon/react';
+import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
 import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
@@ -141,11 +141,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             />
           ))}
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.bottomButton} disabled={isSavingOrders} kind="secondary" onClick={handleCancel}>
+            <Button className={styles.actionButton} kind="secondary" onClick={handleCancel}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button
-              className={styles.bottomButton}
+              className={styles.actionButton}
               kind="primary"
               onClick={handleSave}
               disabled={
@@ -156,7 +156,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
               }
             >
-              {t('signAndClose', 'Sign and close')}
+              {isSavingOrders ? (
+                <InlineLoading description={t('saving', 'Saving') + '...'} />
+              ) : (
+                <span>{t('signAndClose', 'Sign and close')}</span>
+              )}
             </Button>
           </ButtonSet>
         </div>

@@ -10,7 +10,7 @@
       "component": "vitalsSummary",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": true
       },
       "order": 1
     },
@@ -21,7 +21,7 @@
       "meta": {
         "title": "Vitals",
         "view": "vitals",
-        "columnSpan": 2
+        "fullWidth": true
       },
       "order": 1
     },
@@ -35,7 +35,7 @@
       "component": "biometricsOverview",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       },
       "order": 2
     },
@@ -46,7 +46,7 @@
       "meta": {
         "view": "biometrics",
         "title": "Biometrics",
-        "columnSpan": 2
+        "fullWidth": true
       }
     },
     {
@@ -56,7 +56,6 @@
       "order": 2,
       "meta": {
         "slot": "patient-chart-vitals-biometrics-dashboard-slot",
-        "columns": 1,
         "path": "Vitals & Biometrics"
       }
     },
@@ -72,14 +71,7 @@
     {
       "name": "patient-vitals-biometrics-form-workspace",
       "title": "recordVitalsAndBiometrics",
-      "component": "vitalsBiometricsFormWorkspace",
-      "type": "form"
-    }
-  ],
-  "modals": [
-    {
-      "name": "vitals-and-biometrics-delete-modal",
-      "component": "vitalsAndBiometricsDeleteModal"
+      "component": "vitalsBiometricsFormWorkspace"
     }
   ]
 }

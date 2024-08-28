@@ -16,7 +16,6 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-orders-dashboard-slot",
-        "columns": 1,
         "path": "Orders",
         "hideDashboardTitle": true
       },
@@ -27,7 +26,7 @@
       "component": "ordersDashboard",
       "slot": "patient-chart-orders-dashboard-slot",
       "meta": {
-        "columnSpan": 4
+        "fullWidth": false
       }
     }
   ],

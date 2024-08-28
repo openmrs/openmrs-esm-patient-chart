@@ -77,7 +77,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ defaultValue, registe
               rules={{ required: true }}
               defaultValue={defaultValue?.value?.uuid}
             >
-              <SelectItem text={t('option', 'Choose an Option')} value="" />
+              <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
               {concept?.answers?.length &&
                 concept?.answers?.map((answer) => (
                   <SelectItem key={answer.uuid} text={answer.display} value={answer.uuid}>
@@ -134,7 +134,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ defaultValue, registe
                     autoFocus={index === 0}
                     defaultValue={getSavedMemberValue(member.uuid, member.datatype.display)}
                   >
-                    <SelectItem text={t('option', 'Choose an Option')} value="" />
+                    <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
 
                     {member?.answers?.map((answer) => (
                       <SelectItem key={answer.uuid} text={answer.display} value={answer.uuid}>

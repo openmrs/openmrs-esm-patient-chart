@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
-import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { formatDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
@@ -63,7 +63,6 @@ interface TrendlineProps {
 const Trendline: React.FC<TrendlineProps> = ({
   patientUuid,
   conceptUuid,
-  basePath,
   hideTrendlineHeader = false,
   showBackToTimelineButton = false,
 }) => {
@@ -72,6 +71,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
   const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
+  const [showResultsTable, setShowResultsTable] = useState(false);
 
   const [upperRange, lowerRange] = useMemo(() => {
     if (obs.length === 0) {
@@ -109,8 +109,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   const tableData: Array<{
     id: string;
-    date: string;
-    time: string;
+    dateTime: string;
     value:
       | number
       | {
@@ -139,8 +138,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     tableData.push({
       id: `${idx}`,
-      date: formatDate(parseDate(obs.obsDatetime)),
-      time: formatTime(parseDate(obs.obsDatetime)),
+      dateTime: obs.obsDatetime,
       value: {
         value: parseFloat(obs.value),
         interpretation: obs.interpretation,
@@ -198,12 +196,8 @@ const Trendline: React.FC<TrendlineProps> = ({
   const tableHeaderData = useMemo(
     () => [
       {
-        header: t('date', 'Date'),
-        key: 'date',
-      },
-      {
-        header: t('timeOfTest', 'Time of Test'),
-        key: 'time',
+        header: t('dateTime', 'Date and time'),
+        key: 'dateTime',
       },
       {
         header: `${t('value', 'Value')} (${leftAxisTitle})`,
@@ -236,7 +230,19 @@ const Trendline: React.FC<TrendlineProps> = ({
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
-      <DrawTable {...{ tableData, tableHeaderData }} />
+
+      {showResultsTable ? (
+        <>
+          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
+            {t('hideResultsTable', 'Hide results table')}
+          </Button>
+          <DrawTable {...{ tableData, tableHeaderData }} />
+        </>
+      ) : (
+        <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
+          {t('showResultsTable', 'Show results table')}
+        </Button>
+      )}
     </div>
   );
 };
