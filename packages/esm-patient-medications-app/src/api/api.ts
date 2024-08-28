@@ -14,7 +14,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  * @param status Allows fetching either all orders or only active orders.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
+export function usePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig() as ConfigObject;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
