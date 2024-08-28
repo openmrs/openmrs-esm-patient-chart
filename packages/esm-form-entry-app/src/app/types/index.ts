@@ -454,6 +454,8 @@ export interface PatientModel {
   age: number;
   gendercreatconstant?: number;
   identifiers: Array<Identifier>;
+  patientUuid: string;
+  [key: string]: any;
 }
 
 export interface IdentifierPayload {
