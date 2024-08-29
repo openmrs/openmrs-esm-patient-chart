@@ -341,17 +341,15 @@ export class FormDataSourceService {
     }
   }
   public getPatientObject(patient): PatientModel {
-    let model: PatientModel = {
-      sex: this.getGender(patient?.gender),
-      birthdate: new Date(patient?.birthDate),
-      age: this.calculateAge(patient?.birthDate),
-      identifiers: [],
-      gendercreatconstant: patient?.gender === 'female' ? 0.85 : patient?.gender === 'male' ? 1 : undefined,
+    return {
+      ...patient,
+      patientUuid: patient.id,
+      sex: this.getGender(patient.gender),
+      birthdate: patient.birthDate ? new Date(patient.birthDate) : undefined,
+      age: this.calculateAge(patient.birthDate),
+      gendercreatconstant: patient.gender === 'female' ? 0.85 : patient.gender === 'male' ? 1 : undefined,
+      identifiers: this.mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient),
     };
-
-    model.identifiers = this.mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient);
-
-    return model;
   }
 
   private calculateAge(birthday) {
