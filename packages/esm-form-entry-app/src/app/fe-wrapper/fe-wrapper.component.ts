@@ -229,7 +229,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
                 });
             }
 
-            this.programService.handlePatientCareProgram(this.form, encounter.uuid);
+            this.programService.handlePatientCareProgram(this.form, encounter);
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
