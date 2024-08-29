@@ -269,7 +269,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
       onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
-  });
+  } as any);
 
   const orderTypesToDisplay = useMemo(
     () => [
