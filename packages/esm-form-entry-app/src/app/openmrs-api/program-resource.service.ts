@@ -26,7 +26,7 @@ export class ProgramResourceService {
   ) {}
 
   private programEnrollmentUrl(): string {
-    return `${this.windowRef.nativeWindow.openmrsBase}${restBaseUrl}/programenrollment--`;
+    return `${this.windowRef.nativeWindow.openmrsBase}${restBaseUrl}/programenrollment`;
   }
 
   public handlePatientCareProgram(form: Form, encounter: Encounter): Observable<any> {

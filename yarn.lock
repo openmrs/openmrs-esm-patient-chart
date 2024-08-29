@@ -2224,9 +2224,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@esbuild/android-arm64@npm:0.18.17":
-  version: 0.18.17
-  resolution: "@esbuild/android-arm64@npm:0.18.17"
+"@discoveryjs/json-ext@npm:^0.6.1":
+  version: 0.6.3
+  resolution: "@discoveryjs/json-ext@npm:0.6.3"
+  checksum: 10/6cb35ce92c8f1e9533250da9a893def63cce4f9a4f67677259bf11619d83858ca9c010171f49b22d83153b7b7ff65c39bbbf0edf4734d67e864de1044b7a943c
+  languageName: node
+  linkType: hard
+
+"@emnapi/core@npm:^1.1.0":
+  version: 1.2.0
+  resolution: "@emnapi/core@npm:1.2.0"
+  dependencies:
+    "@emnapi/wasi-threads": "npm:1.0.1"
+    tslib: "npm:^2.4.0"
+  checksum: 10/b0b32b7702ae501be76c72ee77778e0356696b49a72f56c3c04774db23baa3a6054acf839a3d8a49fee415386946685edb904eaa3ac95b5c73cedd2f2766853c
+  languageName: node
+  linkType: hard
+
+"@emnapi/runtime@npm:^1.1.0":
+  version: 1.2.0
+  resolution: "@emnapi/runtime@npm:1.2.0"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10/c954b36493b713e451c74e9f1a48124b5491196700ec458c5d4a94eac3351e14803b4fd48ae6f72c77956d75792093d377f96412a6f59766099cb142e5c5b8f4
+  languageName: node
+  linkType: hard
+
+"@emnapi/wasi-threads@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@emnapi/wasi-threads@npm:1.0.1"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10/949f8bdcb11153d530652516b11d4b11d8c6ed48a692b4a59cbaa4305327aed59a61f0d87c366085c20ad0b0336c3b50eaddbddeeb3e8c55e7e82b583b9d98fb
+  languageName: node
+  linkType: hard
+
+"@esbuild/aix-ppc64@npm:0.19.12":
+  version: 0.19.12
+  resolution: "@esbuild/aix-ppc64@npm:0.19.12"
+  conditions: os=aix & cpu=ppc64
+  languageName: node
+  linkType: hard
+
+"@esbuild/aix-ppc64@npm:0.20.1":
+  version: 0.20.1
+  resolution: "@esbuild/aix-ppc64@npm:0.20.1"
+  conditions: os=aix & cpu=ppc64
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-arm64@npm:0.19.12":
+  version: 0.19.12
+  resolution: "@esbuild/android-arm64@npm:0.19.12"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
@@ -3749,6 +3798,70 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ljharb/through@npm:^2.3.12":
+  version: 2.3.13
+  resolution: "@ljharb/through@npm:2.3.13"
+  dependencies:
+    call-bind: "npm:^1.0.7"
+  checksum: 10/6150c6c43a726d52c26863ed6dc4ab54fa7cf625c81463a5ddec86278c99e23bf94dfc99ebf09a9ac3191332d4a27344e092f7e07f252b8cd600e2b38e645870
+  languageName: node
+  linkType: hard
+
+"@module-federation/error-codes@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/error-codes@npm:0.14.3"
+  checksum: 10/3b6c25940d966648c2531b80edabafd36eddccdd8f68ba6702686a1e4fd2dbaa4a34ef6fb22a4d8a615b907e907e233dd0fd312c49a7369a49669bc1ab414a19
+  languageName: node
+  linkType: hard
+
+"@module-federation/runtime-core@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/runtime-core@npm:0.14.3"
+  dependencies:
+    "@module-federation/error-codes": "npm:0.14.3"
+    "@module-federation/sdk": "npm:0.14.3"
+  checksum: 10/7e974a8c051334929e28231fe1552489258ab1b545f0f5ad59644b0288765642f3e908b48c3cc59bc74a326f4f92325788b1a898f89d8f795f8036aa812b2bb6
+  languageName: node
+  linkType: hard
+
+"@module-federation/runtime-tools@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/runtime-tools@npm:0.14.3"
+  dependencies:
+    "@module-federation/runtime": "npm:0.14.3"
+    "@module-federation/webpack-bundler-runtime": "npm:0.14.3"
+  checksum: 10/09bc9d482ead7d38d5f9f6e1d45c85f257833302315447b2a17c26dc44046f8aa0563ffdb2f5addbddbf5f8f972c13dc8e80932a8a34780738232332bbdf5ce9
+  languageName: node
+  linkType: hard
+
+"@module-federation/runtime@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/runtime@npm:0.14.3"
+  dependencies:
+    "@module-federation/error-codes": "npm:0.14.3"
+    "@module-federation/runtime-core": "npm:0.14.3"
+    "@module-federation/sdk": "npm:0.14.3"
+  checksum: 10/b7009953998f2624f5ece3da4174d8427d30b2af3b108154f0fa2365aa6c08d167e23b9771508f2c6038a397f21e0e26b93dd09f3d4b7b90eac6b0ee7f1b9ee2
+  languageName: node
+  linkType: hard
+
+"@module-federation/sdk@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/sdk@npm:0.14.3"
+  checksum: 10/f359fa15ecebe6e1e80e8fbd4d4969ae2d2d92f0d3e338443c45fba4772327368e086b108adcec585763d974e7462227a9e51b0531826292e2249f2612d0f822
+  languageName: node
+  linkType: hard
+
+"@module-federation/webpack-bundler-runtime@npm:0.14.3":
+  version: 0.14.3
+  resolution: "@module-federation/webpack-bundler-runtime@npm:0.14.3"
+  dependencies:
+    "@module-federation/runtime": "npm:0.14.3"
+    "@module-federation/sdk": "npm:0.14.3"
+  checksum: 10/016d1c51e82e230b2d33f67aba7c9ff2cd9f939306a48dfa3aeb0f3939dd82f797e06b478c009459d7516fadbf43024cd0fc13618555a64c470192d9b87ab926
+  languageName: node
+  linkType: hard
+
 "@mole-inc/bin-wrapper@npm:^8.0.1":
   version: 8.0.1
   resolution: "@mole-inc/bin-wrapper@npm:8.0.1"
@@ -4931,9 +5044,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+"@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app":
   version: 5.0.0
-  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=11fd55&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=46b0d3&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -4954,10 +5067,11 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/7944f66960733d22f66275cfe6634f92430edfc894df880b64c1753476a7521d99902ef676f5a792d1315860b62495a7a3f17867f009cadf3014cef10397dd0c
+  checksum: 10/34716b117cdad5f3721066d059724b923010d3754f59ec9c1448231d1ae259f7e96754da8a27a5c780cd036da11d5ad7aff3e0325332c4acd9b93c2966f14f48
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@openmrs/ngx-formentry@npm:next":
 <<<<<<< HEAD
   version: 17.0.1-pre.480
@@ -4978,6 +5092,11 @@ __metadata:
 =======
   version: 5.0.1-pre.445
   resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.445"
+=======
+"@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+  version: 5.0.0
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=46b0d3&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
+>>>>>>> a137f84d ((feat) : improve work on patient enrollment)
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -5000,10 +5119,14 @@ __metadata:
     shelljs: ^0.7.8
     tree-model: ^1.0.7
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/776500819b21d37cf8c4abd99608290a7cca20c1a22e0a553c3ac08fb768bb1bfe9f91eb14ab59f56b451d8064ebba0b70f8441805ea21815bf5dd3e688016cd
 =======
   checksum: 10/a5e5e34002e0863581db2fa8930e0b09758b352c38653eda476cca3e4977d5c1d61e81db057ca314193fc800dfb78e7bd6f81fc8670e4388e484a10199d242c4
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
+=======
+  checksum: 10/34716b117cdad5f3721066d059724b923010d3754f59ec9c1448231d1ae259f7e96754da8a27a5c780cd036da11d5ad7aff3e0325332c4acd9b93c2966f14f48
+>>>>>>> a137f84d ((feat) : improve work on patient enrollment)
   languageName: node
   linkType: hard
 
