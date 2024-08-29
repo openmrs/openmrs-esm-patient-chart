@@ -34,7 +34,8 @@
               "lodash",
               "moment",
               "raf",
-              "rgbcolor"
+              "rgbcolor",
+              "zone.js"
             ],
             "preserveSymlinks": true,
             "outputPath": "dist",
