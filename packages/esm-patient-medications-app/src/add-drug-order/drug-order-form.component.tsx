@@ -624,6 +624,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       step={1}
                       max={maxDispenseDurationInDays}
                       allowEmpty={true}
+                      hideSteppers
                     />
                   ) : (
                     <CustomNumberInput
@@ -698,6 +699,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       label={t('prescriptionRefills', 'Prescription refills')}
                       max={99}
                       allowEmpty
+                      hideSteppers
                     />
                   ) : (
                     <CustomNumberInput
