@@ -1,8 +1,8 @@
 import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import { Form } from '@openmrs/ngx-formentry';
-import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
-import { catchError, concatAll, filter, map, mergeMap, take } from 'rxjs/operators';
+import { Observable, forkJoin, from, throwError, of, Subscription, Subject } from 'rxjs';
+import { catchError, concatAll, filter, map, mergeMap, switchMap, take, takeUntil } from 'rxjs/operators';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
@@ -202,57 +202,65 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   private handleFormSubmission() {
     this.changeState('submitting');
-    this.patientResourceService.validateIdentifiers(this.form).subscribe((resp) => {
-      if (resp.length > 0) {
-        this.changeState('readyWithValidationErrors');
-        showSnackbar({
-          title: this.translateService.instant('patientIdentifierDuplication'),
-          subtitle: this.translateService.instant('patientIdentifierDuplicationDescription'),
-          kind: 'error',
-          isLowContrast: false,
-        });
-      } else {
-        this.formSubmissionService.submitPayload(this.form).subscribe(
-          ({ encounter }) => {
-            this.onPostResponse(encounter);
-            const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-
-            if (!isOffline && encounter?.uuid) {
-              this.encounterResourceService
-                .getEncounterByUuid(encounter.uuid)
-                .pipe(take(1))
-                .subscribe((encounter) => {
-                  if (Array.isArray(encounter?.orders)) {
-                    const submittedOrders = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
-                    this.showLabOrdersNotification(submittedOrders);
-                  }
-                });
-            }
-
-            this.programService.handlePatientCareProgram(this.form, encounter);
+    this.patientResourceService
+      .validateIdentifiers(this.form)
+      .pipe(
+        switchMap((resp) => {
+          if (resp.length > 0) {
+            this.changeState('readyWithValidationErrors');
             showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: this.translateService.instant('formSubmittedSuccessfully'),
-              title: this.form.schema.display ?? this.form.schema.name,
-              timeoutInMs: 5000,
-            });
-            this.changeState('submitted');
-            this.closeFormWithSavedChanges();
-          },
-          (error: Error) => {
-            this.changeState('submissionError');
-            showSnackbar({
-              isLowContrast: true,
+              title: this.translateService.instant('patientIdentifierDuplication'),
+              subtitle: this.translateService.instant('patientIdentifierDuplicationDescription'),
               kind: 'error',
-              subtitle: this.translateService.instant('formSubmissionFailed').replace('{error}', error.message),
-              title: this.form.schema.display ?? this.form.schema.name,
-              timeoutInMs: 5000,
+              isLowContrast: false,
             });
-          },
-        );
-      }
-    });
+            return throwError('Validation failed');
+          }
+          return this.formSubmissionService.submitPayload(this.form);
+        }),
+        switchMap(({ encounter }) => {
+          this.onPostResponse(encounter);
+          const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
+
+          if (!isOffline && encounter?.uuid) {
+            return this.encounterResourceService.getEncounterByUuid(encounter.uuid).pipe(
+              take(1),
+              switchMap((fullEncounter) => {
+                if (Array.isArray(fullEncounter?.orders)) {
+                  const submittedOrders = fullEncounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
+                  this.showLabOrdersNotification(submittedOrders);
+                }
+                return this.programService.handlePatientCareProgram(this.form, encounter);
+              }),
+            );
+          }
+          return this.programService.handlePatientCareProgram(this.form, encounter);
+        }),
+      )
+      .subscribe(
+        () => {
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'success',
+            subtitle: this.translateService.instant('formSubmittedSuccessfully'),
+            title: this.form.schema.display ?? this.form.schema.name,
+            timeoutInMs: 5000,
+          });
+          this.changeState('submitted');
+          this.closeForm();
+        },
+        (error: Error) => {
+          console.error('Form submission error:', error);
+          this.changeState('submissionError');
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'error',
+            subtitle: this.translateService.instant('formSubmissionFailed').replace('{error}', error?.message),
+            title: this.form.schema.display ?? this.form.schema.name,
+            timeoutInMs: 5000,
+          });
+        },
+      );
   }
 
   private modifyVisitDate(visitUuid: string, visitStartDatetime: string, visitStopDatetime: string) {
