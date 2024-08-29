@@ -5302,6 +5302,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+  version: 5.0.0
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=11fd55&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
+  dependencies:
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    "@angular/animations": ^16.2.12
+    "@angular/cdk": ^16.2.12
+    "@angular/common": ^16.2.12
+    "@angular/compiler": ^16.2.12
+    "@angular/compiler-cli": ^16.2.12
+    "@angular/core": ^16.2.12
+    "@angular/forms": ^16.2.12
+    "@carbon/styles": ^1.11.0
+    "@ng-select/ng-select": ^11.2.0
+    "@ngx-translate/core": ^15.0.0
+    "@openmrs/ngx-file-uploader": "*"
+    lodash: ^4.17.21
+    moment: ^2.29.4
+    ngx-webcam: ^0.4.1
+    reflect-metadata: ^0.1.13
+    shelljs: ^0.7.8
+    tree-model: ^1.0.7
+  checksum: 10/7944f66960733d22f66275cfe6634f92430edfc894df880b64c1753476a7521d99902ef676f5a792d1315860b62495a7a3f17867f009cadf3014cef10397dd0c
+  languageName: node
+  linkType: hard
+
 "@openmrs/ngx-formentry@npm:next":
   version: 17.0.1-pre.480
   resolution: "@openmrs/ngx-formentry@npm:17.0.1-pre.480"

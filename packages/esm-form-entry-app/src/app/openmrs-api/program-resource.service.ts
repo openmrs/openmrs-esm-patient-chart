@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { WindowRef } from '../window-ref';
 import { Form } from '@openmrs/ngx-formentry';
-import { MetaData } from '../types';
+import { Encounter, MetaData } from '../types';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { EncounterResourceService } from './encounter-resource.service';
@@ -24,21 +24,22 @@ export class ProgramResourceService {
     return `${this.windowRef.nativeWindow.openmrsBase}${restBaseUrl}/programenrollment`;
   }
 
-  public handlePatientCareProgram(form: Form, encounterUuid: string): void {
+  public handlePatientCareProgram(form: Form, encounter: Encounter): void {
     const careProgramMeta: MetaData | undefined = form.schema.meta?.programs;
     if (!careProgramMeta) {
       return;
     }
 
     const { uuid, isEnrollment, enrollmentDateQuestionId, discontinuationDateQuestionId } = careProgramMeta;
-    const enrollmentDate = this.getProgramDate(form, isEnrollment, enrollmentDateQuestionId);
+    const enrollmentDate =
+      this.getProgramDate(form, isEnrollment, enrollmentDateQuestionId) ?? encounter.encounterDatetime;
     const discontinuationDate = this.getProgramDate(form, !isEnrollment, discontinuationDateQuestionId);
     const locationUuid = this.getUserLocationUuid(form);
     const utcOffset = form.valueProcessingInfo.utcOffset ?? '+0300';
 
     isEnrollment
-      ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounterUuid, utcOffset)
-      : this.discontinuePatientFromCareProgram(discontinuationDate, encounterUuid, utcOffset);
+      ? this.enrollPatientToCareProgram(enrollmentDate, uuid, locationUuid, encounter.uuid, utcOffset)
+      : this.discontinuePatientFromCareProgram(discontinuationDate, encounter.uuid, utcOffset);
   }
 
   public enrollPatientToCareProgram(
