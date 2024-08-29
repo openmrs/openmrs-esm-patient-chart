@@ -214,6 +214,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               kind: 'error',
               isLowContrast: false,
             });
+            this.closeForm(); // Close the form after showing the error
             return throwError('Validation failed');
           }
           return this.formSubmissionService.submitPayload(this.form);
@@ -259,6 +260,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             title: this.form.schema.display ?? this.form.schema.name,
             timeoutInMs: 5000,
           });
+          this.closeForm(); // Close the form after showing the error
         },
       );
   }
