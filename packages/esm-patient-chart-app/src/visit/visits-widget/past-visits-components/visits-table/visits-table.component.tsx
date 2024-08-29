@@ -37,8 +37,12 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
-import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
+import {
+  type HtmlFormEntryForm,
+  EmptyState,
+  PatientChartPagination,
+  launchFormEntryOrHtmlForms,
+} from '@openmrs/esm-patient-common-lib';
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
