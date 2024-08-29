@@ -1,4 +1,5 @@
 import { validator, Type } from '@openmrs/esm-framework';
+import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 
 export const configSchema = {
   htmlFormEntryForms: {
@@ -132,14 +133,6 @@ export const configSchema = {
     _default: [],
   },
 };
-
-export interface HtmlFormEntryForm {
-  formUuid: string;
-  formName: string;
-  formUiResource: string;
-  formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
-  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
-}
 
 export interface FormsSection {
   name: string;

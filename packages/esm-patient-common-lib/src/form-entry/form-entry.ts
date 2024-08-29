@@ -1,4 +1,4 @@
-import { type HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
+import { type HtmlFormEntryForm } from '../types';
 
 export interface FormEntryProps {
   encounterUuid?: string;
