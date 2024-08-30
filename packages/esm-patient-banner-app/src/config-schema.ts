@@ -36,6 +36,21 @@ export const configSchema = {
       'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
     _default: '4in 6in',
   },
+  printIdentifierStickerWidth: {
+    _type: Type.String,
+    _description: 'Specifies the width of the sticker to be printed.',
+    _default: '4in',
+  },
+  printIdentifierStickerHeight: {
+    _type: Type.String,
+    _description: 'Specifies the height of the sticker to be printed.',
+    _default: '6in',
+  },
+  printIdentifierStickerPaperSize: {
+    _type: Type.String,
+    _description: 'Specifies the paper size to be used for printing the sticker.',
+    _default: 'A4',
+  },
   useRelationshipNameLink: {
     _type: Type.Boolean,
     _description: "Whether to use the relationship name as a link to the associated person's patient chart.",
@@ -50,4 +65,7 @@ export interface ConfigObject {
   printIdentifierStickerFields: Array<string>;
   printIdentifierStickerSize: string;
   useRelationshipNameLink: boolean;
+  printIdentifierStickerWidth: string;
+  printIdentifierStickerHeight: string;
+  printIdentifierStickerPaperSize: string;
 }
