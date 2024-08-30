@@ -139,7 +139,7 @@ describe('AddLabOrder', () => {
           display: 'CD4 COUNT',
           urgency: 'STAT',
           instructions: 'plz do it thx',
-          labReferenceNumber: 'lba-000124',
+          accessionNumber: 'lba-000124',
           testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
           orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),

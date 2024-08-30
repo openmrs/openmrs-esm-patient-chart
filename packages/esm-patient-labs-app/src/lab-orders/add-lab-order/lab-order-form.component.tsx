@@ -62,7 +62,7 @@ export function LabOrderForm({
         urgency: z.string().refine((value) => value !== '', {
           message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
         }),
-        labReferenceNumber: z.string().optional(),
+        accessionNumber: z.string().optional(),
         testType: z.object(
           { label: z.string(), conceptUuid: z.string() },
           {
@@ -182,7 +182,7 @@ export function LabOrderForm({
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <Controller
-                  name="labReferenceNumber"
+                  name="accessionNumber"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
@@ -193,8 +193,8 @@ export function LabOrderForm({
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
-                      invalid={errors.labReferenceNumber?.message}
-                      invalidText={errors.labReferenceNumber?.message}
+                      invalid={errors.accessionNumber?.message}
+                      invalidText={errors.accessionNumber?.message}
                     />
                   )}
                 />
