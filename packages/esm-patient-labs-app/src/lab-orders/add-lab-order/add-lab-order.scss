@@ -28,8 +28,7 @@
 
   button {
     display: flex;
-    padding-left: 0 !important;
-    margin: 0 layout.$spacing-05;
+    margin-left: -(layout.$spacing-03);
 
     svg {
       order: 1;
