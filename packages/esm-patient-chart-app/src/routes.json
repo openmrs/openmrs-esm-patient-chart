@@ -24,6 +24,12 @@
       "offline": true
     },
     {
+      "name": "encounter-list-table-tabs",
+      "component": "encounterListTableTabs",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "start-visit-button",
       "component": "startVisitActionButton",
       "slot": "patient-actions-slot",
