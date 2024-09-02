@@ -110,10 +110,11 @@ interface PrintComponentProps extends Partial<ConfigObject> {
 const PrintComponent = ({ patient }: PrintComponentProps) => {
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
+  const primaryIdentifierValue = patient?.identifier?.find((identifier) => identifier.use === 'official')?.value;
   return (
     <div className={styles.stickerContainer}>
       <div className={styles.documentHeader}>
-        <Barcode value={'100001'} {...defaultBarcodeParams} />
+        <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
         <ImplementationLogo />
       </div>
       {printPatientSticker.fields.map((field) => {
@@ -127,8 +128,9 @@ const PrintComponent = ({ patient }: PrintComponentProps) => {
 const ImplementationLogo: React.FC = () => {
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
-  return printPatientSticker.logo ? (
-    <span>{printPatientSticker.logo}</span>
+
+  return printPatientSticker?.header?.logo ? (
+    <span>{printPatientSticker?.header?.logo}</span>
   ) : (
     <svg role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
       <path

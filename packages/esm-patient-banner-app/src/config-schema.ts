@@ -13,12 +13,32 @@ export const configSchema = {
       _type: Type.UUID,
     },
   },
-
   printPatientSticker: {
     enabled: {
       _type: Type.Boolean,
       _description: 'Whether to enable the print patient sticker feature',
       _default: true,
+    },
+    header: {
+      _type: Type.Object,
+      _description: 'The header to display on the patient sticker',
+      _elements: {
+        showBarcode: {
+          _type: Type.Boolean,
+          _description: 'Whether to display a barcode on the patient sticker',
+          _default: true,
+        },
+        showLogo: {
+          _type: Type.Boolean,
+          _description: 'Whether to display a logo on the patient sticker',
+          _default: true,
+        },
+        logo: {
+          _type: Type.String,
+          _description: 'The URL of the logo to display in the patient sticker',
+          _default: '',
+        },
+      },
     },
     fields: {
       _type: Type.Array,
@@ -40,11 +60,6 @@ export const configSchema = {
         _type: Type.UUID,
       },
     },
-    logo: {
-      _type: Type.String,
-      _description: 'The URL of the logo to display in the patient sticker',
-      _default: '',
-    },
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
@@ -59,10 +74,14 @@ export interface ConfigObject {
   contactAttributeTypes: Array<string>;
   printPatientSticker: {
     enabled: boolean;
+    header: {
+      showBarcode: boolean;
+      showLogo: boolean;
+      logo: string;
+    };
     fields: Array<AllowedPatientFields>;
     pageSize: string;
     identifiersToDisplay: Array<string>;
-    logo: string;
   };
   useRelationshipNameLink: boolean;
 }
