@@ -5,6 +5,12 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.documentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .row {
   margin: layout.$spacing-03 0 0;
   display: flex;
@@ -47,6 +53,16 @@
   :global(.cds--inline-loading__text) {
     @include type.type-style('body-01');
   }
+}
+
+.strong {
+  @include type.type-style('heading-06');
+  font-weight: 700;
+  margin-right: layout.$spacing-03;
+}
+
+.patientDetail {
+  @include type.type-style('heading-05');
 }
 
 @media print {

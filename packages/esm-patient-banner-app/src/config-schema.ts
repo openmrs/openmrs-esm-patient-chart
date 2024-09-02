@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   contactAttributeTypes: {
@@ -12,29 +13,38 @@ export const configSchema = {
       _type: Type.UUID,
     },
   },
-  excludePatientIdentifierCodeTypes: {
-    uuids: {
+
+  printPatientSticker: {
+    enabled: {
+      _type: Type.Boolean,
+      _description: 'Whether to enable the print patient sticker feature',
+      _default: true,
+    },
+    fields: {
       _type: Type.Array,
-      _description: 'List of UUIDs of patient identifier types to exclude from rendering in the patient banner',
+      _description: 'Patient demographics to include in the patient sticker printout',
+      _default: ['name', 'dob', 'gender', 'identifier', 'age'],
+    },
+    pageSize: {
+      _type: Type.String,
+      _description:
+        'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
+      _default: 'A4',
+    },
+    identifiersToDisplay: {
+      _type: Type.Array,
+      _description:
+        'List of UUIDs of patient identifier types to exclude from rendering in the patient banner. If empty, all identifiers will be displayed.',
       _default: [],
       _elements: {
         _type: Type.UUID,
       },
     },
-  },
-  printIdentifierStickerFields: {
-    _type: Type.Array,
-    _description: 'Patient demographics to include in the identifier sticker printout',
-    _default: ['age', 'dateOfBirth', 'gender', 'identifier', 'name'],
-    _elements: {
+    logo: {
       _type: Type.String,
+      _description: 'The URL of the logo to display in the patient sticker',
+      _default: '',
     },
-  },
-  printIdentifierStickerSize: {
-    _type: Type.String,
-    _description:
-      'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
-    _default: '4in 6in',
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
@@ -42,12 +52,17 @@ export const configSchema = {
     _default: false,
   },
 };
+
+export type AllowedPatientFields = 'name' | 'dob' | 'gender' | 'identifier' | 'age';
+
 export interface ConfigObject {
   contactAttributeTypes: Array<string>;
-  excludePatientIdentifierCodeTypes: {
-    uuids: Array<string>;
+  printPatientSticker: {
+    enabled: boolean;
+    fields: Array<AllowedPatientFields>;
+    pageSize: string;
+    identifiersToDisplay: Array<string>;
+    logo: string;
   };
-  printIdentifierStickerFields: Array<string>;
-  printIdentifierStickerSize: string;
   useRelationshipNameLink: boolean;
 }

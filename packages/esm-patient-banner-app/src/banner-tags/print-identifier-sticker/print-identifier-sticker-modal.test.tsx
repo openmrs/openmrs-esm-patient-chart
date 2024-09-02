@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useReactToPrint } from 'react-to-print';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema, type ConfigObject } from '../config-schema';
+import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockPatient } from 'tools';
-import PrintIdentifierSticker from './print-identifier-sticker/print-identifier-sticker.modal';
+import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockCloseModal = jest.fn();
 const mockUseReactToPrint = jest.mocked(useReactToPrint);

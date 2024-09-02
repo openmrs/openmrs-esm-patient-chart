@@ -5997,6 +5997,7 @@ __metadata:
     openmrs: "npm:next"
     prettier: "npm:^3.0.3"
     react: "npm:^18.3.1"
+    react-barcode: "npm:^1.5.3"
     react-dom: "npm:^18.3.1"
     react-hook-form: "npm:^7.46.2"
     react-i18next: "npm:^11.18.6"
@@ -22349,6 +22350,18 @@ __metadata:
     prop-types: ^15.0.0 || ^16.0.0
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
   checksum: 10/cdbb231d7d19cd3890873b465affe984aa006341c8b6130a670bfe406461665fb8f5607e0c3d7650aa4ec43b96acdad0b572b760e16c2cc41ddc15986aac7590
+  languageName: node
+  linkType: hard
+
+"react-barcode@npm:^1.5.3":
+  version: 1.5.3
+  resolution: "react-barcode@npm:1.5.3"
+  dependencies:
+    jsbarcode: "npm:^3.8.0"
+    prop-types: "npm:^15.6.2"
+  peerDependencies:
+    react: ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 10/1c1953c6e64fad12cf60f6be82a138849c5d8f0267b7aac1077662b86e58637192282d4a22d745f947c1ae168f058fe1a53f3111a00ba34d4d53657ebb1118c1
   languageName: node
   linkType: hard
 
