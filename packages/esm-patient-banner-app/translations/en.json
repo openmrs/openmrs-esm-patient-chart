@@ -7,7 +7,11 @@
   "countyDistrict": "District",
   "district": "District",
   "openmrsLogo": "OpenMRS logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "Postal code",
   "state": "State",
   "stateProvince": "State"
