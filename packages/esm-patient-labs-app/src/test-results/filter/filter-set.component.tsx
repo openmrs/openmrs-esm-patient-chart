@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Accordion, AccordionItem, Button, Checkbox, Search } from '@carbon/react';
-import { TreeViewAlt, Close, Search as SearchIcon } from '@carbon/react/icons';
+import { Accordion, AccordionItem, Button, Checkbox } from '@carbon/react';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
@@ -15,6 +14,10 @@ const isIndeterminate = (kids, checkboxes) => {
 
 interface FilterSetProps {
   hideFilterSetHeader?: boolean;
+}
+
+interface filterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
+  itemNumber: number;
 }
 
 function filterTreeNode(inputValue, treeNode) {
@@ -31,15 +34,10 @@ function filterTreeNode(inputValue, treeNode) {
   return false;
 }
 
-const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
+const FilterSet: React.FC<FilterSetProps> = () => {
   const { roots } = useContext(FilterContext);
-  const config = useConfig<ConfigObject>();
-  const tablet = useLayoutType() === 'tablet';
-  const { t } = useTranslation();
-  const { resetTree } = useContext(FilterContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [treeDataFiltered, setTreeDataFiltered] = useState(roots);
-  const [showSearchInput, setShowSearchInput] = useState(false);
 
   useEffect(() => {
     const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
@@ -47,40 +45,12 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   }, [searchTerm, roots]);
 
   return (
-    <div className={!tablet ? styles.stickyFilterSet : ''}>
-      {!hideFilterSetHeader &&
-        (!showSearchInput ? (
-          <div className={styles.filterSetHeader}>
-            <h4>{t('tree', 'Tree')}</h4>
-            <div className={styles.filterSetActions}>
-              <Button
-                kind="ghost"
-                size="sm"
-                onClick={resetTree}
-                renderIcon={(props) => <TreeViewAlt size={16} {...props} />}
-              >
-                {t('resetTreeText', 'Reset tree')}
-              </Button>
-
-              <Button kind="ghost" size="sm" renderIcon={SearchIcon} onClick={() => setShowSearchInput(true)}>
-                {t('search', 'Search')}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.filterTreeSearchHeader}>
-            <Search autoFocus size="sm" value={searchTerm} onChange={(evt) => setSearchTerm(evt.target.value)} />
-            <Button kind="secondary" size="sm" onClick={() => {}}>
-              {t('search', 'Search')}
-            </Button>
-            <Button hasIconOnly renderIcon={Close} size="sm" kind="ghost" onClick={() => setShowSearchInput(false)} />
-          </div>
-        ))}
+    <div>
       <div className={styles.filterSetContent}>
         {treeDataFiltered?.length > 0 ? (
           treeDataFiltered?.map((root, index) => (
-            <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-              <FilterNode root={root} level={0} open={config.resultsViewerConcepts[index].defaultOpen} />
+            <div className={`${styles.nestedAccordion} ${styles.nestedAccordionTablet}`} key={`filter-node-${index}`}>
+              <FilterNodeParent root={root} itemNumber={index} />
             </div>
           ))
         ) : (
@@ -91,11 +61,48 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   );
 };
 
+const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
+  const config = useConfig<ConfigObject>();
+  const { t } = useTranslation();
+  const tablet = useLayoutType() === 'tablet';
+  const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
+
+  if (!root.subSets) return;
+
+  const filterParent = root.subSets.map((node) => {
+    return (
+      <FilterNode
+        root={node}
+        level={0}
+        open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
+      />
+    );
+  });
+
+  return (
+    <div>
+      <div className={`${styles.treeNodeHeader} ${tablet ? styles.treeNodeHeaderTablet : ''}`}>
+        <h5>{t(root.display)}</h5>
+        <Button
+          className={styles.button}
+          kind="ghost"
+          size="sm"
+          onClick={() => setExpandAll((prevValue) => !prevValue)}
+        >
+          <span>{t(!expandAll ? `Expand all` : `Collapse all`)}</span>
+        </Button>
+      </div>
+      {filterParent}
+    </div>
+  );
+};
+
 const FilterNode = ({ root, level, open }: FilterNodeProps) => {
   const tablet = useLayoutType() === 'tablet';
   const { checkboxes, parents, updateParent } = useContext(FilterContext);
   const indeterminate = isIndeterminate(parents[root.flatName], checkboxes);
   const allChildrenChecked = parents[root.flatName]?.every((kid) => checkboxes[kid]);
+
   return (
     <Accordion align="start" size={tablet ? 'md' : 'sm'}>
       <AccordionItem
@@ -104,7 +111,7 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
             id={root?.flatName}
             checked={root.hasData && allChildrenChecked}
             indeterminate={indeterminate}
-            labelText={`${root?.display} (${parents?.[root?.flatName]?.length})`}
+            labelText={`${root?.display} (${parents?.[root?.flatName]?.length ?? 0})`}
             onChange={() => updateParent(root.flatName)}
             disabled={!root.hasData}
           />
