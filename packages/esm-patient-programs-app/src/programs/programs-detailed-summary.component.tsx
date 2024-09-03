@@ -26,7 +26,7 @@ import {
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePrograms } from './programs.resource';
+import { findLastState, usePrograms } from './programs.resource';
 import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
@@ -67,21 +67,29 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
+      {
+        key: 'state',
+        header: t('state', 'State'),
+      },
     ],
     [t],
   );
 
   const tableRows = useMemo(
     () =>
-      enrollments?.map((program) => ({
-        id: program.uuid,
-        display: program.display,
-        location: program.location?.display ?? '--',
-        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
-        status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
-          : t('active', 'Active'),
-      })),
+      enrollments?.map((program) => {
+        const state = program ? findLastState(program.states) : null;
+        return {
+          id: program.uuid,
+          display: program.display,
+          location: program.location?.display ?? '--',
+          dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
+          status: program.dateCompleted
+            ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
+            : t('active', 'Active'),
+          state: state ? state.state.concept.display : t('(none)', '(None)'),
+        };
+      }),
     [enrollments, t],
   );
 

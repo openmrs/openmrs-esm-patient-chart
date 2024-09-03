@@ -38,6 +38,7 @@ jest.mock('./programs.resource', () => ({
   updateProgramEnrollment: jest.fn(),
   useAvailablePrograms: jest.fn(),
   useEnrollments: jest.fn(),
+  findLastState: jest.fn(),
 }));
 
 mockUseLocations.mockReturnValue(mockLocationsResponse);

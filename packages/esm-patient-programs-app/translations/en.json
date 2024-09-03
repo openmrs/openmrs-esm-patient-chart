@@ -1,4 +1,5 @@
 {
+  "(none)": "(None)",
   "actions": "Actions",
   "active": "Active",
   "activePrograms": "Active programs",
@@ -7,6 +8,7 @@
   "cancel": "Cancel",
   "carePrograms": "Care Programs",
   "chooseProgram": "Choose a program",
+  "chooseState": "Choose a state",
   "completedOn": "Completed On",
   "configurePrograms": "Please configure programs to continue.",
   "dateCompleted": "Date completed",
@@ -28,8 +30,10 @@
   "programRequired": "Program is required",
   "programs": "Program enrollments",
   "Programs": "Programs",
+  "programState": "State",
   "saveAndClose": "Save and close",
   "saving": "Saving",
   "seeAll": "See all",
+  "state": "State",
   "status": "Status"
 }

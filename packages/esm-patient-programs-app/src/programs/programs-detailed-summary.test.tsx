@@ -68,6 +68,7 @@ describe('ProgramsDetailedSummary', () => {
     expect(screen.getByRole('columnheader', { name: /active programs/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /date enrolled/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /status/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /state/i })).toBeInTheDocument();
 
     const addButton = screen.getByRole('button', { name: /Add/ });
     expect(addButton).toBeInTheDocument();

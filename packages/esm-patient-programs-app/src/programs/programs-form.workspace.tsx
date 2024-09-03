@@ -16,7 +16,7 @@ import {
   Stack,
 } from '@carbon/react';
 import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -25,6 +25,7 @@ import {
   useAvailablePrograms,
   useEnrollments,
   updateProgramEnrollment,
+  findLastState,
 } from './programs.resource';
 import styles from './programs-form.scss';
 
@@ -38,6 +39,7 @@ const createProgramsFormSchema = (t: TFunction) =>
     enrollmentDate: z.date(),
     completionDate: z.date().nullable(),
     enrollmentLocation: z.string(),
+    selectedState: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -81,6 +83,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     return currentEnrollment?.location.uuid ?? null;
   };
 
+  const currentState = currentEnrollment ? findLastState(currentEnrollment.states) : null;
+
   const {
     control,
     handleSubmit,
@@ -94,8 +98,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
       enrollmentLocation: getLocationUuid() ?? '',
+      selectedState: currentState?.state.uuid ?? '',
     },
   });
+
+  const selectedProgram = useWatch({ control, name: 'selectedProgram' });
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -103,7 +110,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
-      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation } = data;
+      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedState } = data;
 
       const payload = {
         patient: patientUuid,
@@ -111,6 +118,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
+        states:
+          !!selectedState && selectedState != currentState?.state.uuid ? [{ state: { uuid: selectedState } }] : [],
       };
 
       try {
@@ -144,7 +153,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
       setIsSubmittingForm(false);
     },
-    [closeWorkspaceWithSavedChanges, currentEnrollment, mutateEnrollments, patientUuid, t],
+    [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
 
   const programSelect = (
@@ -241,6 +250,41 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     />
   );
 
+  let workflowStates = [];
+  if (!currentProgram && !!selectedProgram) {
+    const program = eligiblePrograms.find((p) => p.uuid === selectedProgram);
+    if (program?.allWorkflows.length > 0) workflowStates = program.allWorkflows[0].states;
+  } else if (currentProgram?.allWorkflows.length > 0) {
+    workflowStates = currentProgram.allWorkflows[0].states;
+  }
+
+  const stateSelect = (
+    <Controller
+      name="selectedState"
+      control={control}
+      render={({ fieldState, field: { onChange, value } }) => (
+        <>
+          <Select
+            aria-label="program workflow state"
+            id="state"
+            invalid={!!fieldState?.error}
+            labelText={t('programState', 'State')}
+            onChange={(event) => onChange(event.target.value)}
+            value={value}
+          >
+            <SelectItem text={t('chooseState', 'Choose a state')} value="" />
+            {workflowStates.map((state) => (
+              <SelectItem key={state.uuid} text={state.concept.display} value={state.uuid}>
+                {state.concept.display}
+              </SelectItem>
+            ))}
+          </Select>
+          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
+        </>
+      )}
+    />
+  );
+
   const formGroups = [
     {
       style: { maxWidth: isTablet && '50%' },
@@ -261,6 +305,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       style: { width: '50%' },
       legendText: '',
       value: enrollmentLocation,
+    },
+    {
+      style: { width: '50%' },
+      legendText: '',
+      value: stateSelect,
     },
   ];
 

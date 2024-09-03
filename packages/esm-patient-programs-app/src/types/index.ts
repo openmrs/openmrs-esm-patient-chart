@@ -5,22 +5,7 @@ export interface ProgramsFetchResponse {
 export interface PatientProgram {
   uuid: string;
   patient?: DisplayMetadata;
-  program: {
-    uuid: string;
-    name: string;
-    allWorkflows: Array<{
-      uuid: string;
-      concept: DisplayMetadata;
-      retired: boolean;
-      states: Array<{}>;
-      links?: Links;
-    }>;
-    concept?: {
-      display: string;
-      uuid: string;
-    };
-    links?: Links;
-  };
+  program: Program;
   display: string;
   dateEnrolled: string;
   dateCompleted: string | null;
@@ -31,9 +16,19 @@ export interface PatientProgram {
   };
   voided?: boolean;
   outcome?: null;
-  states?: [];
+  states?: ProgramWorkflowState[];
   links?: Links;
   resourceVersion?: string;
+}
+
+export interface ProgramWorkflowState {
+  state: {
+    uuid: string;
+    concept: DisplayMetadata;
+  };
+  startDate: string;
+  endDate: string;
+  voided: boolean;
 }
 
 export type Links = Array<{
@@ -56,13 +51,22 @@ export interface DataCaptureComponentProps {
 export interface Program {
   uuid: string;
   display: string;
+  name: string;
   allWorkflows: Array<{
+    uuid: string;
+    concept: DisplayMetadata;
+    retired: boolean;
+    states: Array<{
+      uuid: string;
+      concept: DisplayMetadata;
+    }>;
     links?: Links;
   }>;
   concept: {
     uuid: string;
     display: string;
   };
+  links?: Links;
 }
 
 export interface LocationData {
