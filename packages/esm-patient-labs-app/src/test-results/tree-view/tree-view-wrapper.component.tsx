@@ -5,6 +5,7 @@ import { FilterProvider } from '../filter/filter-context';
 import TreeView from './tree-view.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { useGetManyObstreeData } from '../grouped-timeline';
+import { type viewOpts } from '../../types';
 
 interface TreeViewWrapperProps {
   patientUuid: string;
@@ -12,6 +13,7 @@ interface TreeViewWrapperProps {
   testUuid: string;
   expanded: boolean;
   type: string;
+  view?: viewOpts;
 }
 
 const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
