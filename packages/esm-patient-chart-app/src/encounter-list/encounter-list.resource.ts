@@ -1,11 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
-export function fetchOpenMRSForms(formNames: string[]) {
-  const fetch = (name) => openmrsFetch(`/ws/rest/v1/form?q=${name}&v=full`);
-  return Promise.all(formNames.map((name) => fetch(name)));
-}
-
-export function fetchOpenMRSForms2(formUuids: string[]) {
+export function fetchOpenMRSForms(formUuids: string[]) {
   const fetch = (uuid) => openmrsFetch(`/ws/rest/v1/form/${uuid}`);
   return Promise.all(formUuids.map((uuid) => fetch(uuid)));
 }

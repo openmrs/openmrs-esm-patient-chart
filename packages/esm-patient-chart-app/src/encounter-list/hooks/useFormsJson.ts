@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr';
-import { fetchOpenMRSForms2 } from '../encounter-list.resource';
+import { fetchOpenMRSForms } from '../encounter-list.resource';
 import { type FormSchema } from '@openmrs/esm-form-engine-lib';
 
 export function useFormsJson(formUuids: string[]) {
   const [openmrsForms, setOpenmrsForms] = useState<FormSchema[]>([]);
   const { data: responses, isLoading: isLoadingOpenmrsForms } = useSWRImmutable<any, Error>(
     formUuids,
-    fetchOpenMRSForms2,
+    fetchOpenMRSForms,
   );
 
   useEffect(() => {
