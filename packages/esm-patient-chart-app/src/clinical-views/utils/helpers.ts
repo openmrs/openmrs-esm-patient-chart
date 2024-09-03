@@ -3,7 +3,7 @@ import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { type FormSchema } from '@openmrs/esm-form-engine-lib';
 import dayjs from 'dayjs';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { fetchPatientRelationships } from '../encounter-list.resource';
+import { fetchPatientRelationships } from '../../encounter-list/encounter-list.resource';
 
 type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
@@ -34,11 +34,6 @@ export function launchEncounterForm(
       },
     },
   });
-}
-
-export function getEncounterValues(encounter, param: string, isDate?: Boolean) {
-  if (isDate) return dayjs(encounter[param]).format('DD-MMM-YYYY');
-  else return encounter[param] ? encounter[param] : '--';
 }
 
 export function formatDateTime(dateString: string): any {
@@ -191,14 +186,4 @@ export function getObsFromEncounter(
     );
   }
   return obs.value;
-}
-
-export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-  });
 }

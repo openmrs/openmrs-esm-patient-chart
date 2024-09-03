@@ -1,7 +1,4 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type FormSchema } from '@openmrs/esm-form-engine-lib';
-import { type Form } from './types';
-import useSWR from 'swr';
 
 export function fetchOpenMRSForms(formNames: string[]) {
   const fetch = (name) => openmrsFetch(`/ws/rest/v1/form?q=${name}&v=full`);
@@ -27,30 +24,12 @@ export function fetchPatientRelationships(patientUuid: string) {
   });
 }
 
-export const useO3FormSchema = (formUuid: string) => {
-  const url = formUuid ? `${restBaseUrl}/o3/forms/${formUuid}` : null;
-
-  const { data, error, isLoading } = useSWR<{ data: FormSchema }>(url, openmrsFetch);
-
-  const schema = { ...data?.data, encounterType: data?.data.encounterType['uuid'] };
-
-  return { schema, error, isLoading };
-};
-
-export const customFormRepresentation =
-  'custom:(uuid,name,display,encounterType:(uuid,name,viewPrivilege,editPrivilege),version,published,retired,resources:(uuid,name,dataType,valueReference))';
-
-export const useO3Forms = (patientUuid: string) => {
-  const url = `${restBaseUrl}/form?v=${customFormRepresentation}`;
-
-  const { data, error, isLoading } = useSWR<{ results: Array<Form> }, Error>(url, (url) =>
-    openmrsFetch<{ results: Array<Form> }>(url).then((response) => response.data),
-  );
-
-  const schemas = data?.results?.map((form) => ({
-    ...form,
-    encounterType: form.encounterType['uuid'],
-  }));
-
-  return { o3Forms: schemas, error, isLoading };
-};
+export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}

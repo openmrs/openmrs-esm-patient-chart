@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
-import { getObsFromEncounter, findObs } from '../utils/helpers';
+import { getObsFromEncounter, findObs } from '../../clinical-views/utils/helpers';
 
 export const renderTag = (encounter, concept, statusColorMappings) => {
   const columnStatus = getObsFromEncounter(encounter, concept);

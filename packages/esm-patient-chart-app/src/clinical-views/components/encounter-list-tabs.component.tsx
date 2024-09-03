@@ -1,8 +1,8 @@
 import React from 'react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
-import { EncounterList } from './components/encounter-list.component';
-import { getMenuItemTabsConfiguration } from './utils/encounter-list-config-builder';
+import { EncounterList } from '../../encounter-list/components/encounter-list.component';
+import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
 import styles from './encounter-list-tabs.scss';
 
 interface EncounterListTabsComponentProps {
