@@ -5,14 +5,14 @@ import {
   getConceptFromMappings,
   getConditionalConceptValue,
 } from './helpers';
-import { renderTag } from '../components/tag.component';
+import { renderTag } from '../../encounter-list/components/tag.component';
 import {
   type Encounter,
   type ColumnDefinition,
   type TabSchema,
   type ActionProps,
   type ConditionalActionProps,
-} from '../types';
+} from '../../encounter-list/types';
 
 interface FormattedColumn {
   key: string;

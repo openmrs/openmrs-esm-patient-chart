@@ -15,7 +15,8 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { type FormSchema } from '@openmrs/esm-form-engine-lib';
-import { deleteEncounter, launchEncounterForm } from '../utils/helpers';
+import { launchEncounterForm } from '../../clinical-views/utils/helpers';
+import { deleteEncounter } from '../encounter-list.resource';
 import { useEncounterRows, useFormsJson, usePatientDeathStatus } from '../hooks';
 import { type Encounter } from '../types';
 
