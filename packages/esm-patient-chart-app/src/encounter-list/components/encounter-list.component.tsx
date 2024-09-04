@@ -252,7 +252,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   return (
     <>
-      {tableRows?.length === 0 || encounters.length === 0 ? (
+      {tableRows?.length > 0 || encounters.length > 0 ? (
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
