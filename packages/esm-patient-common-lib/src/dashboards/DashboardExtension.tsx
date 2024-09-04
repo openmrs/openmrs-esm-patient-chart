@@ -22,15 +22,13 @@ export const DashboardExtension = ({
   const location = useLocation();
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
-  // t('title', 'Title')
-  const translatedTitle = t(title);
   return (
     <div key={path} style={{ width: '16rem' }}>
       <ConfigurableLink
         className={classNames('cds--side-nav__link', { 'active-left-nav-link': path === navLink })}
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
-        {translatedTitle}
+        {t(title)}
       </ConfigurableLink>
     </div>
   );
