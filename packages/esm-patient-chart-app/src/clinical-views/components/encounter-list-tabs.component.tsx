@@ -7,7 +7,6 @@ import styles from './encounter-list-tabs.scss';
 
 interface EncounterListTabsComponentProps {
   patientUuid: string;
-  filter?: (encounter: any, formName?: string) => boolean;
 }
 
 const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({ patientUuid }) => {

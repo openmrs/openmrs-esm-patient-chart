@@ -23,15 +23,6 @@
   border-bottom: 0.375rem solid var(--brand-03);
 }
 
-.newServiceEnrolmentBtn {
-  margin-bottom: 0.5em;
-  text-align: right;
-}
-
-.newServiceEnrolmentBtn > button {
-  background-color: $ui-background;
-}
-
 .widgetContainer :global(.cds--data-table) thead th button span {
   height: unset !important;
 }
