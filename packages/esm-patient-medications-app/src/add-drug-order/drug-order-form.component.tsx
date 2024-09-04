@@ -463,19 +463,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                 </Grid>
                 <Grid className={styles.gridRow}>
                   <Column lg={8} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="route"
-                        type="comboBox"
-                        size={isTablet ? 'lg' : 'md'}
-                        id="editRoute"
-                        items={drugRoutes}
-                        placeholder={t('editRouteComboBoxTitle', 'Route')}
-                        titleText={t('editRouteComboBoxTitle', 'Route')}
-                        itemToString={(item) => item?.value}
-                      />
-                    </InputWrapper>
                   </Column>
                   <Column lg={8} md={4} sm={4}>
                     <InputWrapper>
