@@ -497,20 +497,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
                 <Grid className={styles.gridRow}>
                   <Column lg={16} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="patientInstructions"
-                        type="textArea"
-                        labelText={t('patientInstructions', 'Patient instructions')}
-                        placeholder={t(
-                          'patientInstructionsPlaceholder',
-                          'Additional dosing instructions (e.g. "Take after eating")',
-                        )}
-                        maxLength={65535}
-                        rows={isTablet ? 6 : 4}
-                      />
-                    </InputWrapper>
                   </Column>
                   <Column lg={16} md={4} sm={4}>
                     <Grid className={styles.gridRow}>
