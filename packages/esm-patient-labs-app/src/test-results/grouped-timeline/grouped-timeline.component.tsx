@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, usePatient } from '@openmrs/esm-framework';
+import { ConfigurableLink, showModal, usePatient } from '@openmrs/esm-framework';
 import { Grid, ShadowBox } from '../panel-timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
@@ -30,6 +30,14 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
 
 const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
   const { patientUuid } = usePatient();
+  const launchResultsDialog = (patientUuid: string, title: string, testUuid: string) => {
+    const dispose = showModal('timeline-results-modal', {
+      closeDeleteModal: () => dispose(),
+      patientUuid,
+      testUuid,
+      title,
+    });
+  };
 
   return (
     <div
@@ -38,16 +46,18 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isS
         boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
       }}
     >
-      {!isString ? (
-        <ConfigurableLink
-          to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
-          className={styles.trendlineLink}
-        >
-          {title}
-        </ConfigurableLink>
-      ) : (
-        <span className={styles.trendlineLink}>{title}</span>
-      )}
+      <span className={styles['trendline-link']}>
+        {!isString ? (
+          <span
+            className={styles['trendline-link-view']}
+            onClick={() => launchResultsDialog(patientUuid, title, conceptUuid)}
+          >
+            {title}
+          </span>
+        ) : (
+          <span className={styles.trendlineLink}>{title}</span>
+        )}
+      </span>
       <span className={styles.rangeUnits}>
         {range} {units}
       </span>
@@ -292,18 +302,19 @@ export const GroupedTimeline = () => {
                   )
                 : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
 
-              // show kid rows
               return (
-                <TimelineDataGroup
-                  parent={parent}
-                  subRows={subRows}
-                  key={index}
-                  xScroll={xScroll}
-                  setXScroll={setXScroll}
-                  panelName={panelName}
-                  setPanelName={setPanelName}
-                  groupNumber={shownGroups}
-                />
+                subRows?.length > 0 && (
+                  <TimelineDataGroup
+                    parent={parent}
+                    subRows={subRows}
+                    key={index}
+                    xScroll={xScroll}
+                    setXScroll={setXScroll}
+                    panelName={panelName}
+                    setPanelName={setPanelName}
+                    groupNumber={shownGroups}
+                  />
+                )
               );
             } else return null;
           })}

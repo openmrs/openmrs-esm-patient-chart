@@ -32,12 +32,6 @@ export const configSchema = {
       },
     ],
   },
-  showPrintButton: {
-    _type: Type.Boolean,
-    _default: true,
-    _description:
-      'Whether or not to display the print button in the Test Results dashboard. When set to `true`, a print button is shown alongside the panel and tree view content switcher. When clicked, a modal pops up showing a datatable with the available test results. Once the user selects an appropriate date range, they can click on the print button in the modal to print the data',
-  },
   orders: {
     labOrderTypeUuid: {
       _type: Type.UUID,
@@ -97,7 +91,6 @@ export interface OrderReason {
 }
 export interface ConfigObject {
   resultsViewerConcepts: Array<ObsTreeEntry>;
-  showPrintButton: boolean;
   orders: {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
