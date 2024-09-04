@@ -1,5 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { type OpenmrsEncounter } from '../../../esm-patient-common-lib/src/types';
+import { type OpenmrsEncounter } from '@openmrs/esm-patient-common-lib';
 
 import useSWR from 'swr';
 

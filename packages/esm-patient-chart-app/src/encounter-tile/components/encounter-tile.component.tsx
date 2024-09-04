@@ -1,7 +1,7 @@
 import { CodeSnippetSkeleton, Tile, Column } from '@carbon/react';
 import React from 'react';
 import styles from './tile.scss';
-import { LazyCell } from '../lazy-cell/lazy-cell.component';
+import { LazyCell } from '../../lazy-cell/lazy-cell.component';
 import { useLastEncounter } from '../hooks/useLastEncounter';
 
 export interface EncounterTileColumn {
