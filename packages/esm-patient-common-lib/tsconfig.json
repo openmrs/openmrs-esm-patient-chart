@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "../../tools/setup-tests.ts", "../esm-patient-chart-app/src/hooks", "../esm-patient-chart-app/src/lazy-cell", "../esm-patient-chart-app/src/encounter-list/encounter-list-utils.ts", "../esm-patient-chart-app/src/encounter-list/api.resource.ts", "../esm-patient-chart-app/src/encounter-list/encounter-tile-config-builder.ts", "../esm-patient-chart-app/src/encounter-list/index.ts", "../esm-patient-chart-app/src/encounter-list/shema-manipulation.ts"],
+  "include": ["src/**/*", "../../tools/setup-tests.ts"],
 }
