@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { getDynamicOfflineDataEntries } from '@openmrs/esm-framework';
+import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 import { type Form, type FormEncounterResource } from '../types';
-import { type HtmlFormEntryForm } from '../config-schema';
 
 /**
  * Returns whether the given form encounter is valid for offline mode and can be cached.

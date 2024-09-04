@@ -39,6 +39,10 @@ export interface OrderBasketItem {
   };
   extractedOrderError?: ExtractedOrderErrorObject;
   isOrderIncomplete?: boolean;
+  /**
+   * An optional identifier from the fulfiller (e.g., lab system) for the specimen or record associated with the order.
+   */
+  accessionNumber?: string;
 }
 
 export interface OrderPost {
@@ -68,7 +72,7 @@ export interface OrderPost {
   orderReasonNonCoded?: string;
   orderReason?: string;
   instructions?: string;
-  labReferenceNumber?: string;
+  accessionNumber?: string;
 }
 
 export interface PatientOrderFetchResponse {
@@ -146,7 +150,6 @@ export interface Order {
   clinicalHistory: string;
   numberOfRepeats: string;
   type: string;
-  labReferenceNumber?: string;
 }
 
 export interface OrderTypeFetchResponse {
@@ -204,7 +207,6 @@ export interface LabOrderBasketItem extends OrderBasketItem {
     label: string;
     conceptUuid: string;
   };
-  labReferenceNumber?: string;
   urgency?: string;
   instructions?: string;
   previousOrder?: string;
