@@ -1,5 +1,4 @@
-import { getConceptFromMappings, getObsFromEncounter } from './encounter-list-utils';
-import { extractSchemaValues, replaceWithConfigDefaults } from './shema-manipulation';
+import { getConceptFromMappings, getObsFromEncounter } from './helpers';
 
 interface MenuCardProps {
   title: string;
@@ -21,6 +20,9 @@ interface ColumnDefinition {
   hasSummary?: boolean;
   conceptMappings?: Array<string>;
   summaryConcept?: SummaryConcept;
+  isTrueFalseConcept?: boolean;
+  type: string;
+  fallbackConcepts?: Array<string>;
 }
 
 interface FormattedCardColumn {
@@ -39,11 +41,8 @@ const calculateDateDifferenceInDate = (givenDate: string): string => {
   return `${totalDays} days`;
 };
 
-export const getEncounterTileColumns = (schemaConfig: MenuCardProps, config = null) => {
-  const configDefaults = extractSchemaValues(config);
-  const transformedSchemaConfig = replaceWithConfigDefaults(schemaConfig, configDefaults);
-
-  const columns: Array<FormattedCardColumn> = transformedSchemaConfig.columns?.map((column) => ({
+export const getEncounterTileColumns = (tileDefinition: MenuCardProps) => {
+  const columns: Array<FormattedCardColumn> = tileDefinition.columns?.map((column) => ({
     key: column.id,
     header: column.title,
     concept: column.concept,
@@ -78,7 +77,7 @@ export const getEncounterTileColumns = (schemaConfig: MenuCardProps, config = nu
             const primaryDate = getObsFromEncounter(
               encounter,
               column.summaryConcept.primaryConcept,
-              column.summaryConcept.hasDate,
+              column.summaryConcept.isDate,
             );
 
             if (primaryDate !== '--') {
@@ -88,7 +87,7 @@ export const getEncounterTileColumns = (schemaConfig: MenuCardProps, config = nu
             }
           }
 
-          return getObsFromEncounter(encounter, column.summaryConcept.primaryConcept, column.summaryConcept.hasDate);
+          return getObsFromEncounter(encounter, column.summaryConcept.primaryConcept, column.summaryConcept.isDate);
         }
       : null,
   }));
