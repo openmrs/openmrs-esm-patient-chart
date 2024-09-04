@@ -5,11 +5,6 @@ export function fetchOpenMRSForms(formUuids: string[]) {
   return Promise.all(formUuids.map((uuid) => fetch(uuid)));
 }
 
-export function fetchFormsClobData(valueReferences: string[]) {
-  const fetch = (ref: string) => openmrsFetch(`/ws/rest/v1/clobdata/${ref}`);
-  return Promise.all(valueReferences?.map((ref) => fetch(ref)));
-}
-
 export function fetchPatientRelationships(patientUuid: string) {
   return openmrsFetch(`${restBaseUrl}relationship?person=${patientUuid}&v=full`).then(({ data }) => {
     if (data.results.length) {
