@@ -17,12 +17,9 @@ export const DashboardGroupExtension = ({ title, slotName, basePath, isExpanded 
     registerNavGroup(slotName);
   }, [slotName]);
 
-  // t('myNavGroupTitle', 'My Nav Group Title')
-  const translatedNavGroupTitle = t(title);
-
   return (
     <Accordion>
-      <AccordionItem open={isExpanded ?? true} title={translatedNavGroupTitle} style={{ border: 'none' }}>
+      <AccordionItem open={isExpanded ?? true} title={t(title)} style={{ border: 'none' }}>
         <ExtensionSlot name={slotName ?? title} state={{ basePath }} />
       </AccordionItem>
     </Accordion>
