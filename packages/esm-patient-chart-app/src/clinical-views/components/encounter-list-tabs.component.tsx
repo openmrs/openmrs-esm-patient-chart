@@ -15,7 +15,7 @@ const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({
   const { tabDefinitions = [] } = config;
 
   const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions);
-  const filter = (encounter, name) => false;
+  const filter = (encounter, formUuid) => encounter?.form?.uuid === formUuid;
 
   return (
     <div className={styles.tabContainer}>
@@ -29,7 +29,7 @@ const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({
           {tabsConfig.map((tab) => (
             <TabPanel key={tab.name}>
               <EncounterList
-                filter={tab.hasFilter ? (encounter) => filter(encounter, tab.launchOptions[0].label) : null}
+                filter={tab.hasFilter ? (encounter) => filter(encounter, tab.formList[0].uuid) : null}
                 patientUuid={patientUuid}
                 formList={tab.formList}
                 columns={tab.columns}
