@@ -1,6 +1,6 @@
 export * from './cards';
 export * from './dashboards/createDashboardLink';
-export * from './dashboards/DashboardExtension.component';
+export * from './dashboards/DashboardExtension';
 export * from './empty-state';
 export * from './error-state';
 export * from './form-entry-interop';
