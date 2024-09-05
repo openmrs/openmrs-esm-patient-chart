@@ -35,29 +35,35 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
   const showPlaceholderText = !dataUri && !initialState;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.image}>
-        {showPlaceholderText ? (
+    <>
+      {showPlaceholderText ? (
+        <div className={styles.noImage}>
           <div className={styles.placeholderText}>{t('noImageToDisplay', 'No image to display')}</div>
-        ) : (
+          <div className={styles.editImage}>
+            <label htmlFor="" className={styles.editText}>
+              {t('edit', 'Edit')}
+            </label>
+            <IconButton
+              className={styles.editButton}
+              label={showPlaceholderText ? t('addPatientImage', 'Add image') : t('changeImage', 'Change Image')}
+              kind="ghost"
+              onClick={showCam}
+              size="md"
+            >
+              <Edit style={{ fill: '#ffffff' }} />
+            </IconButton>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.imageContainer} onClick={showCam}>
           <img src={dataUri || initialState} alt="Preview" className={styles.preview} />
-        )}
-      </div>
-      <div className={styles.editImage}>
-        <label htmlFor="" className={styles.editText}>
-          {t('edit', 'Edit')}
-        </label>
-        <IconButton
-          className={styles.editButton}
-          label={showPlaceholderText ? t('addPatientImage', 'Add image') : t('changeImage', 'Change Image')}
-          kind="ghost"
-          onClick={showCam}
-          size="md"
-        >
-          <Edit style={{ fill: '#ffffff' }} />
-        </IconButton>
-      </div>
-    </div>
+          <div className={styles.edit}>
+            <Edit className={styles.editIcon} style={{ fill: 'black' }} />
+            <span>Edit</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -7,6 +7,12 @@
   align-items: center;
 }
 
+.noImage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .placeholderText {
   width: 57px;
   height: 32px;
@@ -18,10 +24,6 @@
   line-height: 1.33;
   letter-spacing: 0.32px;
   color: colors.$cool-gray-70;
-}
-
-.image {
-  margin: 0;
   width: 120px;
   height: 120px;
   padding: 44px 31px 44px 32px;
@@ -63,20 +65,44 @@
   padding-top: 9px;
 }
 
-.placeholderIconContainer {
-  width: layout.$spacing-10;
-  height: layout.$spacing-10;
-  background-color: #d8d8d8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.imageContainer {
+  position: relative;
+  cursor: pointer;
 }
 
-.actionButton {
-  flex: 1;
-  margin-left: layout.$spacing-05;
+.imageContainer:hover {
+  transition:
+    filter 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.imageContainer:hover .preview {
+  filter: brightness(0.8);
 }
 
 .preview {
-  width: 100%;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  transition: filter 0.3s ease;
+}
+
+.edit {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  background-color: colors.$white-0;
+  bottom: 8px;
+  right: 8px;
+  border-radius: 6px;
+  padding: 5px 6px 5px 6px;
+  width: fit-content;
+  color: colors.$warm-gray-100;
+  border: 1px solid colors.$blue-20-hover;
+}
+
+.editIcon {
+  margin-right: 6px;
 }
