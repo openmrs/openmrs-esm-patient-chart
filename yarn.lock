@@ -5976,7 +5976,7 @@ __metadata:
     swr: 2.x
   languageName: unknown
   linkType: soft
-  
+
 "@openmrs/esm-react-utils@npm:5.8.1-pre.2279":
   version: 5.8.1-pre.2279
   resolution: "@openmrs/esm-react-utils@npm:5.8.1-pre.2279"
@@ -20228,7 +20228,6 @@ __metadata:
     webpack-stats-plugin: "npm:^1.0.3"
     workbox-webpack-plugin: "npm:^6.4.1"
     yargs: "npm:^17.6.2"
-  bin:
   checksum: 10/212b3f091087762fab4535abf72ec8ae37abae19b093236ca9f12476f5c61cec32dfa64fd1399aec078ce66a5a015a039e75622d1c965464b0c1b8fc5a5dc502
   languageName: node
   linkType: hard
