@@ -30,6 +30,9 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       patientUuid={mockPatient.id}
       promptBeforeClosing={jest.fn()}
       setTitle={jest.fn()}
+      setCancelTitle={jest.fn()}
+      setCancelMessage={jest.fn()}
+      setCancelConfirmText={jest.fn()}
     />,
   );
 

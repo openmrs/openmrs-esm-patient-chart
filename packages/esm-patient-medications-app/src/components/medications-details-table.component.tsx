@@ -267,7 +267,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-label="medications" {...getTableProps()}>
+              <Table aria-label="medications" className={styles.table} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
