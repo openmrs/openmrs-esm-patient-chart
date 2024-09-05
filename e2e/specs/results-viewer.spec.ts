@@ -272,7 +272,6 @@ test('Record and edit test results', async ({ page }) => {
         await test.step(resultsPageReference, async () => {
           const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
           const valueCell = row.locator('td:nth-child(2)');
-          console.log({ valueCell });
           await expect(valueCell).toContainText(value);
         });
       }
@@ -281,8 +280,6 @@ test('Record and edit test results', async ({ page }) => {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
-        console.log({ valueCell });
-
         await expect(valueCell).toContainText(value);
       });
     }
@@ -350,16 +347,15 @@ test('Record and edit test results', async ({ page }) => {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
-        console.log({ valueCell });
 
         await expect(valueCell).toContainText(updatedValue);
       });
     }
+
     for (const { resultsPageReference, updatedValue } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
-        console.log({ valueCell });
 
         await expect(valueCell).toContainText(updatedValue);
       });
