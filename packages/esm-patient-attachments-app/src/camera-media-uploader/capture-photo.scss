@@ -1,17 +1,66 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 
 .container {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-.buttonCssReset {
-  max-width: layout.$spacing-10;
-  padding: 0;
+.placeholderText {
+  width: 57px;
+  height: 32px;
+  font-family: IBMPlexSans;
+  font-size: 12px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: 0.32px;
+  color: colors.$cool-gray-70;
+}
+
+.image {
   margin: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
+  width: 120px;
+  height: 120px;
+  padding: 44px 31px 44px 32px;
+  border: solid 1px colors.$cool-gray-80;
+}
+
+.editImage {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 120px;
+  height: 48px;
+  padding: 0 13px 0 0;
+  background-color: colors.$cool-gray-80;
+}
+
+.editText {
+  width: 26px;
+  height: 18px;
+  margin-left: 0.5rem;
+  padding-left: 15px;
+  font-family: IBMPlexSans;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.29;
+  letter-spacing: 0.16px;
+  color: colors.$white-0;
+}
+
+.editButton {
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+  justify-self: flex-end;
+  margin-right: 0.5rem;
+  padding-top: 9px;
 }
 
 .placeholderIconContainer {

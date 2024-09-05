@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
-import { Camera } from '@carbon/react/icons';
+import { IconButton } from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
 import { showModal, toOmrsIsoString, type UploadedFile } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
 
@@ -27,26 +27,36 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
       closeModal: () => {
         close();
       },
+      title: t('addPhoto', 'Add Image'),
       cameraOnly: false,
     });
-  }, [onCapturePhoto]);
+  }, [onCapturePhoto, t]);
 
-  const showPlaceholderIcon = !dataUri && !initialState;
+  const showPlaceholderText = !dataUri && !initialState;
 
   return (
     <div className={styles.container}>
-      <button type="button" onClick={showCam} className={styles.buttonCssReset}>
-        {showPlaceholderIcon ? (
-          <div className={styles.placeholderIconContainer}>
-            <Camera size="20" />
-          </div>
+      <div className={styles.image}>
+        {showPlaceholderText ? (
+          <div className={styles.placeholderText}>{t('noImageToDisplay', 'No image to display')}</div>
         ) : (
           <img src={dataUri || initialState} alt="Preview" className={styles.preview} />
         )}
-      </button>
-      <Button kind="ghost" onClick={showCam} className={styles.actionButton}>
-        {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
-      </Button>
+      </div>
+      <div className={styles.editImage}>
+        <label htmlFor="" className={styles.editText}>
+          {t('edit', 'Edit')}
+        </label>
+        <IconButton
+          className={styles.editButton}
+          label={showPlaceholderText ? t('addPatientImage', 'Add image') : t('changeImage', 'Change Image')}
+          kind="ghost"
+          onClick={showCam}
+          size="md"
+        >
+          <Edit style={{ fill: '#ffffff' }} />
+        </IconButton>
+      </div>
     </div>
   );
 };

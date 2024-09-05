@@ -5,7 +5,11 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './upload-status.scss';
 
-const UploadStatusComponent: React.FC = () => {
+interface UploadStatusComponentProps {
+  title?: string;
+}
+
+const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) => {
   const { t } = useTranslation();
   const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
@@ -62,7 +66,7 @@ const UploadStatusComponent: React.FC = () => {
       <ModalHeader
         closeModal={closeModal}
         className={styles.modalHeader}
-        title={t('addAttachment_title', 'Add Attachment')}
+        title={title ? title : t('addAttachment_title', 'Add Attachment')}
       />
       <ModalBody>
         <p className="cds--label-description">
