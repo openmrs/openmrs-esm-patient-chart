@@ -82,7 +82,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer className={styles.tableContainer}>
-            <Table aria-label="biometrics" {...getTableProps()}>
+            <Table aria-label="biometrics" className={styles.table} {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

@@ -78,6 +78,9 @@ export default function AddLabOrderWorkspace({
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
           setTitle={() => {}}
+          setCancelTitle={() => {}}
+          setCancelMessage={() => {}}
+          setCancelConfirmText={() => {}}
         />
       )}
     </div>

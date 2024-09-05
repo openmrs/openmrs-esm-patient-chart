@@ -41,19 +41,15 @@ test('Record vital signs', async ({ page }) => {
     await vitalsPage.page.getByRole('spinbutton', { name: /diastolic/i }).fill('100');
   });
 
-  await test.step('And I fill `37` as the pulse', async () => {
+  await test.step('And I fill `65` as the pulse', async () => {
     await vitalsPage.page.getByRole('spinbutton', { name: /pulse/i }).fill('65');
   });
 
-  await test.step('And I fill `37` as the respiration rate', async () => {
+  await test.step('And I fill `16` as the respiration rate', async () => {
     await vitalsPage.page.getByRole('spinbutton', { name: /respiration rate/i }).fill('16');
   });
 
-  await test.step('And I fill `37` as the oxygen saturation', async () => {
-    await vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i }).fill('98');
-  });
-
-  await test.step('And I add `37` as the oxygen saturation', async () => {
+  await test.step('And I fill `98` as the oxygen saturation', async () => {
     await vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i }).fill('98');
   });
 

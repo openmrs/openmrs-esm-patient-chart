@@ -79,16 +79,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
   test('looks ok', async () => {
     const user = userEvent.setup();
 
-    render(
-      <AddDrugOrderWorkspace
-        order={undefined as any}
-        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-        promptBeforeClosing={() => false}
-        patientUuid={'mock-patient-uuid'}
-        setTitle={jest.fn()}
-      />,
-    );
+    renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     await screen.findAllByRole('listitem');
@@ -113,16 +104,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     });
     const user = userEvent.setup();
 
-    render(
-      <AddDrugOrderWorkspace
-        order={undefined as any}
-        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-        promptBeforeClosing={() => false}
-        patientUuid={'mock-patient-uuid'}
-        setTitle={jest.fn()}
-      />,
-    );
+    renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
@@ -133,16 +115,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
   test('can add items directly to the basket', async () => {
     const user = userEvent.setup();
 
-    render(
-      <AddDrugOrderWorkspace
-        order={undefined as any}
-        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-        promptBeforeClosing={() => false}
-        patientUuid={'mock-patient-uuid'}
-        setTitle={jest.fn()}
-      />,
-    );
+    renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
@@ -166,16 +139,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
   test('can open the drug form ', async () => {
     const user = userEvent.setup();
 
-    render(
-      <AddDrugOrderWorkspace
-        order={undefined as any}
-        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-        promptBeforeClosing={() => false}
-        patientUuid={'mock-patient-uuid'}
-        setTitle={jest.fn()}
-      />,
-    );
+    renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
@@ -191,16 +155,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
   test('can open an item in the medication form and on saving, it should add the order in the order basket store', async () => {
     const user = userEvent.setup();
 
-    render(
-      <AddDrugOrderWorkspace
-        order={undefined as any}
-        closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-        closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-        promptBeforeClosing={() => false}
-        patientUuid={'mock-patient-uuid'}
-        setTitle={jest.fn()}
-      />,
-    );
+    renderAddDrugOrderWorkspace();
 
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
@@ -233,3 +188,19 @@ describe('AddDrugOrderWorkspace drug search', () => {
     );
   });
 });
+
+function renderAddDrugOrderWorkspace() {
+  render(
+    <AddDrugOrderWorkspace
+      order={undefined as any}
+      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+      promptBeforeClosing={() => false}
+      patientUuid={'mock-patient-uuid'}
+      setTitle={jest.fn()}
+      setCancelTitle={jest.fn()}
+      setCancelMessage={jest.fn()}
+      setCancelConfirmText={jest.fn()}
+    />,
+  );
+}

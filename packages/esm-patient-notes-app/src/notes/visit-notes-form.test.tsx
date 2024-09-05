@@ -20,6 +20,9 @@ const defaultProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
+  setCancelTitle: jest.fn(),
+  setCancelMessage: jest.fn(),
+  setCancelConfirmText: jest.fn(),
 };
 
 function renderVisitNotesForm(props = {}) {

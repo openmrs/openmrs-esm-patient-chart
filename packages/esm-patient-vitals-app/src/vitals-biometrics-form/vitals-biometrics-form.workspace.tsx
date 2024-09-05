@@ -122,7 +122,11 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const height = watch('height');
 
   useEffect(() => {
-    getMuacColorCode(extractNumbers(age(patient.patient?.birthDate)), midUpperArmCircumference, setMuacColorCode);
+    const patientBirthDate = patient?.patient?.birthDate;
+    if (patientBirthDate && midUpperArmCircumference) {
+      const patientAge = extractNumbers(age(patientBirthDate));
+      getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
+    }
   }, [watch, patient.patient?.birthDate, midUpperArmCircumference]);
 
   useEffect(() => {
