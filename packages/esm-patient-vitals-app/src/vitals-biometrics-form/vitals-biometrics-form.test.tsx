@@ -24,6 +24,9 @@ const testProps = {
   promptBeforeClosing: () => {},
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),
+  setCancelTitle: jest.fn(),
+  setCancelMessage: jest.fn(),
+  setCancelConfirmText: jest.fn(),
 };
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
