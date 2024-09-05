@@ -1,7 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { type OpenmrsEncounter } from '@openmrs/esm-patient-common-lib';
 
 import useSWR from 'swr';
+import { type Encounter } from '../utils/helpers';
 
 export const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -18,7 +18,7 @@ export function useLastEncounter(patientUuid: string, encounterType: string) {
 
   const cacheKey = endpointUrl;
 
-  const { data, error, isValidating, isLoading } = useSWR<{ results: Array<OpenmrsEncounter> }, Error>(
+  const { data, error, isValidating, isLoading } = useSWR<{ results: Array<Encounter> }, Error>(
     cacheKey,
     async (url) => {
       const cachedData = cache.get(url);

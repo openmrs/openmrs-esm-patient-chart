@@ -1,6 +1,7 @@
 import { age, formatDate, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { type TFunction } from 'i18next';
 import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
+import { esmPatientChartSchema } from '../../config-schema';
 
 export interface Observation {
   uuid: string;
@@ -108,6 +109,19 @@ export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: A
   return observations.length ? observations.join(', ') : '--';
 }
 
+/**
+ * Retrieves and formats an observation from an encounter based on the provided concept and various options.
+ *
+ * @param encounter - The encounter object from which observations will be extracted.
+ * @param obsConcept - The main concept to search for in the encounter's observations.
+ * @param isDate - Optional flag to indicate if the observation value should be treated as a date.
+ * @param isTrueFalseConcept - Optional flag to check if the observation concept represents a true/false value.
+ * @param type - Optional property type for filtering or fetching additional encounter properties.
+ * @param fallbackConcepts - Optional list of alternative concepts to use if the primary concept is not found.
+ * @param secondaryConcept - Optional secondary concept to check if the primary value matches a specific condition.
+ * @param t - Optional translation function.
+ * @returns The value of the observation, formatted appropriately, or '--' if not found or applicable.
+ */
 export function getObsFromEncounter(
   encounter: Encounter,
   obsConcept: string,
@@ -129,13 +143,14 @@ export function getObsFromEncounter(
     }
   }
 
+  // handles things like location, provider, visit type, etc. that are not in the encounter
   if (type) {
     getEncounterProperty(encounter, type);
   }
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
     const primaryValue = obs.value.name.display;
-    if (primaryValue === t('Other non-coded')) {
+    if (primaryValue === esmPatientChartSchema.otherConceptUuid._default) {
       const secondaryObs = findObs(encounter, secondaryConcept);
       return secondaryObs ? secondaryObs.value : '--';
     }
@@ -150,6 +165,7 @@ export function getObsFromEncounter(
     return '--';
   }
 
+  // format obs date or datetime appropriately
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
       return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
