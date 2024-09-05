@@ -138,6 +138,11 @@ export const esmPatientChartSchema = {
     _default: '/etl-latest/etl/patient/',
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
+  trueConceptUuid: {
+    _type: Type.String,
+    _description: 'Default concept uuid for true in forms',
+    _default: 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3',
+  },
 };
 
 export interface ChartConfig {
@@ -167,4 +172,5 @@ export interface ChartConfig {
     uuid: string;
   }>;
   visitDiagnosisConceptUuid: string;
+  trueConceptUuid: string;
 }
