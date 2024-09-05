@@ -21,7 +21,6 @@
 }
 
 .tile {
-  height: 35%;
   padding: layout.$spacing-01 0 layout.$spacing-05 layout.$spacing-05;
   margin: layout.$spacing-03;
   border: solid 1px #e0e0e0;
@@ -34,17 +33,11 @@
 .tileTitle {
   @include type.type-style('label-01');
   display: block;
+  padding-top: layout.$spacing-05;
 }
 
 .columnContainer {
   margin: 0px 0px layout.$spacing-06 layout.$spacing-06;
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.29;
-  letter-spacing: 0.16px;
-  color: #525252;
   display: flex;
   flex-direction: row;
 }
@@ -56,33 +49,12 @@
 }
 
 .tileSubTitle {
-  height: layout.$spacing-05;
-  font-size: 16px;
-  line-height: 1.33;
-  letter-spacing: 0.32px;
-  color: #525252;
-  display: block;
+  @include type.type-style('body-compact-01');
 }
 
 .tileValue {
-  display: block;
-  font-size: 20px;
-  line-height: 1.29;
-  color: #161616;
+  @include type.type-style('body-long-01');
   margin: layout.$spacing-05 layout.$spacing-10 layout.$spacing-06 0;
-}
-
-.tabletTileTitle {
-  margin: 0px 0px layout.$spacing-03 layout.$spacing-06;
-  font-size: 14px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.29;
-  letter-spacing: 0.16px;
-  color: #525252;
-  display: flex;
-  flex-direction: row;
 }
 
 .tileBox {
@@ -90,4 +62,8 @@
   display: flex;
   flex-direction: row;
   flex: 1;
+}
+
+.tileContainer {
+  height: fit-content;
 }

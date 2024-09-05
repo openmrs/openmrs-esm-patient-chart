@@ -29,7 +29,7 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
-import PatientSummaryOverviewList from './clinical-views/components/patient-program-summary.component';
+import clinicalViewsSummaryComponent from './clinical-views/components/clinical-views-summary.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -107,10 +107,10 @@ export const stopVisitPatientSearchActionButton = getSyncLifecycle(stopVisitActi
   moduleName,
 });
 
-export const patientProgramSummary = getSyncLifecycle(PatientSummaryOverviewList, {
-  featureName: 'program-summary',
-  moduleName,
-});
+export const clinicalViewsSummary = getAsyncLifecycle(
+  () => import('./clinical-views/components/clinical-views-summary.component'),
+  { featureName: 'clinical-views-summary', moduleName },
+);
 
 export const cancelVisitPatientSearchActionButton = getSyncLifecycle(cancelVisitActionButtonComponent, {
   featureName: 'patient-actions-slot-cancel-visit-button',
