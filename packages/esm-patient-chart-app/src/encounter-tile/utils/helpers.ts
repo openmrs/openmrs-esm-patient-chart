@@ -1,51 +1,83 @@
-import dayjs from 'dayjs';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { age, formatDate, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
+import { esmPatientChartSchema } from '../../config-schema';
 
-export function getEncounterValues(encounter, param: string, isDate?: Boolean) {
-  if (isDate) return dayjs(encounter[param]).format('DD-MMM-YYYY');
+export interface Observation {
+  uuid: string;
+  concept: { uuid: string; name: string };
+  value:
+    | {
+        uuid: string;
+        name: {
+          name: string;
+        };
+        names?: Array<{ uuid: string; name: string; conceptNameType: string }>;
+      }
+    | string;
+  groupMembers?: Array<Observation>;
+  obsDatetime: string;
+}
+
+export interface Encounter extends OpenmrsResource {
+  encounterDatetime: Date;
+  encounterType: { uuid: string; name: string };
+  patient: {
+    uuid: string;
+    display: string;
+    age: number;
+    birthDate: string;
+  };
+  location: {
+    uuid: string;
+    display: string;
+    name: string;
+  };
+  encounterProviders?: Array<{ encounterRole: string; provider: { uuid: string; name: string } }>;
+  obs: Array<Observation>;
+  form?: {
+    uuid: string;
+  };
+  visit?: string;
+}
+
+export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
+  if (isDate) return formatDate(encounter[param]);
   else return encounter[param] ? encounter[param] : '--';
 }
 
-export function formatDateTime(dateString: string): any {
-  const format = 'YYYY-MM-DDTHH:mm:ss';
-  if (dateString.includes('.')) {
-    dateString = dateString.split('.')[0];
-  }
-  return dayjs(dateString, format, true).toDate();
+export function obsArrayDateComparator(left: Observation, right: Observation) {
+  return new Date(right.obsDatetime).getTime() - new Date(left.obsDatetime).getTime();
 }
 
-export function obsArrayDateComparator(left, right) {
-  return formatDateTime(right.obsDatetime) - formatDateTime(left.obsDatetime);
-}
-
-export function findObs(encounter, obsConcept): Record<string, any> {
+export function findObs(encounter: Encounter, obsConcept: string): Observation {
   const allObs = encounter?.obs?.filter((observation) => observation.concept.uuid === obsConcept) || [];
   return allObs?.length == 1 ? allObs[0] : allObs?.sort(obsArrayDateComparator)[0];
 }
 
-export function getObsFromEncounters(encounters, obsConcept) {
+export function getObsFromEncounters(encounters: Encounter, obsConcept: string) {
   const filteredEnc = encounters?.find((enc) => enc.obs.find((obs) => obs.concept.uuid === obsConcept));
   return getObsFromEncounter(filteredEnc, obsConcept);
 }
 
-export function resolveValueUsingMappings(encounter, concept, mappings) {
+export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings) {
   const obs = findObs(encounter, concept);
   for (const key in mappings) {
-    if (mappings[key] === obs?.value?.uuid) {
+    if (typeof obs?.value === 'object' && 'uuid' in obs.value && mappings[key] === obs?.value?.uuid) {
       return key;
     }
   }
   return '--';
 }
 
-export function getConditionalConceptValue(encounter: any, conditionalConceptMappings, isDate) {
+export function getConditionalConceptValue(encounter: Encounter, conditionalConceptMappings, isDate: Boolean) {
   const { trueConcept, nonTrueConcept, dependantConcept, conditionalConcept } = conditionalConceptMappings;
-  const dependantUuid = findObs(encounter, dependantConcept)?.value?.uuid;
+  const dependantValue = findObs(encounter, dependantConcept)?.value;
+  const dependantUuid =
+    typeof dependantValue === 'object' && 'uuid' in dependantValue ? dependantValue.uuid : undefined;
   const finalConcept = dependantUuid === conditionalConcept ? trueConcept : nonTrueConcept;
   return getObsFromEncounter(encounter, finalConcept, isDate);
 }
 
-export function getConceptFromMappings(encounter, concepts) {
+export function getConceptFromMappings(encounter: Encounter, concepts: Array<string>) {
   for (const concept of concepts) {
     const obs = findObs(encounter, concept);
     if (obs && obs.value) {
@@ -55,7 +87,7 @@ export function getConceptFromMappings(encounter, concepts) {
   return null;
 }
 
-export function getMultipleObsFromEncounter(encounter, obsConcepts: Array<string>) {
+export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>) {
   let observations = [];
   obsConcepts.map((concept) => {
     const obs = getObsFromEncounter(encounter, concept);
@@ -68,8 +100,8 @@ export function getMultipleObsFromEncounter(encounter, obsConcepts: Array<string
 }
 
 export function getObsFromEncounter(
-  encounter,
-  obsConcept,
+  encounter: Encounter,
+  obsConcept: string,
   isDate?: Boolean,
   isTrueFalseConcept?: Boolean,
   type?: string,
@@ -83,20 +115,22 @@ export function getObsFromEncounter(
   }
 
   if (isTrueFalseConcept) {
-    if (
-      (obs?.value?.uuid != 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3' && obs?.value?.name?.name !== 'Unknown') ||
-      obs?.value?.name?.name === 'FALSE'
-    ) {
-      return 'No';
-    } else if (obs?.value?.uuid == 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3') {
-      return 'Yes';
-    } else {
-      return obs?.value?.name?.name;
+    if (typeof obs?.value === 'object') {
+      if (
+        (obs?.value?.uuid != esmPatientChartSchema.trueConceptUuid._default && obs?.value?.name?.name !== 'Unknown') ||
+        obs?.value?.name?.name === 'FALSE'
+      ) {
+        return 'No';
+      } else if (obs?.value?.uuid == esmPatientChartSchema.trueConceptUuid._default) {
+        return 'Yes';
+      } else {
+        return obs?.value?.name?.name;
+      }
     }
   }
 
   if (type === 'location') {
-    return encounter.location.name;
+    return encounter.location.display;
   }
 
   if (type === 'provider') {
@@ -108,12 +142,14 @@ export function getObsFromEncounter(
   }
 
   if (type === 'ageAtHivTest') {
-    return encounter.patient.age;
+    return age(encounter.patient.birthDate, encounter.encounterDatetime);
   }
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
     const primaryValue =
       obs.value.names.find((conceptName) => conceptName.conceptNameType === 'SHORT')?.name || obs.value.name.name;
+
+    obs.value.names.find((conceptName) => conceptName.conceptNameType === 'SHORT')?.name || obs.value.name.name;
     if (primaryValue === 'Other non-coded') {
       const secondaryObs = findObs(encounter, secondaryConcept);
       return secondaryObs ? secondaryObs.value : '--';
@@ -132,7 +168,7 @@ export function getObsFromEncounter(
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
       return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
-    } else {
+    } else if (typeof obs.value === 'string') {
       return formatDate(parseDate(obs.value), { mode: 'wide' });
     }
   }

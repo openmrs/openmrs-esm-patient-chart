@@ -21,8 +21,8 @@
       "offline": true
     },
     {
-      "name": "program-summary",
-      "component": "patientProgramSummary",
+      "name": "clinical-views-summary",
+      "component": "clinicalViewsSummary",
       "online": true,
       "offline": true
     },

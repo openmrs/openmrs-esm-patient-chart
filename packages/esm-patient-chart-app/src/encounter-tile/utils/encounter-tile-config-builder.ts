@@ -49,9 +49,11 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps) => {
     encounterUuid: column.encounterType,
     hasSummary: column.hasSummary || false,
     getObsValue: (encounter) => {
+      let obsValue;
+
       if (column.conceptMappings) {
         const concept = getConceptFromMappings(encounter, column.conceptMappings);
-        return getObsFromEncounter(
+        obsValue = getObsFromEncounter(
           encounter,
           concept,
           column.isDate,
@@ -59,35 +61,42 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps) => {
           column.type,
           column.fallbackConcepts,
         );
+      } else {
+        obsValue = getObsFromEncounter(encounter, column.concept, column.isDate);
       }
-      return getObsFromEncounter(encounter, column.concept, column.isDate);
+      return typeof obsValue === 'string' ? obsValue : obsValue?.name?.name || '--';
     },
     getSummaryObsValue: column.hasSummary
       ? (encounter) => {
+          let summaryValue;
+
           if (column.summaryConcept.secondaryConcept) {
             const primaryConceptType = getObsFromEncounter(encounter, column.summaryConcept.primaryConcept);
             if (primaryConceptType !== '--') {
-              return primaryConceptType;
+              summaryValue = primaryConceptType;
             } else {
-              return getObsFromEncounter(encounter, column.summaryConcept.secondaryConcept);
+              summaryValue = getObsFromEncounter(encounter, column.summaryConcept.secondaryConcept);
             }
-          }
-
-          if (column.summaryConcept.hasCalculatedDate) {
+          } else if (column.summaryConcept.hasCalculatedDate) {
             const primaryDate = getObsFromEncounter(
               encounter,
               column.summaryConcept.primaryConcept,
               column.summaryConcept.isDate,
             );
 
-            if (primaryDate !== '--') {
-              return calculateDateDifferenceInDate(primaryDate);
+            if (typeof primaryDate === 'string' && primaryDate !== '--') {
+              summaryValue = calculateDateDifferenceInDate(primaryDate);
             } else {
-              return '--';
+              summaryValue = '--';
             }
+          } else {
+            summaryValue = getObsFromEncounter(
+              encounter,
+              column.summaryConcept.primaryConcept,
+              column.summaryConcept.isDate,
+            );
           }
-
-          return getObsFromEncounter(encounter, column.summaryConcept.primaryConcept, column.summaryConcept.isDate);
+          return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';
         }
       : null,
   }));

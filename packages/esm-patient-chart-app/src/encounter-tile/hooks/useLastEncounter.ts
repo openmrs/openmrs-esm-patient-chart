@@ -16,6 +16,7 @@ export function useLastEncounter(patientUuid: string, encounterType: string) {
   const { data, error, isValidating } = useSWR<{ data: { results: Array<OpenmrsEncounter> } }, Error>(
     endpointUrl,
     openmrsFetch,
+    { dedupingInterval: 5000, refreshInterval: 0 },
   );
 
   return {
