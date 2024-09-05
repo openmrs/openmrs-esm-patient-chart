@@ -2,9 +2,8 @@ import React, { useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
 import styles from './tile.scss';
-import { groupColumnsByEncounterType } from '../../utils/helpers';
+import { type Encounter, groupColumnsByEncounterType } from '../../utils/helpers';
 import { useLastEncounter } from '../../hooks/useLastEncounter';
-import { LazyCell } from '../../../lazy-cell/lazy-cell.component';
 import { useTranslation } from 'react-i18next';
 
 export interface EncounterTileColumn {
@@ -13,20 +12,15 @@ export interface EncounterTileColumn {
   encounterUuid: string;
   concept: string;
   title?: string;
-  getObsValue: (encounter: any) => string | Promise<string>;
-  getSummaryObsValue?: (encounter: any) => string | Promise<string>;
-  encounter?: any;
+  getObsValue: (encounter: Encounter) => string;
+  getSummaryObsValue?: (encounter: Encounter) => string;
+  encounter?: Encounter;
   hasSummary?: Boolean;
 }
 export interface EncounterTileProps {
   patientUuid: string;
   columns: Array<EncounterTileColumn>;
   headerTitle: string;
-}
-
-export interface EncounterValuesTileProps {
-  patientUuid: string;
-  column: any;
 }
 
 export const EncounterTile = React.memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
@@ -81,24 +75,26 @@ const EncounterData: React.FC<{
 
   return (
     <div className={styles.tileBox}>
-      {columns.map((column, ind) => (
-        <div key={ind}>
-          <span className={styles.tileTitle}>{column.header}</span>
-          <span className={styles.tileValue}>
-            <LazyCell lazyValue={column.getObsValue(lastEncounter)} />
-          </span>
-          {column.hasSummary && (
-            <>
-              <span className={styles.tileValue}>
-                <LazyCell lazyValue={column.getSummaryObsValue(lastEncounter)} />
-              </span>
-              <span className={styles.tileValue}>
-                <LazyCell lazyValue={column.getObsValue(lastEncounter)} />
-              </span>
-            </>
-          )}
-        </div>
-      ))}
+      {columns.map((column, ind) => {
+        return (
+          <div key={ind}>
+            <span className={styles.tileTitle}>{column.header}</span>
+            <span className={styles.tileValue}>
+              <p>{column.getObsValue(lastEncounter)}</p>
+            </span>
+            {column.hasSummary && (
+              <>
+                <span className={styles.tileValue}>
+                  <p>{column.getSummaryObsValue(lastEncounter)}</p>
+                </span>
+                <span className={styles.tileValue}>
+                  <p>{column.getObsValue(lastEncounter)}</p>
+                </span>
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
