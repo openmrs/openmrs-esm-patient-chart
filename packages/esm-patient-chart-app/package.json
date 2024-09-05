@@ -56,6 +56,6 @@
   },
   "devDependencies": {
     "@types/uuid": "^9.0.4",
-    "webpack": "^5.88.2"
+    "webpack": "^5.94.0"
   }
 }

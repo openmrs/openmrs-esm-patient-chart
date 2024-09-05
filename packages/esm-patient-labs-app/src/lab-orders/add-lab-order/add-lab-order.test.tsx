@@ -76,6 +76,9 @@ function renderAddLabOrderWorkspace() {
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
       setTitle={jest.fn()}
+      setCancelTitle={jest.fn()}
+      setCancelMessage={jest.fn()}
+      setCancelConfirmText={jest.fn()}
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
