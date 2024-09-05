@@ -322,6 +322,9 @@ function renderAllergyForm(props = {}) {
     patient: mockPatient,
     patientUuid: mockPatient.id,
     setTitle: jest.fn(),
+    setCancelTitle: jest.fn(),
+    setCancelMessage: jest.fn(),
+    setCancelConfirmText: jest.fn(),
   };
 
   render(<AllergyForm {...defaultProps} {...props} />);
