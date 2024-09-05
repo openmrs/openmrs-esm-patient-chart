@@ -6,8 +6,8 @@ import useSWR from 'swr';
 export const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
   'patient:(uuid,display,age,identifiers,person),encounterProviders:(uuid,provider:(uuid,name)),' +
-  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
-  'names:(uuid,conceptNameType,name))),form:(uuid,name))';
+  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,display,name:(uuid,name)),value:(uuid,name:(uuid,name,display),' +
+  'names:(uuid,conceptNameType,name,display))),form:(uuid,name))';
 
 export function useLastEncounter(patientUuid: string, encounterType: string) {
   const query = `encounterType=${encounterType}&patient=${patientUuid}&limit=1&order=desc&startIndex=0`;
@@ -16,8 +16,8 @@ export function useLastEncounter(patientUuid: string, encounterType: string) {
   const { data, error, isValidating } = useSWR<{ data: { results: Array<OpenmrsEncounter> } }, Error>(
     endpointUrl,
     openmrsFetch,
+    { dedupingInterval: 5000, refreshInterval: 0 },
   );
-
   return {
     lastEncounter: data ? data?.data?.results.shift() : null,
     error,
