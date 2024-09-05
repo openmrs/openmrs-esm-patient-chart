@@ -14,7 +14,6 @@ interface HtmlFormEntryComponentProps extends DefaultPatientWorkspaceProps {
 
 const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   patientUuid,
-  title,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   setCancelTitle,
@@ -32,12 +31,7 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
 
   // custom messaging to display to a user when closing the workspace without using the buttons within the form
   setCancelTitle(t('warning', 'Warning'));
-  setCancelMessage(
-    t('closeHtmlFormWarning', {
-      defaultValue: 'Please use the Save or Cancel button on the {{title}} form to close the form.',
-      replace: { title },
-    }),
-  );
+  setCancelMessage(t('closeHtmlFormWarning', 'Please use the Save or Cancel button on the form to close the form.'));
   setCancelConfirmText(t('ignoreWarning', 'Ignore Warning'));
 
   // urls for entering a new form and editing an existing form; note that we specify the returnUrl as post-message:close-workspace,
