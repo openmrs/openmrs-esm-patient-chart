@@ -15,7 +15,7 @@ export interface EncounterTileColumn {
 }
 export interface EncounterTileProps {
   patientUuid: string;
-  columns: Array<any>;
+  columns: Array<EncounterTileColumn>;
   headerTitle: string;
 }
 
@@ -24,22 +24,24 @@ export interface EncounterValuesTileProps {
   column: any;
 }
 
-export const EncounterTile: React.FC<EncounterTileProps> = ({ patientUuid, columns, headerTitle }) => {
+const EncounterTile: React.FC<EncounterTileProps> = ({ patientUuid, columns, headerTitle }) => {
   return (
-    // <>
-    <Tile className={styles.tile}>
-      <div className={styles.cardTitle}>
-        <h4 className={styles.title}> {headerTitle} </h4>
-      </div>
-      <Column className={styles.columnContainer}>
-        {columns.map((column, ind) => (
-          <EncounterValuesTile key={ind} patientUuid={patientUuid} column={column} />
-        ))}
-      </Column>
-    </Tile>
-    // </>
+    <div className={styles.tileContainer}>
+      <Tile className={styles.tile}>
+        <div className={styles.cardTitle}>
+          <h4 className={styles.title}> {headerTitle} </h4>
+        </div>
+        <Column className={styles.columnContainer}>
+          {columns.map((column, ind) => (
+            <EncounterValuesTile key={ind} patientUuid={patientUuid} column={column} />
+          ))}
+        </Column>
+      </Tile>
+    </div>
   );
 };
+
+export const MemoizedEncounterTile = React.memo(EncounterTile);
 
 export const EncounterValuesTile: React.FC<EncounterValuesTileProps> = ({ patientUuid, column }) => {
   const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, column.encounterUuid);
