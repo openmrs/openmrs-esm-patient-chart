@@ -46,7 +46,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onComp
   return (
     <div className={styles.filePreviewContainer}>
       <ModalHeader closeModal={closeModal} className={styles.modalHeader}>
-        {title ? title : t('addAttachment_title', 'Add Attachment')}{' '}
+        {title || t('addAttachment_title', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </ModalHeader>
       <FilePreview

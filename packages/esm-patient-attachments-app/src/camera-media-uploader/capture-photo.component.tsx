@@ -39,7 +39,9 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
       {showPlaceholderText ? (
         <div className={styles.placeholderText}>{t('noImageToDisplay', 'No image to display')}</div>
       ) : (
-        <img src={dataUri || initialState} alt="Preview" className={styles.preview} />
+        <div className={styles.preview}>
+          <img src={dataUri || initialState} alt="Preview" className={styles.previewImage} />
+        </div>
       )}
       <div className={styles.editImage}>
         <span className={styles.editText}>{t('edit', 'Edit')}</span>

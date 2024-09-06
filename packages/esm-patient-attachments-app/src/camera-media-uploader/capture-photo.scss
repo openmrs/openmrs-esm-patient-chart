@@ -10,13 +10,7 @@
 .placeholderText {
   width: 57px;
   height: 32px;
-  font-family: IBMPlexSans;
   font-size: 12px;
-  font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.33;
-  letter-spacing: 0.32px;
   color: colors.$cool-gray-70;
   width: 120px;
   height: 120px;
@@ -38,28 +32,25 @@
 .editText {
   width: 26px;
   height: 18px;
-  margin-left: 0.5rem;
+  margin-left: layout.$spacing-03;
   padding-left: 15px;
-  font-family: IBMPlexSans;
-  font-size: 14px;
-  font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.29;
-  letter-spacing: 0.16px;
   color: colors.$white-0;
 }
 
 .editButton {
   display: flex;
-  width: 1rem;
-  height: 1rem;
+  width: layout.$spacing-05;
+  height: layout.$spacing-05;
   justify-self: flex-end;
-  margin-right: 0.5rem;
+  margin-right: layout.$spacing-03;
   padding-top: 9px;
 }
 
 .preview {
+  object-fit: contain;
+}
+
+.previewImage {
   display: block;
   width: 120px;
   height: auto;

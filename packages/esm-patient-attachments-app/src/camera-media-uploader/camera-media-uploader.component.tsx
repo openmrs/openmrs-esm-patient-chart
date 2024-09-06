@@ -121,7 +121,7 @@ const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) 
 
   return (
     <div className={styles.cameraSection}>
-      <ModalHeader closeModal={closeModal} title={title ? title : t('addAttachment_title', 'Add Attachment')} />
+      <ModalHeader closeModal={closeModal} title={title || t('addAttachment_title', 'Add Attachment')} />
       <ModalBody className={styles.modalBody}>
         <Tabs className={styles.tabs} defaultSelectedIndex={1}>
           <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
