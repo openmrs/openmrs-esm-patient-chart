@@ -169,7 +169,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
             {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" size="lg" onClick={saveImageOrPdf} disabled={emptyName}>
-            {title ? title : t('addAttachment', 'Add attachment')}
+            {title || t('addAttachment', 'Add attachment')}
           </Button>
         </UserHasAccess>
       </ModalFooter>
