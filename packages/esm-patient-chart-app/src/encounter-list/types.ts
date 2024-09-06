@@ -88,16 +88,17 @@ export interface ActionProps {
   mode: string;
   label: string;
   formName: string;
+  intent?: string;
 }
 
 export interface ConditionalActionProps {
   mode: string;
   label: string;
-  package: string;
   formName: string;
   dependsOn?: string;
   dependantConcept?: string;
   dependantEncounter?: string;
+  intent?: string;
 }
 
 export interface ColumnDefinition {

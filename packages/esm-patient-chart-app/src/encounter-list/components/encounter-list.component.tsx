@@ -213,8 +213,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   const formLauncher = useMemo(() => {
     if (formsJson.length == 1 && !formsJson[0]['availableIntents']?.length) {
-      // we only have one form with no intents
-      // just return the "Add" button
       return (
         <Button
           kind="ghost"
