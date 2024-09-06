@@ -29,19 +29,30 @@ jobs:
           node-version: 18
 
       - name: Cache dependencies
-        id: cache
+        id: cache-dependencies
         uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --immutable
+        
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(grep '@playwright/test@' yarn.lock | sed -n 's/.*npm:\([^":]*\).*/\1/p' | head -n 1)" >> $GITHUB_ENV
 
+      - name: Cache Playwright binaries
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
@@ -87,3 +98,4 @@ jobs:
           path: './logs'
           retention-days: 2
           overwrite: true
+          
