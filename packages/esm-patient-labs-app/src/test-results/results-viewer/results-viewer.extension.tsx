@@ -80,6 +80,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
+            <p>{t('view', 'View')} : </p>
             <ContentSwitcher
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
@@ -139,6 +140,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
               totalResultsCount ? `(${totalResultsCount})` : ''
             }`}</h4>
+            <p className={styles.viewOptionsSubHeading}>{t('view', 'View')} : </p>
             <ContentSwitcher
               className={styles.viewOptionsSwitcher}
               onChange={({ name }: { name: viewOpts }) => setView(name)}
