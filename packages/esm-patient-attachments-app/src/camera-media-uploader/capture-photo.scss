@@ -9,7 +9,7 @@
 
 .placeholderText {
   width: 57px;
-  height: 32px;
+  height: layout.$spacing-07;
   font-size: 12px;
   color: colors.$cool-gray-70;
   width: 120px;
@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: space-between;
   width: 120px;
-  height: 48px;
+  height: layout.$spacing-09;
   padding: 0 13px 0 0;
   background-color: colors.$cool-gray-80;
 }
