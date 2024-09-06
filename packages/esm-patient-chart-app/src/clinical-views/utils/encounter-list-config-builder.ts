@@ -57,45 +57,32 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
   );
 };
 
+const createActionObject = (encounter: Encounter, action: ActionProps | ConditionalActionProps) => ({
+  form: { name: action.formName },
+  encounterUuid: encounter.uuid,
+  intent: action.intent || '*', // Provide a default value if 'intent' is missing
+  label: action.label,
+  mode: action.mode,
+});
+
 const getActions = (encounter: Encounter, column: ColumnDefinition) => {
-  const baseActions =
-    column.actionOptions?.map((action: ActionProps) => ({
-      form: { name: action.formName },
-      encounterUuid: encounter.uuid,
-      intent: '*',
-      label: action.label,
-      mode: action.mode,
-    })) || [];
+  const baseActions = column.actionOptions?.map((action: ActionProps) => createActionObject(encounter, action)) || [];
 
   const conditionalActions =
-    column.conditionalActionOptions?.map((action) => createConditionalAction(encounter, action)) || [];
+    column.conditionalActionOptions?.map((action) => createConditionalAction(encounter, action)).filter(Boolean) || [];
 
   return [...baseActions, ...conditionalActions];
 };
 
 const createConditionalAction = (encounter: Encounter, action: ConditionalActionProps) => {
   const dependantObsValue = getObsFromEncounter(encounter, action.dependantConcept);
-
   if (dependantObsValue === action.dependsOn) {
-    return {
-      form: { name: action.formName },
-      encounterUuid: encounter.uuid,
-      intent: '*',
-      label: action.label,
-      mode: action.mode,
-    };
+    return createActionObject(encounter, action);
   }
 
   const dependantEncounterValue = encounter.encounterType?.uuid;
-
   if (dependantEncounterValue === action.dependantEncounter) {
-    return {
-      form: { name: action.formName, package: action.package },
-      encounterUuid: encounter.uuid,
-      intent: '*',
-      label: action.label,
-      mode: action.mode,
-    };
+    return createActionObject(encounter, action);
   }
 
   return null;
