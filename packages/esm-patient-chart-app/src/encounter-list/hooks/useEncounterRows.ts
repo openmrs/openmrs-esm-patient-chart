@@ -27,11 +27,10 @@ export function useEncounterRows(
 
   useEffect(() => {
     if (response) {
-      // sort the encounters
       response.data.results.sort(
         (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
       );
-      // apply filter
+
       if (encounterFilter) {
         setEncounters(response.data.results.filter((encounter) => encounterFilter(encounter)));
       } else {

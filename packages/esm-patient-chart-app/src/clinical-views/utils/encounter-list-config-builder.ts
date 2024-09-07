@@ -60,7 +60,7 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
 const createActionObject = (encounter: Encounter, action: ActionProps | ConditionalActionProps) => ({
   form: { name: action.formName },
   encounterUuid: encounter.uuid,
-  intent: action.intent || '*', // Provide a default value if 'intent' is missing
+  intent: action.intent || '*',
   label: action.label,
   mode: action.mode,
 });
