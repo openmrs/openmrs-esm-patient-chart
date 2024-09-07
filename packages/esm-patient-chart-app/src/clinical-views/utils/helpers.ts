@@ -1,8 +1,6 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { type FormSchema } from '@openmrs/esm-form-engine-lib';
-import dayjs from 'dayjs';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, formatDatetime } from '@openmrs/esm-framework';
 import { fetchPatientRelationships } from '../../encounter-list/encounter-list.resource';
 
 type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
@@ -37,11 +35,8 @@ export function launchEncounterForm(
 }
 
 export function formatDateTime(dateString: string): any {
-  const format = 'YYYY-MM-DDTHH:mm:ss';
-  if (dateString.includes('.')) {
-    dateString = dateString.split('.')[0];
-  }
-  return dayjs(dateString, format, true).toDate();
+  const parsedDate = parseDate(dateString.includes('.') ? dateString.split('.')[0] : dateString);
+  return formatDatetime(parsedDate);
 }
 
 export function obsArrayDateComparator(left, right) {
@@ -121,6 +116,8 @@ export function getObsFromEncounter(
     return '--';
   }
 
+  // Not sure if these concepts are similar in all implementations,
+  // There might be a better way to use a generic value
   if (isTrueFalseConcept) {
     if (
       (obs?.value?.uuid != 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3' && obs?.value?.name?.name !== 'Unknown') ||
@@ -142,6 +139,7 @@ export function getObsFromEncounter(
     return encounter.encounterProviders.map((p) => p.provider.name).join(' | ');
   }
 
+  // TODO: This needs to put in some other place
   if (type === 'mothersName') {
     return fetchMotherName(encounter.patient.uuid);
   }
@@ -150,6 +148,7 @@ export function getObsFromEncounter(
     return encounter.encounterType.name;
   }
 
+  // TODO: Need to get a better place for this
   if (type === 'ageAtHivTest') {
     return encounter.patient.age;
   }
