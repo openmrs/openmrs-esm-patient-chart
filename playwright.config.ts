@@ -29,6 +29,18 @@ const config: PlaywrightTestConfig = {
         ...devices['Desktop Chrome'],
       },
     },
+    {
+      name: 'English',
+      use: { locale: 'en' },
+    },
+    {
+      name: 'French',
+      use: { locale: 'fr' },
+    },
+    {
+      name: 'Spanish',
+      use: { locale: 'es' },
+    },
   ],
 };
 
