@@ -30,6 +30,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
   const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
+  const formSessionIntent = additionalProps?.formSessionIntent ?? '*';
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
@@ -82,7 +83,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
-          formSessionIntent={additionalProps?.formSessionIntent}
+          formSessionIntent={formSessionIntent}
           onSubmit={closeWorkspaceWithSavedChanges}
           patientUUID={patientUuid}
           visit={visit}

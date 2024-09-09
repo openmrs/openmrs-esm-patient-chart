@@ -8,7 +8,10 @@ export interface OverviewPanelData {
   name: string;
   range: string;
   interpretation: OBSERVATION_INTERPRETATION;
-  value?: string | number;
+  value?: {
+    interpretation: string;
+    value: string | number;
+  };
   valueCodeableConcept?: Coding;
 }
 
