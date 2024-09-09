@@ -142,7 +142,9 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             ) : null}
             {medication.dateStopped ? (
               <span>
-                <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
+                <span className={styles.label01}>
+                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
+                </span>
                 {formatDate(new Date(medication.dateStopped))}
               </span>
             ) : null}

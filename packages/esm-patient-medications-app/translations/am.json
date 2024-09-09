@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "Dose",
   "editFrequencyComboBoxTitle": "Frequency",
   "editRouteComboBoxTitle": "Route",
-  "endDate": "End date",
   "error": "Error",
   "errorFetchingDrugOrderTemplates": "Error fetching drug order templates",
   "errorFetchingDrugResults": "Error fetching results for \"{{searchTerm}}\"",

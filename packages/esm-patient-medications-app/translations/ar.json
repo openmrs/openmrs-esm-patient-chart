@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "الجرعة",
   "editFrequencyComboBoxTitle": "التكرار",
   "editRouteComboBoxTitle": "الطريقة",
-  "endDate": "تاريخ الانتهاء",
   "error": "خطأ",
   "errorFetchingDrugOrderTemplates": "خطأ في جلب قوالب طلب الدواء",
   "errorFetchingDrugResults": "خطأ في جلب النتائج لـ \"{{searchTerm}}\"",
