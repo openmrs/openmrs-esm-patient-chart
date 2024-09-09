@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "מינון",
   "editFrequencyComboBoxTitle": "תדירות",
   "editRouteComboBoxTitle": "דרך",
-  "endDate": "תאריך סיום",
   "error": "שגיאה",
   "errorFetchingDrugOrderTemplates": "שגיאה בקבלת תבניות הזמנת תרופות",
   "errorFetchingDrugResults": "שגיאה בקבלת תוצאות עבור \"{{searchTerm}}\"",
