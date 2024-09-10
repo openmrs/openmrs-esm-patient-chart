@@ -34,10 +34,17 @@ const mockTestTypes = [
   {
     conceptUuid: 'test-lab-uuid-1',
     label: 'HIV VIRAL LOAD',
+    synonyms: ['HIV VIRAL LOAD', 'HIV VL'],
   },
   {
     conceptUuid: 'test-lab-uuid-2',
     label: 'CD4 COUNT',
+    synonyms: ['CD4 COUNT', 'CD4'],
+  },
+  {
+    conceptUuid: 'test-lab-uuid-3',
+    label: 'HEMOGLOBIN',
+    synonyms: ['HEMOGLOBIN', 'HGB'],
   },
 ];
 const mockUseTestTypes = jest.fn().mockReturnValue({
@@ -198,6 +205,15 @@ describe('AddLabOrder', () => {
     expect(screen.getByText(/male/i)).toBeInTheDocument();
     expect(screen.getByText(/52 yrs/i)).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
+  });
+
+  test('should be possible to search for test types by synonyms', async () => {
+    const user = userEvent.setup();
+    renderAddLabOrderWorkspace();
+    const searchInput = screen.getByRole('searchbox');
+    await user.type(searchInput, 'hgb');
+    await screen.findByText(/hemoglobin/i);
+    expect(screen.queryByText(/hiv viral load/i)).not.toBeInTheDocument();
   });
 
   test('should display an error message if test types fail to load', () => {
