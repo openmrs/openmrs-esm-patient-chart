@@ -32,9 +32,9 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
       labOrderableConcepts
         ? labOrderableConcepts.map(
             (c) =>
-              `${restBaseUrl}/concept/${c}?v=custom:(display,names,uuid,setMembers:(display,uuid,names,setMembers:(display,uuid,names)))`,
+              `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
           )
-        : `${restBaseUrl}/concept?class=Test?v=custom:(display,names,uuid,setMembers:(display,uuid,setMembers:(display,uuid,names)))`,
+        : `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
