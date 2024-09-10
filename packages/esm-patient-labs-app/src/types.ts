@@ -77,6 +77,9 @@ export interface Concept {
     display: string;
     name: string;
   };
+  names: Array<{
+    display: string;
+  }>;
   answers: [];
   setMembers: [];
   hiNormal: number;
