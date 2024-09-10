@@ -148,7 +148,6 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await form.getByPlaceholder(/route/i).clear();
     await form.getByPlaceholder(/route/i).fill('Inhalation');
     await form.getByText('Inhalation', { exact: true }).click();
-    await page.pause();
   });
 
   await test.step('And I change the frequency to `Twice daily`', async () => {
