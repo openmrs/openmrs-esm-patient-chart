@@ -155,7 +155,7 @@ describe('ProgramsForm', () => {
     );
   });
 
-  it('renders the programs status field', async () => {
+  it('renders the programs status field if the config property is set to true', async () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       showProgramStatusField: true,
@@ -163,7 +163,7 @@ describe('ProgramsForm', () => {
 
     renderProgramsForm();
 
-    expect(screen.getByLabelText('Program status')).toBeInTheDocument();
+    expect(screen.getByLabelText(/program status/i)).toBeInTheDocument();
   });
 });
 

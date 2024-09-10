@@ -263,15 +263,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     workflowStates = currentProgram.allWorkflows[0].states;
   }
 
-  const stateSelect = (
+  const programStatusDropdown = (
     <Controller
       name="selectedProgramStatus"
       control={control}
       render={({ fieldState, field: { onChange, value } }) => (
         <>
           <Select
-            aria-label="program status"
-            id="state"
+            aria-label={t('programStatus', 'Program status')}
+            id="programStatus"
             invalid={!!fieldState?.error}
             labelText={t('programStatus', 'Program status')}
             onChange={(event) => onChange(event.target.value)}
@@ -317,7 +317,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     formGroups.push({
       style: { width: '50%' },
       legendText: '',
-      value: stateSelect,
+      value: programStatusDropdown,
     });
   }
 

@@ -7,7 +7,8 @@ export const configSchema = {
   },
   showProgramStatusField: {
     _type: Type.Boolean,
-    _description: 'Whether to show the Program status field',
+    _description:
+      'Whether to show the Program status field in the Record program enrollment and Edit program enrollment forms. If set to true, the `Program status` field is displayed in the Programs datatable',
     _default: false,
   },
 };

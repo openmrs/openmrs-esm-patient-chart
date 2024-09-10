@@ -98,7 +98,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
         status: enrollment.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
           : t('active', 'Active'),
-        state: state ? state.state.concept.display : t('(none)', '(None)'),
+        state: state ? state.state.concept.display : '--',
       };
     });
   }, [paginatedEnrollments, t]);

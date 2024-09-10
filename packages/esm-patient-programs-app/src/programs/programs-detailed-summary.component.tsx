@@ -89,7 +89,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           status: program.dateCompleted
             ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
             : t('active', 'Active'),
-          state: state ? state.state.concept.display : t('(none)', '(None)'),
+          state: state ? state.state.concept.display : '--',
         };
       }),
     [enrollments, t],
