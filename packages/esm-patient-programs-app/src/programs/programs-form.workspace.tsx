@@ -18,7 +18,7 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -39,7 +39,7 @@ const createProgramsFormSchema = (t: TFunction) =>
     enrollmentDate: z.date(),
     completionDate: z.date().nullable(),
     enrollmentLocation: z.string(),
-    selectedState: z.string(),
+    selectedProgramStatus: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -58,6 +58,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const config = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
@@ -98,7 +99,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
       enrollmentLocation: getLocationUuid() ?? '',
-      selectedState: currentState?.state.uuid ?? '',
+      selectedProgramStatus: currentState?.state.uuid ?? '',
     },
   });
 
@@ -110,7 +111,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
-      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedState } = data;
+      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
 
       const payload = {
         patient: patientUuid,
@@ -119,10 +120,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
         states:
-          !!selectedState && selectedState != currentState?.state.uuid ? [{ state: { uuid: selectedState } }] : [],
+          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
+            ? [{ state: { uuid: selectedProgramStatus } }]
+            : [],
       };
 
       try {
+        setIsSubmittingForm(true);
+
         const abortController = new AbortController();
 
         if (currentEnrollment) {
@@ -260,19 +265,19 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const stateSelect = (
     <Controller
-      name="selectedState"
+      name="selectedProgramStatus"
       control={control}
       render={({ fieldState, field: { onChange, value } }) => (
         <>
           <Select
-            aria-label="program workflow state"
+            aria-label="program status"
             id="state"
             invalid={!!fieldState?.error}
-            labelText={t('programState', 'State')}
+            labelText={t('programStatus', 'Program status')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
           >
-            <SelectItem text={t('chooseState', 'Choose a state')} value="" />
+            <SelectItem text={t('chooseStatus', 'Choose a program status')} value="" />
             {workflowStates.map((state) => (
               <SelectItem key={state.uuid} text={state.concept.display} value={state.uuid}>
                 {state.concept.display}
@@ -306,7 +311,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       legendText: '',
       value: enrollmentLocation,
     },
-    {
+    config.showProgramStatusField && {
       style: { width: '50%' },
       legendText: '',
       value: stateSelect,

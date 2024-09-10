@@ -105,10 +105,12 @@ export const usePrograms = (patientUuid: string) => {
 };
 
 export const findLastState = (states: ProgramWorkflowState[]): ProgramWorkflowState => {
-  const active = states.filter((s) => !s.voided);
-  const notCompleted = active.find((s) => !s.endDate);
-  if (notCompleted) return notCompleted;
-  const compareFn = (a: ProgramWorkflowState, b: ProgramWorkflowState): number =>
-    new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
-  return active.sort(compareFn).at(active.length - 1);
+  const activeStates = states.filter((state) => !state.voided);
+  const ongoingState = activeStates.find((state) => !state.endDate);
+
+  if (ongoingState) {
+    return ongoingState;
+  }
+
+  return activeStates.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
 };

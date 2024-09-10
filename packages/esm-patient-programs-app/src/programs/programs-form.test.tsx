@@ -1,7 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { type FetchResponse, showSnackbar, useLocations } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  showSnackbar,
+  useLocations,
+  useConfig,
+  getDefaultsFromConfigSchema,
+} from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -11,6 +17,7 @@ import {
   useEnrollments,
 } from './programs.resource';
 import ProgramsForm from './programs-form.workspace';
+import { type ConfigObject, configSchema } from '../config-schema';
 
 const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
 const mockUseEnrollments = jest.mocked(useEnrollments);
@@ -21,6 +28,7 @@ const mockUseLocations = jest.mocked(useLocations);
 const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 const testProps = {
   closeWorkspace: mockCloseWorkspace,
@@ -145,6 +153,17 @@ describe('ProgramsForm', () => {
         title: 'Program enrollment updated',
       }),
     );
+  });
+
+  it('renders the programs status field', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showProgramStatusField: true,
+    });
+
+    renderProgramsForm();
+
+    expect(screen.getByLabelText('Program status')).toBeInTheDocument();
   });
 });
 

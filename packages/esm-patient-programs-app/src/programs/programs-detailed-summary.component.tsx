@@ -40,7 +40,7 @@ interface ProgramEditButtonProps {
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { hideAddProgramButton } = useConfig<ConfigObject>();
+  const { hideAddProgramButton, showProgramStatusField } = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
@@ -49,8 +49,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
 
   const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
-    () => [
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(() => {
+    const headers = [
       {
         key: 'display',
         header: t('activePrograms', 'Active programs'),
@@ -67,13 +67,15 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
-      {
+    ];
+    if (showProgramStatusField) {
+      headers.push({
         key: 'state',
-        header: t('state', 'State'),
-      },
-    ],
-    [t],
-  );
+        header: t('programStatus', 'Program status'),
+      });
+    }
+    return headers;
+  }, [t, showProgramStatusField]);
 
   const tableRows = useMemo(
     () =>
