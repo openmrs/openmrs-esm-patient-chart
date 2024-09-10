@@ -74,7 +74,9 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
     }
 
     if (searchTerm && searchTerm.trim() !== '') {
-      return testTypes.filter((testType) => testType.label.toLowerCase().includes(searchTerm.toLowerCase()));
+      return testTypes?.filter((testType) =>
+        testType.synonyms.some((name) => name.toLowerCase().includes(searchTerm.toLowerCase())),
+      );
     }
   }, [searchTerm, testTypes]);
 
