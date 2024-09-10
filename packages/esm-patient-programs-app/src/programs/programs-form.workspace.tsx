@@ -58,7 +58,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const config = useConfig();
+  const { showProgramStatusField } = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
@@ -311,12 +311,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       legendText: '',
       value: enrollmentLocation,
     },
-    config.showProgramStatusField && {
+  ];
+
+  if (showProgramStatusField) {
+    formGroups.push({
       style: { width: '50%' },
       legendText: '',
       value: stateSelect,
-    },
-  ];
+    });
+  }
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
