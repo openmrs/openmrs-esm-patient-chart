@@ -18,7 +18,14 @@ import {
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  parseDate,
+  showSnackbar,
+  useLayoutType,
+  useLocations,
+  useSession,
+  LocationPicker,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -52,7 +59,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
@@ -74,13 +80,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         return !enrollment || enrollment.dateCompleted !== null;
       });
 
-  const getLocationUuid = () => {
-    if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
-      return session?.sessionLocation?.uuid;
-    }
-    return currentEnrollment?.location.uuid ?? null;
-  };
-
+      const getLocationUuid = () => {
+        if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
+          return session?.sessionLocation?.uuid;
+        }
+        return currentEnrollment?.location.uuid ?? null;
+      };
   const {
     control,
     handleSubmit,
@@ -165,8 +170,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             {eligiblePrograms?.length > 0 &&
               eligiblePrograms.map((program) => (
                 <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                  {program.display}
-                </SelectItem>
+                {program.display}
+              </SelectItem>
               ))}
           </Select>
           <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
@@ -223,20 +228,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentLocation"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <Select
-          aria-label="enrollment location"
-          id="location"
-          labelText={t('enrollmentLocation', 'Enrollment location')}
-          onChange={(event) => onChange(event.target.value)}
-          value={value}
-        >
-          {availableLocations?.length > 0 &&
-            availableLocations.map((location) => (
-              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                {location.display}
-              </SelectItem>
-            ))}
-        </Select>
+        <LocationPicker
+          selectedLocationUuid={value}
+          defaultLocationUuid={session?.sessionLocation?.uuid}
+          locationTag="Login Location"
+          onChange={(locationUuid) => onChange(locationUuid)}
+        />
       )}
     />
   );
@@ -258,7 +255,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: completionDate,
     },
     {
-      style: { width: '50%' },
+      style: { width: '100%' },
       legendText: '',
       value: enrollmentLocation,
     },
@@ -283,7 +280,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         ))}
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+      <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">
