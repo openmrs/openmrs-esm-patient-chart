@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -111,6 +112,7 @@
 
 .heading {
   @include type.type-style('heading-01');
+  color: colors.$gray-70;
   margin-bottom: layout.$spacing-03;
 }
 
