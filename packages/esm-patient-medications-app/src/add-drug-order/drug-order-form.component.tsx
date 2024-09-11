@@ -67,18 +67,18 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
       message: t('freeDosageErrorMessage', 'Add free dosage note'),
     }),
     dosage: z.number({
-      invalid_type_error: t('dosageRequiredErrorMessage', 'A dosage is required'),
+      invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
     }),
     unit: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectUnitErrorMessage', 'Please select a unit'),
+        invalid_type_error: t('selectUnitErrorMessage', 'Dose unit is required'),
       },
     ),
     route: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectRouteErrorMessage', 'Please select a route'),
+        invalid_type_error: t('selectRouteErrorMessage', 'Route is required'),
       },
     ),
     patientInstructions: z.string().nullable(),
@@ -87,13 +87,13 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
     duration: z.number().nullable(),
     durationUnit: z.object({ ...comboSchema }).nullable(),
     indication: z.string().refine((value) => value !== '', {
-      message: t('indicationErrorMessage', 'Please add an indication'),
+      message: t('indicationErrorMessage', 'Indication is required'),
     }),
     startDate: z.date(),
     frequency: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectFrequencyErrorMessage', 'Please select a frequency'),
+        invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
       },
     ),
   };
@@ -110,7 +110,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('pillDispensedErrorMessage', 'The quantity to dispense is required'),
+          message: t('pillDispensedErrorMessage', 'Quantity to dispense is required'),
         },
       ),
     quantityUnits: z
@@ -124,7 +124,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit'),
+          message: t('selectQuantityUnitsErrorMessage', 'Quantity unit is required'),
         },
       ),
     numRefills: z
@@ -138,7 +138,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('numRefillsErrorMessage', 'The number of refills is required'),
+          message: t('numRefillsErrorMessage', 'Number of refills is required'),
         },
       ),
   };
