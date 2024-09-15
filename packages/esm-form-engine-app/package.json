@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "license": "MPL-2.0",
   "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",
@@ -53,6 +53,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.88.2"
+    "webpack": "^5.94.0"
   }
 }

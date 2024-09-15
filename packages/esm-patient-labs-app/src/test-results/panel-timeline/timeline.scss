@@ -11,6 +11,11 @@
   gap: 1px;
   justify-items: center;
   align-items: center;
+  border: 0.5px solid colors.$gray-30;
+}
+
+.grid:hover {
+  border: none;
 }
 
 .day-column,
@@ -61,7 +66,6 @@
   left: 0;
   display: grid;
   grid-auto-flow: row;
-  gap: 0.5px;
   justify-items: baseline;
   align-items: center;
   padding: layout.$spacing-05;
@@ -77,9 +81,7 @@
 
   display: grid;
   grid-auto-flow: row;
-  column-gap: 1px;
   row-gap: 0px;
-  background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
   border-collapse: collapse;
 }
@@ -109,6 +111,7 @@
   left: 0px;
   top: 0px;
   z-index: 3;
+  border-right: 0.5px solid colors.$gray-30;
 
   span {
     @include type.type-style('heading-compact-01');
@@ -197,10 +200,8 @@
 
 .recent-results-grid {
   display: grid;
-  background-color: white;
   overflow: auto;
   max-height: calc(100vh - 9rem);
-  border: 1px solid colors.$gray-50;
 }
 
 .recent-results-grid::-webkit-scrollbar {
@@ -216,3 +217,4 @@
 .trendline-link-view:hover {
   text-decoration: underline;
 }
+

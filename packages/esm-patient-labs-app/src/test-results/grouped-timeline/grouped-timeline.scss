@@ -98,6 +98,7 @@
   align-self: flex-start;
   background-color: $ui-03;
   padding: 0.6rem layout.$spacing-05;
+  border-top: 1px solid colors.$gray-30;
 }
 
 .rowStartCell {
@@ -236,4 +237,14 @@
 .shadowBox {
   grid-row: 2 / -1;
   grid-column: 1 / 2;
+}
+
+.trendline-link-view {
+  @include type.type-style('helper-text-01');
+  color: colors.$blue-60;
+  cursor: pointer;
+}
+
+.trendline-link-view:hover {
+  text-decoration: underline;
 }
