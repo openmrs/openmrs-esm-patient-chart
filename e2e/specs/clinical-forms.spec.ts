@@ -51,7 +51,7 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
-    await page.getByLabel(/subjective Findings/i).fill(subjectiveFindings);
+    await page.getByLabel(/subjective findings/i).fill(subjectiveFindings);
   });
 
   await test.step('And I fill the `Objective findings` question', async () => {
@@ -160,8 +160,67 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
+    await page.locator('#SOAPSubjectiveFindings').waitFor();
     await expect(page.getByText(subjectiveFindings)).toBeVisible();
     await expect(page.getByText(objectiveFindings)).toBeVisible();
+  });
+});
+
+test('Form state is retained when minimizing a form in the workspace', async ({ page }) => {
+  const chartPage = new ChartPage(page);
+
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+  });
+
+  await test.step('Then I should see the `Laboratory Test Results` form listed in the clinical forms workspace', async () => {
+    await expect(page.getByRole('cell', { name: /laboratory test results/i, exact: true })).toBeVisible();
+  });
+
+  await test.step('When I click the `Laboratory Test Results` link to launch the form', async () => {
+    await page.getByText(/laboratory test results/i).click();
+  });
+
+  await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
+    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+  });
+
+  await test.step('And I maximize the form', async () => {
+    await page.getByRole('button', { name: /maximize/i }).click();
+  });
+
+  await test.step('And I fill in values for the `White Blood Cells (WBC)`, `Platelets`, and `Neutrophils` questions', async () => {
+    await page.locator('#ManualInputWhiteBloodCells').waitFor();
+    await page.getByRole('spinbutton', { name: /white blood cells/i }).fill('5000');
+    await page.getByRole('spinbutton', { name: /platelets/i }).fill('180000');
+    await page.getByRole('spinbutton', { name: /neutrophils/i }).fill('35');
+  });
+
+  await test.step('Then I minimize the form in the workspace', async () => {
+    await page.getByRole('button', { name: /minimize/i }).click();
+  });
+
+  await test.step('And then I maximize the form in the workspace', async () => {
+    await page.getByRole('button', { name: /maximize/i }).click();
+  });
+
+  await test.step('And I should see the original form state retained', async () => {
+    await expect(page.getByLabel(/white blood cells/i)).toHaveValue('5000');
+    await expect(page.getByLabel(/platelets/i)).toHaveValue('180000');
+    await expect(page.getByLabel(/neutrophils/i)).toHaveValue('35');
+  });
+
+  await test.step('When I click on the `Save` button', async () => {
+    await page.getByRole('button', { name: /save/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/record created/i)).toBeVisible();
+    await expect(page.getByText(/a new encounter was created/i)).toBeVisible();
   });
 });
 

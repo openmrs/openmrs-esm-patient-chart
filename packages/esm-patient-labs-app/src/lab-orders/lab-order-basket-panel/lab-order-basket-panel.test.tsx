@@ -11,7 +11,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useOrderBasket: () => mockUseOrderBasket(),
 }));
 
-describe('LabOrderBasketPanel: ', () => {
+describe('LabOrderBasketPanel', () => {
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
     render(<LabOrderBasketPanel />);

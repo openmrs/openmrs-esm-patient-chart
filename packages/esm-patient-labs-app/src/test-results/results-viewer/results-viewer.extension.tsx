@@ -9,12 +9,12 @@ import { navigate, showModal, useConfig, useLayoutType } from '@openmrs/esm-fram
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
-import PanelView from '../panel-view';
+import PanelView from '../panel-view/panel-view.component';
 import TabletOverlay from '../tablet-overlay';
-import TreeViewWrapper from '../tree-view';
+import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import Trendline from '../trendline/trendline.component';
 import type { ConfigObject } from '../../config-schema';
-import styles from './results-viewer.styles.scss';
+import styles from './results-viewer.scss';
 
 type panelOpts = 'tree' | 'panel';
 type viewOpts = 'split' | 'full';

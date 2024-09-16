@@ -21,7 +21,7 @@ export type Allergy = {
 
 type UseAllergies = {
   allergies: Array<Allergy>;
-  isError: Error | null;
+  error: Error | null;
   isLoading: boolean;
   isValidating: boolean;
   mutate: () => void;
@@ -45,7 +45,7 @@ export function useAllergies(patientUuid: string): UseAllergies {
 
   return {
     allergies: data ? formattedAllergies : null,
-    isError: error,
+    error: error,
     isLoading,
     isValidating,
     mutate,

@@ -5,16 +5,12 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import AllergiesTile from './allergies-tile.component';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-};
-
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('AllergiesTile', () => {
   it('renders an empty state when allergy data is not available', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
-    renderAllergiesTile();
+    renderWithSwr(<AllergiesTile patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -24,7 +20,7 @@ describe('AllergiesTile', () => {
 
   it("renders a summary of the patient's allergy data when available", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
-    renderAllergiesTile();
+    renderWithSwr(<AllergiesTile patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -32,7 +28,3 @@ describe('AllergiesTile', () => {
     expect(screen.getByText(/ACE inhibitors, Fish, Penicillins, Morphine, Aspirin/i)).toBeInTheDocument();
   });
 });
-
-function renderAllergiesTile() {
-  renderWithSwr(<AllergiesTile {...testProps} />);
-}

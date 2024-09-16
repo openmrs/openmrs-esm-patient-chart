@@ -1,19 +1,18 @@
-@use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .productiveHeading03 {
-  @include type.type-style("heading-03");
+  @include type.type-style('heading-03');
 }
 
 .title {
   @extend .productiveHeading03;
-  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
+  margin: 0 layout.$spacing-03 layout.$spacing-03 0;
 }
 
 .orderDisplay {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .danger {
@@ -21,14 +20,14 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
 
   :global(.cds--inline-loading) {
-    min-height: 1rem !important;
+    min-height: layout.$spacing-05 !important;
   }
 
   :global(.cds--inline-loading__text) {
@@ -37,12 +36,12 @@
 }
 
 .tablet {
-  padding: 1.5rem spacing.$spacing-05;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .form {
@@ -61,18 +60,18 @@
 }
 
 .grid {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .row {
-  margin: spacing.$spacing-03 0rem 0rem;
+  margin: layout.$spacing-03 0 0;
   display: flex;
   flex-flow: row wrap;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
 }
 
 .spacer {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .noteInput {
@@ -80,9 +79,9 @@
 }
 
 .errorNotification {
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
 }
 
 .errorContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }

@@ -1,5 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetContainer {
   background-color: $ui-background;
@@ -10,16 +11,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
 }
 
 .toggleButtons {
   width: fit-content;
-  margin: 0 spacing.$spacing-03;
+  margin: 0 layout.$spacing-03;
 }
 
 .toggle {
-  padding: 0.5rem;
+  padding: layout.$spacing-03;
   color: $interactive-01;
   min-height: 0px;
 
@@ -33,8 +34,8 @@
 
   &:global(.cds--btn--tertiary:active) {
     border-color: $interactive-01;
-    background-color: #edf5ff;
-    color: #edf5ff;
+    background-color: colors.$blue-10;
+    color: colors.$blue-10;
   }
 
   &:global(.cds--btn--tertiary:focus) {
@@ -48,17 +49,17 @@
   }
 
   &:global(.cds--btn--ghost) {
-    border-color: #a6c8ff;
+    border-color: colors.$blue-30;
   }
 
   &:global(.cds--btn--ghost:hover) {
-    color:  #000;
+    color: black;
     background-color: $ui-01;
   }
 }
 
 .toggle:first-of-type {
-  border-radius: spacing.$spacing-02 0 0 spacing.$spacing-02;
+  border-radius: layout.$spacing-02 0 0 layout.$spacing-02;
 
   &:global(.cds--btn--ghost) {
     border-right: 0;
@@ -66,10 +67,10 @@
 }
 
 .toggle:last-of-type {
-  border-radius: 0 spacing.$spacing-02 spacing.$spacing-02 0;
+  border-radius: 0 layout.$spacing-02 layout.$spacing-02 0;
 
   &:global(.cds--btn--ghost) {
-    border-left: 0rem;
+    border-left: 0;
   }
 }
 
@@ -91,4 +92,3 @@
   flex: 1 1 0%;
   justify-content: end;
 }
-

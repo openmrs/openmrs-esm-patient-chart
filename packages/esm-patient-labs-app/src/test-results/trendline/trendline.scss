@@ -1,21 +1,22 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "~@carbon/charts/styles.css";
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@import '~@carbon/charts/styles.css';
 
 .container {
   :global(.cds--cc--area path.area) {
     stroke: none;
-    fill: #a7f0ba;
+    fill: colors.$green-20;
   }
 }
 
 .ui-shell-header-modal-bar-default {
-  height: 3rem;
+  height: layout.$spacing-09;
   object-fit: contain;
-  background-color: #005d5d;
+  background-color: colors.$teal-70;
   color: white;
-  padding-top: 1rem;
+  padding-top: layout.$spacing-05;
   padding-left: 0.938rem;
   display: flex;
 }
@@ -30,14 +31,13 @@
 .title {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-right: 4px;
+  margin-right: layout.$spacing-02;
 }
 
 .reference-range {
   @include type.type-style('helper-text-01');
- //  color: $text-05; // WIP
+  //  color: $text-05; // WIP
 }
-
 
 .header {
   display: grid;
@@ -61,7 +61,7 @@
 
     svg {
       order: 1;
-      margin-right: 0.5rem;
+      margin-right: layout.$spacing-03;
     }
 
     span {
@@ -74,15 +74,21 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding-right: spacing.$spacing-05;
+  padding-right: layout.$spacing-05;
 }
 
 .background {
   width: 100%;
-  padding: 2.375rem 5.688rem 2.188rem 1rem;
+  padding: 2.375rem 5.688rem 2.188rem layout.$spacing-05;
   background: white;
 }
 
 .range-tabs :global(.cds--tabs--scrollable__nav-link) {
   width: 7rem;
+}
+
+.tabPanel {
+  :global(.cds--tab--list) {
+    width: 100%;
+  }
 }

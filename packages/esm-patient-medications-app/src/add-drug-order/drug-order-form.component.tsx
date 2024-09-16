@@ -468,6 +468,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                           label={t('editDoseComboBoxTitle', 'Dose')}
                           min={0}
                           hideSteppers={true}
+                          step={0.01}
                         />
                       </div>
                     </InputWrapper>

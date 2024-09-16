@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar, useLocations } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -17,16 +17,18 @@ const mockUseEnrollments = jest.mocked(useEnrollments);
 const mockCreateProgramEnrollment = jest.mocked(createProgramEnrollment);
 const mockUpdateProgramEnrollment = jest.mocked(updateProgramEnrollment);
 const mockShowSnackbar = jest.mocked(showSnackbar);
-
+const mockUseLocations = jest.mocked(useLocations);
 const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-  useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
-}));
+const testProps = {
+  closeWorkspace: mockCloseWorkspace,
+  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: mockPromptBeforeClosing,
+  setTitle: jest.fn(),
+};
 
 jest.mock('./programs.resource', () => ({
   createProgramEnrollment: jest.fn(),
@@ -35,32 +37,30 @@ jest.mock('./programs.resource', () => ({
   useEnrollments: jest.fn(),
 }));
 
+mockUseLocations.mockReturnValue(mockLocationsResponse);
+
+mockUseAvailablePrograms.mockReturnValue({
+  data: mockCareProgramsResponse,
+  eligiblePrograms: [],
+  error: null,
+  isLoading: false,
+});
+
+mockUseEnrollments.mockReturnValue({
+  data: mockEnrolledProgramsResponse,
+  error: null,
+  isLoading: false,
+  isValidating: false,
+  activeEnrollments: [],
+  mutateEnrollments: jest.fn(),
+});
+
+mockCreateProgramEnrollment.mockResolvedValue({
+  status: 201,
+  statusText: 'Created',
+} as unknown as FetchResponse);
+
 describe('ProgramsForm', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockUseAvailablePrograms.mockReturnValue({
-      data: mockCareProgramsResponse,
-      eligiblePrograms: [],
-      error: null,
-      isLoading: false,
-    });
-
-    mockUseEnrollments.mockReturnValue({
-      data: mockEnrolledProgramsResponse,
-      error: null,
-      isLoading: false,
-      isValidating: false,
-      activeEnrollments: [],
-      mutateEnrollments: jest.fn(),
-    });
-
-    mockCreateProgramEnrollment.mockResolvedValue({
-      status: 201,
-      statusText: 'Created',
-    } as unknown as FetchResponse);
-  });
-
   it('renders a success toast notification upon successfully recording a program enrollment', async () => {
     const user = userEvent.setup();
 
@@ -145,13 +145,5 @@ describe('ProgramsForm', () => {
 });
 
 function renderProgramsForm(programEnrollmentUuidToEdit?: string) {
-  const testProps = {
-    closeWorkspace: mockCloseWorkspace,
-    closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: mockPromptBeforeClosing,
-    setTitle: jest.fn(),
-  };
-
   render(<ProgramsForm {...testProps} programEnrollmentId={programEnrollmentUuidToEdit} />);
 }

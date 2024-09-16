@@ -93,7 +93,7 @@ export const usePrograms = (patientUuid: string) => {
   } = useEnrollments(patientUuid);
   const { data: availablePrograms, eligiblePrograms } = useAvailablePrograms(enrollments);
 
-  const status = { isLoading: enrolLoading, isError: enrollError };
+  const status = { isLoading: enrolLoading, error: enrollError };
   return {
     enrollments,
     ...status,

@@ -60,7 +60,7 @@ export interface MappedVisitQueueEntry {
 interface UseVisitQueueEntries {
   queueEntry: MappedVisitQueueEntry | null;
   isLoading: boolean;
-  isError: Error;
+  error: Error;
   isValidating?: boolean;
   mutate: () => void;
 }
@@ -112,7 +112,7 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
   return {
     queueEntry: mappedVisitQueueEntry,
     isLoading,
-    isError: error,
+    error: error,
     isValidating,
     mutate,
   };

@@ -5,12 +5,12 @@ import { Search as SearchIcon, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
+import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
 import type { ObsRecord } from '../../types';
 import { testResultsBasePath } from '../helpers';
 import LabSetPanel from './panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';
-import PanelTimelineComponent from '../panel-timeline';
+import PanelTimelineComponent from '../panel-timeline/panel-timeline-component';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from './usePanelData';
 import styles from './panel-view.scss';
@@ -188,7 +188,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
       {!showSearchFields ? (
         <>
           <div className={styles.flex}>
-            <h4 className={styles.productiveHeading02}>
+            <h4 className={styles.heading}>
               {!searchTerm
                 ? t('panel', 'Panel')
                 : t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
@@ -197,7 +197,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
                   })}
             </h4>
             {searchTerm ? (
-              <Button kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>
+              <Button className={styles.clearButton} kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>
                 {t('clear', 'Clear')}
               </Button>
             ) : null}
@@ -214,7 +214,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
               value={localSearchTerm}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               placeholder={t('searchByTestName', 'Search by test name')}
-              autoFocus={true}
+              autoFocus
             />
             <Button kind="secondary" size="sm" onClick={handleSearchTerm}>
               {t('search', 'Search')}
@@ -237,7 +237,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
                 value={localSearchTerm}
                 onChange={(e) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
-                autoFocus={true}
+                autoFocus
                 size="lg"
               />
               <Button kind="secondary" onClick={handleSearchTerm}>

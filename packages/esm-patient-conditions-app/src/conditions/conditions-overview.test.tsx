@@ -1,38 +1,31 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-};
-
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  launchPatientWorkspace: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  conditionPageSize: 5,
 });
 
 describe('ConditionsOverview', () => {
-  beforeEach(() => {
-    mockOpenmrsFetch.mockClear();
-    mockUseConfig.mockReturnValue({ conditionPageSize: 5 });
-  });
-
   it('renders an empty state view if conditions data is unavailable', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -54,7 +47,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -69,7 +62,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockResolvedValueOnce({ data: mockFhirConditionsResponse } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -101,7 +94,7 @@ describe('ConditionsOverview', () => {
 
     mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -113,7 +106,3 @@ describe('ConditionsOverview', () => {
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
   });
 });
-
-function renderConditionsOverview() {
-  renderWithSwr(<ConditionsOverview {...testProps} />);
-}
