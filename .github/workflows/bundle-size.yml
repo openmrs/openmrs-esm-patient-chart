@@ -19,13 +19,13 @@ jobs:
         with:
           node-version: 18
 
-      - name: Setup a local cache server for Turborepo
+      - name: 🚀 Setup a local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: Compute bundle size report
+      - name: 📊 Compute bundle size report
         uses: preactjs/compressed-size-action@v2
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
