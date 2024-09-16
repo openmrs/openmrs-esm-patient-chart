@@ -16,15 +16,16 @@ import {
   Stack,
 } from '@carbon/react';
 import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
   useAvailablePrograms,
   useEnrollments,
   updateProgramEnrollment,
+  findLastState,
 } from './programs.resource';
 import styles from './programs-form.scss';
 
@@ -38,6 +39,7 @@ const createProgramsFormSchema = (t: TFunction) =>
     enrollmentDate: z.date(),
     completionDate: z.date().nullable(),
     enrollmentLocation: z.string(),
+    selectedProgramStatus: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -56,6 +58,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const { showProgramStatusField } = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
@@ -81,6 +84,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     return currentEnrollment?.location.uuid ?? null;
   };
 
+  const currentState = currentEnrollment ? findLastState(currentEnrollment.states) : null;
+
   const {
     control,
     handleSubmit,
@@ -94,8 +99,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
       enrollmentLocation: getLocationUuid() ?? '',
+      selectedProgramStatus: currentState?.state.uuid ?? '',
     },
   });
+
+  const selectedProgram = useWatch({ control, name: 'selectedProgram' });
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -103,7 +111,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
-      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation } = data;
+      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
 
       const payload = {
         patient: patientUuid,
@@ -111,9 +119,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
+        states:
+          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
+            ? [{ state: { uuid: selectedProgramStatus } }]
+            : [],
       };
 
       try {
+        setIsSubmittingForm(true);
+
         const abortController = new AbortController();
 
         if (currentEnrollment) {
@@ -144,7 +158,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
       setIsSubmittingForm(false);
     },
-    [closeWorkspaceWithSavedChanges, currentEnrollment, mutateEnrollments, patientUuid, t],
+    [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
 
   const programSelect = (
@@ -241,6 +255,41 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     />
   );
 
+  let workflowStates = [];
+  if (!currentProgram && !!selectedProgram) {
+    const program = eligiblePrograms.find((p) => p.uuid === selectedProgram);
+    if (program?.allWorkflows.length > 0) workflowStates = program.allWorkflows[0].states;
+  } else if (currentProgram?.allWorkflows.length > 0) {
+    workflowStates = currentProgram.allWorkflows[0].states;
+  }
+
+  const programStatusDropdown = (
+    <Controller
+      name="selectedProgramStatus"
+      control={control}
+      render={({ fieldState, field: { onChange, value } }) => (
+        <>
+          <Select
+            aria-label={t('programStatus', 'Program status')}
+            id="programStatus"
+            invalid={!!fieldState?.error}
+            labelText={t('programStatus', 'Program status')}
+            onChange={(event) => onChange(event.target.value)}
+            value={value}
+          >
+            <SelectItem text={t('chooseStatus', 'Choose a program status')} value="" />
+            {workflowStates.map((state) => (
+              <SelectItem key={state.uuid} text={state.concept.display} value={state.uuid}>
+                {state.concept.display}
+              </SelectItem>
+            ))}
+          </Select>
+          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
+        </>
+      )}
+    />
+  );
+
   const formGroups = [
     {
       style: { maxWidth: isTablet && '50%' },
@@ -263,6 +312,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: enrollmentLocation,
     },
   ];
+
+  if (showProgramStatusField) {
+    formGroups.push({
+      style: { width: '50%' },
+      legendText: '',
+      value: programStatusDropdown,
+    });
+  }
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

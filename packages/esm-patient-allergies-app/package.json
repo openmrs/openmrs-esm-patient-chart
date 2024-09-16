@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-allergies-app",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "license": "MPL-2.0",
   "description": "Patient allergies microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-allergies-app.js",
@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.88.2"
+    "webpack": "^5.94.0"
   }
 }

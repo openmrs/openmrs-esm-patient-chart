@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "剂量",
   "editFrequencyComboBoxTitle": "频率",
   "editRouteComboBoxTitle": "途径",
-  "endDate": "结束日期",
   "error": "错误",
   "errorFetchingDrugOrderTemplates": "获取药物医嘱模板时出现错误",
   "errorFetchingDrugResults": "获取“{{searchTerm}}”的结果时出现错误",

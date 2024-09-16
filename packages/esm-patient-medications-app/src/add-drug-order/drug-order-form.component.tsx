@@ -67,18 +67,18 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
       message: t('freeDosageErrorMessage', 'Add free dosage note'),
     }),
     dosage: z.number({
-      invalid_type_error: t('dosageRequiredErrorMessage', 'A dosage is required'),
+      invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
     }),
     unit: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectUnitErrorMessage', 'Please select a unit'),
+        invalid_type_error: t('selectUnitErrorMessage', 'Dose unit is required'),
       },
     ),
     route: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectRouteErrorMessage', 'Please select a route'),
+        invalid_type_error: t('selectRouteErrorMessage', 'Route is required'),
       },
     ),
     patientInstructions: z.string().nullable(),
@@ -87,13 +87,13 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
     duration: z.number().nullable(),
     durationUnit: z.object({ ...comboSchema }).nullable(),
     indication: z.string().refine((value) => value !== '', {
-      message: t('indicationErrorMessage', 'Please add an indication'),
+      message: t('indicationErrorMessage', 'Indication is required'),
     }),
     startDate: z.date(),
     frequency: z.object(
       { ...comboSchema },
       {
-        invalid_type_error: t('selectFrequencyErrorMessage', 'Please select a frequency'),
+        invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
       },
     ),
   };
@@ -110,7 +110,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('pillDispensedErrorMessage', 'The quantity to dispense is required'),
+          message: t('pillDispensedErrorMessage', 'Quantity to dispense is required'),
         },
       ),
     quantityUnits: z
@@ -124,7 +124,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('selectQuantityUnitsErrorMessage', 'Dispensing requires a quantity unit'),
+          message: t('selectQuantityUnitsErrorMessage', 'Quantity unit is required'),
         },
       ),
     numRefills: z
@@ -138,7 +138,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
           return true;
         },
         {
-          message: t('numRefillsErrorMessage', 'The number of refills is required'),
+          message: t('numRefillsErrorMessage', 'Number of refills is required'),
         },
       ),
   };
@@ -338,7 +338,11 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     return orderConfigObject?.orderFrequencies ?? [];
   }, [orderConfigObject]);
 
-  const filterItems = useCallback((menu) => {
+  const filterItemsByName = useCallback((menu) => {
+    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+  }, []);
+
+  const filterItemsBySynonymNames = useCallback((menu) => {
     if (menu?.inputValue?.length) {
       return menu.item?.names?.some((abbr: string) => abbr.toLowerCase().includes(menu.inputValue.toLowerCase()));
     }
@@ -482,6 +486,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         getValues={getValues}
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
+                        shouldFilterItem={filterItemsByName}
                         items={drugDosingUnits}
                         placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                         titleText={t('editDosageUnitsTitle', 'Dose unit')}
@@ -496,14 +501,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     <InputWrapper>
                       <ControlledFieldInput
                         control={control}
-                        name="route"
-                        type="comboBox"
-                        size={isTablet ? 'lg' : 'md'}
                         id="editRoute"
                         items={drugRoutes}
-                        placeholder={t('editRouteComboBoxTitle', 'Route')}
-                        titleText={t('editRouteComboBoxTitle', 'Route')}
                         itemToString={(item) => item?.value}
+                        name="route"
+                        placeholder={t('editRouteComboBoxTitle', 'Route')}
+                        shouldFilterItem={filterItemsByName}
+                        size={isTablet ? 'lg' : 'md'}
+                        titleText={t('editRouteComboBoxTitle', 'Route')}
+                        type="comboBox"
                       />
                     </InputWrapper>
                   </Column>
@@ -516,7 +522,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         size={isTablet ? 'lg' : 'md'}
                         id="editFrequency"
                         items={orderFrequencies}
-                        shouldFilterItem={filterItems}
+                        shouldFilterItem={filterItemsBySynonymNames}
                         placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                         titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                         itemToString={(item) => item?.value}
@@ -647,6 +653,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     items={durationUnits}
                     itemToString={(item) => item?.value}
                     placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                    shouldFilterItem={filterItemsByName}
                   />
                 </InputWrapper>
               </Column>
@@ -674,14 +681,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                 <InputWrapper>
                   <ControlledFieldInput
                     control={control}
-                    name="quantityUnits"
-                    type="comboBox"
-                    size="lg"
                     id="dispensingUnits"
                     items={drugDispensingUnits}
-                    placeholder={t('editDispensingUnit', 'Quantity unit')}
-                    titleText={t('editDispensingUnit', 'Quantity unit')}
                     itemToString={(item) => item?.value}
+                    name="quantityUnits"
+                    placeholder={t('editDispensingUnit', 'Quantity unit')}
+                    shouldFilterItem={filterItemsByName}
+                    size="lg"
+                    titleText={t('editDispensingUnit', 'Quantity unit')}
+                    type="comboBox"
                   />
                 </InputWrapper>
               </Column>
@@ -848,6 +856,7 @@ const ControlledFieldInput = ({
       return (
         <NumberInput
           className={fieldErrorStyles}
+          disableWheel
           onBlur={onBlur}
           onChange={(e, { value }) => {
             const number = parseFloat(value);

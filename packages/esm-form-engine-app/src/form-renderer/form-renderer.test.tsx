@@ -5,7 +5,7 @@ import useFormSchema from '../hooks/useFormSchema';
 
 const mockUseFormSchema = jest.mocked(useFormSchema);
 
-jest.mock('@openmrs/openmrs-form-engine-lib', () => ({
+jest.mock('@openmrs/esm-form-engine-lib', () => ({
   FormEngine: jest
     .fn()
     .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
@@ -24,6 +24,9 @@ describe('FormRenderer', () => {
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
     setTitle: jest.fn(),
+    setCancelTitle: jest.fn(),
+    setCancelMessage: jest.fn(),
+    setCancelConfirmText: jest.fn(),
   };
 
   test('renders FormError component when there is an error', () => {

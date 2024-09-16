@@ -1,5 +1,3 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
-
 export * from './test-results';
 
 export interface DashboardLinkConfig {
@@ -48,4 +46,12 @@ export interface DisplayMetadata {
   display: string;
   links: Links;
   uuid: string;
+}
+
+export interface HtmlFormEntryForm {
+  formUuid: string;
+  formName: string;
+  formUiResource: string;
+  formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
+  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
 }

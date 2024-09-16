@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "Dosis",
   "editFrequencyComboBoxTitle": "Frecuencia",
   "editRouteComboBoxTitle": "Ruta",
-  "endDate": "Fecha de finalización",
   "error": "Error",
   "errorFetchingDrugOrderTemplates": "Error en la obtención de plantillas de pedidos de medicamentos",
   "errorFetchingDrugResults": "Error al buscar resultados para \"{{searchTerm}}\"",

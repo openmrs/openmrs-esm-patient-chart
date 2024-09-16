@@ -1,4 +1,5 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
@@ -23,109 +24,61 @@
   }
 }
 
-tr {
-  &.critically-low,
-  &.critically-high,
-  &.low,
-  &.high {
-    td:nth-child(2) {
-      @include type.type-style('heading-compact-01');
-      color: $ui-05;
-    }
-  }
-
-  &.critically-low,
-  &.critically-high,
-  &.off-scale-high,
-  &.off-scale-low {
-    outline: layout.$spacing-01 solid $danger;
-    outline-offset: -1px;
-  }
-
-  &.low,
-  &.high {
-    outline: 1px solid black;
-    outline-offset: -1px;
-  }
-
-  &.critically-low {
-    td:nth-child(2)::after {
-      content: ' ↓↓';
-    }
-  }
-
-  &.critically-high {
-    td:nth-child(2)::after {
-      content: ' ↑↑';
-    }
-  }
-
-  &.low {
-    td:nth-child(2)::after {
-      content: ' ↓';
-    }
-  }
-
-  &.high {
-    td:nth-child(2)::after {
-      content: ' ↑';
-    }
-  }
-
-  &.off-scale-low {
-    td:nth-child(2)::after {
-      content: ' ↓↓↓';
-    }
-  }
-
-  &.off-scale-high {
-    td:nth-child(2)::after {
-      content: ' ↑↑↑';
-    }
-  }
-}
-
 .offScaleHigh,
 .offScaleLow,
 .criticallyHigh,
 .criticallyLow,
 .high,
 .low {
-  @include type.type-style('heading-compact-01');
+  span {
+    @include type.type-style('heading-compact-01');
+  }
 }
 
 .high,
 .low {
-  box-shadow: 0 0 0 1px black;
+  background-color: colors.$orange-10 !important;
+  border-top: 1px solid colors.$orange-20 !important;
 }
 
 .criticallyHigh,
 .criticallyLow {
-  box-shadow:
-    0 0 0 1px $danger,
-    inset 0 0 0 1px $danger;
+  background-color: colors.$red-20 !important;
+  border-top: 1px solid colors.$red-20-hover !important;
 }
 
-.offScaleLow::after {
-  content: ' ↓↓↓';
+.offScaleLow {
+  span::after {
+    content: ' ↓↓↓';
+  }
 }
 
-.offScaleHigh::after {
-  content: ' ↑↑↑';
+.offScaleHigh {
+  span::after {
+    content: ' ↑↑↑';
+  }
 }
 
-.criticallyLow::after {
-  content: ' ↓↓';
+.criticallyLow {
+  span::after {
+    content: ' ↓↓';
+  }
 }
 
-.criticallyHigh::after {
-  content: ' ↑↑';
+.criticallyHigh {
+  span::after {
+    content: ' ↑↑';
+  }
 }
 
-.low::after {
-  content: ' ↓';
+.low {
+  span::after {
+    content: ' ↓';
+  }
 }
 
-.high::after {
-  content: ' ↑';
+.high {
+  span::after {
+    content: ' ↑';
+  }
 }

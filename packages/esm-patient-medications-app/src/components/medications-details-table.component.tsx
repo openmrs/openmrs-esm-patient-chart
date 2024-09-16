@@ -142,7 +142,9 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             ) : null}
             {medication.dateStopped ? (
               <span>
-                <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
+                <span className={styles.label01}>
+                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
+                </span>
                 {formatDate(new Date(medication.dateStopped))}
               </span>
             ) : null}
@@ -267,7 +269,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-label="medications" {...getTableProps()}>
+              <Table aria-label="medications" className={styles.table} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

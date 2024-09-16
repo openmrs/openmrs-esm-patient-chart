@@ -32,7 +32,7 @@ import {
   usePagination,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
-import { usePrograms } from './programs.resource';
+import { findLastState, usePrograms } from './programs.resource';
 import { type ConfigurableProgram } from '../types';
 import styles from './programs-overview.scss';
 
@@ -78,21 +78,29 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       header: t('status', 'Status'),
     },
     {
+      key: 'state',
+      header: t('state', 'State'),
+    },
+    {
       key: 'actions',
       header: t('actions', 'Actions'),
     },
   ];
 
   const tableRows = React.useMemo(() => {
-    return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
-      id: enrollment.uuid,
-      display: enrollment.display,
-      location: enrollment.location?.display ?? '--',
-      dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
-      status: enrollment.dateCompleted
-        ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
-        : t('active', 'Active'),
-    }));
+    return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => {
+      const state = enrollment ? findLastState(enrollment.states) : null;
+      return {
+        id: enrollment.uuid,
+        display: enrollment.display,
+        location: enrollment.location?.display ?? '--',
+        dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
+        status: enrollment.dateCompleted
+          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
+          : t('active', 'Active'),
+        state: state ? state.state.concept.display : '--',
+      };
+    });
   }, [paginatedEnrollments, t]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;

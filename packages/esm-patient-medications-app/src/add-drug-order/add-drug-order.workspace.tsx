@@ -1,15 +1,19 @@
 import React, { useCallback, useState } from 'react';
-import DrugSearch from './drug-search/drug-search.component';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
+import { useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { DrugOrderForm } from './drug-order-form.component';
-import { useSession } from '@openmrs/esm-framework';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import type { DrugOrderBasketItem } from '../types';
+import { DrugOrderForm } from './drug-order-form.component';
+import DrugSearch from './drug-search/drug-search.component';
+import styles from './add-drug-order.scss';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
@@ -23,6 +27,7 @@ export default function AddDrugOrderWorkspace({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }: AddDrugOrderWorkspace) {
+  const { t } = useTranslation();
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
@@ -69,7 +74,22 @@ export default function AddDrugOrderWorkspace({
   );
 
   if (!currentOrder) {
-    return <DrugSearch openOrderForm={openOrderForm} />;
+    return (
+      <>
+        <div className={styles.backButton}>
+          <Button
+            iconDescription="Return to order basket"
+            kind="ghost"
+            onClick={cancelDrugOrder}
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            size="sm"
+          >
+            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+          </Button>
+        </div>
+        <DrugSearch openOrderForm={openOrderForm} />
+      </>
+    );
   } else {
     return (
       <DrugOrderForm

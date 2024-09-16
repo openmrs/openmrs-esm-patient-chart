@@ -36,55 +36,54 @@ test('Record and edit test results', async ({ page }) => {
       value: '150',
       updatedValue: '155',
     },
-    // TODO: Uncomment the rest once https://openmrs.atlassian.net/browse/O3-3478 is fixed
-    // {
-    //   label: 'Neutrophils (%)',
-    //   resultsPageReference: 'Neutrophils',
-    //   value: '60',
-    //   updatedValue: '62'
-    // },
-    // {
-    //   label: 'MCV (fL) - Mean Corpuscular Volume',
-    //   resultsPageReference: 'MCV',
-    //   value: '90',
-    //   updatedValue: '92'
-    // },
-    // {
-    //   label: 'MCH (pg) - Mean Corpuscular Hemoglobin',
-    //   resultsPageReference: 'MCH',
-    //   value: '30',
-    //   updatedValue: '31'
-    // },
-    // {
-    //   label: 'MCHC (g/dL) - Mean Cell Hemoglobin Concentration',
-    //   resultsPageReference: 'MCHC',
-    //   value: '33',
-    //   updatedValue: '34'
-    // },
-    // {
-    //   label: 'Lymphocytes (%) - microscopic exam',
-    //   resultsPageReference: 'Lymphocytes',
-    //   value: '30',
-    //   updatedValue: '32'
-    // },
-    // {
-    //   label: 'Hematocrit (%)',
-    //   resultsPageReference: 'Hematocrit',
-    //   value: '45',
-    //   updatedValue: '47'
-    // },
-    // {
-    //   label: 'Haemoglobin (g/dL)',
-    //   resultsPageReference: 'Haemoglobin',
-    //   value: '15',
-    //   updatedValue: '16'
-    // },
-    // {
-    //   label: 'Combined % of monocytes, eosinophils and basophils (%)',
-    //   resultsPageReference: 'Combined % of monocytes, eosinophils and basophils',
-    //   value: '5',
-    //   updatedValue: '6'
-    // }
+    {
+      label: 'Neutrophils (%)',
+      resultsPageReference: 'Neutrophils',
+      value: '60',
+      updatedValue: '62',
+    },
+    {
+      label: 'MCV (fL) - Mean Corpuscular Volume',
+      resultsPageReference: 'Mean corpuscular volume',
+      value: '90',
+      updatedValue: '92',
+    },
+    {
+      label: 'MCH (pg) - Mean Corpuscular Hemoglobin',
+      resultsPageReference: 'Mean corpuscular hemoglobin',
+      value: '30',
+      updatedValue: '31',
+    },
+    {
+      label: 'MCHC (g/dL) - Mean Cell Hemoglobin Concentration',
+      resultsPageReference: 'Mean cell hemoglobin concentration',
+      value: '33',
+      updatedValue: '34',
+    },
+    {
+      label: 'Lymphocytes (%) - microscopic exam',
+      resultsPageReference: 'Lymphocytes',
+      value: '30',
+      updatedValue: '32',
+    },
+    {
+      label: 'Hematocrit (%)',
+      resultsPageReference: 'Hematocrit',
+      value: '45',
+      updatedValue: '47',
+    },
+    {
+      label: 'Haemoglobin (g/dL)',
+      resultsPageReference: 'Haemoglobin',
+      value: '15',
+      updatedValue: '16',
+    },
+    {
+      label: 'Combined % of monocytes, eosinophils and basophils (%)',
+      resultsPageReference: 'Combined % of monocytes, eosinophils and basophils',
+      value: '5',
+      updatedValue: '6',
+    },
   ];
 
   const chemistryResultsData = [
@@ -106,109 +105,108 @@ test('Record and edit test results', async ({ page }) => {
       value: '5.5',
       updatedValue: '5.7',
     },
-    // TODO: Uncomment the rest once https://openmrs.atlassian.net/browse/O3-3478 is fixed
-    // {
-    //   label: 'Fasting Blood Glucose (mg/dL)',
-    //   resultsPageReference: 'Fasting Blood Glucose',
-    //   value: '90',
-    //   updatedValue: '92'
-    // },
-    // {
-    //   label: 'Post-Prandial Blood Glucose (mg/dL)',
-    //   resultsPageReference: 'Post-Prandial Blood Glucose',
-    //   value: '140',
-    //   updatedValue: '142'
-    // },
-    // {
-    //   label: 'Serum Albumin (g/dL)',
-    //   resultsPageReference: 'Serum Albumin',
-    //   value: '4.0',
-    //   updatedValue: '4.2'
-    // },
-    // {
-    //   label: 'Serum Calcium (mg/dL)',
-    //   resultsPageReference: 'Serum Calcium',
-    //   value: '9.0',
-    //   updatedValue: '9.2'
-    // },
-    // {
-    //   label: 'Serum Potassium (mmol/L)',
-    //   resultsPageReference: 'Serum Potassium',
-    //   value: '4.2',
-    //   updatedValue: '4.4'
-    // },
-    // {
-    //   label: 'Serum Sodium (mmol/L)',
-    //   resultsPageReference: 'Serum Sodium',
-    //   value: '140',
-    //   updatedValue: '142'
-    // },
-    // {
-    //   label: 'Serum Creatinine (umol/L)',
-    //   resultsPageReference: 'Serum Creatinine',
-    //   value: '70',
-    //   updatedValue: '72'
-    // },
-    // {
-    //   label: 'Total Protein (g/dL)',
-    //   resultsPageReference: 'Total Protein',
-    //   value: '7.0',
-    //   updatedValue: '7.2'
-    // },
-    // {
-    //   label: 'Serum Glucose (mg/dl)',
-    //   resultsPageReference: 'Serum Glucose',
-    //   value: '90',
-    //   updatedValue: '92'
-    // },
-    // {
-    //   label: 'Serum Glucose (mmol)',
-    //   resultsPageReference: 'Serum Glucose',
-    //   value: '5.0',
-    //   updatedValue: '5.2'
-    // },
-    // {
-    //   label: 'Total Bilirubin (umol/L)',
-    //   resultsPageReference: 'Total Bilirubin',
-    //   value: '10',
-    //   updatedValue: '12'
-    // },
-    // {
-    //   label: 'Serum Glutamic-Oxaloacetic Transaminase (IU/L) aka SGPT, AST',
-    //   resultsPageReference: 'Serum Glutamic-Oxaloacetic Transaminase',
-    //   value: '30',
-    //   updatedValue: '32'
-    // },
-    // {
-    //   label: 'Alkaline Phosphatase, ALP (U/L)',
-    //   resultsPageReference: 'Alkaline Phosphatase, ALP',
-    //   value: '70',
-    //   updatedValue: '72'
-    // },
-    // {
-    //   label: 'Serum Uric Acid (mg/dL)',
-    //   resultsPageReference: 'Serum Uric Acid',
-    //   value: '4.5',
-    //   updatedValue: '4.7'
-    // },
-    // {
-    //   label: 'Total Cholesterol (mmol/L)',
-    //   resultsPageReference: 'Total Cholesterol',
-    //   value: '5.0',
-    //   updatedValue: '5.2'
-    // },
-    // {
-    //   label: 'Triglycerides (mmol/L)',
-    //   resultsPageReference: 'Triglycerides',
-    //   value: '1.5',
-    //   updatedValue: '1.7'
-    // },
-    // {
-    //   label: 'Serum Carbon Dioxide CO2 (mmol/L)',
-    //   resultsPageReference: 'Serum Carbon Dioxide CO2',
-    //   value: '25',
-    //   updatedValue: '27'
-    // }
+    {
+      label: 'Fasting Blood Glucose (mg/dL)',
+      resultsPageReference: 'Fasting Blood Glucose',
+      value: '90',
+      updatedValue: '92',
+    },
+    {
+      label: 'Post-Prandial Blood Glucose (mg/dL)',
+      resultsPageReference: 'Post-Prandial Blood Glucose',
+      value: '140',
+      updatedValue: '142',
+    },
+    {
+      label: 'Serum Albumin (g/dL)',
+      resultsPageReference: 'Serum Albumin',
+      value: '4.0',
+      updatedValue: '4.2',
+    },
+    {
+      label: 'Serum Calcium (mg/dL)',
+      resultsPageReference: 'Serum Calcium',
+      value: '9.0',
+      updatedValue: '9.2',
+    },
+    {
+      label: 'Serum Potassium (mmol/L)',
+      resultsPageReference: 'Serum Potassium',
+      value: '4.2',
+      updatedValue: '4.4',
+    },
+    {
+      label: 'Serum Sodium (mmol/L)',
+      resultsPageReference: 'Serum Sodium',
+      value: '140',
+      updatedValue: '142',
+    },
+    {
+      label: 'Serum Creatinine (umol/L)',
+      resultsPageReference: 'Serum Creatinine',
+      value: '70',
+      updatedValue: '72',
+    },
+    {
+      label: 'Total Protein (g/dL)',
+      resultsPageReference: 'Total Protein',
+      value: '7.0',
+      updatedValue: '8',
+    },
+    {
+      label: 'Serum Glucose (mg/dl)',
+      resultsPageReference: 'Serum Glucose',
+      value: '90',
+      updatedValue: '92',
+    },
+    {
+      label: 'Serum Glucose (mmol)',
+      resultsPageReference: 'Serum Glucose',
+      value: '5.0',
+      updatedValue: '5.2',
+    },
+    {
+      label: 'Total Bilirubin (umol/L)',
+      resultsPageReference: 'Total Bilirubin',
+      value: '10',
+      updatedValue: '12',
+    },
+    {
+      label: 'Serum Glutamic-Oxaloacetic Transaminase (IU/L) aka SGPT, AST',
+      resultsPageReference: 'Serum Glutamic-Oxaloacetic Transaminase',
+      value: '30',
+      updatedValue: '32',
+    },
+    {
+      label: 'Alkaline Phosphatase, ALP (U/L)',
+      resultsPageReference: 'Alkaline Phosphatase',
+      value: '70',
+      updatedValue: '72',
+    },
+    {
+      label: 'Serum Uric Acid (mg/dL)',
+      resultsPageReference: 'uric acid, serum',
+      value: '4.5',
+      updatedValue: '4.7',
+    },
+    {
+      label: 'Total Cholesterol (mmol/L)',
+      resultsPageReference: 'Total Cholesterol',
+      value: '5.0',
+      updatedValue: '5.2',
+    },
+    {
+      label: 'Triglycerides (mmol/L)',
+      resultsPageReference: 'Triglycerides',
+      value: '1.5',
+      updatedValue: '1.7',
+    },
+    {
+      label: 'Serum Carbon Dioxide CO2 (mmol/L)',
+      resultsPageReference: 'Serum Carbon Dioxide',
+      value: '25',
+      updatedValue: '27',
+    },
   ];
 
   await test.step('When I visit the results viewer page', async () => {
@@ -257,29 +255,30 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record created/i, { exact: true })).toBeVisible();
-    await expect(page.getByText(/a new encounter was created/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I go to the results viewer page', async () => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Panel` tab', async () => {
-    await page.getByRole('tab', { name: /panel/i }).click();
+  await test.step('And I click on the `Individual tests` tab', async () => {
+    await page.getByRole('tab', { name: /individual tests/i }).click();
   });
 
   await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
-    for (const { resultsPageReference, value } of completeBloodCountData) {
-      await test.step(resultsPageReference, async () => {
-        const row = page.locator(`tr:has-text("${resultsPageReference}")`);
-        const valueCell = row.locator('td:nth-child(2)');
-        await expect(valueCell).toContainText(value);
-      });
-    }
+    await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
+      for (const { resultsPageReference, value } of completeBloodCountData) {
+        await test.step(resultsPageReference, async () => {
+          const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
+          const valueCell = row.locator('td:nth-child(2)');
+          await expect(valueCell).toContainText(value);
+        });
+      }
+    });
     for (const { resultsPageReference, value } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
-        const row = page.locator(`tr:has-text("${resultsPageReference}")`);
+        const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
         await expect(valueCell).toContainText(value);
       });
@@ -332,30 +331,32 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(page.getByText(/record updated/i, { exact: true })).toBeVisible();
-    await expect(page.getByText(/the patient encounter was updated/i, { exact: true })).toBeVisible();
+    await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
 
   await test.step('When I revisit the `Results Viewer` page', async () => {
     await resultsViewerPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Panel` tab', async () => {
-    await page.getByRole('tab', { name: /panel/i }).click();
+  await test.step('And I click on the `Individual tests` tab', async () => {
+    await page.getByRole('tab', { name: /individual tests/i }).click();
   });
 
   await test.step('Then I should see the updated results reflect in the results viewer', async () => {
     for (const { resultsPageReference, updatedValue } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
-        const row = page.locator(`tr:has-text("${resultsPageReference}")`);
+        const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
+
         await expect(valueCell).toContainText(updatedValue);
       });
     }
+
     for (const { resultsPageReference, updatedValue } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
-        const row = page.locator(`tr:has-text("${resultsPageReference}")`);
+        const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
         const valueCell = row.locator('td:nth-child(2)');
+
         await expect(valueCell).toContainText(updatedValue);
       });
     }

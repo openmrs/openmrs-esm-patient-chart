@@ -26,7 +26,7 @@ import {
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePrograms } from './programs.resource';
+import { findLastState, usePrograms } from './programs.resource';
 import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
@@ -40,7 +40,7 @@ interface ProgramEditButtonProps {
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { hideAddProgramButton } = useConfig<ConfigObject>();
+  const { hideAddProgramButton, showProgramStatusField } = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
@@ -49,8 +49,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
 
   const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
-    () => [
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(() => {
+    const headers = [
       {
         key: 'display',
         header: t('activePrograms', 'Active programs'),
@@ -67,21 +67,31 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
-    ],
-    [t],
-  );
+    ];
+    if (showProgramStatusField) {
+      headers.push({
+        key: 'state',
+        header: t('programStatus', 'Program status'),
+      });
+    }
+    return headers;
+  }, [t, showProgramStatusField]);
 
   const tableRows = useMemo(
     () =>
-      enrollments?.map((program) => ({
-        id: program.uuid,
-        display: program.display,
-        location: program.location?.display ?? '--',
-        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
-        status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
-          : t('active', 'Active'),
-      })),
+      enrollments?.map((program) => {
+        const state = program ? findLastState(program.states) : null;
+        return {
+          id: program.uuid,
+          display: program.display,
+          location: program.location?.display ?? '--',
+          dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
+          status: program.dateCompleted
+            ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
+            : t('active', 'Active'),
+          state: state ? state.state.concept.display : '--',
+        };
+      }),
     [enrollments, t],
   );
 

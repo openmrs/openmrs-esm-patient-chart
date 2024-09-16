@@ -27,7 +27,6 @@
   "editDoseComboBoxTitle": "បញ្ចូលកំរិតប្រើប្រាស់",
   "editFrequencyComboBoxTitle": "បញ្ចូលភាពញឹកញាប់នៃការមកពិនិត្យជំងឺ",
   "editRouteComboBoxTitle": "បញ្ចូល ផ្លូវបញ្ចូលថ្នាំ",
-  "endDate": "កាលបរិច្ឆេទបញ្ចប់",
   "error": "កំហុស/លំអៀង",
   "errorFetchingDrugOrderTemplates": "មានបញ្ហាក្នុងការទាញយកទម្រង់គំរូវេជ្ជបញ្ជាសម្រាប់ឱសថ",
   "errorFetchingDrugResults": "មានបញ្ហាក្នុងការទាញយកលទ្ធផលសម្រាប់ \"{{searchTerm}}\"",

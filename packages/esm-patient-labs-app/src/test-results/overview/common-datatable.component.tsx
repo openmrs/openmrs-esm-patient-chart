@@ -66,17 +66,14 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
             </TableHead>
             <TableBody>
               {rows.map((row, i) => (
-                <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
+                <TypedTableRow key={row.id} interpretation={data[i]?.value?.interpretation} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
-                    return (
-                      <TableCell
-                        className={
-                          cell.value?.interpretation ? styles[interpretationToCSS[cell.value.interpretation]] : ''
-                        }
-                        key={cell.id}
-                      >
-                        {cell.value?.value ?? cell.value}
+                    return cell.value?.interpretation ? (
+                      <TableCell className={styles[interpretationToCSS[cell.value.interpretation]]} key={cell.id}>
+                        <span>{cell.value?.value ?? cell.value}</span>
                       </TableCell>
+                    ) : (
+                      <TableCell key={cell.id}>{cell?.value}</TableCell>
                     );
                   })}
                 </TypedTableRow>
