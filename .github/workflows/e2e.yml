@@ -10,7 +10,7 @@ on:
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
-  TURBO_TOKEN: ${{ secrets.TURBO_SERVER_TOKEN }}
+  TURBO_TOKEN: 'turbo-token'
   TURBO_TEAM: ${{ github.repository_owner }}
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ''
+          server-token: ${{ env.TURBO_TOKEN }}
 
       - name: Build apps
         run: yarn turbo run build --color --concurrency=5
