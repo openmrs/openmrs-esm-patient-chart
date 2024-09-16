@@ -1,56 +1,50 @@
-@use '@carbon/layout';
 @use '@carbon/colors';
+@use '@carbon/layout';
 
 .imageContainer {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-}
-
-.placeholderText {
-  height: layout.$spacing-07;
+  text-align: center;
   font-size: layout.$spacing-04;
   color: colors.$cool-gray-70;
   width: 7.5rem;
   height: 7.5rem;
-  padding: layout.$spacing-08 layout.$spacing-07;
-  border: solid 1px colors.$cool-gray-80;
+  border: 1px solid colors.$cool-gray-80;
 }
 
-.editImage {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 7.5rem;
-  height: layout.$spacing-09;
-  padding: 0 layout.$spacing-04 0 0;
-  background-color: colors.$cool-gray-80;
-}
-
-.editText {
-  height: layout.$spacing-05;
-  margin-left: layout.$spacing-03;
-  padding-left: layout.$spacing-05;
-  color: colors.$white-0;
-}
-
-.editButton {
-  display: flex;
-  width: layout.$spacing-05;
-  height: layout.$spacing-05;
-  justify-self: flex-end;
-  margin-right: layout.$spacing-03;
-}
-
-.preview {
-  width: 7.5rem;
-  border: solid 1px colors.$cool-gray-80;
-}
-
-.previewImage {
+.imagePreview {
   object-fit: contain;
   display: block;
   width: 100%;
+  height: 100%;
+}
+
+.altImagePreview {
+  @extend .imagePreview;
+  padding: layout.$spacing-07;
   height: auto;
+}
+
+.emptyState {
+  padding: layout.$spacing-07;
+}
+
+.editButtonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 7.5rem;
+  background-color: colors.$cool-gray-80;
+}
+
+.editButton {
+  color: colors.$white-0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  &:hover {
+    color: colors.$white-0;
+  }
 }

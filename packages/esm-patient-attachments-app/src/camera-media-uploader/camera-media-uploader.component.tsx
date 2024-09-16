@@ -8,6 +8,7 @@ import FileReviewContainer from './file-review.component';
 import MediaUploaderComponent from './media-uploader.component';
 import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 
 interface CameraMediaUploaderModalProps {
   allowedExtensions: Array<string> | null;
@@ -37,6 +38,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   const [error, setError] = useState<Error>(null);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
   const [uploadFilesToServer, setUploadFilesToServer] = useState(false);
+  const { allowedFileExtensions } = useAllowedFileExtensions();
 
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
@@ -76,7 +78,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   return (
     <CameraMediaUploaderContext.Provider
       value={{
-        allowedExtensions,
+        allowedExtensions: allowedFileExtensions,
         cameraOnly,
         clearData,
         closeModal,
