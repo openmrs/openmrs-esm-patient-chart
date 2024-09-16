@@ -47,7 +47,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
             alt={t('imagePreview', 'Image preview')}
             className={classNames({
               [styles.imagePreview]: !showEmptyState,
-              [styles.altImagePreview]: !dataUri || !initialState,
+              [styles.altImagePreview]: showEmptyState,
             })}
             src={dataUri || initialState}
           />
