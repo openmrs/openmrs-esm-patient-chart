@@ -29,6 +29,7 @@ export function launchEncounterForm(
       additionalProps: {
         mode: action === 'add' ? 'enter' : action,
         formSessionIntent: intent,
+        openClinicalFormsWorkspaceOnFormClose: false,
       },
     },
   });
