@@ -6,6 +6,6 @@ export class ResultsViewerPage {
   readonly formsTable = () => this.page.getByRole('table', { name: /forms/i });
 
   async goTo(patientUuid: string) {
-    await this.page.goto('/openmrs/spa/patient/' + patientUuid + '/chart/Results Viewer');
+    await this.page.goto('/openmrs/spa/patient/' + patientUuid + '/chart/Results');
   }
 }

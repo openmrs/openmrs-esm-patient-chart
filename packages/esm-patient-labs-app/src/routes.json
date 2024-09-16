@@ -11,7 +11,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-test-results-dashboard-slot",
-        "path": "Results Viewer",
+        "path": "Results",
         "hideDashboardTitle": true
       },
       "order": 4
