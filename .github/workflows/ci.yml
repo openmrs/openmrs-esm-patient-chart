@@ -77,12 +77,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: 🚀 Setup a local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
-
       - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
