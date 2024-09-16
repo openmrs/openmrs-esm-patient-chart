@@ -98,6 +98,11 @@ test('Add, edit and delete vital signs', async ({ page }) => {
     await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill('42');
   });
 
+  await test.step('When I change the pulse to `70`', async () => {
+    await vitalsPage.page.getByRole('spinbutton', { name: /pulse/i }).clear();
+    await vitalsPage.page.getByRole('spinbutton', { name: /pulse/i }).fill('70');
+  });
+
   await test.step('And I change the change the additional notes', async () => {
     await vitalsPage.page.getByPlaceholder(/type any additional notes here/i).clear();
     await vitalsPage.page.getByPlaceholder(/type any additional notes here/i).fill('Vitals test');
@@ -119,7 +124,7 @@ test('Add, edit and delete vital signs', async ({ page }) => {
     await expect(headerRow).toContainText(/SPO2/i);
     await expect(dataRow).toContainText('42');
     await expect(dataRow).toContainText('120 / 100');
-    await expect(dataRow).toContainText('65');
+    await expect(dataRow).toContainText('70');
     await expect(dataRow).toContainText('16');
     await expect(dataRow).toContainText('98');
   });
