@@ -93,7 +93,7 @@ test('Add, edit and delete vital signs', async ({ page }) => {
     await expect(vitalsPage.page.getByText(/Edit vitals and biometrics/i)).toBeVisible();
   });
 
-  await test.step('And I change the `Temperature`', async () => {
+  await test.step('When I change the temperature to `42`', async () => {
     await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).clear();
     await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill('42');
   });

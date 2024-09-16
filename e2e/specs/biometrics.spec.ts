@@ -79,7 +79,7 @@ test('Record biometrics', async ({ page }) => {
     await expect(biometricsPage.page.getByText(/Edit vitals and biometrics/i)).toBeVisible();
   });
 
-  await test.step('And I change the `Weight`', async () => {
+  await test.step('When I change the weight to `70`', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).clear();
     await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('70');
   });
