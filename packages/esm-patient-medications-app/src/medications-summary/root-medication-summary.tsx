@@ -2,13 +2,13 @@ import React from 'react';
 import MedicationsSummary from './medications-summary.component';
 
 export interface RootMedicationSummaryProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-export default function RootMedicationSummary({ patientUuid }: RootMedicationSummaryProps) {
+export default function RootMedicationSummary({ patient }: RootMedicationSummaryProps) {
   return (
     <div>
-      <MedicationsSummary patientUuid={patientUuid} />
+      <MedicationsSummary patient={patient} />
     </div>
   );
 }

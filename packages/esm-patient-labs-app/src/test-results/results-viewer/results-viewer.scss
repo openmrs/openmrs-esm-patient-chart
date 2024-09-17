@@ -178,3 +178,9 @@
     order: 2;
   }
 }
+
+.groupPanelsTables {
+  > div + div {
+    margin-top: layout.$spacing-05;
+  }
+}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import {
   DataTable,
   Button,
@@ -23,21 +23,22 @@ import {
   useLaunchWorkspaceRequiringVisit,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { Add, User, Printer } from '@carbon/react/icons';
 import {
+  AddIcon,
   age,
   getPatientName,
   formatDate,
+  PrinterIcon,
   useConfig,
   useLayoutType,
-  usePatient,
   usePagination,
+  UserIcon,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 
@@ -49,7 +50,7 @@ export interface ActiveMedicationsProps {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
 const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
@@ -60,7 +61,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
-  patientUuid,
+  patient,
 }) => {
   const pageSize = 5;
   const { t } = useTranslation();
@@ -69,7 +70,6 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   const config = useConfig() as ConfigObject;
   const showPrintButton = config.showPrintButton;
   const contentToPrintRef = useRef(null);
-  const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -186,16 +186,16 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     };
 
     const identifiers =
-      patient?.patient?.identifier?.filter(
+      patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      name: patient?.patient ? getPatientName(patient?.patient) : '',
-      age: age(patient?.patient?.birthDate),
-      gender: getGender(patient?.patient?.gender),
-      location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      name: patient ? getPatientName(patient) : '',
+      age: age(patient?.birthDate),
+      gender: getGender(patient?.gender),
+      location: patient?.address?.[0].city,
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
@@ -212,7 +212,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
-        if (patient && patient.patient && title) {
+        if (patient && title) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
@@ -235,7 +235,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
           {showPrintButton && (
             <Button
               kind="ghost"
-              renderIcon={Printer}
+              renderIcon={PrinterIcon}
               iconDescription="Add vitals"
               className={styles.printButton}
               onClick={handlePrint}
@@ -246,7 +246,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
           {showAddButton ?? true ? (
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
               onClick={launchAddDrugOrder}
             >
@@ -333,7 +333,7 @@ function InfoTooltip({ orderer }: { orderer: string }) {
       align="top-left"
       direction="top"
       label={orderer}
-      renderIcon={(props) => <User size={16} {...props} />}
+      renderIcon={(props: Partial<Parameters<typeof UserIcon>[0]>) => <UserIcon size={16} {...props} />}
       iconDescription={orderer}
       kind="ghost"
       size="sm"

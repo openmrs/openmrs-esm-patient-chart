@@ -6,15 +6,15 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { usePatientOrders } from '../api/api';
 
 interface ActiveMedicationsProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) => {
+const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
+  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id, 'ACTIVE');
 
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
@@ -31,7 +31,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) =>
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
-        patientUuid={patientUuid}
+        patient={patient}
       />
     );
   }
