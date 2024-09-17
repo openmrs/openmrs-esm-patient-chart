@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { Close } from '@carbon/react/icons';
-import { type Attachment, useLayoutType } from '@openmrs/esm-framework';
+import { type Attachment, CloseIcon, useLayoutType } from '@openmrs/esm-framework';
 import styles from './attachment-preview.scss';
 
 interface AttachmentPreviewProps {
@@ -47,7 +45,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           kind="ghost"
           label={t('closePreview', 'Close preview')}
           onClick={onClosePreview}
-          renderIcon={Close}
+          renderIcon={CloseIcon}
           size={responsiveSize}
         />
         <div className={styles.attachmentPreview}>

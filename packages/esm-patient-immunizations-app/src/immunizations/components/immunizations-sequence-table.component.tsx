@@ -12,9 +12,8 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
+import { EditIcon, formatDate, getCoreTranslation, parseDate } from '@openmrs/esm-framework';
 import { type ImmunizationGrouped } from '../../types';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
 import styles from './immunizations-sequence-table.scss';
 
@@ -48,8 +47,8 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
       edit: (
         <Button
           kind="ghost"
-          iconDescription="Edit"
-          renderIcon={(props) => <Edit size={16} {...props} />}
+          iconDescription={t('edit', 'Edit')}
+          renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => <EditIcon size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,

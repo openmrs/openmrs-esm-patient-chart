@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableExpandedRow,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { AddIcon, useConfig, useLayoutType, usePagination, useVisit } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -24,7 +24,6 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { useConfig, useLayoutType, usePagination, useVisit } from '@openmrs/esm-framework';
 import styles from './immunizations-detailed-summary.scss';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
 import { orderBy, get, first, isEmpty } from 'lodash-es';
@@ -100,7 +99,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             <Button
               size="sm"
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
               iconDescription="Add"
               hasIconOnly
               onClick={() => {
@@ -133,7 +132,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
+            renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
             iconDescription="Add immunizations"
             onClick={launchImmunizationsForm}
           >

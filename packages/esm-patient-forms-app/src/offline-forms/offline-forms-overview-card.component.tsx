@@ -1,8 +1,7 @@
 import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, Tile, SkeletonText } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
-import { navigate } from '@openmrs/esm-framework';
+import { ArrowRightIcon, navigate } from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import styles from './offline-forms-overview-card.scss';
 
@@ -18,7 +17,9 @@ const OfflineFormsOverviewCard: React.FC = () => {
           <Button
             className={styles.viewButton}
             kind="ghost"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
+            renderIcon={(props: Partial<Parameters<typeof ArrowRightIcon>[0]>) => (
+              <ArrowRightIcon size={16} {...props} />
+            )}
             size="sm"
             onClick={() => navigate({ to: `\${openmrsSpaBase}/offline-tools/forms` })}
           >

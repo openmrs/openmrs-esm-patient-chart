@@ -24,14 +24,15 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit, TrashCan } from '@carbon/react/icons';
 import {
+  EditIcon,
   formatDatetime,
   getConfig,
   isDesktop,
   parseDate,
   showModal,
   showSnackbar,
+  TrashCanIcon,
   useLayoutType,
   usePagination,
   useSession,
@@ -327,7 +328,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                         selectedVisit?.visitStopDatetime,
                                       );
                                     }}
-                                    renderIcon={(props) => <Edit size={16} {...props} />}
+                                    renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => (
+                                      <EditIcon size={16} {...props} />
+                                    )}
                                   >
                                     {t('editThisEncounter', 'Edit this encounter')}
                                   </Button>
@@ -335,7 +338,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 <Button
                                   kind="danger--ghost"
                                   onClick={() => handleDeleteEncounter(selectedVisit?.id, selectedVisit?.form?.display)}
-                                  renderIcon={(props) => <TrashCan size={16} {...props} />}
+                                  renderIcon={(props: Partial<Parameters<typeof TrashCanIcon>[0]>) => (
+                                    <TrashCanIcon size={16} {...props} />
+                                  )}
                                 >
                                   {t('deleteThisEncounter', 'Delete this encounter')}
                                 </Button>
