@@ -5,7 +5,6 @@
 
 .grid {
   width: fit-content;
-  background-color: $color-gray-30;
   display: grid;
   grid-auto-rows: auto;
   gap: 1px;
@@ -84,6 +83,8 @@
   row-gap: 0px;
   grid-template: auto auto / 9em auto;
   border-collapse: collapse;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .padding-container::-webkit-scrollbar {
@@ -217,4 +218,3 @@
 .trendline-link-view:hover {
   text-decoration: underline;
 }
-

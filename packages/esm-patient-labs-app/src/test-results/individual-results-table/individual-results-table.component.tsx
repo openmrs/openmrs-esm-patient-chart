@@ -107,7 +107,7 @@ const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (subRows?.length) {
     return (
-      <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container>
+      <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <div className={styles.cardTitle}>
