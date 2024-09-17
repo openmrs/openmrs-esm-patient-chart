@@ -1,13 +1,15 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { type ConfigObject, configSchema } from '../config-schema';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -106,5 +108,22 @@ describe('ProgramsDetailedSummary', () => {
     expect(screen.getByRole('button', { name: /add/i })).toBeDisabled();
     expect(screen.getByText(/enrolled in all programs/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
+  });
+
+  it('renders the programs status field', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showProgramStatusField: true,
+    });
+
+    renderWithSwr(<ProgramsDetailedSummary patientUuid={mockPatient.id} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('columnheader', { name: /program status/i })).toBeInTheDocument();
   });
 });

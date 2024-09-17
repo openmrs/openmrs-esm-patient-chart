@@ -80,7 +80,7 @@ const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
   if (subRows?.length) {
     return (
       <div>
-        <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container>
+        <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <div className={styles.cardTitle}>

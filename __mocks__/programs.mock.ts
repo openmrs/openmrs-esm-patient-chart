@@ -47,6 +47,7 @@ export const mockEnrolledProgramsResponse = [
   {
     uuid: '8ba6c08f-66d9-4a18-a233-5f658b1755bf',
     program: {
+      display: 'Human immunodeficiency virus (HIV) disease',
       uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
       name: 'HIV Care and Treatment',
       allWorkflows: [],
@@ -62,6 +63,7 @@ export const mockEnrolledProgramsResponse = [
     },
     dateEnrolled: '2020-01-16T00:00:00.000+0000',
     dateCompleted: null,
+    states: [],
   },
 ];
 
@@ -84,6 +86,7 @@ export const mockEnrolledInAllProgramsResponse = [
     },
     dateEnrolled: '2020-01-16T00:00:00.000+0000',
     dateCompleted: null,
+    states: [],
   },
   {
     uuid: '700b7914-9dc9-4569-8fe3-6db6c80af4c5',
@@ -99,6 +102,7 @@ export const mockEnrolledInAllProgramsResponse = [
     },
     dateEnrolled: '2021-03-16T00:00:00.000+0000',
     dateCompleted: null,
+    states: [],
   },
   {
     uuid: '874e5326-faa0-4d4b-a891-9a0e3a16f30f',
@@ -114,11 +118,13 @@ export const mockEnrolledInAllProgramsResponse = [
     },
     dateEnrolled: '2021-02-16T00:00:00.000+0000',
     dateCompleted: null,
+    states: [],
   },
 ];
 
 export const mockCareProgramsResponse = [
   {
+    name: 'HIV TREATMENT',
     uuid: '64f950e6-1b07-4ac0-8e7e-f3e148f3463f',
     display: 'HIV Care and Treatment',
     allWorkflows: [],
@@ -128,6 +134,7 @@ export const mockCareProgramsResponse = [
     },
   },
   {
+    name: 'ONCOLOGY SCREENING AND DIAGNOSIS PROGRAM',
     uuid: '11b129ca-a5e7-4025-84bf-b92a173e20de',
     display: 'Oncology Screening and Diagnosis',
     allWorkflows: [],
@@ -137,6 +144,7 @@ export const mockCareProgramsResponse = [
     },
   },
   {
+    name: 'HIV DIFFERENTIATED CARE PROGRAM',
     uuid: 'b2f65a51-2f87-4faa-a8c6-327a0c1d2e17',
     display: 'HIV Differentiated Care',
     allWorkflows: [],

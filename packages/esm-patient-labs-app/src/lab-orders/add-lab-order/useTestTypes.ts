@@ -10,6 +10,7 @@ type ConceptResults = FetchResponse<{ results: Array<Concept> }>;
 export interface TestType {
   label: string;
   conceptUuid: string;
+  synonyms: string[];
 }
 
 export interface UseTestType {
@@ -31,9 +32,9 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
       labOrderableConcepts
         ? labOrderableConcepts.map(
             (c) =>
-              `${restBaseUrl}/concept/${c}?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
+              `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
           )
-        : `${restBaseUrl}/concept?class=Test?v=custom:(display,uuid,setMembers:(display,uuid,setMembers:(display,uuid)))`,
+        : `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -58,7 +59,6 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
 
 export function useTestTypes(): UseTestType {
   const { labOrderableConcepts } = useConfig<ConfigObject>().orders;
-
   const { data, isLoading, error } = useTestConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
 
   useEffect(() => {
@@ -73,6 +73,7 @@ export function useTestTypes(): UseTestType {
         ?.map((concept) => ({
           label: concept.display,
           conceptUuid: concept.uuid,
+          synonyms: concept.names?.flatMap((name) => name.display) ?? [],
         }))
         ?.sort((testConcept1, testConcept2) => testConcept1.label.localeCompare(testConcept2.label))
         ?.filter((item, pos, array) => !pos || array[pos - 1].conceptUuid !== item.conceptUuid),
