@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -15,6 +15,7 @@ import Trendline from '../trendline/trendline.component';
 import type { ConfigObject } from '../../config-schema';
 import styles from './results-viewer.scss';
 import { type viewOpts } from '../../types';
+import debounce from 'lodash-es/debounce';
 
 type panelOpts = 'tree' | 'panel';
 
@@ -65,6 +66,34 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const isExpanded = view === 'full';
   const trendlineView = testUuid && type === 'trendline';
   const responsiveSize = isTablet ? 'lg' : 'md';
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      const [entry] = entries;
+      setIsHeaderVisible(entry.isIntersecting);
+    };
+
+    const observerOptions: IntersectionObserverInit = {
+      threshold: 1,
+      rootMargin: '-1px 0px 0px 0px',
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    const currentHeader = headerRef.current;
+    if (currentHeader) {
+      observer.observe(currentHeader);
+    }
+
+    return () => {
+      if (currentHeader) {
+        observer.unobserve(currentHeader);
+      }
+      observer.disconnect();
+    };
+  }, []);
 
   const navigateBackFromTrendlineView = useCallback(() => {
     navigate({
@@ -75,7 +104,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   if (isTablet) {
     return (
       <div className={styles.resultsContainer}>
-        <div className={styles.resultsHeader}>
+        <div ref={headerRef} className={styles.headerSentinel} />
+        <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
@@ -123,7 +153,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
 
   return (
     <div className={styles.resultsContainer}>
-      <div className={styles.resultsHeader}>
+      <div ref={headerRef} className={styles.headerSentinel} />
+      <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
           <h4>{t('tests', 'Tests')}</h4>
           <Button
