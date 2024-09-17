@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
@@ -14,8 +15,11 @@ export function useAllowedFileExtensions() {
 
   const { data, error, isLoading } = useSWRImmutable<{ data: { results: Array<GlobalProperty> } }>(url, openmrsFetch);
 
-  const allowedFileExtensions =
-    data?.data?.results?.length > 0 ? data?.data?.results[0].value?.toLowerCase().split(',') || undefined : undefined;
+  const allowedFileExtensions = useMemo(() => {
+    return data?.data?.results?.length > 0
+      ? data?.data?.results[0].value?.toLowerCase().split(',') || undefined
+      : undefined;
+  }, [data]);
 
   return {
     allowedFileExtensions,

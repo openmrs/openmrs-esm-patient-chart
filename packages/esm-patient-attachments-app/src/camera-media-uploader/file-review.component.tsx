@@ -8,6 +8,7 @@ import styles from './file-review.scss';
 
 export interface FileReviewContainerProps {
   onCompletion: () => void;
+  title?: string;
 }
 
 interface FilePreviewProps {
@@ -15,10 +16,11 @@ interface FilePreviewProps {
   collectDescription?: boolean;
   moveToNextFile: () => void;
   onSaveFile: (dataUri: UploadedFile) => void;
+  title?: string;
   uploadedFile: UploadedFile;
 }
 
-const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
+const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onCompletion }) => {
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
 
@@ -44,10 +46,11 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   return (
     <div className={styles.filePreviewContainer}>
       <ModalHeader closeModal={closeModal} className={styles.modalHeader}>
-        {t('addAttachment_title', 'Add Attachment')}{' '}
+        {title || t('addAttachment_title', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </ModalHeader>
       <FilePreview
+        title={title}
         key={filesToUpload[currentFile - 1]?.fileName}
         clearData={clearData}
         collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
@@ -59,7 +62,13 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   );
 };
 
-const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescription, onSaveFile, clearData }) => {
+const FilePreview: React.FC<FilePreviewProps> = ({
+  title,
+  uploadedFile,
+  collectDescription,
+  onSaveFile,
+  clearData,
+}) => {
   const { t } = useTranslation();
   const [fileName, setFileName] = useState(uploadedFile.fileName);
   const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
@@ -160,7 +169,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
             {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" size="lg" onClick={saveImageOrPdf} disabled={emptyName}>
-            {t('addAttachment', 'Add attachment')}
+            {title || t('addAttachment', 'Add attachment')}
           </Button>
         </UserHasAccess>
       </ModalFooter>
