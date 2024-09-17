@@ -464,7 +464,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           .subscribe({
             next: (response) => {
               if (response.status === 201) {
-                if (config.showServiceQueueFields) {
+                if (config.showServiceQueueFields && queueLocation && service && priority) {
                   // retrieve values from the queue extension
                   setVisitUuid(response.data.uuid);
 
