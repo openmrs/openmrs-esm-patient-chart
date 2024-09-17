@@ -22,6 +22,21 @@ export const configSchema = {
       },
     },
   },
+  numberOfPatientIdStickers: {
+    _type: Type.Number,
+    _description: 'The number of patient ID stickers to print',
+    _default: '30',
+  },
+  numberOfPatientIdStickerColumns: {
+    _type: Type.Number,
+    _description: 'The number of columns of patient ID stickers to print per page',
+    _default: '3',
+  },
+  numberOfPatientIdStickerRowsPerPage: {
+    _type: Type.Number,
+    _description: 'The number of rows for patient ID stickers to print per page',
+    _default: '5',
+  },
   printIdentifierStickerFields: {
     _type: Type.Array,
     _description: 'Patient demographics to include in the identifier sticker printout',
@@ -30,11 +45,22 @@ export const configSchema = {
       _type: Type.String,
     },
   },
-  printIdentifierStickerSize: {
+  printIdentifierStickerPaperSize: {
     _type: Type.String,
     _description:
-      'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
-    _default: '4in 6in',
+      'Specifies the paper size for printing, using units like "mm" or "in", or standard sizes such as "148mm 210mm", "A1", "A2", "A4", or "A5".',
+    _default: 'A4',
+  },
+  printIdentifierStickerHeight: {
+    _type: Type.String,
+    _description:
+      'Specifies the height of each patient ID sticker in the printout in units such as px or rem e.g. "15px", "5rem"',
+    _default: '10rem',
+  },
+  printIdentifierStickerWidth: {
+    _type: Type.String,
+    _description: 'The width of each patient ID sticker in the printout in units such as px or rem',
+    _default: '13rem',
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
@@ -47,7 +73,12 @@ export interface ConfigObject {
   excludePatientIdentifierCodeTypes: {
     uuids: Array<string>;
   };
+  numberOfPatientIdStickerColumns: number;
+  numberOfPatientIdStickerRowsPerPage: number;
+  numberOfPatientIdStickers: number;
   printIdentifierStickerFields: Array<string>;
-  printIdentifierStickerSize: string;
+  printIdentifierStickerHeight: string;
+  printIdentifierStickerPaperSize: string;
+  printIdentifierStickerWidth: string;
   useRelationshipNameLink: boolean;
 }

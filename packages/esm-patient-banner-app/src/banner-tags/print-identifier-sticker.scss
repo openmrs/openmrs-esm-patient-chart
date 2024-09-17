@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@import '@openmrs/esm-styleguide/src/vars';
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
@@ -47,6 +48,31 @@
   :global(.cds--inline-loading__text) {
     @include type.type-style('body-01');
   }
+}
+
+.previewContainer {
+  max-height: 10rem;
+  overflow-y: scroll;
+  background-color: white;
+  width: 100%;
+  border: 1px solid $ui-03;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+}
+
+.labelNumberInput {
+  padding: 1rem;
+}
+
+.stickerContent {
+  display: inline-flex;
+  width: -webkit-fill-available;
+  justify-content: space-between;
+}
+
+.hideResultsPreview {
+  display: none;
 }
 
 @media print {

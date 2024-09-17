@@ -199,26 +199,14 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
-  const onBeforeGetContentResolve = useRef(null);
-
-  useEffect(() => {
-    if (isPrinting && onBeforeGetContentResolve.current) {
-      onBeforeGetContentResolve.current();
-    }
-  }, [isPrinting]);
-
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
+    contentRef: contentToPrintRef,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: () =>
-      new Promise((resolve) => {
-        if (patient && patient.patient && title) {
-          onBeforeGetContentResolve.current = resolve;
-          setIsPrinting(true);
-        }
-      }),
+    onBeforePrint: () => {
+      setIsPrinting(true);
+      return Promise.resolve();
+    },
     onAfterPrint: () => {
-      onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
   });

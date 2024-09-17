@@ -153,26 +153,14 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     [vitals],
   );
 
-  const onBeforeGetContentResolve = useRef(null);
-
-  useEffect(() => {
-    if (isPrinting && onBeforeGetContentResolve.current) {
-      onBeforeGetContentResolve.current();
-    }
-  }, [isPrinting]);
-
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
+    contentRef: contentToPrintRef,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${headerTitle}`,
-    onBeforeGetContent: () =>
-      new Promise((resolve) => {
-        if (patient && patient.patient && headerTitle) {
-          onBeforeGetContentResolve.current = resolve;
-          setIsPrinting(true);
-        }
-      }),
+    onBeforePrint: () => {
+      setIsPrinting(true);
+      return Promise.resolve();
+    },
     onAfterPrint: () => {
-      onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
   });

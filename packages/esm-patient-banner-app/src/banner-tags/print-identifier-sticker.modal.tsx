@@ -1,108 +1,47 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation, type TFunction } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import React, { useCallback, useRef, useState } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { useReactToPrint, type UseReactToPrintOptions } from 'react-to-print';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, NumberInput, Stack } from '@carbon/react';
+import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import IdentifierSticker from './print-identifier-sticker.component';
+import PrintIdentifierStickerContent from './print-identifier-sticker-content.component';
 import styles from './print-identifier-sticker.scss';
 
-interface PrintIdentifierStickerProps {
+interface PrintIdentifierStickerModalProps {
   closeModal: () => void;
   patient: fhir.Patient;
 }
 
-interface PrintComponentProps extends Partial<ConfigObject> {
-  patientDetails: {
-    address?: fhir.Address[];
-    age?: string;
-    dateOfBirth?: string;
-    gender?: string;
-    id?: string;
-    identifiers?: fhir.Identifier[];
-    name?: string;
-    photo?: fhir.Attachment[];
-  };
-  t: TFunction;
-}
-
-const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
+const PrintIdentifierStickerModal: React.FC<PrintIdentifierStickerModalProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
-  const { printIdentifierStickerFields, printIdentifierStickerSize, excludePatientIdentifierCodeTypes } =
+  const { numberOfPatientIdStickers, numberOfPatientIdStickerRowsPerPage, numberOfPatientIdStickerColumns } =
     useConfig<ConfigObject>();
-  const contentToPrintRef = useRef(null);
-  const onBeforeGetContentResolve = useRef<() => void | null>(null);
+  const contentToPrintRef = useRef<HTMLDivElement | null>(null);
+  const [numberOfLabelColumns, setNumberOfLabelColumns] = useState<number>(numberOfPatientIdStickerColumns);
+  const [numberOfLabelRowsPerPage, setNumberOfLabelRowsPerPage] = useState<number>(numberOfPatientIdStickerRowsPerPage);
+  const [numberOfLabels, setNumberOfLabels] = useState<number>(numberOfPatientIdStickers);
   const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
 
-  useEffect(() => {
-    if (isPrinting && onBeforeGetContentResolve.current) {
-      onBeforeGetContentResolve.current();
-    }
-  }, [isPrinting]);
+  const labels = Array.from({ length: numberOfLabels });
 
-  const patientDetails = useMemo(() => {
-    if (!patient) {
-      return {};
-    }
-
-    const getGender = (gender: string): string => {
-      switch (gender) {
-        case 'male':
-          return getCoreTranslation('male', 'Male');
-        case 'female':
-          return getCoreTranslation('female', 'Female');
-        case 'other':
-          return getCoreTranslation('other', 'Other');
-        case 'unknown':
-          return getCoreTranslation('unknown', 'Unknown');
-        default:
-          return gender;
-      }
-    };
-
-    const identifiers =
-      patient.identifier?.filter(
-        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
-      ) ?? [];
-
-    return {
-      address: patient.address,
-      age: age(patient.birthDate),
-      dateOfBirth: patient.birthDate,
-      gender: getGender(patient.gender),
-      id: patient.id,
-      identifiers: [...identifiers],
-      name: patient ? getPatientName(patient) : '',
-      photo: patient.photo,
-    };
-  }, [excludePatientIdentifierCodeTypes?.uuids, patient]);
-
-  const handleBeforeGetContent = useCallback(
-    () =>
-      new Promise<void>((resolve) => {
-        if (patient && headerTitle) {
-          onBeforeGetContentResolve.current = resolve;
-          setIsPrinting(true);
-        }
-      }),
-    [headerTitle, patient],
-  );
+  const handleBeforePrint = useCallback(() => setIsPrinting(true), []);
 
   const handleAfterPrint = useCallback(() => {
-    onBeforeGetContentResolve.current = null;
     setIsPrinting(false);
     closeModal();
   }, [closeModal]);
 
-  const handlePrintError = useCallback((errorLocation, error) => {
-    onBeforeGetContentResolve.current = null;
-
+  const handlePrintError = useCallback<UseReactToPrintOptions['onPrintError']>((errorLocation, error) => {
     showSnackbar({
       isLowContrast: false,
       kind: 'error',
       title: getCoreTranslation('printError', 'Print error'),
       subtitle:
-        getCoreTranslation('printErrorExplainer', 'An error occurred in "{{errorLocation}}": ', { errorLocation }) +
+        getCoreTranslation('printErrorExplainer', 'An error occurred during "{{errorLocation}}": ', { errorLocation }) +
         error,
     });
 
@@ -110,10 +49,9 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   }, []);
 
   const handlePrint = useReactToPrint({
-    content: () => contentToPrintRef.current,
-    documentTitle: `${patientDetails.name} - ${headerTitle}`,
+    contentRef: contentToPrintRef,
+    documentTitle: `${patient ? getPatientName(patient) : ''} - ${headerTitle}`,
     onAfterPrint: handleAfterPrint,
-    onBeforeGetContent: handleBeforeGetContent,
     onPrintError: handlePrintError,
   });
 
@@ -123,21 +61,62 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         closeModal={closeModal}
         title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
       />
-      <ModalBody>
-        <div ref={contentToPrintRef}>
-          <style type="text/css" media="print">
-            {`
-              @page {
-                size: ${printIdentifierStickerSize};
-              }
-            `}
-          </style>
-          <PrintComponent
-            patientDetails={patientDetails}
-            printIdentifierStickerFields={printIdentifierStickerFields}
-            t={t}
+      <ModalBody aria-label="Print identifier sticker modal" hasScrollingContent>
+        <Stack gap={5}>
+          <NumberInput
+            hideSteppers
+            id="numberOfColumnsInput"
+            label={t('numberOfLabelColumns', 'No. of patient ID sticker columns')}
+            min={1}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setNumberOfLabelColumns(parseInt(event.target.value || '1'))
+            }
+            value={numberOfLabelColumns}
           />
-        </div>
+          <NumberInput
+            hideSteppers
+            id="numberOfRowsPerPageInput"
+            label={t('numberOfLabelRowsPerPage', 'No. of patient ID sticker rows per page')}
+            min={1}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setNumberOfLabelRowsPerPage(parseInt(event.target.value || '1'))
+            }
+            value={numberOfLabelRowsPerPage}
+          />
+          <NumberInput
+            hideSteppers
+            id="numberOfLabels"
+            label={t('numberOfLabels', 'No. of patient ID stickers')}
+            min={1}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setNumberOfLabels(parseInt(event.target.value || '1'))
+            }
+            value={numberOfLabels}
+          />
+          <div className={styles.stickerContent}>
+            <IdentifierSticker patient={patient} />
+            <span>
+              <Button kind="ghost" onClick={() => setIsPreviewVisible(!isPreviewVisible)}>
+                {!isPreviewVisible ? t('showPreview', 'Show preview') : t('hidePreview', 'Hide preview')}
+              </Button>
+            </span>
+          </div>
+          <div
+            className={classNames(styles.previewContainer, {
+              [styles.hideResultsPreview]: !isPreviewVisible,
+            })}
+          >
+            <div ref={contentToPrintRef}>
+              <PrintIdentifierStickerContent
+                labels={labels}
+                numberOfLabelColumns={numberOfLabelColumns}
+                numberOfLabelRowsPerPage={numberOfLabelRowsPerPage}
+                patient={patient}
+                ref={contentToPrintRef}
+              />
+            </div>
+          </div>
+        </Stack>
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
@@ -155,30 +134,4 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   );
 };
 
-const PrintComponent = ({ patientDetails, printIdentifierStickerFields, t }: PrintComponentProps) => {
-  return (
-    <div className={styles.stickerContainer}>
-      {printIdentifierStickerFields.includes('name') && <div className={styles.patientName}>{patientDetails.name}</div>}
-      <div className={styles.detailsGrid}>
-        {patientDetails.identifiers.map((identifier) => {
-          return (
-            <p key={identifier?.id}>
-              {identifier?.type?.text}: <strong>{identifier?.value}</strong>
-            </p>
-          );
-        })}
-        <p>
-          {getCoreTranslation('sex', 'Sex')}: <strong>{patientDetails.gender}</strong>
-        </p>
-        <p>
-          {t('dob', 'DOB')}: <strong>{patientDetails.dateOfBirth}</strong>
-        </p>
-        <p>
-          {getCoreTranslation('age', 'Age')}: <strong>{patientDetails.age}</strong>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default PrintIdentifierSticker;
+export default PrintIdentifierStickerModal;

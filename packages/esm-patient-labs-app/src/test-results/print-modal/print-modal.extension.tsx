@@ -21,6 +21,7 @@ import { useReactToPrint } from 'react-to-print';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
+
 import {
   age,
   getPatientName,
@@ -32,6 +33,7 @@ import {
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
+import { type ObsRecord } from '../../types';
 import styles from './print-modal.scss';
 
 function PrintModal({ patientUuid, closeDialog }) {
@@ -61,7 +63,7 @@ function PrintModal({ patientUuid, closeDialog }) {
   ];
 
   const handlePrint = useReactToPrint({
-    content: () => printContainerRef.current,
+    contentRef: printContainerRef,
   });
 
   const patient = usePatient(patientUuid);
@@ -246,7 +248,7 @@ function PrintModal({ patientUuid, closeDialog }) {
   );
 }
 
-const formatPanelForDisplay = (panel) => {
+const formatPanelForDisplay = (panel: ObsRecord) => {
   return {
     id: panel.id,
     testType: panel.name,
