@@ -3791,6 +3791,70 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jridgewell/trace-mapping@npm:^0.3.20":
+  version: 0.3.25
+  resolution: "@jridgewell/trace-mapping@npm:0.3.25"
+  dependencies:
+    "@jridgewell/resolve-uri": "npm:^3.1.0"
+    "@jridgewell/sourcemap-codec": "npm:^1.4.14"
+  checksum: 10/dced32160a44b49d531b80a4a2159dceab6b3ddf0c8e95a0deae4b0e894b172defa63d5ac52a19c2068e1fe7d31ea4ba931fbeec103233ecb4208953967120fc
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/arrow@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@jsep-plugin/arrow@npm:1.0.5"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/73cb2f7464664c17bf62f8bf6a1267abef81b19b4c926332babdabe110d4bf3b00310e060ee5c42d1e61fa7e471dade3e1dba5384262db324ae09ec68346231d
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/new@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@jsep-plugin/new@npm:1.0.3"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/d9fd7f10fb07e1ecf8e8359c41aa97cec775776934617550c9c5f8742a148f6b77edee30a29b89f88b9bdace6967b3f02a9596b773f3746c67df28d118852eba
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/numbers@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@jsep-plugin/numbers@npm:1.0.1"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/bf5c75fe8829828112daa2aba68c5c4494056570f02b758357ea6fa9ea949c4d247d850e555dfe506b5b5854af76645eee41e9893f283f20e11a23141d007286
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/regex@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@jsep-plugin/regex@npm:1.0.3"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/c08c7bd79a164995923ea799949b9f6b18dcf2bd314522ed0dcfc669fd249a06fea200606086c7d54b12d39ce3cfa61d910229e5184c667ead135f6da6997532
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/template@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@jsep-plugin/template@npm:1.0.4"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/bec2d32b9cf260fe081e895d92b3908bfb0cf11f925571f972944b4b5c92510811fd93c2db15cab96968685db1a689bfbdb9e8909bc2b0fcb719d2129bf8d71b
+  languageName: node
+  linkType: hard
+
+"@jsep-plugin/ternary@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@jsep-plugin/ternary@npm:1.1.3"
+  peerDependencies:
+    jsep: ^0.4.0||^1.0.0
+  checksum: 10/03425119968d5eea4d0664df58d066759c4bb80dd0651da6034df88e876d286e7de6392406b796b1a92dd6cc76dbbd1cdb9590a7b99933f7af78839673020e82
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -4390,7 +4454,7 @@ __metadata:
     tree-model: "npm:^1.0.7"
     tslib: "npm:^2.4.1"
     uuid: "npm:^8.3.2"
-    webpack: "npm:~5.89.0"
+    webpack: "npm:~5.94.0"
     zone.js: "npm:~0.13.3"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
@@ -5045,20 +5109,20 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app":
-  version: 5.0.0
-  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=46b0d3&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
+  version: 17.0.0
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=bc75a2&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^16.2.12
-    "@angular/cdk": ^16.2.12
-    "@angular/common": ^16.2.12
-    "@angular/compiler": ^16.2.12
-    "@angular/compiler-cli": ^16.2.12
-    "@angular/core": ^16.2.12
-    "@angular/forms": ^16.2.12
-    "@carbon/styles": ^1.11.0
-    "@ng-select/ng-select": ^11.2.0
+    "@angular/animations": ^17.3.12
+    "@angular/cdk": ^17.3.10
+    "@angular/common": ^17.3.12
+    "@angular/compiler": ^17.3.12
+    "@angular/compiler-cli": ^17.3.12
+    "@angular/core": ^17.3.12
+    "@angular/forms": ^17.3.12
+    "@carbon/styles": 1.x
+    "@ng-select/ng-select": ^12.0.7
     "@ngx-translate/core": ^15.0.0
     "@openmrs/ngx-file-uploader": "*"
     lodash: ^4.17.21
@@ -5067,7 +5131,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/34716b117cdad5f3721066d059724b923010d3754f59ec9c1448231d1ae259f7e96754da8a27a5c780cd036da11d5ad7aff3e0325332c4acd9b93c2966f14f48
+  checksum: 10/052d0a244974ae171516ce0e9c2dd39a66c9cd5a9610176b1d900662ab7ee0a06376490cd0b1e48c7d949e38bb28908ea35875896578344ffccadc25549241ff
   languageName: node
   linkType: hard
 
@@ -5094,21 +5158,26 @@ __metadata:
   resolution: "@openmrs/ngx-formentry@npm:5.0.1-pre.445"
 =======
 "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
+<<<<<<< HEAD
   version: 5.0.0
   resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=46b0d3&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
 >>>>>>> a137f84d ((feat) : improve work on patient enrollment)
+=======
+  version: 17.0.0
+  resolution: "@openmrs/ngx-formentry@file:/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/dkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=bc75a2&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^16.2.12
-    "@angular/cdk": ^16.2.12
-    "@angular/common": ^16.2.12
-    "@angular/compiler": ^16.2.12
-    "@angular/compiler-cli": ^16.2.12
-    "@angular/core": ^16.2.12
-    "@angular/forms": ^16.2.12
-    "@carbon/styles": ^1.11.0
-    "@ng-select/ng-select": ^11.2.0
+    "@angular/animations": ^17.3.12
+    "@angular/cdk": ^17.3.10
+    "@angular/common": ^17.3.12
+    "@angular/compiler": ^17.3.12
+    "@angular/compiler-cli": ^17.3.12
+    "@angular/core": ^17.3.12
+    "@angular/forms": ^17.3.12
+    "@carbon/styles": 1.x
+    "@ng-select/ng-select": ^12.0.7
     "@ngx-translate/core": ^15.0.0
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
     "@openmrs/ngx-file-uploader": "*"
@@ -5120,6 +5189,7 @@ __metadata:
     tree-model: ^1.0.7
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/776500819b21d37cf8c4abd99608290a7cca20c1a22e0a553c3ac08fb768bb1bfe9f91eb14ab59f56b451d8064ebba0b70f8441805ea21815bf5dd3e688016cd
 =======
   checksum: 10/a5e5e34002e0863581db2fa8930e0b09758b352c38653eda476cca3e4977d5c1d61e81db057ca314193fc800dfb78e7bd6f81fc8670e4388e484a10199d242c4
@@ -5127,6 +5197,9 @@ __metadata:
 =======
   checksum: 10/34716b117cdad5f3721066d059724b923010d3754f59ec9c1448231d1ae259f7e96754da8a27a5c780cd036da11d5ad7aff3e0325332c4acd9b93c2966f14f48
 >>>>>>> a137f84d ((feat) : improve work on patient enrollment)
+=======
+  checksum: 10/052d0a244974ae171516ce0e9c2dd39a66c9cd5a9610176b1d900662ab7ee0a06376490cd0b1e48c7d949e38bb28908ea35875896578344ffccadc25549241ff
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
   languageName: node
   linkType: hard
 
@@ -8129,6 +8202,7 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@types/estree@npm:1.0.5":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
@@ -8140,9 +8214,20 @@ __metadata:
   version: 4.19.6
   resolution: "@types/express-serve-static-core@npm:4.19.6"
 =======
+=======
+>>>>>>> 83cfbbb6 ((feat) : initial work to bring appointment model to form engine)
 <<<<<<< HEAD
 "@types/express-serve-static-core@npm:*, @types/express-serve-static-core@npm:^4.17.33":
 =======
+=======
+"@types/estree@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@types/estree@npm:1.0.5"
+  checksum: 10/7de6d928dd4010b0e20c6919e1a6c27b61f8d4567befa89252055fad503d587ecb9a1e3eab1b1901f923964d7019796db810b7fd6430acb26c32866d126fd408
+  languageName: node
+  linkType: hard
+
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
 "@types/express-serve-static-core@npm:*, @types/express-serve-static-core@npm:^4.17.18":
   version: 4.17.29
   resolution: "@types/express-serve-static-core@npm:4.17.29"
@@ -10769,6 +10854,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"browserslist@npm:^4.23.3":
+  version: 4.23.3
+  resolution: "browserslist@npm:4.23.3"
+  dependencies:
+    caniuse-lite: "npm:^1.0.30001646"
+    electron-to-chromium: "npm:^1.5.4"
+    node-releases: "npm:^2.0.18"
+    update-browserslist-db: "npm:^1.1.0"
+  bin:
+    browserslist: cli.js
+  checksum: 10/e266d18c6c6c5becf9a1a7aa264477677b9796387972e8fce34854bb33dc1666194dc28389780e5dc6566e68a95e87ece2ce222e1c4ca93c2b75b61dfebd5f1c
+  languageName: node
+  linkType: hard
+
 "browserstack@npm:^1.5.1":
   version: 1.6.1
   resolution: "browserstack@npm:1.6.1"
@@ -11035,11 +11134,14 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001591, caniuse-lite@npm:^1.0.30001646, caniuse-lite@npm:^1.0.30001718":
   version: 1.0.30001721
   resolution: "caniuse-lite@npm:1.0.30001721"
   checksum: 10/88fa7ecb5b9a4c1393d7793fc6d35552340beba9a898b4f7b05f9ae266b230ffa35aef5da0d33d1872fb1fcb32d860dfd00298d7b4da8eeea5e6eb3cfa029a18
 =======
+=======
+>>>>>>> 83cfbbb6 ((feat) : initial work to bring appointment model to form engine)
 <<<<<<< HEAD
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001591, caniuse-lite@npm:^1.0.30001646":
   version: 1.0.30001653
@@ -11054,9 +11156,19 @@ __metadata:
   resolution: "canvg@npm:3.0.11"
 =======
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001464, caniuse-lite@npm:^1.0.30001538, caniuse-lite@npm:^1.0.30001565":
+=======
+"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001464, caniuse-lite@npm:^1.0.30001565":
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
   version: 1.0.30001572
   resolution: "caniuse-lite@npm:1.0.30001572"
   checksum: 10/cf27b354c0af58d5468cdc0ecea5bff381bc382378016b36b05790929f80e321ee712470a536911dee82e946ad4be246a21326835f1da599c6ee12ec150ae8b7
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001646":
+  version: 1.0.30001660
+  resolution: "caniuse-lite@npm:1.0.30001660"
+  checksum: 10/5d83f0b7e2075b7e31f114f739155dc6c21b0afe8cb61180f625a4903b0ccd3d7591a5f81c930f14efddfa57040203ba0890850b8a3738f6c7f17c7dd83b9de8
   languageName: node
   linkType: hard
 
@@ -13340,6 +13452,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-to-chromium@npm:^1.5.4":
+  version: 1.5.23
+  resolution: "electron-to-chromium@npm:1.5.23"
+  checksum: 10/01118e662fb57245cbfaff44bb77c31ae3070f4a89ac032a7ae9f6cba1626ce4d3f16b30184a5149a8efa905badc2b6681beb4b12ce3d94f47d6f5e8493410e9
+  languageName: node
+  linkType: hard
+
 "emittery@npm:^0.13.1":
   version: 0.13.1
   resolution: "emittery@npm:0.13.1"
@@ -14008,6 +14127,13 @@ __metadata:
   checksum: 10/afa618e73362576b63f6ca83c975456621095a1ed42ff068174e3f5cea48afc422814dda548c96e6ebb5333e7265140c7292abcc81bbd6ccb1757d50d3a4e182
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
 >>>>>>> 8c2b420a (Revert "(chore) Bump Angular to v17 (#1976)")
+  languageName: node
+  linkType: hard
+
+"escalade@npm:^3.1.2":
+  version: 3.2.0
+  resolution: "escalade@npm:3.2.0"
+  checksum: 10/9d7169e3965b2f9ae46971afa392f6e5a25545ea30f2e2dd99c9b0a95a3f52b5653681a84f5b2911a413ddad2d7a93d3514165072f349b5ffc59c75a899970d6
   languageName: node
   linkType: hard
 
@@ -15040,7 +15166,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fraction.js@npm:^4.2.0, fraction.js@npm:^4.3.6":
+"fraction.js@npm:^4.2.0, fraction.js@npm:^4.3.7":
   version: 4.3.7
   resolution: "fraction.js@npm:4.3.7"
   checksum: 10/bb5ebcdeeffcdc37b68ead3bdfc244e68de188e0c64e9702197333c72963b95cc798883ad16adc21588088b942bca5b6a6ff4aeb1362d19f6f3b629035dc15f5
@@ -19935,6 +20061,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoid@npm:^3.3.7":
+  version: 3.3.7
+  resolution: "nanoid@npm:3.3.7"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: 10/ac1eb60f615b272bccb0e2b9cd933720dad30bf9708424f691b8113826bb91aca7e9d14ef5d9415a6ba15c266b37817256f58d8ce980c82b0ba3185352565679
+  languageName: node
+  linkType: hard
+
 "natural-compare-lite@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare-lite@npm:1.4.0"
@@ -20117,6 +20252,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-releases@npm:^2.0.18":
+  version: 2.0.18
+  resolution: "node-releases@npm:2.0.18"
+  checksum: 10/241e5fa9556f1c12bafb83c6c3e94f8cf3d8f2f8f904906ecef6e10bcaa1d59aa61212d4651bec70052015fc54bd3fdcdbe7fc0f638a17e6685aa586c076ec4e
+  languageName: node
+  linkType: hard
+
 "node-watch@npm:^0.7.4":
   version: 0.7.4
   resolution: "node-watch@npm:0.7.4"
@@ -20259,7 +20401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm-registry-fetch@npm:^14.0.0, npm-registry-fetch@npm:^14.0.3":
+"npm-registry-fetch@npm:^14.0.0, npm-registry-fetch@npm:^14.0.5":
   version: 14.0.5
   resolution: "npm-registry-fetch@npm:14.0.5"
   dependencies:
@@ -21231,6 +21373,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"picocolors@npm:^1.0.1, picocolors@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "picocolors@npm:1.1.0"
+  checksum: 10/a2ad60d94d185c30f2a140b19c512547713fb89b920d32cc6cf658fa786d63a37ba7b8451872c3d9fc34883971fb6e5878e07a20b60506e0bb2554dce9169ccb
+  languageName: node
+  linkType: hard
+
 "picomatch@npm:2.3.1, picomatch@npm:^2.0.4, picomatch@npm:^2.2.1, picomatch@npm:^2.2.2, picomatch@npm:^2.2.3, picomatch@npm:^2.3.1":
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
   version: 2.3.1
@@ -21782,6 +21931,7 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "postcss@npm:8.4.35":
   version: 8.4.35
   resolution: "postcss@npm:8.4.35"
@@ -21803,6 +21953,9 @@ __metadata:
   checksum: 10/7eaf7346d04929ee979548ece5e34d253eae6f175346e298b2c4621ad6f4ee00adfe7abe72688640e910c0361ae50537c5dda3e35fd1066491282c342b3ee5c8
 =======
 "postcss@npm:8.4.31, postcss@npm:^8.2.14, postcss@npm:^8.2.15, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.27, postcss@npm:^8.4.6":
+=======
+"postcss@npm:8.4.31, postcss@npm:^8.2.14, postcss@npm:^8.2.15, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.27":
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
   version: 8.4.31
   resolution: "postcss@npm:8.4.31"
   dependencies:
@@ -21811,6 +21964,17 @@ __metadata:
     source-map-js: "npm:^1.0.2"
   checksum: 10/1a6653e72105907377f9d4f2cd341d8d90e3fde823a5ddea1e2237aaa56933ea07853f0f2758c28892a1d70c53bbaca200eb8b80f8ed55f13093003dbec5afa0
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.4.41":
+  version: 8.4.47
+  resolution: "postcss@npm:8.4.47"
+  dependencies:
+    nanoid: "npm:^3.3.7"
+    picocolors: "npm:^1.1.0"
+    source-map-js: "npm:^1.2.1"
+  checksum: 10/f2b50ba9b6fcb795232b6bb20de7cdc538c0025989a8ed9c4438d1960196ba3b7eaff41fdb1a5c701b3504651ea87aeb685577707f0ae4d6ce6f3eae5df79a81
   languageName: node
   linkType: hard
 
@@ -24244,6 +24408,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"source-map-js@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "source-map-js@npm:1.2.1"
+  checksum: 10/ff9d8c8bf096d534a5b7707e0382ef827b4dd360a577d3f34d2b9f48e12c9d230b5747974ee7c607f0df65113732711bb701fe9ece3c7edbd43cb2294d707df3
+  languageName: node
+  linkType: hard
+
 "source-map-loader@npm:4.0.1":
   version: 4.0.1
   resolution: "source-map-loader@npm:4.0.1"
@@ -25015,11 +25186,17 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "terser-webpack-plugin@npm:^5.3.10, terser-webpack-plugin@npm:^5.3.11":
   version: 5.3.14
   resolution: "terser-webpack-plugin@npm:5.3.14"
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
+>>>>>>> 83cfbbb6 ((feat) : initial work to bring appointment model to form engine)
 "terser-webpack-plugin@npm:^5.3.10":
   version: 5.3.10
   resolution: "terser-webpack-plugin@npm:5.3.10"
@@ -25035,7 +25212,23 @@ __metadata:
     schema-utils: "npm:^3.1.1"
     serialize-javascript: "npm:^6.0.1"
     terser: "npm:^5.26.0"
+<<<<<<< HEAD
 =======
+=======
+  peerDependencies:
+    webpack: ^5.1.0
+  peerDependenciesMeta:
+    "@swc/core":
+      optional: true
+    esbuild:
+      optional: true
+    uglify-js:
+      optional: true
+  checksum: 10/fb1c2436ae1b4e983be043fa0a3d355c047b16b68f102437d08c736d7960c001e7420e2f722b9d99ce0dc70ca26a68cc63c0b82bc45f5b48671142b352a9d938
+  languageName: node
+  linkType: hard
+
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
 "terser-webpack-plugin@npm:^5.3.7":
   version: 5.3.9
   resolution: "terser-webpack-plugin@npm:5.3.9"
@@ -25119,6 +25312,20 @@ __metadata:
   checksum: 10/bd7ba6bfef58f8c179592894923c8c933d980e17287d3f2a9927550be853d1601beebb724cf015929599b32945641c44f9c3db8dd242c7933af3830bcb853510
 >>>>>>> c27d4ea6 (Revert "(chore) Bump Angular to v17 (#1976)")
 >>>>>>> 8c2b420a (Revert "(chore) Bump Angular to v17 (#1976)")
+  languageName: node
+  linkType: hard
+
+"terser@npm:^5.26.0":
+  version: 5.32.0
+  resolution: "terser@npm:5.32.0"
+  dependencies:
+    "@jridgewell/source-map": "npm:^0.3.3"
+    acorn: "npm:^8.8.2"
+    commander: "npm:^2.20.0"
+    source-map-support: "npm:~0.5.20"
+  bin:
+    terser: bin/terser
+  checksum: 10/b398e37509e64665da233502911f3b32046656a569b1814e0c9944141f0484b3e4d13985faf5c8610dff2d27c2636dd30bab55cab3d8e14080ae273131fb5754
   languageName: node
   linkType: hard
 
@@ -26195,6 +26402,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"update-browserslist-db@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "update-browserslist-db@npm:1.1.0"
+  dependencies:
+    escalade: "npm:^3.1.2"
+    picocolors: "npm:^1.0.1"
+  peerDependencies:
+    browserslist: ">= 4.21.0"
+  bin:
+    update-browserslist-db: cli.js
+  checksum: 10/d70b9efeaf4601aadb1a4f6456a7a5d9118e0063d995866b8e0c5e0cf559482671dab6ce7b079f9536b06758a344fbd83f974b965211e1c6e8d1958540b0c24c
+  languageName: node
+  linkType: hard
+
 "uri-js@npm:^4.2.2":
   version: 4.4.1
   resolution: "uri-js@npm:4.4.1"
@@ -26839,6 +27060,7 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "webpack-dev-server@npm:5.2.2, webpack-dev-server@npm:^5.2.1":
   version: 5.2.2
   resolution: "webpack-dev-server@npm:5.2.2"
@@ -26886,11 +27108,62 @@ __metadata:
 
 "webpack-merge@npm:5.10.0, webpack-merge@npm:^5.0.0":
 =======
+=======
+>>>>>>> 83cfbbb6 ((feat) : initial work to bring appointment model to form engine)
 <<<<<<< HEAD
 "webpack-dev-server@npm:^4.15.1, webpack-dev-server@npm:^4.15.2":
   version: 4.15.2
   resolution: "webpack-dev-server@npm:4.15.2"
 =======
+=======
+"webpack-dev-server@npm:^4.15.2":
+  version: 4.15.2
+  resolution: "webpack-dev-server@npm:4.15.2"
+  dependencies:
+    "@types/bonjour": "npm:^3.5.9"
+    "@types/connect-history-api-fallback": "npm:^1.3.5"
+    "@types/express": "npm:^4.17.13"
+    "@types/serve-index": "npm:^1.9.1"
+    "@types/serve-static": "npm:^1.13.10"
+    "@types/sockjs": "npm:^0.3.33"
+    "@types/ws": "npm:^8.5.5"
+    ansi-html-community: "npm:^0.0.8"
+    bonjour-service: "npm:^1.0.11"
+    chokidar: "npm:^3.5.3"
+    colorette: "npm:^2.0.10"
+    compression: "npm:^1.7.4"
+    connect-history-api-fallback: "npm:^2.0.0"
+    default-gateway: "npm:^6.0.3"
+    express: "npm:^4.17.3"
+    graceful-fs: "npm:^4.2.6"
+    html-entities: "npm:^2.3.2"
+    http-proxy-middleware: "npm:^2.0.3"
+    ipaddr.js: "npm:^2.0.1"
+    launch-editor: "npm:^2.6.0"
+    open: "npm:^8.0.9"
+    p-retry: "npm:^4.5.0"
+    rimraf: "npm:^3.0.2"
+    schema-utils: "npm:^4.0.0"
+    selfsigned: "npm:^2.1.1"
+    serve-index: "npm:^1.9.1"
+    sockjs: "npm:^0.3.24"
+    spdy: "npm:^4.0.2"
+    webpack-dev-middleware: "npm:^5.3.4"
+    ws: "npm:^8.13.0"
+  peerDependencies:
+    webpack: ^4.37.0 || ^5.0.0
+  peerDependenciesMeta:
+    webpack:
+      optional: true
+    webpack-cli:
+      optional: true
+  bin:
+    webpack-dev-server: bin/webpack-dev-server.js
+  checksum: 10/86ca4fb49d2a264243b2284c6027a9a91fd7d47737bbb4096e873be8a3f8493a9577b1535d7cc84de1ee991da7da97686c85788ccac547b0f5cf5c7686aacee9
+  languageName: node
+  linkType: hard
+
+>>>>>>> 3bb43fec ((feat) : initial work to bring appointment model to form engine)
 "webpack-merge@npm:5.9.0":
   version: 5.9.0
   resolution: "webpack-merge@npm:5.9.0"
