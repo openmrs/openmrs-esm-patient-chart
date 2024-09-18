@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenuButton, DocumentIcon, useWorkspaces } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
@@ -36,7 +36,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   return (
     <ActionMenuButton
-      getIcon={(props: Partial<Parameters<typeof DocumentIcon>[0]>) => <DocumentIcon {...props} />}
+      getIcon={(props: ComponentProps<typeof DocumentIcon>) => <DocumentIcon {...props} />}
       label={t('clinicalForms', 'Clinical forms')}
       iconDescription={t('clinicalForms', 'Clinical forms')}
       handler={launchPatientWorkspaceCb}

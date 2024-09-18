@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +57,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
           className={styles.editButton}
           kind="ghost"
           onClick={showCam}
-          renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => <EditIcon {...props} />}
+          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon {...props} />}
           size={responsiveSize}
         >
           <span>{t('edit', 'Edit')}</span>

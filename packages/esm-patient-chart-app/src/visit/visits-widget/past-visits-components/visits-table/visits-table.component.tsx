@@ -1,5 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import classNames from 'classnames';
+import React, { type ComponentProps, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -328,7 +327,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                         selectedVisit?.visitStopDatetime,
                                       );
                                     }}
-                                    renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => (
+                                    renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}
                                   >
@@ -338,7 +337,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 <Button
                                   kind="danger--ghost"
                                   onClick={() => handleDeleteEncounter(selectedVisit?.id, selectedVisit?.form?.display)}
-                                  renderIcon={(props: Partial<Parameters<typeof TrashCanIcon>[0]>) => (
+                                  renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
                                     <TrashCanIcon size={16} {...props} />
                                   )}
                                 >

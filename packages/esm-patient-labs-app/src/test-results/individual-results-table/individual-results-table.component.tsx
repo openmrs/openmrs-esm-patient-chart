@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -121,9 +121,7 @@ const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
                 <Button
                   kind="ghost"
                   className={styles.viewTimeline}
-                  renderIcon={(props: Partial<Parameters<typeof ArrowRightIcon>[0]>) => (
-                    <ArrowRightIcon size={16} {...props} />
-                  )}
+                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
                   iconDescription="view timeline"
                   onClick={() => launchResultsDialog(headerTitle, subRows[0]?.conceptUuid)}
                 >

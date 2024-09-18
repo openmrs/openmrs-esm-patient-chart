@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { type ComponentProps, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { EditIcon, showModal, useLayoutType } from '@openmrs/esm-framework';
@@ -25,7 +25,7 @@ export const EditQueueEntry: React.FC<EditQueueEntryProps> = ({ queueEntry }) =>
       onClick={launchEditPriorityModal}
       size={isTablet ? 'sm' : 'md'}
       iconDescription={t('movePatientToNextService', 'Move patient to next service')}
-      renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => (
+      renderIcon={(props: ComponentProps<typeof EditIcon>) => (
         <EditIcon className={styles.editStatusIcon} size={16} {...props} />
       )}
     >

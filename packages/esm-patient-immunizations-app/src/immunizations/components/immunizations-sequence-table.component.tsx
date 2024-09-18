@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { type ComponentProps, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import {
@@ -48,7 +48,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
         <Button
           kind="ghost"
           iconDescription={t('edit', 'Edit')}
-          renderIcon={(props: Partial<Parameters<typeof EditIcon>[0]>) => <EditIcon size={16} {...props} />}
+          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,

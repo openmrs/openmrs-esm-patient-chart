@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
@@ -216,7 +216,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         ) : (
           <Button
             kind="ghost"
-            renderIcon={(props: Partial<Parameters<typeof ShoppingCartArrowDownIcon>[0]>) => (
+            renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
               <ShoppingCartArrowDownIcon size={16} {...props} />
             )}
             onClick={addToBasket}
@@ -226,7 +226,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         )}
         <Button
           kind="ghost"
-          renderIcon={(props: Partial<Parameters<typeof ArrowRightIcon>[0]>) => <ArrowRightIcon size={16} {...props} />}
+          renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
           onClick={() => openOrderForm(createLabOrder(testType))}
         >
           {t('goToDrugOrderForm', 'Order form')}

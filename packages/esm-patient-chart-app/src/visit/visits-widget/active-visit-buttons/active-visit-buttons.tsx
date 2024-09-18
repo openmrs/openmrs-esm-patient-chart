@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { type ComponentProps, useCallback } from 'react';
 import styles from './active-visit-buttons.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, MenuButton, MenuItem } from '@carbon/react';
@@ -81,7 +81,7 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
         <div className={styles.buttonsContainer}>
           <Button
             kind="ghost"
-            renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add visit note"
             onClick={launchVisitNotesFormWorkspace}
           >
@@ -89,7 +89,7 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
           </Button>
           <Button
             kind="ghost"
-            renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add lab or prescription"
             onClick={launchOrderBasketFormWorkspace}
           >

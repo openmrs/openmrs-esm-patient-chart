@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { type ComponentProps, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -99,7 +99,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             <Button
               size="sm"
               kind="ghost"
-              renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add"
               hasIconOnly
               onClick={() => {
@@ -132,7 +132,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add immunizations"
             onClick={launchImmunizationsForm}
           >

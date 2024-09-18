@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ export default function AddLabOrderWorkspace({
         <div className={styles.backButton}>
           <Button
             kind="ghost"
-            renderIcon={(props: Partial<Parameters<typeof ArrowLeftIcon>[0]>) => <ArrowLeftIcon size={24} {...props} />}
+            renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription="Return to order basket"
             size="sm"
             onClick={cancelOrder}

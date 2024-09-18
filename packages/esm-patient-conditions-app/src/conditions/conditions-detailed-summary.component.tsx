@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -122,7 +122,7 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
-              renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add conditions"
               onClick={launchConditionsForm}
             >

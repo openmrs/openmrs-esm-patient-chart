@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { capitalize } from 'lodash-es';
 import {
@@ -246,7 +246,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
           {showAddButton ?? true ? (
             <Button
               kind="ghost"
-              renderIcon={(props: Partial<Parameters<typeof AddIcon>[0]>) => <AddIcon size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
               onClick={launchAddDrugOrder}
             >
@@ -333,7 +333,7 @@ function InfoTooltip({ orderer }: { orderer: string }) {
       align="top-left"
       direction="top"
       label={orderer}
-      renderIcon={(props: Partial<Parameters<typeof UserIcon>[0]>) => <UserIcon size={16} {...props} />}
+      renderIcon={(props: ComponentProps<typeof UserIcon>) => <UserIcon size={16} {...props} />}
       iconDescription={orderer}
       kind="ghost"
       size="sm"
