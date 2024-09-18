@@ -54,8 +54,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 datePickerType="single"
                 id={dateFieldName}
                 style={{ paddingBottom: '1rem' }}
-                minDate={minDateObj}
-                maxDate={maxDateObj}
                 onChange={([date]) => onChange(date)}
                 value={value}
               >
