@@ -7,6 +7,7 @@
   "cancel": "Cancelar",
   "carePrograms": "Programas de atención",
   "chooseProgram": "Elegir un programa",
+  "chooseStatus": "Choose a program status",
   "completedOn": "Completado el",
   "configurePrograms": "Por favor, configure programas para continuar.",
   "dateCompleted": "Fecha de finalización",
@@ -28,8 +29,10 @@
   "programRequired": "Program is required",
   "programs": "Programas",
   "Programs": "Programas",
+  "programStatus": "Program status",
   "saveAndClose": "Guardar y cerrar",
   "saving": "Saving",
   "seeAll": "Ver todos",
+  "state": "State",
   "status": "Estado"
 }

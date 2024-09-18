@@ -7,6 +7,7 @@
   "cancel": "បោះបង់",
   "carePrograms": "កម្មវិធីថែទាំ",
   "chooseProgram": "ជ្រើសរើសកម្មវិធីមួយ",
+  "chooseStatus": "Choose a program status",
   "completedOn": "បានបញ្ចប់នៅលើ",
   "configurePrograms": "សូមកំណត់រចនាសម្ព័ន្ធកម្មវិធីដើម្បីបន្ត",
   "dateCompleted": "កាលបរិច្ឆេទដែលបានបំពេញ",
@@ -28,8 +29,10 @@
   "programRequired": "Program is required",
   "programs": "កម្មវិធី",
   "Programs": "កម្មវិធី",
+  "programStatus": "Program status",
   "saveAndClose": "រក្សាទុក និងបិទ",
   "saving": "Saving",
   "seeAll": "ឃើញទាំងអស់",
+  "state": "State",
   "status": "ស្ថានភាព"
 }

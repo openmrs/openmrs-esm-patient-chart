@@ -1,26 +1,14 @@
 {
   "address1": "כתובת רשומה 1",
   "address2": "כתובת רשומה 2",
-  "age": "Age",
-  "cancel": "Cancel",
   "city": "עיר",
   "cityVillage": "עיר",
   "country": "מדינה",
   "countyDistrict": "מחוז",
   "district": "מחוז",
   "dob": "DOB",
-  "female": "Female",
-  "male": "Male",
-  "other": "Other",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "מיקוד",
-  "print": "Print",
-  "printError": "Print error",
-  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
-  "printIdentifierSticker": "Print identifier sticker",
-  "printing": "Printing",
-  "sex": "Sex",
   "state": "מדינה",
-  "stateProvince": "מדינה",
-  "unknown": "Unknown"
+  "stateProvince": "מדינה"
 }
