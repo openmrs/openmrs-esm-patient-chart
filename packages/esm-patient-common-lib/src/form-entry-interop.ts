@@ -1,5 +1,9 @@
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
+export const clinicalFormsWorkspace = 'clinical-forms-workspace';
+export const formEntryWorkspace = 'patient-form-entry-workspace';
+export const htmlFormEntryWorkspace = 'patient-html-form-entry-workspace';
+
 interface HtmlFormEntryForm {
   formUuid: string;
   formName: string;
@@ -19,12 +23,15 @@ export function launchFormEntryOrHtmlForms(
   visitStartDatetime?: string,
   visitStopDatetime?: string,
   mutateForms?: () => void,
+  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  formEntryWorkspaceName = formEntryWorkspace,
+  htmlFormEntryWorkspaceName = htmlFormEntryWorkspace,
 ) {
   if (visitUuid) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
 
     if (htmlForm) {
-      launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm);
+      launchHtmlFormEntry(patientUuid, formName, encounterUuid, visitUuid, htmlForm, htmlFormEntryWorkspaceName);
     } else {
       launchFormEntry(
         formUuid,
@@ -37,6 +44,8 @@ export function launchFormEntryOrHtmlForms(
         visitStopDatetime,
         htmlForm,
         mutateForms,
+        clinicalFormsWorkspaceName,
+        formEntryWorkspaceName,
       );
     }
   } else {
@@ -55,9 +64,14 @@ export function launchFormEntry(
   visitStopDatetime?: string,
   htmlForm?: HtmlFormEntryForm,
   mutateForm?: () => void,
+  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  formEntryWorkspaceName = formEntryWorkspace,
 ) {
-  launchPatientWorkspace('patient-form-entry-workspace', {
+  launchPatientWorkspace(formEntryWorkspaceName, {
     workspaceTitle: formName,
+    clinicalFormsWorkspaceName,
+    formEntryWorkspaceName,
+    patientUuid,
     mutateForm,
     formInfo: {
       encounterUuid,
@@ -72,9 +86,17 @@ export function launchFormEntry(
   });
 }
 
-export function launchHtmlFormEntry(formName, encounterUuid, visitUuid, htmlForm) {
-  launchPatientWorkspace('patient-html-form-entry-workspace', {
+export function launchHtmlFormEntry(
+  patientUuid: string,
+  formName: string,
+  encounterUuid: string,
+  visitUuid: string,
+  htmlForm: HtmlFormEntryForm,
+  workspaceName = htmlFormEntryWorkspace,
+) {
+  launchPatientWorkspace(workspaceName, {
     workspaceTitle: formName,
+    patientUuid,
     formInfo: {
       encounterUuid,
       visitUuid,
