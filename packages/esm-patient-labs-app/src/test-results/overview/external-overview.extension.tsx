@@ -1,9 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
-import { navigate } from '@openmrs/esm-framework';
+import { ArrowRightIcon, navigate } from '@openmrs/esm-framework';
 import {
   EmptyState,
   type ExternalOverviewProps,
@@ -65,7 +64,9 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
                     <h4 className={classNames(styles.productiveHeading03, styles.text02)}>{cardTitle}</h4>
                     <Button
                       kind="ghost"
-                      renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                      renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (
+                        <ArrowRightIcon size={16} {...props} />
+                      )}
                       iconDescription="See all results"
                       onClick={handleSeeAll}
                     >

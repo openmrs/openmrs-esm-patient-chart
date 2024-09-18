@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pen } from '@carbon/react/icons';
+import { ActionMenuButton, PenIcon } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
-import { ActionMenuButton } from '@openmrs/esm-framework';
 
 const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -11,7 +10,7 @@ const VisitNoteActionButton: React.FC = () => {
 
   return (
     <ActionMenuButton
-      getIcon={(props) => <Pen {...props} />}
+      getIcon={(props: ComponentProps<typeof PenIcon>) => <PenIcon {...props} />}
       label={t('visitNote', 'Visit note')}
       iconDescription={t('note', 'Note')}
       handler={launchVisitNotesWorkspace}
