@@ -823,10 +823,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet
-          className={classNames({
+          className={classNames(styles.buttonSet, {
             [styles.tablet]: isTablet,
             [styles.desktop]: !isTablet,
-            [styles.buttonSet]: true,
           })}
         >
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
