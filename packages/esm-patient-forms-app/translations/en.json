@@ -1,13 +1,11 @@
 {
   "clinicalForm": "Clinical Form",
   "clinicalForms": "Clinical forms",
-  "closeHtmlFormWarning": "Please use the Save or Cancel button on the form to close the form.",
   "editForm": "Edit form",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
   "formSearchHint": "Try searching for the form using an alternative name or keyword",
   "homeOverviewCardView": "View",
-  "ignoreWarning": "Ignore Warning",
   "lastCompleted": "Last completed",
   "never": "Never",
   "noFormsToDisplay": "There are no forms to display.",
@@ -23,6 +21,5 @@
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
   "searchForAForm": "Search for a form",
-  "searchThisList": "Search this list",
-  "warning": "Warning"
+  "searchThisList": "Search this list"
 }
