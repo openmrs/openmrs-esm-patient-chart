@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import {
@@ -16,12 +16,13 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
 import {
+  AddIcon,
+  type ConfigObject,
+  EditIcon,
   formatDate,
   formatDatetime,
   useConfig,
-  type ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
@@ -117,7 +118,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             <Button
               disabled={isEnrolledInAllPrograms}
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription={t('addPrograms', 'Add programs')}
               onClick={launchProgramsForm}
             >
@@ -186,7 +187,7 @@ function ProgramEditButton({ programEnrollmentId, t }: ProgramEditButtonProps) {
     <Button
       aria-label="edit program"
       kind="ghost"
-      renderIcon={(props) => <Edit size={16} {...props} />}
+      renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
       iconDescription={t('editProgram', 'Edit Program')}
       onClick={launchEditProgramsForm}
       hasIconOnly

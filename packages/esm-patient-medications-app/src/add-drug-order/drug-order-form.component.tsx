@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
@@ -21,12 +21,11 @@ import {
   TextInput,
   Toggle,
 } from '@carbon/react';
-import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { type Control, Controller, useController, useForm } from 'react-hook-form';
+import { Subtract } from '@carbon/react/icons';
 import {
+  AddIcon,
   age,
+  ArrowLeftIcon,
   ExtensionSlot,
   formatDate,
   getPatientName,
@@ -35,9 +34,13 @@ import {
   useLayoutType,
   usePatient,
 } from '@openmrs/esm-framework';
+import { type Control, Controller, useController, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import type {
+  CommonMedicationValueCoded,
   DosingUnit,
   DrugOrderBasketItem,
   DurationUnit,
@@ -45,7 +48,7 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { useRequireOutpatientQuantity } from '../api/api';
+import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
@@ -407,7 +410,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             <div className={styles.backButton}>
               <Button
                 kind="ghost"
-                renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+                renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
                 iconDescription="Return to order basket"
                 size="sm"
                 onClick={onCancel}
@@ -487,10 +490,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         shouldFilterItem={filterItemsByName}
-                        items={drugDosingUnits}
                         placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                         titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                        itemToString={(item) => item?.value}
+                        items={drugDosingUnits}
+                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
                         handleAfterChange={handleUnitAfterChange}
                       />
                     </InputWrapper>
@@ -503,7 +506,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         control={control}
                         id="editRoute"
                         items={drugRoutes}
-                        itemToString={(item) => item?.value}
+                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
                         name="route"
                         placeholder={t('editRouteComboBoxTitle', 'Route')}
                         shouldFilterItem={filterItemsByName}
@@ -525,7 +528,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         shouldFilterItem={filterItemsBySynonymNames}
                         placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                         titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                        itemToString={(item) => item?.value}
+                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
                       />
                     </InputWrapper>
                   </Column>
@@ -651,7 +654,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     id="durationUnitPlaceholder"
                     titleText={t('durationUnit', 'Duration unit')}
                     items={durationUnits}
-                    itemToString={(item) => item?.value}
+                    itemToString={(item: CommonMedicationValueCoded) => item?.value}
                     placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
                     shouldFilterItem={filterItemsByName}
                   />
@@ -683,7 +686,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     control={control}
                     id="dispensingUnits"
                     items={drugDispensingUnits}
-                    itemToString={(item) => item?.value}
+                    itemToString={(item: CommonMedicationValueCoded) => item?.value}
                     name="quantityUnits"
                     placeholder={t('editDispensingUnit', 'Quantity unit')}
                     shouldFilterItem={filterItemsByName}
@@ -766,10 +769,13 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
     field: { onBlur, onChange, value, ref },
   } = useController<MedicationOrderFormData>({ name: name, control });
 
-  const handleChange = (e) => {
-    const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
-    onChange(val ? parseInt(val) : 0);
-  };
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
+      onChange(val ? parseInt(val) : 0);
+    },
+    [onChange],
+  );
 
   const increment = () => {
     setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
@@ -793,22 +799,31 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
           ref={ref}
           {...inputProps}
         />
-        <Button hasIconOnly renderIcon={Add} onClick={increment} iconDescription={t('increment', 'Increment')} />
+        <Button hasIconOnly renderIcon={AddIcon} onClick={increment} iconDescription={t('increment', 'Increment')} />
       </div>{' '}
     </div>
   );
 };
 
-interface ControlledFieldInputProps {
+type MedicationOrderFormValue = MedicationOrderFormData[keyof MedicationOrderFormData];
+
+interface BaseControlledFieldInputProps {
   name: keyof MedicationOrderFormData;
   type: 'toggle' | 'checkbox' | 'number' | 'textArea' | 'textInput' | 'comboBox';
-  handleAfterChange?: (
-    newValue: MedicationOrderFormData[keyof MedicationOrderFormData],
-    prevValue: MedicationOrderFormData[keyof MedicationOrderFormData],
-  ) => void;
+  handleAfterChange?: (newValue: MedicationOrderFormValue, prevValue: MedicationOrderFormValue) => void;
   control: Control<MedicationOrderFormData>;
-  [x: string]: any;
+  getValues?: (name: keyof MedicationOrderFormData) => MedicationOrderFormValue;
 }
+
+type ControlledFieldInputProps = Omit<BaseControlledFieldInputProps, 'type'> &
+  (
+    | ({ type: 'toggle' } & ComponentProps<typeof Toggle>)
+    | ({ type: 'checkbox' } & ComponentProps<typeof Checkbox>)
+    | ({ type: 'number' } & ComponentProps<typeof NumberInput>)
+    | ({ type: 'textArea' } & ComponentProps<typeof TextArea>)
+    | ({ type: 'textInput' } & ComponentProps<typeof TextInput>)
+    | ({ type: 'comboBox' } & ComponentProps<typeof ComboBox>)
+  );
 
 const ControlledFieldInput = ({
   name,
@@ -816,8 +831,6 @@ const ControlledFieldInput = ({
   control,
   getValues,
   handleAfterChange,
-  optionsWithAbbreviations,
-  orderFrequencies,
   ...restProps
 }: ControlledFieldInputProps) => {
   const {
@@ -830,7 +843,7 @@ const ControlledFieldInput = ({
   });
 
   const handleChange = useCallback(
-    (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
+    (newValue: MedicationOrderFormValue) => {
       const prevValue = getValues?.(name);
       onChange(newValue);
       handleAfterChange?.(newValue, prevValue);
@@ -839,20 +852,17 @@ const ControlledFieldInput = ({
   );
 
   const component = useMemo(() => {
-    if (type === 'toggle')
+    if (type === 'toggle') {
       return (
-        <Toggle
-          toggled={value}
-          onChange={() => {} /* Required by the typings, but we don't need it. */}
-          onToggle={(value) => handleChange(value)}
-          {...restProps}
-        />
+        <Toggle toggled={value} onToggle={(value: MedicationOrderFormValue) => handleChange(value)} {...restProps} />
       );
+    }
 
-    if (type === 'checkbox')
-      return <Checkbox checked={value} onChange={(e, { checked, id }) => handleChange(checked)} {...restProps} />;
+    if (type === 'checkbox') {
+      return <Checkbox checked={value} onChange={(e, { checked }) => handleChange(checked)} {...restProps} />;
+    }
 
-    if (type === 'number')
+    if (type === 'number') {
       return (
         <NumberInput
           className={fieldErrorStyles}
@@ -867,32 +877,35 @@ const ControlledFieldInput = ({
           {...restProps}
         />
       );
+    }
 
-    if (type === 'textArea')
+    if (type === 'textArea') {
       return (
         <TextArea
           className={fieldErrorStyles}
           onBlur={onBlur}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleChange(e.target.value)}
           ref={ref}
           value={value}
           {...restProps}
         />
       );
+    }
 
-    if (type === 'textInput')
+    if (type === 'textInput') {
       return (
         <TextInput
           className={fieldErrorStyles}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
           value={value}
           {...restProps}
         />
       );
+    }
 
-    if (type === 'comboBox')
+    if (type === 'comboBox') {
       return (
         <ComboBox
           className={fieldErrorStyles}
@@ -903,6 +916,7 @@ const ControlledFieldInput = ({
           {...restProps}
         />
       );
+    }
 
     return null;
   }, [type, value, restProps, fieldErrorStyles, onBlur, ref, handleChange]);

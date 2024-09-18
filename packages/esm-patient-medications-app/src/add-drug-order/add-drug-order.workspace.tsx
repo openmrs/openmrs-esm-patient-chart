@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
-import { useSession } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
@@ -81,7 +80,7 @@ export default function AddDrugOrderWorkspace({
             iconDescription="Return to order basket"
             kind="ghost"
             onClick={cancelDrugOrder}
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
             size="sm"
           >
             <span>{t('backToOrderBasket', 'Back to order basket')}</span>

@@ -1,5 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import classNames from 'classnames';
+import React, { type ComponentProps, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -24,14 +23,15 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit, TrashCan } from '@carbon/react/icons';
 import {
+  EditIcon,
   formatDatetime,
   getConfig,
   isDesktop,
   parseDate,
   showModal,
   showSnackbar,
+  TrashCanIcon,
   useLayoutType,
   usePagination,
   useSession,
@@ -327,7 +327,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                         selectedVisit?.visitStopDatetime,
                                       );
                                     }}
-                                    renderIcon={(props) => <Edit size={16} {...props} />}
+                                    renderIcon={(props: ComponentProps<typeof EditIcon>) => (
+                                      <EditIcon size={16} {...props} />
+                                    )}
                                   >
                                     {t('editThisEncounter', 'Edit this encounter')}
                                   </Button>
@@ -335,7 +337,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 <Button
                                   kind="danger--ghost"
                                   onClick={() => handleDeleteEncounter(selectedVisit?.id, selectedVisit?.form?.display)}
-                                  renderIcon={(props) => <TrashCan size={16} {...props} />}
+                                  renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
+                                    <TrashCanIcon size={16} {...props} />
+                                  )}
                                 >
                                   {t('deleteThisEncounter', 'Delete this encounter')}
                                 </Button>

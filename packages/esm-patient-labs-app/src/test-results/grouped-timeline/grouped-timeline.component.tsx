@@ -2,14 +2,16 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, showModal, usePatient } from '@openmrs/esm-framework';
+import { showModal } from '@openmrs/esm-framework';
 import { Grid, ShadowBox } from '../panel-timeline/helpers';
-import { makeThrottled, testResultsBasePath } from '../helpers';
+import { makeThrottled } from '../helpers';
 import type {
   DateHeaderGridProps,
   PanelNameCornerProps,
   TimelineCellProps,
   DataRowsProps,
+  NewRowStartCellProps,
+  TimelineDataGroupProps,
 } from './grouped-timeline-types';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.scss';
@@ -28,16 +30,23 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
   <TimeSlots className={classNames(styles.cornerGridElement, { [styles.shadow]: showShadow })}>{panelName}</TimeSlots>
 );
 
-const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
-  const { patientUuid } = usePatient();
-  const launchResultsDialog = (patientUuid: string, title: string, testUuid: string) => {
+const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
+  title,
+  range,
+  units,
+  conceptUuid,
+  patientUuid,
+  shadow = false,
+  isString = false,
+}) => {
+  const launchResultsDialog = useCallback(() => {
     const dispose = showModal('timeline-results-modal', {
       closeDeleteModal: () => dispose(),
       patientUuid,
-      testUuid,
+      testUuid: conceptUuid,
       title,
     });
-  };
+  }, [patientUuid, conceptUuid, title]);
 
   return (
     <div
@@ -48,10 +57,7 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isS
     >
       <span className={styles['trendline-link']}>
         {!isString ? (
-          <span
-            className={styles['trendline-link-view']}
-            onClick={() => launchResultsDialog(patientUuid, title, conceptUuid)}
-          >
+          <span className={styles['trendline-link-view']} onClick={launchResultsDialog}>
             {title}
           </span>
         ) : (
@@ -100,7 +106,7 @@ const GridItems = React.memo<{
   </>
 ));
 
-const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => {
+const DataRows: React.FC<DataRowsProps> = ({ patientUuid, timeColumns, rowData, sortedTimes, showShadow }) => {
   return (
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
@@ -116,6 +122,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
                 title: row.display,
                 shadow: showShadow,
                 conceptUuid: row.conceptUuid,
+                patientUuid,
                 isString,
               }}
             />
@@ -193,7 +200,16 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
   );
 };
 
-const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, setPanelName, groupNumber }) => {
+const TimelineDataGroup: React.FC<TimelineDataGroupProps> = ({
+  patientUuid,
+  parent,
+  subRows,
+  xScroll,
+  setXScroll,
+  panelName,
+  setPanelName,
+  groupNumber,
+}) => {
   const { timelineData } = useContext(FilterContext);
   const {
     data: {
@@ -205,25 +221,25 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   const titleRef = useRef();
 
   const el: HTMLElement | null = ref.current;
-  if (groupNumber === 1 && panelName === '') {
-    setPanelName(parent.display);
-  }
-
   if (el) {
     el.scrollLeft = xScroll;
   }
 
-  const handleScroll = makeThrottled((e) => {
-    setXScroll(e.target.scrollLeft);
-  }, 200);
+  if (groupNumber === 1 && panelName === '') {
+    setPanelName(parent.display);
+  }
 
   useEffect(() => {
+    const handleScroll = makeThrottled((e) => {
+      setXScroll(e.target.scrollLeft);
+    }, 200);
+
     const div: HTMLElement | null = ref.current;
     if (div) {
       div.addEventListener('scroll', handleScroll);
       return () => div.removeEventListener('scroll', handleScroll);
     }
-  }, [handleScroll]);
+  }, [setXScroll]);
 
   return (
     <>
@@ -236,6 +252,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
         <div className={styles.gridContainer} ref={ref}>
           <DataRows
             {...{
+              patientUuid,
               timeColumns,
               rowData: subRows,
               sortedTimes,
@@ -250,7 +267,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   );
 };
 
-export const GroupedTimeline = () => {
+export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
@@ -305,6 +322,7 @@ export const GroupedTimeline = () => {
               return (
                 subRows?.length > 0 && (
                   <TimelineDataGroup
+                    patientUuid={patientUuid}
                     parent={parent}
                     subRows={subRows}
                     key={index}

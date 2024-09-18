@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { ArrowRightIcon, useLayoutType } from '@openmrs/esm-framework';
+import styles from './recent-overview.scss';
 import useOverviewData from './useOverviewData';
 import CommonOverview from './common-overview.component';
-import { Button, DataTableSkeleton } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
-import { useLayoutType } from '@openmrs/esm-framework';
-import styles from './recent-overview.scss';
 
 const RECENT_COUNT = 5;
 
@@ -37,7 +36,9 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
                       kind="ghost"
                       onClick={() => navigateToResults(basePath)}
                       iconDescription="See all results"
-                      renderIcon={(props) => <ArrowRight size={24} {...props} />}
+                      renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (
+                        <ArrowRightIcon size={24} {...props} />
+                      )}
                     >
                       {t('seeAllResults', 'See all results')}
                     </Button>
@@ -47,8 +48,9 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
                       patientUuid,
                       overviewData: overviewData.slice(0, RECENT_COUNT),
                       insertSeparator: true,
-                      openTimeline: (panelUuid) => navigateToTimeline(basePath, panelUuid),
-                      openTrendline: (panelUuid, testUuid) => navigateToTrendline(basePath, panelUuid, testUuid),
+                      openTimeline: (panelUuid: string) => navigateToTimeline(basePath, panelUuid),
+                      openTrendline: (panelUuid: string, testUuid: string) =>
+                        navigateToTrendline(basePath, panelUuid, testUuid),
                     }}
                   />
                 </div>

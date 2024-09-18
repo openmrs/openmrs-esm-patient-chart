@@ -1,9 +1,17 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
-import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
-import { closeWorkspace, useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { ShoppingCartArrowUp } from '@carbon/react/icons';
+import {
+  ArrowRightIcon,
+  closeWorkspace,
+  ShoppingCartArrowDownIcon,
+  useDebounce,
+  useLayoutType,
+  useSession,
+  ResponsiveWrapper,
+} from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
@@ -208,7 +216,9 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         ) : (
           <Button
             kind="ghost"
-            renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+              <ShoppingCartArrowDownIcon size={16} {...props} />
+            )}
             onClick={addToBasket}
           >
             {t('directlyAddToBasket', 'Add to basket')}
@@ -216,7 +226,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         )}
         <Button
           kind="ghost"
-          renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
           onClick={() => openOrderForm(createLabOrder(testType))}
         >
           {t('goToDrugOrderForm', 'Order form')}

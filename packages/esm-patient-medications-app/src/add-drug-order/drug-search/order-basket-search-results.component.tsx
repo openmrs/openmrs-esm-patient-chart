@@ -1,10 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
+import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { closeWorkspace, useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
+import {
+  ArrowRightIcon,
+  closeWorkspace,
+  ShoppingCartArrowDownIcon,
+  useConfig,
+  useLayoutType,
+  usePatient,
+  UserHasAccess,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
 import { ordersEqual } from './helpers';
@@ -199,7 +207,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 {drugAlreadyInBasket ? (
                   <Button
                     kind="danger--ghost"
-                    renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
+                      <ShoppingCartArrowUp size={16} {...props} />
+                    )}
                     onClick={() => removeFromBasket(orderItem)}
                   >
                     {t('removeFromBasket', 'Remove from basket')}
@@ -207,7 +217,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 ) : (
                   <Button
                     kind="ghost"
-                    renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                      <ShoppingCartArrowDownIcon size={16} {...props} />
+                    )}
                     onClick={() => addToBasket(orderItem)}
                     disabled={drugAlreadyPrescribed}
                   >
@@ -216,7 +228,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 )}
                 <Button
                   kind="ghost"
-                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
                   onClick={() => openOrderForm(orderItem)}
                   disabled={drugAlreadyPrescribed}
                 >
