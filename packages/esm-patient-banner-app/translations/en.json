@@ -13,5 +13,6 @@
   "patientNameWithSeparator": "Patient name:",
   "postalCode": "Postal code",
   "state": "State",
-  "stateProvince": "State"
+  "stateProvince": "State",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }
