@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/_vars' as *;
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
@@ -9,6 +10,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid $brand-01;
+  margin-bottom: layout.$spacing-05;
 }
 
 .row {
@@ -56,13 +59,17 @@
 }
 
 .strong {
-  @include type.type-style('heading-06');
+  @include type.type-style('heading-04');
   font-weight: 700;
-  margin-right: layout.$spacing-03;
+  margin-inline-end: layout.$spacing-03;
 }
 
 .patientDetail {
-  @include type.type-style('heading-05');
+  @include type.type-style('heading-03');
+}
+
+.implementationLogo {
+  width: 40%;
 }
 
 @media print {

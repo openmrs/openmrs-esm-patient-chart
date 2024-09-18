@@ -114,8 +114,14 @@ const PrintComponent = ({ patient }: PrintComponentProps) => {
   return (
     <div className={styles.stickerContainer}>
       <div className={styles.documentHeader}>
-        <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
-        <ImplementationLogo />
+        {printPatientSticker?.header?.showBarcode && (
+          <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
+        )}
+        {printPatientSticker?.header?.showLogo && (
+          <div className={styles.implementationLogo}>
+            <ImplementationLogo />
+          </div>
+        )}
       </div>
       {printPatientSticker.fields.map((field) => {
         const Component = getPatientField(field);
@@ -130,7 +136,7 @@ const ImplementationLogo: React.FC = () => {
   const { printPatientSticker } = useConfig<ConfigObject>();
 
   return printPatientSticker?.header?.logo ? (
-    <span>{printPatientSticker?.header?.logo}</span>
+    <img alt="implementation-logo" src={printPatientSticker?.header?.logo} />
   ) : (
     <svg role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
       <path

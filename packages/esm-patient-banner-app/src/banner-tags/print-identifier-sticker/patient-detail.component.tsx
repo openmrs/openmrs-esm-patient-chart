@@ -1,5 +1,5 @@
 import React from 'react';
-import { age, getCoreTranslation, getPatientName, useConfig } from '@openmrs/esm-framework';
+import { age, type CoreTranslationKey, getCoreTranslation, getPatientName, useConfig } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { type ConfigObject } from '../../config-schema';
 import { useTranslation } from 'react-i18next';
@@ -89,5 +89,59 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
         </div>
       ))}
     </div>
+  );
+};
+
+export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
+  const { t } = useTranslation();
+
+  if (patient.telecom.length == 0) {
+    return null;
+  }
+
+  return (
+    <div>
+      <span>
+        <strong className={styles.strong}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</strong>
+      </span>
+      <span className={styles.patientDetail}>{patient.telecom[0]?.value}</span>
+    </div>
+  );
+};
+
+export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
+  const address = patient?.address?.find((a) => a.use === 'home');
+  const getAddressKey = (url: string) => url.split('#')[1];
+
+  return (
+    <>
+      {address ? (
+        Object.entries(address)
+          .filter(([key]) => key !== 'id' && key !== 'use')
+          .map(([key, value]) =>
+            key === 'extension' ? (
+              address.extension?.[0]?.extension?.map((add, i) => (
+                <div key={`address-${key}-${i}`}>
+                  <span className={styles.strong}>
+                    {getCoreTranslation(
+                      getAddressKey(add.url) as CoreTranslationKey,
+                      getAddressKey(add.url) as CoreTranslationKey,
+                    )}
+                    :
+                  </span>
+                  <span className={styles.patientDetail}>{add.valueString}</span>
+                </div>
+              ))
+            ) : (
+              <div key={`address-${key}`}>
+                <span className={styles.strong}>{getCoreTranslation(key as CoreTranslationKey, key)}:</span>
+                <span className={styles.patientDetail}>{value}</span>
+              </div>
+            ),
+          )
+      ) : (
+        <li>--</li>
+      )}
+    </>
   );
 };

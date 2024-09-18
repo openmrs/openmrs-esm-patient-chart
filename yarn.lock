@@ -18185,6 +18185,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsbarcode@npm:^3.8.0":
+  version: 3.11.6
+  resolution: "jsbarcode@npm:3.11.6"
+  checksum: 10/4dcf9f675e799741c89fa4941a97147a1c01575d792a186d8f1f8ad6b949d9d78fa658b0c9321ec1fa2c9ec0aa9784ac1181632357585114ecd74e9a3a08c979
+  languageName: node
+  linkType: hard
+
 "jsbn@npm:1.1.0":
   version: 1.1.0
   resolution: "jsbn@npm:1.1.0"

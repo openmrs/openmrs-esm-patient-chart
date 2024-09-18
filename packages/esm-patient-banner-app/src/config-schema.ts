@@ -22,28 +22,28 @@ export const configSchema = {
     header: {
       _type: Type.Object,
       _description: 'The header to display on the patient sticker',
-      _elements: {
-        showBarcode: {
-          _type: Type.Boolean,
-          _description: 'Whether to display a barcode on the patient sticker',
-          _default: true,
-        },
-        showLogo: {
-          _type: Type.Boolean,
-          _description: 'Whether to display a logo on the patient sticker',
-          _default: true,
-        },
-        logo: {
-          _type: Type.String,
-          _description: 'The URL of the logo to display in the patient sticker',
-          _default: '',
-        },
+      showBarcode: {
+        _type: Type.Boolean,
+        _description: 'Whether to display a barcode on the patient sticker',
+      },
+      showLogo: {
+        _type: Type.Boolean,
+        _description: 'Whether to display a logo on the patient sticker',
+      },
+      logo: {
+        _type: Type.String,
+        _description: 'The URL of the logo to display in the patient sticker',
+      },
+      _default: {
+        showBarcode: true,
+        showLogo: true,
+        logo: '',
       },
     },
     fields: {
       _type: Type.Array,
       _description: 'Patient demographics to include in the patient sticker printout',
-      _default: ['name', 'dob', 'gender', 'identifier', 'age'],
+      _default: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
     },
     pageSize: {
       _type: Type.String,
@@ -68,7 +68,7 @@ export const configSchema = {
   },
 };
 
-export type AllowedPatientFields = 'name' | 'dob' | 'gender' | 'identifier' | 'age';
+export type AllowedPatientFields = 'name' | 'dob' | 'gender' | 'identifier' | 'age' | 'contact' | 'address';
 
 export interface ConfigObject {
   contactAttributeTypes: Array<string>;

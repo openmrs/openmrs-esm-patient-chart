@@ -1,7 +1,9 @@
 import { type Options } from 'react-barcode';
 import { type AllowedPatientFields } from '../../config-schema';
 import {
+  PatientAddress,
   PatientAge,
+  PatientContact,
   type PatientDetailProps,
   PatientDob,
   PatientGender,
@@ -32,6 +34,10 @@ export function getPatientField(field: AllowedPatientFields): React.FC<PatientDe
       return PatientGender;
     case 'identifier':
       return PatientIdentifier;
+    case 'contact':
+      return PatientContact;
+    case 'address':
+      return PatientAddress;
     default:
       console.error(`Invalid patient field: ${field}`);
       return null;
