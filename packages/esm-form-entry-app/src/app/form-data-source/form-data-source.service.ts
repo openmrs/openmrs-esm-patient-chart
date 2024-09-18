@@ -19,6 +19,7 @@ import type {
   Provider,
   Questions,
 } from '../types';
+import { AppointmentService } from '../openmrs-api/appointment-resource.service';
 
 @Injectable()
 export class FormDataSourceService {
@@ -27,6 +28,7 @@ export class FormDataSourceService {
     private locationResourceService: LocationResourceService,
     private conceptResourceService: ConceptResourceService,
     private localStorageService: LocalStorageService,
+    private appointmentService: AppointmentService,
   ) {}
 
   public getDataSources(formSchema: FormSchema) {
@@ -51,9 +53,17 @@ export class FormDataSourceService {
         resolveSelectedValue: this.resolveConcept.bind(this),
         searchOptions: this.findDiagnoses.bind(this),
       },
+      services: {
+        resolveSelectedValue: this.resolveAppointmentService.bind(this),
+        searchOptions: this.findAppointmentServices.bind(this),
+      },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
       recentObs: this.getMostRecentObsDataSource(formSchema),
     };
+  }
+
+  private resolveAppointmentService(uuid: string) {
+    return this.appointmentService.fetchAppointmentServiceByUuid(uuid);
   }
 
   private getWhoStagingCriteriaDataSource() {
@@ -238,6 +248,17 @@ export class FormDataSourceService {
     return this.locationResourceService.getLocationByUuid(uuid).pipe(map(this.mapLocation));
   }
 
+  public getAppointmentServices(searchText: string) {
+    return this.appointmentService.fetchAllAppointmentServices().pipe(map((services) => this.mapService(services)));
+  }
+
+  public mapService(service) {
+    return {
+      label: service.name,
+      value: service.uuid,
+    };
+  }
+
   private mapLocation(location?: Location) {
     return (
       location && {
@@ -306,6 +327,12 @@ export class FormDataSourceService {
             .map(this.mapConcept),
         ),
       );
+  }
+
+  public findAppointmentServices(searchText: string) {
+    return this.appointmentService
+      .fetchAllAppointmentServices(searchText)
+      .pipe(map((services) => services.map(this.mapService)));
   }
 
   public mapConcept(concept?: Concept) {

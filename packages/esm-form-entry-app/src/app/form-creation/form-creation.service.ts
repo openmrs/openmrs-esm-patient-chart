@@ -1,4 +1,11 @@
-import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
+import {
+  AppointmentAdapter,
+  DataSources,
+  EncounterAdapter,
+  Form,
+  FormFactory,
+  PatientIdentifierAdapter,
+} from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
@@ -8,6 +15,8 @@ import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.serv
 import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
 import { Session } from '@openmrs/esm-framework';
 import { isFunction } from 'lodash-es';
+import { AppointmentService } from '../openmrs-api/appointment-resource.service';
+import dayjs from 'dayjs';
 
 /**
  * Data required for creating a {@link Form} instance.
@@ -67,6 +76,8 @@ export class FormCreationService {
     private readonly configResourceService: ConfigResourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private readonly patientIdentifierAdapter: PatientIdentifierAdapter,
+    private readonly appointmentService: AppointmentService,
+    private readonly appointmentAdapter: AppointmentAdapter,
   ) {}
 
   /**
@@ -89,6 +100,7 @@ export class FormCreationService {
     if (encounter) {
       const encounterUuid = encounter.uuid;
       this.populateEncounterForEditing(form, createFormParams);
+      this.populateAppointmentForEditing(form, createFormParams);
       form.valueProcessingInfo.encounterUuid = encounterUuid;
     } else {
       const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
@@ -130,6 +142,7 @@ export class FormCreationService {
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.session.sessionLocation);
+    this.dataSources.registerDataSource('services', dataSources.services);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
     const config = this.configResourceService.getConfig();
@@ -274,6 +287,17 @@ export class FormCreationService {
     if (encounterLocation.length > 0 && session?.sessionLocation) {
       encounterLocation[0].control.setValue(session.sessionLocation.uuid);
     }
+    // Appointment location.
+    const appointmentLocation = form.searchNodeByQuestionId('appointmentLocation');
+    if (appointmentLocation.length > 0 && session?.sessionLocation) {
+      appointmentLocation[0].control.setValue(session.sessionLocation.uuid);
+    }
+    // Appointment date issued.
+    const dateAppointmentIssued = form.searchNodeByQuestionId('dateAppointmentIssued');
+    form.valueProcessingInfo.dateAppointmentIssued = currentDate;
+    if (dateAppointmentIssued.length > 0) {
+      dateAppointmentIssued[0].control.setValue(currentDate);
+    }
 
     // Provider.
     const encounterProvider = form.searchNodeByQuestionId('provider', 'encounterProvider');
@@ -338,6 +362,24 @@ export class FormCreationService {
     if (encounter) {
       this.encounterAdapter.populateForm(form, encounter);
     }
+  }
+
+  private populateAppointmentForEditing(form: Form, createFormParams: CreateFormParams) {
+    const { encounter } = createFormParams;
+
+    this.appointmentService
+      .fetchPatientAppointmentsFromDate(encounter.patient.uuid, encounter?.encounterDatetime)
+      .subscribe((appointments) => {
+        const encounterDateCreated = dayjs(encounter.auditInfo.dateCreated).toISOString();
+        const appointmentIssuedOnThisEncounter = appointments.find((appointment) => {
+          const appointmentDateCreated = dayjs(appointment.dateCreated).toISOString();
+          return encounterDateCreated === appointmentDateCreated;
+        });
+        if (appointmentIssuedOnThisEncounter) {
+          form.valueProcessingInfo.appointmentUuid = appointmentIssuedOnThisEncounter.uuid;
+          this.appointmentAdapter.populateForm(form, appointmentIssuedOnThisEncounter);
+        }
+      });
   }
 }
 

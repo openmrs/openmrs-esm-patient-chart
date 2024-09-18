@@ -70,7 +70,8 @@ export class EncounterResourceService {
       'location:ref,encounterType:ref,' +
       'encounterProviders:(uuid,display,provider:(uuid,display)),orders:full,' +
       'obs:(uuid,obsDatetime,formFieldNamespace,formFieldPath,concept:(uuid,uuid,name:(display)),value:ref,groupMembers),' +
-      'diagnoses:(uuid,diagnosis,certainty,rank,voided,display))';
+      'diagnoses:(uuid,diagnosis,certainty,rank,voided,display),'+
+      'auditInfo:(dateCreated))';
     const params = new HttpParams().set('v', customDefaultRep);
     const url = this.getUrl() + 'encounter/' + uuid;
     return this.http.get<Encounter>(url, { params });

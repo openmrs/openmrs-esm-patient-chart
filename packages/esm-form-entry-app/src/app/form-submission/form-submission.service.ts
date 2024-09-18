@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { EncounterAdapter, PersonAttribuAdapter, Form } from '@openmrs/ngx-formentry';
+import { catchError, mergeMap, switchMap } from 'rxjs/operators';
+import { EncounterAdapter, PersonAttribuAdapter, Form, AppointmentAdapter } from '@openmrs/ngx-formentry';
 import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
@@ -22,6 +22,8 @@ import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 import { PatientResourceService } from '../openmrs-api/patient-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
 import { TranslateService } from '@ngx-translate/core';
+import { AppointmentService } from '../openmrs-api/appointment-resource.service';
+import { start } from 'single-spa';
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
  */
@@ -44,6 +46,8 @@ export class FormSubmissionService {
     private readonly patientResourceService: PatientResourceService,
     private readonly configResourceService: ConfigResourceService,
     private readonly translateService: TranslateService,
+    private readonly appointmentAdapter: AppointmentAdapter,
+    private readonly appointmentService: AppointmentService,
   ) {}
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
@@ -58,14 +62,14 @@ export class FormSubmissionService {
         if (isOfflineSubmission) {
           this.deepClearInitialNodeValues(form.rootNode);
         }
-
         const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
         const personUpdate = this.buildPersonUpdatePayload(form);
         const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
-
+        const appointmentPayload = this.appointmentAdapter.generateFormPayload(form);
+        
         return isOfflineSubmission
           ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
-          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload);
+          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload, appointmentPayload);
       }),
     );
   }
@@ -118,11 +122,13 @@ export class FormSubmissionService {
     encounterCreate: EncounterCreate,
     personUpdate: PersonUpdate,
     identifierPayload: IdentifierPayload,
+    appointmentPayload: any,
   ): Observable<FormSubmissionResult> {
     return forkJoin({
       encounter: this.submitEncounter(encounterCreate),
       person: this.submitPersonUpdate(personUpdate),
       identifiers: this.submitPatientIdentifier(identifierPayload),
+      appointment: this.submitAppointment(appointmentPayload, encounterCreate),
     });
   }
 
@@ -247,6 +253,14 @@ export class FormSubmissionService {
     return of(undefined);
   }
 
+  private submitAppointment(appointmentPayload: any, encounterToCreate: EncounterCreate): Observable<any> {
+    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+    const { ...restOfPayload } = appointmentPayload;
+    const payloadToSave = { ...restOfPayload, patientUuid: patientUuid };
+
+    return this.appointmentService.createAppointment(payloadToSave);
+  }
+
   // TODO: Should this function be extracted?
   // This type of general HTTP/REST API error handling is most likely also useful elsewhere.
   private throwUserFriendlyError(error: HttpErrorResponse): never {
@@ -267,7 +281,6 @@ export class FormSubmissionService {
     const {
       error: { fieldErrors, globalErrors, message, code },
     } = errorObject ?? {};
-
     if (fieldErrors) {
       return Object.values(fieldErrors)
         .flatMap((errors) => errors.map((error) => error.message))
