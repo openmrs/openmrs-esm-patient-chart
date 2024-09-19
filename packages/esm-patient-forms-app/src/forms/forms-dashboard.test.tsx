@@ -44,9 +44,6 @@ describe('FormsDashboard', () => {
         closeWorkspaceWithSavedChanges={jest.fn()}
         patientUuid=""
         setTitle={jest.fn()}
-        setCancelTitle={jest.fn()}
-        setCancelMessage={jest.fn()}
-        setCancelConfirmText={jest.fn()}
       />,
     );
 
