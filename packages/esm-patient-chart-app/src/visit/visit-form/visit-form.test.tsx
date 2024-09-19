@@ -55,9 +55,6 @@ const testProps = {
   promptBeforeClosing: mockPromptBeforeClosing,
   showVisitEndDateTimeFields: false,
   setTitle: mockSetTitle,
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);
