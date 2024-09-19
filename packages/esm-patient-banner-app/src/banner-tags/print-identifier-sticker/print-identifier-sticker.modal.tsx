@@ -138,7 +138,7 @@ const ImplementationLogo: React.FC = () => {
   return printPatientSticker?.header?.logo ? (
     <img alt="implementation-logo" src={printPatientSticker?.header?.logo} />
   ) : (
-    <svg role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
+    <svg data-testid="openmrs-logo" role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
