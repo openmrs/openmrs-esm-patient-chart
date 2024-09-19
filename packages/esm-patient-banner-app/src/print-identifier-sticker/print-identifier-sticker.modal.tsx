@@ -3,7 +3,7 @@ import { useTranslation, type TFunction } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { age, getPatientName, showSnackbar, useConfig, getCoreTranslation, usePatient } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
+import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
 import Barcode from 'react-barcode';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';

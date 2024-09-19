@@ -35,8 +35,16 @@ export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
 
 export const printIdentifierStickerModal = getAsyncLifecycle(
-  () => import('./banner-tags/print-identifier-sticker/print-identifier-sticker.modal'),
+  () => import('./print-identifier-sticker/print-identifier-sticker.modal'),
   options,
+);
+
+export const printIdentifierStickerActionButton = getAsyncLifecycle(
+  () => import('./print-identifier-sticker/print-identifier-sticker-action-button.component'),
+  {
+    featureName: 'patient-actions-slot-print-identifier-sticker-button',
+    moduleName,
+  },
 );
 
 /*

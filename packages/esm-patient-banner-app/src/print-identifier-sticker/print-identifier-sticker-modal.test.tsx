@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PrintIdentifierSticker from './print-identifier-sticker.modal';
-import { mockFhirPatient } from '../../../../../__mocks__/patient.mock';
+import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject, configSchema } from '../../config-schema';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { useReactToPrint } from 'react-to-print';
 import userEvent from '@testing-library/user-event';
 import Barcode from 'react-barcode';
