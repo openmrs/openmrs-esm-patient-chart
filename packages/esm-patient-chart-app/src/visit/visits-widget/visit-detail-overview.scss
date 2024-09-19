@@ -37,6 +37,13 @@
   padding: layout.$spacing-05 0 !important;
 }
 
+.tabList {
+  position: sticky;
+  top: 3rem;
+  z-index: 10;
+  background-color: $ui-01;
+}
+
 .tab {
   &:active,
   &:focus {
@@ -44,7 +51,7 @@
   }
 
   &[aria-selected='true'] {
-    box-shadow: inset 0 layout.$spacing-01 0 0 var(--brand-03) !important;
+    border-bottom: 0.1875rem solid var(--brand-03) !important;
   }
 }
 
