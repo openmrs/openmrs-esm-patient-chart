@@ -1,9 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
-import { navigate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback, useMemo, useState } from 'react';
+import { navigate, showModal, showSnackbar } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { EncounterListDataTable } from './table.component';
-import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, MenuButton, MenuItem } from '@carbon/react';
+import {
+  Button,
+  Link,
+  OverflowMenu,
+  OverflowMenuItem,
+  DataTableSkeleton,
+  MenuButton,
+  MenuItem,
+  Pagination,
+} from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchEncounterForm } from '../../clinical-views/utils/helpers';
 import { deleteEncounter } from '../encounter-list.resource';
@@ -55,17 +64,20 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   const { isDead } = usePatientDeathStatus(patientUuid);
   const formUuids = useMemo(() => formList.map((form) => form.uuid), [formList]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const { formsJson, isLoading: isLoadingFormsJson } = useFormsJson(formUuids);
 
-  const { encounters, isLoading, onFormSave, mutate } = useEncounterRows(
+  const { encounters, total, isLoading, onFormSave, mutate } = useEncounterRows(
     patientUuid,
     encounterType,
     filter,
     afterFormSaveAction,
+    pageSize,
+    currentPage,
   );
 
-  const encountersPageSize = 10;
-  const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersPageSize);
   const { workspaceWindowSize, displayText, hideFormLauncher } = launchOptions;
 
   const defaultActions = useMemo(
@@ -136,7 +148,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     [onFormSave, t, mutate],
   );
 
-  const tableRows = paginatedEncounters.map((encounter) => {
+  const tableRows = encounters.map((encounter) => {
     const tableRow: { id: string; actions: any } = { id: encounter.uuid, actions: null };
 
     encounter['launchFormActions'] = {
@@ -245,7 +257,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   }, [formsJson, hideFormLauncher, isDead, displayText, onFormSave, workspaceWindowSize, patientUuid, t]);
 
   if (isLoading === true || isLoadingFormsJson === true) {
-    return <DataTableSkeleton rowCount={5} />;
+    return <DataTableSkeleton rowCount={10} />;
   }
 
   return (
@@ -259,12 +271,15 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               {!(hideFormLauncher ?? isDead) && <div className={styles.toggleButtons}>{formLauncher}</div>}
             </div>
             <EncounterListDataTable tableHeaders={headers} tableRows={tableRows} />
-            <PatientChartPagination
-              currentItems={paginatedEncounters.length}
-              onPageNumberChange={({ page }) => goTo(page)}
-              pageNumber={currentPage}
-              pageSize={encountersPageSize}
-              totalItems={encounters.length}
+            <Pagination
+              page={currentPage}
+              pageSizes={[10, 20, 30, 40, 50]}
+              onChange={({ page, pageSize }) => {
+                setCurrentPage(page);
+                setPageSize(pageSize);
+              }}
+              pageSize={pageSize}
+              totalItems={total}
             />
           </div>
         </>

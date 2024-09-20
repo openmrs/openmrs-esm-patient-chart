@@ -9,21 +9,24 @@ export const encounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
   'names:(uuid,conceptNameType,name))),form:(uuid,name))';
 
+interface EncounterResponse {
+  results: Encounter[];
+  totalCount?: number;
+}
+
 export function useEncounterRows(
   patientUuid: string,
   encounterType: string,
   encounterFilter: (encounter) => boolean,
   afterFormSaveAction: () => void,
+  pageSize?: number,
+  currentPage?: number,
 ) {
+  const startIndex = (currentPage - 1) * pageSize;
   const [encounters, setEncounters] = useState([]);
-  const url = `${restBaseUrl}/encounter?encounterType=${encounterType}&patient=${patientUuid}&v=${encounterRepresentation}`;
+  const url = `${restBaseUrl}/encounter?encounterType=${encounterType}&patient=${patientUuid}&v=${encounterRepresentation}&totalCount=true&limit=${pageSize}&startIndex=${startIndex}`;
 
-  const {
-    data: response,
-    error,
-    isLoading,
-    mutate,
-  } = useSWR<{ data: { results: Encounter[] } }, Error>(url, openmrsFetch);
+  const { data: response, error, isLoading, mutate } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
   useEffect(() => {
     if (response) {
@@ -46,6 +49,7 @@ export function useEncounterRows(
 
   return {
     encounters,
+    total: response?.data?.totalCount,
     isLoading,
     error,
     onFormSave,
