@@ -248,7 +248,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             timeoutInMs: 5000,
           });
           this.changeState('submitted');
-          this.closeForm();
+          this.closeWorkspaceWithSavedChanges();
         },
         (error: Error) => {
           console.error('Form submission error:', error);
@@ -260,7 +260,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             title: this.form.schema.display ?? this.form.schema.name,
             timeoutInMs: 5000,
           });
-          this.closeForm(); // Close the form after showing the error
+          this.closeWorkspaceWithSavedChanges(); // Close the form after showing the error
         },
       );
   }
@@ -346,7 +346,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     closeWorkspace();
   }
 
-  public closeFormWithSavedChanges() {
+  public closeWorkspaceWithSavedChanges() {
     const closeWorkspaceWithSavedChanges = this.singleSpaPropsService.getPropOrThrow('closeWorkspaceWithSavedChanges');
     closeWorkspaceWithSavedChanges();
   }

@@ -66,7 +66,7 @@ export class FormSubmissionService {
         const personUpdate = this.buildPersonUpdatePayload(form);
         const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
         const appointmentPayload = this.appointmentAdapter.generateFormPayload(form);
-        
+
         return isOfflineSubmission
           ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
           : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload, appointmentPayload);
@@ -128,7 +128,7 @@ export class FormSubmissionService {
       encounter: this.submitEncounter(encounterCreate),
       person: this.submitPersonUpdate(personUpdate),
       identifiers: this.submitPatientIdentifier(identifierPayload),
-      appointment: this.submitAppointment(appointmentPayload, encounterCreate),
+      appointment: this.submitAppointment(appointmentPayload),
     });
   }
 
@@ -253,12 +253,23 @@ export class FormSubmissionService {
     return of(undefined);
   }
 
-  private submitAppointment(appointmentPayload: any, encounterToCreate: EncounterCreate): Observable<any> {
-    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
-    const { ...restOfPayload } = appointmentPayload;
-    const payloadToSave = { ...restOfPayload, patientUuid: patientUuid };
+  private submitAppointment(appointmentPayload): Observable<any> {
+    if (Array.isArray(appointmentPayload) && appointmentPayload.length > 0) {
+      return forkJoin(
+        appointmentPayload.map((payload) => {
+          if (!payload?.startDateTime) {
+            return of(undefined);
+          } else {
+            const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+            const { ...restOfPayload } = payload;
+            const payloadToSave = { ...restOfPayload, patientUuid: patientUuid };
 
-    return this.appointmentService.createAppointment(payloadToSave);
+            return this.appointmentService.createAppointment(payloadToSave);
+          }
+        }),
+      );
+    }
+    return of(undefined);
   }
 
   // TODO: Should this function be extracted?
