@@ -51,7 +51,7 @@ import {
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
 
-type VisitNotesFormData = Omit<z.infer<typeof visitNoteFormSchema>, 'images'> & {
+type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
   images?: UploadedFile[];
 };
 
@@ -76,27 +76,27 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const visitNoteFormSchema = z.object({
-  noteDate: z.date(),
-  primaryDiagnosisSearch: z.string({
-    required_error: 'Choose at least one primary diagnosis',
-  }),
-  secondaryDiagnosisSearch: z.string().optional(),
-  clinicalNote: z.string().optional(),
-  images: z
-    .array(
-      z.object({
-        base64Content: z.string(),
-        file: z.custom<File>((value) => value instanceof File, {
-          message: 'Invalid file',
+const createSchema = (t: TFunction) => {
+  return z.object({
+    noteDate: z.date(),
+    primaryDiagnosisSearch: z.string(),
+    secondaryDiagnosisSearch: z.string().optional(),
+    clinicalNote: z.string().optional(),
+    images: z
+      .array(
+        z.object({
+          base64Content: z.string(),
+          file: z.custom<File>((value) => value instanceof File, {
+            message: 'Invalid file',
+          }),
+          fileDescription: z.string().optional(),
+          fileName: z.string(),
+          fileType: z.string(),
         }),
-        fileDescription: z.string().optional(),
-        fileName: z.string(),
-        fileType: z.string(),
-      }),
-    )
-    .optional(),
-});
+      )
+      .optional(),
+  });
+};
 
 const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   closeWorkspace,
@@ -125,9 +125,33 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
 
-  const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<VisitNotesFormData>({
+  const visitNoteFormSchema = createSchema(t);
+
+  const customResolver = useCallback(
+    async (data, context, options) => {
+      const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
+
+      if (selectedPrimaryDiagnoses.length === 0) {
+        return {
+          ...zodResult,
+          errors: {
+            ...zodResult.errors,
+            primaryDiagnosisSearch: {
+              type: 'custom',
+              message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
+            },
+          },
+        };
+      }
+
+      return zodResult;
+    },
+    [visitNoteFormSchema, selectedPrimaryDiagnoses, t],
+  );
+
+  const { control, handleSubmit, watch, setValue, formState, clearErrors } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
-    resolver: zodResolver(visitNoteFormSchema),
+    resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
       noteDate: new Date(),
@@ -165,6 +189,9 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
               if (fieldName === 'primaryDiagnosisSearch') {
                 setSearchPrimaryResults(matchingConceptDiagnoses);
                 setIsLoadingPrimaryDiagnoses(false);
+                if (matchingConceptDiagnoses.length > 0) {
+                  clearErrors('primaryDiagnosisSearch');
+                }
               } else if (fieldName === 'secondaryDiagnosisSearch') {
                 setSearchSecondaryResults(matchingConceptDiagnoses);
                 setIsLoadingSecondaryDiagnoses(false);
@@ -176,7 +203,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             });
         }
       }, searchTimeoutInMs),
-    [config.diagnosisConceptClass],
+    [config.diagnosisConceptClass, clearErrors],
   );
 
   const handleSearch = useCallback(
@@ -197,6 +224,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       setValue('primaryDiagnosisSearch', '');
       setSearchPrimaryResults([]);
       setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
+      clearErrors('primaryDiagnosisSearch');
     } else if (searchInputField === 'secondaryDiagnosisSearch') {
       setValue('secondaryDiagnosisSearch', '');
       setSearchSecondaryResults([]);
