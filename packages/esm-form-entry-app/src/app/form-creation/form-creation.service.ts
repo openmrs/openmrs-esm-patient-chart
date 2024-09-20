@@ -14,7 +14,7 @@ import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-re
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
 import { Session } from '@openmrs/esm-framework';
-import { isFunction } from 'lodash-es';
+import { create, isFunction } from 'lodash-es';
 import { AppointmentService } from '../openmrs-api/appointment-resource.service';
 import dayjs from 'dayjs';
 
@@ -142,7 +142,9 @@ export class FormCreationService {
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.session.sessionLocation);
+    // Appointment service types
     this.dataSources.registerDataSource('services', dataSources.services);
+    this.dataSources.registerDataSource('appointmentSummaryService', this.appointmentService);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
     const config = this.configResourceService.getConfig();
@@ -269,6 +271,7 @@ export class FormCreationService {
       // If the visit start date is before the current date, use the visit start date as the default date.
       if (visitStartDatetime && moment(visitStartDatetime).isBefore(currentDate, 'date')) {
         currentDate = visitStartDatetime;
+        form.valueProcessingInfo.dateAppointmentScheduled = visitStartDatetime;
       } else {
         currentDate = moment().format();
       }
@@ -287,17 +290,9 @@ export class FormCreationService {
     if (encounterLocation.length > 0 && session?.sessionLocation) {
       encounterLocation[0].control.setValue(session.sessionLocation.uuid);
     }
-    // Appointment location.
-    const appointmentLocation = form.searchNodeByQuestionId('appointmentLocation');
-    if (appointmentLocation.length > 0 && session?.sessionLocation) {
-      appointmentLocation[0].control.setValue(session.sessionLocation.uuid);
-    }
-    // Appointment date issued.
-    const dateAppointmentIssued = form.searchNodeByQuestionId('dateAppointmentIssued');
-    form.valueProcessingInfo.dateAppointmentIssued = currentDate;
-    if (dateAppointmentIssued.length > 0) {
-      dateAppointmentIssued[0].control.setValue(currentDate);
-    }
+
+    // Appointment questions
+    this.setAppointmentQuestionDefaultValue(form, createFormParams);
 
     // Provider.
     const encounterProvider = form.searchNodeByQuestionId('provider', 'encounterProvider');
@@ -318,6 +313,23 @@ export class FormCreationService {
         encounterDate[0]?.control?.disable();
       }
     }
+  }
+
+  private setAppointmentQuestionDefaultValue(form: Form, createFormParams: CreateFormParams) {
+    const appointmentQuestionsNodes = this.appointmentAdapter.findAppointmentQuestionNodes(form.rootNode);
+    if (appointmentQuestionsNodes.length === 0) {
+      return;
+    }
+
+    appointmentQuestionsNodes.forEach((appointmentQuestionNode) => {
+      const { appointmentKey } = appointmentQuestionNode.question.extras.questionOptions;
+      if (appointmentKey === 'location') {
+        appointmentQuestionNode.control.setValue(createFormParams.session.sessionLocation.uuid);
+      }
+      if (appointmentKey === 'providers') {
+        appointmentQuestionNode.control.setValue(createFormParams.session.currentProvider.uuid);
+      }
+    });
   }
 
   private setUpPayloadProcessingInformation(form: Form, createFormParams: CreateFormParams) {
@@ -367,11 +379,17 @@ export class FormCreationService {
   private populateAppointmentForEditing(form: Form, createFormParams: CreateFormParams) {
     const { encounter } = createFormParams;
 
+    // If the form has appointment questions, fetch the patient's appointments and populate the form with the latest appointment.
+    const appointmentQuestions = this.appointmentAdapter.findAppointmentQuestionNodes(form.rootNode);
+    if (appointmentQuestions.length === 0) {
+      return;
+    }
+
     this.appointmentService
       .fetchPatientAppointmentsFromDate(encounter.patient.uuid, encounter?.encounterDatetime)
       .subscribe((appointments) => {
         const encounterDateCreated = dayjs(encounter.auditInfo.dateCreated).toISOString();
-        const appointmentIssuedOnThisEncounter = appointments.find((appointment) => {
+        const appointmentIssuedOnThisEncounter = appointments.filter((appointment) => {
           const appointmentDateCreated = dayjs(appointment.dateCreated).toISOString();
           return encounterDateCreated === appointmentDateCreated;
         });
