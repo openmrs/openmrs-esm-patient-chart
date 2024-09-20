@@ -7,6 +7,7 @@
   "cancel": "取消",
   "carePrograms": "护理项目",
   "chooseProgram": "选择一个项目",
+  "chooseStatus": "Choose a program status",
   "completedOn": "完成于",
   "configurePrograms": "请配置项目以继续。",
   "dateCompleted": "完成日期",
@@ -28,8 +29,10 @@
   "programRequired": "Program is required",
   "programs": "项目登记",
   "Programs": "项目",
+  "programStatus": "Program status",
   "saveAndClose": "保存并关闭",
   "saving": "Saving",
   "seeAll": "查看全部",
+  "state": "State",
   "status": "状态"
 }

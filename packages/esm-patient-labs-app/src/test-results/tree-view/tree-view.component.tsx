@@ -1,18 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, DataTableSkeleton, Button } from '@carbon/react';
-import { TreeViewAlt } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
+import { useLayoutType, TreeViewAltIcon } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterSet, { FilterContext } from '../filter';
 import GroupedTimeline from '../grouped-timeline';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
-import styles from '../results-viewer/results-viewer.scss';
 import { type viewOpts } from '../../types';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import styles from '../results-viewer/results-viewer.scss';
 
 interface TreeViewProps {
   patientUuid: string;
@@ -24,19 +23,16 @@ interface TreeViewProps {
   view?: viewOpts;
 }
 
-const GroupedPanelsTables = ({ loadingPanelData }) => {
+const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boolean }> = ({
+  className,
+  loadingPanelData,
+}) => {
   const { timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
-  const [panelName, setPanelName] = useState('');
   const { t } = useTranslation();
-  let shownGroups = 0;
 
   const {
     data: { rowData },
   } = timelineData;
-
-  useEffect(() => {
-    setPanelName('');
-  }, [rowData]);
 
   const filteredParents = lowestParents?.filter(
     (parent) => parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked,
@@ -47,22 +43,17 @@ const GroupedPanelsTables = ({ loadingPanelData }) => {
   }
 
   return (
-    <>
+    <Layer className={className}>
       {filteredParents?.map((parent, index) => {
-        shownGroups += 1;
         const subRows = someChecked
           ? rowData?.filter(
               (row: { flatName: string }) =>
                 parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
             )
           : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
-        return (
-          <div style={{ paddingBottom: '1rem' }}>
-            <IndividualResultsTable isLoading={loadingPanelData} parent={parent} subRows={subRows} index={index} />
-          </div>
-        );
+        return <IndividualResultsTable isLoading={loadingPanelData} parent={parent} subRows={subRows} index={index} />;
       })}
-    </>
+    </Layer>
   );
 };
 
@@ -77,10 +68,10 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
   if (tablet) {
     return (
       <>
-        <div>{!loading ? <GroupedTimeline /> : <DataTableSkeleton />}</div>
+        <div>{!loading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton />}</div>
         <div className={styles.floatingTreeButton}>
           <Button
-            renderIcon={TreeViewAlt}
+            renderIcon={TreeViewAltIcon}
             hasIconOnly
             onClick={() => setShowTreeOverlay(true)}
             iconDescription={t('showTree', 'Show tree')}
@@ -124,12 +115,12 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>
-            <GroupedPanelsTables loadingPanelData={loading} />
+            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={loading} />
           </div>
         ) : view === 'over-time' ? (
           panels.map((panel) => (
-            <div className={styles.panelViewTimeline}>
-              <GroupedTimeline />
+            <div key={`panel-${panel.id}`} className={styles.panelViewTimeline}>
+              <GroupedTimeline patientUuid={patientUuid} />
             </div>
           ))
         ) : null}

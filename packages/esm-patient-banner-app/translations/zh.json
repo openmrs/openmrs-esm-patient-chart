@@ -1,26 +1,14 @@
 {
   "address1": "地址行1",
   "address2": "地址行2",
-  "age": "年龄",
-  "cancel": "取消",
   "city": "城市",
   "cityVillage": "城市",
   "country": "国家",
   "countyDistrict": "区县",
   "district": "区县",
   "dob": "出生日期",
-  "female": "女性",
-  "male": "男性",
-  "other": "其他",
   "patientIdentifierSticker": "患者标识符贴纸",
   "postalCode": "邮政编码",
-  "print": "打印",
-  "printError": "打印错误",
-  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
-  "printIdentifierSticker": "打印标识符贴纸",
-  "printing": "打印中",
-  "sex": "性别",
   "state": "省份",
-  "stateProvince": "省份",
-  "unknown": "未知"
+  "stateProvince": "省份"
 }

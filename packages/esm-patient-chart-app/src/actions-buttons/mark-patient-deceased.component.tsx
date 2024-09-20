@@ -5,14 +5,19 @@ import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientDeceasedStatus } from '../data.resource';
 import styles from './action-button.scss';
 
-const MarkPatientDeceasedOverflowMenuItem = ({ patientUuid }) => {
+interface MarkPatientDeceasedOverflowMenuItemProps {
+  patientUuid?: string;
+  patient?: fhir.Patient;
+}
+
+const MarkPatientDeceasedOverflowMenuItem: React.FC<MarkPatientDeceasedOverflowMenuItemProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const { isDead, isLoading: isPatientLoading } = usePatientDeceasedStatus(patientUuid);
+  const { isDead } = usePatientDeceasedStatus(patient);
 
   const handleLaunchModal = useCallback(() => launchPatientWorkspace('mark-patient-deceased-workspace-form'), []);
 
   return (
-    !isPatientLoading &&
+    patient &&
     !isDead && (
       <OverflowMenuItem
         className={styles.menuitem}

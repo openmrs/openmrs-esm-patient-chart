@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, restBaseUrl, usePatient } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface CauseOfDeathFetchResponse {
   uuid: string;
@@ -35,21 +35,10 @@ export function useCausesOfDeath() {
   };
 }
 
-export function usePatientDeceasedStatus(patientUuid: string) {
-  const { isLoading: isPatientLoading, patient } = usePatient(patientUuid);
-
-  if (isPatientLoading) {
-    return {
-      deathDate: undefined,
-      isDead: undefined,
-      isLoading: isPatientLoading,
-    };
-  }
-
+export function usePatientDeceasedStatus(patient: fhir.Patient) {
   return {
     deathDate: patient?.deceasedDateTime,
     isDead: patient?.deceasedBoolean ?? Boolean(patient?.deceasedDateTime),
-    isLoading: isPatientLoading,
   };
 }
 

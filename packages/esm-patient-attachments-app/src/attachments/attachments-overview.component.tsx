@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, Loading } from '@carbon/react';
-import { Add, List, Thumbnail_2 } from '@carbon/react/icons';
+import { List, Thumbnail_2 } from '@carbon/react/icons';
 import {
+  AddIcon,
   createAttachment,
   deleteAttachmentPermanently,
   showModal,
@@ -153,7 +154,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
                 </IconSwitch>
               </ContentSwitcher>
               <div className={styles.divider} />
-              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showAddAttachmentModal}>
+              <Button
+                kind="ghost"
+                renderIcon={AddIcon}
+                iconDescription="Add attachment"
+                onClick={showAddAttachmentModal}
+              >
                 {t('add', 'Add')}
               </Button>
             </div>

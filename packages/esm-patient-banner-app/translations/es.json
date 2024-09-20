@@ -1,26 +1,14 @@
 {
   "address1": "Línea de Dirección 1",
   "address2": "Línea de Dirección 2",
-  "age": "Age",
-  "cancel": "Cancel",
   "city": "Ciudad",
   "cityVillage": "ciudad",
   "country": "País",
   "countyDistrict": "Distrito",
   "district": "Distrito",
   "dob": "DOB",
-  "female": "Female",
-  "male": "Male",
-  "other": "Other",
   "patientIdentifierSticker": "Patient identifier sticker",
   "postalCode": "Código Postal",
-  "print": "Print",
-  "printError": "Print error",
-  "printErrorExplainer": "An error occurred in \"{{errorLocation}}\": ",
-  "printIdentifierSticker": "Print identifier sticker",
-  "printing": "Printing",
-  "sex": "Sex",
   "state": "State",
-  "stateProvince": "State",
-  "unknown": "Unknown"
+  "stateProvince": "State"
 }

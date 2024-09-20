@@ -58,7 +58,7 @@
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .viewOptionsText {
@@ -96,6 +96,8 @@
 .leftHeaderActions {
   display: flex;
   min-width: layout.$spacing-08;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 .leftHeaderActions > :global(.cds--content-switcher),
@@ -177,5 +179,11 @@
 
   span {
     order: 2;
+  }
+}
+
+.groupPanelsTables {
+  > div + div {
+    margin-top: layout.$spacing-05;
   }
 }
