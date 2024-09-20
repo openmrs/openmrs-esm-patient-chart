@@ -125,7 +125,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
 
-  const visitNoteFormSchema = createSchema(t);
+  const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
 
   const customResolver = useCallback(
     async (data, context, options) => {
@@ -177,6 +177,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const debouncedSearch = useMemo(
     () =>
       debounce((fieldQuery, fieldName) => {
+        clearErrors('primaryDiagnosisSearch');
         if (fieldQuery) {
           if (fieldName === 'primaryDiagnosisSearch') {
             setIsLoadingPrimaryDiagnoses(true);
@@ -189,9 +190,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
               if (fieldName === 'primaryDiagnosisSearch') {
                 setSearchPrimaryResults(matchingConceptDiagnoses);
                 setIsLoadingPrimaryDiagnoses(false);
-                if (matchingConceptDiagnoses.length > 0) {
-                  clearErrors('primaryDiagnosisSearch');
-                }
               } else if (fieldName === 'secondaryDiagnosisSearch') {
                 setSearchSecondaryResults(matchingConceptDiagnoses);
                 setIsLoadingSecondaryDiagnoses(false);
@@ -217,38 +215,59 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     [debouncedSearch, watch],
   );
 
-  const handleAddDiagnosis = (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
-    let newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
-    if (searchInputField === 'primaryDiagnosisSearch') {
-      newDiagnosis.rank = 1;
-      setValue('primaryDiagnosisSearch', '');
-      setSearchPrimaryResults([]);
-      setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
-      clearErrors('primaryDiagnosisSearch');
-    } else if (searchInputField === 'secondaryDiagnosisSearch') {
-      setValue('secondaryDiagnosisSearch', '');
-      setSearchSecondaryResults([]);
-      setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
-    }
-    setCombinedDiagnoses((diagnosisCombined) => [...diagnosisCombined, newDiagnosis]);
-  };
+  const createDiagnosis = useCallback(
+    (concept: Concept) => ({
+      certainty: 'PROVISIONAL',
+      display: concept.display,
+      diagnosis: {
+        coded: concept.uuid,
+      },
+      patient: patientUuid,
+      rank: 2,
+    }),
+    [patientUuid],
+  );
 
-  const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
-    if (searchInputField === 'primaryInputSearch') {
-      setSelectedPrimaryDiagnoses(
-        selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
+  const handleAddDiagnosis = useCallback(
+    (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
+      const newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
+      if (searchInputField === 'primaryDiagnosisSearch') {
+        newDiagnosis.rank = 1;
+        setValue('primaryDiagnosisSearch', '');
+        setSearchPrimaryResults([]);
+        setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
+        clearErrors('primaryDiagnosisSearch');
+      } else if (searchInputField === 'secondaryDiagnosisSearch') {
+        setValue('secondaryDiagnosisSearch', '');
+        setSearchSecondaryResults([]);
+        setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
+      }
+      setCombinedDiagnoses((combinedDiagnoses) => [...combinedDiagnoses, newDiagnosis]);
+    },
+    [createDiagnosis, setValue, clearErrors],
+  );
+
+  const handleRemoveDiagnosis = useCallback(
+    (diagnosisToRemove: Diagnosis, searchInputField) => {
+      if (searchInputField === 'primaryInputSearch') {
+        setSelectedPrimaryDiagnoses(
+          selectedPrimaryDiagnoses.filter(
+            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
+          ),
+        );
+      } else if (searchInputField === 'secondaryInputSearch') {
+        setSelectedSecondaryDiagnoses(
+          selectedSecondaryDiagnoses.filter(
+            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
+          ),
+        );
+      }
+      setCombinedDiagnoses(
+        combinedDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
       );
-    } else if (searchInputField === 'secondaryInputSearch') {
-      setSelectedSecondaryDiagnoses(
-        selectedSecondaryDiagnoses.filter(
-          (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
-        ),
-      );
-    }
-    setCombinedDiagnoses(
-      combinedDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
-    );
-  };
+    },
+    [combinedDiagnoses, selectedPrimaryDiagnoses, selectedSecondaryDiagnoses],
+  );
 
   const isDiagnosisNotSelected = (diagnosis: Concept) => {
     const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
@@ -260,16 +279,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
     return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
   };
-
-  const createDiagnosis = (concept: Concept) => ({
-    certainty: 'PROVISIONAL',
-    display: concept.display,
-    diagnosis: {
-      coded: concept.uuid,
-    },
-    patient: patientUuid,
-    rank: 2,
-  });
 
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
