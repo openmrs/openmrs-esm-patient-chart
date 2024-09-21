@@ -34,11 +34,7 @@
   display: flex;
   align-items: center;
   color: $ui-02;
-  padding: layout.$spacing-04 layout.$spacing-05;
-
-  &:hover {
-    background-color: colors.$teal-90;
-  }
+  padding: 0 layout.$spacing-03;
 
   :global(.cds--popover--bottom .cds--popover-content) {
     text-align: center;
