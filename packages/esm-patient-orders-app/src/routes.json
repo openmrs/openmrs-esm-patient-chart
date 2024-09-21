@@ -5,6 +5,18 @@
   },
   "extensions": [
     {
+      "name": "order-price-details",
+      "component": "orderPriceDetailsExtension",
+      "slot": "order-item-price-and-stock-info",
+      "order": 0
+    },
+    {
+      "name": "order-stock-details",
+      "component": "orderStockDetailsExtension",
+      "slot": "order-item-price-and-stock-info",
+      "order": 1
+    },
+    {
       "name": "order-basket-action-menu",
       "component": "orderBasketActionMenu",
       "slot": "action-menu-patient-chart-items-slot",

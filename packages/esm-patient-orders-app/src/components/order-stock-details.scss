@@ -1,0 +1,11 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.itemInStock {
+  color: $support-02;
+  display: flex;
+}
+
+.itemOutOfStock {
+  color: $danger;
+  display: flex;
+}

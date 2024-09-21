@@ -6,11 +6,12 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import {
   ArrowRightIcon,
   closeWorkspace,
+  ExtensionSlot,
+  ResponsiveWrapper,
   ShoppingCartArrowDownIcon,
   useDebounce,
   useLayoutType,
   useSession,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type TestType, useTestTypes } from './useTestTypes';
@@ -224,33 +225,40 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
       </div>
-      <div className={styles.searchResultActions}>
-        {testTypeAlreadyInBasket ? (
-          <Button
-            kind="danger--ghost"
-            renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
-            onClick={removeFromBasket}
-          >
-            {t('removeFromBasket', 'Remove from basket')}
-          </Button>
-        ) : (
+      <div className={styles.searchResultFooter}>
+        <ExtensionSlot
+          name="order-item-price-and-stock-info"
+          state={{ code: testType.conceptUuid }}
+          className={styles.priceAndStockContainer}
+        />
+        <div className={styles.searchResultActions}>
+          {testTypeAlreadyInBasket ? (
+            <Button
+              kind="danger--ghost"
+              renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+              onClick={removeFromBasket}
+            >
+              {t('removeFromBasket', 'Remove from basket')}
+            </Button>
+          ) : (
+            <Button
+              kind="ghost"
+              renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                <ShoppingCartArrowDownIcon size={16} {...props} />
+              )}
+              onClick={addToBasket}
+            >
+              {t('directlyAddToBasket', 'Add to basket')}
+            </Button>
+          )}
           <Button
             kind="ghost"
-            renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
-              <ShoppingCartArrowDownIcon size={16} {...props} />
-            )}
-            onClick={addToBasket}
+            renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
+            onClick={() => openOrderForm(createLabOrder(testType))}
           >
-            {t('directlyAddToBasket', 'Add to basket')}
+            {t('goToDrugOrderForm', 'Order form')}
           </Button>
-        )}
-        <Button
-          kind="ghost"
-          renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-          onClick={() => openOrderForm(createLabOrder(testType))}
-        >
-          {t('goToDrugOrderForm', 'Order form')}
-        </Button>
+        </div>
       </div>
     </Tile>
   );

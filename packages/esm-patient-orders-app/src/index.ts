@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
@@ -34,6 +34,15 @@ export const testResultsFormWorkspace = getAsyncLifecycle(
 );
 
 export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);
+
+export const orderPriceDetailsExtension = getAsyncLifecycle(
+  () => import('./components/order-price-details.component'),
+  options,
+);
+export const orderStockDetailsExtension = getAsyncLifecycle(
+  () => import('./components/order-stock-details.component'),
+  options,
+);
 
 export const ordersDashboardLink =
   // t('Orders', 'Orders')
