@@ -82,3 +82,14 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+.priceAndStockContainer {
+  border-top: 1px solid $grey-2;
+  margin-top: layout.$spacing-03;
+  padding-top: layout.$spacing-03;
+  font-size: 12px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: layout.$spacing-02;
+}

@@ -2,7 +2,7 @@ import React, { type ComponentProps, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
-import { TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
+import { ExtensionSlot, TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './lab-order-basket-item-tile.scss';
 
@@ -25,36 +25,43 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   const shouldOnClickBeCalled = useRef(true);
 
   const labTile = (
-    <div className={styles.orderBasketItemTile}>
-      <div className={styles.clipTextWithEllipsis}>
-        <OrderActionLabel orderBasketItem={orderBasketItem} />
-        <br />
-        <span className={styles.name}>{orderBasketItem.testType?.label}</span>
-        <span className={styles.label01}>
-          {!!orderBasketItem.orderError && (
-            <>
-              <br />
-              <span className={styles.orderErrorText}>
-                <WarningIcon size={16} />
-                &nbsp;
-                <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
-                {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
-              </span>
-            </>
-          )}
-        </span>
+    <div>
+      <div className={styles.orderBasketItemTile}>
+        <div className={styles.clipTextWithEllipsis}>
+          <OrderActionLabel orderBasketItem={orderBasketItem} />
+          <br />
+          <span className={styles.name}>{orderBasketItem.testType?.label}</span>
+          <span className={styles.label01}>
+            {!!orderBasketItem.orderError && (
+              <>
+                <br />
+                <span className={styles.orderErrorText}>
+                  <WarningIcon size={16} />
+                  &nbsp;
+                  <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
+                  {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
+                </span>
+              </>
+            )}
+          </span>
+        </div>
+        <Button
+          className={styles.removeButton}
+          kind="ghost"
+          hasIconOnly={true}
+          renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
+          iconDescription={t('removeFromBasket', 'Remove from basket')}
+          onClick={() => {
+            shouldOnClickBeCalled.current = false;
+            onRemoveClick();
+          }}
+          tooltipPosition="left"
+        />
       </div>
-      <Button
-        className={styles.removeButton}
-        kind="ghost"
-        hasIconOnly={true}
-        renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
-        iconDescription={t('removeFromBasket', 'Remove from basket')}
-        onClick={() => {
-          shouldOnClickBeCalled.current = false;
-          onRemoveClick();
-        }}
-        tooltipPosition="left"
+      <ExtensionSlot
+        name="order-item-price-and-stock-info"
+        state={{ code: orderBasketItem.testType.conceptUuid }}
+        className={styles.priceAndStockContainer}
       />
     </div>
   );

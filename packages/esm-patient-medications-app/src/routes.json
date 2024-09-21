@@ -43,6 +43,7 @@
       "name": "add-drug-order",
       "title": "addDrugOrderWorkspaceTitle",
       "component": "addDrugOrderWorkspace",
+      "width": "wider",
       "type": "order"
     }
   ]

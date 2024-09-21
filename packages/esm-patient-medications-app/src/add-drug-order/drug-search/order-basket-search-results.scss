@@ -43,6 +43,7 @@
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid $grey-2;
+
   &:not(:last-of-type) {
     margin-bottom: layout.$spacing-03;
   }
@@ -58,11 +59,25 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
-.searchResultActions {
+.searchResultFooter {
   border-top: 1px solid $grey-2;
-  padding: 0 layout.$spacing-05;
   display: flex;
-  justify-content: flex-end;
+  padding-left: layout.$spacing-05;
+  justify-content: space-between;
+}
+
+.priceAndStockContainer {
+  font-size: 12px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.searchResultActions {
+  display: flex;
+  align-self: flex-end;
+  margin-left: auto;
 }
 
 .errorLabel {

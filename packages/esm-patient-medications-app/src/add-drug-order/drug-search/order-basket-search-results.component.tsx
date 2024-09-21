@@ -1,12 +1,13 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
-import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
+import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
   closeWorkspace,
+  ExtensionSlot,
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
@@ -203,37 +204,46 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
             drugAlreadyPrescribed ? (
               <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
             ) : (
-              <div className={styles.searchResultActions}>
-                {drugAlreadyInBasket ? (
-                  <Button
-                    kind="danger--ghost"
-                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
-                      <ShoppingCartArrowUp size={16} {...props} />
-                    )}
-                    onClick={() => removeFromBasket(orderItem)}
-                  >
-                    {t('removeFromBasket', 'Remove from basket')}
-                  </Button>
-                ) : (
+              <div className={styles.searchResultFooter}>
+                <ExtensionSlot
+                  name="order-item-price-and-stock-info"
+                  state={{ code: orderItem.drug.uuid }}
+                  className={styles.priceAndStockContainer}
+                />
+                <div className={styles.searchResultActions}>
+                  {drugAlreadyInBasket ? (
+                    <Button
+                      kind="danger--ghost"
+                      renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
+                        <ShoppingCartArrowUp size={16} {...props} />
+                      )}
+                      onClick={() => removeFromBasket(orderItem)}
+                    >
+                      {t('removeFromBasket', 'Remove from basket')}
+                    </Button>
+                  ) : (
+                    <Button
+                      kind="ghost"
+                      renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                        <ShoppingCartArrowDownIcon size={16} {...props} />
+                      )}
+                      onClick={() => addToBasket(orderItem)}
+                      disabled={drugAlreadyPrescribed}
+                    >
+                      {t('directlyAddToBasket', 'Add to basket')}
+                    </Button>
+                  )}
                   <Button
                     kind="ghost"
-                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
-                      <ShoppingCartArrowDownIcon size={16} {...props} />
+                    renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (
+                      <ArrowRightIcon size={16} {...props} />
                     )}
-                    onClick={() => addToBasket(orderItem)}
+                    onClick={() => openOrderForm(orderItem)}
                     disabled={drugAlreadyPrescribed}
                   >
-                    {t('directlyAddToBasket', 'Add to basket')}
+                    {t('goToDrugOrderForm', 'Order form')}
                   </Button>
-                )}
-                <Button
-                  kind="ghost"
-                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-                  onClick={() => openOrderForm(orderItem)}
-                  disabled={drugAlreadyPrescribed}
-                >
-                  {t('goToDrugOrderForm', 'Order form')}
-                </Button>
+                </div>
               </div>
             )
           ) : null}
