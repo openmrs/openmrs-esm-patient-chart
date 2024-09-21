@@ -49,7 +49,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
 
   const cardTitle = t('recentResults', 'Recent Results');
   const handleSeeAll = useCallback(() => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results Viewer` });
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results` });
   }, [patientUuid]);
 
   return (
