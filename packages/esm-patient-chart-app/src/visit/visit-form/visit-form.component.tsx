@@ -178,6 +178,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const defaultValues = useMemo(() => {
     const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
     const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
+
     let defaultValues: Partial<VisitFormData> = {
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
@@ -689,20 +690,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           )}
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
-              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
               dateFieldName="visitStartDate"
+              maxDate={maxVisitStartDatetime}
               timeFieldName="visitStartTime"
               timeFormatFieldName="visitStartTimeFormat"
-              maxDate={maxVisitStartDatetime}
+              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
             />
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
-                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
                 dateFieldName="visitStopDate"
+                minDate={minVisitStopDatetime}
                 timeFieldName="visitStopTime"
                 timeFormatFieldName="visitStopTimeFormat"
-                minDate={minVisitStopDatetime}
+                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
               />
             )}
 
