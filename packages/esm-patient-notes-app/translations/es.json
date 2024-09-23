@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "No hay notas de visita para mostrar",
   "primaryDiagnosis": "Diagnóstico principal",
   "primaryDiagnosisInputPlaceholder": "Elegir un diagnóstico principal",
+  "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
   "saveAndClose": "Guardar y cerrar",
   "saving": "Saving",
   "searchForPrimaryDiagnosis": "Buscar un diagnóstico principal",
