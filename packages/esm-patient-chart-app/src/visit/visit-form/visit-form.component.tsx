@@ -465,7 +465,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           .subscribe({
             next: (response) => {
               if (response.status === 201) {
-                if (config.showServiceQueueFields) {
+                if (config.showServiceQueueFields && queueLocation && service && priority) {
                   // retrieve values from the queue extension
                   setVisitUuid(response.data.uuid);
 
@@ -824,10 +824,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet
-          className={classNames({
+          className={classNames(styles.buttonSet, {
             [styles.tablet]: isTablet,
             [styles.desktop]: !isTablet,
-            [styles.buttonSet]: true,
           })}
         >
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
