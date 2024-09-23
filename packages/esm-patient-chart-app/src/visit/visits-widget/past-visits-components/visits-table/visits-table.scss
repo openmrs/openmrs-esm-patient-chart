@@ -3,6 +3,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tableContainer {
+  margin: layout.$spacing-05 0;
   padding: 0;
 
   :global(.cds--data-table-header) {

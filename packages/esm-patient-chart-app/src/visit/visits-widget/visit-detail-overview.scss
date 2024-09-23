@@ -50,13 +50,15 @@
 }
 
 .tab {
+  height: 2.5rem;
+
   &:active,
   &:focus {
-    outline: layout.$spacing-01 solid var(--brand-03) !important;
+    outline: none !important;
   }
 
   &[aria-selected='true'] {
-    border-bottom: 0.1875rem solid var(--brand-03) !important;
+    border-bottom: 3px solid var(--brand-03) !important;
   }
 }
 
