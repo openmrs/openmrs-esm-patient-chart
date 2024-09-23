@@ -51,7 +51,15 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
                 parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
             )
           : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
-        return <IndividualResultsTable isLoading={loadingPanelData} parent={parent} subRows={subRows} index={index} />;
+        return (
+          <div
+            className={classNames({
+              [styles.border]: subRows.length,
+            })}
+          >
+            <IndividualResultsTable isLoading={loadingPanelData} parent={parent} subRows={subRows} index={index} />
+          </div>
+        );
       })}
     </Layer>
   );

@@ -1,13 +1,13 @@
 import React from 'react';
-import styles from './visit-form.scss';
-import { Controller, useFormContext } from 'react-hook-form';
-import { type VisitFormData } from './visit-form.resource';
-import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import classNames from 'classnames';
-import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { type amPm } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
+import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { ResponsiveWrapper } from '@openmrs/esm-framework';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
+import { type VisitFormData } from './visit-form.resource';
+import styles from './visit-form.scss';
 
 interface VisitDateTimeFieldProps {
   visitDatetimeLabel: string;
@@ -47,17 +47,17 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         <Controller
           name={dateFieldName}
           control={control}
-          render={({ field: { onBlur, onChange, value } }) => (
+          render={({ field: { onChange, value } }) => (
             <ResponsiveWrapper>
               <DatePicker
+                className={styles.datePicker}
                 dateFormat="d/m/Y"
                 datePickerType="single"
                 id={dateFieldName}
-                style={{ paddingBottom: '1rem' }}
                 minDate={minDateObj}
                 maxDate={maxDateObj}
                 onChange={([date]) => onChange(date)}
-                value={value}
+                value={value ? dayjs(value).format('DD/MM/YYYY') : null}
               >
                 <DatePickerInput
                   id={`${dateFieldName}Input`}
