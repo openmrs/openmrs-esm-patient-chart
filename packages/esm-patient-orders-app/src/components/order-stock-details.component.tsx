@@ -4,11 +4,11 @@ import { CheckmarkFilled, CloseFilled } from '@carbon/react/icons';
 import styles from './order-stock-details.scss';
 
 interface OrderStockDetailsComponentProps {
-  code: string;
+  orderItemUuid: string;
 }
 
-const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({ code }) => {
-  const stockData = useOrderStockInfo(code);
+const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({ orderItemUuid }) => {
+  const { data: stockData } = useOrderStockInfo(orderItemUuid);
 
   if (!stockData) {
     return <div>Loading stock...</div>;

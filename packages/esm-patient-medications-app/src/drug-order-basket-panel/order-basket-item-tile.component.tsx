@@ -92,8 +92,8 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         />
       </div>
       <ExtensionSlot
-        name="order-item-price-and-stock-info"
-        state={{ code: orderBasketItem.drug.uuid }}
+        name="order-tem-additional-info-slot"
+        state={{ orderItemUuid: orderBasketItem.drug.uuid }}
         className={styles.priceAndStockContainer}
       />
     </div>

@@ -6,12 +6,12 @@ import { Information } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 
 interface OrderPriceDetailsComponentProps {
-  code: string;
+  orderItemUuid: string;
 }
 
-const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({ code }) => {
+const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({ orderItemUuid }) => {
   const { t } = useTranslation();
-  const priceData = useOrderPrice(code);
+  const { data: priceData } = useOrderPrice(orderItemUuid);
   // console.log(code);
 
   if (!priceData) {
