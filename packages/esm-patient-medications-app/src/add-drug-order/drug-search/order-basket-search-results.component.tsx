@@ -203,8 +203,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
             ) : (
               <div className={styles.searchResultFooter}>
                 <ExtensionSlot
-                  name="order-item-price-and-stock-info"
-                  state={{ code: orderItem.drug.uuid }}
+                  name="order-tem-additional-info-slot"
+                  state={{ orderItemUuid: orderItem.drug.uuid }}
                   className={styles.priceAndStockContainer}
                 />
                 <div className={styles.searchResultActions}>

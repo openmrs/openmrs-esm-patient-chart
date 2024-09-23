@@ -88,11 +88,10 @@
 }
 
 .priceAndStockContainer {
-  font-size: 12px;
   display: flex;
   justify-content: start;
   align-items: center;
-  gap: layout.$spacing-02;
+  gap: layout.$spacing-05;
 }
 
 .searchResultActions {

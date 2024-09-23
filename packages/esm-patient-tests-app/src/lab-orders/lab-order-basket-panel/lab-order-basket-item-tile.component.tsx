@@ -59,8 +59,8 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
         />
       </div>
       <ExtensionSlot
-        name="order-item-price-and-stock-info"
-        state={{ code: orderBasketItem.testType.conceptUuid }}
+        name="order-tem-additional-info-slot"
+        state={{ orderItemUuid: orderBasketItem.testType.conceptUuid }}
         className={styles.priceAndStockContainer}
       />
     </div>

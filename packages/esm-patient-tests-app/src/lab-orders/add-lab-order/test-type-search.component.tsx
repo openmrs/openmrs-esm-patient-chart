@@ -227,8 +227,8 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
       </div>
       <div className={styles.searchResultFooter}>
         <ExtensionSlot
-          name="order-item-price-and-stock-info"
-          state={{ code: testType.conceptUuid }}
+          name="order-tem-additional-info-slot"
+          state={{ orderItemUuid: testType.conceptUuid }}
           className={styles.priceAndStockContainer}
         />
         <div className={styles.searchResultActions}>
