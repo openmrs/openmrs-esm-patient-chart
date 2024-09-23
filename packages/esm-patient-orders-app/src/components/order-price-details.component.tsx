@@ -11,10 +11,9 @@ interface OrderPriceDetailsComponentProps {
 
 const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({ orderItemUuid }) => {
   const { t } = useTranslation();
-  const { data: priceData } = useOrderPrice(orderItemUuid);
-  // console.log(code);
+  const { data: priceData, isLoading } = useOrderPrice(orderItemUuid);
 
-  if (!priceData) {
+  if (isLoading || !priceData) {
     return <SkeletonText width="100px" />;
   }
 
@@ -23,8 +22,15 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   return (
     <div className={styles.priceDetailsContainer}>
       <span className={styles.priceLabel}>Price:</span>
-      {amount.currency} {amount.value.toFixed(2)}
-      <Tooltip align="bottom" className={styles.priceToolTip} label={t('orderBasePrice', 'Base price')}>
+      {amount.currency} {amount.value}
+      <Tooltip
+        align="bottom"
+        className={styles.priceToolTip}
+        label={t(
+          'priceDisclaimer',
+          'This price is indicative and may not reflect final costs, which could vary due to discounts, insurance coverage, or other pricing rules.',
+        )}
+      >
         <button className={styles.priceToolTipTrigger} type="button">
           <Information />
         </button>

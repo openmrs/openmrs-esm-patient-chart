@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 export const useOrderStockInfo = (orderItemUuid: string) => {
   const { data, isLoading } = useSWR(
-    orderItemUuid ? `${fhirBaseUrl}/ChargeItemDefinition?code=${orderItemUuid}` : null,
+    orderItemUuid ? `${fhirBaseUrl}/InventoryItem?code=${orderItemUuid}` : null,
     async (): Promise<OrderStockData> => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
