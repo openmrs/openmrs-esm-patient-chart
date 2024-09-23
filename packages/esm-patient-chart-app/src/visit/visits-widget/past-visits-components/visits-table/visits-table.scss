@@ -2,9 +2,14 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.tableContainer {
+.container {
   margin: layout.$spacing-05 0;
+}
+
+.tableContainer {
   padding: 0;
+  border: 1px solid $ui-03;
+  border-bottom: none;
 
   :global(.cds--data-table-header) {
     padding: 0;
@@ -21,6 +26,13 @@
   }
 }
 
+.paginationContainer {
+  > div {
+    border: 1px solid $ui-03 !important;
+    border-top: none !important;
+  }
+}
+
 .filterContainer {
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
@@ -28,6 +40,10 @@
 
   :global(.cds--list-box__menu-icon) {
     height: layout.$spacing-05;
+  }
+
+  label {
+    margin-right: layout.$spacing-05 !important;
   }
 }
 
