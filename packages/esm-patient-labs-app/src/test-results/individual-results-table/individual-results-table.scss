@@ -15,6 +15,7 @@ p {
 .low {
   p {
     @include type.type-style('heading-compact-01');
+    color: $ui-05;
   }
 }
 
@@ -78,12 +79,13 @@ p {
 .resultType {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .date {
   color: $text-02;
   padding-right: 0.625rem;
+  @include type.type-style('label-01');
 }
 
 .date::after {
