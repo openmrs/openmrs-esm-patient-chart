@@ -224,12 +224,12 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         <p>
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
-        <ExtensionSlot
-          name="order-tem-additional-info-slot"
-          state={{ orderItemUuid: testType.conceptUuid }}
-          className={styles.priceAndStockContainer}
-        />
       </div>
+      <ExtensionSlot
+        name="order-item-additional-info-slot"
+        state={{ orderItemUuid: testType.conceptUuid }}
+        className={styles.additionalInfoContainer}
+      />
       <div className={styles.searchResultActions}>
         {testTypeAlreadyInBasket ? (
           <Button

@@ -24,7 +24,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
       <span className={styles.priceLabel}>Price:</span>
       {amount.currency} {amount.value}
       <Tooltip
-        align="bottom"
+        align="bottom-left"
         className={styles.priceToolTip}
         label={t(
           'priceDisclaimer',

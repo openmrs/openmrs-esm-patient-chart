@@ -7,13 +7,13 @@
     {
       "name": "order-price-details",
       "component": "orderPriceDetailsExtension",
-      "slot": "order-tem-additional-info-slot",
+      "slot": "order-item-additional-info-slot",
       "order": 0
     },
     {
       "name": "order-stock-details",
       "component": "orderStockDetailsExtension",
-      "slot": "order-tem-additional-info-slot",
+      "slot": "order-item-additional-info-slot",
       "order": 1
     },
     {

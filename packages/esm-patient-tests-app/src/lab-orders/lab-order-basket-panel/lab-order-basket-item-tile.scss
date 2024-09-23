@@ -84,15 +84,13 @@
 }
 
 .additionalInfoContainer {
-  border-top: 1px solid $grey-2;
-  margin-top: layout.$spacing-03;
-  padding-top: layout.$spacing-03;
+  padding: layout.$spacing-05 0;
   display: flex;
   justify-content: start;
   align-items: center;
   gap: layout.$spacing-05;
 }
 
-.additionalInfoContainer:empty {
-  display: none;
+.additionalInfoContainer:not(:has(div:not(:empty))) {
+  padding: 0;
 }

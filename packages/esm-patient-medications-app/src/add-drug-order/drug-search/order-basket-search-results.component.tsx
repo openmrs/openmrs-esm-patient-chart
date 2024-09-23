@@ -198,7 +198,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
             </UserHasAccess>
           </div>
           <ExtensionSlot
-            name="order-tem-additional-info-slot"
+            name="order-item-additional-info-slot"
             state={{ orderItemUuid: orderItem.drug.uuid }}
             className={styles.additionalInfoContainer}
           />
