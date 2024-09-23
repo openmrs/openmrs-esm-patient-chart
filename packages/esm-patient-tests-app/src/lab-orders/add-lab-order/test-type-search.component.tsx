@@ -224,41 +224,39 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
         <p>
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
-      </div>
-      <div className={styles.searchResultFooter}>
         <ExtensionSlot
           name="order-tem-additional-info-slot"
           state={{ orderItemUuid: testType.conceptUuid }}
           className={styles.priceAndStockContainer}
         />
-        <div className={styles.searchResultActions}>
-          {testTypeAlreadyInBasket ? (
-            <Button
-              kind="danger--ghost"
-              renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
-              onClick={removeFromBasket}
-            >
-              {t('removeFromBasket', 'Remove from basket')}
-            </Button>
-          ) : (
-            <Button
-              kind="ghost"
-              renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
-                <ShoppingCartArrowDownIcon size={16} {...props} />
-              )}
-              onClick={addToBasket}
-            >
-              {t('directlyAddToBasket', 'Add to basket')}
-            </Button>
-          )}
+      </div>
+      <div className={styles.searchResultActions}>
+        {testTypeAlreadyInBasket ? (
+          <Button
+            kind="danger--ghost"
+            renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+            onClick={removeFromBasket}
+          >
+            {t('removeFromBasket', 'Remove from basket')}
+          </Button>
+        ) : (
           <Button
             kind="ghost"
-            renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-            onClick={() => openOrderForm(createLabOrder(testType))}
+            renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+              <ShoppingCartArrowDownIcon size={16} {...props} />
+            )}
+            onClick={addToBasket}
           >
-            {t('goToDrugOrderForm', 'Order form')}
+            {t('directlyAddToBasket', 'Add to basket')}
           </Button>
-        </div>
+        )}
+        <Button
+          kind="ghost"
+          renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
+          onClick={() => openOrderForm(createLabOrder(testType))}
+        >
+          {t('goToDrugOrderForm', 'Order form')}
+        </Button>
       </div>
     </Tile>
   );

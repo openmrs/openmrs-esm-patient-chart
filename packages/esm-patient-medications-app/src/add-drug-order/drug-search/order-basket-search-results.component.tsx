@@ -197,50 +197,46 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
               )}
             </UserHasAccess>
           </div>
+          <ExtensionSlot
+            name="order-tem-additional-info-slot"
+            state={{ orderItemUuid: orderItem.drug.uuid }}
+            className={styles.additionalInfoContainer}
+          />
           {!isLoadingActiveOrders ? (
             drugAlreadyPrescribed ? (
               <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
             ) : (
-              <div className={styles.searchResultFooter}>
-                <ExtensionSlot
-                  name="order-tem-additional-info-slot"
-                  state={{ orderItemUuid: orderItem.drug.uuid }}
-                  className={styles.priceAndStockContainer}
-                />
-                <div className={styles.searchResultActions}>
-                  {drugAlreadyInBasket ? (
-                    <Button
-                      kind="danger--ghost"
-                      renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
-                        <ShoppingCartArrowUp size={16} {...props} />
-                      )}
-                      onClick={() => removeFromBasket(orderItem)}
-                    >
-                      {t('removeFromBasket', 'Remove from basket')}
-                    </Button>
-                  ) : (
-                    <Button
-                      kind="ghost"
-                      renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
-                        <ShoppingCartArrowDownIcon size={16} {...props} />
-                      )}
-                      onClick={() => addToBasket(orderItem)}
-                      disabled={drugAlreadyPrescribed}
-                    >
-                      {t('directlyAddToBasket', 'Add to basket')}
-                    </Button>
-                  )}
+              <div className={styles.searchResultActions}>
+                {drugAlreadyInBasket ? (
+                  <Button
+                    kind="danger--ghost"
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
+                      <ShoppingCartArrowUp size={16} {...props} />
+                    )}
+                    onClick={() => removeFromBasket(orderItem)}
+                  >
+                    {t('removeFromBasket', 'Remove from basket')}
+                  </Button>
+                ) : (
                   <Button
                     kind="ghost"
-                    renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (
-                      <ArrowRightIcon size={16} {...props} />
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                      <ShoppingCartArrowDownIcon size={16} {...props} />
                     )}
-                    onClick={() => openOrderForm(orderItem)}
+                    onClick={() => addToBasket(orderItem)}
                     disabled={drugAlreadyPrescribed}
                   >
-                    {t('goToDrugOrderForm', 'Order form')}
+                    {t('directlyAddToBasket', 'Add to basket')}
                   </Button>
-                </div>
+                )}
+                <Button
+                  kind="ghost"
+                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
+                  onClick={() => openOrderForm(orderItem)}
+                  disabled={drugAlreadyPrescribed}
+                >
+                  {t('goToDrugOrderForm', 'Order form')}
+                </Button>
               </div>
             )
           ) : null}

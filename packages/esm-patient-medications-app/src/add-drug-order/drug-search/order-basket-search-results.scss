@@ -50,18 +50,19 @@
   justify-content: space-between;
 }
 
-.priceAndStockContainer {
+.additionalInfoContainer {
   display: flex;
-  flex-flow: row wrap;
   justify-content: start;
   align-items: center;
-  gap: layout.$spacing-05;
+  gap: layout.$spacing-03;
+  padding-left: layout.$spacing-05;
+  padding-bottom: layout.$spacing-03;
 }
 
 .searchResultActions {
+  border-top: 1px solid $grey-2;
+  padding: 0 layout.$spacing-05;
   display: flex;
-  align-self: flex-end;
-  margin-left: auto;
   justify-content: flex-end;
 
   svg {
