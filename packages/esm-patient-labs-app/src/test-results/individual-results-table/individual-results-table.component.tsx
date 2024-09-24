@@ -2,20 +2,30 @@ import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
-  DataTableSkeleton,
   Button,
   DataTable,
-  TableContainer,
+  DataTableSkeleton,
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@carbon/react';
 import { ArrowRightIcon, showModal, useLayoutType, isDesktop, formatDate } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type RowData } from '../filter/filter-types';
 import styles from './individual-results-table.scss';
+
+interface IndividualResultsTableProps {
+  isLoading: boolean;
+  parent: {
+    display: string;
+  };
+  subRows: Array<RowData>;
+  index: number;
+}
 
 const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
   switch (interpretation) {
@@ -43,7 +53,7 @@ const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
   }
 };
 
-const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
+const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, parent, subRows, index }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const patientUuid = getPatientUuidFromUrl();
@@ -62,49 +72,52 @@ const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
     [patientUuid],
   );
 
-  const tableHeaders = [
-    { key: 'testName', header: t('testName', 'Test Name') },
-    {
-      key: 'value',
-      header: t('value', 'Value'),
-    },
-    { key: 'referenceRange', header: t('referenceRange', 'Reference range') },
-  ];
+  const tableHeaders = useMemo(() => {
+    return [
+      { key: 'testName', header: t('testName', 'Test Name') },
+      {
+        key: 'value',
+        header: t('value', 'Value'),
+      },
+      { key: 'referenceRange', header: t('referenceRange', 'Reference range') },
+    ];
+  }, [t]);
 
-  const tableRows = useMemo(() => {
-    const rowData = subRows.flatMap((row, i) => {
-      const { units = '', range = '', obs: values } = row;
-      const isString = isNaN(parseFloat(values?.[0]?.value));
+  const tableRows = useMemo(
+    () =>
+      subRows.map((row, i) => {
+        const { units = '', range = '', obs: values } = row;
+        const isString = isNaN(parseFloat(values?.[0]?.value));
 
-      return {
-        ...row,
-        id: `${i}-${index}`,
-        testName: (
-          <span className={styles['trendline-link']}>
-            {!isString ? (
-              <span
-                className={styles['trendline-link-view']}
-                onClick={() => launchResultsDialog(row.display, row.conceptUuid)}
-              >
-                {row.display}
-              </span>
-            ) : (
-              <span className={styles.trendlineLink}>{row.display}</span>
-            )}
-          </span>
-        ),
-        value: {
-          value: (row.obs[0]?.value ? row.obs[0]?.value : '') + +' ' + (row?.units ? ` ${row?.units}` : ''),
-          interpretation: row.obs[0]?.interpretation,
-        },
-        referenceRange: `${range || '--'} ${units || '--'}`,
-      };
-    });
-
-    return rowData;
-  }, [index, subRows, launchResultsDialog]);
+        return {
+          ...row,
+          id: `${i}-${index}`,
+          testName: (
+            <span className={styles['trendline-link']}>
+              {!isString ? (
+                <span
+                  className={styles['trendline-link-view']}
+                  onClick={() => launchResultsDialog(row.display, row.conceptUuid)}
+                >
+                  {row.display}
+                </span>
+              ) : (
+                <span className={styles.trendlineLink}>{row.display}</span>
+              )}
+            </span>
+          ),
+          value: {
+            value: `${row.obs[0]?.value ?? ''} ${row.units ?? ''}`,
+            interpretation: row.obs[0]?.interpretation,
+          },
+          referenceRange: `${range || '--'} ${units || '--'}`,
+        };
+      }),
+    [index, subRows, launchResultsDialog],
+  );
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+
   if (subRows?.length) {
     return (
       <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container useZebraStyles>
