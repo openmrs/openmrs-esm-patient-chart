@@ -5,6 +5,8 @@ import { SkeletonText, Tooltip } from '@carbon/react';
 import { Information } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 
+// import { } from "@openmrs/esm-framework"
+
 interface OrderPriceDetailsComponentProps {
   orderItemUuid: string;
 }
@@ -21,8 +23,8 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
 
   return (
     <div className={styles.priceDetailsContainer}>
-      <span className={styles.priceLabel}>Price:</span>
-      {amount.currency} {amount.value}
+      <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
+      {`${amount.currency} ${amount.value}`}
       <Tooltip
         align="bottom-left"
         className={styles.priceToolTip}
