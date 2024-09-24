@@ -94,7 +94,7 @@ const IndividualResultsTable = ({ isLoading, parent, subRows, index }) => {
           </span>
         ),
         value: {
-          value: (row.obs[0]?.value ? row.obs[0]?.value : '') + ' ' + (row?.units ? ` ${row?.units}` : ''),
+          value: `${row.obs[0]?.value ?? ''} ${row.units ?? ''}`,
           interpretation: row.obs[0]?.interpretation,
         },
         referenceRange: `${range || '--'} ${units || '--'}`,
