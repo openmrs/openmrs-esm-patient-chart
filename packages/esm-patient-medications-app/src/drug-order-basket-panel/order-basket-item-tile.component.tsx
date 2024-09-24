@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useRef } from 'react';
+import React, { type ComponentProps, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
@@ -23,6 +23,13 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
   // handleClick event later. Not sure if this is a bug, but this shouldn't be possible in our flows.
   // Hence, we manually prevent the handleClick callback from being invoked as soon as the button is pressed once.
   const shouldOnClickBeCalled = useRef(true);
+
+  const additionalInfoSlotState = useMemo(
+    () => ({
+      orderItemUuid: orderBasketItem.drug.uuid,
+    }),
+    [orderBasketItem],
+  );
 
   const tileContent = (
     <div>
@@ -93,7 +100,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
       </div>
       <ExtensionSlot
         name="order-item-additional-info-slot"
-        state={{ orderItemUuid: orderBasketItem.drug.uuid }}
+        state={additionalInfoSlotState}
         className={styles.additionalInfoContainer}
       />
     </div>
