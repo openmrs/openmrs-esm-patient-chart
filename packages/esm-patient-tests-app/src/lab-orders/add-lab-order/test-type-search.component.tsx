@@ -6,7 +6,6 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import {
   ArrowRightIcon,
   closeWorkspace,
-  ExtensionSlot,
   ResponsiveWrapper,
   ShoppingCartArrowDownIcon,
   useDebounce,
@@ -225,11 +224,6 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
       </div>
-      <ExtensionSlot
-        name="order-item-additional-info-slot"
-        state={{ orderItemUuid: testType.conceptUuid }}
-        className={styles.additionalInfoContainer}
-      />
       <div className={styles.searchResultActions}>
         {testTypeAlreadyInBasket ? (
           <Button

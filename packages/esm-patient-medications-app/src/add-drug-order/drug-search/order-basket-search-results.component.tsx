@@ -7,7 +7,6 @@ import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-com
 import {
   ArrowRightIcon,
   closeWorkspace,
-  ExtensionSlot,
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
@@ -197,11 +196,6 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
               )}
             </UserHasAccess>
           </div>
-          <ExtensionSlot
-            name="order-item-additional-info-slot"
-            state={{ orderItemUuid: orderItem.drug.uuid }}
-            className={styles.additionalInfoContainer}
-          />
           {!isLoadingActiveOrders ? (
             drugAlreadyPrescribed ? (
               <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
