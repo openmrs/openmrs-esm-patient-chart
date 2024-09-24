@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useOrderPrice } from '../hooks/useOrderPrice';
 import styles from './order-price-details.scss';
 import { SkeletonText, Tooltip } from '@carbon/react';
 import { Information } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-
-// import { } from "@openmrs/esm-framework"
 
 interface OrderPriceDetailsComponentProps {
   orderItemUuid: string;
@@ -15,11 +13,20 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   const { t } = useTranslation();
   const { data: priceData, isLoading } = useOrderPrice(orderItemUuid);
 
+  const amount = useMemo(() => {
+    if (!priceData || priceData.entry.length === 0) {
+      return null;
+    }
+    return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
+  }, [priceData]);
+
   if (isLoading || !priceData) {
     return <SkeletonText width="100px" />;
   }
 
-  const { amount } = priceData.entry[0].resource.propertyGroup[0].priceComponent[0];
+  if (!amount) {
+    return null;
+  }
 
   return (
     <div className={styles.priceDetailsContainer}>

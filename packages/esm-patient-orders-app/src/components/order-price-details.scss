@@ -1,3 +1,4 @@
+@use '@carbon/styles/scss/type';
 @use '@carbon/layout';
 
 .priceDetailsContainer {
@@ -8,7 +9,7 @@
 }
 
 .priceLabel {
-  font-weight: 800;
+  @include type.type-style('heading-compact-01');
   padding-right: layout.$spacing-02;
 }
 
