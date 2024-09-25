@@ -40,6 +40,7 @@ const store = createGlobalStore<Record<string, FormState>>('ampath-form-state', 
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
+  private workspaceDirtyStateListenerSubscription: Subscription;
   private unsubscribeStore: () => void | undefined;
 
   public formUuid: string;
@@ -77,6 +78,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   public ngOnDestroy() {
     this.unsubscribeStore && this.unsubscribeStore();
     this.launchFormSubscription?.unsubscribe();
+    this.workspaceDirtyStateListenerSubscription?.unsubscribe();
   }
 
   public launchForm() {
@@ -387,9 +389,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private setupWorkspaceDirtyStateListener(): void {
     const promptBeforeClosing = this.singleSpaPropsService.getPropOrThrow('promptBeforeClosing');
 
-    this.form.rootNode.control.valueChanges
+    this.workspaceDirtyStateListenerSubscription = this.form.rootNode.control.valueChanges
       .pipe(
-        map((control) => Boolean(control)),
+        map(() => this.form.rootNode.control.dirty),
         filter((isDirty) => isDirty),
         take(1),
       )
