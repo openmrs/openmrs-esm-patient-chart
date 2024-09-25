@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
+import { CheckmarkFilledIcon, CloseFilledIcon } from '@openmrs/esm-framework';
 import { useOrderStockInfo } from '../hooks/useOrderStockInfo';
-import { CheckmarkFilled, CloseFilled } from '@carbon/react/icons';
 import styles from './order-stock-details.scss';
 import { SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -29,11 +29,11 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     <div>
       {isInStock ? (
         <div className={styles.itemInStock}>
-          <CheckmarkFilled size={16} /> {t('inStock', 'In Stock')}
+          <CheckmarkFilledIcon size={16} /> {t('inStock', 'In Stock')}
         </div>
       ) : (
         <div className={styles.itemOutOfStock}>
-          <CloseFilled size={16} /> {t('outOfStock', 'Out of Stock')}
+          <CloseFilledIcon size={16} /> {t('outOfStock', 'Out of Stock')}
         </div>
       )}
     </div>
