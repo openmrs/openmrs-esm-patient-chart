@@ -188,7 +188,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
             form && (
               <OverflowMenuItem
                 index={index}
-                itemText={actionItem.label}
+                itemText={t(actionItem.label)}
                 onClick={(e) => {
                   e.preventDefault();
                   actionItem.mode === 'delete'
@@ -217,11 +217,11 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   const headers = useMemo(() => {
     if (columns) {
       return columns.map((column) => {
-        return { key: column.key, header: column.header };
+        return { key: column.key, header: t(column.header) };
       });
     }
     return [];
-  }, [columns]);
+  }, [columns, t]);
 
   const formLauncher = useMemo(() => {
     if (formsJson.length == 1 && !formsJson[0]['availableIntents']?.length) {
@@ -229,13 +229,13 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <Button
           kind="ghost"
           renderIcon={Add}
-          iconDescription="Add "
+          iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
             launchEncounterForm(formsJson[0], 'add', onFormSave, null, '', '*', workspaceWindowSize, patientUuid);
           }}
         >
-          {displayText}
+          {t(displayText)}
         </Button>
       );
     } else if (formsJson.length && !(hideFormLauncher ?? isDead)) {
@@ -266,7 +266,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t(headerTitle)}</h4>
               {/* @ts-ignore */}
               {!(hideFormLauncher ?? isDead) && <div className={styles.toggleButtons}>{formLauncher}</div>}
             </div>
@@ -286,7 +286,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       ) : (
         <EmptyState
           displayText={description}
-          headerTitle={headerTitle}
+          headerTitle={t(headerTitle)}
           launchForm={
             hideFormLauncher || isDead
               ? null
