@@ -21,7 +21,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     error: error,
     isLoading: isLoading,
     isValidating: isValidating,
-  } = usePatientOrders(patientUuid);
+  } = usePatientOrders(patient?.id, 'any');
 
   const [pastOrders, activeOrders] = useMemo(() => {
     const currentDate = new Date();
