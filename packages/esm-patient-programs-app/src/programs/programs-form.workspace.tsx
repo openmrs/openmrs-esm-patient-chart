@@ -34,13 +34,29 @@ interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
 }
 
 const createProgramsFormSchema = (t: TFunction) =>
-  z.object({
-    selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
-    enrollmentDate: z.date(),
-    completionDate: z.date().nullable(),
-    enrollmentLocation: z.string(),
-    selectedProgramStatus: z.string(),
-  });
+  z
+    .object({
+      selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
+      enrollmentDate: z.date(),
+      completionDate: z.date().nullable().optional(),
+      enrollmentLocation: z.string(),
+      selectedProgramStatus: z.string(),
+    })
+    .refine(
+      (data) => {
+        if (data.completionDate) {
+          return (
+            dayjs(data.completionDate).isSame(dayjs(data.enrollmentDate), 'day') ||
+            dayjs(data.completionDate).isAfter(dayjs(data.enrollmentDate))
+          );
+        }
+        return true;
+      },
+      {
+        message: t('completionDateInvalid', 'Completion date must be the same or after enrollment date'),
+        path: ['completionDate'],
+      },
+    );
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 
@@ -120,7 +136,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
         states:
-          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
+          !!selectedProgramStatus && selectedProgramStatus !== currentState?.state.uuid
             ? [{ state: { uuid: selectedProgramStatus } }]
             : [],
       };
@@ -220,7 +236,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
+          minDate={(() => {
+            const enrollmentDate = new Date(watch('enrollmentDate'));
+            enrollmentDate.setHours(0, 0, 0, 0);
+            return enrollmentDate;
+          })()}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => onChange(date)}
