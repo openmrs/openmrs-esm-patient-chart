@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
-import { Search as SearchIcon, Close } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
+import { CloseIcon, navigate, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
 import type { ObsRecord } from '../../types';
@@ -222,7 +221,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
           </Form>
           <Button
             hasIconOnly
-            renderIcon={Close}
+            renderIcon={CloseIcon}
             iconDescription={t('closeSearchBar', 'Close search')}
             onClick={handleToggleSearchFields}
             size="sm"
@@ -235,7 +234,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
             <Form onSubmit={handleSearchTerm} className={classNames(styles.flex, styles.tabletSearch)}>
               <Search
                 value={localSearchTerm}
-                onChange={(e) => setLocalSearchTerm(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
                 autoFocus
                 size="lg"

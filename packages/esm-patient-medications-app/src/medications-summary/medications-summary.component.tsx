@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { parseDate } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit, type Order } from '@openmrs/esm-patient-common-lib';
-import { usePatientOrders } from '../api/api';
+import { usePatientOrders } from '../api';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface MedicationsSummaryProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
+export default function MedicationsSummary({ patient }: MedicationsSummaryProps) {
   const { t } = useTranslation();
   const launchAddDrugWorkspace =
     useLaunchWorkspaceRequiringVisit<AddDrugOrderWorkspaceAdditionalProps>('add-drug-order');
@@ -64,7 +64,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showDiscontinueButton={true}
                 showModifyButton={true}
                 showReorderButton={false}
-                patientUuid={patientUuid}
+                patient={patient}
               />
             );
           }
@@ -90,7 +90,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showDiscontinueButton={false}
                 showModifyButton={false}
                 showReorderButton={true}
-                patientUuid={patientUuid}
+                patient={patient}
               />
             );
           }

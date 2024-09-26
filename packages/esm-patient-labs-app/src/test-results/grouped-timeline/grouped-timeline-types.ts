@@ -1,5 +1,5 @@
 import type { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { type TreeNode } from '../filter/filter-types';
+import { type RowData, type TreeNode } from '../filter/filter-types';
 
 export interface PanelNameCornerProps {
   showShadow: boolean;
@@ -31,14 +31,36 @@ interface DataRow extends TreeNode {
   range: string;
 }
 
+export interface NewRowStartCellProps {
+  title: string;
+  range: string;
+  units: string;
+  conceptUuid: string;
+  patientUuid: string;
+  shadow?: boolean;
+  isString?: boolean;
+}
+
 export interface TimelineCellProps {
   text: string;
   interpretation?: OBSERVATION_INTERPRETATION;
   zebra: boolean;
 }
 
+export interface TimelineDataGroupProps {
+  patientUuid: string;
+  parent: TreeNode;
+  subRows: Array<RowData>;
+  panelName: string;
+  setPanelName: (name: string) => void;
+  xScroll: number;
+  setXScroll: (x: number) => void;
+  groupNumber: number;
+}
+
 export interface DataRowsProps {
-  rowData: DataRow[];
+  patientUuid: string;
+  rowData: Array<RowData>;
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
   showShadow: boolean;

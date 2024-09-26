@@ -1,10 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
-import { age, getPatientName, formatDate, parseDate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import {
+  age,
+  ArrowLeftIcon,
+  getPatientName,
+  formatDate,
+  parseDate,
+  useLayoutType,
+  usePatient,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -59,7 +66,7 @@ export default function AddLabOrderWorkspace({
         <div className={styles.backButton}>
           <Button
             kind="ghost"
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription="Return to order basket"
             size="sm"
             onClick={cancelOrder}

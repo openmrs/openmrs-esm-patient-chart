@@ -1,16 +1,18 @@
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+
 interface Observation {
   display: string;
   flatName: string;
   hasData?: boolean;
 }
+
 export interface TreeNode {
   conceptUuid?: string;
   datatype?: string;
   display: string;
   flatName: string;
   subSets?: Array<TreeNode>;
-  hasData?: true;
+  hasData?: boolean;
   hiCritical?: number;
   hiNormal?: number;
   lowAbsolute?: number;
@@ -21,6 +23,7 @@ export interface TreeNode {
   range?: string;
   [x: string]: any;
 }
+
 export interface FilterNodeProps {
   root: TreeNode;
   level: number;

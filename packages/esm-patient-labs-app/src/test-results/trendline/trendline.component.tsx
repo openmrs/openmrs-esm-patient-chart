@@ -1,9 +1,8 @@
-import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
-import { formatDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
@@ -35,7 +34,7 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
           <ConfigurableLink to={testResultsBasePath(`/patient/${patientUuid}/chart`)}>
             <Button
               kind="ghost"
-              renderIcon={(props) => <ArrowLeft {...props} size={24} />}
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
               iconDescription={t('returnToTimeline', 'Return to timeline')}
             >
               <span>{t('backToTimeline', 'Back to timeline')}</span>

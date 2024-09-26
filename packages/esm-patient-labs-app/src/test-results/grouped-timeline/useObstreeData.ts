@@ -1,21 +1,34 @@
-import { usePatient, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { usePatient, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
 
-export const getName = (prefix, name) => {
+export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-const augmentObstreeData = (node, prefix) => {
-  const outData = JSON.parse(JSON.stringify(node));
+interface ObsTreeNode {
+  flatName?: string;
+  display: string;
+  hasData: boolean;
+  hiNormal?: number;
+  lowNormal?: number;
+  range?: string;
+  subSets: Array<ObsTreeNode>;
+  obs: Array<{ value: string }>;
+}
+
+const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
+  const outData: Partial<ObsTreeNode> = JSON.parse(JSON.stringify(node));
   outData.flatName = getName(prefix, node.display);
   outData.hasData = false;
 
   if (outData?.subSets?.length) {
-    outData.subSets = outData.subSets.map((subNode) => augmentObstreeData(subNode, getName(prefix, node?.display)));
-    outData.hasData = outData.subSets.some((subNode) => subNode.hasData);
+    outData.subSets = outData.subSets.map((subNode: ObsTreeNode) =>
+      augmentObstreeData(subNode, getName(prefix, node?.display)),
+    );
+    outData.hasData = outData.subSets.some((subNode: ObsTreeNode) => subNode.hasData);
   }
   if (exist(outData?.hiNormal, outData?.lowNormal)) {
     outData.range = `${outData.lowNormal} – ${outData.hiNormal}`;
@@ -26,12 +39,15 @@ const augmentObstreeData = (node, prefix) => {
     outData.hasData = true;
   }
 
-  return { ...outData };
+  return { ...outData } as ObsTreeNode;
 };
 
-const useGetObstreeData = (conceptUuid) => {
+const useGetObstreeData = (conceptUuid: string) => {
   const { patientUuid } = usePatient();
-  const response = useSWR(`${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`, openmrsFetch);
+  const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
+    `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
+    openmrsFetch,
+  );
   const result = useMemo(() => {
     if (response.data) {
       const { data, ...rest } = response;

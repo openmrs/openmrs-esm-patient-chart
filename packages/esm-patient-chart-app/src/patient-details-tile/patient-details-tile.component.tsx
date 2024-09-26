@@ -1,21 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
-import { InlineLoading } from '@carbon/react';
-import { age, getPatientName, formatDate, usePatient, parseDate } from '@openmrs/esm-framework';
+import { age, getPatientName, formatDate, parseDate } from '@openmrs/esm-framework';
 import styles from './patient-details-tile.scss';
 
 interface PatientDetailsTileInterface {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid }) => {
-  const { patient, isLoading } = usePatient(patientUuid);
+const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patient }) => {
   const { t } = useTranslation();
-
-  if (isLoading) {
-    return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
-  }
 
   return (
     <div className={styles.container}>

@@ -35,7 +35,7 @@ describe('ActiveMedications', () => {
   test('renders an empty state view when there are no active medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -56,7 +56,7 @@ describe('ActiveMedications', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -69,7 +69,7 @@ describe('ActiveMedications', () => {
   test('renders a tabular overview of the active medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -105,7 +105,7 @@ test('clicking the Record active medications link opens the order basket form', 
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+  renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
   const orderLink = screen.getByText('Record active medications');
@@ -117,7 +117,7 @@ test('clicking the Add button opens the order basket form', async () => {
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+  renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
   const button = screen.getByRole('button', { name: /Add/i });

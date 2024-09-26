@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,8 +16,8 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import {
+  AddIcon,
   formatDate,
   parseDate,
   isDesktop as isDesktopLayout,
@@ -159,7 +159,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add conditions"
               onClick={launchConditionsForm}
             >

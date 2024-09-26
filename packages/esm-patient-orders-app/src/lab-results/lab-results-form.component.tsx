@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { useOrderConceptByUuid, updateOrderResult, useLabEncounter, useObservation } from './lab-results.resource';
-import ResultFormField from './result-form-field.component';
-import styles from './lab-results-form.scss';
 import { mutate } from 'swr';
+import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
+import { useOrderConceptByUuid, updateOrderResult, useLabEncounter, useObservation } from './lab-results.resource';
+import ResultFormField from './lab-results-form-field.component';
+import styles from './lab-results-form.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
-  order,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  order,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
@@ -24,17 +24,17 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const [obsUuid, setObsUuid] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
   const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const { encounter, isLoading: isLoadingEncounter, mutate: mutateLabOrders } = useLabEncounter(order.encounter.uuid);
   const { data, isLoading: isLoadingObs, error: isErrorObs } = useObservation(obsUuid);
+  const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
 
   const {
     control,
     register,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     getValues,
     handleSubmit,
   } = useForm<{ testResult: any }>({
@@ -82,11 +82,18 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }
 
-  const saveLabResults = (data, e) => {
-    setIsSubmitting(true);
-    e.preventDefault();
-    // assign result to test order
-    const documentedValues = getValues();
+  const saveLabResults = () => {
+    const formValues = getValues();
+
+    const isEmptyForm = Object.values(formValues).every(
+      (value) => value === '' || value === null || value === undefined,
+    );
+
+    if (isEmptyForm) {
+      setShowEmptyFormErrorNotification(true);
+      return;
+    }
+
     let obsValue = [];
 
     if (concept.set && concept.setMembers.length > 0) {
@@ -160,7 +167,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       abortController,
     ).then(
       () => {
-        setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
         mutateLabOrders();
         mutate(
@@ -177,7 +183,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         });
       },
       (err) => {
-        setIsSubmitting(false);
         showSnackbar({
           title: t('errorSavingLabResults', 'Error saving lab results'),
           kind: 'error',
@@ -185,6 +190,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         });
       },
     );
+
+    setShowEmptyFormErrorNotification(false);
   };
 
   return (
@@ -192,22 +199,23 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       <div className={styles.grid}>
         {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
         {concept && (
-          <Stack gap={2}>
+          <Stack gap={5}>
             {!isLoadingInitialValues ? (
-              <ResultFormField
-                defaultValue={initialValues}
-                register={register}
-                concept={concept}
-                control={control}
-                errors={errors}
-              />
+              <ResultFormField defaultValue={initialValues} concept={concept} control={control} />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
           </Stack>
         )}
+        {showEmptyFormErrorNotification && (
+          <InlineNotification
+            className={styles.emptyFormError}
+            lowContrast
+            title={t('error', 'Error')}
+            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+          />
+        )}
       </div>
-
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
           {t('discard', 'Discard')}

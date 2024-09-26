@@ -10,7 +10,7 @@ const defaultProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
+  setTitle: jest.fn,
 };
 
 const mockPastVisits = {

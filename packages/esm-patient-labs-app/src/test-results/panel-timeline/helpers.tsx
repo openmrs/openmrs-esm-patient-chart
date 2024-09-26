@@ -36,16 +36,24 @@ export const Grid: React.FC<{
   style: React.CSSProperties;
   padding?: boolean;
   dataColumns: number;
-}> = ({ dataColumns, style = {}, padding = false, ...props }) => (
-  <div
-    style={{
-      ...style,
-      gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, 5em)`,
-    }}
-    className={styles['grid']}
-    {...props}
-  />
-);
+}> = ({ dataColumns, style = {}, padding = false, ...props }) => {
+  const minColumnWidth = 4;
+  const maxColumnWidth = 10;
+
+  const dynamicColumnWidth = Math.max(minColumnWidth, Math.min(maxColumnWidth, 100 / dataColumns));
+
+  return (
+    <div
+      style={{
+        ...style,
+        gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, ${dynamicColumnWidth}em)`,
+        overflow: 'hidden',
+      }}
+      className={styles['grid']}
+      {...props}
+    />
+  );
+};
 
 export const PaddingContainer = React.forwardRef<HTMLElement, any>((props, ref) => (
   <div ref={ref} className={styles['padding-container']} {...props} />

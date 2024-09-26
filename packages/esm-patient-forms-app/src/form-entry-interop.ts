@@ -1,7 +1,10 @@
 import { navigate, type Visit } from '@openmrs/esm-framework';
-import { type HtmlFormEntryForm } from './config-schema';
-import isEmpty from 'lodash-es/isEmpty';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import {
+  type HtmlFormEntryForm,
+  launchPatientWorkspace,
+  launchStartVisitPrompt,
+} from '@openmrs/esm-patient-common-lib';
+import { isEmpty } from 'lodash-es';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,

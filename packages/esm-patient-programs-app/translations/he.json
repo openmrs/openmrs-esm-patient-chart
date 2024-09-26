@@ -7,6 +7,7 @@
   "cancel": "בטל",
   "carePrograms": "תוכניות טיפול",
   "chooseProgram": "בחר תוכנית",
+  "chooseStatus": "Choose a program status",
   "completedOn": "הושלם בתאריך",
   "configurePrograms": "אנא הגדר תוכניות כדי להמשיך.",
   "dateCompleted": "תאריך השלמה",
@@ -28,8 +29,10 @@
   "programRequired": "Program is required",
   "programs": "תוכניות",
   "Programs": "תוכניות",
+  "programStatus": "Program status",
   "saveAndClose": "שמור וסגור",
   "saving": "Saving",
   "seeAll": "ראה הכל",
+  "state": "State",
   "status": "סטטוס"
 }

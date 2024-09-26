@@ -136,13 +136,17 @@ export function prepMedicationOrderPostData(
  * Hook to fetch the system setting for whether to require quantity, quantity units,
  * and number of refills for outpatient drug orders.
  *
- * @returns {Object} An object containing:
+ * @returns An object containing:
  * - requireOutpatientQuantity: A boolean indicating whether to require quantity, quantity units,
  * and number of refills for outpatient drug orders.
  * - error: Any error encountered during the fetch operation.
  * - isLoading: A boolean indicating if the fetch operation is in progress.
  */
-export function useRequireOutpatientQuantity() {
+export function useRequireOutpatientQuantity(): {
+  requireOutpatientQuantity: boolean;
+  isLoading: boolean;
+  error?: Error;
+} {
   const url = `${restBaseUrl}/systemsetting/drugOrder.requireOutpatientQuantity?v=custom:(value)`;
 
   const { data, error, isLoading } = useSWRImmutable<{ data: { value: 'true' | 'false' } }, Error>(url, openmrsFetch);

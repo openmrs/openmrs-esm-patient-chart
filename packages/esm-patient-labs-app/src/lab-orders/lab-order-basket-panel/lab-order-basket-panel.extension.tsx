@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
-import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, closeWorkspace, ChevronDownIcon, ChevronUpIcon, useLayoutType } from '@openmrs/esm-framework';
 import {
   launchPatientWorkspace,
   type OrderBasketItem,
@@ -98,7 +97,7 @@ export default function LabOrderBasketPanelExtension() {
         <div className={styles.buttonContainer}>
           <Button
             kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add lab order"
             onClick={openNewLabForm}
             size={isTablet ? 'md' : 'sm'}
@@ -109,8 +108,8 @@ export default function LabOrderBasketPanelExtension() {
             className={styles.chevron}
             hasIconOnly
             kind="ghost"
-            renderIcon={(props) =>
-              isExpanded ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+            renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
+              isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
             iconDescription="View"
             disabled={orders.length === 0}

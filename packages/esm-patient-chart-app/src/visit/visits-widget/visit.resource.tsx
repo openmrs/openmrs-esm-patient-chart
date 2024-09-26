@@ -38,7 +38,7 @@ export function useInfiniteVisits(patientUuid: string) {
   );
 
   return {
-    visits: data ? [].concat(data?.flatMap((page) => page.data.results)) : null,
+    visits: data ? [].concat(data?.flatMap((page) => page?.data?.results)) : null,
     error,
     hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
     isLoading,

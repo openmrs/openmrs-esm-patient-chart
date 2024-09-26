@@ -1,9 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { type ComponentProps, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
+import { ArrowLeftIcon, formatDate, parseDate } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type MappedList, usePatientListMembers } from '../patient-lists.resource';
 import PatientListDetailsTable from './patient-list-details-table.component';
 import styles from './patient-list-details.scss';
@@ -33,7 +32,7 @@ function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps)
       <div className={styles.backButton}>
         <Button
           kind="ghost"
-          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription="Back to patient lists"
           size="sm"
           onClick={closeListDetailsWorkspace}

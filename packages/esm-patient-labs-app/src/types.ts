@@ -77,6 +77,9 @@ export interface Concept {
     display: string;
     name: string;
   };
+  names: Array<{
+    display: string;
+  }>;
   answers: [];
   setMembers: [];
   hiNormal: number;
@@ -132,3 +135,5 @@ export interface ObservationSet {
   uuid: string;
   meta: ConceptMeta;
 }
+
+export type viewOpts = 'individual-test' | 'over-time' | 'full';
