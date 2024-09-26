@@ -85,6 +85,7 @@ export interface Order {
   asNeeded: boolean;
   asNeededCondition?: string;
   autoExpireDate: string;
+  autoStopDate: string;
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;

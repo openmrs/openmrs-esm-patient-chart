@@ -128,26 +128,29 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </p>
           </div>
           <p className={styles.bodyLong01}>
-            {medication.orderReasonNonCoded ? (
+            {medication.orderReasonNonCoded && (
               <span>
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            ) : null}
-            {medication.quantity ? (
+            )}
+            {medication.quantity && (
               <span>
                 <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                 {medication.quantity} {medication?.quantityUnits?.display}
               </span>
-            ) : null}
-            {medication.dateStopped ? (
+            )}
+            {(medication.dateStopped || medication.autoStopDate) && (
               <span>
                 <span className={styles.label01}>
-                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
+                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}:{' '}
+                  {formatDate(new Date(medication.dateStopped || medication.autoStopDate))}
                 </span>
-                {formatDate(new Date(medication.dateStopped))}
               </span>
-            ) : null}
+            )}
+            {(medication.dateStopped != null || medication.autoStopDate != null) && (
+              <span className={styles.label01}>&mdash; {t('discontinued', 'Discontinued').toUpperCase()}</span>
+            )}
           </p>
         </div>
       ),
