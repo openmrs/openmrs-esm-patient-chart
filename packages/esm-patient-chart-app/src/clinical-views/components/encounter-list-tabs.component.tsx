@@ -1,5 +1,6 @@
 import React from 'react';
 import { useConfig } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import { EncounterList } from '../../encounter-list/components/encounter-list.component';
 import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
@@ -12,7 +13,7 @@ interface EncounterListTabsComponentProps {
 const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { tabDefinitions = [] } = config;
-
+  const { t } = useTranslation();
   const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions);
   const filter = (encounter, formUuid) => encounter?.form?.uuid === formUuid;
 
@@ -21,7 +22,7 @@ const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({
       <Tabs>
         <TabList contained>
           {tabsConfig.map((tab) => (
-            <Tab key={tab.name}>{tab.name}</Tab>
+            <Tab key={tab.name}>{t(tab.name)}</Tab>
           ))}
         </TabList>
         <TabPanels>
