@@ -14,7 +14,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id, 'ACTIVE');
+  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
 
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
