@@ -23,7 +23,7 @@ export const DashboardExtension = ({
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
   return (
-    <div key={path} style={{ width: '16rem' }}>
+    <div key={path}>
       <ConfigurableLink
         className={classNames('cds--side-nav__link', { 'active-left-nav-link': path === navLink })}
         to={`${basePath}/${encodeURIComponent(path)}`}
