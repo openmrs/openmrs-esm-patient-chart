@@ -173,7 +173,7 @@
   "visitStartDatetime": "Date et heure de début de la visite",
   "visitStarted": "Visite démarrée",
   "visitStartedSuccessfully": "{{visit}} a démarré avec succès",
-  "visitStopDateMustBeAfterMostRecentEncounter": "La date de fin doit être le ou après {{lastEncounterDatetime}}",
+  "visitStopDateMustBeAfterMostRecentEncounter": "La date de fin doit être proche ou après {{lastEncounterDatetime}}",
   "visitStopDatetime": "Date et heure de fin de la visite",
   "visitSummaries": "Résumés de la visite",
   "visitType": "Type de visite",
