@@ -41,6 +41,7 @@ import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
+import { Tag } from '@carbon/react';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -146,10 +147,10 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                   &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}:{' '}
                   {formatDate(new Date(medication.dateStopped || medication.autoStopDate))}
                 </span>
+                <Tag type="gray" className={styles.tag}>
+                  {t('discontinued', 'Discontinued').toUpperCase()}
+                </Tag>
               </span>
-            )}
-            {(medication.dateStopped != null || medication.autoStopDate != null) && (
-              <span className={styles.label01}>&mdash; {t('discontinued', 'Discontinued').toUpperCase()}</span>
             )}
           </p>
         </div>
