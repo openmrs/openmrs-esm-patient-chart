@@ -30,7 +30,8 @@
     {
       "name": "immunization-form-workspace",
       "title": "immunizationWorkspaceTitle",
-      "component": "immunizationFormWorkspace"
+      "component": "immunizationFormWorkspace",
+      "type": "form"
     }
   ]
 }

@@ -35,17 +35,20 @@
     {
       "name": "conditions-widget",
       "component": "conditionsWidget"
-    },
+    }
+  ],
+  "modals": [
     {
       "name": "condition-delete-confirmation-dialog",
-      "component": "conditionDeleteConfirmationDialog"
+      "component": "conditionDeleteConfirmationModal"
     }
   ],
   "workspaces": [
     {
       "name": "conditions-form-workspace",
       "title": "recordCondition",
-      "component": "conditionsFormWorkspace"
+      "component": "conditionsFormWorkspace",
+      "type": "form"
     }
   ]
 }

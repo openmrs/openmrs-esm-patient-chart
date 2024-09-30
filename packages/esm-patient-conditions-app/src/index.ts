@@ -34,7 +34,7 @@ export const conditionsDashboardLink =
     options,
   );
 
-export const conditionDeleteConfirmationDialog = getAsyncLifecycle(
+export const conditionDeleteConfirmationModal = getAsyncLifecycle(
   () => import('./conditions/delete-condition.modal'),
   options,
 );

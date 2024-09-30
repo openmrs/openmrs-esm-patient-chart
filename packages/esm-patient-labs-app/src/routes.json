@@ -27,10 +27,6 @@
       "component": "resultsViewer"
     },
     {
-      "name": "print-modal",
-      "component": "printModal"
-    },
-    {
       "name": "lab-order-panel",
       "component": "labOrderPanel",
       "slot": "order-basket-slot",
@@ -38,6 +34,10 @@
     }
   ],
   "modals": [
+    {
+      "name": "print-modal",
+      "component": "printModal"
+    },
     {
       "name": "timeline-results-modal",
       "component": "timelineResultsModal"

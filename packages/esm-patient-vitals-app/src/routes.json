@@ -71,7 +71,8 @@
     {
       "name": "patient-vitals-biometrics-form-workspace",
       "title": "recordVitalsAndBiometrics",
-      "component": "vitalsBiometricsFormWorkspace"
+      "component": "vitalsBiometricsFormWorkspace",
+      "type": "form"
     }
   ]
 }

@@ -34,7 +34,8 @@
     {
       "name": "programs-form-workspace",
       "title": "programEnrollmentWorkspaceTitle",
-      "component": "programsFormWorkspace"
+      "component": "programsFormWorkspace",
+      "type": "form"
     }
   ]
 }

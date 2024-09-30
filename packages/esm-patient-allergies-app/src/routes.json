@@ -31,10 +31,12 @@
         "slot": "patient-chart-allergies-dashboard-slot",
         "path": "Allergies"
       }
-    },
+    }
+  ],
+  "modals": [
     {
       "name": "allergy-delete-confirmation-dialog",
-      "component": "allergyDeleteConfirmationDialog"
+      "component": "allergyDeleteConfirmationModal"
     }
   ],
   "workspaces": [
