@@ -23,6 +23,7 @@ export type MappedVitals = {
   interpretation: string;
   recordedDate: Date;
   value: number;
+  valueString: string;
 };
 
 export interface PatientVitalsAndBiometrics {
@@ -39,6 +40,7 @@ export interface PatientVitalsAndBiometrics {
   bmi?: number | null;
   respiratoryRate?: number;
   muac?: number;
+  generalPatientNote?: string;
 }
 
 export interface VitalsResponse {
