@@ -15,6 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
+  Tooltip,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -41,7 +43,6 @@ import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
-import { Tag } from '@carbon/react';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -147,9 +148,11 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
                   &mdash; {t('Date', 'date').toUpperCase()}:{' '}
                   {formatDate(new Date(medication.dateStopped || medication.autoStopDate))}
                 </span>
-                <Tag type="gray" className={styles.tag} style={{ marginLeft: '10px' }}>
-                  {t('discontinued', 'Discontinued').toUpperCase()}
-                </Tag>
+                <Tooltip content={t('discontinuedTooltip', 'This request is discontinued')}>
+                  <Tag type="gray" className={styles.tag}>
+                    {t('discontinued_Caps', 'DISCONTINUED')}
+                  </Tag>
+                </Tooltip>
               </span>
             )}
           </p>
