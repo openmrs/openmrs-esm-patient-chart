@@ -16,6 +16,7 @@ import {
   Search,
   StructuredListSkeleton,
   TextInput,
+  Tile,
 } from '@carbon/react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -49,6 +50,10 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
           .map((result) => result.original)
       : causesOfDeath;
   }, [searchTerm, causesOfDeath]);
+
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
   const schema = z
     .object({
@@ -172,34 +177,54 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
                   <Search
-                    onChange={(event) => setSearchTerm(event.target.value)}
-                    placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
                     labelText=""
+                    onChange={handleSearchTermChange}
+                    placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
                   />
                 </ResponsiveWrapper>
               ) : null}
 
-              {causesOfDeath?.length ? (
+              {causesOfDeath?.length && filteredCausesOfDeath.length > 0 ? (
                 <Controller
                   name="causeOfDeath"
                   control={control}
                   render={({ field: { onChange } }) => (
-                    <RadioButtonGroup className={styles.radioButtonGroup} orientation="vertical" onChange={onChange}>
-                      {(filteredCausesOfDeath ? filteredCausesOfDeath : causesOfDeath).map(
-                        ({ uuid, display, name }) => (
-                          <RadioButton
-                            key={uuid}
-                            className={styles.radioButton}
-                            id={name}
-                            labelText={display}
-                            value={uuid}
-                          />
-                        ),
-                      )}
+                    <RadioButtonGroup
+                      className={styles.radioButtonGroup}
+                      name={
+                        causeOfDeathValue === freeTextFieldConceptUuid
+                          ? 'freeTextFieldCauseOfDeath'
+                          : 'codedCauseOfDeath'
+                      }
+                      orientation="vertical"
+                      onChange={onChange}
+                    >
+                      {filteredCausesOfDeath.map(({ uuid, display, name }) => (
+                        <RadioButton
+                          className={styles.radioButton}
+                          id={name}
+                          key={uuid}
+                          labelText={display}
+                          value={uuid}
+                        />
+                      ))}
                     </RadioButtonGroup>
                   )}
                 />
               ) : null}
+
+              {searchTerm && filteredCausesOfDeath.length === 0 && (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>
+                        {t('noMatchingCodedCausesOfDeath', 'No matching coded causes of death')}
+                      </p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </div>
+              )}
 
               {!isLoadingCausesOfDeath && !causesOfDeath?.length ? (
                 <EmptyState
@@ -219,7 +244,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               render={({ field: { onChange, value } }) => (
                 <TextInput
                   id="freeTextCauseOfDeath"
-                  invalid={errors?.nonCodedCauseOfDeath}
+                  invalid={Boolean(errors?.nonCodedCauseOfDeath)}
                   invalidText={errors?.nonCodedCauseOfDeath && errors?.nonCodedCauseOfDeath?.message}
                   labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
                   onChange={onChange}
