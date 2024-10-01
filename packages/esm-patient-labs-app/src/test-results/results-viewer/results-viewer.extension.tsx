@@ -5,6 +5,8 @@ import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
+import { type viewOpts } from '../../types';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
@@ -12,10 +14,7 @@ import PanelView from '../panel-view/panel-view.component';
 import TabletOverlay from '../tablet-overlay';
 import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import Trendline from '../trendline/trendline.component';
-import type { ConfigObject } from '../../config-schema';
 import styles from './results-viewer.scss';
-import { type viewOpts } from '../../types';
-import debounce from 'lodash-es/debounce';
 
 type panelOpts = 'tree' | 'panel';
 
@@ -161,7 +160,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             className={styles.button}
             kind="ghost"
             size={isTablet ? 'md' : 'sm'}
-            onClick={resetTree} //TO-DO (undo selections fix)
+            onClick={resetTree} // TODO: Undo selections fix
           >
             <span>{t('reset', 'Reset')}</span>
           </Button>
