@@ -106,6 +106,7 @@
   "noObservationsFound": "No observations found",
   "notes": "Notes",
   "notes__lower": "notes",
+  "noVisitTypesToDisplay": "No visit types to display",
   "optional": "optional",
   "orderDurationAndUnit": "for {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Indefinite duration",
