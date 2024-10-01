@@ -6,9 +6,9 @@
   "country": "País",
   "countyDistrict": "Distrito",
   "district": "Distrito",
-  "dob": "DOB",
-  "patientIdentifierSticker": "Patient identifier sticker",
+  "dob": "Fecha de Nacimiento",
+  "patientIdentifierSticker": "Etiqueta de identificación del paciente",
   "postalCode": "Código Postal",
-  "state": "State",
-  "stateProvince": "State"
+  "state": "Estado",
+  "stateProvince": "Estado"
 }

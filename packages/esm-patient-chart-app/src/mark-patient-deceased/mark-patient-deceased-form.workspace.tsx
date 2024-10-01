@@ -219,8 +219,8 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               render={({ field: { onChange, value } }) => (
                 <TextInput
                   id="freeTextCauseOfDeath"
-                  invalid={errors?.nonCodedCauseOfDeath}
-                  invalidText={errors?.nonCodedCauseOfDeath && errors?.nonCodedCauseOfDeath?.message}
+                  invalid={!!errors?.nonCodedCauseOfDeath}
+                  invalidText={errors?.nonCodedCauseOfDeath?.message}
                   labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
                   onChange={onChange}
                   placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}

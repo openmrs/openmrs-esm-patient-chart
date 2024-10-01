@@ -1,6 +1,7 @@
 import { ReplaySubject } from 'rxjs';
 import { AppProps } from 'single-spa';
 import { Encounter, EncounterCreate } from './app/types';
+import { DefaultWorkspaceProps } from '@openmrs/esm-framework';
 
 export const singleSpaPropsSubject = new ReplaySubject<SingleSpaProps>(1);
 
@@ -52,4 +53,4 @@ export type SingleSpaProps = AppProps &
   PreFilledQuestions &
   ApplicationStatus & {
     additionalProps?: any;
-  };
+  } & Partial<DefaultWorkspaceProps>;

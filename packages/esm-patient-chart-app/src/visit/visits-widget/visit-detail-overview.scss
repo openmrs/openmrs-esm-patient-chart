@@ -34,17 +34,31 @@
 }
 
 .tabs > :global(.cds--tab-content) {
-  padding: layout.$spacing-05 0 !important;
+  padding: 0 0 !important;
+}
+
+.tabList {
+  position: sticky;
+  top: 3rem;
+  z-index: 10;
+  background-color: $ui-01;
+  border-bottom: 2px solid $ui-03;
+
+  & :global(.cds--tabs__nav-link) {
+    border-bottom: none !important;
+  }
 }
 
 .tab {
+  height: 2.5rem;
+
   &:active,
   &:focus {
-    outline: layout.$spacing-01 solid var(--brand-03) !important;
+    outline: none !important;
   }
 
   &[aria-selected='true'] {
-    box-shadow: inset 0 layout.$spacing-01 0 0 var(--brand-03) !important;
+    border-bottom: 3px solid var(--brand-03) !important;
   }
 }
 

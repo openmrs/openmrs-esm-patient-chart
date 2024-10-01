@@ -29,7 +29,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   return (
     <div className={styles.tabs}>
       <Tabs>
-        <TabList aria-label="Visit detail tabs" contained>
+        <TabList aria-label="Visit detail tabs" className={styles.tabList}>
           <Tab className={styles.tab} id="visit-summaries-tab">
             {t('visitSummaries', 'Visit summaries')}
           </Tab>

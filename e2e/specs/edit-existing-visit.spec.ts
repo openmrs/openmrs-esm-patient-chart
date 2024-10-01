@@ -27,7 +27,12 @@ test('Edit an existing visit', async ({ page }) => {
 
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
-    await expect(chartPage.page.getByPlaceholder(/dd\/mm\/yyyy/i)).toBeVisible();
+    const datePickerInput = chartPage.page.getByPlaceholder(/dd\/mm\/yyyy/i);
+    await expect(datePickerInput).toBeVisible();
+    const dateValue = await datePickerInput.inputValue();
+    expect(dateValue).not.toBe('');
+    expect(dateValue).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+
     await expect(chartPage.page.getByPlaceholder(/hh\:mm/i)).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toHaveValue('Outpatient Clinic');

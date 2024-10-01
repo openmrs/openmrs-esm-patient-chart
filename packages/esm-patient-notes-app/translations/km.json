@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "មិនមានបង្ហាញពីកំណត់សម្គាល់នៃការមកពិនិត្យទេ",
   "primaryDiagnosis": "Primary diagnosis",
   "primaryDiagnosisInputPlaceholder": "Choose a primary diagnosis",
+  "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
   "saveAndClose": "រក្សាទុក និងបិទ",
   "saving": "Saving",
   "searchForPrimaryDiagnosis": "Search for a primary diagnosis",

@@ -181,33 +181,33 @@ export const markPatientDeceasedForm = getAsyncLifecycle(
   },
 );
 
-export const cancelVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
+export const cancelVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
   featureName: 'cancel visit',
   moduleName,
 });
 
-export const startVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
+export const startVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
   featureName: 'start visit',
   moduleName,
 });
 
-export const deleteVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/delete-visit-dialog.component'), {
+export const deleteVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/delete-visit-dialog.component'), {
   featureName: 'delete visit',
   moduleName,
 });
 
-export const modifyVisitDateDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/modify-visit-date.modal'), {
-  featureName: 'delete visit',
+export const modifyVisitDateModal = getAsyncLifecycle(() => import('./visit/visit-prompt/modify-visit-date.modal'), {
+  featureName: 'modify visit date',
   moduleName,
 });
 
-export const endVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
+export const endVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
   featureName: 'end visit',
   moduleName,
 });
 
 export const markPatientAliveModal = getAsyncLifecycle(() => import('./mark-patient-alive/mark-patient-alive.modal'), {
-  featureName: 'Mark patient alive',
+  featureName: 'mark patient alive',
   moduleName,
 });
 

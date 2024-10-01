@@ -193,7 +193,7 @@ export function LabOrderForm({
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
-                      invalid={errors.accessionNumber?.message}
+                      invalid={!!errors.accessionNumber}
                       invalidText={errors.accessionNumber?.message}
                     />
                   )}
@@ -216,7 +216,7 @@ export function LabOrderForm({
                       items={priorityOptions}
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      invalid={errors.urgency?.message}
+                      invalid={!!errors.urgency}
                       invalidText={errors.urgency?.message}
                     />
                   )}
@@ -241,7 +241,7 @@ export function LabOrderForm({
                         items={orderReasons}
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
-                        invalid={errors.orderReason?.message}
+                        invalid={!!errors.orderReason}
                         invalidText={errors.orderReason?.message}
                       />
                     )}
@@ -266,7 +266,7 @@ export function LabOrderForm({
                       onChange={onChange}
                       onBlur={onBlur}
                       maxCount={500}
-                      invalid={errors.instructions?.message}
+                      invalid={!!errors.instructions}
                       invalidText={errors.instructions?.message}
                     />
                   )}

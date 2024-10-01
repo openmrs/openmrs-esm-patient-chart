@@ -60,7 +60,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   );
 
   const handleSeeAvailableResults = useCallback(() => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results` });
   }, [patientUuid]);
 
   if (!overviewData.length)

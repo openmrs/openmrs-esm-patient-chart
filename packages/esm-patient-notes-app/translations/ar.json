@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "لا توجد ملاحظة للزيارة لعرضها",
   "primaryDiagnosis": "التشخيص الرئيسي",
   "primaryDiagnosisInputPlaceholder": "اختر التشخيص الرئيسي",
+  "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
   "saveAndClose": "حفظ وإغلاق",
   "saving": "Saving",
   "searchForPrimaryDiagnosis": "ابحث عن التشخيص الرئيسي",

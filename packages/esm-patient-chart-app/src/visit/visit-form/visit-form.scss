@@ -122,3 +122,7 @@
 .bodyShort02 {
   @include type.type-style('body-compact-02');
 }
+
+.datePicker {
+  padding-bottom: layout.$spacing-05;
+}
