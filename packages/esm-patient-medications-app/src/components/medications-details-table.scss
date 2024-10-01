@@ -68,6 +68,8 @@
 }
 
 .tag {
-  margin-left: 10px;
+  margin: 0 !important;
+  margin-left: 0.5rem !important;
   border: none;
+  text-transform: uppercase;
 }

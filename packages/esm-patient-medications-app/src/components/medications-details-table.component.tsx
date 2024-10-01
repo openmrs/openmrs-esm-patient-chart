@@ -144,13 +144,9 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             )}
             {(medication.dateStopped || medication.autoStopDate) && (
               <span>
-                <Tooltip
-                  content={`${t('discontinuedDate', 'Discontinued date')}: ${formatDate(
-                    new Date(medication.dateStopped || medication.autoStopDate),
-                  )}`}
-                >
+                <Tooltip align="top" label={formatDate(new Date(medication.dateStopped))}>
                   <Tag type="gray" className={styles.tag}>
-                    {t('discontinued_Caps', 'DISCONTINUED')}
+                    {t('discontinued', 'Discontinued')}
                   </Tag>
                 </Tooltip>
               </span>
