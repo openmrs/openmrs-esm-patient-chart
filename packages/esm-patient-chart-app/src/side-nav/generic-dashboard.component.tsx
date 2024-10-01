@@ -19,6 +19,11 @@ export const genericDashboardConfigSchema = {
     _default: '',
     _type: Type.String,
   },
+  icon: {
+    _description: 'The icon for this dashboard',
+    _default: '',
+    _type: Type.String,
+  },
 };
 
 export interface GenericDashboardConfig {
@@ -26,6 +31,7 @@ export interface GenericDashboardConfig {
   title: string;
   /** This gets used by the patient chart when it renders the dashboard itself. */
   slot: string;
+  icon?: React.ReactElement;
 }
 
 interface GenericDashboardProps {
@@ -37,6 +43,7 @@ export default function GenericDashboard({ basePath }: GenericDashboardProps) {
   return (
     <BrowserRouter>
       <DashboardExtension
+        icon={config.icon}
         path={config.path}
         title={config.title}
         basePath={basePath}
