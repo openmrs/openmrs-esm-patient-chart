@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 :global(.omrs-breakpoint-gt-small-desktop .-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
@@ -46,6 +47,23 @@
   position: sticky;
   top: layout.$spacing-09;
   display: flex;
+  transition: border-bottom 0.2s ease-in-out;
+}
+
+.resultsHeaderScrolled {
+  border-bottom: 1px solid colors.$gray-20;
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+
+.headerSentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  visibility: hidden;
 }
 
 .leftHeaderSection {
