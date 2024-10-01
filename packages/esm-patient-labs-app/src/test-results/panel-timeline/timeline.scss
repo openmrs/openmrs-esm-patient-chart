@@ -7,10 +7,15 @@
   width: fit-content;
   display: grid;
   grid-auto-rows: auto;
-  gap: 1px;
+  gap: 0;
   justify-items: center;
   align-items: center;
-  border: 0.5px solid colors.$gray-30;
+
+  > div {
+    border: 0.5px solid colors.$gray-50;
+    border-bottom: none;
+    border-left: none;
+  }
 }
 
 .grid:hover {
@@ -77,7 +82,6 @@
 .padding-container {
   padding: 0px 0 0 0;
   box-sizing: border-box;
-
   display: grid;
   grid-auto-flow: row;
   row-gap: 0px;
