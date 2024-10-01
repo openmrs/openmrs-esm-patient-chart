@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import {
   launchPatientWorkspace,
   CardHeader,
@@ -24,6 +23,7 @@ import {
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import {
+  AddIcon,
   type ConfigObject,
   formatDate,
   formatDatetime,
@@ -113,7 +113,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           {config.hideAddProgramButton ? null : (
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add programs"
               onClick={launchProgramsForm}
               disabled={availablePrograms?.length && eligiblePrograms?.length === 0}

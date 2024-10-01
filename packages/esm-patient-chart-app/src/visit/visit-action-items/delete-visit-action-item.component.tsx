@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button } from '@carbon/react';
-import { UserHasAccess, type Visit, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { TrashCanIcon, UserHasAccess, type Visit, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { TrashCan } from '@carbon/react/icons';
 
 interface DeleteVisitActionItemProps {
   patientUuid: string;
@@ -39,7 +38,7 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
       <Button
         onClick={isActiveVisit ? cancelVisit : deleteVisit}
         kind="danger--ghost"
-        renderIcon={TrashCan}
+        renderIcon={TrashCanIcon}
         size={isTablet ? 'lg' : 'sm'}
       >
         {isActiveVisit ? t('cancelVisit', 'Cancel visit') : t('deleteVisit', 'Delete visit')}

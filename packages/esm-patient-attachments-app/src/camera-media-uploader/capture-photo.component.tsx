@@ -1,9 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { Button } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { showModal, toOmrsIsoString, useLayoutType, type UploadedFile } from '@openmrs/esm-framework';
+import { EditIcon, showModal, toOmrsIsoString, useLayoutType, type UploadedFile } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
 
 export interface CapturePhotoProps {
@@ -58,7 +57,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
           className={styles.editButton}
           kind="ghost"
           onClick={showCam}
-          renderIcon={(props) => <Edit {...props} />}
+          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon {...props} />}
           size={responsiveSize}
         >
           <span>{t('edit', 'Edit')}</span>

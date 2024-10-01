@@ -7,21 +7,26 @@ import styles from './action-button.scss';
 
 interface MarkPatientAliveOverflowMenuItemProps {
   patientUuid?: string;
+  patient?: fhir.Patient;
 }
 
-const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({ patientUuid }) => {
+const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({
+  patientUuid,
+  patient,
+}) => {
   const { t } = useTranslation();
-  const { isDead, isLoading: isLoadingPatient } = usePatientDeceasedStatus(patientUuid);
+  const { isDead } = usePatientDeceasedStatus(patient);
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('mark-patient-alive-modal', {
       closeModal: () => dispose(),
       patientUuid,
+      patient,
     });
-  }, [patientUuid]);
+  }, [patientUuid, patient]);
 
   return (
-    !isLoadingPatient &&
+    patient &&
     isDead && (
       <OverflowMenuItem
         className={styles.menuitem}

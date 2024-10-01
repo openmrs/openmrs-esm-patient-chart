@@ -195,18 +195,16 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div className={styles.vitalsHeader}>
-      <span className={styles.container}>
+    <div className={styles.emptyStateVitalsHeader}>
+      <div className={styles.container}>
         <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
         <span className={styles.bodyText}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
-      </span>
-
-      <div className={styles.container}>
-        <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
-          {t('recordVitals', 'Record vitals')}
-          <ArrowRight size={16} className={styles.recordVitalsIconButton} />
-        </Button>
       </div>
+
+      <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
+        {t('recordVitals', 'Record vitals')}
+        <ArrowRight size={16} className={styles.recordVitalsIconButton} />
+      </Button>
     </div>
   );
 };

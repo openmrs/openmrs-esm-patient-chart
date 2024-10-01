@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { Button, Header } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
+import { ArrowLeftIcon } from '@openmrs/esm-framework';
 import styles from './tablet-overlay.scss';
 
 interface OverlayProps {
@@ -13,9 +13,10 @@ interface OverlayProps {
 const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsGroup }) => (
   <div className={styles.tabletOverlay}>
     <Header className={styles.tabletOverlayHeader}>
-      <Button onClick={close} hasIconOnly>
-        <ArrowLeft size={16} onClick={close} />
-      </Button>
+      <Button
+        onClick={close}
+        icon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={16} {...props} />}
+      />
       <div className={styles.headerContent}>{headerText}</div>
     </Header>
     <div className={styles.overlayContent}>{children}</div>

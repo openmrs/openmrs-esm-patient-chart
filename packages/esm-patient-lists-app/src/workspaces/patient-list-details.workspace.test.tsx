@@ -21,9 +21,6 @@ const defaultProps = {
     type: 'My List',
   },
   setTitle: jest.fn(),
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 const mockPatientListData = [

@@ -55,9 +55,6 @@ const testProps = {
   promptBeforeClosing: mockPromptBeforeClosing,
   showVisitEndDateTimeFields: false,
   setTitle: mockSetTitle,
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);
@@ -568,7 +565,7 @@ describe('Visit form', () => {
     expect(mockSaveVisit).not.toHaveBeenCalled();
   });
 
-  it('should disable the submit button show an inline error notification if required visit attribute fields fail to load', async () => {
+  it('should disable the submit button and display an inline error notification if required visit attribute fields fail to load', async () => {
     mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),

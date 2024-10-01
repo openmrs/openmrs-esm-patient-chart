@@ -20,9 +20,6 @@ const defaultProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 function renderVisitNotesForm(props = {}) {
@@ -65,36 +62,37 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   renderVisitNotesForm();
 
-  expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
-  expect(screen.getByRole('searchbox', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
-  expect(screen.getByRole('searchbox', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
-  expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /visit date/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
 });
 
-test.only('typing in the diagnosis search input triggers a search', async () => {
+test('typing in the diagnosis search input triggers a search', async () => {
+  const user = userEvent.setup();
+
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
   expect(screen.getByText('Diabetes Mellitus, Type II')).toBeInTheDocument();
 
   // clicking on a search result displays the selected diagnosis as a tag
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
   const diabetesMellitusTag = screen.getByTitle(/^Diabetes Mellitus$/i);
   expect(diabetesMellitusTag).toBeInTheDocument();
 
   const closeTagButton = screen.getByRole('button', { name: /clear filter/i });
   // Clicking the close button on the tag removes the selected diagnosis
-  await userEvent.click(closeTagButton);
+  await user.click(closeTagButton);
   // no selected diagnoses left
   expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
 });
@@ -112,25 +110,29 @@ test('renders an error message when no matching diagnoses are found', async () =
 });
 
 test('closes the form and the workspace when the cancel button is clicked', async () => {
+  const user = userEvent.setup();
+
   renderVisitNotesForm();
 
   const cancelButton = screen.getByRole('button', { name: /Discard/i });
-  await userEvent.click(cancelButton);
+  await user.click(cancelButton);
 
   expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
 });
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
+  const user = userEvent.setup();
+
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
         encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
-        provider: undefined,
+        provider: mockSessionDataResponse.data.currentProvider.uuid,
       },
     ]),
     encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
     form: ConfigMock.visitNoteConfig.formConceptUuid,
-    location: undefined,
+    location: mockSessionDataResponse.data.sessionLocation.uuid,
     obs: expect.arrayContaining([
       {
         concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -138,6 +140,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
       },
     ]),
     patient: mockPatient.id,
+    encounterDatetime: undefined,
   };
 
   mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as ReturnType<
@@ -147,27 +150,32 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   renderVisitNotesForm();
 
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
+
+  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(clinicalNote);
-  await userEvent.type(clinicalNote, 'Sample clinical note');
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
 
-  const submitButton = screen.getByRole('button', { name: /Save and close/i });
-
-  await userEvent.click(submitButton);
+  await user.click(submitButton);
 
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {
+  const user = userEvent.setup();
+
   const error = {
     message: 'Internal Server Error',
     response: {
@@ -181,21 +189,21 @@ test('renders an error snackbar if there was a problem recording a condition', a
 
   renderVisitNotesForm();
 
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(clinicalNote);
-  await userEvent.type(clinicalNote, 'Sample clinical note');
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
 
-  const submitButton = screen.getByRole('button', { name: /Save and close/i });
-
-  await userEvent.click(submitButton);
+  await user.click(submitButton);
 
   expect(mockShowSnackbar).toHaveBeenCalledWith({
     isLowContrast: false,

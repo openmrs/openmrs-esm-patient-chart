@@ -20,14 +20,13 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
 import {
   EmptyDataIllustration,
   PatientChartPagination,
   launchFormEntryOrHtmlForms,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { EditIcon, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { type CompletedFormInfo } from '../types';
 import styles from './form-view.scss';
@@ -222,7 +221,7 @@ const FormView: React.FC<FormViewProps> = ({
                             {row.cells[0].value && (
                               <Button
                                 hasIconOnly
-                                renderIcon={Edit}
+                                renderIcon={EditIcon}
                                 iconDescription={t('editForm', 'Edit form')}
                                 onClick={() =>
                                   launchFormEntryOrHtmlForms(
