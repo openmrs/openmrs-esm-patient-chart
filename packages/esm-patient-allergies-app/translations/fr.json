@@ -10,7 +10,7 @@
   "allergySaveError": "Erreur en enregistrant les allergies",
   "allergyUpdated": "Allergie modifiée",
   "cancel": "Annuler",
-  "dateOfOnsetAndComments": "Date of onset and comments",
+  "dateOfOnsetAndComments": "Date de début et commentaires",
   "delete": "Suppression",
   "deleteModalConfirmationText": "Etes vous sûr de vouloir supprimer cette allergie?",
   "deletePatientAllergy": "Suppression de l'allergie",

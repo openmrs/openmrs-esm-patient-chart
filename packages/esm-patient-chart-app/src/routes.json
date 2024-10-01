@@ -147,36 +147,6 @@
       "offline": true
     },
     {
-      "name": "cancel-visit-dialog",
-      "component": "cancelVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "start-visit-dialog",
-      "component": "startVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "delete-visit-dialog",
-      "component": "deleteVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "modify-visit-date-dialog",
-      "component": "modifyVisitDateDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "end-visit-dialog",
-      "component": "endVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "start-visit-button-patient-search",
       "slot": "start-visit-button-slot",
       "component": "startVisitPatientSearchActionButton",
@@ -187,12 +157,6 @@
       "name": "visit-attribute-tags",
       "slot": "patient-banner-tags-slot",
       "component": "visitAttributeTags",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "delete-encounter-modal",
-      "component": "deleteEncounterModal",
       "online": true,
       "offline": true
     },
@@ -232,8 +196,32 @@
   ],
   "modals": [
     {
+      "name": "cancel-visit-dialog",
+      "component": "cancelVisitModal"
+    },
+    {
+      "name": "delete-encounter-modal",
+      "component": "deleteEncounterModal"
+    },
+    {
+      "name": "delete-visit-dialog",
+      "component": "deleteVisitModal"
+    },
+    {
+      "name": "end-visit-dialog",
+      "component": "endVisitModal"
+    },
+    {
       "name": "mark-patient-alive-modal",
       "component": "markPatientAliveModal"
+    },
+    {
+      "name": "modify-visit-date-dialog",
+      "component": "modifyVisitDateModal"
+    },
+    {
+      "name": "start-visit-dialog",
+      "component": "startVisitModal"
     }
   ],
   "pages": [

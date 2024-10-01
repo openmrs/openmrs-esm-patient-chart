@@ -1,14 +1,14 @@
 {
-  "address1": "Address line 1",
-  "address2": "Address line 2",
-  "city": "City",
-  "cityVillage": "City",
-  "country": "Country",
+  "address1": "Ligne d'adresse 1",
+  "address2": "Ligne d'adresse 2",
+  "city": "Ville",
+  "cityVillage": "ville",
+  "country": "Pays",
   "countyDistrict": "District",
   "district": "District",
   "dob": "Date de naissance",
   "patientIdentifierSticker": "Autocollant d'identification du patient",
-  "postalCode": "Postal code",
-  "state": "State",
-  "stateProvince": "State"
+  "postalCode": "Code postal",
+  "state": "État",
+  "stateProvince": "État"
 }
