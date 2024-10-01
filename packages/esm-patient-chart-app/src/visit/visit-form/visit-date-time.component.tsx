@@ -64,7 +64,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                   labelText={t('date', 'Date')}
                   placeholder="dd/mm/yyyy"
                   style={{ width: '100%' }}
-                  invalid={errors[dateFieldName]?.message}
+                  invalid={!!errors[dateFieldName]}
                   invalidText={errors[dateFieldName]?.message}
                 />
               </DatePicker>
@@ -84,7 +84,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
                 value={value}
                 onBlur={onBlur}
-                invalid={errors[timeFieldName]?.message}
+                invalid={!!errors[timeFieldName]}
                 invalidText={errors[timeFieldName]?.message}
               >
                 <Controller
@@ -96,7 +96,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value}
                       aria-label={t('timeFormat ', 'Time Format')}
-                      invalid={errors[timeFormatFieldName]?.message}
+                      invalid={!!errors[timeFormatFieldName]}
                       invalidText={errors[timeFormatFieldName]?.message}
                     >
                       <SelectItem value="AM" text="AM" />
