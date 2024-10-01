@@ -100,6 +100,7 @@
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "No encounters found",
   "noEncountersToDisplay": "No encounters to display",
+  "noMatchingCodedCausesOfDeath": "No matching coded causes of death",
   "nonCodedCauseOfDeath": "Non-coded cause of death",
   "nonCodedCauseOfDeathRequired": "Please enter the non-coded cause of death",
   "noObservationsFound": "No observations found",
