@@ -13,6 +13,7 @@ import {
 
 export const defaultBarcodeParams: Options = {
   width: 2,
+  format: 'CODE39',
   background: '#f4f4f4',
   displayValue: true,
   renderer: 'img',

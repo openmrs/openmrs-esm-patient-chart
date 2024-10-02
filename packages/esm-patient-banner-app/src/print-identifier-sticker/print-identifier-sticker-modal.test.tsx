@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PrintIdentifierSticker from './print-identifier-sticker.modal';
 import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { useReactToPrint } from 'react-to-print';
 import userEvent from '@testing-library/user-event';
@@ -109,7 +109,7 @@ describe('Testing PrintIdentifierStickerModal', () => {
     expect(getByTextWithMarkup(/Joshua Johnson/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/\+255777053243/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/100008E/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/4 yrs, 11 mths/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(age(mockFhirPatient.birthDate))).toBeInTheDocument();
   });
 });
 

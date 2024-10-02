@@ -1,5 +1,4 @@
 import { Type } from '@openmrs/esm-framework';
-import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   contactAttributeTypes: {
@@ -21,7 +20,8 @@ export const configSchema = {
     },
     header: {
       _type: Type.Object,
-      _description: 'The header to display on the patient sticker',
+      _description:
+        'Configuration properties for the patient sticker headerConfiguration properties for the patient sticker header',
       showBarcode: {
         _type: Type.Boolean,
         _description: 'Whether to display a barcode on the patient sticker',

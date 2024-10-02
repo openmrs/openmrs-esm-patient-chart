@@ -42,8 +42,8 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   const handleAfterPrint = useCallback(() => {
     onBeforeGetContentResolve.current = null;
     setIsPrinting(false);
-    // closeModal();
-  }, []);
+    closeModal();
+  }, [closeModal]);
 
   const handlePrintError = useCallback((errorLocation, error) => {
     onBeforeGetContentResolve.current = null;

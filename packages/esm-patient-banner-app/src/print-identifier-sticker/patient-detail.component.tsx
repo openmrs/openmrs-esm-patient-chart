@@ -95,7 +95,7 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
 export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
 
-  if (patient.telecom.length == 0) {
+  if (!patient?.telecom?.length) {
     return null;
   }
 
@@ -104,7 +104,7 @@ export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
       <span>
         <strong className={styles.strong}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</strong>
       </span>
-      <span className={styles.patientDetail}>{patient.telecom[0]?.value}</span>
+      <span className={styles.patientDetail}>{patient.telecom?.[0]?.value}</span>
     </div>
   );
 };
