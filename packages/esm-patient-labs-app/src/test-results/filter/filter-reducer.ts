@@ -41,13 +41,6 @@ const computeParents = (
     leaves.push(...activeLeaves);
     tests.push(...activeTests);
     lowestParents.push({ flatName: node.flatName, display: node.display });
-  } else if (!node?.subSets?.length && node.obs?.length > 0) {
-    // Treat the current node as a leaf and a test
-    leaves.push(node.flatName);
-    tests.push([node.flatName, node]);
-
-    // Add the current node to the lowest parents list
-    lowestParents.push({ flatName: node.flatName, display: node.display });
   } else if (node?.subSets?.length) {
     node.subSets.forEach((subNode) => {
       const {
@@ -61,6 +54,12 @@ const computeParents = (
       tests.push(...newTests);
       lowestParents.push(...newLowestParents);
     });
+  } else if (node.obs?.length > 0) {
+    // Treat the current node as a leaf and a test
+    leaves.push(node.flatName);
+    tests.push([node.flatName, node]);
+    // Add the current node to the lowest parents list
+    lowestParents.push({ flatName: node.flatName, display: node.display });
   }
   parents[node.flatName] = leaves;
   return { parents, leaves, tests, lowestParents };
