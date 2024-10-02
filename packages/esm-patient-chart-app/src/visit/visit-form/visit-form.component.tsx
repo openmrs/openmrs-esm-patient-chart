@@ -128,11 +128,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitFormSchema = useMemo(() => {
     const createVisitAttributeSchema = (required: boolean) =>
       required
-        ? z
-            .string({
-              required_error: t('fieldRequired', 'This field is required'),
-            })
-            .refine((value) => !!value, t('fieldRequired', 'This field is required'))
+        ? z.string({
+            required_error: t('fieldRequired', 'This field is required'),
+          })
         : z.string().optional();
 
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(

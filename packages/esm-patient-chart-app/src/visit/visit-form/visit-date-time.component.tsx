@@ -61,7 +61,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
               >
                 <DatePickerInput
                   id={`${dateFieldName}Input`}
-                  invalid={!!errors[dateFieldName]}
+                  invalid={Boolean(errors[dateFieldName])}
                   invalidText={errors[dateFieldName]?.message}
                   labelText={t('date', 'Date')}
                   placeholder="dd/mm/yyyy"
@@ -78,7 +78,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             render={({ field: { onBlur, onChange, value } }) => (
               <TimePicker
                 id={timeFieldName}
-                invalid={!!errors[timeFieldName]}
+                invalid={Boolean(errors[timeFieldName])}
                 invalidText={errors[timeFieldName]?.message}
                 labelText={t('time', 'Time')}
                 onBlur={onBlur}
@@ -94,7 +94,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                     <TimePickerSelect
                       aria-label={t('timeFormat ', 'Time Format')}
                       id={`${timeFormatFieldName}Input`}
-                      invalid={!!errors[timeFormatFieldName]}
+                      invalid={Boolean(errors[timeFormatFieldName])}
                       invalidText={errors[timeFormatFieldName]?.message}
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value}
