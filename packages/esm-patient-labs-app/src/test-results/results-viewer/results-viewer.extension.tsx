@@ -33,7 +33,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const conceptUuids = config.resultsViewerConcepts.map((concept) => concept.conceptUuid) ?? [];
-  const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
@@ -41,8 +41,8 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 
   if (roots?.length) {
     return (
-      <FilterProvider roots={!loading ? roots : []}>
-        <ResultsViewer patientUuid={patientUuid} basePath={basePath} loading={loading} />
+      <FilterProvider roots={!isLoading ? roots : []}>
+        <ResultsViewer patientUuid={patientUuid} basePath={basePath} loading={isLoading} />
       </FilterProvider>
     );
   }

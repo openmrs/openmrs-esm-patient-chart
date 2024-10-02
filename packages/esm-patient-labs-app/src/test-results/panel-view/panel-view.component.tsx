@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
@@ -20,6 +20,12 @@ interface PanelViewProps {
   type: string;
   basePath: string;
   patientUuid: string;
+}
+interface PanelViewHeaderProps {
+  isTablet: boolean;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  totalSearchResults: number;
 }
 
 const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, type, patientUuid }) => {
@@ -50,8 +56,8 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
 
   useEffect(() => {
     // Selecting the active panel should not occur in small-desktop
-    if (layout !== 'tablet' && filteredPanels) {
-      setActivePanel(filteredPanels?.[0]);
+    if (layout !== 'tablet' && filteredPanels?.length) {
+      setActivePanel(filteredPanels[0]);
     }
   }, [filteredPanels, layout]);
 
@@ -66,10 +72,11 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
             totalSearchResults={filteredPanels?.length ?? 0}
           />
           {!isLoading ? (
-            panels.length > 0 ? (
-              filteredPanels.length ? (
+            panels?.length > 0 ? (
+              filteredPanels?.length ? (
                 filteredPanels.map((panel) => (
                   <LabSetPanel
+                    key={panel.conceptUuid}
                     panel={panel}
                     observations={[panel, ...panel.relatedObs]}
                     setActivePanel={setActivePanel}
@@ -112,10 +119,11 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
               totalSearchResults={filteredPanels?.length ?? 0}
             />
             {!isLoading ? (
-              panels.length > 0 ? (
-                filteredPanels.length ? (
+              panels?.length > 0 ? (
+                filteredPanels?.length ? (
                   filteredPanels.map((panel) => (
                     <LabSetPanel
+                      key={panel.conceptUuid} // Add a unique key prop
                       panel={panel}
                       observations={[panel, ...panel.relatedObs]}
                       setActivePanel={setActivePanel}
@@ -150,13 +158,6 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
     </>
   );
 };
-
-interface PanelViewHeaderProps {
-  isTablet: boolean;
-  searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  totalSearchResults: number;
-}
 
 const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
   isTablet,
