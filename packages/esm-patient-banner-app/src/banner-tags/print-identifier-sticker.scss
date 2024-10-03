@@ -6,6 +6,18 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.printedBy {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: smaller;
+  margin: 0 layout.$spacing-02;
+
+  span {
+    margin-left: layout.$spacing-02;
+  }
+}
+
 .row {
   margin: layout.$spacing-03 0 0;
   display: flex;
@@ -59,16 +71,18 @@
     overflow: hidden;
   }
 
-  .printedBy {
-    @include type.type-style('body-compact-01');
-    margin: 0 layout.$spacing-02;
-    font-size: 12px;
-    text-align: center;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: colors.$white;
+    font-size: smaller;
   }
 
-  .subheader {
-    @include type.type-style('heading-03');
-    color: colors.$gray-70;
-    padding: layout.$spacing-03;
+  .printedBy {
+    @include type.type-style('body-compact-01');
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }

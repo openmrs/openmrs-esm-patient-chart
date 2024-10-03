@@ -17,7 +17,6 @@ import styles from './print-identifier-sticker.scss';
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
   patient: fhir.Patient;
-  subheader: string;
 }
 
 interface PrintComponentProps extends Partial<ConfigObject> {
@@ -34,7 +33,7 @@ interface PrintComponentProps extends Partial<ConfigObject> {
   t: TFunction;
 }
 
-const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient, subheader }) => {
+const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
   const { printIdentifierStickerFields, printIdentifierStickerSize, excludePatientIdentifierCodeTypes } =
     useConfig<ConfigObject>();
@@ -132,26 +131,23 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
       <ModalHeader
         closeModal={closeModal}
         title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
-      >
-        <div className={styles.subheader}>
-          <h4>{subheader}</h4>
-        </div>
-      </ModalHeader>
+      />
       <ModalBody>
         <div ref={contentToPrintRef}>
           <style type="text/css" media="print">
-            {`
-        @page {
+            {`@page {
           size: ${printIdentifierStickerSize};
-        }
-      `}
+        }`}
           </style>
-          <div className={styles.printedBy}>
-            {t('printedBy', 'Printed by')}
-            <span className={styles.printedBy}>
-              {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
-            </span>
+          <div className={styles.header}>
+            <div className={styles.printedBy}>
+              {t('printedBy', 'Printed by')}
+              <span>
+                {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
+              </span>
+            </div>
           </div>
+
           <PrintComponent
             patientDetails={patientDetails}
             printIdentifierStickerFields={printIdentifierStickerFields}
