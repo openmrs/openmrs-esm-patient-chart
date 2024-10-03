@@ -10,7 +10,15 @@ export const renderTag = (encounter, concept, statusColorMappings) => {
     return '--';
   } else {
     return (
-      <Tag type={statusColorMappings[columnStatusObs?.value?.uuid]} title={columnStatus} style={{ minWidth: '80px' }}>
+      <Tag
+        type={
+          typeof columnStatusObs?.value === 'object' && 'uuid' in columnStatusObs.value
+            ? statusColorMappings[columnStatusObs.value.uuid]
+            : undefined
+        }
+        title={columnStatus}
+        style={{ minWidth: '80px' }}
+      >
         {columnStatus}
       </Tag>
     );
