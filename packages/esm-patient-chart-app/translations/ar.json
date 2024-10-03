@@ -71,6 +71,7 @@
   "fieldRequired": "هذا الحقل مطلوب",
   "filterByEncounterType": "تصفية حسب نوع اللقاء",
   "form": "Form name",
+  "futureStartTime": "Visit start time cannot be in the future",
   "goToThisEncounter": "اذهب إلى هذا اللقاء",
   "indication": "دلالة",
   "invalidTimeFormat": "Invalid time format",
