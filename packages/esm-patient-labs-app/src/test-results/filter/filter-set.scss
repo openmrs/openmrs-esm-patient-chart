@@ -1,11 +1,19 @@
-@use '@carbon/layout';
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .filterSetContent {
   max-height: calc(100vh - 9.5rem);
   overflow-y: auto;
+
+  .treeNodeHeader:first-of-type {
+    padding-top: 0;
+  }
+
+  .nestedAccordion:first-of-type {
+    margin-top: 0;
+  }
 }
 
 // background of filter, and spacing between containers

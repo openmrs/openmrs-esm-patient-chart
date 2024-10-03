@@ -102,9 +102,9 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
     );
   }, [data]);
   const roots = result.map((item) => item.data);
-  const loading = result.some((item) => item.loading);
+  const isLoading = result.some((item) => item.loading);
 
-  return { roots, loading, error };
+  return { roots, isLoading, error };
 };
 
 export default useGetManyObstreeData;
