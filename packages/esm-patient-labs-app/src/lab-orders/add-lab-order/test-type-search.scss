@@ -5,21 +5,44 @@
 
 /** For TestTypeSearchResults */
 .container {
-  margin: layout.$spacing-03 layout.$spacing-05;
+  margin: layout.$spacing-03 layout.$spacing-05 0;
 }
 
-.divider {
-  border: 0;
-  border-top: 1px solid $color-gray-30;
-  width: 66%;
-}
+.separator {
+  @include type.type-style('body-01');
+  color: colors.$gray-90;
+  width: 12rem;
+  margin: layout.$spacing-05 auto layout.$spacing-03;
+  overflow: hidden;
+  text-align: center;
 
-.desktopDivider {
-  margin: layout.$spacing-07 auto layout.$spacing-05;
-}
+  &::before,
+  &::after {
+    background-color: colors.$gray-40;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
 
-.tabletDivider {
-  margin: layout.$spacing-08 auto layout.$spacing-06;
+  &::before {
+    right: layout.$spacing-05;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: layout.$spacing-05;
+    margin-right: -50%;
+  }
+}
+.separatorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: layout.$spacing-05;
 }
 
 .searchResultsCount {
@@ -35,7 +58,6 @@
 }
 
 /** For TestTypeSearchResultItem */
-
 .searchResultTile {
   padding: 0;
   display: flex;
@@ -48,8 +70,9 @@
 }
 
 .tabletSearchResultTile {
-  margin-top: 5px;
-  background-color: $ui-02;
+  &:not(:last-of-type) {
+    margin-bottom: layout.$spacing-04;
+  }
 }
 
 .searchResultTileContent {
@@ -61,6 +84,10 @@
   padding: 0 layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
+
+  svg {
+    fill: currentColor !important;
+  }
 }
 
 .searchResultSkeletonWrapper {

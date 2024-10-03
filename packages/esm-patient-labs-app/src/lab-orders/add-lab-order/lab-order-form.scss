@@ -83,6 +83,7 @@
   }
 }
 
-.bodyShort02 {
+.testType {
   @include type.type-style('body-compact-02');
+  margin-top: layout.$spacing-03;
 }

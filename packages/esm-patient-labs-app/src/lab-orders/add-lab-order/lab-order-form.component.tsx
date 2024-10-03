@@ -14,11 +14,11 @@ import {
   Column,
   ComboBox,
   Form,
-  Layer,
   Grid,
   InlineNotification,
-  TextInput,
+  Layer,
   TextArea,
+  TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ordersEqual, priorityOptions } from './lab-order';
@@ -159,11 +159,11 @@ export function LabOrderForm({
     <>
       {errorLoadingTestTypes && (
         <InlineNotification
+          className={styles.inlineNotification}
           kind="error"
           lowContrast
-          className={styles.inlineNotification}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
         />
       )}
 
@@ -174,7 +174,7 @@ export function LabOrderForm({
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
-                <p className={styles.bodyShort02}>{initialOrder?.testType?.label}</p>
+                <p className={styles.testType}>{initialOrder?.testType?.label}</p>
               </InputWrapper>
             </Column>
           </Grid>
@@ -187,14 +187,14 @@ export function LabOrderForm({
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       id="labReferenceNumberInput"
-                      size={responsiveSize}
-                      labelText={t('labReferenceNumber', 'Lab reference number')}
-                      maxLength={150}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
                       invalid={!!errors.accessionNumber}
                       invalidText={errors.accessionNumber?.message}
+                      labelText={t('labReferenceNumber', 'Lab reference number')}
+                      maxLength={150}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      size={responsiveSize}
+                      value={value}
                     />
                   )}
                 />
@@ -207,17 +207,17 @@ export function LabOrderForm({
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
+                  render={({ field: { onBlur, onChange, value } }) => (
                     <ComboBox
-                      size={responsiveSize}
                       id="priorityInput"
-                      titleText={t('priority', 'Priority')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      invalid={!!errors.urgency}
+                      invalidText={errors.urgency?.message}
                       items={priorityOptions}
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
+                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      size={responsiveSize}
+                      titleText={t('priority', 'Priority')}
                     />
                   )}
                 />
@@ -231,18 +231,18 @@ export function LabOrderForm({
                   <Controller
                     name="orderReason"
                     control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
+                    render={({ field: { onBlur, onChange } }) => (
                       <ComboBox
-                        size={responsiveSize}
                         id="orderReasonInput"
-                        titleText={t('orderReason', 'Order reason')}
-                        selectedItem={''}
-                        itemToString={(item) => item?.display}
-                        items={orderReasons}
-                        onBlur={onBlur}
-                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
                         invalid={!!errors.orderReason}
                         invalidText={errors.orderReason?.message}
+                        items={orderReasons}
+                        itemToString={(item) => item?.display}
+                        onBlur={onBlur}
+                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                        selectedItem={''}
+                        size={responsiveSize}
+                        titleText={t('orderReason', 'Order reason')}
                       />
                     )}
                   />
@@ -260,14 +260,14 @@ export function LabOrderForm({
                     <TextArea
                       enableCounter
                       id="additionalInstructionsInput"
-                      size={responsiveSize}
-                      labelText={t('additionalInstructions', 'Additional instructions')}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      maxCount={500}
                       invalid={!!errors.instructions}
                       invalidText={errors.instructions?.message}
+                      labelText={t('additionalInstructions', 'Additional instructions')}
+                      maxCount={500}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      size={responsiveSize}
+                      value={value}
                     />
                   )}
                 />
@@ -280,9 +280,9 @@ export function LabOrderForm({
             <Column className={styles.errorContainer}>
               <InlineNotification
                 lowContrast
-                title={t('error', 'Error')}
-                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
                 onClose={() => setShowErrorNotification(false)}
+                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
+                title={t('error', 'Error')}
               />
             </Column>
           )}
@@ -292,7 +292,7 @@ export function LabOrderForm({
             <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
               {t('discard', 'Discard')}
             </Button>
-            <Button className={styles.button} kind="primary" type="submit" size="xl">
+            <Button className={styles.button} kind="primary" size="xl" type="submit">
               {t('saveOrder', 'Save order')}
             </Button>
           </ButtonSet>
