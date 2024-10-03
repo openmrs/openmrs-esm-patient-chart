@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Tile } from '@carbon/react';
-import { useConfig, useConnectivity, usePatient, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, useConfig, useConnectivity, usePatient } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
@@ -13,12 +13,23 @@ import styles from './forms-dashboard.scss';
 import { useForms } from '../hooks/use-forms';
 import { useTranslation } from 'react-i18next';
 
-const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
+interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
+  clinicalFormsWorkspaceName?: string;
+  formEntryWorkspaceName?: string;
+  htmlFormEntryWorkspaceName?: string;
+}
+
+const FormsDashboard: React.FC<FormsDashboardProps> = ({
+  patientUuid,
+  clinicalFormsWorkspaceName,
+  formEntryWorkspaceName,
+  htmlFormEntryWorkspaceName,
+}) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
   const htmlFormEntryForms = config.htmlFormEntryForms;
-  const { patient, patientUuid } = usePatient();
+  const { patient, patientUuid: fetchedPatientUuid } = usePatient(patientUuid);
   const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
@@ -26,18 +37,29 @@ const FormsDashboard: React.FC<DefaultPatientWorkspaceProps> = () => {
     (formUuid: string, encounterUuid: string, formName: string) => {
       launchFormEntryOrHtmlForms(
         htmlFormEntryForms,
-        patientUuid,
+        fetchedPatientUuid,
         formUuid,
-        currentVisit.uuid,
+        currentVisit?.uuid,
         encounterUuid,
         formName,
-        currentVisit.visitType.uuid,
-        currentVisit.startDatetime,
-        currentVisit.stopDatetime,
+        currentVisit?.visitType.uuid,
+        currentVisit?.startDatetime,
+        currentVisit?.stopDatetime,
         mutateForms,
+        clinicalFormsWorkspaceName,
+        formEntryWorkspaceName,
+        htmlFormEntryWorkspaceName,
       );
     },
-    [currentVisit, htmlFormEntryForms, mutateForms, patientUuid],
+    [
+      currentVisit,
+      htmlFormEntryForms,
+      mutateForms,
+      fetchedPatientUuid,
+      clinicalFormsWorkspaceName,
+      formEntryWorkspaceName,
+      htmlFormEntryWorkspaceName,
+    ],
   );
 
   const sections = useMemo(() => {
