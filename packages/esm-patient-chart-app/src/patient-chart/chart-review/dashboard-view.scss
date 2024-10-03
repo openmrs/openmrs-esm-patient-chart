@@ -15,7 +15,9 @@
 }
 
 // See https://zpl.io/lrlmdq0 for the Visits dashboard design
-[data-extension-slot-name='patient-chart-encounters-dashboard-slot'] {
+[data-extension-slot-name='patient-chart-encounters-dashboard-slot'],
+// See https://zpl.io/RmMXrDE for the Test Results dashboard design
+[data-extension-slot-name='patient-chart-test-results-dashboard-slot'] {
   margin: 0 layout.$spacing-05;
 }
 

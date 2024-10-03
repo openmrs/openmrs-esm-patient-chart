@@ -54,18 +54,18 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 dateFormat="d/m/Y"
                 datePickerType="single"
                 id={dateFieldName}
-                minDate={minDateObj}
                 maxDate={maxDateObj}
+                minDate={minDateObj}
                 onChange={([date]) => onChange(date)}
                 value={value ? dayjs(value).format('DD/MM/YYYY') : null}
               >
                 <DatePickerInput
                   id={`${dateFieldName}Input`}
+                  invalid={Boolean(errors[dateFieldName])}
+                  invalidText={errors[dateFieldName]?.message}
                   labelText={t('date', 'Date')}
                   placeholder="dd/mm/yyyy"
                   style={{ width: '100%' }}
-                  invalid={!!errors[dateFieldName]}
-                  invalidText={errors[dateFieldName]?.message}
                 />
               </DatePicker>
             </ResponsiveWrapper>
@@ -78,26 +78,26 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             render={({ field: { onBlur, onChange, value } }) => (
               <TimePicker
                 id={timeFieldName}
+                invalid={Boolean(errors[timeFieldName])}
+                invalidText={errors[timeFieldName]?.message}
                 labelText={t('time', 'Time')}
+                onBlur={onBlur}
                 onChange={(event) => onChange(event.target.value as amPm)}
                 pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
                 value={value}
-                onBlur={onBlur}
-                invalid={!!errors[timeFieldName]}
-                invalidText={errors[timeFieldName]?.message}
               >
                 <Controller
                   name={timeFormatFieldName}
                   control={control}
                   render={({ field: { onChange, value } }) => (
                     <TimePickerSelect
+                      aria-label={t('timeFormat ', 'Time Format')}
                       id={`${timeFormatFieldName}Input`}
+                      invalid={Boolean(errors[timeFormatFieldName])}
+                      invalidText={errors[timeFormatFieldName]?.message}
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value}
-                      aria-label={t('timeFormat ', 'Time Format')}
-                      invalid={!!errors[timeFormatFieldName]}
-                      invalidText={errors[timeFormatFieldName]?.message}
                     >
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />

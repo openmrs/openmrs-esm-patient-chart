@@ -49,7 +49,7 @@ export const Grid: React.FC<{
         gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, ${dynamicColumnWidth}em)`,
         overflow: 'hidden',
       }}
-      className={styles['grid']}
+      className={styles.grid}
       {...props}
     />
   );
