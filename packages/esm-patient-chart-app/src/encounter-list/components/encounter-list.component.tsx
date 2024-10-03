@@ -19,6 +19,7 @@ import { deleteEncounter } from '../encounter-list.resource';
 import { useEncounterRows, useFormsJson, usePatientDeathStatus } from '../hooks';
 
 import styles from './encounter-list.scss';
+import { type TableRow, type Encounter, type Mode } from '../types';
 
 export interface EncounterListColumn {
   key: string;
@@ -110,8 +111,12 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     [formsJson, t],
   );
 
-  const createLaunchFormAction = (encounter, mode) => () =>
-    launchEncounterForm(formsJson[0], mode, onFormSave, null, encounter.uuid, null, workspaceWindowSize, patientUuid);
+  const createLaunchFormAction = useCallback(
+    (encounter: Encounter, mode: Mode) => () => {
+      launchEncounterForm(formsJson[0], mode, onFormSave, null, encounter.uuid, null, workspaceWindowSize, patientUuid);
+    },
+    [formsJson, onFormSave, patientUuid, workspaceWindowSize],
+  );
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid, encounterTypeName) => {
@@ -123,6 +128,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
               onFormSave();
+              mutate();
               showSnackbar({
                 isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
@@ -139,7 +145,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               });
             })
             .finally(() => {
-              mutate();
               close();
             });
         },
@@ -148,71 +153,89 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     [onFormSave, t, mutate],
   );
 
-  const tableRows = encounters.map((encounter) => {
-    const tableRow: { id: string; actions: any } = { id: encounter.uuid, actions: null };
+  const tableRows = useMemo(() => {
+    return encounters.map((encounter: Encounter) => {
+      const tableRow: TableRow = { id: encounter.uuid, actions: null };
 
-    encounter['launchFormActions'] = {
-      editEncounter: createLaunchFormAction(encounter, 'edit'),
-      viewEncounter: createLaunchFormAction(encounter, 'view'),
-    };
+      encounter['launchFormActions'] = {
+        editEncounter: createLaunchFormAction(encounter, 'edit'),
+        viewEncounter: createLaunchFormAction(encounter, 'view'),
+      };
 
-    columns.forEach((column) => {
-      let val = column?.getValue(encounter);
-      if (column.link) {
-        val = (
-          <Link
-            onClick={(e) => {
-              e.preventDefault();
-              if (column.link.handleNavigate) {
-                column.link.handleNavigate(encounter);
-              } else {
-                column.link?.getUrl && navigate({ to: column.link.getUrl() });
-              }
-            }}
-          >
-            {val}
-          </Link>
-        );
-      }
-      tableRow[column.key] = val;
-    });
-
-    const actions = tableRow.actions?.length ? tableRow.actions : defaultActions;
-
-    tableRow['actions'] = (
-      <OverflowMenu flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
-        {actions.map((actionItem, index) => {
-          const form = formsJson.length ? formsJson?.find((form) => form.name === actionItem?.form?.name) : null;
-
-          return (
-            form && (
-              <OverflowMenuItem
-                index={index}
-                itemText={t(actionItem.label)}
-                onClick={(e) => {
-                  e.preventDefault();
-                  actionItem.mode === 'delete'
-                    ? handleDeleteEncounter(encounter.uuid, encounter.encounterType.name)
-                    : launchEncounterForm(
-                        form,
-                        actionItem.mode === 'enter' ? 'add' : actionItem.mode,
-                        onFormSave,
-                        null,
-                        encounter.uuid,
-                        actionItem.intent,
-                        workspaceWindowSize,
-                        patientUuid,
-                      );
-                }}
-              />
-            )
+      columns.forEach((column) => {
+        let val = column?.getValue(encounter);
+        if (column.link) {
+          val = (
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                if (column.link.handleNavigate) {
+                  column.link.handleNavigate(encounter);
+                } else {
+                  column.link?.getUrl && navigate({ to: column.link.getUrl() });
+                }
+              }}
+            >
+              {val}
+            </Link>
           );
-        })}
-      </OverflowMenu>
-    );
+        }
+        tableRow[column.key] = val;
+      });
 
-    return tableRow;
-  });
+      const actions =
+        Array.isArray(tableRow.actions) && tableRow.actions.length > 0 ? tableRow.actions : defaultActions;
+
+      tableRow['actions'] = (
+        <OverflowMenu flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
+          {actions.map((actionItem, index) => {
+            const form =
+              formsJson.length && actionItem?.form?.name
+                ? formsJson.find((form) => form.name === actionItem.form.name)
+                : null;
+
+            return (
+              form && (
+                <OverflowMenuItem
+                  key={index}
+                  index={index}
+                  itemText={t(actionItem.label)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    actionItem.mode === 'delete'
+                      ? handleDeleteEncounter(encounter.uuid, encounter.encounterType.name)
+                      : launchEncounterForm(
+                          form,
+                          actionItem.mode === 'enter' ? 'add' : actionItem.mode,
+                          onFormSave,
+                          null,
+                          encounter.uuid,
+                          actionItem.intent,
+                          workspaceWindowSize,
+                          patientUuid,
+                        );
+                  }}
+                />
+              )
+            );
+          })}
+        </OverflowMenu>
+      );
+
+      return tableRow;
+    });
+  }, [
+    encounters,
+    createLaunchFormAction,
+    columns,
+    defaultActions,
+    formsJson,
+    t,
+    handleDeleteEncounter,
+    onFormSave,
+    workspaceWindowSize,
+    patientUuid,
+  ]);
 
   const headers = useMemo(() => {
     if (columns) {

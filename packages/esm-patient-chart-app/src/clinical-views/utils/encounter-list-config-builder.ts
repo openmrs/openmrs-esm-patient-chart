@@ -5,7 +5,6 @@ import {
   getConceptFromMappings,
   getConditionalConceptValue,
 } from './helpers';
-import { renderTag } from '../../encounter-list/components/tag.component';
 import {
   type Encounter,
   type ColumnDefinition,
@@ -13,12 +12,20 @@ import {
   type ActionProps,
   type ConditionalActionProps,
 } from '../../encounter-list/types';
+import { renderTag } from '../../encounter-list/components/tag.component';
 
 interface FormattedColumn {
   key: string;
   header: string;
-  getValue: (encounter: any) => string;
-  link?: any;
+  getValue: (
+    encounter: any,
+  ) =>
+    | string
+    | number
+    | Element
+    | { uuid: string; name: { name: string }; names?: { uuid: string; name: string; conceptNameType: string }[] }
+    | { form: { name: string }; encounterUuid: string; intent: string; label: string; mode: string }[];
+  link?: { getUrl: (encounter: any) => string; handleNavigate?: (encounter: any) => void };
   concept?: string;
 }
 
@@ -26,7 +33,6 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
   if (column.id === 'actions') {
     return getActions(encounter, column);
   }
-
   if (column.statusColorMappings) {
     return renderTag(encounter, column.concept, column.statusColorMappings);
   }
@@ -105,7 +111,13 @@ export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>) => {
     key: column.id,
     header: column.title,
     concept: column.concept,
-    getValue: (encounter) => getColumnValue(encounter, column),
+    getValue: (encounter) =>
+      getColumnValue(encounter, column) as
+        | string
+        | number
+        | Element
+        | { uuid: string; name: { name: string }; names?: { uuid: string; name: string; conceptNameType: string }[] }
+        | { form: { name: string }; encounterUuid: string; intent: string; label: string; mode: string }[],
     link: column.isLink
       ? {
           getUrl: (encounter) => encounter.url,

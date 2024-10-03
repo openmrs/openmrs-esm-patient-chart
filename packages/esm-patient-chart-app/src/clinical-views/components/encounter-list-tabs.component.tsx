@@ -5,6 +5,7 @@ import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import { EncounterList } from '../../encounter-list/components/encounter-list.component';
 import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
 import styles from './encounter-list-tabs.scss';
+import { filter } from '../utils/helpers';
 
 interface EncounterListTabsComponentProps {
   patientUuid: string;
@@ -15,7 +16,6 @@ const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({
   const { tabDefinitions = [] } = config;
   const { t } = useTranslation();
   const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions);
-  const filter = (encounter, formUuid) => encounter?.form?.uuid === formUuid;
 
   return (
     <div className={styles.tabContainer}>
