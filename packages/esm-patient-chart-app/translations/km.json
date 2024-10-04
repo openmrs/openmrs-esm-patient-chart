@@ -71,6 +71,7 @@
   "fieldRequired": "ព័ត៌មាននេះចាំបាច់ត្រូវបំពេញ",
   "filterByEncounterType": "ត្រងតាមប្រភេទនៃការជួបពិនិត្យជំងឺ",
   "form": "Form name",
+  "futureStartTime": "Visit start time cannot be in the future",
   "goToThisEncounter": "ទៅរកការជួបពិនិត្យជំងឺលើកនេះ",
   "indication": "ការចង្អុលបង្ហាញ",
   "invalidTimeFormat": "ទម្រង់ពេលវេលាមិនត្រឹមត្រូវ",
