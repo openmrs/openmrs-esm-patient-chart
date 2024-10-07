@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
-import { type ConfigObject } from '../config-schema';
+import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 import { type DrugOrderBasketItem } from '../types';
-import useSWRImmutable from 'swr/immutable';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -15,7 +15,7 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
-  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
+  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +

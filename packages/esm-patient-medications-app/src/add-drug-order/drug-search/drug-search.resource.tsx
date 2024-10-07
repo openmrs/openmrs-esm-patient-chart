@@ -106,7 +106,7 @@ export function getTemplateOrderBasketItem(
         patientInstructions: '',
         asNeeded: template.template.dosingInstructions.asNeeded || false,
         asNeededCondition: template.template.dosingInstructions.asNeededCondition,
-        startDate: new Date(),
+        startDate: new Date().toISOString(),
         duration: null,
         durationUnit: configDefaultDurationConcept
           ? {
@@ -147,7 +147,7 @@ export function getTemplateOrderBasketItem(
         patientInstructions: '',
         asNeeded: false,
         asNeededCondition: null,
-        startDate: new Date(),
+        startDate: new Date().toISOString(),
         duration: null,
         durationUnit: configDefaultDurationConcept
           ? {

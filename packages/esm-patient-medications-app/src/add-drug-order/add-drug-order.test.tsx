@@ -55,6 +55,8 @@ jest.mock('../api/api', () => ({
 }));
 
 describe('AddDrugOrderWorkspace drug search', () => {
+  const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
   beforeEach(() => {
     _resetOrderBasketStore();
 
@@ -130,7 +132,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
         isOrderIncomplete: true,
-        startDate: expect.any(Date),
+        startDate: expect.stringMatching(dateTimeRegex),
       }),
     ]);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
@@ -179,7 +181,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
             undefined,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
-          startDate: expect.any(Date),
+          startDate: expect.stringMatching(dateTimeRegex),
           indication: 'Hypertension',
           careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
           orderer: mockSessionDataResponse.data.currentProvider.uuid,

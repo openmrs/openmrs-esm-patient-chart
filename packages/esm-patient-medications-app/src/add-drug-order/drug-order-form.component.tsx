@@ -1,7 +1,8 @@
 import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
+import { capitalize } from 'lodash-es';
 import classNames from 'classnames';
-import capitalize from 'lodash-es/capitalize';
+import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
@@ -55,9 +56,26 @@ export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
-  promptBeforeClosing: (testFcn: () => boolean) => void;
+  promptBeforeClosing: (testFn: () => boolean) => void;
 }
 
+interface BaseControlledFieldInputProps {
+  control: Control<MedicationOrderFormData>;
+  getValues?: (name: keyof MedicationOrderFormData) => MedicationOrderFormValue;
+  handleAfterChange?: (newValue: MedicationOrderFormValue, prevValue: MedicationOrderFormValue) => void;
+  name: keyof MedicationOrderFormData;
+  type: 'toggle' | 'checkbox' | 'number' | 'textArea' | 'textInput' | 'comboBox';
+}
+
+type ControlledFieldInputProps = Omit<BaseControlledFieldInputProps, 'type'> &
+  (
+    | ({ type: 'checkbox' } & ComponentProps<typeof Checkbox>)
+    | ({ type: 'comboBox' } & ComponentProps<typeof ComboBox>)
+    | ({ type: 'number' } & ComponentProps<typeof NumberInput>)
+    | ({ type: 'textArea' } & ComponentProps<typeof TextArea>)
+    | ({ type: 'textInput' } & ComponentProps<typeof TextInput>)
+    | ({ type: 'toggle' } & ComponentProps<typeof Toggle>)
+  );
 const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: TFunction) => {
   const comboSchema = {
     default: z.boolean().optional(),
@@ -167,52 +185,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
 };
 
 type MedicationOrderFormData = z.infer<ReturnType<typeof createMedicationOrderFormSchema>>;
-
-function MedicationInfoHeader({
-  orderBasketItem,
-  routeValue,
-  unitValue,
-  dosage,
-}: {
-  orderBasketItem: DrugOrderBasketItem;
-  routeValue: string;
-  unitValue: string;
-  dosage: number;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <div className={styles.medicationInfo} id="medicationInfo">
-      <strong className={styles.productiveHeading02}>
-        {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
-      </strong>{' '}
-      <span className={styles.bodyLong01}>
-        {routeValue && <>&mdash; {routeValue}</>}{' '}
-        {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
-      </span>
-      {dosage && unitValue ? (
-        <>
-          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <strong>
-            <span className={styles.productiveHeading02}>
-              {dosage} {unitValue.toLowerCase()}
-            </span>
-          </strong>
-        </>
-      ) : null}{' '}
-      <ExtensionSlot name="medication-info-slot" state={{ order: orderBasketItem }} />
-    </div>
-  );
-}
-
-function InputWrapper({ children }) {
-  const isTablet = useLayoutType() === 'tablet';
-  return (
-    <Layer level={isTablet ? 1 : 0}>
-      <div className={styles.field}>{children}</div>
-    </Layer>
-  );
-}
+type MedicationOrderFormValue = MedicationOrderFormData[keyof MedicationOrderFormData];
 
 export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
   const { t } = useTranslation();
@@ -220,12 +193,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
-
-  const defaultStartDate = useMemo(() => {
-    if (typeof initialOrderBasketItem?.startDate === 'string') parseDate(initialOrderBasketItem?.startDate);
-
-    return initialOrderBasketItem?.startDate as Date;
-  }, [initialOrderBasketItem?.startDate]);
 
   const medicationOrderFormSchema = useMemo(
     () => createMedicationOrderFormSchema(requireOutpatientQuantity, t),
@@ -258,7 +225,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       numRefills: initialOrderBasketItem?.numRefills,
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
-      startDate: defaultStartDate,
+      startDate: initialOrderBasketItem?.startDate ? dayjs(initialOrderBasketItem?.startDate).toDate() : new Date(),
     },
   });
 
@@ -297,7 +264,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      startDate: data.startDate ? dayjs(data.startDate).toISOString() : dayjs().toISOString(),
     };
     onSave(newBasketItems as DrugOrderBasketItem);
   };
@@ -591,7 +558,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
           <section className={styles.formSection}>
             <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription duration')}</h3>
             <Grid className={styles.gridRow}>
-              {/* TODO: This input does nothing */}
               <Column lg={16} md={4} sm={4}>
                 <div className={styles.fullWidthDatePickerContainer}>
                   <InputWrapper>
@@ -601,16 +567,17 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       render={({ field: { onBlur, value, onChange, ref } }) => (
                         <DatePicker
                           datePickerType="single"
+                          dateFormat="d/m/Y"
                           maxDate={new Date().toISOString()}
-                          value={value}
-                          onChange={([newStartDate]) => onChange(newStartDate)}
                           onBlur={onBlur}
+                          onChange={([newStartDate]) => onChange(newStartDate)}
                           ref={ref}
+                          value={value ? dayjs(value).format('DD/MM/YYYY') : null}
                         >
                           <DatePickerInput
                             id="startDatePicker"
-                            placeholder="mm/dd/yyyy"
                             labelText={t('startDate', 'Start date')}
+                            placeholder="dd/mm/yyyy"
                             size="lg"
                           />
                         </DatePicker>
@@ -761,78 +728,14 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   );
 }
 
-const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }) => {
-  const { t } = useTranslation();
-  const { maxDispenseDurationInDays } = useConfig();
-
-  const {
-    field: { onBlur, onChange, value, ref },
-  } = useController<MedicationOrderFormData>({ name: name, control });
-
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
-      onChange(val ? parseInt(val) : 0);
-    },
-    [onChange],
-  );
-
-  const increment = () => {
-    setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
-  };
-
-  const decrement = () => {
-    setValue(name, Math.max(Number(value) - 1, 0));
-  };
-
-  return (
-    <div className={styles.customElement}>
-      <span className="cds--label">{labelText}</span>
-      <div className={styles.customNumberInput}>
-        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
-        <TextInput
-          onChange={handleChange}
-          value={!!value ? value : '--'}
-          size="lg"
-          className={styles.customInput}
-          onBlur={onBlur}
-          ref={ref}
-          {...inputProps}
-        />
-        <Button hasIconOnly renderIcon={AddIcon} onClick={increment} iconDescription={t('increment', 'Increment')} />
-      </div>{' '}
-    </div>
-  );
-};
-
-type MedicationOrderFormValue = MedicationOrderFormData[keyof MedicationOrderFormData];
-
-interface BaseControlledFieldInputProps {
-  name: keyof MedicationOrderFormData;
-  type: 'toggle' | 'checkbox' | 'number' | 'textArea' | 'textInput' | 'comboBox';
-  handleAfterChange?: (newValue: MedicationOrderFormValue, prevValue: MedicationOrderFormValue) => void;
-  control: Control<MedicationOrderFormData>;
-  getValues?: (name: keyof MedicationOrderFormData) => MedicationOrderFormValue;
-}
-
-type ControlledFieldInputProps = Omit<BaseControlledFieldInputProps, 'type'> &
-  (
-    | ({ type: 'toggle' } & ComponentProps<typeof Toggle>)
-    | ({ type: 'checkbox' } & ComponentProps<typeof Checkbox>)
-    | ({ type: 'number' } & ComponentProps<typeof NumberInput>)
-    | ({ type: 'textArea' } & ComponentProps<typeof TextArea>)
-    | ({ type: 'textInput' } & ComponentProps<typeof TextInput>)
-    | ({ type: 'comboBox' } & ComponentProps<typeof ComboBox>)
-  );
-
-const ControlledFieldInput = ({
+function ControlledFieldInput({
   name,
   type,
   control,
   getValues,
   handleAfterChange,
   ...restProps
-}: ControlledFieldInputProps) => {
+}: ControlledFieldInputProps) {
   const {
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
@@ -927,4 +830,94 @@ const ControlledFieldInput = ({
       <FormLabel className={styles.errorLabel}>{error?.message}</FormLabel>
     </>
   );
-};
+}
+
+function CustomNumberInput({ setValue, control, name, labelText, ...inputProps }) {
+  const { t } = useTranslation();
+  const { maxDispenseDurationInDays } = useConfig();
+
+  const {
+    field: { onBlur, onChange, value, ref },
+  } = useController<MedicationOrderFormData>({ name: name, control });
+
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
+      onChange(val ? parseInt(val) : 0);
+    },
+    [onChange],
+  );
+
+  const increment = () => {
+    setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
+  };
+
+  const decrement = () => {
+    setValue(name, Math.max(Number(value) - 1, 0));
+  };
+
+  return (
+    <div className={styles.customElement}>
+      <span className="cds--label">{labelText}</span>
+      <div className={styles.customNumberInput}>
+        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
+        <TextInput
+          onChange={handleChange}
+          value={!!value ? value : '--'}
+          size="lg"
+          className={styles.customInput}
+          onBlur={onBlur}
+          ref={ref}
+          {...inputProps}
+        />
+        <Button hasIconOnly renderIcon={AddIcon} onClick={increment} iconDescription={t('increment', 'Increment')} />
+      </div>{' '}
+    </div>
+  );
+}
+
+function InputWrapper({ children }) {
+  const isTablet = useLayoutType() === 'tablet';
+  return (
+    <Layer level={isTablet ? 1 : 0}>
+      <div className={styles.field}>{children}</div>
+    </Layer>
+  );
+}
+
+function MedicationInfoHeader({
+  orderBasketItem,
+  routeValue,
+  unitValue,
+  dosage,
+}: {
+  orderBasketItem: DrugOrderBasketItem;
+  routeValue: string;
+  unitValue: string;
+  dosage: number;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.medicationInfo} id="medicationInfo">
+      <strong className={styles.productiveHeading02}>
+        {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
+      </strong>{' '}
+      <span className={styles.bodyLong01}>
+        {routeValue && <>&mdash; {routeValue}</>}{' '}
+        {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
+      </span>
+      {dosage && unitValue ? (
+        <>
+          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+          <strong>
+            <span className={styles.productiveHeading02}>
+              {dosage} {unitValue.toLowerCase()}
+            </span>
+          </strong>
+        </>
+      ) : null}{' '}
+      <ExtensionSlot name="medication-info-slot" state={{ order: orderBasketItem }} />
+    </div>
+  );
+}
