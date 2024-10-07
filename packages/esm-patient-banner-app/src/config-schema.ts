@@ -15,8 +15,7 @@ export const configSchema = {
   printPatientSticker: {
     header: {
       _type: Type.Object,
-      _description:
-        'Configuration properties for the patient sticker headerConfiguration properties for the patient sticker header',
+      _description: 'Configuration properties for patient identifier stickers',
       showBarcode: {
         _type: Type.Boolean,
         _description: 'Whether to display a barcode on the patient sticker',
@@ -63,7 +62,7 @@ export const configSchema = {
   },
 };
 
-export type AllowedPatientFields = 'name' | 'dob' | 'gender' | 'identifier' | 'age' | 'contact' | 'address';
+export type AllowedPatientFields = 'address' | 'age' | 'contact' | 'dob' | 'gender' | 'identifier' | 'name';
 
 export interface ConfigObject {
   contactAttributeTypes: Array<string>;

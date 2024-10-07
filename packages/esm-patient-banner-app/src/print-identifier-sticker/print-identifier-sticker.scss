@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '~@openmrs/esm-styleguide/src/_vars' as *;
+@use '@openmrs/esm-styleguide/src/_vars' as *;
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;

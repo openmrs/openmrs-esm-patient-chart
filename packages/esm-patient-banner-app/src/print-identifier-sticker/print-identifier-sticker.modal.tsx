@@ -1,15 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation, type TFunction } from 'react-i18next';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Barcode from 'react-barcode';
+import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { age, getPatientName, showSnackbar, useConfig, getCoreTranslation, usePatient } from '@openmrs/esm-framework';
+import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import styles from './print-identifier-sticker.scss';
-import Barcode from 'react-barcode';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
+import styles from './print-identifier-sticker.scss';
 
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
+  patient: fhir.Patient;
+}
+
+interface PrintComponentProps extends Partial<ConfigObject> {
   patient: fhir.Patient;
 }
 
@@ -103,12 +107,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   );
 };
 
-interface PrintComponentProps extends Partial<ConfigObject> {
-  patient: fhir.Patient;
-}
-
 const PrintComponent = ({ patient }: PrintComponentProps) => {
-  const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
   const primaryIdentifierValue = patient?.identifier?.find((identifier) => identifier.use === 'official')?.value;
   return (
@@ -136,8 +135,9 @@ const ImplementationLogo: React.FC = () => {
   const { printPatientSticker } = useConfig<ConfigObject>();
 
   return printPatientSticker?.header?.logo ? (
-    <img alt="implementation-logo" src={printPatientSticker?.header?.logo} />
+    <img alt={t('implementationLogo', 'Implementation logo')} src={printPatientSticker?.header?.logo} />
   ) : (
+    // TODO: Figure out why #omrs-logo-full-mono sprite is not working
     <svg data-testid="openmrs-logo" role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"

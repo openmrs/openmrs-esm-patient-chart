@@ -1,46 +1,51 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import PrintIdentifierSticker from './print-identifier-sticker.modal';
-import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
-import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject, configSchema } from '../config-schema';
-import { useReactToPrint } from 'react-to-print';
-import userEvent from '@testing-library/user-event';
 import Barcode from 'react-barcode';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { useReactToPrint } from 'react-to-print';
+import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { getByTextWithMarkup } from 'tools';
+import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockedCloseModal = jest.fn();
-const mockedUseConfig = jest
-  .mocked(useConfig<ConfigObject>)
-  .mockResolvedValue(getDefaultsFromConfigSchema(configSchema));
+const mockedUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockedUseReactToPrint = jest.mocked(useReactToPrint);
+
+const defaultConfig: ConfigObject = getDefaultsFromConfigSchema(configSchema);
+
 jest.mock('react-to-print', () => ({
   ...jest.requireActual('react-to-print'),
   useReactToPrint: jest.fn(),
 }));
-const mockedUseReactToPrint = jest.mocked(useReactToPrint);
 
 jest.mock('react-barcode', () => jest.fn().mockReturnValue(<div data-testid="barcode" />));
 
-describe('Testing PrintIdentifierStickerModal', () => {
+describe('PrintIdentifierStickerModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
   });
-  it('should render PrintIdentifierStickerModal', async () => {
+
+  it('renders the print modal', async () => {
     const user = userEvent.setup();
     const mockHandlePrint = jest.fn();
     mockedUseReactToPrint.mockReturnValue(mockHandlePrint);
+
     renderPrintIdentifierStickerModal();
+
     expect(screen.getByText(/print identifier sticker/i)).toBeInTheDocument();
     const printButton = screen.getByRole('button', { name: /print/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
+
     await user.click(cancelButton);
-    expect(mockedCloseModal).toHaveBeenCalled();
+    expect(mockedCloseModal).toHaveBeenCalledTimes(1);
+
     await user.click(printButton);
-    expect(mockHandlePrint).toHaveBeenCalled();
+    expect(mockHandlePrint).toHaveBeenCalledTimes(1);
   });
-  it('should render barcode if enabled via config', async () => {
-    const defaultConfig = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
+
+  it('renders a barcode if enabled via config', async () => {
     mockedUseConfig.mockReturnValue({
       ...defaultConfig,
       printPatientSticker: {
@@ -52,7 +57,9 @@ describe('Testing PrintIdentifierStickerModal', () => {
         },
       },
     });
+
     renderPrintIdentifierStickerModal();
+
     expect(screen.getByTestId('barcode')).toBeInTheDocument();
     expect(Barcode).toHaveBeenCalledWith(
       {
@@ -71,8 +78,8 @@ describe('Testing PrintIdentifierStickerModal', () => {
     );
     expect(screen.getByTestId('openmrs-logo')).toBeInTheDocument();
   });
-  it("should not render barcode if it's disabled via config", async () => {
-    const defaultConfig = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
+
+  it("should not render a barcode if it's disabled via config", async () => {
     mockedUseConfig.mockReturnValue({
       ...defaultConfig,
       printPatientSticker: {
@@ -84,12 +91,14 @@ describe('Testing PrintIdentifierStickerModal', () => {
         },
       },
     });
+
     renderPrintIdentifierStickerModal();
+
     expect(screen.queryByTestId('barcode')).not.toBeInTheDocument();
     expect(screen.queryByTestId('openmrs-logo')).not.toBeInTheDocument();
   });
-  it('should render implementation logo if passed via config', () => {
-    const defaultConfig = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
+
+  it('renders a custom implementation logo if passed via config', () => {
     mockedUseConfig.mockReturnValue({
       ...defaultConfig,
       printPatientSticker: {
@@ -101,12 +110,15 @@ describe('Testing PrintIdentifierStickerModal', () => {
         },
       },
     });
+
     renderPrintIdentifierStickerModal();
+
     expect(screen.getByRole('img')).toHaveAttribute('src', '/openmrs/spa/logo.png');
   });
 
-  it('should render patient details', () => {
+  it("renders the patient's details in the print modal", () => {
     renderPrintIdentifierStickerModal();
+
     expect(getByTextWithMarkup(/Joshua Johnson/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/\+255777053243/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/100008E/i)).toBeInTheDocument();

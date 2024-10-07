@@ -1,8 +1,8 @@
 import React from 'react';
-import { age, type CoreTranslationKey, getCoreTranslation, getPatientName, useConfig } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { type ConfigObject } from '../config-schema';
 import { useTranslation } from 'react-i18next';
+import { age, type CoreTranslationKey, getCoreTranslation, getPatientName, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
 
 export interface PatientDetailProps {
