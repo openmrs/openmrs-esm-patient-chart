@@ -62,6 +62,7 @@ describe('Testing PrintIdentifierStickerModal', () => {
         displayValue: true,
         renderer: 'img',
         font: 'IBM Plex Sans',
+        format: 'CODE39',
         textAlign: 'center',
         textPosition: 'bottom',
         fontSize: 16,
