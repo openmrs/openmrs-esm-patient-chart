@@ -23,7 +23,10 @@
     },
     {
       "name": "results-viewer",
-      "slots": ["patient-chart-results-viewer-slot", "patient-chart-test-results-dashboard-slot"],
+      "slots": [
+        "patient-chart-results-viewer-slot",
+        "patient-chart-test-results-dashboard-slot"
+      ],
       "component": "resultsViewer"
     },
     {
