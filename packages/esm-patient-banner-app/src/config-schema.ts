@@ -13,11 +13,6 @@ export const configSchema = {
     },
   },
   printPatientSticker: {
-    enabled: {
-      _type: Type.Boolean,
-      _description: 'Whether to enable the print patient sticker feature',
-      _default: true,
-    },
     header: {
       _type: Type.Object,
       _description:
@@ -73,7 +68,6 @@ export type AllowedPatientFields = 'name' | 'dob' | 'gender' | 'identifier' | 'a
 export interface ConfigObject {
   contactAttributeTypes: Array<string>;
   printPatientSticker: {
-    enabled: boolean;
     header: {
       showBarcode: boolean;
       showLogo: boolean;

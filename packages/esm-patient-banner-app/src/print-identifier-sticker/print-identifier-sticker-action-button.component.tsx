@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { showModal, useConfig, useFeatureFlag, usePatient } from '@openmrs/esm-framework';
+import { showModal, useFeatureFlag, usePatient } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
-import type { ConfigObject } from '../config-schema';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
   patientUuid: string;
@@ -13,7 +12,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { printPatientSticker } = useConfig<ConfigObject>();
+  const canPrintPatientIdentifierSticker = useFeatureFlag('print-patient-identifier-sticker');
   const { patient } = usePatient(patientUuid);
 
   const handleLaunchModal = useCallback(() => {
@@ -23,7 +22,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     });
   }, [patient]);
 
-  if (!patient || !printPatientSticker?.enabled) {
+  if (!patient || !canPrintPatientIdentifierSticker) {
     return null;
   }
 
