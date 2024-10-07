@@ -24,6 +24,13 @@
       "component": "patientBanner",
       "online": true,
       "offline": true
+    },
+    {
+      "name": "print-identifier-sticker-button",
+      "slot": "patient-actions-slot",
+      "component": "printIdentifierStickerActionButton",
+      "online": true,
+      "offline": true
     }
   ],
   "modals": [
