@@ -49,7 +49,7 @@ export const configSchema = {
     identifiersToDisplay: {
       _type: Type.Array,
       _description:
-        'List of UUIDs of patient identifier types to exclude from rendering in the patient banner. If empty, all identifiers will be displayed.',
+        'List of UUIDs of patient identifier types to include on the patient sticker. If empty, all identifiers will be displayed.',
       _default: [],
       _elements: {
         _type: Type.UUID,
