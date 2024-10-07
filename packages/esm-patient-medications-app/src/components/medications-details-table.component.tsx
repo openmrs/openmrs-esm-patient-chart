@@ -104,22 +104,21 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
-              <Tooltip
-                align="top"
-                label={
-                  <>
-                    {formatDate(new Date(medication.dateStopped || medication.autoExpireDate))}
-                    <br />
-                    &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
-                  </>
-                }
-              >
-                {(medication.dateStopped || medication.autoExpireDate) && (
+              {(medication.dateStopped || medication.autoExpireDate) && medication.action === 'DISCONTINUE' && (
+                <Tooltip
+                  align="top"
+                  label={
+                    <>
+                      {t('discontinuedDate', 'Discontinued date').toUpperCase()} &mdash;
+                      {formatDate(new Date(medication.dateStopped || medication.autoExpireDate))}
+                    </>
+                  }
+                >
                   <Tag type="gray" className={styles.tag}>
                     {t('discontinued', 'Discontinued')}
                   </Tag>
-                )}
-              </Tooltip>
+                </Tooltip>
+              )}
             </p>
             <p className={styles.bodyLong01}>
               <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
