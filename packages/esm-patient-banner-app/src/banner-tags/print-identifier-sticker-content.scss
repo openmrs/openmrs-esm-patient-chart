@@ -1,0 +1,38 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.printRoot {
+  @media print {
+    @page {
+      size: var(--omrs-print-label-paper-size, auto);
+    }
+
+    html,
+    body {
+      height: initial !important;
+      overflow: initial !important;
+      background-color: white;
+    }
+  }
+
+  .labelsContainer {
+    display: grid;
+    column-gap: 1.3rem;
+    row-gap: 1rem;
+    place-items: center;
+    background-color: white;
+    grid-template-columns: repeat(var(--omrs-print-label-columns, 1), 1fr);
+    grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
+  }
+
+  .printContainer {
+    height: var(--omrs-print-label-sticker-height, 11rem);
+    width: var(--omrs-print-label-sticker-width, 13rem);
+    background-color: $ui-01;
+  }
+
+  .pageBreak {
+    page-break-after: always;
+  }
+}
