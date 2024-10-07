@@ -221,7 +221,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
       onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
-  });
+  } as any);
 
   return (
     <div className={styles.widgetCard}>

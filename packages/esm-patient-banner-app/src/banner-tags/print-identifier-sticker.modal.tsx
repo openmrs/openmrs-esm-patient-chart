@@ -115,7 +115,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     onAfterPrint: handleAfterPrint,
     onBeforeGetContent: handleBeforeGetContent,
     onPrintError: handlePrintError,
-  });
+  } as any);
 
   return (
     <>

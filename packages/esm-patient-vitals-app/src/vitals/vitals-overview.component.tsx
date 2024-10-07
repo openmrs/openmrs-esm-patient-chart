@@ -175,7 +175,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
       onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
-  });
+  } as any);
 
   return (
     <>

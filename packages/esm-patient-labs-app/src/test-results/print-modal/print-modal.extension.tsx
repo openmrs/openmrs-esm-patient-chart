@@ -62,7 +62,7 @@ function PrintModal({ patientUuid, closeDialog }) {
 
   const handlePrint = useReactToPrint({
     content: () => printContainerRef.current,
-  });
+  } as any);
 
   const patient = usePatient(patientUuid);
 
