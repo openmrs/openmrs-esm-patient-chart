@@ -74,11 +74,18 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
-  function checkValidity(value, onChange) {
-    setInvalid(!(Number(value) || value === ''));
+  function checkValidity(value: string, onChange: (value: number | undefined) => void) {
+    setInvalid(false);
+    if (value === undefined) {
+      onChange(undefined);
+      return;
+    }
+    const parsedValue = Number(value.trim());
 
-    if (!invalid) {
-      onChange(value === '' ? undefined : Number(value));
+    if (isNaN(parsedValue)) {
+      setInvalid(true);
+    } else {
+      onChange(parsedValue);
     }
   }
 
@@ -157,8 +164,8 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               ref={ref}
                               style={{ ...fieldStyles }}
                               title={fieldProperty.name}
-                              type={fieldProperty.type}
-                              value={value}
+                              type="text"
+                              value={value ?? ''}
                             />
                           );
                         }}
