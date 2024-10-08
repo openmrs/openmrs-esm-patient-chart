@@ -6,13 +6,13 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { usePatientOrders } from '../api/api';
 
 interface ActiveMedicationsProps {
-  patient: fhir.Patient;
+  patient: fhir.Patient | null;
 }
 
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('activeMedicationsDisplayText', 'Active medications');
-  const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
+  const displayText = t('activeMedicationsDisplayText', 'Active medication');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'Active Medication');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
 
@@ -22,12 +22,17 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
 
   if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
-  if (activePatientOrders?.length) {
+  const activeMedications = activePatientOrders?.filter((order) => {
+    const isActive = !order.dateStopped && order.action !== 'DISCONTINUE';
+    return isActive || (!order.autoExpireDate && order.action !== 'DISCONTINUE');
+  });
+
+  if (activeMedications?.length) {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
-        title={t('activeMedicationsTableTitle', 'Active Medications')}
-        medications={activePatientOrders}
+        title={t('activeMedicationsTableTitle', 'Active Medication')}
+        medications={activeMedications}
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
@@ -35,6 +40,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
       />
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
 };
 
