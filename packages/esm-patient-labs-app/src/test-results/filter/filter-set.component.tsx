@@ -22,7 +22,6 @@ interface filterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
 }
 
 function filterTreeNode(inputValue, treeNode) {
-  // If the tree node's display value contains the user input, or any of its children's display contains the user input, return true
   if (
     treeNode &&
     (treeNode.display.toLowerCase().includes(inputValue.toLowerCase()) ||
@@ -30,8 +29,6 @@ function filterTreeNode(inputValue, treeNode) {
   ) {
     return true;
   }
-
-  // Otherwise, return false
   return false;
 }
 
@@ -62,23 +59,39 @@ const FilterSet: React.FC<FilterSetProps> = () => {
   );
 };
 
+// Recursive function to check if a node or any of its descendants have data
+const hasNodeOrChildrenWithData = (node) => {
+  if (node.hasData) {
+    return true;
+  }
+  if (node.subSets) {
+    return node.subSets.some((subNode) => hasNodeOrChildrenWithData(subNode));
+  }
+  return false;
+};
+
 const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
   const config = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
 
-  if (!root.subSets) return;
+  if (!hasNodeOrChildrenWithData(root)) {
+    return null;
+  }
 
-  const filterParent = root.subSets.map((node) => {
-    return (
-      <FilterNode
-        root={node}
-        level={0}
-        open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
-      />
-    );
-  });
+  const filterParent = root.subSets
+    .filter((node) => hasNodeOrChildrenWithData(node))
+    .map((node) => {
+      return (
+        <FilterNode
+          root={node}
+          level={0}
+          open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
+          key={node.flatName}
+        />
+      );
+    });
 
   return (
     <div>
@@ -104,6 +117,11 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
   const indeterminate = isIndeterminate(parents[root.flatName], checkboxes);
   const allChildrenChecked = parents[root.flatName]?.every((kid) => checkboxes[kid]);
 
+  // Filter out nodes that don't have data or descendants with data
+  if (!hasNodeOrChildrenWithData(root)) {
+    return null;
+  }
+
   return (
     <Accordion align="start" size={tablet ? 'md' : 'sm'}>
       <AccordionItem
@@ -121,8 +139,11 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
         open={open ?? false}
       >
         {!root?.subSets?.[0]?.obs &&
-          root?.subSets?.map((node, index) => <FilterNode root={node} level={level + 1} key={index} />)}
-        {root?.subSets?.[0]?.obs && root.subSets?.map((obs, index) => <FilterLeaf leaf={obs} key={index} />)}
+          root?.subSets
+            ?.filter((node) => hasNodeOrChildrenWithData(node))
+            .map((node, index) => <FilterNode root={node} level={level + 1} key={index} />)}
+        {root?.subSets?.[0]?.obs &&
+          root.subSets?.filter((obs) => obs.hasData).map((obs, index) => <FilterLeaf leaf={obs} key={index} />)}
       </AccordionItem>
     </Accordion>
   );
@@ -130,6 +151,12 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
 
 const FilterLeaf = ({ leaf }: FilterLeafProps) => {
   const { checkboxes, toggleVal } = useContext(FilterContext);
+
+  // Filter out leaves without data
+  if (!leaf.hasData) {
+    return null;
+  }
+
   return (
     <div className={styles.filterItem}>
       <Checkbox
@@ -137,7 +164,6 @@ const FilterLeaf = ({ leaf }: FilterLeafProps) => {
         labelText={leaf?.display}
         checked={checkboxes?.[leaf.flatName]}
         onChange={() => toggleVal(leaf.flatName)}
-        disabled={!leaf.hasData}
       />
     </div>
   );
