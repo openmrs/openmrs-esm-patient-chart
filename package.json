@@ -18,6 +18,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
     "classnames": "^2.3.2",
+    "react-barcode": "^1.5.3",
     "react-hook-form": "^7.46.2",
     "react-to-print": "^2.14.13",
     "zod": "^3.22.2"
@@ -82,5 +83,5 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.5.0"
 }

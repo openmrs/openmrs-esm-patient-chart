@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExtensionSlot, useConnectivity, usePatient } from '@openmrs/esm-framework';
 import {
+  clinicalFormsWorkspace,
   type DefaultPatientWorkspaceProps,
   type FormEntryProps,
   useVisitOrOfflineVisit,
@@ -9,10 +10,12 @@ import {
 interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
   mutateForm: () => void;
   formInfo: FormEntryProps;
+  clinicalFormsWorkspaceName?: string;
 }
 
 const FormEntry: React.FC<FormEntryComponentProps> = ({
   patientUuid,
+  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -47,6 +50,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       },
       promptBeforeClosing,
       additionalProps,
+      clinicalFormsWorkspaceName,
     }),
     [
       formUuid,
@@ -67,6 +71,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       closeWorkspaceWithSavedChanges,
       promptBeforeClosing,
       additionalProps,
+      clinicalFormsWorkspaceName,
     ],
   );
 

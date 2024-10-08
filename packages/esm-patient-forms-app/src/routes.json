@@ -37,6 +37,11 @@
       "offline": true,
       "online": true,
       "order": 2
+    },
+    {
+      "name": "clinical-forms-workspaceExtension",
+      "component": "clinicalFormsWorkspaceExtension",
+      "slot": "ward-patient-clinical-forms-workspace-slot"
     }
   ],
   "workspaces": [
@@ -50,6 +55,17 @@
       "width": "wider"
     },
     {
+      "name": "ward-patient-form-entry-workspace",
+      "title": "clinicalForm",
+      "component": "patientFormEntryWorkspace",
+      "type": "ward-patient-clinical-form",
+      "canMaximize": true,
+      "canHide": false,
+      "width": "wider",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
       "name": "patient-html-form-entry-workspace",
       "title": "clinicalForm",
       "component": "patientHtmlFormEntryWorkspace",
@@ -57,6 +73,17 @@
       "canMaximize": true,
       "canHide": false,
       "width": "extra-wide"
+    },
+    {
+      "name": "ward-patient-html-form-entry-workspace",
+      "title": "clinicalForm",
+      "component": "patientHtmlFormEntryWorkspace",
+      "type": "ward-patient-clinical-form",
+      "canMaximize": true,
+      "canHide": false,
+      "width": "extra-wide",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
     },
     {
       "name": "clinical-forms-workspace",

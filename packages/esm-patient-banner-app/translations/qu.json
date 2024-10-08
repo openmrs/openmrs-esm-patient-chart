@@ -1,0 +1,14 @@
+{
+  "address1": "Address line 1",
+  "address2": "Address line 2",
+  "city": "City",
+  "cityVillage": "city",
+  "country": "Country",
+  "countyDistrict": "District",
+  "district": "District",
+  "dob": "DOB",
+  "patientIdentifierSticker": "Patient identifier sticker",
+  "postalCode": "Postal code",
+  "state": "State",
+  "stateProvince": "State"
+}

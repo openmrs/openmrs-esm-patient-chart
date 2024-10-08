@@ -11,9 +11,15 @@
   justify-content: space-between;
   align-items: center;
   min-height: layout.$spacing-09;
-  margin: layout.$spacing-03 0 0 layout.$spacing-05;
+  padding-left: layout.$spacing-05;
   outline: none;
   pointer-events: visibleFill;
+}
+
+.emptyStateVitalsHeader {
+  @extend .vitalsHeader;
+  background-color: $openmrs-background-grey;
+  border-bottom: 1px solid $ui-03;
 }
 
 .headerItems {

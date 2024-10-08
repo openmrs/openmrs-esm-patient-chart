@@ -18,8 +18,8 @@ import {
   type LabOrderBasketItem,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { TestTypeSearch } from './test-type-search.component';
 import { LabOrderForm } from './lab-order-form.component';
+import { TestTypeSearch } from './test-type-search.component';
 import styles from './add-lab-order.scss';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
@@ -36,11 +36,9 @@ export default function AddLabOrderWorkspace({
   promptBeforeClosing,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
-
+  const isTablet = useLayoutType() === 'tablet';
   const { patient, isLoading: isLoadingPatient, patientUuid } = usePatient();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
-
-  const isTablet = useLayoutType() === 'tablet';
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -75,9 +73,7 @@ export default function AddLabOrderWorkspace({
           </Button>
         </div>
       )}
-      {!currentLabOrder ? (
-        <TestTypeSearch openLabForm={setCurrentLabOrder} />
-      ) : (
+      {currentLabOrder ? (
         <LabOrderForm
           initialOrder={currentLabOrder}
           patientUuid={patientUuid}
@@ -86,6 +82,8 @@ export default function AddLabOrderWorkspace({
           promptBeforeClosing={promptBeforeClosing}
           setTitle={() => {}}
         />
+      ) : (
+        <TestTypeSearch openLabForm={setCurrentLabOrder} />
       )}
     </div>
   );

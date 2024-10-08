@@ -9,6 +9,17 @@
   z-index: 1;
 }
 
+.nestedTimelineHeader {
+  border: 0.5px solid colors.$gray-50;
+}
+
+.timelineDataContainer {
+  > div + div {
+    margin: 1rem 0;
+    border: 0.5px solid colors.$gray-50;
+  }
+}
+
 .dateHeaderContainer {
   padding: 0;
   box-sizing: border-box;
@@ -61,6 +72,7 @@
 .timelineDataCell {
   @extend .timelineCell;
   justify-items: first baseline;
+  gap: 0;
 
   p {
     @include type.type-style('body-compact-01');
@@ -95,10 +107,8 @@
 
 .rowHeader {
   overflow: hidden;
-  align-self: flex-start;
   background-color: $ui-03;
-  padding: 0.6rem layout.$spacing-05;
-  border-top: 1px solid colors.$gray-30;
+  padding: 0.5rem layout.$spacing-05;
 }
 
 .rowStartCell {
@@ -113,6 +123,11 @@
   justify-items: baseline;
   align-items: center;
   padding: layout.$spacing-05;
+  border-left: none !important;
+
+  :last-of-type {
+    border-bottom: none !important;
+  }
 }
 
 .timelineCellZebra {

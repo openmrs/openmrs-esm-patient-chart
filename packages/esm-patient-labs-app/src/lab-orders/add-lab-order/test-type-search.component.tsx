@@ -13,12 +13,13 @@ import {
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { prepLabOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
+import { prepLabOrderPostData } from '../api';
 import { createEmptyLabOrder } from './lab-order';
 import styles from './test-type-search.scss';
 
 interface TestTypeSearchResultsProps {
+  cancelOrder: () => void;
   searchTerm: string;
   openOrderForm: (searchResult: LabOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
@@ -45,6 +46,13 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
     searchInputRef.current?.focus();
   };
 
+  const cancelOrder = useCallback(() => {
+    closeWorkspace('add-lab-order', {
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
+  }, []);
+
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value ?? '');
   };
@@ -54,24 +62,30 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
       <ResponsiveWrapper>
         <Search
           autoFocus
-          size="lg"
-          placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           labelText={t('searchFieldPlaceholder', 'Search for a test type')}
           onChange={handleSearchTermChange}
+          placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           ref={searchInputRef}
+          size="lg"
           value={searchTerm}
         />
       </ResponsiveWrapper>
       <TestTypeSearchResults
-        searchTerm={debouncedSearchTerm}
-        openOrderForm={openLabForm}
+        cancelOrder={cancelOrder}
         focusAndClearSearchInput={focusAndClearSearchInput}
+        openOrderForm={openLabForm}
+        searchTerm={debouncedSearchTerm}
       />
     </>
   );
 }
 
-function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchInput }: TestTypeSearchResultsProps) {
+function TestTypeSearchResults({
+  cancelOrder,
+  searchTerm,
+  openOrderForm,
+  focusAndClearSearchInput,
+}: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { testTypes, isLoading, error } = useTestTypes();
@@ -137,8 +151,14 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
             ))}
           </div>
         </div>
-
-        <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
+        {isTablet && (
+          <div className={styles.separatorContainer}>
+            <p className={styles.separator}>{t('or', 'or')}</p>
+            <Button iconDescription="Return to order basket" kind="ghost" onClick={cancelOrder}>
+              {t('returnToOrderBasket', 'Return to order basket')}
+            </Button>
+          </div>
+        )}
       </>
     );
   }
@@ -244,7 +264,6 @@ const TestTypeSearchSkeleton = () => {
     [styles.skeletonTile]: true,
   });
   const buttonSize = isTablet ? 'md' : 'sm';
-  const dividerClassName = classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider);
 
   return (
     <div className={styles.searchResultSkeletonWrapper}>
@@ -257,7 +276,6 @@ const TestTypeSearchSkeleton = () => {
           <SkeletonText />
         </Tile>
       ))}
-      <hr className={dividerClassName} />
     </div>
   );
 };

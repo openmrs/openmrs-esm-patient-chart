@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "אין הערת ביקור להצגה",
   "primaryDiagnosis": "אבחנה עיקרית",
   "primaryDiagnosisInputPlaceholder": "בחר אבחנה ראשית",
+  "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
   "saveAndClose": "שמור וסגור",
   "saving": "Saving",
   "searchForPrimaryDiagnosis": "חפש אבחנה ראשית",

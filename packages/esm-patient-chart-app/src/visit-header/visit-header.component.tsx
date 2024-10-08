@@ -47,13 +47,12 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 
   const name = patient ? getPatientName(patient) : '';
   const patientUuid = `${patient?.id}`;
-  const { currentVisit } = useVisit(patientUuid);
   const patientNameIsTooLong = !isTablet && name.trim().length > 25;
+  const { currentVisit } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
-
   const getServiceString = useCallback(() => {
     if (queueEntry?.status && queueEntry.service) {
       return `${t(queueEntry.status)} - ${t(queueEntry.service)}`;
@@ -93,7 +92,12 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       ) : (
         <span className={styles.patientName}>{name} </span>
       )}
-      <span className={styles.patientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</span>
+
+      <span className={styles.patientInfo}>
+        {patient?.birthDate ? `${age(patient.birthDate)}, ` : ''}
+        {patient?.gender ? getGender(patient.gender) : ''}
+      </span>
+
       {queueEntry && (
         <>
           <div className={styles.navDivider} />

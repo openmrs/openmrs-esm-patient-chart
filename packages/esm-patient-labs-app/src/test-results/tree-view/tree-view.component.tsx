@@ -17,7 +17,7 @@ interface TreeViewProps {
   patientUuid: string;
   basePath: string;
   testUuid: string;
-  loading: boolean;
+  isLoading: boolean;
   expanded: boolean;
   type: string;
   view?: viewOpts;
@@ -27,8 +27,8 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   className,
   loadingPanelData,
 }) => {
-  const { timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const { t } = useTranslation();
+  const { timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
 
   const {
     data: { rowData },
@@ -51,21 +51,23 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
                 parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
             )
           : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
-        return (
+
+        return subRows.length > 0 ? (
           <div
+            key={parent.flatName}
             className={classNames({
               [styles.border]: subRows.length,
             })}
           >
             <IndividualResultsTable isLoading={loadingPanelData} parent={parent} subRows={subRows} index={index} />
           </div>
-        );
+        ) : null;
       })}
     </Layer>
   );
 };
 
-const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, loading, expanded, type, view }) => {
+const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, isLoading, expanded, type, view }) => {
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const { t } = useTranslation();
@@ -76,7 +78,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
   if (tablet) {
     return (
       <>
-        <div>{!loading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton />}</div>
+        <div>{!isLoading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton />}</div>
         <div className={styles.floatingTreeButton}>
           <Button
             renderIcon={TreeViewAltIcon}
@@ -91,18 +93,18 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
             close={() => setShowTreeOverlay(false)}
             buttonsGroup={
               <>
-                <Button kind="secondary" size="xl" onClick={resetTree} disabled={loading}>
+                <Button kind="secondary" size="xl" onClick={resetTree} disabled={isLoading}>
                   {t('resetTreeText', 'Reset tree')}
                 </Button>
-                <Button kind="primary" size="xl" onClick={() => setShowTreeOverlay(false)} disabled={loading}>
+                <Button kind="primary" size="xl" onClick={() => setShowTreeOverlay(false)} disabled={isLoading}>
                   {`${t('view', 'View')} ${
-                    !loading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
+                    !isLoading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
                   } ${t('resultsText', 'results')}`}
                 </Button>
               </>
             }
           >
-            {!loading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
+            {!isLoading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
           </TabletOverlay>
         )}
       </>
@@ -113,17 +115,17 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
     <>
       {!expanded && (
         <div className={styles.leftSection}>
-          {!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
+          {!isLoading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
         </div>
       )}
       <div className={classNames(styles.rightSection, expanded ? styles.fullView : styles.splitView)}>
         {testUuid && type === 'trendline' ? (
           <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : loading || isLoadingPanelData ? (
+        ) : isLoading || isLoadingPanelData ? (
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>
-            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={loading} />
+            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={isLoading} />
           </div>
         ) : view === 'over-time' ? (
           panels.map((panel) => (
