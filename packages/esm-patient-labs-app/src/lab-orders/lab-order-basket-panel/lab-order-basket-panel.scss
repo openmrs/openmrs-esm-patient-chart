@@ -68,6 +68,12 @@
   align-items: center;
 }
 
+.addButton {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
 .chevron {
   svg {
     fill: black;
