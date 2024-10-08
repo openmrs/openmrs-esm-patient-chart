@@ -24,7 +24,6 @@ import pastVisitsDetailOverviewComponent from './visit/past-visit-overview.compo
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
 import patientChartPageComponent from './root.component';
 import patientDetailsTileComponent from './patient-details-tile/patient-details-tile.component';
-import printIdentifierStickerActionButtonComponent from './actions-buttons/print-identifier-sticker.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
@@ -49,11 +48,6 @@ export function startupApp() {
     'rde',
     'Retrospective Data Entry',
     "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.",
-  );
-  registerFeatureFlag(
-    'print-patient-identifier-sticker',
-    'Print patient identifier sticker',
-    'Features to support printing a patient identifier sticker',
   );
 }
 
@@ -228,11 +222,6 @@ export const deleteVisitActionButton = getAsyncLifecycle(
   () => import('./visit/visit-action-items/delete-visit-action-item.component'),
   { featureName: 'delete-visit', moduleName },
 );
-
-export const printIdentifierStickerActionButton = getSyncLifecycle(printIdentifierStickerActionButtonComponent, {
-  featureName: 'patient-actions-slot-print-identifier-sticker-button',
-  moduleName,
-});
 
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),

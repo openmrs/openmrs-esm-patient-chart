@@ -71,6 +71,7 @@
   "fieldRequired": "此字段为必填项",
   "filterByEncounterType": "按问诊类型筛选",
   "form": "表单名称",
+  "futureStartTime": "Visit start time cannot be in the future",
   "goToThisEncounter": "前往这次问诊",
   "indication": "适应症",
   "invalidTimeFormat": "时间格式无效",

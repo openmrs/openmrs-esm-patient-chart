@@ -39,6 +39,10 @@ export const patientHtmlFormEntryWorkspace = getAsyncLifecycle(
 
 // t('clinicalForms', 'Clinical forms')
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
+export const clinicalFormsWorkspaceExtension = getAsyncLifecycle(
+  () => import('./forms/forms-dashboard.workspace'),
+  options,
+);
 
 export const clinicalFormActionMenu = getSyncLifecycle(clinicalFormActionMenuComponent, options);
 

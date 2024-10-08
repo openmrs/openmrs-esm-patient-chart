@@ -71,6 +71,7 @@
   "fieldRequired": "שדה זה הוא חובה",
   "filterByEncounterType": "סנן לפי סוג ביקור",
   "form": "Form name",
+  "futureStartTime": "Visit start time cannot be in the future",
   "goToThisEncounter": "עבור לביקור זה",
   "indication": "רמז",
   "invalidTimeFormat": "פורמט זמן לא תקין",
