@@ -33,7 +33,7 @@ export function usePatientOrders(patientUuid: string, status?: 'ACTIVE' | 'any',
     () =>
       data?.data?.results
         ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
-        : null,
+        : [],
     [data],
   );
 

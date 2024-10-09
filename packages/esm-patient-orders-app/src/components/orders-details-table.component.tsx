@@ -318,7 +318,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         if (orderTypes && orderTypes?.length > 0) {
           return (
             <>
-              {!tableRows.length ? (
+              {!tableRows?.length ? (
                 // FIXME: The displayText translation is not working as expected
                 <EmptyState
                   headerTitle={headerTitle}
