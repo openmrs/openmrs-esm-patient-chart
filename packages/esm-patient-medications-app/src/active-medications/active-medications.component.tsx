@@ -6,13 +6,13 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { usePatientOrders } from '../api/api';
 
 interface ActiveMedicationsProps {
-  patient: fhir.Patient | null;
+  patient: fhir.Patient;
 }
 
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('activeMedicationsDisplayText', 'Active medication');
-  const headerTitle = t('activeMedicationsHeaderTitle', 'Active Medication');
+  const displayText = t('activeMedicationsDisplayText', 'Active medications');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'Active Medications');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
 
@@ -31,7 +31,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
-        title={t('activeMedicationsTableTitle', 'Active Medication')}
+        title={t('activeMedicationsTableTitle', 'Active Medications')}
         medications={activeMedications}
         showDiscontinueButton={true}
         showModifyButton={true}
