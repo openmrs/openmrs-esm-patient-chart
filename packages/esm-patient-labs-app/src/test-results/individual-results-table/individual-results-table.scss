@@ -105,6 +105,11 @@ p {
 .viewTimeline {
   display: flex;
   margin-left: auto;
+  margin-top: -(layout.$spacing-02);
+
+  svg {
+    fill: colors.$blue-60 !important;
+  }
 }
 
 .cardTitle {

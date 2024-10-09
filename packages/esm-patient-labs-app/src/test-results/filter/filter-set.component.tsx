@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Accordion, AccordionItem, Button, Checkbox } from '@carbon/react';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
@@ -81,7 +82,7 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
 
   return (
     <div>
-      <div className={`${styles.treeNodeHeader} ${tablet ? styles.treeNodeHeaderTablet : ''}`}>
+      <div className={classNames(styles.treeNodeHeader, { [styles.treeNodeHeaderTablet]: tablet })}>
         <h5>{t(root.display)}</h5>
         <Button
           className={styles.button}

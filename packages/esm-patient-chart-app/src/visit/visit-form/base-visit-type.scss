@@ -1,11 +1,7 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
-
-.visitTypeOverviewWrapper {
-  margin: layout.$spacing-05 0;
-  border: 0.0625rem solid $grey-2;
-}
 
 .tablet {
   background-color: $ui-02;
@@ -16,6 +12,15 @@
 
   .paginationContainer div {
     background-color: $ui-01;
+  }
+}
+
+.visitTypeOverviewWrapper {
+  margin: layout.$spacing-05 0;
+  border: 0.0625rem solid $grey-2;
+
+  &:has(.skeleton) {
+    border-bottom: none !important;
   }
 }
 
@@ -40,4 +45,31 @@
 .radioButton {
   padding: layout.$spacing-02 layout.$spacing-05;
   margin: layout.$spacing-03 0;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }

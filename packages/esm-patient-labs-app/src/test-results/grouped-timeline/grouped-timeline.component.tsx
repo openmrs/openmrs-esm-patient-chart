@@ -262,7 +262,6 @@ const TimelineDataGroup: React.FC<TimelineDataGroupProps> = ({
           <ShadowBox />
         </div>
       </div>
-      <div style={{ height: '2em' }}></div>
     </>
   );
 };
@@ -293,7 +292,7 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
   if (activeTests && timelineData && loaded) {
     return (
       <div className={styles.timelineHeader}>
-        <div className={styles.timelineHeader}>
+        <div className={styles.nestedTimelineHeader}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid
@@ -308,7 +307,7 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
             />
           </div>
         </div>
-        <div>
+        <div className={styles.timelineDataContainer}>
           {lowestParents?.map((parent, index) => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               shownGroups += 1;

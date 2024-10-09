@@ -65,3 +65,9 @@
 .tableContainer {
   flex: 1;
 }
+
+.table {
+  td {
+    border-bottom: none !important;
+  }
+}

@@ -24,7 +24,6 @@ import pastVisitsDetailOverviewComponent from './visit/past-visit-overview.compo
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
 import patientChartPageComponent from './root.component';
 import patientDetailsTileComponent from './patient-details-tile/patient-details-tile.component';
-import printIdentifierStickerActionButtonComponent from './actions-buttons/print-identifier-sticker.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
@@ -49,11 +48,6 @@ export function startupApp() {
     'rde',
     'Retrospective Data Entry',
     "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.",
-  );
-  registerFeatureFlag(
-    'print-patient-identifier-sticker',
-    'Print patient identifier sticker',
-    'Features to support printing a patient identifier sticker',
   );
 }
 
@@ -181,33 +175,33 @@ export const markPatientDeceasedForm = getAsyncLifecycle(
   },
 );
 
-export const cancelVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
+export const cancelVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
   featureName: 'cancel visit',
   moduleName,
 });
 
-export const startVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
+export const startVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
   featureName: 'start visit',
   moduleName,
 });
 
-export const deleteVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/delete-visit-dialog.component'), {
+export const deleteVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/delete-visit-dialog.component'), {
   featureName: 'delete visit',
   moduleName,
 });
 
-export const modifyVisitDateDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/modify-visit-date.modal'), {
-  featureName: 'delete visit',
+export const modifyVisitDateModal = getAsyncLifecycle(() => import('./visit/visit-prompt/modify-visit-date.modal'), {
+  featureName: 'modify visit date',
   moduleName,
 });
 
-export const endVisitDialog = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
+export const endVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
   featureName: 'end visit',
   moduleName,
 });
 
 export const markPatientAliveModal = getAsyncLifecycle(() => import('./mark-patient-alive/mark-patient-alive.modal'), {
-  featureName: 'Mark patient alive',
+  featureName: 'mark patient alive',
   moduleName,
 });
 
@@ -228,11 +222,6 @@ export const deleteVisitActionButton = getAsyncLifecycle(
   () => import('./visit/visit-action-items/delete-visit-action-item.component'),
   { featureName: 'delete-visit', moduleName },
 );
-
-export const printIdentifierStickerActionButton = getSyncLifecycle(printIdentifierStickerActionButtonComponent, {
-  featureName: 'patient-actions-slot-print-identifier-sticker-button',
-  moduleName,
-});
 
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),

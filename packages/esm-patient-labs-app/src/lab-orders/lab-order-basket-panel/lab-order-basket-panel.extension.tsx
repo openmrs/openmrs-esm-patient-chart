@@ -96,24 +96,25 @@ export default function LabOrderBasketPanelExtension() {
         </div>
         <div className={styles.buttonContainer}>
           <Button
-            kind="ghost"
-            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
+            className={styles.addButton}
             iconDescription="Add lab order"
+            kind="ghost"
             onClick={openNewLabForm}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
           </Button>
           <Button
             className={styles.chevron}
+            disabled={orders.length === 0}
             hasIconOnly
+            iconDescription="View"
             kind="ghost"
+            onClick={() => setIsExpanded(!isExpanded)}
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
               isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
-            iconDescription="View"
-            disabled={orders.length === 0}
-            onClick={() => setIsExpanded(!isExpanded)}
           >
             {t('add', 'Add')}
           </Button>
@@ -128,9 +129,9 @@ export default function LabOrderBasketPanelExtension() {
                   {incompleteOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
+                      orderBasketItem={order}
                     />
                   ))}
                 </>
@@ -140,9 +141,9 @@ export default function LabOrderBasketPanelExtension() {
                   {newOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
+                      orderBasketItem={order}
                     />
                   ))}
                 </>
@@ -153,9 +154,9 @@ export default function LabOrderBasketPanelExtension() {
                   {renewedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
+                      orderBasketItem={order}
                     />
                   ))}
                 </>
@@ -166,9 +167,9 @@ export default function LabOrderBasketPanelExtension() {
                   {revisedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
+                      orderBasketItem={order}
                     />
                   ))}
                 </>
@@ -179,9 +180,9 @@ export default function LabOrderBasketPanelExtension() {
                   {discontinuedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
+                      orderBasketItem={order}
                     />
                   ))}
                 </>

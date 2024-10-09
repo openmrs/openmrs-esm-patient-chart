@@ -1,7 +1,6 @@
 import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
 import classNames from 'classnames';
-import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   ButtonSet,
@@ -10,6 +9,7 @@ import {
   ComboBox,
   DatePicker,
   DatePickerInput,
+  IconButton,
   Form,
   FormGroup,
   FormLabel,
@@ -22,6 +22,7 @@ import {
   Toggle,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
+import { capitalize } from 'lodash-es';
 import {
   AddIcon,
   age,
@@ -434,7 +435,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               <Column lg={12} md={6} sm={4}>
                 <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
               </Column>
-              <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
+              <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
                 <ControlledFieldInput
                   name="isFreeTextDosage"
                   type="toggle"
@@ -469,7 +470,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                           control={control}
                           type="number"
                           name="dosage"
-                          size={isTablet ? 'lg' : 'md'}
                           id="doseSelection"
                           placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                           label={t('editDoseComboBoxTitle', 'Dose')}
@@ -487,7 +487,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         name="unit"
                         type="comboBox"
                         getValues={getValues}
-                        size={isTablet ? 'lg' : 'md'}
                         id="dosingUnits"
                         shouldFilterItem={filterItemsByName}
                         placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
@@ -510,7 +509,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         name="route"
                         placeholder={t('editRouteComboBoxTitle', 'Route')}
                         shouldFilterItem={filterItemsByName}
-                        size={isTablet ? 'lg' : 'md'}
                         titleText={t('editRouteComboBoxTitle', 'Route')}
                         type="comboBox"
                       />
@@ -522,7 +520,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         control={control}
                         name="frequency"
                         type="comboBox"
-                        size={isTablet ? 'lg' : 'md'}
                         id="editFrequency"
                         items={orderFrequencies}
                         shouldFilterItem={filterItemsBySynonymNames}
@@ -551,7 +548,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       />
                     </InputWrapper>
                   </Column>
-                  <Column lg={16} md={4} sm={4}>
+                  <Column className={styles.prn} lg={16} md={4} sm={4}>
                     <Grid className={styles.gridRow}>
                       <Column lg={6} md={8} sm={4}>
                         <InputWrapper>
@@ -562,7 +559,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                               type="checkbox"
                               id="prn"
                               labelText={t('takeAsNeeded', 'Take as needed')}
-                              size="lg"
                             />
                           </FormGroup>
                         </InputWrapper>
@@ -609,9 +605,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                         >
                           <DatePickerInput
                             id="startDatePicker"
-                            placeholder="mm/dd/yyyy"
+                            placeholder="dd/mm/yyyy"
                             labelText={t('startDate', 'Start date')}
-                            size="lg"
+                            size={isTablet ? 'lg' : 'sm'}
                           />
                         </DatePicker>
                       )}
@@ -626,7 +622,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       control={control}
                       name="duration"
                       type="number"
-                      size="lg"
                       id="durationInput"
                       label={t('duration', 'Duration')}
                       min={0}
@@ -637,6 +632,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                   ) : (
                     <CustomNumberInput
                       control={control}
+                      isTablet={isTablet}
                       setValue={setValue}
                       name="duration"
                       labelText={t('duration', 'Duration')}
@@ -644,13 +640,12 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                   )}
                 </InputWrapper>
               </Column>
-              <Column lg={8} md={2} sm={4}>
+              <Column className={styles.durationUnit} lg={8} md={2} sm={4}>
                 <InputWrapper>
                   <ControlledFieldInput
                     control={control}
                     name="durationUnit"
                     type="comboBox"
-                    size="lg"
                     id="durationUnitPlaceholder"
                     titleText={t('durationUnit', 'Duration unit')}
                     items={durationUnits}
@@ -671,7 +666,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     control={control}
                     name="pillsDispensed"
                     type="number"
-                    size="lg"
                     id="quantityDispensed"
                     label={t('quantityToDispense', 'Quantity to dispense')}
                     min={0}
@@ -690,7 +684,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     name="quantityUnits"
                     placeholder={t('editDispensingUnit', 'Quantity unit')}
                     shouldFilterItem={filterItemsByName}
-                    size="lg"
                     titleText={t('editDispensingUnit', 'Quantity unit')}
                     type="comboBox"
                   />
@@ -703,7 +696,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       control={control}
                       name="numRefills"
                       type="number"
-                      size="lg"
                       id="prescriptionRefills"
                       min={0}
                       label={t('prescriptionRefills', 'Prescription refills')}
@@ -713,6 +705,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                   ) : (
                     <CustomNumberInput
                       control={control}
+                      isTablet={isTablet}
                       setValue={setValue}
                       name="numRefills"
                       labelText={t('prescriptionRefills', 'Prescription refills')}
@@ -728,7 +721,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     control={control}
                     name="indication"
                     type="textInput"
-                    size="lg"
                     id="indication"
                     labelText={t('indication', 'Indication')}
                     placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
@@ -761,9 +753,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   );
 }
 
-const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }) => {
+const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...inputProps }) => {
   const { t } = useTranslation();
   const { maxDispenseDurationInDays } = useConfig();
+  const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const {
     field: { onBlur, onChange, value, ref },
@@ -789,17 +782,21 @@ const CustomNumberInput = ({ setValue, control, name, labelText, ...inputProps }
     <div className={styles.customElement}>
       <span className="cds--label">{labelText}</span>
       <div className={styles.customNumberInput}>
-        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
+        <IconButton onClick={decrement} label={t('decrement', 'Decrement')} size={responsiveSize}>
+          <Subtract size={16} />
+        </IconButton>
         <TextInput
           onChange={handleChange}
-          value={!!value ? value : '--'}
-          size="lg"
           className={styles.customInput}
           onBlur={onBlur}
           ref={ref}
+          value={!!value ? value : '--'}
+          size={responsiveSize}
           {...inputProps}
         />
-        <Button hasIconOnly renderIcon={AddIcon} onClick={increment} iconDescription={t('increment', 'Increment')} />
+        <IconButton onClick={increment} label={t('increment', 'Increment')} size={responsiveSize}>
+          <AddIcon size={16} />
+        </IconButton>
       </div>{' '}
     </div>
   );
@@ -837,6 +834,8 @@ const ControlledFieldInput = ({
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
   } = useController<MedicationOrderFormData>({ name: name, control });
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const fieldErrorStyles = classNames({
     [styles.fieldError]: error?.message,
@@ -873,6 +872,7 @@ const ControlledFieldInput = ({
             handleChange(isNaN(number) ? null : number);
           }}
           ref={ref}
+          size={responsiveSize}
           value={!!value ? value : 0}
           {...restProps}
         />
@@ -886,6 +886,7 @@ const ControlledFieldInput = ({
           onBlur={onBlur}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleChange(e.target.value)}
           ref={ref}
+          size={responsiveSize}
           value={value}
           {...restProps}
         />
@@ -899,6 +900,7 @@ const ControlledFieldInput = ({
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
+          size={responsiveSize}
           value={value}
           {...restProps}
         />
@@ -912,6 +914,7 @@ const ControlledFieldInput = ({
           onBlur={onBlur}
           onChange={({ selectedItem }) => handleChange(selectedItem)}
           ref={ref}
+          size={responsiveSize}
           selectedItem={value}
           {...restProps}
         />
@@ -919,7 +922,7 @@ const ControlledFieldInput = ({
     }
 
     return null;
-  }, [type, value, restProps, fieldErrorStyles, onBlur, ref, handleChange]);
+  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, responsiveSize]);
 
   return (
     <>
