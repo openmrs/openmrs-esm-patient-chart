@@ -1,4 +1,5 @@
 {
+  "add": "Add",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
@@ -35,6 +36,7 @@
   "diagnoses": "Diagnoses",
   "discard": "Discard",
   "dose": "Dose",
+  "editEncounter": "Edit",
   "editPastVisit": "Edit past visit",
   "editThisEncounter": "Edit this encounter",
   "editThisVisit": "Edit this visit",
@@ -156,6 +158,7 @@
   "updateError": "Error updating upcoming appointment",
   "updateVisit": "Update visit",
   "updatingVisit": "Updating visit",
+  "viewEncounter": "View",
   "visit": "Visit",
   "visitAttributes": "Visit attributes",
   "visitCancelled": "Visit cancelled",
