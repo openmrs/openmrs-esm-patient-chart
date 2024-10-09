@@ -102,7 +102,7 @@ const FormView: React.FC<FormViewProps> = ({
       results?.map((formInfo) => {
         return {
           id: formInfo.form.uuid,
-          lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
+          lastCompleted: formInfo.lastCompletedDate ? formatDatetime(formInfo.lastCompletedDate) : undefined,
           formName: formInfo.form.display ?? formInfo.form.name,
           formUuid: formInfo.form.uuid,
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,

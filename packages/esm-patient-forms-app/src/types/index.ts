@@ -12,7 +12,7 @@ export interface SectionConfig {
     id: string;
     uuid: string;
     display: string;
-    lastCompleted: string;
+    lastCompletedDate: string;
     formUuid: string;
   }>;
 }
@@ -73,7 +73,7 @@ export interface ListResponse<T> {
 export interface CompletedFormInfo {
   form: Form;
   associatedEncounters: Array<EncounterWithFormRef>;
-  lastCompleted?: Date;
+  lastCompletedDate?: Date;
 }
 
 export interface FormsSection {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import debounce from 'lodash-es/debounce';
+import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton } from '@carbon/react';
 import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
@@ -65,7 +65,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
       filteredForms?.map((formData) => {
         return {
           id: formData.form.uuid,
-          lastCompleted: formData.lastCompleted ? formatDatetime(formData.lastCompleted) : undefined,
+          lastCompleted: formData.lastCompletedDate ? formatDatetime(formData.lastCompletedDate) : undefined,
           formName: formData.form.display ?? formData.form.name,
           formUuid: formData.form.uuid,
           encounterUuid: formData?.associatedEncounters[0]?.uuid,
