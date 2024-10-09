@@ -23,8 +23,11 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
   const activeMedications = activePatientOrders?.filter((order) => {
-    const isActive = !order.dateStopped && order.action !== 'DISCONTINUE';
-    return isActive || (!order.autoExpireDate && order.action !== 'DISCONTINUE');
+    const isDateStoppedUnset = !order.dateStopped;
+    const isActionValid = order.action !== 'DISCONTINUE';
+    const isAutoExpireDateValid = !order.autoExpireDate || new Date(order.autoExpireDate) > new Date();
+
+    return isDateStoppedUnset && isActionValid && isAutoExpireDateValid;
   });
 
   if (activeMedications?.length) {

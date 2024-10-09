@@ -14,7 +14,7 @@ const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encoun
   return (
     <ExtensionSlot
       name="test-results-filtered-overview-slot"
-      state={{ ...({ filter, patientUuid } as ExternalOverviewProps) }}
+      state={{ filter, patientUuid } as ExternalOverviewProps}
     />
   );
 };
