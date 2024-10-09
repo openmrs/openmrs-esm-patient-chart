@@ -6,9 +6,15 @@
   "country": "ប្រទេស",
   "countyDistrict": "ស្រុក/ខ័ណ្ឌ",
   "district": "ស្រុក/ខ័ណ្ឌ",
-  "dob": "DOB",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "លេខកូដតំបន់",
+  "printIdentifierSticker": "Print identifier sticker",
   "state": "រដ្ឋ",
-  "stateProvince": "រដ្ឋ"
+  "stateProvince": "រដ្ឋ",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }
