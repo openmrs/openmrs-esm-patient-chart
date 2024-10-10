@@ -6,9 +6,15 @@
   "country": "الدولة",
   "countyDistrict": "المنطقة",
   "district": "المنطقة",
-  "dob": "DOB",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "الرمز البريدي",
+  "printIdentifierSticker": "Print identifier sticker",
   "state": "الولاية",
-  "stateProvince": "الولاية"
+  "stateProvince": "الولاية",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }
