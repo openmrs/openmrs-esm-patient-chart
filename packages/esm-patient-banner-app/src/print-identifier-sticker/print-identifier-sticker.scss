@@ -1,9 +1,16 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/_vars' as *;
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.printedBy {
+  display: none;
+  background-color: colors.$white;
+  padding: 15px;
 }
 
 .documentHeader {
@@ -79,5 +86,11 @@
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
+  }
+
+  .printedBy {
+    @include type.type-style('body-compact-01');
+    display: flex;
+    gap: 10px;
   }
 }

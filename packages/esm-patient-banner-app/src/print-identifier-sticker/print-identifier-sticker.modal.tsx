@@ -3,7 +3,14 @@ import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import {
+  getPatientName,
+  showSnackbar,
+  useConfig,
+  getCoreTranslation,
+  formatDate,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
 import styles from './print-identifier-sticker.scss';
@@ -25,6 +32,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
+  const session = useSession();
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
@@ -88,6 +96,12 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
               }
             `}
           </style>
+          <div className={styles.printedBy}>
+            <span>
+              {t('printedBy', 'Printed by')} {session?.user?.display || t('unknownUser', 'Unknown user')}{' '}
+              {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
+            </span>
+          </div>
           <PrintComponent patient={patient} />
         </div>
       </ModalBody>
