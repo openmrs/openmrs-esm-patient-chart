@@ -134,6 +134,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
 
       sortFunc: (valueA, valueB) => (valueA.spo2 && valueB.spo2 ? valueA.spo2 - valueB.spo2 : 0),
     },
+    {
+      key: 'generalPatientNoteRender',
+      header: t('notes', 'Notes'),
+      isSortable: true,
+      sortFunc: (valueA, valueB) => new Date(valueA.date).getTime() - new Date(valueB.date).getTime(),
+    },
   ];
 
   const tableRows: Array<VitalsTableRow> = useMemo(
@@ -148,6 +154,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
           spo2Render: vitalSigns.spo2 ?? '--',
           temperatureRender: vitalSigns.temperature ?? '--',
           respiratoryRateRender: vitalSigns.respiratoryRate ?? '--',
+          generalPatientNoteRender: vitalSigns.generalPatientNote ?? '--',
         };
       }),
     [vitals],
