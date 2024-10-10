@@ -34,29 +34,13 @@ interface ProgramsFormProps extends DefaultPatientWorkspaceProps {
 }
 
 const createProgramsFormSchema = (t: TFunction) =>
-  z
-    .object({
-      selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
-      enrollmentDate: z.date(),
-      completionDate: z.date().nullable().optional(),
-      enrollmentLocation: z.string(),
-      selectedProgramStatus: z.string(),
-    })
-    .refine(
-      (data) => {
-        if (data.completionDate) {
-          return (
-            dayjs(data.completionDate).isSame(dayjs(data.enrollmentDate), 'day') ||
-            dayjs(data.completionDate).isAfter(dayjs(data.enrollmentDate))
-          );
-        }
-        return true;
-      },
-      {
-        message: t('completionDateInvalid', 'Completion date must be the same or after enrollment date'),
-        path: ['completionDate'],
-      },
-    );
+  z.object({
+    selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
+    enrollmentDate: z.date(),
+    completionDate: z.date().nullable(),
+    enrollmentLocation: z.string(),
+    selectedProgramStatus: z.string(),
+  });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 
@@ -112,8 +96,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     resolver: zodResolver(programsFormSchema),
     defaultValues: {
       selectedProgram: currentEnrollment?.program.uuid ?? '',
-      enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
-      completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
+      enrollmentDate: currentEnrollment?.dateEnrolled
+        ? dayjs(currentEnrollment.dateEnrolled).toDate()
+        : dayjs().startOf('day').toDate(),
+      completionDate: currentEnrollment?.dateCompleted ? dayjs(currentEnrollment.dateCompleted).toDate() : null,
       enrollmentLocation: getLocationUuid() ?? '',
       selectedProgramStatus: currentState?.state.uuid ?? '',
     },
@@ -136,7 +122,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
         states:
-          !!selectedProgramStatus && selectedProgramStatus !== currentState?.state.uuid
+          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
             ? [{ state: { uuid: selectedProgramStatus } }]
             : [],
       };
@@ -217,7 +203,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={([date]) => onChange(date ? dayjs(date).toDate() : null)}
           value={value}
         >
           <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
@@ -236,11 +222,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          minDate={(() => {
-            const enrollmentDate = new Date(watch('enrollmentDate'));
-            enrollmentDate.setHours(0, 0, 0, 0);
-            return enrollmentDate;
-          })()}
+          minDate={new Date(watch('enrollmentDate')).toISOString()}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => onChange(date)}
