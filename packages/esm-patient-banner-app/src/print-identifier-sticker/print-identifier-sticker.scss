@@ -6,6 +6,11 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.printedBy {
+  display: none;
+  align-items: center;
+}
+
 .documentHeader {
   display: flex;
   justify-content: space-between;
@@ -79,5 +84,17 @@
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
+  }
+
+  .header {
+    align-items: center;
+    justify-content: space-between;
+    font-size: smaller;
+  }
+
+  .printedBy {
+    @include type.type-style('body-compact-01');
+    display: flex;
+    gap: 10px;
   }
 }
