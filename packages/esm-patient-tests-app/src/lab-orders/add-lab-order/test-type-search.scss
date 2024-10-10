@@ -1,0 +1,152 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+/** For TestTypeSearchResults */
+.container {
+  margin: layout.$spacing-03 layout.$spacing-05 0;
+}
+
+.separator {
+  @include type.type-style('body-01');
+  color: colors.$gray-90;
+  width: 12rem;
+  margin: layout.$spacing-05 auto layout.$spacing-03;
+  overflow: hidden;
+  text-align: center;
+
+  &::before,
+  &::after {
+    background-color: colors.$gray-40;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: layout.$spacing-05;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: layout.$spacing-05;
+    margin-right: -50%;
+  }
+}
+.separatorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: layout.$spacing-05;
+}
+
+.searchResultsCount {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.orderBasketSearchResultsHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: layout.$spacing-03;
+  align-items: center;
+}
+
+/** For TestTypeSearchResultItem */
+.searchResultTile {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid $grey-2;
+  &:not(:last-of-type) {
+    margin-bottom: layout.$spacing-03;
+  }
+}
+
+.tabletSearchResultTile {
+  &:not(:last-of-type) {
+    margin-bottom: layout.$spacing-04;
+  }
+}
+
+.searchResultTileContent {
+  padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.searchResultActions {
+  border-top: 1px solid $grey-2;
+  padding: 0 layout.$spacing-05;
+  display: flex;
+  justify-content: flex-end;
+
+  svg {
+    fill: currentColor !important;
+  }
+}
+
+.searchResultSkeletonWrapper {
+  margin: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03;
+
+  :global(.cds--skeleton__text) {
+    margin: 0;
+  }
+
+  .searchResultCntSkeleton {
+    margin-right: layout.$spacing-07;
+  }
+
+  .skeletonTile {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.emptyState {
+  margin: layout.$spacing-05;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: layout.$spacing-07;
+  border: 1px solid $ui-03;
+  text-align: center;
+  background-color: $ui-01;
+}
+
+:global(.omrs-breakpoint-lt-small-desktop) .emptyState {
+  background-color: $ui-02;
+}
+
+.link {
+  color: $interactive-01;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.resultsContainer::-webkit-scrollbar {
+  width: layout.$spacing-03;
+}
+
+.resultsContainer::-webkit-scrollbar-thumb {
+  background: $ui-04;
+  border-radius: layout.$spacing-02;
+}
+
+.heading {
+  @include type.type-style('heading-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.text02 {
+  color: $text-02;
+}

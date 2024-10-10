@@ -68,6 +68,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 actionsSlotName="patient-actions-slot"
                 isDeceased={patient.deceasedBoolean}
                 patientUuid={patientUuid}
+                patient={patient}
               />
             ) : null}
           </div>

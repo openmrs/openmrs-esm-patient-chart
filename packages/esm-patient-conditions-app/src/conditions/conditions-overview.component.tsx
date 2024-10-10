@@ -180,7 +180,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer className={styles.tableContainer}>
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
