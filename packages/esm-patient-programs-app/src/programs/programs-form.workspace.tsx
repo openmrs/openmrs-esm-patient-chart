@@ -96,8 +96,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     resolver: zodResolver(programsFormSchema),
     defaultValues: {
       selectedProgram: currentEnrollment?.program.uuid ?? '',
-      enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
-      completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
+      enrollmentDate: currentEnrollment?.dateEnrolled
+        ? dayjs(currentEnrollment.dateEnrolled).toDate()
+        : dayjs().startOf('day').toDate(),
+      completionDate: currentEnrollment?.dateCompleted ? dayjs(currentEnrollment.dateCompleted).toDate() : null,
       enrollmentLocation: getLocationUuid() ?? '',
       selectedProgramStatus: currentState?.state.uuid ?? '',
     },
@@ -201,7 +203,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={([date]) => onChange(date ? dayjs(date).toDate() : null)}
           value={value}
         >
           <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
