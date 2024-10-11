@@ -32,7 +32,7 @@
 .heading {
   @include type.type-style('heading-compact-02');
   margin-right: layout.$spacing-03;
-  color: $text-02;
+  color: $ui-05 !important;
 }
 
 .rowContainer {
