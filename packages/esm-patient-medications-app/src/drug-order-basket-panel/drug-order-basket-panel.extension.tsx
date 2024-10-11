@@ -92,6 +92,7 @@ export default function DrugOrderBasketPanelExtension() {
         </div>
         <div className={styles.buttonContainer}>
           <Button
+            className={styles.addButton}
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add medication"
