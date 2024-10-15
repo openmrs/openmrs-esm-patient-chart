@@ -43,7 +43,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
-    getValues,
     handleSubmit,
   } = useForm<{ testResult: Record<string, unknown> }>({
     defaultValues: {},
@@ -108,7 +107,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       setShowEmptyFormErrorNotification(true);
       return;
     }
-    const obsPayload = createObservationPayload(concept, order, formValues);
+    // Set the observation status to 'FINAL' as we're not capturing it in the form
+    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
@@ -133,7 +133,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         orderDiscontinuationPayload,
         abortController,
       );
-
       closeWorkspaceWithSavedChanges();
       mutateLabOrders();
       mutateOrderData();
@@ -181,7 +180,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          disabled={isSubmitting || Object.keys(errors).length > 0}
+          type="submit"
+        >
           {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (

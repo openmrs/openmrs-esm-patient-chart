@@ -160,31 +160,32 @@ export async function updateOrderResult(
   throw new Error('Failed to update order');
 }
 
-export function createObservationPayload(concept: LabOrderConcept, order: Order, values: any) {
+export function createObservationPayload(
+  concept: LabOrderConcept,
+  order: Order,
+  values: Record<string, unknown>,
+  status: string,
+) {
   if (concept.set && concept.setMembers.length > 0) {
     const groupMembers = concept.setMembers
-      .map((member) => createGroupMember(member, order, values))
-      .filter((member) => member?.value !== null && member?.value !== undefined);
+      .map((member) => createGroupMember(member, order, values, status))
+      .filter((member) => member !== null && member.value !== null && member.value !== undefined);
 
     if (groupMembers.length === 0) {
       return { obs: [] };
     }
 
-    return { obs: [createObservation(order, groupMembers)] };
-  }
-
-  if (!concept.set && concept.setMembers.length === 0) {
+    return { obs: [createObservation(order, groupMembers, null, status)] };
+  } else {
     const value = getValue(concept, values);
     if (value === null || value === undefined) {
       return { obs: [] };
     }
-    return { obs: [createObservation(order, null, value)] };
+    return { obs: [createObservation(order, null, value, status)] };
   }
-
-  return { obs: [] };
 }
 
-function createGroupMember(member, order, values) {
+function createGroupMember(member: LabOrderConcept, order: Order, values: Record<string, unknown>, status: string) {
   const value = getValue(member, values);
   if (value === null || value === undefined) {
     return null;
@@ -192,22 +193,22 @@ function createGroupMember(member, order, values) {
   return {
     concept: { uuid: member.uuid },
     value: value,
-    status: 'FINAL',
+    status: status,
     order: { uuid: order.uuid },
   };
 }
 
-function createObservation(order, groupMembers = null, value = null) {
+function createObservation(order: Order, groupMembers = null, value = null, status: string) {
   return {
     concept: { uuid: order.concept.uuid },
-    status: 'FINAL',
+    status: status,
     order: { uuid: order.uuid },
     ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
     ...(value !== null && value !== undefined && { value }),
   };
 }
 
-function getValue(concept, values) {
+function getValue(concept: LabOrderConcept, values: Record<string, unknown>) {
   const { datatype, uuid } = concept;
   const value = values[uuid];
 
@@ -215,11 +216,12 @@ function getValue(concept, values) {
     return null;
   }
 
-  if (['Numeric', 'Text'].includes(datatype.display)) {
+  // hl7Abbreviation is NM for Numeric and ST for Text
+  if (['NM', 'ST'].includes(datatype.hl7Abbreviation)) {
     return value;
   }
 
-  if (datatype.display === 'Coded') {
+  if (datatype.hl7Abbreviation === 'CWE') {
     return { uuid: value };
   }
 
