@@ -39,7 +39,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     formState: { errors, isDirty, isSubmitting },
     getValues,
     handleSubmit,
-    setError,
   } = useForm<{ testResult: any }>({
     defaultValues: {},
     resolver: zodResolver(schema),
@@ -192,10 +191,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         title: t('errorSavingLabResults', 'Error saving lab results'),
         kind: 'error',
         subtitle: err?.message,
-      });
-      setError('root', {
-        type: 'manual',
-        message: err?.message || t('unknownError', 'An unknown error occurred'),
       });
     } finally {
       setShowEmptyFormErrorNotification(false);

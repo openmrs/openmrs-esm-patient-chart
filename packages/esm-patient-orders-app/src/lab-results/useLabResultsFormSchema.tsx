@@ -11,7 +11,10 @@ type SchemaRecord = Record<string, z.ZodType>;
 export const useLabResultsFormSchema = (labOrderConceptUuid: string) => {
   const { concept, isLoading: isLoadingConcept } = useOrderConceptByUuid(labOrderConceptUuid);
 
-  if (isLoadingConcept) {
+  if (isLoadingConcept || !concept) {
+    if (!concept) {
+      console.warn(`Couldn't load concept ${labOrderConceptUuid}`);
+    }
     return z.object({});
   }
 
@@ -89,8 +92,8 @@ const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType => {
  */
 const createNumericSchema = (
   labOrderConcept: LabOrderConcept,
-  upperLimit: number | undefined,
-  lowerLimit: number | undefined,
+  upperLimit: number | null | undefined,
+  lowerLimit: number | null | undefined,
 ): z.ZodType => {
   let baseSchema = z
     .preprocess((val) => {
@@ -102,23 +105,28 @@ const createNumericSchema = (
       message: `${labOrderConcept.display} must be a valid number`,
     });
 
-  if (lowerLimit === null && upperLimit === null) {
+  const hasLowerLimit = lowerLimit !== null && lowerLimit !== undefined;
+  const hasUpperLimit = upperLimit !== null && upperLimit !== undefined;
+
+  if (!hasLowerLimit && !hasUpperLimit) {
     return baseSchema;
   }
 
-  if (lowerLimit !== null && upperLimit !== null) {
+  if (hasLowerLimit && hasUpperLimit) {
     return baseSchema.refine((val) => val === undefined || (val >= lowerLimit && val <= upperLimit), {
       message: `${labOrderConcept.display} must be between ${lowerLimit} and ${upperLimit}`,
     });
   }
 
-  if (lowerLimit !== null) {
+  if (hasLowerLimit) {
     return baseSchema.refine((val) => val === undefined || val >= lowerLimit, {
       message: `${labOrderConcept.display} must be greater than or equal to ${lowerLimit}`,
     });
   }
 
-  return baseSchema.refine((val) => val === undefined || val <= upperLimit!, {
-    message: `${labOrderConcept.display} must be less than or equal to ${upperLimit}`,
-  });
+  if (hasUpperLimit) {
+    return baseSchema.refine((val) => val === undefined || val <= upperLimit, {
+      message: `${labOrderConcept.display} must be less than or equal to ${upperLimit}`,
+    });
+  }
 };

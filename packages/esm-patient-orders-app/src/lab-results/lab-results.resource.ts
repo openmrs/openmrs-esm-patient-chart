@@ -25,12 +25,12 @@ export interface LabOrderConcept {
   mappings?: Array<Mapping>;
   answers?: Array<OpenmrsResource>;
   setMembers?: Array<LabOrderConcept>;
-  hiNormal?: number;
-  hiAbsolute?: number;
-  hiCritical?: number;
-  lowNormal?: number;
-  lowAbsolute?: number;
-  lowCritical?: number;
+  hiNormal?: number | null | undefined;
+  hiAbsolute?: number | null | undefined;
+  hiCritical?: number | null | undefined;
+  lowNormal?: number | null | undefined;
+  lowAbsolute?: number | null | undefined;
+  lowCritical?: number | null | undefined;
   units?: string;
 }
 
