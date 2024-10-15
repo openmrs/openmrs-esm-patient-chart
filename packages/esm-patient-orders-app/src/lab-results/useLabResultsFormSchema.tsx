@@ -33,17 +33,25 @@ export const useLabResultsFormSchema = (labOrderConceptUuid: string) => {
  * @returns A Zod schema object for the single concept.
  */
 const createSingleConceptSchema = (labOrderConcept: LabOrderConcept) => {
-  const { hiAbsolute: upperLimit, lowAbsolute: lowerLimit, datatype } = labOrderConcept;
-  if (datatype.display?.toLowerCase() === 'numeric') {
-    const zodObject = createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+  const {
+    hiAbsolute: upperLimit,
+    lowAbsolute: lowerLimit,
+    datatype: { hl7Abbreviation },
+  } = labOrderConcept;
 
-    return z.object({
-      [labOrderConcept.uuid]: zodObject,
-    });
+  let zodObject: z.ZodType;
+
+  switch (hl7Abbreviation) {
+    // hl7Abbreviation for numeric is NM
+    case 'NM':
+      zodObject = createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+      break;
+    default:
+      zodObject = z.any();
   }
 
   return z.object({
-    [labOrderConcept.uuid]: z.any(),
+    [labOrderConcept.uuid]: zodObject,
   });
 };
 
@@ -69,18 +77,20 @@ const createSetMembersSchema = (labOrderConcepts: Array<LabOrderConcept>): z.Zod
  * @returns A Zod schema type based on the concept's data type.
  */
 const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType => {
-  const conceptDataType = labOrderConcept.datatype.display?.toLowerCase();
-  const { hiAbsolute: upperLimit, lowAbsolute: lowerLimit } = labOrderConcept;
-  if (conceptDataType === 'text') {
-    return z.string().optional();
-  }
+  const {
+    hiAbsolute: upperLimit,
+    lowAbsolute: lowerLimit,
+    datatype: { hl7Abbreviation },
+  } = labOrderConcept;
 
-  if (conceptDataType === 'numeric') {
-    return createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+  switch (hl7Abbreviation) {
+    case 'ST':
+      return z.string().optional();
+    case 'NM':
+      return createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+    default:
+      return z.any();
   }
-
-  // Default case
-  return z.unknown();
 };
 
 /**

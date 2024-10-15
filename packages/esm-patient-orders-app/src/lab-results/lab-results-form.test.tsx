@@ -1,23 +1,20 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useOrderConceptByUuid, useLabEncounter, useObservation } from './lab-results.resource';
+import { useOrderConceptByUuid, useLabEncounter, useObservation, type LabOrderConcept } from './lab-results.resource';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
+import { type Encounter } from '../types/encounter';
+
+const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
+const mockUseLabEncounter = jest.mocked(useLabEncounter);
+const mockUseObservation = jest.mocked(useObservation);
 
 jest.mock('./lab-results.resource', () => ({
   useOrderConceptByUuid: jest.fn(),
-  useLabEncounter: jest
-    .fn()
-    .mockReturnValue({ encounter: [{ obs: [] }], isLoading: false, mutateLabOrders: jest.fn() }),
-  useObservation: jest.fn().mockReturnValue({ data: [], isLoading: false }),
-  updateOrderResult: jest.fn().mockReturnValue(Promise.resolve()),
-}));
-
-jest.mock('@openmrs/esm-framework', () => ({
-  useAbortController: jest.fn(() => ({ signal: new AbortController().signal })),
-  useLayoutType: jest.fn(() => 'desktop'),
-  showSnackbar: jest.fn(),
+  useLabEncounter: jest.fn(),
+  useObservation: jest.fn(),
+  updateOrderResult: jest.fn().mockResolvedValue({}),
 }));
 
 const mockOrder = {
@@ -40,12 +37,12 @@ const testProps = {
 
 describe('LabResultsForm', () => {
   beforeEach(() => {
-    (useOrderConceptByUuid as jest.Mock).mockReturnValue({
+    mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
         uuid: 'concept-uuid',
         display: 'Test Concept',
         setMembers: [],
-        datatype: { display: 'Numeric' },
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
         hiAbsolute: 100,
         hiCritical: 80,
         hiNormal: 70,
@@ -53,11 +50,26 @@ describe('LabResultsForm', () => {
         lowCritical: 40,
         lowNormal: 50,
         units: 'mg/dL',
-      },
+      } as LabOrderConcept,
       isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     });
-    (useLabEncounter as jest.Mock).mockReturnValue({ encounter: { obs: [] }, isLoading: false, mutate: jest.fn() });
-    (useObservation as jest.Mock).mockReturnValue({ data: null, isLoading: false });
+    mockUseLabEncounter.mockReturnValue({
+      encounter: { obs: [] } as Encounter,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseObservation.mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
   });
 
   test('validates numeric input correctly', async () => {
@@ -104,12 +116,12 @@ describe('LabResultsForm', () => {
 
   test('validate numeric input with concept having only hiAbsolute', async () => {
     const user = userEvent.setup();
-    (useOrderConceptByUuid as jest.Mock).mockReturnValue({
+    mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
         uuid: 'concept-uuid',
         display: 'Test Concept',
         setMembers: [],
-        datatype: { display: 'Numeric' },
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
         hiAbsolute: 100,
         lowAbsolute: null,
         lowCritical: null,
@@ -117,7 +129,11 @@ describe('LabResultsForm', () => {
         hiCritical: null,
         hiNormal: null,
         units: 'mg/dL',
-      },
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -134,12 +150,12 @@ describe('LabResultsForm', () => {
 
   test('validate numeric input with concept having only lowAbsolute', async () => {
     const user = userEvent.setup();
-    (useOrderConceptByUuid as jest.Mock).mockReturnValue({
+    mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
         uuid: 'concept-uuid',
         display: 'Test Concept',
         setMembers: [],
-        datatype: { display: 'Numeric' },
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
         lowAbsolute: 0,
         lowCritical: null,
         lowNormal: null,
@@ -147,7 +163,11 @@ describe('LabResultsForm', () => {
         hiNormal: null,
         hiAbsolute: null,
         units: 'mg/dL',
-      },
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -188,11 +208,11 @@ describe('LabResultsForm', () => {
 
   test('validate numeric input where concept is a panel', async () => {
     const user = userEvent.setup();
-    (useOrderConceptByUuid as jest.Mock).mockReturnValue({
+    mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
         uuid: 'concept-uuid',
         display: 'Test Concept',
-        datatype: { display: 'Numeric' },
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
         lowAbsolute: 0,
         lowCritical: null,
         lowNormal: null,
@@ -205,7 +225,7 @@ describe('LabResultsForm', () => {
             uuid: 'set-member-uuid',
             display: 'Set Member',
             setMembers: [],
-            datatype: { display: 'Numeric' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
             lowAbsolute: 50,
             lowCritical: 70,
             lowNormal: 80,
@@ -218,7 +238,7 @@ describe('LabResultsForm', () => {
             uuid: 'set-member-uuid-2',
             display: 'Set Member 2',
             setMembers: [],
-            datatype: { display: 'Numeric' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
             lowAbsolute: 5,
             lowCritical: 10,
             lowNormal: 15,
@@ -228,7 +248,11 @@ describe('LabResultsForm', () => {
             units: 'mg/dL',
           },
         ],
-      },
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 

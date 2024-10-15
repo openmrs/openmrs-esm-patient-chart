@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
@@ -44,6 +44,14 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     resolver: zodResolver(schema),
     mode: 'all',
   });
+
+  const mutateOrderData = useCallback(() => {
+    mutate(
+      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
+      undefined,
+      { revalidate: true },
+    );
+  }, [order.patient.uuid]);
 
   useEffect(() => {
     if (!isLoadingEncounter && encounter?.obs?.length > 0 && !isEditing) {
@@ -174,11 +182,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
       closeWorkspaceWithSavedChanges();
       mutateLabOrders();
-      mutate(
-        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
-        undefined,
-        { revalidate: true },
-      );
+      mutateOrderData();
       showSnackbar({
         title: t('saveLabResults', 'Save lab results'),
         kind: 'success',

@@ -13,6 +13,7 @@ const labConceptRepresentation =
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
+type NullableNumber = number | null | undefined;
 export interface LabOrderConcept {
   uuid: string;
   display: string;
@@ -25,12 +26,12 @@ export interface LabOrderConcept {
   mappings?: Array<Mapping>;
   answers?: Array<OpenmrsResource>;
   setMembers?: Array<LabOrderConcept>;
-  hiNormal?: number | null | undefined;
-  hiAbsolute?: number | null | undefined;
-  hiCritical?: number | null | undefined;
-  lowNormal?: number | null | undefined;
-  lowAbsolute?: number | null | undefined;
-  lowCritical?: number | null | undefined;
+  hiNormal?: NullableNumber;
+  hiAbsolute?: NullableNumber;
+  hiCritical?: NullableNumber;
+  lowNormal?: NullableNumber;
+  lowAbsolute?: NullableNumber;
+  lowCritical?: NullableNumber;
   units?: string;
 }
 
