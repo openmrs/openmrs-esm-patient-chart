@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { type Observation, type Encounter } from '../types/encounter';
 import { type OrderDiscontinuationPayload } from '../types/order';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -157,4 +158,70 @@ export async function updateOrderResult(
     }
   }
   throw new Error('Failed to update order');
+}
+
+export function createObservationPayload(concept: LabOrderConcept, order: Order, values: any) {
+  if (concept.set && concept.setMembers.length > 0) {
+    const groupMembers = concept.setMembers
+      .map((member) => createGroupMember(member, order, values))
+      .filter((member) => member?.value !== null && member?.value !== undefined);
+
+    if (groupMembers.length === 0) {
+      return { obs: [] };
+    }
+
+    return { obs: [createObservation(order, groupMembers)] };
+  }
+
+  if (!concept.set && concept.setMembers.length === 0) {
+    const value = getValue(concept, values);
+    if (value === null || value === undefined) {
+      return { obs: [] };
+    }
+    return { obs: [createObservation(order, null, value)] };
+  }
+
+  return { obs: [] };
+}
+
+function createGroupMember(member, order, values) {
+  const value = getValue(member, values);
+  if (value === null || value === undefined) {
+    return null;
+  }
+  return {
+    concept: { uuid: member.uuid },
+    value: value,
+    status: 'FINAL',
+    order: { uuid: order.uuid },
+  };
+}
+
+function createObservation(order, groupMembers = null, value = null) {
+  return {
+    concept: { uuid: order.concept.uuid },
+    status: 'FINAL',
+    order: { uuid: order.uuid },
+    ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
+    ...(value !== null && value !== undefined && { value }),
+  };
+}
+
+function getValue(concept, values) {
+  const { datatype, uuid } = concept;
+  const value = values[uuid];
+
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (['Numeric', 'Text'].includes(datatype.display)) {
+    return value;
+  }
+
+  if (datatype.display === 'Coded') {
+    return { uuid: value };
+  }
+
+  return null;
 }
