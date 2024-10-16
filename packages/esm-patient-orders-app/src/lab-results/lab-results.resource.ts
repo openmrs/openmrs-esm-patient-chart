@@ -220,7 +220,7 @@ function getValue(concept: LabOrderConcept, values: Record<string, unknown>) {
   if (['NM', 'ST'].includes(datatype.hl7Abbreviation)) {
     return value;
   }
-
+  // hl7Abbreviation is CWE for Coded with exceptions datatype
   if (datatype.hl7Abbreviation === 'CWE') {
     return { uuid: value };
   }
