@@ -25,6 +25,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
   formatDatetime,
+  type NewVisitPayload,
   openmrsFetch,
   restBaseUrl,
   saveVisit,
@@ -39,15 +40,14 @@ import {
   useSession,
   useVisit,
   useVisitTypes,
-  type NewVisitPayload,
   type Visit,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
+  type DefaultPatientWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
-  type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../config-schema';
 import { type VisitFormData } from './visit-form.resource';
@@ -121,8 +121,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   });
 
   const displayVisitStopDateTimeFields = useMemo(
-    () => Boolean(visitToEdit?.stopDatetime || showVisitEndDateTimeFields),
-    [visitToEdit?.stopDatetime, showVisitEndDateTimeFields],
+    () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
+    [visitToEdit?.uuid, showVisitEndDateTimeFields],
   );
 
   const visitFormSchema = useMemo(() => {
@@ -283,31 +283,33 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     const visitStopTime = getValues('visitStopTime');
     const visitStopTimeFormat = getValues('visitStopTimeFormat');
 
-    const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
+    if (visitStopDate && visitStopTime && visitStopTimeFormat) {
+      const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
 
-    const visitStopDatetime = visitStopDate.setHours(visitStopHours, visitStopMinutes);
+      const visitStopDatetime = visitStopDate.setHours(visitStopHours, visitStopMinutes);
 
-    if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
-      validSubmission = false;
-      setError('visitStopDate', {
-        message: t(
-          'visitStopDateMustBeAfterMostRecentEncounter',
-          'Stop date needs to be on or after {{lastEncounterDatetime}}',
-          {
-            lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-            interpolation: {
-              escapeValue: false,
+      if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
+        validSubmission = false;
+        setError('visitStopDate', {
+          message: t(
+            'visitStopDateMustBeAfterMostRecentEncounter',
+            'Stop date needs to be on or after {{lastEncounterDatetime}}',
+            {
+              lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
+              interpolation: {
+                escapeValue: false,
+              },
             },
-          },
-        ),
-      });
-    }
+          ),
+        });
+      }
 
-    if (visitStartDatetime >= visitStopDatetime) {
-      validSubmission = false;
-      setError('visitStopDate', {
-        message: t('invalidVisitStopDate', 'Visit stop date time cannot be on or before visit start date time'),
-      });
+      if (visitStartDatetime >= visitStopDatetime) {
+        validSubmission = false;
+        setError('visitStopDate', {
+          message: t('invalidVisitStopDate', 'Visit stop date time cannot be on or before visit start date time'),
+        });
+      }
     }
 
     return validSubmission;
@@ -442,7 +444,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         delete payload.patient;
       }
 
-      if (displayVisitStopDateTimeFields) {
+      if (displayVisitStopDateTimeFields && visitStopDate && visitStopTime && visitStopTimeFormat) {
         const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
 
         payload.stopDatetime = toDateObjectStrict(
