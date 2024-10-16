@@ -255,15 +255,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
     }
-  }, [isPrinting, onBeforeGetContentResolve]);
+  }, [isPrinting]);
 
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: () =>
+    onBeforeGetContent: (): Promise<void> =>
       new Promise((resolve) => {
-        if (patient && patient?.patient && title) {
-          onBeforeGetContentResolve.current = resolve;
+        if (patient && title) {
+          onBeforeGetContentResolve.current = resolve();
           setIsPrinting(true);
         }
       }),
@@ -347,8 +347,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       {showPrintButton && (
                         <Button
                           kind="ghost"
-                          renderIcon={(props) => <PrinterIcon {...props} size={16} />}
-                          iconDescription={t('print', 'Print')}
+                          renderIcon={PrinterIcon}
+                          iconDescription="Add vitals"
                           className={styles.printButton}
                           onClick={handlePrint}
                         >
@@ -358,7 +358,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       {showAddButton && (
                         <Button
                           kind="ghost"
-                          renderIcon={(props) => <AddIcon {...props} size={16} />}
+                          renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
                           onClick={launchOrderBasket}
                         >
@@ -392,18 +392,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       }) => (
                         <>
                           <TableContainer {...getTableContainerProps}>
-                            <div className={styles.toolBarContent}>
-                              <TableToolbarContent>
-                                <Layer>
-                                  <Search
-                                    expanded
-                                    onChange={onInputChange}
-                                    placeholder={t('searchTable', 'Search table')}
-                                    size="lg"
-                                  />
-                                </Layer>
-                              </TableToolbarContent>
-                            </div>
+                            {!isPrinting && (
+                              <div className={styles.toolBarContent}>
+                                <TableToolbarContent>
+                                  <Layer>
+                                    <Search
+                                      expanded
+                                      onChange={onInputChange}
+                                      placeholder={t('searchTable', 'Search table')}
+                                      size="lg"
+                                    />
+                                  </Layer>
+                                </TableToolbarContent>
+                              </div>
+                            )}
                             <Table className={styles.table} {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
