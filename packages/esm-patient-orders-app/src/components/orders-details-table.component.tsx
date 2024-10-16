@@ -177,43 +177,45 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     },
   ];
 
-  const tableRows = useMemo(() => {
-    return allOrders?.map((order) => ({
-      id: order.uuid,
-      dateActivated: order.dateActivated,
-      orderNumber: order.orderNumber,
-      dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
-      orderType: capitalize(order.orderType?.display ?? '--'),
-      order: order.display,
-      priority: (
-        <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
-          {
-            // t('ON_SCHEDULED_DATE', 'On scheduled date')
-            // t('ROUTINE', 'Routine')
-            // t('STAT', 'STAT')
-          }
-          {t(order.urgency, capitalize(order.urgency.replace('_', ' ')))}
-        </div>
-      ),
-      orderedBy: order.orderer?.display,
-      status: order.fulfillerStatus ? (
-        <div className={styles.statusPill} data-status={lowerCase(order.fulfillerStatus.replace('_', ' '))}>
-          {
-            // t('RECEIVED', 'Received')
-            // t('IN_PROGRESS', 'In progress')
-            // t('EXCEPTION', 'Exception')
-            // t('ON_HOLD', 'On hold')
-            // t('DECLINED', 'Declined')
-            // t('COMPLETED', 'Completed')
-            // t('DISCONTINUED', 'Discontinued')
-          }
-          {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replace('_', ' ')))}
-        </div>
-      ) : (
-        '--'
-      ),
-    }));
-  }, [allOrders, t]);
+  const tableRows = useMemo(
+    () =>
+      allOrders?.map((order) => ({
+        id: order.uuid,
+        dateActivated: order.dateActivated,
+        orderNumber: order.orderNumber,
+        dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
+        orderType: capitalize(order.orderType?.display ?? '--'),
+        order: order.display,
+        priority: (
+          <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
+            {
+              // t('ON_SCHEDULED_DATE', 'On scheduled date')
+              // t('ROUTINE', 'Routine')
+              // t('STAT', 'STAT')
+            }
+            {t(order.urgency, capitalize(order.urgency.replace('_', ' ')))}
+          </div>
+        ),
+        orderedBy: order.orderer?.display,
+        status: order.fulfillerStatus ? (
+          <div className={styles.statusPill} data-status={lowerCase(order.fulfillerStatus.replace('_', ' '))}>
+            {
+              // t('RECEIVED', 'Received')
+              // t('IN_PROGRESS', 'In progress')
+              // t('EXCEPTION', 'Exception')
+              // t('ON_HOLD', 'On hold')
+              // t('DECLINED', 'Declined')
+              // t('COMPLETED', 'Completed')
+              // t('DISCONTINUED', 'Discontinued')
+            }
+            {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replace('_', ' ')))}
+          </div>
+        ) : (
+          '--'
+        ),
+      })) ?? [],
+    [allOrders, t],
+  );
 
   const { results: paginatedOrders, goTo, currentPage } = usePagination(tableRows, defaultPageSize);
 
@@ -301,7 +303,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             setSelectedOrderTypeUuid(e.selectedItem.uuid);
           }}
           selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
-          titleText={t('selectOrderType', 'Select order type')}
+          titleText={t('selectOrderType', 'Select order type') + ':'}
           type="inline"
         />
       </div>
@@ -318,8 +320,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         if (orderTypes && orderTypes?.length > 0) {
           return (
             <>
-              {!tableRows.length ? (
-                // FIXME: The displayText translation is not working as expected
+              {!tableRows?.length ? (
                 <EmptyState
                   headerTitle={headerTitle}
                   displayText={
@@ -327,7 +328,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       ? t('orders', 'Orders')
                       : // t('Drug Order_few', 'Drug Orders')
                         // t('Test Order_few', 'Test Orders')
-                        t(selectedOrderName, {
+                        t(selectedOrderName?.toLowerCase() ?? 'orders', {
                           count: 3,
                           default: selectedOrderName,
                         })
