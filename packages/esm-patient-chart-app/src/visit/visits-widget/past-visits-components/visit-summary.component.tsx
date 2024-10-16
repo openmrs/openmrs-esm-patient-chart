@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
 import {
   type AssignedExtension,
   Extension,
@@ -14,13 +14,13 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import {
-  type Order,
+  type Diagnosis,
   type Encounter,
+  mapEncounters,
   type Note,
   type Observation,
+  type Order,
   type OrderItem,
-  type Diagnosis,
-  mapEncounters,
 } from '../visit.resource';
 import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
@@ -117,11 +117,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          diagnoses.map((diagnosis, i) => (
-            <Tag key={i} type={diagnosis.order === 'Primary' ? 'red' : 'blue'}>
-              {diagnosis.diagnosis}
-            </Tag>
-          ))
+          diagnoses
+            .sort((diagnosis) => (diagnosis.order === 'Primary' ? -1 : 1))
+            .map((diagnosis, i) => (
+              <Tag key={i} type={diagnosis.order === 'Primary' ? 'red' : 'blue'}>
+                {diagnosis.diagnosis}
+              </Tag>
+            ))
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
