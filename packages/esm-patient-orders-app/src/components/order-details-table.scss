@@ -161,3 +161,18 @@
 .helperText {
   @include type.type-style('helper-text-02');
 }
+
+.printButton {
+  margin-left: 1.25rem;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    width: fit-content;
+    padding: 0 !important;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+}

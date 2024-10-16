@@ -177,6 +177,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     },
   ];
 
+  if (isPrinting) {
+    tableHeaders.push({
+      key: 'dosage',
+      header: t('dosage', 'Dosage'),
+      isSortable: true,
+    });
+  }
+
   const tableRows = useMemo(
     () =>
       allOrders?.map((order) => ({
@@ -184,7 +192,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         dateActivated: order.dateActivated,
         orderNumber: order.orderNumber,
         dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
-        orderType: capitalize(order.orderType?.display ?? '--'),
+        orderType: capitalize(order.orderType?.display ?? '-'),
+        dosage:
+          order.type === 'drugorder' ? (
+            <div className={styles.singleLineText}>{`${t('indication', 'Indication').toUpperCase()}
+            ${order.orderReasonNonCoded} ${'-'} ${t('quantity', 'Quantity').toUpperCase()} ${order.quantity} ${order
+              ?.quantityUnits?.display} `}</div>
+          ) : (
+            '--'
+          ),
         order: order.display,
         priority: (
           <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
@@ -255,15 +271,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
     }
-  }, [isPrinting, onBeforeGetContentResolve]);
+  }, [isPrinting]);
 
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: () =>
+    onBeforeGetContent: (): Promise<void> =>
       new Promise((resolve) => {
-        if (patient && patient?.patient && title) {
-          onBeforeGetContentResolve.current = resolve;
+        if (patient && title) {
+          onBeforeGetContentResolve.current = resolve();
           setIsPrinting(true);
         }
       }),
@@ -347,8 +363,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       {showPrintButton && (
                         <Button
                           kind="ghost"
-                          renderIcon={(props) => <PrinterIcon {...props} size={16} />}
-                          iconDescription={t('print', 'Print')}
+                          renderIcon={PrinterIcon}
+                          iconDescription={t('printOrder', 'Print order')}
                           className={styles.printButton}
                           onClick={handlePrint}
                         >
@@ -358,7 +374,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       {showAddButton && (
                         <Button
                           kind="ghost"
-                          renderIcon={(props) => <AddIcon {...props} size={16} />}
+                          renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
                           onClick={launchOrderBasket}
                         >
@@ -392,18 +408,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                       }) => (
                         <>
                           <TableContainer {...getTableContainerProps}>
-                            <div className={styles.toolBarContent}>
-                              <TableToolbarContent>
-                                <Layer>
-                                  <Search
-                                    expanded
-                                    onChange={onInputChange}
-                                    placeholder={t('searchTable', 'Search table')}
-                                    size="lg"
-                                  />
-                                </Layer>
-                              </TableToolbarContent>
-                            </div>
+                            {!isPrinting && (
+                              <div className={styles.toolBarContent}>
+                                <TableToolbarContent>
+                                  <Layer>
+                                    <Search
+                                      expanded
+                                      onChange={onInputChange}
+                                      placeholder={t('searchTable', 'Search table')}
+                                      size="lg"
+                                    />
+                                  </Layer>
+                                </TableToolbarContent>
+                              </div>
+                            )}
                             <Table className={styles.table} {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
@@ -425,19 +443,21 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                       <TableExpandRow className={styles.row} {...getRowProps({ row })}>
                                         {row.cells.map((cell) => (
                                           <TableCell className={styles.tableCell} key={cell.id}>
-                                            {cell.value['content'] ?? cell.value}
+                                            {cell.value?.['content'] ?? cell.value}
                                           </TableCell>
                                         ))}
-                                        <TableCell className="cds--table-column-menu">
-                                          <OrderBasketItemActions
-                                            items={orders}
-                                            openOrderBasket={launchOrderBasket}
-                                            openOrderForm={() => openOrderForm(matchingOrder)}
-                                            orderItem={matchingOrder}
-                                            setOrderItems={setOrders}
-                                            responsiveSize={responsiveSize}
-                                          />
-                                        </TableCell>
+                                        {!isPrinting && (
+                                          <TableCell className="cds--table-column-menu">
+                                            <OrderBasketItemActions
+                                              items={orders}
+                                              openOrderBasket={launchOrderBasket}
+                                              openOrderForm={() => openOrderForm(matchingOrder)}
+                                              orderItem={matchingOrder}
+                                              setOrderItems={setOrders}
+                                              responsiveSize={responsiveSize}
+                                            />
+                                          </TableCell>
+                                        )}
                                       </TableExpandRow>
                                       {row.isExpanded ? (
                                         <TableExpandedRow
