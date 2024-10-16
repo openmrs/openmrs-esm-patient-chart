@@ -1,7 +1,14 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useOrderConceptByUuid, useLabEncounter, useObservation, type LabOrderConcept } from './lab-results.resource';
+import {
+  useOrderConceptByUuid,
+  useLabEncounter,
+  useObservation,
+  type LabOrderConcept,
+  updateOrderResult,
+  type Datatype,
+} from './lab-results.resource';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
@@ -11,6 +18,7 @@ const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 
 jest.mock('./lab-results.resource', () => ({
+  ...jest.requireActual('./lab-results.resource'),
   useOrderConceptByUuid: jest.fn(),
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),
@@ -24,6 +32,7 @@ const mockOrder = {
   patient: { uuid: 'patient-uuid' },
   orderNumber: 'ORD-1',
   careSetting: { uuid: 'care-setting-uuid' },
+  orderer: { uuid: 'orderer-uuid' },
 };
 
 const testProps = {
@@ -206,7 +215,7 @@ describe('LabResultsForm', () => {
     });
   });
 
-  test('validate numeric input where concept is a panel', async () => {
+  test('validate numeric input where concept is a set', async () => {
     const user = userEvent.setup();
     mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
@@ -278,5 +287,273 @@ describe('LabResultsForm', () => {
 
     await user.type(setMember2Input, '4');
     expect(await screen.findByText('Set Member 2 must be between 5 and 30')).toBeInTheDocument();
+  });
+
+  test('lab results form submits the correct lab result payload when the concept is not a set', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        setMembers: [],
+        datatype: { display: 'Text', hl7Abbreviation: 'ST' } as Datatype,
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+    const input = await screen.findByRole('textbox', { name: /Test Concept/i });
+    await user.type(input, '100');
+    const submitButton = screen.getByRole('button', { name: 'Save and close' });
+    await user.click(submitButton);
+
+    expect(updateOrderResult).toHaveBeenCalledWith(
+      'order-uuid',
+      'encounter-uuid',
+      { obs: [{ concept: { uuid: 'concept-uuid' }, order: { uuid: 'order-uuid' }, status: 'FINAL', value: '100' }] },
+      { fulfillerComment: 'Test Results Entered', fulfillerStatus: 'COMPLETED' },
+      {
+        action: 'DISCONTINUE',
+        careSetting: 'care-setting-uuid',
+        concept: 'concept-uuid',
+        encounter: 'encounter-uuid',
+        orderer: mockOrder.orderer,
+        patient: 'patient-uuid',
+        previousOrder: 'order-uuid',
+        type: 'testorder',
+      },
+      expect.anything(),
+    );
+  });
+
+  test('lab results forms submits correct payload when the concept is a set and one set member is keyed', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        set: true,
+        setMembers: [
+          {
+            uuid: 'set-member-uuid-1',
+            display: 'Set Member 1',
+            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
+            hiAbsolute: 100,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mg/dL',
+          },
+          {
+            uuid: 'set-member-uuid-2',
+            display: 'Set Member 2',
+            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
+            hiAbsolute: 80,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mmol/L',
+          },
+        ],
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+      } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100 mg/dL)');
+    await user.type(concept1Input, '100');
+
+    const submitButton = screen.getByRole('button', { name: 'Save and close' });
+    await user.click(submitButton);
+
+    // Expect the observation payload to include only the set member that was keyed
+    expect(updateOrderResult).toHaveBeenCalledWith(
+      'order-uuid',
+      'encounter-uuid',
+      {
+        obs: [
+          {
+            concept: {
+              uuid: 'concept-uuid',
+            },
+            status: 'FINAL',
+            order: {
+              uuid: 'order-uuid',
+            },
+            groupMembers: [
+              {
+                concept: {
+                  uuid: 'set-member-uuid-1',
+                },
+                value: 100,
+                status: 'FINAL',
+                order: {
+                  uuid: 'order-uuid',
+                },
+              },
+            ],
+          },
+        ],
+      },
+      {
+        fulfillerStatus: 'COMPLETED',
+        fulfillerComment: 'Test Results Entered',
+      },
+      {
+        previousOrder: 'order-uuid',
+        type: 'testorder',
+        action: 'DISCONTINUE',
+        careSetting: 'care-setting-uuid',
+        encounter: 'encounter-uuid',
+        patient: 'patient-uuid',
+        concept: 'concept-uuid',
+        orderer: { uuid: 'orderer-uuid' },
+      },
+      expect.anything(),
+    );
+  });
+
+  test('lab results form submits correct payload when the concept is a set and both set members are keyed', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        set: true,
+        setMembers: [
+          {
+            uuid: 'set-member-uuid-1',
+            display: 'Set Member 1',
+            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 100,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mg/dL',
+          },
+          {
+            uuid: 'set-member-uuid-2',
+            display: 'Set Member 2',
+            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 80,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mmol/L',
+          },
+        ],
+        datatype: { display: 'Numeric' },
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+      } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100 mg/dL)');
+    await user.type(concept1Input, '100');
+
+    const concept2Input = await screen.findByLabelText('Set Member 2 (0 - 80 mmol/L)');
+    await user.type(concept2Input, '60');
+
+    const submitButton = screen.getByRole('button', { name: 'Save and close' });
+    await user.click(submitButton);
+
+    // Expect the observation payload to include both set members with their respective values
+    expect(updateOrderResult).toHaveBeenCalledWith(
+      'order-uuid',
+      'encounter-uuid',
+      {
+        obs: [
+          {
+            concept: {
+              uuid: 'concept-uuid',
+            },
+            status: 'FINAL',
+            order: {
+              uuid: 'order-uuid',
+            },
+            groupMembers: [
+              {
+                concept: {
+                  uuid: 'set-member-uuid-1',
+                },
+                value: 100,
+                status: 'FINAL',
+                order: {
+                  uuid: 'order-uuid',
+                },
+              },
+              {
+                concept: {
+                  uuid: 'set-member-uuid-2',
+                },
+                value: 60,
+                status: 'FINAL',
+                order: {
+                  uuid: 'order-uuid',
+                },
+              },
+            ],
+          },
+        ],
+      },
+      {
+        fulfillerStatus: 'COMPLETED',
+        fulfillerComment: 'Test Results Entered',
+      },
+      {
+        previousOrder: 'order-uuid',
+        type: 'testorder',
+        action: 'DISCONTINUE',
+        careSetting: 'care-setting-uuid',
+        encounter: 'encounter-uuid',
+        patient: 'patient-uuid',
+        concept: 'concept-uuid',
+        orderer: { uuid: 'orderer-uuid' },
+      },
+      expect.anything(),
+    );
   });
 });
