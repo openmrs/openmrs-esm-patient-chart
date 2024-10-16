@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
@@ -8,6 +8,8 @@ import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@o
 import { useOrderConceptByUuid, updateOrderResult, useLabEncounter, useObservation } from './lab-results.resource';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
@@ -30,19 +32,29 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const { encounter, isLoading: isLoadingEncounter, mutate: mutateLabOrders } = useLabEncounter(order.encounter.uuid);
   const { data, isLoading: isLoadingObs, error: isErrorObs } = useObservation(obsUuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
+  const schema = useLabResultsFormSchema(order.concept.uuid);
 
   const {
     control,
-    register,
     formState: { errors, isDirty, isSubmitting },
     getValues,
     handleSubmit,
   } = useForm<{ testResult: any }>({
     defaultValues: {},
+    resolver: zodResolver(schema),
+    mode: 'all',
   });
 
+  const mutateOrderData = useCallback(() => {
+    mutate(
+      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
+      undefined,
+      { revalidate: true },
+    );
+  }, [order.patient.uuid]);
+
   useEffect(() => {
-    if (!isLoadingEncounter && encounter?.obs.length > 0 && !isEditing) {
+    if (!isLoadingEncounter && encounter?.obs?.length > 0 && !isEditing) {
       const obs = encounter.obs.find((obs) => obs.concept?.uuid === order?.concept.uuid);
       if (obs) {
         setObsUuid(obs.uuid);
@@ -82,7 +94,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }
 
-  const saveLabResults = () => {
+  const saveLabResults = async (formData) => {
     const formValues = getValues();
 
     const isEmptyForm = Object.values(formValues).every(
@@ -158,50 +170,45 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       fulfillerComment: 'Test Results Entered',
     };
 
-    updateOrderResult(
-      order.uuid,
-      order.encounter.uuid,
-      obsPayload,
-      resultsStatusPayload,
-      orderDiscontinuationPayload,
-      abortController,
-    ).then(
-      () => {
-        closeWorkspaceWithSavedChanges();
-        mutateLabOrders();
-        mutate(
-          (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
-          undefined,
-          { revalidate: true },
-        );
-        showSnackbar({
-          title: t('saveLabResults', 'Save lab results'),
-          kind: 'success',
-          subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-            orderNumber: order?.orderNumber,
-          }),
-        });
-      },
-      (err) => {
-        showSnackbar({
-          title: t('errorSavingLabResults', 'Error saving lab results'),
-          kind: 'error',
-          subtitle: err?.message,
-        });
-      },
-    );
+    try {
+      await updateOrderResult(
+        order.uuid,
+        order.encounter.uuid,
+        obsPayload,
+        resultsStatusPayload,
+        orderDiscontinuationPayload,
+        abortController,
+      );
 
-    setShowEmptyFormErrorNotification(false);
+      closeWorkspaceWithSavedChanges();
+      mutateLabOrders();
+      mutateOrderData();
+      showSnackbar({
+        title: t('saveLabResults', 'Save lab results'),
+        kind: 'success',
+        subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+          orderNumber: order?.orderNumber,
+        }),
+      });
+    } catch (err) {
+      showSnackbar({
+        title: t('errorSavingLabResults', 'Error saving lab results'),
+        kind: 'error',
+        subtitle: err?.message,
+      });
+    } finally {
+      setShowEmptyFormErrorNotification(false);
+    }
   };
 
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
       <div className={styles.grid}>
         {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
         {concept && (
           <Stack gap={5}>
             {!isLoadingInitialValues ? (
-              <ResultFormField defaultValue={initialValues} concept={concept} control={control} />
+              <ResultFormField defaultValue={initialValues} concept={concept} control={control} errors={errors} />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
@@ -220,13 +227,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          onClick={handleSubmit(saveLabResults)}
-          disabled={isSubmitting}
-          type="submit"
-        >
+        <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">
           {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
