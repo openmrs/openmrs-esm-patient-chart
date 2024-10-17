@@ -1,0 +1,69 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.title {
+  @include type.type-style('productive-heading-03');
+}
+
+.title:after {
+  content: '';
+  display: block;
+  width: layout.$spacing-07;
+  padding-top: layout.$spacing-01;
+  border-bottom: layout.$spacing-03 solid $brand-teal-01;
+}
+
+.cardTitle {
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
+}
+
+.tile {
+  padding: layout.$spacing-01 0 layout.$spacing-05 layout.$spacing-05;
+  margin: layout.$spacing-03;
+  border: solid 1px #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #ffffff;
+}
+
+.tileTitle {
+  @include type.type-style('label-01');
+  display: block;
+  padding-top: layout.$spacing-05;
+}
+
+.columnContainer {
+  margin: 0px 0px layout.$spacing-06 layout.$spacing-06;
+  display: flex;
+  flex-direction: row;
+}
+
+.tileBoxColumn {
+  width: 100%;
+  display: 'flex';
+  flex-direction: 'row';
+}
+
+.tileSubTitle {
+  @include type.type-style('body-compact-01');
+}
+
+.tileValue {
+  @include type.type-style('body-long-01');
+  margin: layout.$spacing-05 layout.$spacing-10 layout.$spacing-06 0;
+}
+
+.tileBox {
+  width: 25%;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.tileContainer {
+  height: fit-content;
+}
