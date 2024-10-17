@@ -31,7 +31,8 @@ import styles from './visit-summary.scss';
 
 interface DiagnosisItem {
   diagnosis: string;
-  order: string;
+  rank: number;
+  type: string;
 }
 
 interface VisitSummaryProps {
@@ -70,14 +71,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         );
       }
 
-      //Check if there is a diagnosis associated with this encounter
+      // Check if there is a diagnosis associated with this encounter
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
           enc.diagnoses.forEach((diagnosis: Diagnosis) => {
             // Putting all the diagnoses in a single array.
             diagnoses.push({
               diagnosis: diagnosis.display,
-              order: diagnosis.rank === 1 ? 'Primary' : 'Secondary',
+              type: diagnosis.rank === 1 ? 'red' : 'blue',
+              rank: diagnosis.rank,
             });
           });
         }
@@ -102,6 +104,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
     });
 
+    // Sort the diagnoses by rank, so that those of rank 1 come first
+    diagnoses.sort((a, b) => a.rank - b.rank);
+
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
@@ -117,13 +122,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          diagnoses
-            .sort((diagnosis) => (diagnosis.order === 'Primary' ? -1 : 1))
-            .map((diagnosis, i) => (
-              <Tag key={i} type={diagnosis.order === 'Primary' ? 'red' : 'blue'}>
-                {diagnosis.diagnosis}
-              </Tag>
-            ))
+          diagnoses.map((diagnosis, i) => (
+            <Tag key={`${diagnosis.diagnosis}-${i}`} type={diagnosis.type}>
+              {diagnosis.diagnosis}
+            </Tag>
+          ))
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
