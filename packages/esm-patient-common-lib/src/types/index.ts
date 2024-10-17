@@ -4,6 +4,7 @@ export interface DashboardLinkConfig {
   path: string;
   title: string;
   moduleName: string;
+  icon?: React.ReactElement;
 }
 
 export interface DashboardConfig extends DashboardLinkConfig {
