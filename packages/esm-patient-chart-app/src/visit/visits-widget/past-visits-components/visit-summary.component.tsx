@@ -104,7 +104,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
     });
 
-    // Sort the diagnoses by rank, so that those of rank 1 come first
+    // Sort the diagnoses by rank, so that primary diagnoses come first
     diagnoses.sort((a, b) => a.rank - b.rank);
 
     return [diagnoses, notes, medications];
