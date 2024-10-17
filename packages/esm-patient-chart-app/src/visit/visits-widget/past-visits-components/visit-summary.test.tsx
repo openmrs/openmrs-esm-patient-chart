@@ -56,6 +56,24 @@ describe('VisitSummary', () => {
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
+   it('renders diagnoses tags when there are diagnoses', () => {
+    const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+
+    const malariaTag = screen.getByText(/^malaria, confirmed$/i);
+    const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
+
+    expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
+    expect(malariaTag).toBeInTheDocument();
+    expect(hivTag).toBeInTheDocument();
+
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(malariaTag.closest('div')).toHaveClass('cds--tag--red');
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(hivTag.closest('div')).toHaveClass('cds--tag--blue');
+  });
+
   it('should display notes, tests and medication summary', async () => {
     const user = userEvent.setup();
 
