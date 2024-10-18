@@ -1,51 +1,63 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   background-color: $openmrs-background-grey;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-05;
+  border-bottom: 1px solid $ui-03;
 }
 
 .vitalsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: layout.$spacing-09;
-  padding-left: layout.$spacing-05;
+  min-height: layout.$spacing-07;
   outline: none;
   pointer-events: visibleFill;
 }
 
 .emptyStateVitalsHeader {
-  @extend .vitalsHeader;
-  background-color: $openmrs-background-grey;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 layout.$spacing-05;
+  min-height: layout.$spacing-09;
+  outline: none;
+  pointer-events: visibleFill;
   border-bottom: 1px solid $ui-03;
+
+  .container {
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .bodyText {
+    margin-left: layout.$spacing-03;
+  }
 }
 
 .headerItems {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   flex-flow: row wrap;
-  gap: layout.$spacing-02;
+  gap: layout.$spacing-02 layout.$spacing-04;
 }
 
 .heading {
   @include type.type-style('heading-compact-02');
-  margin-right: layout.$spacing-03;
   color: $ui-05 !important;
 }
 
 .rowContainer {
   width: 100%;
-  border-bottom: 1px solid $ui-03;
-  padding-bottom: layout.$spacing-04;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 layout.$spacing-05;
   max-width: 100vw;
 }
 
@@ -65,10 +77,15 @@
   min-height: layout.$spacing-09;
 }
 
+.tag {
+  margin-right: 0;
+}
+
 .overdueIndicator {
   display: flex;
   align-items: center;
   min-inline-size: max-content;
+  color: colors.$red-70;
 
   svg {
     margin-right: layout.$spacing-02;
@@ -97,19 +114,12 @@
   margin-left: layout.$spacing-03;
 }
 
-.heading {
-  @include type.type-style('heading-compact-02');
-  margin-right: layout.$spacing-03;
-  color: $text-02;
-}
-
 .bodyText {
   @include type.type-style('label-01');
   color: $text-02;
 }
 
 .link {
-  margin-left: layout.$spacing-02;
   @extend .bodyText;
   text-decoration-line: none;
   color: $interactive-01;
