@@ -5,9 +5,9 @@ import duration from 'dayjs/plugin/duration';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 dayjs.extend(duration);
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
-import { ArrowRight, Time } from '@carbon/react/icons';
+import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig, useWorkspaces } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import {
@@ -37,13 +37,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { workspaces } = useWorkspaces();
 
-  const isWorkspaceOpen = useCallback(() => {
-    return Boolean(workspaces?.length);
-  }, [workspaces]);
+  const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
 
   const launchVitalsAndBiometricsForm = useCallback(
-    (e: Event) => {
-      e.stopPropagation();
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       launchForm(currentVisit, config);
     },
     [config, currentVisit],
@@ -61,19 +59,37 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
     const now = dayjs();
     const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
-    let overdueVitalsTagContent = '';
+
+    let overdueVitalsTagContent: React.ReactNode = 'null';
 
     switch (true) {
       case vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount <= 7:
-        overdueVitalsTagContent = t('daysOldVitals', 'These vitals are {{count}} days old', {
-          count: vitalsOverdueDayCount,
-        });
+        overdueVitalsTagContent = (
+          <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
+            <span>
+              {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
+              These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
+            </span>
+          </Trans>
+        );
         break;
       case vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14:
-        overdueVitalsTagContent = t('overOneWeekOldVitals', 'These vitals are over one week old');
+        overdueVitalsTagContent = (
+          <Trans i18nKey="overOneWeekOldVitals">
+            <span>
+              These vitals are <strong>over one week old</strong>
+            </span>
+          </Trans>
+        );
         break;
       default:
-        overdueVitalsTagContent = t('outOfDateVitals', 'These vitals are out of date');
+        overdueVitalsTagContent = (
+          <Trans i18nKey="outOfDateVitals">
+            <span>
+              These vitals are <strong>out of date</strong>
+            </span>
+          </Trans>
+        );
         break;
     }
 
@@ -86,11 +102,8 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
             {vitalsOverdue ? (
-              <Tag type="red">
-                <span className={styles.overdueIndicator}>
-                  <Time />
-                  {`${t('overdue', 'Overdue')}: ${overdueVitalsTagContent}`}
-                </span>
+              <Tag className={styles.tag} type="red">
+                <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
               </Tag>
             ) : null}
             <ConfigurableLink
@@ -166,7 +179,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             />
             <VitalsHeaderItem
               interpretation={assessValue(
-                latestVitals.temperature,
+                latestVitals?.temperature,
                 getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
               )}
               unitName={t('temperatureAbbreviated', 'Temp')}
