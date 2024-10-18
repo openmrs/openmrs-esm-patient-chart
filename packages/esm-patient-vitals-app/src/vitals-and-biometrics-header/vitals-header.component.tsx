@@ -60,37 +60,31 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     const now = dayjs();
     const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
 
-    let overdueVitalsTagContent: React.ReactNode = 'null';
+    let overdueVitalsTagContent: React.ReactNode = null;
 
-    switch (true) {
-      case vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount <= 7:
-        overdueVitalsTagContent = (
-          <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
-            <span>
-              {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
-              These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
-            </span>
-          </Trans>
-        );
-        break;
-      case vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14:
-        overdueVitalsTagContent = (
-          <Trans i18nKey="overOneWeekOldVitals">
-            <span>
-              These vitals are <strong>over one week old</strong>
-            </span>
-          </Trans>
-        );
-        break;
-      default:
-        overdueVitalsTagContent = (
-          <Trans i18nKey="outOfDateVitals">
-            <span>
-              These vitals are <strong>out of date</strong>
-            </span>
-          </Trans>
-        );
-        break;
+    if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
+          <span>
+            {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
+            These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
+          </span>
+        </Trans>
+      );
+    } else if (vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="overOneWeekOldVitals">
+          <span>These vitals are</span>
+        </Trans>
+      );
+    } else {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="outOfDateVitals">
+          <span>
+            These vitals are <strong>out of date</strong>
+          </span>
+        </Trans>
+      );
     }
 
     return (
