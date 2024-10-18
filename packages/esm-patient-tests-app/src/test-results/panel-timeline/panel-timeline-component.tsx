@@ -13,6 +13,7 @@ const PanelTimelineComponent: React.FC<PanelTimelineComponentProps> = ({ activeP
   const { t } = useTranslation();
   const rows: Array<ObsRecord> = activePanel ? [activePanel, ...activePanel?.relatedObs] : [];
   const mappedObservations = Object.fromEntries(rows.map((obs) => [obs.name, groupedObservations[obs.conceptUuid]]));
+
   const allTimes = []
     .concat(...Object.values(mappedObservations).map((obsRecords) => obsRecords.map((obs) => obs.effectiveDateTime)))
     .sort((time1, time2) => Date.parse(time2) - Date.parse(time1));

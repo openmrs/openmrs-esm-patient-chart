@@ -9,6 +9,7 @@ import {
   type TimelineData,
 } from './filter-types';
 import reducer from './filter-reducer';
+import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 
 const initialState: ReducerState = {
   checkboxes: {},
@@ -22,6 +23,7 @@ const initialContext = {
   state: initialState,
   ...initialState,
   timelineData: null,
+  tableData: null,
   trendlineData: null,
   activeTests: [],
   someChecked: false,
@@ -93,6 +95,50 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
     };
   }, [activeTests, state.tests]);
 
+  const tableData = useMemo<GroupedObservation[]>(() => {
+    const flattenedObs: Observation[] = [];
+
+    for (const key in state.tests) {
+      const test = state.tests[key] as TestResult;
+      if (test.obs && Array.isArray(test.obs)) {
+        test.obs.forEach((obs) => {
+          const flattenedEntry = {
+            ...obs,
+            key: key,
+            ...test,
+          };
+          flattenedObs.push(flattenedEntry);
+        });
+      }
+    }
+
+    const groupedObs: Record<string, GroupedObservation> = {};
+
+    flattenedObs.forEach((curr: MappedObservation) => {
+      const flatNameParts = curr.flatName.split('-');
+      const groupKey = flatNameParts.length > 1 ? flatNameParts[1].trim() : flatNameParts[0].trim();
+      const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
+
+      const compositeKey = `${groupKey}__${dateKey}`;
+      if (!groupedObs[compositeKey]) {
+        groupedObs[compositeKey] = {
+          key: groupKey,
+          date: dateKey,
+          flatName: curr.flatName,
+          entries: [],
+        };
+      }
+
+      groupedObs[compositeKey].entries.push(curr);
+    });
+
+    const resultArray = Object.values(groupedObs).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    return resultArray;
+  }, [state.tests]);
+
   useEffect(() => {
     if (roots?.length && !Object.keys(state?.parents).length) {
       actions.initialize(roots);
@@ -113,6 +159,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
       value={{
         ...state,
         timelineData,
+        tableData,
         activeTests,
         someChecked,
         totalResultsCount,
