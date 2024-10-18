@@ -1,0 +1,20 @@
+{
+  "address1": "Địa chỉ 1",
+  "address2": "Địa chỉ 2",
+  "city": "Thành phố",
+  "cityVillage": "thành phố",
+  "country": "Đất nước",
+  "countyDistrict": "Huyện",
+  "district": "Huyện",
+  "implementationLogo": "Logo triển khai",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
+  "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
+  "postalCode": "Postal code",
+  "printIdentifierSticker": "Print identifier sticker",
+  "state": "State",
+  "stateProvince": "State",
+  "telephoneNumberWithSeparator": "Telephone number:"
+}
