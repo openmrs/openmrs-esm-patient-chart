@@ -6,9 +6,15 @@
   "country": "国家",
   "countyDistrict": "区县",
   "district": "区县",
-  "dob": "出生日期",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "患者标识符贴纸",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "邮政编码",
+  "printIdentifierSticker": "Print identifier sticker",
   "state": "省份",
-  "stateProvince": "省份"
+  "stateProvince": "省份",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }
