@@ -70,7 +70,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   clearData,
 }) => {
   const { t } = useTranslation();
-  const [fileName, setFileName] = useState(uploadedFile.fileName);
+  const fileExtension = uploadedFile.fileName.match(/\.[^/.]+$/)?.[0] || '';
+  const [fileName, setFileName] = useState(uploadedFile.fileName.replace(/\.[^/.]+$/, '')); // Display name without extension
   const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
   const [emptyName, setEmptyName] = useState(false);
 
@@ -79,11 +80,11 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       event.preventDefault();
       onSaveFile?.({
         ...uploadedFile,
-        fileName,
+        fileName: `${fileName}${fileExtension}`,
         fileDescription,
       });
     },
-    [onSaveFile, fileName, fileDescription, uploadedFile],
+    [onSaveFile, fileName, fileExtension, fileDescription, uploadedFile],
   );
 
   const cancelCapture = useCallback(
