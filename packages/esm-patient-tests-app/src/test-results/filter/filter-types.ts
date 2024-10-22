@@ -101,6 +101,7 @@ export interface TimelineData {
 
 export interface FilterContextProps extends ReducerState {
   timelineData: TimelineData;
+  tableData?: any;
   activeTests: string[];
   someChecked: boolean;
   totalResultsCount: number;
