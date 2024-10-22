@@ -73,6 +73,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   const fileExtension = uploadedFile.fileName.match(/\.[^/.]+$/)?.[0] || '';
   const [fileName, setFileName] = useState(uploadedFile.fileName.replace(/\.[^/.]+$/, '')); // Display name without extension
   const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
+  const [invalidCharacter, setInvalidCharacter] = useState(false);
   const [emptyName, setEmptyName] = useState(false);
 
   const saveImageOrPdf = useCallback(
@@ -99,14 +100,21 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       event.preventDefault();
 
-      if (event.target.value === '') {
+      const inputValue = event.target.value;
+
+      const containsInvalidChar = /[.,]/.test(inputValue);
+      setInvalidCharacter(containsInvalidChar); 
+
+    if (!containsInvalidChar) {
+      if (inputValue === '') {
         setEmptyName(true);
       } else if (emptyName) {
         setEmptyName(false);
       }
 
-      setFileName(event.target.value);
-    },
+      setFileName(inputValue);
+    }
+  },
     [setEmptyName, setFileName, emptyName],
   );
 
@@ -139,8 +147,14 @@ const FilePreview: React.FC<FilePreviewProps> = ({
                 autoComplete="off"
                 autoFocus
                 id="caption"
-                invalid={emptyName}
-                invalidText={emptyName && t('fieldRequired', 'This field is required')}
+                invalid={emptyName || invalidCharacter} 
+                invalidText={
+                  emptyName
+                  ? t('fieldRequired', 'This field is required')
+                  : invalidCharacter
+                  ? t('invalidCharacters', 'File name cannot contain . or ,')
+                  : ''
+                }
                 labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
                   'name',
                   'name',
