@@ -148,6 +148,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       return new Date(visitStartDatetime) <= new Date();
     };
 
+    const hadPreviousStopDateTime = Boolean(visitToEdit?.stopDatetime);
+
     return z
       .object({
         visitStartDate: z.date().refine(
@@ -167,13 +169,17 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           .string()
           .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
         visitStartTimeFormat: z.enum(['PM', 'AM']),
-        visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
-        visitStopTime: displayVisitStopDateTimeFields
-          ? z
-              .string()
-              .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
-          : z.string().optional(),
-        visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
+        visitStopDate: displayVisitStopDateTimeFields && hadPreviousStopDateTime ? z.date() : z.date().optional(),
+        visitStopTime:
+          displayVisitStopDateTimeFields && hadPreviousStopDateTime
+            ? z
+                .string()
+                .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
+            : z.string().optional(),
+        visitStopTimeFormat:
+          displayVisitStopDateTimeFields && hadPreviousStopDateTime
+            ? z.enum(['PM', 'AM'])
+            : z.enum(['PM', 'AM']).optional(),
         programType: z.string().optional(),
         visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
         visitLocation: z.object({
@@ -186,7 +192,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         message: t('futureStartTime', 'Visit start time cannot be in the future'),
         path: ['visitStartTime'],
       });
-  }, [t, config, displayVisitStopDateTimeFields]);
+  }, [config.visitAttributeTypes, visitToEdit?.stopDatetime, t, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
     const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
