@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 import {
   getDefaultsFromConfigSchema,
   openmrsFetch,
+  restBaseUrl,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -347,13 +348,13 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
@@ -417,7 +418,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -426,7 +427,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -490,12 +491,12 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       { method: 'DELETE' },
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       { method: 'DELETE' },
     );
 
