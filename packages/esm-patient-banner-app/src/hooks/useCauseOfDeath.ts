@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface CauseOfDeathResponse {
   data: {
@@ -13,7 +13,7 @@ interface CauseOfDeathResponse {
 
 export function useCauseOfDeath(patientUuid: string) {
   const customRepresentation = 'custom:(causeOfDeath:(display),causeOfDeathNonCoded)';
-  const url = `/ws/rest/v1/person/${patientUuid}?v=${customRepresentation}`;
+  const url = `${restBaseUrl}/person/${patientUuid}?v=${customRepresentation}`;
 
   const { data, error } = useSWR<CauseOfDeathResponse, Error>(patientUuid ? url : null, openmrsFetch);
 
