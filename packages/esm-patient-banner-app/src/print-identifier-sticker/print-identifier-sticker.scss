@@ -4,10 +4,13 @@
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
+  height: var(--omrs-print-label-sticker-height, auto);
+  width: var(--omrs-print-label-sticker-width, auto);
 }
 
 .documentHeader {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid $brand-01;
@@ -72,12 +75,67 @@
   width: 40%;
 }
 
-@media print {
-  html,
-  body {
-    height: 100vh;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
+.previewContainer {
+  max-height: 10rem;
+  overflow-y: scroll;
+  background-color: white;
+  width: 100%;
+  border: 1px solid $ui-03;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+}
+
+.labelNumberInput {
+  padding: 1rem;
+}
+
+.hidePreviewContainer {
+  display: none;
+}
+
+.printRoot {
+  @media print {
+    @page {
+      size: var(--omrs-print-label-paper-size, auto);
+    }
+
+    html,
+    body {
+      height: initial !important;
+      overflow: initial !important;
+      background-color: white;
+    }
+
+    .pageBreak {
+      page-break-after: always;
+      // page-break-inside: avoid;
+    }
   }
+
+  .labelsContainer {
+    grid-template-columns: repeat(var(--omrs-print-label-colums, 1), 1fr);
+    grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
+  }
+}
+
+.printContainer {
+  background-color: $ui-01;
+  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+}
+
+.labelsContainer {
+  display: grid;
+  column-gap: 1.3rem;
+  row-gap: 1rem;
+  place-items: center;
+  background-color: white;
+}
+
+.multipleStickerInputs {
+  display: flex;
+  margin-left: 1rem;
+  gap: 1rem;
+  align-items: center;
 }
