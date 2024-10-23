@@ -7,14 +7,17 @@
   "countyDistrict": "District",
   "district": "District",
   "implementationLogo": "Implementation logo",
+  "onDate": "On date",
   "patientAge": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
   "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
   "patientNameWithSeparator": "Patient name:",
   "postalCode": "Postal code",
+  "printedBy": "Printed by",
   "printIdentifierSticker": "Print identifier sticker",
   "state": "State",
   "stateProvince": "State",
-  "telephoneNumberWithSeparator": "Telephone number:"
+  "telephoneNumberWithSeparator": "Telephone number:",
+  "unknownUser": "Unknown user"
 }
