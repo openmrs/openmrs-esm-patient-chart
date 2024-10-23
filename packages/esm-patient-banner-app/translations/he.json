@@ -6,9 +6,15 @@
   "country": "מדינה",
   "countyDistrict": "מחוז",
   "district": "מחוז",
-  "dob": "DOB",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "מיקוד",
+  "printIdentifierSticker": "Print identifier sticker",
   "state": "מדינה",
-  "stateProvince": "מדינה"
+  "stateProvince": "מדינה",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }

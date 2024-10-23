@@ -6,9 +6,15 @@
   "country": "Pays",
   "countyDistrict": "District",
   "district": "District",
-  "dob": "Date de naissance",
+  "implementationLogo": "Logo de mise en œuvre",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date de Naissance:",
+  "patientGenderWithSeparator": "Genre:",
   "patientIdentifierSticker": "Autocollant d'identification du patient",
+  "patientNameWithSeparator": "Nom du Patient:",
   "postalCode": "Code postal",
+  "printIdentifierSticker": "Imprimer l'autocollant d'identification",
   "state": "État",
-  "stateProvince": "État"
+  "stateProvince": "État",
+  "telephoneNumberWithSeparator": "Numéro de téléphone:"
 }

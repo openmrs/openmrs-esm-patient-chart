@@ -6,9 +6,15 @@
   "country": "País",
   "countyDistrict": "Distrito",
   "district": "Distrito",
-  "dob": "Fecha de Nacimiento",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Etiqueta de identificación del paciente",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "Código Postal",
+  "printIdentifierSticker": "Print identifier sticker",
   "state": "Estado",
-  "stateProvince": "Estado"
+  "stateProvince": "Estado",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }

@@ -46,7 +46,6 @@
 .label {
   @include type.type-style('label-01');
   color: $text-02;
-  margin-right: 0.375rem;
 }
 
 .danger-icon {
@@ -78,18 +77,27 @@
   }
 }
 
+.arrow {
+  color: colors.$gray-100;
+  font-weight: 500;
+}
+
 .low::after {
+  @extend .arrow;
   content: ' ↓';
 }
 
 .critically-low::after {
+  @extend .arrow;
   content: ' ↓↓';
 }
 
 .high::after {
+  @extend .arrow;
   content: ' ↑';
 }
 
 .critically-high::after {
+  @extend .arrow;
   content: ' ↑↑';
 }

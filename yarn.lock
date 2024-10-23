@@ -5678,8 +5678,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 2.1.0-pre.1524
-  resolution: "@openmrs/esm-form-engine-lib@npm:2.1.0-pre.1524"
+  version: 2.1.0-pre.1526
+  resolution: "@openmrs/esm-form-engine-lib@npm:2.1.0-pre.1526"
   dependencies:
     "@carbon/react": "npm:>1.47.0 <1.50.0"
     classnames: "npm:^2.5.1"
@@ -5697,7 +5697,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     swr: 2.x
-  checksum: 10/5d2fe6aabaadcfa70e439988094789926f10e98c30a003c3fbc6d746e06f957faf111b36a338c6d3a52b75a0fead03b64b6e664830d71d6fa1585a93380d3c71
+  checksum: 10/8aaf4e07ff29487c7559d708637d9064226f7e1f9830f53c30a77bb23a50752bde0cb7a42e157b9703d5fb7cd021d306dc84dc1c39bab3a5d6c137dced92235f
   languageName: node
   linkType: hard
 
@@ -6007,7 +6007,7 @@ __metadata:
     sass: "npm:^1.54.3"
     swc-loader: "npm:^0.2.3"
     swr: "npm:^2.2.4"
-    turbo: "npm:^2.0.12"
+    turbo: "npm:^2.2.3"
     typescript: "npm:^4.0.3"
     webpack-cli: "npm:^4.10.0"
     webpack-dev-server: "npm:^4.15.1"
@@ -25452,58 +25452,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-darwin-64@npm:2.1.0"
+"turbo-darwin-64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-darwin-64@npm:2.2.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-darwin-arm64@npm:2.1.0"
+"turbo-darwin-arm64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-darwin-arm64@npm:2.2.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-linux-64@npm:2.1.0"
+"turbo-linux-64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-linux-64@npm:2.2.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-linux-arm64@npm:2.1.0"
+"turbo-linux-arm64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-linux-arm64@npm:2.2.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-windows-64@npm:2.1.0"
+"turbo-windows-64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-windows-64@npm:2.2.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.1.0":
-  version: 2.1.0
-  resolution: "turbo-windows-arm64@npm:2.1.0"
+"turbo-windows-arm64@npm:2.2.3":
+  version: 2.2.3
+  resolution: "turbo-windows-arm64@npm:2.2.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:^2.0.12":
-  version: 2.1.0
-  resolution: "turbo@npm:2.1.0"
+"turbo@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "turbo@npm:2.2.3"
   dependencies:
-    turbo-darwin-64: "npm:2.1.0"
-    turbo-darwin-arm64: "npm:2.1.0"
-    turbo-linux-64: "npm:2.1.0"
-    turbo-linux-arm64: "npm:2.1.0"
-    turbo-windows-64: "npm:2.1.0"
-    turbo-windows-arm64: "npm:2.1.0"
+    turbo-darwin-64: "npm:2.2.3"
+    turbo-darwin-arm64: "npm:2.2.3"
+    turbo-linux-64: "npm:2.2.3"
+    turbo-linux-arm64: "npm:2.2.3"
+    turbo-windows-64: "npm:2.2.3"
+    turbo-windows-arm64: "npm:2.2.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -25519,7 +25519,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10/e180ac4cf6a2df9c53b894a0ddd320686bd64a3afb3f686d28f04eeecca2642aa8f8b168104663debf3414014533b4b1178a36497ac47e3a9076dd5ae1813814
+  checksum: 10/ce7dc0b45d11ba9d2a435daad3357ad45e51a81583134912d1ff5b4569c6d233f56b5fc2459ad5c4a8d41ddec566574e34e5c8649ef64b7546348014bd371ea5
   languageName: node
   linkType: hard
 
