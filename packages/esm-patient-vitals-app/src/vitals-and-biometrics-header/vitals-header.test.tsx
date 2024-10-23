@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
@@ -88,7 +89,7 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-    expect(screen.getByText(/overdue: these vitals are out of date/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {
@@ -104,6 +105,27 @@ describe('VitalsHeader', () => {
 
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+  });
+
+  it('displays correct overdue tag for vitals 5 days old', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    // TODO: Fix pluralization so that the string reads "5 days old"
+    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {

@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { type Observation, type Encounter } from '../types/encounter';
 import { type OrderDiscontinuationPayload } from '../types/order';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -13,6 +14,7 @@ const labConceptRepresentation =
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
+type NullableNumber = number | null | undefined;
 export interface LabOrderConcept {
   uuid: string;
   display: string;
@@ -25,12 +27,12 @@ export interface LabOrderConcept {
   mappings?: Array<Mapping>;
   answers?: Array<OpenmrsResource>;
   setMembers?: Array<LabOrderConcept>;
-  hiNormal?: number;
-  hiAbsolute?: number;
-  hiCritical?: number;
-  lowNormal?: number;
-  lowAbsolute?: number;
-  lowCritical?: number;
+  hiNormal?: NullableNumber;
+  hiAbsolute?: NullableNumber;
+  hiCritical?: NullableNumber;
+  lowNormal?: NullableNumber;
+  lowAbsolute?: NullableNumber;
+  lowCritical?: NullableNumber;
   units?: string;
 }
 
@@ -156,4 +158,72 @@ export async function updateOrderResult(
     }
   }
   throw new Error('Failed to update order');
+}
+
+export function createObservationPayload(
+  concept: LabOrderConcept,
+  order: Order,
+  values: Record<string, unknown>,
+  status: string,
+) {
+  if (concept.set && concept.setMembers.length > 0) {
+    const groupMembers = concept.setMembers
+      .map((member) => createGroupMember(member, order, values, status))
+      .filter((member) => member !== null && member.value !== null && member.value !== undefined);
+
+    if (groupMembers.length === 0) {
+      return { obs: [] };
+    }
+
+    return { obs: [createObservation(order, groupMembers, null, status)] };
+  } else {
+    const value = getValue(concept, values);
+    if (value === null || value === undefined) {
+      return { obs: [] };
+    }
+    return { obs: [createObservation(order, null, value, status)] };
+  }
+}
+
+function createGroupMember(member: LabOrderConcept, order: Order, values: Record<string, unknown>, status: string) {
+  const value = getValue(member, values);
+  if (value === null || value === undefined) {
+    return null;
+  }
+  return {
+    concept: { uuid: member.uuid },
+    value: value,
+    status: status,
+    order: { uuid: order.uuid },
+  };
+}
+
+function createObservation(order: Order, groupMembers = null, value = null, status: string) {
+  return {
+    concept: { uuid: order.concept.uuid },
+    status: status,
+    order: { uuid: order.uuid },
+    ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
+    ...(value !== null && value !== undefined && { value }),
+  };
+}
+
+function getValue(concept: LabOrderConcept, values: Record<string, unknown>) {
+  const { datatype, uuid } = concept;
+  const value = values[uuid];
+
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  // hl7Abbreviation is NM for Numeric and ST for Text
+  if (['NM', 'ST'].includes(datatype.hl7Abbreviation)) {
+    return value;
+  }
+  // hl7Abbreviation is CWE for Coded with exceptions datatype
+  if (datatype.hl7Abbreviation === 'CWE') {
+    return { uuid: value };
+  }
+
+  return null;
 }
