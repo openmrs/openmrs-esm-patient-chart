@@ -1,5 +1,5 @@
 {
-  "cancel": "Cancel",
+  "cancel": "Hủy",
   "closeThisPanel": "Close this panel",
   "collapseAll": "Collapse all",
   "deleteQuestion": "Delete question",
@@ -7,8 +7,8 @@
   "deleteQuestionExplainerText": "This action cannot be undone.",
   "errorTitle": "There was an error with this form",
   "expandAll": "Expand all",
-  "loading": "Loading",
-  "or": "or",
+  "loading": "Đang tải",
+  "or": "hoặc",
   "thisList": "this list",
   "toggleCollapseOrExpand": "Toggle collapse or expand",
   "tryAgainMessage": "Try opening another form from"
