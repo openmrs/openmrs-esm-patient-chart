@@ -91,7 +91,11 @@ const MediaUploaderComponent = () => {
         {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB.', {
           fileSize: maxFileSize,
         })}.
-        Supported files are {allowedExtensions?.join(', ')}.
+
+      {t('supportedFiletypes', 'Supported files are {{supportedFiles}}.',{
+        supportedFiles: allowedExtensions?.join(', '),
+      })}
+      
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
