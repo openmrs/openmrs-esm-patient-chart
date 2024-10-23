@@ -70,8 +70,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   clearData,
 }) => {
   const { t } = useTranslation();
-  const fileExtension = uploadedFile.fileName.match(/\.[^/.]+$/)?.[0] || '';
-  const [fileName, setFileName] = useState(uploadedFile.fileName.replace(/\.[^/.]+$/, '')); // Display name without extension
+  const fileExtension = uploadedFile.fileName.match(/\.[^\\/.]+$/)?.[0] || '';
+  const [fileName, setFileName] = useState(uploadedFile.fileName.replace(/\.[^\\/.]+$/, ''));
   const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
   const [invalidCharacter, setInvalidCharacter] = useState(false);
   const [emptyName, setEmptyName] = useState(false);
