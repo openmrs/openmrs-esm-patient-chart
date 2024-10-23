@@ -10,9 +10,11 @@ export interface DashboardExtensionProps {
   title: string;
   basePath: string;
   moduleName?: string;
+  icon?: React.ReactElement;
 }
 
 export const DashboardExtension = ({
+  icon,
   path,
   title,
   basePath,
@@ -28,7 +30,7 @@ export const DashboardExtension = ({
         className={classNames('cds--side-nav__link', { 'active-left-nav-link': path === navLink })}
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
-        {t(title)}
+        {icon} {t(title)}
       </ConfigurableLink>
     </div>
   );
