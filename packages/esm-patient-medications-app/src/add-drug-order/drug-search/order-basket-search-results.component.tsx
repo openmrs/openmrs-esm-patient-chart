@@ -115,7 +115,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const patient = usePatient();
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
     [orders, drug],
