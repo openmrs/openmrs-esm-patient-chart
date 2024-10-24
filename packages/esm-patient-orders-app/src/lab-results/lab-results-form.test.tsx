@@ -59,6 +59,7 @@ describe('LabResultsForm', () => {
         lowCritical: 40,
         lowNormal: 50,
         units: 'mg/dL',
+        allowDecimal: false,
       } as LabOrderConcept,
       isLoading: false,
       error: null,
@@ -93,6 +94,58 @@ describe('LabResultsForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Test Concept must be between 0 and 100')).toBeInTheDocument();
+    });
+  });
+
+  test('validate when we have a concept with allowDecimal set to true', async () => {
+    const user = userEvent.setup();
+    // if allowDecimal is true, we should allow decimal values
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        setMembers: [],
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+        hiAbsolute: 100,
+        lowAbsolute: null,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+        allowDecimal: true,
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await user.type(input, '50.5');
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Test Concept must be a whole number')).not.toBeInTheDocument();
+    });
+  });
+
+  test('validate when we have a concept with allowDecimal set to null', async () => {
+    const user = userEvent.setup();
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await user.type(input, '50.5');
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.click(saveButton);
+
+    // if allowDecimal is null or false, we should not allow decimal values
+    await waitFor(() => {
+      expect(screen.getByText('Test Concept must be a whole number')).toBeInTheDocument();
     });
   });
 
