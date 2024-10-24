@@ -474,122 +474,120 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController)
         )
-          .pipe(first())
-          .subscribe({
-            next: (response) => {
-              if (config.showServiceQueueFields && queueLocation && service && priority) {
-                // retrieve values from the queue extension
-                setVisitUuid(response.data.uuid);
+          .then((response) => {
+            if (config.showServiceQueueFields && queueLocation && service && priority) {
+              // retrieve values from the queue extension
+              setVisitUuid(response.data.uuid);
 
-                saveQueueEntry(
-                  response.data.uuid,
-                  service,
-                  patientUuid,
-                  priority,
-                  status,
-                  sortWeight,
-                  queueLocation,
-                  visitQueueNumberAttributeUuid,
-                  abortController,
-                ).then(
-                  ({ status }) => {
+              saveQueueEntry(
+                response.data.uuid,
+                service,
+                patientUuid,
+                priority,
+                status,
+                sortWeight,
+                queueLocation,
+                visitQueueNumberAttributeUuid,
+                abortController,
+              ).then(
+                () => {
+                  mutateCurrentVisit();
+                  mutateVisits();
+                  mutateInfiniteVisits();
+                  mutateQueueEntry();
+                  showSnackbar({
+                    kind: 'success',
+                    title: t('visitStarted', 'Visit started'),
+                    subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                  });
+                },
+                (error) => {
+                  showSnackbar({
+                    title: t('queueEntryError', 'Error adding patient to the queue'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: error?.message,
+                  });
+                },
+              );
+
+              if (config.showUpcomingAppointments && upcomingAppointment) {
+                updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
+                  () => {
                     mutateCurrentVisit();
                     mutateVisits();
                     mutateInfiniteVisits();
-                    mutateQueueEntry();
+                    mutateAppointments();
                     showSnackbar({
+                      isLowContrast: true,
                       kind: 'success',
-                      title: t('visitStarted', 'Visit started'),
-                      subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                      subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                      title: t('appointmentCheckedIn', 'Appointment Checked In'),
                     });
                   },
                   (error) => {
                     showSnackbar({
-                      title: t('queueEntryError', 'Error adding patient to the queue'),
+                      title: t('updateError', 'Error updating upcoming appointment'),
                       kind: 'error',
                       isLowContrast: false,
                       subtitle: error?.message,
                     });
                   },
                 );
-
-                if (config.showUpcomingAppointments && upcomingAppointment) {
-                  updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
-                    () => {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      mutateInfiniteVisits();
-                      mutateAppointments();
-                      showSnackbar({
-                        isLowContrast: true,
-                        kind: 'success',
-                        subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
-                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
-                      });
-                    },
-                    (error) => {
-                      showSnackbar({
-                        title: t('updateError', 'Error updating upcoming appointment'),
-                        kind: 'error',
-                        isLowContrast: false,
-                        subtitle: error?.message,
-                      });
-                    },
-                  );
-                }
               }
+            }
 
-              from(handleVisitAttributes(visitAttributes, response.data.uuid))
-                .pipe(first())
-                .subscribe({
-                  next: (attributesResponses) => {
-                    setIsSubmitting(false);
-                    // Check for no undefined,
-                    // that if there was no failed requests on either creating, updating or deleting an attribute
-                    // then continue and close workspace
-                    if (!attributesResponses.includes(undefined)) {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      mutateInfiniteVisits();
-                      closeWorkspace({ ignoreChanges: true });
-                      showSnackbar({
-                        isLowContrast: true,
-                        kind: 'success',
-                        subtitle: !visitToEdit
-                          ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                              visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                            })
-                          : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                              visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                            }),
-                        title: !visitToEdit
-                          ? t('visitStarted', 'Visit started')
-                          : t('visitDetailsUpdated', 'Visit details updated'),
-                      });
-                    }
-                  },
-                  error: (error) => {
+            // TODO: Refactor this to use Promises
+            from(handleVisitAttributes(visitAttributes, response.data.uuid))
+              .pipe(first())
+              .subscribe({
+                next: (attributesResponses) => {
+                  setIsSubmitting(false);
+                  // Check for no undefined,
+                  // that if there was no failed requests on either creating, updating or deleting an attribute
+                  // then continue and close workspace
+                  if (!attributesResponses.includes(undefined)) {
+                    mutateCurrentVisit();
+                    mutateVisits();
+                    mutateInfiniteVisits();
+                    closeWorkspace({ ignoreChanges: true });
                     showSnackbar({
+                      isLowContrast: true,
+                      kind: 'success',
+                      subtitle: !visitToEdit
+                        ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                            visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                          })
+                        : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                            visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                          }),
                       title: !visitToEdit
-                        ? t('startVisitError', 'Error starting visit')
-                        : t('errorUpdatingVisitDetails', 'Error updating visit details'),
-                      kind: 'error',
-                      isLowContrast: false,
-                      subtitle: error?.message,
+                        ? t('visitStarted', 'Visit started')
+                        : t('visitDetailsUpdated', 'Visit details updated'),
                     });
-                  },
-                });
-            },
-            error: (error) => {
-              showSnackbar({
-                title: !visitToEdit
-                  ? t('startVisitError', 'Error starting visit')
-                  : t('errorUpdatingVisitDetails', 'Error updating visit details'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
+                  }
+                },
+                error: (error) => {
+                  showSnackbar({
+                    title: !visitToEdit
+                      ? t('startVisitError', 'Error starting visit')
+                      : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: error?.message,
+                  });
+                },
               });
-            },
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: !visitToEdit
+                ? t('startVisitError', 'Error starting visit')
+                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
           });
       } else {
         createOfflineVisitForPatient(

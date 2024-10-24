@@ -1,6 +1,5 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { of, throwError } from 'rxjs';
 import { render, screen } from '@testing-library/react';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import userEvent from '@testing-library/user-event';
@@ -256,16 +255,14 @@ describe('Visit form', () => {
   it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 
@@ -324,17 +321,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '183299');
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ uuid: string; visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -394,17 +389,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '1873290');
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -467,17 +460,15 @@ describe('Visit form', () => {
     const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
     await user.clear(insuranceNumberInput);
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -512,7 +503,8 @@ describe('Visit form', () => {
 
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
-    mockSaveVisit.mockReturnValue(throwError(() => ({ status: 500, statusText: 'Internal server error' })));
+
+    mockSaveVisit.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
 
     renderVisitForm();
 
@@ -576,16 +568,14 @@ describe('Visit form', () => {
       ],
     });
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 
