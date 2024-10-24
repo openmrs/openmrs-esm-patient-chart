@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
+import useSWRImmutable from 'swr/immutable';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type DrugOrderBasketItem } from '../types';
-import useSWRImmutable from 'swr/immutable';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -22,7 +23,7 @@ export function usePatientOrders(patientUuid: string) {
     'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true&excludeCanceledAndExpired=true`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true&excludeCanceledAndExpired=false`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -62,10 +63,7 @@ export function useActivePatientOrders(patientUuid: string) {
   const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
 
   const activeOrders = useMemo(
-    () =>
-      allOrders
-        ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped && order.action !== 'DISCONTINUE')
-        : null,
+    () => (allOrders ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped) : null),
     [allOrders],
   );
 
@@ -84,34 +82,22 @@ export function useActivePatientOrders(patientUuid: string) {
  * @param patientUuid The UUID of the patient whose past orders should be fetched.
  */
 export function usePastPatientOrders(patientUuid: string) {
-  const {
-    data: allOrders,
-    error: allOrdersError,
-    isLoading: allOrdersLoading,
-    isValidating: allOrdersValidating,
-  } = usePatientOrders(patientUuid);
-  const {
-    data: activeOrders,
-    error: activeOrdersError,
-    isLoading: activeOrdersLoading,
-    isValidating: activeOrdersValidating,
-  } = useActivePatientOrders(patientUuid);
+  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
+  const { data: activeOrders } = useActivePatientOrders(patientUuid);
 
-  const pastOrders = useMemo(() => {
-    if (!allOrders || !activeOrders) return null;
-    return allOrders.filter((order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid));
-  }, [allOrders, activeOrders]);
+  const activeOrderUUIDs = useMemo(() => activeOrders?.map((order) => order.uuid) || [], [activeOrders]);
 
-  const error = allOrdersError || activeOrdersError;
-  const isLoading = allOrdersLoading || activeOrdersLoading;
-  const isValidating = allOrdersValidating || activeOrdersValidating;
+  const pastOrders = useMemo(
+    () => (allOrders && activeOrderUUIDs ? allOrders.filter((order) => !activeOrderUUIDs.includes(order.uuid)) : null),
+    [allOrders, activeOrderUUIDs],
+  );
 
   return {
     data: pastOrders,
     error,
     isLoading,
     isValidating,
-    mutate: () => {},
+    mutate,
   };
 }
 
