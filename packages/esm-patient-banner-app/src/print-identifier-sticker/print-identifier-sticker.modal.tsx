@@ -2,7 +2,18 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, NumberInput, Stack } from '@carbon/react';
+import {
+  Button,
+  InlineLoading,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  NumberInput,
+  Stack,
+  Grid,
+  Column,
+  Toggle,
+} from '@carbon/react';
 import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
@@ -17,6 +28,7 @@ interface PrintIdentifierStickerProps {
 interface PrintMultipleStickersComponentProps extends Partial<ConfigObject> {
   pageSize: string;
   multipleStickers: {
+    enabled: boolean;
     totalStickers: number;
     stickerColumnsPerPage: number;
     stickerRowsPerPage: number;
@@ -130,6 +142,7 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
     );
     const [numberOfLabels, setNumberOfLabels] = useState<number>(multipleStickers.totalStickers);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+    const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(multipleStickers.enabled);
 
     const labels = Array.from({ length: numberOfLabels });
 
@@ -163,46 +176,68 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
       return;
     }
 
+    const handleOnToggle = (value: boolean) => {
+      const FormCollapseToggleEvent = new CustomEvent('openmrs:form-collapse-toggle', { detail: { value } });
+      window.dispatchEvent(FormCollapseToggleEvent);
+    };
+
     return (
       <Stack gap={5}>
         <PrintComponent patient={patient} />
-        <div className={styles.multipleStickerInputs}>
-          <NumberInput
-            hideSteppers
-            id="numberOfColumnsInput"
-            label={t('numberOfLabelColumnsPage', 'No. of patient ID sticker columns')}
-            min={1}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setNumberOfLabelColumnsPage(parseInt(event.target.value || '1'))
-            }
-            value={numberOfLabelColumnsPage}
-          />
-          <NumberInput
-            hideSteppers
-            id="numberOfRowsPerPageInput"
-            label={t('numberOfLabelRowsPerPage', 'No. of patient ID sticker rows per page')}
-            min={1}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setNumberOfLabelRowsPerPage(parseInt(event.target.value || '1'))
-            }
-            value={numberOfLabelRowsPerPage}
-          />
-          <NumberInput
-            hideSteppers
-            id="numberOfLabels"
-            label={t('numberOfLabels', 'No. of patient ID stickers')}
-            min={1}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setNumberOfLabels(parseInt(event.target.value || '1'))
-            }
-            value={numberOfLabels}
-          />
-        </div>
-        <span>
-          <Button kind="ghost" onClick={() => setIsPreviewVisible(!isPreviewVisible)}>
-            {!isPreviewVisible ? t('showPreview', 'Show preview') : t('hidePreview', 'Hide preview')}
-          </Button>
-        </span>
+        <Grid className={styles.gridContainer}>
+          <Column lg={6} md={8} sm={4}>
+            <Toggle
+              className={styles.multipleStickerToggle}
+              size="sm"
+              labelText={t('printMultipleStickers', 'Print multiple stickers')}
+              id="print-multiple-stickers-toggle"
+              labelA=""
+              labelB=""
+              onToggle={() => setIsMultipleStickersEnabled(!isMultipleStickersEnabled)}
+            />
+          </Column>
+          <Column lg={10} md={8} sm={4} className={!isMultipleStickersEnabled ? styles.hidePreviewContainer : ''}>
+            <div className={styles.multipleStickerInputs}>
+              <NumberInput
+                hideSteppers
+                id="columnsPerPageInput"
+                label={t('columnsPerPage', 'Columns per page')}
+                min={1}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setNumberOfLabelColumnsPage(parseInt(event.target.value || '1'))
+                }
+                value={numberOfLabelColumnsPage}
+              />
+              <NumberInput
+                hideSteppers
+                id="rowsPerPageInput"
+                label={t('rowsPerPage', 'Rows per page')}
+                min={1}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setNumberOfLabelRowsPerPage(parseInt(event.target.value || '1'))
+                }
+                value={numberOfLabelRowsPerPage}
+              />
+              <NumberInput
+                hideSteppers
+                id="totalNumberInput"
+                label={t('totalNumber', 'Total number')}
+                min={1}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setNumberOfLabels(parseInt(event.target.value || '1'))
+                }
+                value={numberOfLabels}
+              />
+            </div>
+            <Button
+              className={styles.previewButton}
+              kind="ghost"
+              onClick={() => setIsPreviewVisible(!isPreviewVisible)}
+            >
+              {!isPreviewVisible ? t('showPreview', 'Show preview') : t('hidePreview', 'Hide preview')}
+            </Button>
+          </Column>
+        </Grid>
         <div className={classNames(styles.previewContainer, !isPreviewVisible ? styles.hidePreviewContainer : '')}>
           <div ref={divRef} className={styles.printRoot}>
             {pages.map((pageLabels, pageIndex) => (

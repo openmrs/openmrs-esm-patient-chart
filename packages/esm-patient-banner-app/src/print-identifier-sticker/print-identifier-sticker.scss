@@ -1,11 +1,16 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/_vars' as *;
+@use '@carbon/colors';
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
   height: var(--omrs-print-label-sticker-height, auto);
   width: var(--omrs-print-label-sticker-width, auto);
+}
+
+.gridContainer {
+  padding-left: 0rem;
 }
 
 .documentHeader {
@@ -67,6 +72,16 @@
   margin-inline-end: layout.$spacing-03;
 }
 
+.multipleStickerToggle {
+  :global(.cds--toggle__label-text) {
+    @include type.type-style('heading-03');
+    font-weight: 700;
+  }
+  :global(.cds--toggle__switch--checked) {
+    background-color: colors.$green-50;
+  }
+}
+
 .patientDetail {
   @include type.type-style('heading-03');
 }
@@ -109,7 +124,6 @@
 
     .pageBreak {
       page-break-after: always;
-      // page-break-inside: avoid;
     }
   }
 
@@ -135,7 +149,9 @@
 
 .multipleStickerInputs {
   display: flex;
-  margin-left: 1rem;
   gap: 1rem;
-  align-items: center;
+}
+
+.previewButton {
+  margin-top: 1rem;
 }
