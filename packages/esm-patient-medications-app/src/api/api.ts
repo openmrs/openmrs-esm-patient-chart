@@ -12,7 +12,6 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  * SWR-based data fetcher for patient orders.
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
- * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig() as ConfigObject;
@@ -23,7 +22,7 @@ export function usePatientOrders(patientUuid: string) {
     'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true&excludeCanceledAndExpired=true`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -51,6 +50,51 @@ export function usePatientOrders(patientUuid: string) {
     isLoading,
     isValidating,
     mutate: mutateOrders,
+  };
+}
+
+/**
+ * Hook to get active patient orders.
+ *
+ * @param patientUuid The UUID of the patient whose active orders should be fetched.
+ */
+export function useActivePatientOrders(patientUuid: string) {
+  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
+
+  const activeOrders = useMemo(
+    () => (allOrders ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped) : null),
+    [allOrders],
+  );
+
+  return {
+    data: activeOrders,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+}
+
+/**
+ * Hook to get past patient orders.
+ *
+ * @param patientUuid The UUID of the patient whose past orders should be fetched.
+ */
+export function usePastPatientOrders(patientUuid: string) {
+  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
+  const { data: activeOrders } = useActivePatientOrders(patientUuid);
+
+  const pastOrders = useMemo(
+    () => (allOrders && activeOrders ? allOrders.filter((order) => !activeOrders.includes(order)) : null),
+    [allOrders, activeOrders],
+  );
+
+  return {
+    data: pastOrders,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
   };
 }
 
@@ -153,7 +197,7 @@ export function useRequireOutpatientQuantity(): {
 
   const results = useMemo(
     () => ({
-      requireOutpatientQuantity: data?.data?.value && data.data.value === 'true',
+      requireOutpatientQuantity: data?.data?.value === 'true',
       error,
       isLoading,
     }),
