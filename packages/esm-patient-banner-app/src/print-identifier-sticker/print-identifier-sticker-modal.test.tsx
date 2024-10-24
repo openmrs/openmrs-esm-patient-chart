@@ -60,7 +60,7 @@ describe('PrintIdentifierStickerModal', () => {
 
     renderPrintIdentifierStickerModal();
 
-    expect(screen.getByTestId('barcode')).toBeInTheDocument();
+    expect(screen.getAllByTestId('barcode')[0]).toBeInTheDocument();
     expect(Barcode).toHaveBeenCalledWith(
       {
         value: '100008E',
@@ -76,7 +76,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
       {},
     );
-    expect(screen.getByTestId('openmrs-logo')).toBeInTheDocument();
+    expect(screen.getAllByTestId('openmrs-logo')[0]).toBeInTheDocument();
   });
 
   it("should not render a barcode if it's disabled via config", async () => {
@@ -113,16 +113,16 @@ describe('PrintIdentifierStickerModal', () => {
 
     renderPrintIdentifierStickerModal();
 
-    expect(screen.getByRole('img')).toHaveAttribute('src', '/openmrs/spa/logo.png');
+    expect(screen.getAllByRole('img')[0]).toHaveAttribute('src', '/openmrs/spa/logo.png');
   });
 
   it("renders the patient's details in the print modal", () => {
     renderPrintIdentifierStickerModal();
 
-    expect(getByTextWithMarkup(/Joshua Johnson/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/\+255777053243/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/100008E/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(age(mockFhirPatient.birthDate))).toBeInTheDocument();
+    expect(screen.getAllByText(/Joshua Johnson/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/\+255777053243/di)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });
 });
 

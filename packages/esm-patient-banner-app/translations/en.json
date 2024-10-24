@@ -3,9 +3,11 @@
   "address2": "Address line 2",
   "city": "City",
   "cityVillage": "city",
+  "columnsPerPage": "Columns per page",
   "country": "Country",
   "countyDistrict": "District",
   "district": "District",
+  "hidePreview": "Hide preview",
   "implementationLogo": "Implementation logo",
   "patientAge": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
@@ -14,7 +16,11 @@
   "patientNameWithSeparator": "Patient name:",
   "postalCode": "Postal code",
   "printIdentifierSticker": "Print identifier sticker",
+  "printMultipleStickers": "Print multiple stickers",
+  "rowsPerPage": "Rows per page",
+  "showPreview": "Show preview",
   "state": "State",
   "stateProvince": "State",
-  "telephoneNumberWithSeparator": "Telephone number:"
+  "telephoneNumberWithSeparator": "Telephone number:",
+  "totalNumber": "Total number"
 }
