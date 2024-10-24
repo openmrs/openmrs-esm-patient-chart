@@ -62,7 +62,10 @@ export function useActivePatientOrders(patientUuid: string) {
   const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
 
   const activeOrders = useMemo(
-    () => (allOrders ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped) : null),
+    () =>
+      allOrders
+        ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped && order.action !== 'DISCONTINUE')
+        : null,
     [allOrders],
   );
 
@@ -81,20 +84,34 @@ export function useActivePatientOrders(patientUuid: string) {
  * @param patientUuid The UUID of the patient whose past orders should be fetched.
  */
 export function usePastPatientOrders(patientUuid: string) {
-  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
-  const { data: activeOrders } = useActivePatientOrders(patientUuid);
+  const {
+    data: allOrders,
+    error: allOrdersError,
+    isLoading: allOrdersLoading,
+    isValidating: allOrdersValidating,
+  } = usePatientOrders(patientUuid);
+  const {
+    data: activeOrders,
+    error: activeOrdersError,
+    isLoading: activeOrdersLoading,
+    isValidating: activeOrdersValidating,
+  } = useActivePatientOrders(patientUuid);
 
-  const pastOrders = useMemo(
-    () => (allOrders && activeOrders ? allOrders.filter((order) => !activeOrders.includes(order)) : null),
-    [allOrders, activeOrders],
-  );
+  const pastOrders = useMemo(() => {
+    if (!allOrders || !activeOrders) return null;
+    return allOrders.filter((order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid));
+  }, [allOrders, activeOrders]);
+
+  const error = allOrdersError || activeOrdersError;
+  const isLoading = allOrdersLoading || activeOrdersLoading;
+  const isValidating = allOrdersValidating || activeOrdersValidating;
 
   return {
     data: pastOrders,
     error,
     isLoading,
     isValidating,
-    mutate,
+    mutate: () => {},
   };
 }
 
