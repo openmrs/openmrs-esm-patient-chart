@@ -81,7 +81,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       event.preventDefault();
 
       const sanitizedFileName = allowedExtensions.reduce((name, ext) => {
-        const regex = new RegExp(`(${ext})+$`, 'i');
+        const regex = new RegExp(`\\.(${ext})+$`, 'i');
         return name.replace(regex, '');
       }, fileName);
 
