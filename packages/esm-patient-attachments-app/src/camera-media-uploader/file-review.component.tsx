@@ -70,6 +70,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   clearData,
 }) => {
   const { t } = useTranslation();
+  const { allowedExtensions } = useContext(CameraMediaUploaderContext);
   const fileExtension = uploadedFile.fileName.match(/\.[^\\/.]+$/)?.[0] || '';
   const [fileName, setFileName] = useState(uploadedFile.fileName.replace(/\.[^\\/.]+$/, ''));
   const [fileDescription, setFileDescription] = useState(uploadedFile.fileDescription);
@@ -78,13 +79,19 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   const saveImageOrPdf = useCallback(
     (event: SyntheticEvent) => {
       event.preventDefault();
+
+      const sanitizedFileName = allowedExtensions.reduce((name, ext) => {
+        const regex = new RegExp(`(${ext})+$`, 'i');
+        return name.replace(regex, '');
+      }, fileName);
+
       onSaveFile?.({
         ...uploadedFile,
-        fileName: `${fileName}${fileExtension}`,
+        fileName: `${sanitizedFileName}${fileExtension}`,
         fileDescription,
       });
     },
-    [onSaveFile, fileName, fileExtension, fileDescription, uploadedFile],
+    [onSaveFile, fileName, fileExtension, allowedExtensions, fileDescription, uploadedFile],
   );
 
   const cancelCapture = useCallback(
