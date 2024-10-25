@@ -103,6 +103,7 @@
 .additionalInfoContainer {
   padding: layout.$spacing-05 0;
   display: flex;
+  flex-flow: row;
   justify-content: start;
   align-items: center;
   gap: layout.$spacing-05;

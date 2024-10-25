@@ -3,9 +3,23 @@
 .itemInStock {
   color: $support-02;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .itemInStockIcon {
+    fill: $support-02;
+  }
 }
 
 .itemOutOfStock {
   color: $danger;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .itemOutOfStockIcon {
+    fill: $danger;
+  }
 }

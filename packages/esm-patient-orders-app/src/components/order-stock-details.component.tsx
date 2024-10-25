@@ -29,11 +29,11 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     <div>
       {isInStock ? (
         <div className={styles.itemInStock}>
-          <CheckmarkFilledIcon size={16} /> {t('inStock', 'In Stock')}
+          <CheckmarkFilledIcon size={16} className={styles.itemInStockIcon} /> {t('inStock', 'In Stock')}
         </div>
       ) : (
         <div className={styles.itemOutOfStock}>
-          <CloseFilledIcon size={16} /> {t('outOfStock', 'Out of Stock')}
+          <CloseFilledIcon size={16} className={styles.itemOutOfStockIcon} /> {t('outOfStock', 'Out of Stock')}
         </div>
       )}
     </div>

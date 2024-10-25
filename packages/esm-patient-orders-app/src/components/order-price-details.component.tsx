@@ -41,7 +41,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
         )}
       >
         <button className={styles.priceToolTipTrigger} type="button">
-          <InformationIcon />
+          <InformationIcon size={16} />
         </button>
       </Tooltip>
     </div>
