@@ -74,7 +74,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     } else if (vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14) {
       overdueVitalsTagContent = (
         <Trans i18nKey="overOneWeekOldVitals">
-          <span>These vitals are</span>
+          <span>
+            These vitals are <strong>over one week old</strong>
+          </span>
         </Trans>
       );
     } else {
