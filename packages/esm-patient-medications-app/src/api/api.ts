@@ -62,10 +62,7 @@ export function usePatientOrders(patientUuid: string) {
 export function useActivePatientOrders(patientUuid: string) {
   const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
 
-  const activeOrders = useMemo(
-    () => (allOrders ? allOrders.filter((order) => !order.autoExpireDate && !order.dateStopped) : null),
-    [allOrders],
-  );
+  const activeOrders = allOrders;
 
   return {
     data: activeOrders,
@@ -81,16 +78,22 @@ export function useActivePatientOrders(patientUuid: string) {
  *
  * @param patientUuid The UUID of the patient whose past orders should be fetched.
  */
+/**
+ * Hook to get past patient orders.
+ *
+ * @param patientUuid The UUID of the patient whose past orders should be fetched.
+ */
 export function usePastPatientOrders(patientUuid: string) {
   const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
   const { data: activeOrders } = useActivePatientOrders(patientUuid);
 
-  const activeOrderUUIDs = useMemo(() => activeOrders?.map((order) => order.uuid) || [], [activeOrders]);
+  const activeOrderUUIDs = useMemo(() => {
+    return activeOrders?.map((order) => order.uuid) || [];
+  }, [activeOrders]);
 
-  const pastOrders = useMemo(
-    () => (allOrders && activeOrderUUIDs ? allOrders.filter((order) => !activeOrderUUIDs.includes(order.uuid)) : null),
-    [allOrders, activeOrderUUIDs],
-  );
+  const pastOrders = useMemo(() => {
+    return allOrders ? allOrders.filter((order) => !activeOrderUUIDs.includes(order.uuid)) : [];
+  }, [allOrders, activeOrderUUIDs]);
 
   return {
     data: pastOrders,
