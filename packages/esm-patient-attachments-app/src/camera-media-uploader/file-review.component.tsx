@@ -80,10 +80,10 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     (event: SyntheticEvent) => {
       event.preventDefault();
 
-      const sanitizedFileName = allowedExtensions.reduce((name, ext) => {
+      const sanitizedFileName = allowedExtensions?.reduce((name, ext) => {
         const regex = new RegExp(`\\.(${ext})+$`, 'i');
         return name.replace(regex, '');
-      }, fileName);
+      }, fileName) || fileName;
 
       onSaveFile?.({
         ...uploadedFile,
