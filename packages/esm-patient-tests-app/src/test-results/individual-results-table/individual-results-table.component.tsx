@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ArrowRightIcon, showModal, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import { ArrowRightIcon, showModal, useLayoutType, isDesktop, formatDate } from '@openmrs/esm-framework';
 import { getPatientUuidFromStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import styles from './individual-results-table.scss';
 import { type GroupedObservation } from '../../types';
@@ -124,7 +124,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
             <div className={styles.cardTitle}>
               <h4 className={styles.resultType}>{headerTitle}</h4>
               <div className={styles.displayFlex}>
-                <span className={styles.date}>{subRows.date ?? ''}</span>
+                <span className={styles.date}>{formatDate(new Date(subRows.date), { mode: 'standard' })}</span>
                 <Button
                   className={styles.viewTimeline}
                   iconDescription="view timeline"

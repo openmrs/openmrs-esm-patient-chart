@@ -41,7 +41,7 @@ describe('IndividualResultsTable', () => {
   it('renders a tabular overview of the available test result data', () => {
     render(<IndividualResultsTable isLoading={false} subRows={mockSubRows} index={0} title={'HIV viral load'} />);
 
-    expect(screen.getByText(/2024-10-15/i)).toBeInTheDocument();
+    expect(screen.getByText(/15-Oct-2024/i)).toBeInTheDocument();
     expect(screen.getByText(/test name/i)).toBeInTheDocument();
     expect(screen.getByText(/reference range/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /view timeline/i })).toBeInTheDocument();
