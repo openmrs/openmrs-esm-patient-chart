@@ -104,7 +104,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
-              {(medication.dateStopped || medication.autoExpireDate) && medication.action === 'DISCONTINUE' && (
+              {(medication.dateStopped || medication.autoExpireDate) && (
                 <Tooltip
                   align="top"
                   label={
