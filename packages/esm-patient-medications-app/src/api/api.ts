@@ -18,6 +18,18 @@ const customRepresentation =
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
 /**
+ * Sorts orders by date activated in descending order.
+ *
+ * @param orders The orders to sort.
+ * @returns The sorted orders.
+ */
+function sortOrdersByDateActivated(orders: any[]) {
+  return orders?.sort(
+    (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
+  );
+}
+
+/**
  * SWR-based data fetcher for patient orders.
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
@@ -40,9 +52,7 @@ export function usePatientOrders(patientUuid: string) {
   const drugOrders = useMemo(
     () =>
       data?.data?.results
-        ? data.data.results
-            .filter((order) => order.orderType.display === 'Drug Order')
-            ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
+        ? sortOrdersByDateActivated(data.data.results.filter((order) => order.orderType.display === 'Drug Order'))
         : null,
     [data],
   );
@@ -75,8 +85,13 @@ export function useActivePatientOrders(patientUuid: string) {
     openmrsFetch,
   );
 
+  const activeOrders = useMemo(
+    () => (data?.data?.results ? sortOrdersByDateActivated(data.data.results) : null),
+    [data],
+  );
+
   return {
-    data: data?.data?.results,
+    data: activeOrders,
     error,
     isLoading,
     isValidating,
@@ -89,22 +104,20 @@ export function useActivePatientOrders(patientUuid: string) {
  *
  * @param patientUuid The UUID of the patient whose past orders should be fetched.
  */
-/**
- * Hook to get past patient orders.
- *
- * @param patientUuid The UUID of the patient whose past orders should be fetched.
- */
 export function usePastPatientOrders(patientUuid: string) {
   const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
   const { data: activeOrders } = useActivePatientOrders(patientUuid);
 
-  const activeOrderUUIDs = useMemo(() => {
-    return activeOrders?.map((order) => order.uuid) || [];
-  }, [activeOrders]);
-
   const pastOrders = useMemo(() => {
-    return allOrders ? allOrders.filter((order) => !activeOrderUUIDs.includes(order.uuid)) : [];
-  }, [allOrders, activeOrderUUIDs]);
+    if (!allOrders || !activeOrders) {
+      return [];
+    }
+
+    const filteredDrugOrders = allOrders.filter(
+      (order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid),
+    );
+    return sortOrdersByDateActivated(filteredDrugOrders);
+  }, [allOrders, activeOrders]);
 
   return {
     data: pastOrders,
@@ -214,7 +227,7 @@ export function useRequireOutpatientQuantity(): {
 
   const results = useMemo(
     () => ({
-      requireOutpatientQuantity: data?.data?.value === 'true',
+      requireOutpatientQuantity: data?.data?.value && data.data.value === 'true',
       error,
       isLoading,
     }),
