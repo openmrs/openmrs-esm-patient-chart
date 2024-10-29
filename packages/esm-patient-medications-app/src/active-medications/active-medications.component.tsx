@@ -12,7 +12,7 @@ interface ActiveMedicationsProps {
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
-  const headerTitle = t('activeMedicationsHeaderTitle', 'Active Medications');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
 
@@ -22,20 +22,12 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
 
   if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
-  const activeMedications = activePatientOrders?.filter((order) => {
-    const isDateStoppedUnset = !order.dateStopped;
-    const isActionValid = order.action !== 'DISCONTINUE';
-    const isAutoExpireDateValid = !order.autoExpireDate || new Date(order.autoExpireDate) > new Date();
-
-    return isDateStoppedUnset && isActionValid && isAutoExpireDateValid;
-  });
-
-  if (activeMedications?.length) {
+  if (activePatientOrders?.length) {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
         title={t('activeMedicationsTableTitle', 'Active Medications')}
-        medications={activeMedications}
+        medications={activePatientOrders}
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}

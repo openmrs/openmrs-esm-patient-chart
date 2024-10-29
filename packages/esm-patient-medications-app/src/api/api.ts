@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type DrugOrderBasketItem } from '../types';
@@ -49,13 +48,7 @@ export function usePatientOrders(patientUuid: string) {
     [patientUuid],
   );
 
-  const drugOrders = useMemo(
-    () =>
-      data?.data?.results
-        ? sortOrdersByDateActivated(data.data.results.filter((order) => order.orderType.display === 'Drug Order'))
-        : null,
-    [data],
-  );
+  const drugOrders = useMemo(() => (data?.data?.results ? sortOrdersByDateActivated(data.data.results) : null), [data]);
 
   return {
     data: data ? drugOrders : null,
