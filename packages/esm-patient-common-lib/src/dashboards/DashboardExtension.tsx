@@ -3,8 +3,21 @@ import classNames from 'classnames';
 import last from 'lodash-es/last';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { ConfigurableLink , ActivityIcon } from '@openmrs/esm-framework';
-import styles from './dashboardextension.scss';
+import {
+  ConfigurableLink,
+  ActivityIcon,
+  ShoppingCartIcon,
+  MedicationIcon,
+  ChartAverageIcon,
+  CalendarHeatMapIcon,
+  WarningIcon,
+  ListCheckedIcon,
+  DocumentAttachmentIcon,
+  TableIcon,
+  EventScheduleIcon,
+} from '@openmrs/esm-framework';
+import { Report } from '@carbon/react/icons';
+import styles from './dashboard-extension.scss';
 
 export interface DashboardExtensionProps {
   path: string;
@@ -23,16 +36,36 @@ export const DashboardExtension = ({
   const location = useLocation();
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
-  const menuIcon = (title) => {
-    switch(title){
+  const menuIcon = (title: string) => {
+    switch (title) {
+      case 'Patient Summary':
+        return <Report className={styles.icon} />;
       case 'Vitals & Biometrics':
-        return <ActivityIcon className={styles.icon}/>;
+        return <ActivityIcon className={styles.icon} />;
+      case 'Orders':
+        return <ShoppingCartIcon className={styles.icon} />;
+      case 'Medications':
+        return <MedicationIcon className={styles.icon} />;
+      case 'Results':
+        return <ChartAverageIcon className={styles.icon} />;
+      case 'Visits':
+        return <CalendarHeatMapIcon className={styles.icon} />;
+      case 'Allergies':
+        return <WarningIcon className={styles.icon} />;
+      case 'Conditions':
+        return <ListCheckedIcon className={styles.icon} />;
+      case 'Attachments':
+        return <DocumentAttachmentIcon className={styles.icon} />;
+      case 'Programs':
+        return <TableIcon className={styles.icon} />;
+      case 'Appointments':
+        return <EventScheduleIcon className={styles.icon} />;
       default:
         return null;
     }
-  }
+  };
 
-  const renderIcon = menuIcon(title)
+  const renderIcon = menuIcon(title);
 
   return (
     <div key={path}>
