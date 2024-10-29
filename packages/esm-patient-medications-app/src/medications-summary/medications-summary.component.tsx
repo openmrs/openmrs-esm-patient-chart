@@ -18,15 +18,15 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
   const {
     data: activeOrders,
     error: activeOrdersError,
-    isLoading: isActiveLoading,
-    isValidating: isActiveValidating,
+    isLoading: isLoadingActiveOrders,
+    isValidating: isValidatingActiveOrders,
   } = useActivePatientOrders(patient?.id);
 
   const {
     data: pastOrders,
     error: pastOrdersError,
-    isLoading: isPastLoading,
-    isValidating: isPastValidating,
+    isLoading: isLoadingPastOrders,
+    isValidating: isValidatingPastOrders,
   } = usePastPatientOrders(patient?.id);
 
   return (
@@ -34,16 +34,16 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
       <div style={{ marginBottom: '1.5rem' }}>
         {(() => {
           const displayText = t('activeMedicationsDisplayText', 'Active medications');
-          const headerTitle = t('activeMedicationsHeaderTitle', 'Active Medications');
+          const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-          if (isActiveLoading) return <DataTableSkeleton role="progressbar" />;
+          if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
 
           if (activeOrdersError) return <ErrorState error={activeOrdersError} headerTitle={headerTitle} />;
 
           if (activeOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isActiveValidating}
+                isValidating={isValidatingActiveOrders}
                 title={t('activeMedicationsTableTitle', 'Active Medications')}
                 medications={activeOrders}
                 showDiscontinueButton={true}
@@ -62,14 +62,14 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
           const headerTitle = t('pastMedicationsHeaderTitle', 'Past Medications');
 
-          if (isPastLoading) return <DataTableSkeleton role="progressbar" />;
+          if (isValidatingPastOrders) return <DataTableSkeleton role="progressbar" />;
 
           if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
 
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isPastValidating}
+                isValidating={isValidatingPastOrders}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
                 showDiscontinueButton={false}

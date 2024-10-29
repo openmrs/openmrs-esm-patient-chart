@@ -36,7 +36,7 @@ function sortOrdersByDateActivated(orders: any[]) {
 export function usePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig() as ConfigObject;
 
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=false`;
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -48,7 +48,7 @@ export function usePatientOrders(patientUuid: string) {
     [patientUuid],
   );
 
-  const drugOrders = useMemo(() => (data?.data?.results ? sortOrdersByDateActivated(data.data.results) : null), [data]);
+  const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
 
   return {
     data: data ? drugOrders : null,
@@ -78,10 +78,7 @@ export function useActivePatientOrders(patientUuid: string) {
     openmrsFetch,
   );
 
-  const activeOrders = useMemo(
-    () => (data?.data?.results ? sortOrdersByDateActivated(data.data.results) : null),
-    [data],
-  );
+  const activeOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
 
   return {
     data: activeOrders,
