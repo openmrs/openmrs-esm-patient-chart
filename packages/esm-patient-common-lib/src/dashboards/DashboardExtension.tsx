@@ -26,7 +26,9 @@ export const DashboardExtension = ({
   const menuIcon = (title) => {
     switch(title){
       case 'Vitals & Biometrics':
-        return <ActivityIcon className={styles.icon}/>
+        return <ActivityIcon className={styles.icon}/>;
+      default:
+        return null;
     }
   }
 
