@@ -73,9 +73,6 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: mockSetTitle,
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 mockUseConfig.mockReturnValue({

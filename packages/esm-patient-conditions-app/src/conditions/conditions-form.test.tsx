@@ -19,9 +19,6 @@ const defaultProps = {
   promptBeforeClosing: jest.fn(),
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 function renderConditionsForm(props = {}) {

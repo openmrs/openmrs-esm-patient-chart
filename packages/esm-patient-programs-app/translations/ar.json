@@ -7,6 +7,7 @@
   "cancel": "إلغاء",
   "carePrograms": "برامج الرعاية",
   "chooseProgram": "اختر برنامجًا",
+  "chooseStatus": "Choose a program status",
   "completedOn": "أكتمل في",
   "configurePrograms": "يرجى تكوين البرامج للمتابعة.",
   "dateCompleted": "تاريخ الاكتمال",
@@ -28,8 +29,10 @@
   "programRequired": "Program is required",
   "programs": "تسجيلات البرنامج",
   "Programs": "البرامج",
+  "programStatus": "Program status",
   "saveAndClose": "حفظ وإغلاق",
   "saving": "Saving",
   "seeAll": "عرض الكل",
+  "state": "State",
   "status": "الحالة"
 }

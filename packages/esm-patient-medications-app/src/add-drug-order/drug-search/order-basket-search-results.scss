@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -5,22 +6,6 @@
 /** For OrderBasketSearchResults */
 .container {
   margin: layout.$spacing-03 layout.$spacing-05 0;
-}
-
-.divider {
-  border: 0;
-  border-top: 1px solid $color-gray-30;
-  width: 66%;
-}
-
-.desktopDivider {
-  margin: layout.$spacing-07 auto layout.$spacing-05;
-  padding-bottom: 8rem;
-}
-
-.tabletDivider {
-  margin: layout.$spacing-08 auto 0;
-  padding-bottom: layout.$spacing-08;
 }
 
 .searchResultsCount {
@@ -36,7 +21,6 @@
 }
 
 /** For DrugSearchResultItem */
-
 .searchResultTile {
   padding: 0;
   display: flex;
@@ -63,6 +47,10 @@
   padding: 0 layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
+
+  svg {
+    fill: currentColor !important;
+  }
 }
 
 .errorLabel {

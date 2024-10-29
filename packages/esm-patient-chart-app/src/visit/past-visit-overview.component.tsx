@@ -12,9 +12,8 @@ import {
   TableCell,
   type DataTableHeader,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { setCurrentVisit } from '@openmrs/esm-framework';
+import { EditIcon, setCurrentVisit } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
@@ -85,14 +84,14 @@ const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, rowIndex) => (
+                  {rows.map((row) => (
                     <TableRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <Button
-                          renderIcon={Edit}
+                          renderIcon={EditIcon}
                           hasIconOnly
                           kind="ghost"
                           iconDescription={t('editThisVisit', 'Edit this visit')}

@@ -1,14 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
-import classNames from 'classnames';
-import debounce from 'lodash-es/debounce';
-import isEmpty from 'lodash-es/isEmpty';
-import { Layer, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton } from '@carbon/react';
+import { Layer, RadioButton, RadioButtonGroup, Search, StructuredListSkeleton, Tile } from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, usePagination, type VisitType } from '@openmrs/esm-framework';
+import { useDebounce, useLayoutType, usePagination, type VisitType } from '@openmrs/esm-framework';
 import { type VisitFormData } from './visit-form.resource';
-import styles from './visit-type-overview.scss';
+import styles from './base-visit-type.scss';
 
 interface BaseVisitTypeProps {
   visitTypes: Array<VisitType>;
@@ -16,21 +14,25 @@ interface BaseVisitTypeProps {
 
 const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
   const { t } = useTranslation();
+  const { control } = useFormContext<VisitFormData>();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const { control } = useFormContext<VisitFormData>();
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const searchResults = useMemo(() => {
-    if (!isEmpty(searchTerm)) {
-      return visitTypes.filter((visitType) => visitType.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1);
-    } else {
+    if (!debouncedSearchTerm.trim()) {
       return visitTypes;
     }
-  }, [searchTerm, visitTypes]);
-
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+    const lowercasedTerm = debouncedSearchTerm.toLowerCase();
+    return visitTypes.filter((visitType) => visitType.display.toLowerCase().includes(lowercasedTerm));
+  }, [debouncedSearchTerm, visitTypes]);
 
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
+  const hasNoMatchingSearchResults = debouncedSearchTerm.trim() !== '' && searchResults.length === 0;
+
+  const handleSearchTermChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  }, []);
 
   return (
     <div className={classNames(styles.visitTypeOverviewWrapper, isTablet ? styles.tablet : styles.desktop)}>
@@ -39,49 +41,63 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
           {isTablet ? (
             <Layer>
               <Search
-                onChange={(event) => handleSearch(event.target.value)}
-                placeholder={t('searchForAVisitType', 'Search for a visit type')}
                 labelText=""
+                onChange={handleSearchTermChange}
+                placeholder={t('searchForAVisitType', 'Search for a visit type')}
               />
             </Layer>
           ) : (
             <Search
-              onChange={(event) => handleSearch(event.target.value)}
-              placeholder={t('searchForAVisitType', 'Search for a visit type')}
               labelText=""
+              onChange={handleSearchTermChange}
+              placeholder={t('searchForAVisitType', 'Search for a visit type')}
             />
           )}
 
-          <Controller
-            name="visitType"
-            control={control}
-            defaultValue={results?.length === 1 ? results[0].uuid : ''}
-            render={({ field: { onChange, value } }) => (
-              <RadioButtonGroup
-                className={styles.radioButtonGroup}
-                orientation="vertical"
-                onChange={onChange}
-                name="radio-button-group"
-                valueSelected={value}
-              >
-                {results.map(({ uuid, display, name }) => (
-                  <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-                ))}
-              </RadioButtonGroup>
-            )}
-          />
-          <div className={styles.paginationContainer}>
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={visitTypes?.length}
-              currentItems={results.length}
-              pageSize={5}
-              onPageNumberChange={({ page }) => goTo(page)}
+          {hasNoMatchingSearchResults ? (
+            <div className={styles.tileContainer}>
+              <Tile className={styles.tile}>
+                <div className={styles.tileContent}>
+                  <p className={styles.content}>{t('noVisitTypesToDisplay', 'No visit types to display')}</p>
+                  <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                </div>
+              </Tile>
+            </div>
+          ) : (
+            <Controller
+              name="visitType"
+              control={control}
+              defaultValue={results?.length === 1 ? results[0].uuid : ''}
+              render={({ field: { onChange, value } }) => (
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  name="visit-types"
+                  onChange={onChange}
+                  orientation="vertical"
+                  valueSelected={value}
+                >
+                  {results.map(({ uuid, display, name }) => (
+                    <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+                  ))}
+                </RadioButtonGroup>
+              )}
             />
-          </div>
+          )}
+
+          {!hasNoMatchingSearchResults && (
+            <div className={styles.paginationContainer}>
+              <PatientChartPagination
+                currentItems={results.length}
+                onPageNumberChange={({ page }) => goTo(page)}
+                pageNumber={currentPage}
+                pageSize={5}
+                totalItems={visitTypes?.length}
+              />
+            </div>
+          )}
         </>
       ) : (
-        <StructuredListSkeleton />
+        <StructuredListSkeleton className={styles.skeleton} />
       )}
     </div>
   );

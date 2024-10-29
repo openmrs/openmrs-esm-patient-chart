@@ -11,9 +11,6 @@ const defaultProps = {
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn,
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 const mockPastVisits = {

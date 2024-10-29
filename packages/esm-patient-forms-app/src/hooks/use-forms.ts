@@ -8,9 +8,9 @@ import {
   userHasAccess,
   useSession,
 } from '@openmrs/esm-framework';
-import { type ListResponse, type Form, type EncounterWithFormRef, type CompletedFormInfo } from '../types';
+import type { ConfigObject } from '../config-schema';
+import type { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
-import { type ConfigObject } from '../config-schema';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
@@ -94,7 +94,8 @@ export function useForms(
   } else {
     formsToDisplay?.sort(
       (formInfo1, formInfo2) =>
-        (formInfo1.lastCompleted ?? MINIMUM_DATE).getDate() - (formInfo2.lastCompleted ?? MINIMUM_DATE).getDate(),
+        (formInfo1.lastCompletedDate ?? MINIMUM_DATE).getDate() -
+        (formInfo2.lastCompletedDate ?? MINIMUM_DATE).getDate(),
     );
   }
 
@@ -113,13 +114,15 @@ function mapToFormCompletedInfo(
 ): Array<CompletedFormInfo> {
   return allForms.map((form) => {
     const associatedEncounters = encounters.filter((encounter) => encounter.form?.uuid === form?.uuid);
-    const lastCompleted =
-      associatedEncounters.length > 0 ? new Date(associatedEncounters?.[0].encounterDatetime) : undefined;
+    const lastCompletedDate =
+      associatedEncounters.length > 0
+        ? new Date(Math.max(...associatedEncounters.map((e) => new Date(e.encounterDatetime).getTime())))
+        : undefined;
 
     return {
       form,
       associatedEncounters,
-      lastCompleted,
+      lastCompletedDate,
     };
   });
 }

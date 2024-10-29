@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Events } from '@carbon/react/icons';
+import { EventsIcon, ActionMenuButton } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { ActionMenuButton } from '@openmrs/esm-framework';
 
 const handleLaunchPatientListsWorkspace = () => launchPatientWorkspace('patient-lists');
 
@@ -11,7 +10,7 @@ function PatientListsActionButton() {
 
   return (
     <ActionMenuButton
-      getIcon={(props) => <Events {...props} />}
+      getIcon={(props: ComponentProps<typeof EventsIcon>) => <EventsIcon {...props} />}
       label={t('patientLists', 'Patient lists')}
       iconDescription={t('patientLists', 'Patient lists')}
       handler={handleLaunchPatientListsWorkspace}

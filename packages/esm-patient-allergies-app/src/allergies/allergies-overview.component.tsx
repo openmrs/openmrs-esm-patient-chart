@@ -13,9 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { AddIcon, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -76,7 +75,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
+            renderIcon={(props) => <AddIcon size={16} {...props} />}
             iconDescription="Add allergies"
             onClick={launchAllergiesForm}
           >

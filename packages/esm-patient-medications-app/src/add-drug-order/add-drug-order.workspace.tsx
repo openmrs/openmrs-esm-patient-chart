@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
-import { useSession } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
@@ -28,6 +27,7 @@ export default function AddDrugOrderWorkspace({
   promptBeforeClosing,
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
@@ -76,17 +76,19 @@ export default function AddDrugOrderWorkspace({
   if (!currentOrder) {
     return (
       <>
-        <div className={styles.backButton}>
-          <Button
-            iconDescription="Return to order basket"
-            kind="ghost"
-            onClick={cancelDrugOrder}
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-            size="sm"
-          >
-            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-          </Button>
-        </div>
+        {!isTablet && (
+          <div className={styles.backButton}>
+            <Button
+              iconDescription="Return to order basket"
+              kind="ghost"
+              onClick={cancelDrugOrder}
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+              size="sm"
+            >
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            </Button>
+          </div>
+        )}
         <DrugSearch openOrderForm={openOrderForm} />
       </>
     );

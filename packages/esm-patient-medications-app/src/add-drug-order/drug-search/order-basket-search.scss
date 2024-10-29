@@ -1,4 +1,6 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 
 .searchPopupContainer {
   position: relative;
@@ -16,6 +18,44 @@
   width: 100%;
   box-shadow: 0 layout.$spacing-01 6px 0 rgba(0, 0, 0, 0.3);
   z-index: 1;
+}
+
+.separator {
+  @include type.type-style('body-01');
+  color: colors.$gray-90;
+  width: 12rem;
+  margin: layout.$spacing-05 auto layout.$spacing-03;
+  overflow: hidden;
+  text-align: center;
+
+  &::before,
+  &::after {
+    background-color: colors.$gray-40;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: layout.$spacing-05;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: layout.$spacing-05;
+    margin-right: -50%;
+  }
+}
+
+.separatorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: layout.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {

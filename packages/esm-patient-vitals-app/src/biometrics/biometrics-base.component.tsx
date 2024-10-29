@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
-import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
+import { Add, Analytics, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { launchVitalsAndBiometricsForm } from '../utils';
@@ -9,8 +9,8 @@ import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../c
 import { type ConfigObject } from '../config-schema';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
-import styles from './biometrics-base.scss';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
+import styles from './biometrics-base.scss';
 
 interface BiometricsBaseProps {
   pageSize: number;
@@ -101,7 +101,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
                 <Table size={16} />
               </IconSwitch>
               <IconSwitch name="chartView" text="Chart view">
-                <ChartLineSmooth size={16} />
+                <Analytics size={16} />
               </IconSwitch>
             </ContentSwitcher>
             <>

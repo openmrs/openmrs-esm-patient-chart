@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart } from '@carbon/react/icons';
+import { ActionMenuButton, ShoppingCartIcon } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { ActionMenuButton } from '@openmrs/esm-framework';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -11,7 +10,7 @@ const OrderBasketActionButton: React.FC = () => {
 
   return (
     <ActionMenuButton
-      getIcon={(props) => <ShoppingCart {...props} />}
+      getIcon={(props: ComponentProps<typeof ShoppingCartIcon>) => <ShoppingCartIcon {...props} />}
       label={t('orderBasket', 'Order basket')}
       iconDescription={t('medications', 'Medications')}
       handler={launchOrderBasket}
