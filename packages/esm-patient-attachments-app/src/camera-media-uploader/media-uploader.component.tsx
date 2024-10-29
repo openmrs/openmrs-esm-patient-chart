@@ -90,12 +90,12 @@ const MediaUploaderComponent = () => {
       <p className="cds--label-description">
         {t('fileUploadSizeConstraints', 'Size limit is {{fileSize}}MB', {
           fileSize: maxFileSize,
-        })}.
-      </p>
-      <p className='cds--label-description'>
-         {t('supportedFiletypes', 'Supported files are {{supportedFiles}}',{
+        })}
+        .{' '}
+        {t('supportedFiletypes', 'Supported files are {{supportedFiles}}', {
           supportedFiles: allowedExtensions?.join(', '),
-          })}.
+        })}
+        .
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
