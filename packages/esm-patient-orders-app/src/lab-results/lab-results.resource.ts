@@ -10,7 +10,7 @@ const labEncounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),' +
   'value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name))))';
 const labConceptRepresentation =
-  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,' +
+  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
@@ -34,6 +34,7 @@ export interface LabOrderConcept {
   lowAbsolute?: NullableNumber;
   lowCritical?: NullableNumber;
   units?: string;
+  allowDecimal?: boolean;
 }
 
 export interface ConceptName {

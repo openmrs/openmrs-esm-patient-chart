@@ -37,6 +37,7 @@ const createSingleConceptSchema = (labOrderConcept: LabOrderConcept) => {
     hiAbsolute: upperLimit,
     lowAbsolute: lowerLimit,
     datatype: { hl7Abbreviation },
+    allowDecimal,
   } = labOrderConcept;
 
   let zodObject: z.ZodType;
@@ -44,7 +45,7 @@ const createSingleConceptSchema = (labOrderConcept: LabOrderConcept) => {
   switch (hl7Abbreviation) {
     // hl7Abbreviation for numeric is NM
     case 'NM':
-      zodObject = createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+      zodObject = createNumericSchema(labOrderConcept, upperLimit, lowerLimit, allowDecimal);
       break;
     default:
       zodObject = z.any();
@@ -81,13 +82,14 @@ const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType => {
     hiAbsolute: upperLimit,
     lowAbsolute: lowerLimit,
     datatype: { hl7Abbreviation },
+    allowDecimal,
   } = labOrderConcept;
 
   switch (hl7Abbreviation) {
     case 'ST':
       return z.string().optional();
     case 'NM':
-      return createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+      return createNumericSchema(labOrderConcept, upperLimit, lowerLimit, allowDecimal);
     default:
       return z.any();
   }
@@ -104,6 +106,7 @@ const createNumericSchema = (
   labOrderConcept: LabOrderConcept,
   upperLimit: number | null | undefined,
   lowerLimit: number | null | undefined,
+  allowDecimal: boolean,
 ): z.ZodType => {
   let baseSchema = z
     .preprocess((val) => {
@@ -117,6 +120,12 @@ const createNumericSchema = (
 
   const hasLowerLimit = lowerLimit !== null && lowerLimit !== undefined;
   const hasUpperLimit = upperLimit !== null && upperLimit !== undefined;
+
+  if (!allowDecimal) {
+    return baseSchema.refine((val) => val === undefined || Number.isInteger(val), {
+      message: `${labOrderConcept.display} should be a whole number`,
+    });
+  }
 
   if (!hasLowerLimit && !hasUpperLimit) {
     return baseSchema;
