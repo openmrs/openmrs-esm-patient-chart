@@ -9,6 +9,7 @@ import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';
 import { useCallback } from 'react';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
+import { usePatientChartStore } from './store/patient-chart-store';
 
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -42,7 +43,7 @@ export function launchPatientChartWithWorkspaceOpen({
 }
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid } = usePatient();
+  const { patientUuid } = usePatientChartStore();
   const { systemVisitEnabled } = useSystemVisitSetting();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 

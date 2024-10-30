@@ -24,6 +24,7 @@ import {
 } from './drug-search.resource';
 import type { DrugOrderBasketItem } from '../../types';
 import styles from './order-basket-search-results.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
@@ -114,8 +115,8 @@ export default function OrderBasketSearchResults({
 const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
-  const patient = usePatient();
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid);
+  const { patientUuid } = usePatientChartStore();
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
     [orders, drug],

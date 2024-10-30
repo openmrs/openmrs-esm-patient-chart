@@ -17,6 +17,7 @@ import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
 import VisitHeader from '../visit-header/visit-header.component';
 import SideMenuPanel from '../side-nav/side-menu.component';
+import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -38,6 +39,17 @@ const PatientChart: React.FC = () => {
   useEffect(() => {
     return () => {
       setCurrentVisit(null, null);
+    };
+  }, [patientUuid]);
+
+  useEffect(() => {
+    getPatientChartStore().setState({
+      patientUuid,
+    });
+    return () => {
+      getPatientChartStore().setState({
+        patientUuid: null,
+      });
     };
   }, [patientUuid]);
 
