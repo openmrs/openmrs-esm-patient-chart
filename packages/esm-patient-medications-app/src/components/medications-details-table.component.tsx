@@ -104,13 +104,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
-              {(medication.dateStopped || medication.autoExpireDate) && (
+              {medication.dateStopped && (
                 <Tooltip
                   align="top"
                   label={
                     <>
                       {t('discontinuedDate', 'Discontinued date').toUpperCase()} &mdash;
-                      {formatDate(new Date(medication.dateStopped || medication.autoExpireDate))}
+                      {formatDate(new Date(medication.dateStopped))}
                     </>
                   }
                 >
