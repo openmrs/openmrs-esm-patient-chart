@@ -10,8 +10,8 @@ const labEncounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),' +
   'value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name))))';
 const labConceptRepresentation =
-  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,' +
-  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
+  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
 type NullableNumber = number | null | undefined;
@@ -33,6 +33,7 @@ export interface LabOrderConcept {
   lowNormal?: NullableNumber;
   lowAbsolute?: NullableNumber;
   lowCritical?: NullableNumber;
+  allowDecimal?: boolean | null;
   units?: string;
 }
 
@@ -126,26 +127,26 @@ export async function updateOrderResult(
   orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
-  const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
+  const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: orderPayload,
+    body: obsPayload,
   });
 
-  if (updateOrderCall.status === 201) {
-    const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+  if (saveEncounter.ok) {
+    const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       signal: abortController.signal,
-      body: obsPayload,
+      body: orderPayload,
     });
 
-    if (saveEncounter.ok) {
+    if (updateOrderCall.status === 201) {
       const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {
