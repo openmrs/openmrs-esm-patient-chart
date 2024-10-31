@@ -1,7 +1,7 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "chartView": "Visualização de Gráfico",
+  "dateAndTime": "Data e hora",
+  "displaying": "Visualizando",
+  "encounterType": "Tipo de consulta",
+  "tableView": "Visualização em Tabela"
 }

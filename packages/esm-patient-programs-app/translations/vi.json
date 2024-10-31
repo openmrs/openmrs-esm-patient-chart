@@ -1,10 +1,10 @@
 {
-  "actions": "Actions",
-  "active": "Active",
+  "actions": "Hành động",
+  "active": "Kích hoạt",
   "activePrograms": "Active programs",
-  "add": "Add",
+  "add": "Thêm",
   "addPrograms": "Add programs",
-  "cancel": "Cancel",
+  "cancel": "Hủy",
   "carePrograms": "Care Programs",
   "chooseProgram": "Choose a program",
   "chooseStatus": "Choose a program status",
@@ -19,7 +19,7 @@
   "enrollmentUpdated": "Program enrollment updated",
   "enrollmentUpdatesNowVisible": "Changes to the program are now visible in the Programs table",
   "fullyEnrolled": "Enrolled in all programs",
-  "location": "Location",
+  "location": "Vị trí",
   "noEligibleEnrollments": "There are no more programs left to enroll this patient in",
   "noProgramsConfigured": "No programs configured",
   "programEnrollments": "Program enrollments",
@@ -28,11 +28,11 @@
   "programName": "Program name",
   "programRequired": "Program is required",
   "programs": "Program enrollments",
-  "Programs": "Programs",
+  "Programs": "Chương trình",
   "programStatus": "Program status",
   "saveAndClose": "Save and close",
-  "saving": "Saving",
+  "saving": "Đang lưu",
   "seeAll": "See all",
   "state": "State",
-  "status": "Status"
+  "status": "Trạng thái"
 }
