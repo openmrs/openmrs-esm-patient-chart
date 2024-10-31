@@ -84,6 +84,7 @@
 
 .patientDetail {
   @include type.type-style('heading-03');
+  text-align: left;
 }
 
 .implementationLogo {
@@ -154,4 +155,14 @@
 
 .previewButton {
   margin-top: 1rem;
+}
+
+.fieldsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1rem;
+}
+
+.fieldRow {
+  display: contents;
 }

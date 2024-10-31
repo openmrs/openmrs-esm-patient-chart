@@ -26,10 +26,16 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
           </div>
         )}
       </div>
-      {printPatientSticker.fields.map((field) => {
-        const Component = getPatientField(field);
-        return <Component key={field} patient={patient} />;
-      })}
+      <div className={styles.fieldsContainer}>
+        {printPatientSticker.fields.map((field) => {
+          const Component = getPatientField(field);
+          return (
+            <div key={field} className={styles.fieldRow}>
+              <Component patient={patient} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -12,7 +12,7 @@ export interface PatientDetailProps {
 export const PatientName: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
-    <div>
+    <div className={styles.fieldRow}>
       <span>
         <strong className={styles.strong}>{t('patientNameWithSeparator', 'Patient name:')}</strong>
       </span>
@@ -24,7 +24,7 @@ export const PatientName: React.FC<PatientDetailProps> = ({ patient }) => {
 export const PatientAge: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
-    <div>
+    <div className={styles.fieldRow}>
       <span>
         <strong className={styles.strong}>{t('patientAge', 'Age:')}</strong>
       </span>
@@ -36,7 +36,7 @@ export const PatientAge: React.FC<PatientDetailProps> = ({ patient }) => {
 export const PatientDob: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
-    <div>
+    <div className={styles.fieldRow}>
       <span>
         <strong className={styles.strong}>{t('patientDateOfBirthWithSeparator', 'Date of birth:')}</strong>
       </span>
@@ -62,7 +62,7 @@ export const PatientGender: React.FC<PatientDetailProps> = ({ patient }) => {
     }
   };
   return (
-    <div>
+    <div className={styles.fieldRow}>
       <span>
         <strong className={styles.strong}>{t('patientGenderWithSeparator', 'Gender:')}</strong>
       </span>
@@ -79,9 +79,9 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
       ? patient.identifier
       : patient.identifier?.filter((identifier) => identifiersToDisplay.includes(identifier.type.coding[0].code));
   return (
-    <div>
+    <div className={styles.fieldRow}>
       {patientIdentifiers?.map((identifier) => (
-        <div key={identifier.id}>
+        <div key={identifier.id} className={styles.fieldRow}>
           <span>
             <strong className={styles.strong}>{identifier.type.text}:</strong>
           </span>
@@ -100,7 +100,7 @@ export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
   }
 
   return (
-    <div>
+    <div className={styles.fieldRow}>
       <span>
         <strong className={styles.strong}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</strong>
       </span>
@@ -121,7 +121,7 @@ export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
           .map(([key, value]) =>
             key === 'extension' ? (
               address.extension?.[0]?.extension?.map((add, i) => (
-                <div key={`address-${key}-${i}`}>
+                <div key={`address-${key}-${i}`} className={styles.fieldRow}>
                   <span className={styles.strong}>
                     {getCoreTranslation(
                       getAddressKey(add.url) as CoreTranslationKey,
@@ -133,7 +133,7 @@ export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
                 </div>
               ))
             ) : (
-              <div key={`address-${key}`}>
+              <div key={`address-${key}`} className={styles.fieldRow}>
                 <span className={styles.strong}>{getCoreTranslation(key as CoreTranslationKey, key)}:</span>
                 <span className={styles.patientDetail}>{value}</span>
               </div>
