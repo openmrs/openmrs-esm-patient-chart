@@ -60,7 +60,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
       <div>
         {(() => {
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
-          const headerTitle = t('pastMedicationsHeaderTitle', 'Past Medications');
+          const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
           if (isValidatingPastOrders) return <DataTableSkeleton role="progressbar" />;
 

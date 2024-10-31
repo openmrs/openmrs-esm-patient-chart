@@ -69,7 +69,7 @@
 
 .tag {
   margin: 0 !important;
-  margin-left: 0.5rem !important;
+  margin-left: ((layout.$spacing-03)) !important;
   border: none;
   text-transform: uppercase;
 }

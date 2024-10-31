@@ -34,7 +34,7 @@ function sortOrdersByDateActivated(orders: any[]) {
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  */
 export function usePatientOrders(patientUuid: string) {
-  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
+  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
 
   const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
 
@@ -65,7 +65,7 @@ export function usePatientOrders(patientUuid: string) {
  * @param patientUuid The UUID of the patient whose active orders should be fetched.
  */
 export function useActivePatientOrders(patientUuid: string) {
-  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
+  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
   const ordersUrl = useMemo(
     () =>
       patientUuid

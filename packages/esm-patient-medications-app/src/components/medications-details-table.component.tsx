@@ -105,15 +105,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
               {medication.dateStopped && (
-                <Tooltip
-                  align="top"
-                  label={
-                    <>
-                      {t('discontinuedDate', 'Discontinued date').toUpperCase()} &mdash;
-                      {formatDate(new Date(medication.dateStopped))}
-                    </>
-                  }
-                >
+                <Tooltip align="top" label={<>{formatDate(new Date(medication.dateStopped))}</>}>
                   <Tag type="gray" className={styles.tag}>
                     {t('discontinued', 'Discontinued')}
                   </Tag>
