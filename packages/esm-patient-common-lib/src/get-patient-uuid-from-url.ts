@@ -1,7 +1,7 @@
-import { getPatientChartStore } from './store/patient-chart-store';
+import { getPatientUuidFromUrlOrStore } from './store/patient-chart-store';
 
-export function getPatientUuidFromUrl(): string {
-  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
-  const patientUuidFromUrl = match && match[1];
-  return patientUuidFromUrl || getPatientChartStore().getState().patientUuid;
-}
+/**
+ * @deprecated This function is now replaced with `getPatientUuidFromUrlOrStore`. This function will be removed in upcoming releases.
+ * @returns {string} patientUuid
+ */
+export const getPatientUuidFromUrl = getPatientUuidFromUrlOrStore;

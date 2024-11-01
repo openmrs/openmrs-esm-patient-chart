@@ -4,7 +4,7 @@ import {
   navigateAndLaunchWorkspace,
   usePatient,
 } from '@openmrs/esm-framework';
-import { getPatientUuidFromUrl } from './get-patient-uuid-from-url';
+import { getPatientUuidFromUrlOrStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';
 import { useCallback } from 'react';
@@ -16,7 +16,7 @@ export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
 }
 
 export function launchPatientWorkspace(workspaceName: string, additionalProps?: object) {
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromUrlOrStore();
   launchWorkspace(workspaceName, {
     patientUuid: patientUuid,
     ...additionalProps,

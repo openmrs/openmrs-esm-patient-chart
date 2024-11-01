@@ -2,7 +2,12 @@ import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ActionMenuButton, launchWorkspace, useLayoutType, usePatient, useWorkspaces } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  getPatientUuidFromUrlOrStore,
+  type OrderBasketItem,
+  useOrderBasket,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
@@ -47,6 +52,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
+    getPatientUuidFromUrlOrStore: () => mockGetPatientUuidFromUrl(),
     launchPatientWorkspace: (arg) => mockLaunchPatientWorkspace(arg),
   };
 });
@@ -61,8 +67,11 @@ jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
   return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => {
-  return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() };
+jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => {
+  return {
+    getPatientUuidFromUrlOrStore: () => mockGetPatientUuidFromUrl(),
+    usePatientChartStore: () => ({ patientUuid: mockPatient.id }),
+  };
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {

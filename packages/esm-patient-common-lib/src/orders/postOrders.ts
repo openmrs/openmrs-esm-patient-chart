@@ -1,5 +1,5 @@
 import { openmrsFetch, type OpenmrsResource, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
+import { getPatientUuidFromUrlOrStore } from '../store/patient-chart-store';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import { type ExtractedOrderErrorObject, type OrderBasketItem, type OrderErrorObject, type OrderPost } from './types';
 
@@ -55,7 +55,7 @@ export async function postOrdersOnNewEncounter(
 }
 
 export async function postOrders(encounterUuid: string, abortController: AbortController) {
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromUrlOrStore();
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
