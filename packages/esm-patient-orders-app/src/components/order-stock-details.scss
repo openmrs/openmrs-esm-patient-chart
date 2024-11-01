@@ -1,3 +1,4 @@
+@use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .itemInStock {
@@ -9,6 +10,7 @@
 
   .itemInStockIcon {
     fill: $support-02;
+    margin-right: layout.$spacing-02;
   }
 }
 
@@ -21,5 +23,6 @@
 
   .itemOutOfStockIcon {
     fill: $danger;
+    margin-right: layout.$spacing-02;
   }
 }

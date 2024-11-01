@@ -10,7 +10,7 @@ interface OrderPriceDetailsComponentProps {
 }
 
 const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({ orderItemUuid }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: priceData, isLoading } = useOrderPrice(orderItemUuid);
 
   const amount = useMemo(() => {
@@ -20,18 +20,35 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
   }, [priceData]);
 
+  const formatPrice = (
+    amount: {
+      value: number;
+      currency: string;
+    },
+    locale: string,
+  ): string => {
+    if (!amount) return '';
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: amount.currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount.value);
+  };
+
   if (isLoading || !priceData) {
-    return <SkeletonText width="100px" />;
+    return <SkeletonText width="100px" data-testid="skeleton-text" />;
   }
 
-  if (!amount) {
+  if (!priceData || !amount) {
     return null;
   }
 
   return (
     <div className={styles.priceDetailsContainer}>
       <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
-      {`${amount.currency} ${amount.value}`}
+      {formatPrice(amount, i18n.language)}
       <Tooltip
         align="bottom-left"
         className={styles.priceToolTip}

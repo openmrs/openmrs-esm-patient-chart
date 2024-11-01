@@ -21,8 +21,12 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     return resource.status === 'active' && resource.netContent?.value > 0;
   }, [stockData]);
 
-  if (isLoading || !stockData) {
-    return <SkeletonText width="100px" />;
+  if (isLoading) {
+    return <SkeletonText width="100px" data-testid="skeleton-text" />;
+  }
+
+  if (!stockData) {
+    return null;
   }
 
   return (
