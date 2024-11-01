@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit, type Order } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { useActivePatientOrders, usePastPatientOrders } from '../api';
-import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
 
 export interface MedicationsSummaryProps {
   patient: fhir.Patient;
