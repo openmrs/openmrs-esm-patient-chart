@@ -20,3 +20,4 @@ export * from './types';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
 export * from './workspaces';
+export * from './store/patient-chart-store';

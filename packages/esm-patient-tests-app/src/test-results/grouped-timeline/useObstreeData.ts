@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { usePatient, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
@@ -43,7 +44,7 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
 };
 
 const useGetObstreeData = (conceptUuid: string) => {
-  const { patientUuid } = usePatient();
+  const { patientUuid } = usePatientChartStore();
   const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
     `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
     openmrsFetch,
@@ -65,7 +66,7 @@ const useGetObstreeData = (conceptUuid: string) => {
 };
 
 const useGetManyObstreeData = (uuidArray: Array<string>) => {
-  const { patientUuid } = usePatient();
+  const { patientUuid } = usePatientChartStore();
   const getObstreeUrl = (index: number) => {
     if (index < uuidArray.length && patientUuid) {
       return `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;

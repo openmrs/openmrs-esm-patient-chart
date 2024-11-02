@@ -17,6 +17,7 @@ import {
   type OrderBasketItem,
   type LabOrderBasketItem,
   launchPatientWorkspace,
+  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderForm } from './lab-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
@@ -37,7 +38,8 @@ export default function AddLabOrderWorkspace({
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { patient, isLoading: isLoadingPatient, patientUuid } = usePatient();
+  const { patientUuid } = usePatientChartStore();
+  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
 
   const patientName = patient ? getPatientName(patient) : '';
