@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { formatDate, formatTime, parseDate, showModal } from '@openmrs/esm-framework';
-import { type OBSERVATION_INTERPRETATION, getPatientUuidFromUrlOrStore } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION, getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { type ParsedTimeType } from '../filter/filter-types';
 import type { ObsRecord } from '../../types';
 import styles from './timeline.scss';
@@ -121,7 +121,7 @@ export const TimelineCell: React.FC<{
 };
 
 export const RowStartCell = ({ title, range, units, shadow = false, testUuid, isString = false }) => {
-  const patientUuid = getPatientUuidFromUrlOrStore();
+  const patientUuid = getPatientUuidFromStore();
   const launchResultsDialog = (patientUuid: string, title: string, testUuid: string) => {
     const dispose = showModal('timeline-results-modal', {
       closeDeleteModal: () => dispose(),

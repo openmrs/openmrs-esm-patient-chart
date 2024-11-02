@@ -28,8 +28,6 @@ export function usePatientChartStore() {
  * This function will get the patient UUID from either URL, or will look into the patient chart store.
  * @returns {string} patientUuid
  */
-export function getPatientUuidFromUrlOrStore() {
-  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
-  const patientUuidFromUrl = match && match[1];
-  return patientUuidFromUrl || patientChartStore.getState().patientUuid;
+export function getPatientUuidFromStore(): string {
+  return patientChartStore.getState()?.patientUuid;
 }

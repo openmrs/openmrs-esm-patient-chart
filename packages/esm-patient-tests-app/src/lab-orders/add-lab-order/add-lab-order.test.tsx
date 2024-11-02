@@ -65,7 +65,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
-  getPatientUuidFromUrlOrStore: jest.fn(() => ptUuid),
+  getPatientUuidFromStore: jest.fn(() => ptUuid),
   usePatientChartStore: jest.fn(() => ({
     patientUuid: ptUuid,
   })),
