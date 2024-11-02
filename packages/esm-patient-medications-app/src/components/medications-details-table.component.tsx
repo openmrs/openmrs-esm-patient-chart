@@ -15,6 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
+  Tooltip,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -102,6 +104,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
+              {medication.dateStopped && (
+                <Tooltip align="right" label={<>{formatDate(new Date(medication.dateStopped))}</>}>
+                  <Tag type="gray" className={styles.tag}>
+                    {t('discontinued', 'Discontinued')}
+                  </Tag>
+                </Tooltip>
+              )}
             </p>
             <p className={styles.bodyLong01}>
               <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
@@ -128,26 +137,18 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </p>
           </div>
           <p className={styles.bodyLong01}>
-            {medication.orderReasonNonCoded ? (
+            {medication.orderReasonNonCoded && (
               <span>
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            ) : null}
-            {medication.quantity ? (
+            )}
+            {medication.quantity && (
               <span>
                 <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                 {medication.quantity} {medication?.quantityUnits?.display}
               </span>
-            ) : null}
-            {medication.dateStopped ? (
-              <span>
-                <span className={styles.label01}>
-                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
-                </span>
-                {formatDate(new Date(medication.dateStopped))}
-              </span>
-            ) : null}
+            )}
           </p>
         </div>
       ),

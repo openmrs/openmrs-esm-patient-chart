@@ -105,16 +105,33 @@ const createNumericSchema = (
   upperLimit: number | null | undefined,
   lowerLimit: number | null | undefined,
 ): z.ZodType => {
-  let baseSchema = z
-    .preprocess((val) => {
-      if (val === '' || val === null || val === undefined) return undefined;
-      const parsed = Number(val);
-      return isNaN(parsed) ? undefined : parsed;
-    }, z.number().optional())
-    .refine((val) => val === undefined || !isNaN(val), {
-      message: `${labOrderConcept.display} must be a valid number`,
-    });
+  const { allowDecimal, display } = labOrderConcept;
+  const processNumber = (val: unknown) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const parsed = Number(val);
+    if (isNaN(parsed)) return undefined;
+    return parsed;
+  };
 
+  let baseSchema = z
+    .preprocess(processNumber, z.number().optional())
+    .refine((val) => val === undefined || !isNaN(val), {
+      message: `${display} must be a valid number`,
+    })
+    .refine(
+      (val) => {
+        if (val === undefined) return true;
+        if (!allowDecimal) {
+          return Number.isInteger(val);
+        }
+        return true;
+      },
+      {
+        message: !allowDecimal ? `${display} must be a whole number` : `${display} must be a valid number`,
+      },
+    );
+
+  // Add range validations
   const hasLowerLimit = lowerLimit !== null && lowerLimit !== undefined;
   const hasUpperLimit = upperLimit !== null && upperLimit !== undefined;
 
@@ -124,19 +141,19 @@ const createNumericSchema = (
 
   if (hasLowerLimit && hasUpperLimit) {
     return baseSchema.refine((val) => val === undefined || (val >= lowerLimit && val <= upperLimit), {
-      message: `${labOrderConcept.display} must be between ${lowerLimit} and ${upperLimit}`,
+      message: `${display} must be between ${lowerLimit} and ${upperLimit}`,
     });
   }
 
   if (hasLowerLimit) {
     return baseSchema.refine((val) => val === undefined || val >= lowerLimit, {
-      message: `${labOrderConcept.display} must be greater than or equal to ${lowerLimit}`,
+      message: `${display} must be greater than or equal to ${lowerLimit}`,
     });
   }
 
   if (hasUpperLimit) {
     return baseSchema.refine((val) => val === undefined || val <= upperLimit, {
-      message: `${labOrderConcept.display} must be less than or equal to ${upperLimit}`,
+      message: `${display} must be less than or equal to ${upperLimit}`,
     });
   }
 };
