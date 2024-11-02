@@ -36,36 +36,28 @@ export const DashboardExtension = ({
   const location = useLocation();
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
-  const menuIcon = (title: string) => {
-    switch (title) {
-      case 'Patient Summary':
-        return <Report className={styles.icon} />;
-      case 'Vitals & Biometrics':
-        return <ActivityIcon className={styles.icon} />;
-      case 'Orders':
-        return <ShoppingCartIcon className={styles.icon} />;
-      case 'Medications':
-        return <MedicationIcon className={styles.icon} />;
-      case 'Results':
-        return <ChartAverageIcon className={styles.icon} />;
-      case 'Visits':
-        return <CalendarHeatMapIcon className={styles.icon} />;
-      case 'Allergies':
-        return <WarningIcon className={styles.icon} />;
-      case 'Conditions':
-        return <ListCheckedIcon className={styles.icon} />;
-      case 'Attachments':
-        return <DocumentAttachmentIcon className={styles.icon} />;
-      case 'Programs':
-        return <TableIcon className={styles.icon} />;
-      case 'Appointments':
-        return <EventScheduleIcon className={styles.icon} />;
-      default:
-        return null;
-    }
+  type MenuTitle = keyof typeof MenuIcons;
+
+  const MenuIcons = {
+    Allergies: WarningIcon,
+    Appointments: EventScheduleIcon,
+    Attachments: DocumentAttachmentIcon,
+    Conditions: ListCheckedIcon,
+    Medications: MedicationIcon,
+    Orders: ShoppingCartIcon,
+    'Patient Summary': Report,
+    Programs: TableIcon,
+    Results: ChartAverageIcon,
+    Visits: CalendarHeatMapIcon,
+    'Vitals & Biometrics': ActivityIcon,
+  } as const;
+
+  const menuIcon = (title: MenuTitle) => {
+    const Icon = MenuIcons[title];
+    return Icon ? <Icon className={styles.icon} /> : null;
   };
 
-  const renderIcon = menuIcon(title);
+  const renderIcon = menuIcon(title as MenuTitle);
 
   return (
     <div key={path}>
