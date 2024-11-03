@@ -35,7 +35,7 @@ describe('ActiveMedications', () => {
   test('renders an empty state view when there are no active medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -56,7 +56,7 @@ describe('ActiveMedications', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -69,7 +69,7 @@ describe('ActiveMedications', () => {
   test('renders a tabular overview of the active medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-    renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+    renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -90,12 +90,12 @@ describe('ActiveMedications', () => {
 
     const expectedTableRows = [
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
-      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good — DISCONTINUED DATE 14-Aug-2023/,
+      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet 14-Aug-2023 DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good 0/,
       /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {{duration}} weeks — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
       /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {{duration}} days INDICATION Heart — QUANTITY 30 Tablet/,
     ];
 
-    expectedTableRows.map((row) =>
+    expectedTableRows.forEach((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
   });
@@ -105,7 +105,7 @@ test('clicking the Record active medications link opens the order basket form', 
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+  renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
   const orderLink = screen.getByText('Record active medications');
@@ -117,7 +117,7 @@ test('clicking the Add button opens the order basket form', async () => {
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-  renderWithSwr(<ActiveMedications patientUuid={mockPatient.id} />);
+  renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
   const button = screen.getByRole('button', { name: /Add/i });

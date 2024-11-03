@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { Close, Edit } from '@carbon/react/icons';
+import { CloseIcon, EditIcon } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags.scss';
@@ -80,7 +80,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
           <Button
             className={styles.actionButton}
             kind="ghost"
-            renderIcon={Edit}
+            renderIcon={EditIcon}
             onClick={handleClickEditFlags}
             iconDescription={t('editFlags', 'Edit flags')}
           >
@@ -93,7 +93,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
             hasIconOnly
             iconDescription={t('closeFlagsBar', 'Close flags bar')}
             kind="ghost"
-            renderIcon={Close}
+            renderIcon={CloseIcon}
             onClick={onHandleCloseHighlightBar}
           />
         ) : null}

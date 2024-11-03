@@ -36,9 +36,6 @@ const testProps = {
   patientUuid: mockPatient.id,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: jest.fn(),
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 jest.mock('./programs.resource', () => ({

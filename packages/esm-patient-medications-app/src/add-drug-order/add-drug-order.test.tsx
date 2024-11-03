@@ -198,9 +198,6 @@ function renderAddDrugOrderWorkspace() {
       promptBeforeClosing={() => false}
       patientUuid={'mock-patient-uuid'}
       setTitle={jest.fn()}
-      setCancelTitle={jest.fn()}
-      setCancelMessage={jest.fn()}
-      setCancelConfirmText={jest.fn()}
     />,
   );
 }

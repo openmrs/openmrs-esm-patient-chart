@@ -3,6 +3,7 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
+  registerFeatureFlag,
   restBaseUrl,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
@@ -26,6 +27,11 @@ export function startupApp() {
   });
 
   defineConfigSchema(moduleName, configSchema);
+  registerFeatureFlag(
+    'print-patient-identifier-sticker',
+    'Print patient identifier sticker',
+    'Features to support printing a patient identifier sticker',
+  );
 }
 
 export const visitTag = getSyncLifecycle(visitTagComponent, options);
@@ -35,8 +41,16 @@ export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
 
 export const printIdentifierStickerModal = getAsyncLifecycle(
-  () => import('./banner-tags/print-identifier-sticker.modal'),
+  () => import('./print-identifier-sticker/print-identifier-sticker.modal'),
   options,
+);
+
+export const printIdentifierStickerActionButton = getAsyncLifecycle(
+  () => import('./print-identifier-sticker/print-identifier-sticker-action-button.component'),
+  {
+    featureName: 'patient-actions-slot-print-identifier-sticker-button',
+    moduleName,
+  },
 );
 
 /*

@@ -121,63 +121,77 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   });
 
   const displayVisitStopDateTimeFields = useMemo(
-    () => visitToEdit?.stopDatetime || showVisitEndDateTimeFields,
+    () => Boolean(visitToEdit?.stopDatetime || showVisitEndDateTimeFields),
     [visitToEdit?.stopDatetime, showVisitEndDateTimeFields],
   );
 
   const visitFormSchema = useMemo(() => {
+    const createVisitAttributeSchema = (required: boolean) =>
+      required
+        ? z.string({
+            required_error: t('fieldRequired', 'This field is required'),
+          })
+        : z.string().optional();
+
     const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
       (acc, { uuid, required }) => ({
         ...acc,
-        [uuid]: required
-          ? z
-              .string({
-                required_error: t('fieldRequired', 'This field is required'),
-              })
-              .refine((value) => !!value, t('fieldRequired', 'This field is required'))
-          : z.string().optional(),
+        [uuid]: createVisitAttributeSchema(required),
       }),
       {},
     );
 
-    return z.object({
-      visitStartDate: z.date().refine(
-        (value) => {
-          const today = dayjs();
-          const startDate = dayjs(value);
-          return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
-        },
-        t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: formatDatetime(new Date()),
-          interpolation: {
-            escapeValue: false,
+    // Validates that the start time is not in the future
+    const validateStartTime = (data: z.infer<typeof visitFormSchema>) => {
+      const [visitStartHours, visitStartMinutes] = convertTime12to24(data.visitStartTime, data.visitStartTimeFormat);
+      const visitStartDatetime = new Date(data.visitStartDate).setHours(visitStartHours, visitStartMinutes);
+      return new Date(visitStartDatetime) <= new Date();
+    };
+
+    return z
+      .object({
+        visitStartDate: z.date().refine(
+          (value) => {
+            const today = dayjs();
+            const startDate = dayjs(value);
+            return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
           },
+          t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
+            firstEncounterDatetime: formatDatetime(new Date()),
+            interpolation: {
+              escapeValue: false,
+            },
+          }),
+        ),
+        visitStartTime: z
+          .string()
+          .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
+        visitStartTimeFormat: z.enum(['PM', 'AM']),
+        visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
+        visitStopTime: displayVisitStopDateTimeFields
+          ? z
+              .string()
+              .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
+          : z.string().optional(),
+        visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
+        programType: z.string().optional(),
+        visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
+        visitLocation: z.object({
+          display: z.string(),
+          uuid: z.string(),
         }),
-      ),
-      visitStartTime: z
-        .string()
-        .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
-      visitStartTimeFormat: z.enum(['PM', 'AM']),
-      visitStopDate: displayVisitStopDateTimeFields ? z.date() : z.date().optional(),
-      visitStopTime: displayVisitStopDateTimeFields
-        ? z
-            .string()
-            .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
-        : z.string().optional(),
-      visitStopTimeFormat: displayVisitStopDateTimeFields ? z.enum(['PM', 'AM']) : z.enum(['PM', 'AM']).optional(),
-      programType: z.string().optional(),
-      visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
-      visitLocation: z.object({
-        display: z.string(),
-        uuid: z.string(),
-      }),
-      visitAttributes: z.object(visitAttributes),
-    });
+        visitAttributes: z.object(visitAttributes),
+      })
+      .refine((data) => validateStartTime(data), {
+        message: t('futureStartTime', 'Visit start time cannot be in the future'),
+        path: ['visitStartTime'],
+      });
   }, [t, config, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
     const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
     const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
+
     let defaultValues: Partial<VisitFormData> = {
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
@@ -385,7 +399,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   );
 
   const onSubmit = useCallback(
-    (data: VisitFormData, event) => {
+    (data: VisitFormData) => {
       if (visitToEdit && !validateVisitStartStopDatetime()) {
         return;
       }
@@ -460,126 +474,120 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController)
         )
-          .pipe(first())
-          .subscribe({
-            next: (response) => {
-              if (response.status === 201) {
-                if (config.showServiceQueueFields) {
-                  // retrieve values from the queue extension
-                  setVisitUuid(response.data.uuid);
+          .then((response) => {
+            if (config.showServiceQueueFields && queueLocation && service && priority) {
+              // retrieve values from the queue extension
+              setVisitUuid(response.data.uuid);
 
-                  saveQueueEntry(
-                    response.data.uuid,
-                    service,
-                    patientUuid,
-                    priority,
-                    status,
-                    sortWeight,
-                    queueLocation,
-                    visitQueueNumberAttributeUuid,
-                    abortController,
-                  ).then(
-                    ({ status }) => {
-                      if (status === 201) {
-                        mutateCurrentVisit();
-                        mutateVisits();
-                        mutateInfiniteVisits();
-                        mutateQueueEntry();
-                        showSnackbar({
-                          kind: 'success',
-                          title: t('visitStarted', 'Visit started'),
-                          subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
-                        });
-                      }
-                    },
-                    (error) => {
-                      showSnackbar({
-                        title: t('queueEntryError', 'Error adding patient to the queue'),
-                        kind: 'error',
-                        isLowContrast: false,
-                        subtitle: error?.message,
-                      });
-                    },
-                  );
-                }
+              saveQueueEntry(
+                response.data.uuid,
+                service,
+                patientUuid,
+                priority,
+                status,
+                sortWeight,
+                queueLocation,
+                visitQueueNumberAttributeUuid,
+                abortController,
+              ).then(
+                () => {
+                  mutateCurrentVisit();
+                  mutateVisits();
+                  mutateInfiniteVisits();
+                  mutateQueueEntry();
+                  showSnackbar({
+                    kind: 'success',
+                    title: t('visitStarted', 'Visit started'),
+                    subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
+                  });
+                },
+                (error) => {
+                  showSnackbar({
+                    title: t('queueEntryError', 'Error adding patient to the queue'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: error?.message,
+                  });
+                },
+              );
 
-                if (config.showUpcomingAppointments && upcomingAppointment) {
-                  updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
-                    () => {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      mutateInfiniteVisits();
-                      mutateAppointments();
-                      showSnackbar({
-                        isLowContrast: true,
-                        kind: 'success',
-                        subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
-                        title: t('appointmentCheckedIn', 'Appointment Checked In'),
-                      });
-                    },
-                    (error) => {
-                      showSnackbar({
-                        title: t('updateError', 'Error updating upcoming appointment'),
-                        kind: 'error',
-                        isLowContrast: false,
-                        subtitle: error?.message,
-                      });
-                    },
-                  );
-                }
-              }
-
-              from(handleVisitAttributes(visitAttributes, response.data.uuid))
-                .pipe(first())
-                .subscribe({
-                  next: (attributesResponses) => {
-                    setIsSubmitting(false);
-                    // Check for no undefined,
-                    // that if there was no failed requests on either creating, updating or deleting an attribute
-                    // then continue and close workspace
-                    if (!attributesResponses.includes(undefined)) {
-                      mutateCurrentVisit();
-                      mutateVisits();
-                      mutateInfiniteVisits();
-                      closeWorkspace({ ignoreChanges: true });
-                      showSnackbar({
-                        isLowContrast: true,
-                        kind: 'success',
-                        subtitle: !visitToEdit
-                          ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                              visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                            })
-                          : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                              visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                            }),
-                        title: !visitToEdit
-                          ? t('visitStarted', 'Visit started')
-                          : t('visitDetailsUpdated', 'Visit details updated'),
-                      });
-                    }
-                  },
-                  error: (error) => {
+              if (config.showUpcomingAppointments && upcomingAppointment) {
+                updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
+                  () => {
+                    mutateCurrentVisit();
+                    mutateVisits();
+                    mutateInfiniteVisits();
+                    mutateAppointments();
                     showSnackbar({
-                      title: !visitToEdit
-                        ? t('startVisitError', 'Error starting visit')
-                        : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+                      isLowContrast: true,
+                      kind: 'success',
+                      subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                      title: t('appointmentCheckedIn', 'Appointment Checked In'),
+                    });
+                  },
+                  (error) => {
+                    showSnackbar({
+                      title: t('updateError', 'Error updating upcoming appointment'),
                       kind: 'error',
                       isLowContrast: false,
                       subtitle: error?.message,
                     });
                   },
-                });
-            },
-            error: (error) => {
-              showSnackbar({
-                title: !visitToEdit
-                  ? t('startVisitError', 'Error starting visit')
-                  : t('errorUpdatingVisitDetails', 'Error updating visit details'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
+                );
+              }
+            }
+
+            // TODO: Refactor this to use Promises
+            from(handleVisitAttributes(visitAttributes, response.data.uuid))
+              .pipe(first())
+              .subscribe({
+                next: (attributesResponses) => {
+                  setIsSubmitting(false);
+                  // Check for no undefined,
+                  // that if there was no failed requests on either creating, updating or deleting an attribute
+                  // then continue and close workspace
+                  if (!attributesResponses.includes(undefined)) {
+                    mutateCurrentVisit();
+                    mutateVisits();
+                    mutateInfiniteVisits();
+                    closeWorkspace({ ignoreChanges: true });
+                    showSnackbar({
+                      isLowContrast: true,
+                      kind: 'success',
+                      subtitle: !visitToEdit
+                        ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                            visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                          })
+                        : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                            visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                          }),
+                      title: !visitToEdit
+                        ? t('visitStarted', 'Visit started')
+                        : t('visitDetailsUpdated', 'Visit details updated'),
+                    });
+                  }
+                },
+                error: (error) => {
+                  showSnackbar({
+                    title: !visitToEdit
+                      ? t('startVisitError', 'Error starting visit')
+                      : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+                    kind: 'error',
+                    isLowContrast: false,
+                    subtitle: error?.message,
+                  });
+                },
               });
-            },
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: !visitToEdit
+                ? t('startVisitError', 'Error starting visit')
+                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
           });
       } else {
         createOfflineVisitForPatient(
@@ -689,20 +697,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           )}
           <Stack gap={1} className={styles.container}>
             <VisitDateTimeField
-              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
               dateFieldName="visitStartDate"
+              maxDate={maxVisitStartDatetime}
               timeFieldName="visitStartTime"
               timeFormatFieldName="visitStartTimeFormat"
-              maxDate={maxVisitStartDatetime}
+              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
             />
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
-                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
                 dateFieldName="visitStopDate"
+                minDate={minVisitStopDatetime}
                 timeFieldName="visitStopTime"
                 timeFormatFieldName="visitStopTimeFormat"
-                minDate={minVisitStopDatetime}
+                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
               />
             )}
 
@@ -823,10 +831,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           </Stack>
         </div>
         <ButtonSet
-          className={classNames({
+          className={classNames(styles.buttonSet, {
             [styles.tablet]: isTablet,
             [styles.desktop]: !isTablet,
-            [styles.buttonSet]: true,
           })}
         >
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>

@@ -24,9 +24,6 @@ describe('FormRenderer', () => {
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
     setTitle: jest.fn(),
-    setCancelTitle: jest.fn(),
-    setCancelMessage: jest.fn(),
-    setCancelConfirmText: jest.fn(),
   };
 
   test('renders FormError component when there is an error', () => {

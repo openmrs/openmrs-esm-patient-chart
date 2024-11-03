@@ -1,14 +1,12 @@
 import React from 'react';
 import { HeaderGlobalAction } from '@carbon/react';
-import { CloseFilled } from '@carbon/react/icons';
-import { getHistory, goBackInHistory, navigate, usePatient } from '@openmrs/esm-framework';
+import { getHistory, goBackInHistory, navigate, CloseFilledIcon } from '@openmrs/esm-framework';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './close-button.scss';
 
-export function CloseButton() {
+export function CloseButton({ patientUuid }: { patientUuid: string }) {
   const { t } = useTranslation();
-  const { patientUuid } = usePatient();
 
   const onClosePatientChart = useCallback(() => {
     const history = getHistory();
@@ -21,6 +19,7 @@ export function CloseButton() {
         break;
       }
     }
+
     if (onCloseTarget) {
       goBackInHistory({ toUrl: onCloseTarget });
     } else {
@@ -34,7 +33,7 @@ export function CloseButton() {
       aria-label={t('close', 'Close')}
       onClick={onClosePatientChart}
     >
-      <CloseFilled size={20} />
+      <CloseFilledIcon size={20} />
     </HeaderGlobalAction>
   );
 }

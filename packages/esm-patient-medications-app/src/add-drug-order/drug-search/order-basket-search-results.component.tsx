@@ -1,10 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { Button, Tile, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import { ArrowRight, ShoppingCartArrowUp, ShoppingCartArrowDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
+import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
+import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { closeWorkspace, useConfig, useLayoutType, usePatient, UserHasAccess } from '@openmrs/esm-framework';
+import {
+  ArrowRightIcon,
+  closeWorkspace,
+  ShoppingCartArrowDownIcon,
+  useConfig,
+  useLayoutType,
+  usePatient,
+  UserHasAccess,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
 import { ordersEqual } from './helpers';
@@ -16,11 +24,17 @@ import {
 } from './drug-search.resource';
 import type { DrugOrderBasketItem } from '../../types';
 import styles from './order-basket-search-results.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
+}
+
+interface DrugSearchResultItemProps {
+  drug: DrugSearchResult;
+  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
 }
 
 export default function OrderBasketSearchResults({
@@ -57,61 +71,52 @@ export default function OrderBasketSearchResults({
     );
   }
 
-  return (
-    <>
-      {drugs?.length ? (
-        <div className={styles.container}>
-          <div className={styles.orderBasketSearchResultsHeader}>
-            <span className={styles.searchResultsCount}>
-              {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
-                count: drugs?.length,
-                searchTerm,
-              })}
-            </span>
-            <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
-              {t('clearSearchResults', 'Clear Results')}
-            </Button>
-          </div>
-          <div className={styles.resultsContainer}>
-            {drugs.map((drug) => (
-              <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
-            ))}
-
-            <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
-          </div>
+  if (drugs?.length === 0) {
+    return (
+      <Tile className={styles.emptyState}>
+        <div>
+          <h4 className={styles.productiveHeading01}>
+            {t('noResultsForDrugSearch', 'No results to display for "{{searchTerm}}"', {
+              searchTerm,
+            })}
+          </h4>
+          <p className={styles.bodyShort01}>
+            <span>{t('tryTo', 'Try to')}</span>{' '}
+            <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
+              {t('searchAgain', 'search again')}
+            </span>{' '}
+            <span>{t('usingADifferentTerm', 'using a different term')}</span>
+          </p>
         </div>
-      ) : (
-        <Tile className={styles.emptyState}>
-          <div>
-            <h4 className={styles.productiveHeading01}>
-              {t('noResultsForDrugSearch', 'No results to display for "{{searchTerm}}"', {
-                searchTerm,
-              })}
-            </h4>
-            <p className={styles.bodyShort01}>
-              <span>{t('tryTo', 'Try to')}</span>{' '}
-              <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
-                {t('searchAgain', 'search again')}
-              </span>{' '}
-              <span>{t('usingADifferentTerm', 'using a different term')}</span>
-            </p>
-          </div>
-        </Tile>
-      )}
-    </>
-  );
-}
+      </Tile>
+    );
+  }
 
-interface DrugSearchResultItemProps {
-  drug: DrugSearchResult;
-  openOrderForm: (searchResult: DrugOrderBasketItem) => void;
+  return (
+    <div className={styles.container}>
+      <div className={styles.orderBasketSearchResultsHeader}>
+        <span className={styles.searchResultsCount}>
+          {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
+            count: drugs?.length,
+            searchTerm,
+          })}
+        </span>
+        <Button kind="ghost" onClick={focusAndClearSearchInput} size={isTablet ? 'md' : 'sm'}>
+          {t('clearSearchResults', 'Clear Results')}
+        </Button>
+      </div>
+      <div className={styles.resultsContainer}>
+        {drugs?.map((drug) => <DrugSearchResultItem key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />)}
+      </div>
+    </div>
+  );
 }
 
 const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
-  const patient = usePatient();
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const { patientUuid } = usePatientChartStore();
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
     [orders, drug],
@@ -199,7 +204,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 {drugAlreadyInBasket ? (
                   <Button
                     kind="danger--ghost"
-                    renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
+                      <ShoppingCartArrowUp size={16} {...props} />
+                    )}
                     onClick={() => removeFromBasket(orderItem)}
                   >
                     {t('removeFromBasket', 'Remove from basket')}
@@ -207,7 +214,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 ) : (
                   <Button
                     kind="ghost"
-                    renderIcon={(props) => <ShoppingCartArrowDown size={16} {...props} />}
+                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                      <ShoppingCartArrowDownIcon size={16} {...props} />
+                    )}
                     onClick={() => addToBasket(orderItem)}
                     disabled={drugAlreadyPrescribed}
                   >
@@ -216,7 +225,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
                 )}
                 <Button
                   kind="ghost"
-                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
                   onClick={() => openOrderForm(orderItem)}
                   disabled={drugAlreadyPrescribed}
                 >
@@ -233,29 +242,24 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
 
 const DrugSearchSkeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
-  const tileClassName = `${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-    styles.skeletonTile
-  }`;
+  const tileClassName = classNames({
+    [styles.tabletSearchResultTile]: isTablet,
+    [styles.desktopSearchResultTile]: !isTablet,
+    [styles.skeletonTile]: true,
+  });
+  const buttonSize = isTablet ? 'md' : 'sm';
+
   return (
     <div className={styles.searchResultSkeletonWrapper}>
       <div className={styles.orderBasketSearchResultsHeader}>
         <SkeletonText className={styles.searchResultCntSkeleton} />
-        <ButtonSkeleton size={isTablet ? 'md' : 'sm'} />
+        <ButtonSkeleton size={buttonSize} />
       </div>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-      <Tile className={tileClassName}>
-        <SkeletonText />
-      </Tile>
-
-      <hr className={classNames(styles.divider, isTablet ? styles.tabletDivider : styles.desktopDivider)} />
+      {[...Array(4)].map((_, index) => (
+        <Tile key={index} className={tileClassName}>
+          <SkeletonText />
+        </Tile>
+      ))}
     </div>
   );
 };
