@@ -17,7 +17,7 @@ import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
 import VisitHeader from '../visit-header/visit-header.component';
 import SideMenuPanel from '../side-nav/side-menu.component';
-import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { getPatientChartStore } from '@openmrs/esm-patient-common-lib/src/store/patient-chart-store';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
