@@ -172,10 +172,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         visitStopDate: displayVisitStopDateTimeFields && hadPreviousStopDateTime ? z.date() : z.date().optional(),
         visitStopTime:
           displayVisitStopDateTimeFields && hadPreviousStopDateTime
-            ? z
+            ? z.string().refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat'))
+            : z
                 .string()
-                .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format'))
-            : z.string().optional(),
+                .refine((value) => !value || value.match(time12HourFormatRegex), t('invalidTimeFormat'))
+                .optional(),
         visitStopTimeFormat:
           displayVisitStopDateTimeFields && hadPreviousStopDateTime
             ? z.enum(['PM', 'AM'])
