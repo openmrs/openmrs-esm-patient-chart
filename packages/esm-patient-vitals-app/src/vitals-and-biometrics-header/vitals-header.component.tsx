@@ -24,9 +24,14 @@ import styles from './vitals-header.scss';
 
 interface VitalsHeaderProps {
   patientUuid: string;
+
+  /**
+   * This is useful for extensions slots using the Vitals Header
+   */
+  hideLinks?: boolean;
 }
 
-const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
+const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = false }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
@@ -102,30 +107,34 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
                 <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
               </Tag>
             ) : null}
-            <ConfigurableLink
-              className={styles.link}
-              to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
-            >
-              {t('vitalsHistory', 'Vitals history')}
-            </ConfigurableLink>
+            {!hideLinks && (
+              <ConfigurableLink
+                className={styles.link}
+                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
+              >
+                {t('vitalsHistory', 'Vitals history')}
+              </ConfigurableLink>
+            )}
           </div>
           {isValidating ? (
             <div className={styles.backgroundDataFetchingIndicator}>
               <span>{isValidating ? <InlineLoading /> : null}</span>
             </div>
           ) : null}
-          <div className={styles.buttonContainer}>
-            <Button
-              className={styles.recordVitalsButton}
-              data-openmrs-role="Record Vitals"
-              kind="ghost"
-              onClick={launchVitalsAndBiometricsForm}
-              size="sm"
-            >
-              {t('recordVitals', 'Record vitals')}
-              <ArrowRight size={16} className={styles.recordVitalsIconButton} />
-            </Button>
-          </div>
+          {!hideLinks && (
+            <div className={styles.buttonContainer}>
+              <Button
+                className={styles.recordVitalsButton}
+                data-openmrs-role="Record Vitals"
+                kind="ghost"
+                onClick={launchVitalsAndBiometricsForm}
+                size="sm"
+              >
+                {t('recordVitals', 'Record vitals')}
+                <ArrowRight size={16} className={styles.recordVitalsIconButton} />
+              </Button>
+            </div>
+          )}
         </div>
         <div
           className={classNames(styles.rowContainer, {
@@ -210,10 +219,12 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
         <span className={styles.bodyText}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
       </div>
 
-      <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
-        {t('recordVitals', 'Record vitals')}
-        <ArrowRight size={16} className={styles.recordVitalsIconButton} />
-      </Button>
+      {!hideLinks && (
+        <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
+          {t('recordVitals', 'Record vitals')}
+          <ArrowRight size={16} className={styles.recordVitalsIconButton} />
+        </Button>
+      )}
     </div>
   );
 };
