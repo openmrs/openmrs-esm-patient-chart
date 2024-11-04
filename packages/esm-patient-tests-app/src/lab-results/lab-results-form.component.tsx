@@ -11,7 +11,7 @@ import {
   useLabEncounter,
   useObservation,
   createObservationPayload,
-} from './lab-results.resource';
+} from '@openmrs/esm-patient-common-lib';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';

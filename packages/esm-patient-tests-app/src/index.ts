@@ -48,6 +48,12 @@ export const labOrderPanel = getAsyncLifecycle(
   options,
 );
 
+// t('enterTestResults', 'Enter test results')
+export const testResultsFormWorkspace = getAsyncLifecycle(
+  () => import('./lab-results/lab-results-form.component'),
+  options,
+);
+
 // t('addLabOrderWorkspaceTitle', 'Add lab order')
 export const addLabOrderWorkspace = getAsyncLifecycle(
   () => import('./lab-orders/add-lab-order/add-lab-order.workspace'),

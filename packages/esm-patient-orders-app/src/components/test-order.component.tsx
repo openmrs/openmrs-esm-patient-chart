@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { useLabEncounter, useOrderConceptByUuid } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType } from '@openmrs/esm-framework';
 
 interface TestOrderProps {

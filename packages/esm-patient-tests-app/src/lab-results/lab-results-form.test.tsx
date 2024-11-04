@@ -8,17 +8,17 @@ import {
   type LabOrderConcept,
   updateOrderResult,
   type Datatype,
-} from './lab-results.resource';
+} from '@openmrs/esm-patient-common-lib';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
-import { type Encounter } from '../types/encounter';
+import { type Encounter } from '@openmrs/esm-patient-common-lib';
 
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 
-jest.mock('./lab-results.resource', () => ({
-  ...jest.requireActual('./lab-results.resource'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderConceptByUuid: jest.fn(),
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),

@@ -27,12 +27,6 @@ export const patientOrdersFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-// t('enterTestResults', 'Enter test results')
-export const testResultsFormWorkspace = getAsyncLifecycle(
-  () => import('./lab-results/lab-results-form.component'),
-  options,
-);
-
 export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);
 
 export const ordersDashboardLink =
