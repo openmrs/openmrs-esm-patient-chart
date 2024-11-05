@@ -64,8 +64,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => ({
-  getPatientUuidFromUrl: jest.fn(() => ptUuid),
+jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
+  getPatientUuidFromStore: jest.fn(() => ptUuid),
+  usePatientChartStore: jest.fn(() => ({
+    patientUuid: ptUuid,
+  })),
 }));
 
 function renderAddLabOrderWorkspace() {
