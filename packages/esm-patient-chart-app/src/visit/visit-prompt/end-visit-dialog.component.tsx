@@ -1,8 +1,7 @@
 import React from 'react';
-import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { parseDate, setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import styles from './end-visit-dialog.scss';
@@ -17,52 +16,45 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
-  const endCurrentVisit = () => {
+  const handleEndVisit = () => {
     if (currentVisitIsRetrospective) {
       setCurrentVisit(null, null);
       closeModal();
     } else {
       const endVisitPayload = {
-        location: currentVisit.location.uuid,
-        startDatetime: parseDate(currentVisit.startDatetime),
-        visitType: currentVisit.visitType.uuid,
         stopDatetime: new Date(),
       };
 
       const abortController = new AbortController();
-      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
-        .pipe(first())
-        .subscribe(
-          (response) => {
-            if (response.status === 200) {
-              if (queueEntry) {
-                removeQueuedPatient(
-                  queueEntry.queue.uuid,
-                  queueEntry.queueEntryUuid,
-                  abortController,
-                  response?.data.stopDatetime,
-                );
-              }
-              mutate();
-              closeModal();
 
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
-                title: t('visitEnded', 'Visit ended'),
-              });
-            }
-          },
-          (error) => {
-            showSnackbar({
-              title: t('errorEndingVisit', 'Error ending visit'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message,
-            });
-          },
-        );
+      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
+        .then((response) => {
+          if (queueEntry) {
+            removeQueuedPatient(
+              queueEntry.queue.uuid,
+              queueEntry.queueEntryUuid,
+              abortController,
+              response?.data.stopDatetime,
+            );
+          }
+          mutate();
+          closeModal();
+
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'success',
+            subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+            title: t('visitEnded', 'Visit ended'),
+          });
+        })
+        .catch((error) => {
+          showSnackbar({
+            title: t('errorEndingVisit', 'Error ending visit'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: error?.message,
+          });
+        });
     }
   };
 
@@ -84,7 +76,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={endCurrentVisit}>
+        <Button kind="danger" onClick={handleEndVisit}>
           {t('endVisit_title', 'End Visit')}
         </Button>
       </ModalFooter>

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
 import {
   type AssignedExtension,
   Extension,
@@ -14,13 +14,13 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import {
-  type Order,
+  type Diagnosis,
   type Encounter,
+  mapEncounters,
   type Note,
   type Observation,
+  type Order,
   type OrderItem,
-  type Diagnosis,
-  mapEncounters,
 } from '../visit.resource';
 import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
@@ -31,7 +31,8 @@ import styles from './visit-summary.scss';
 
 interface DiagnosisItem {
   diagnosis: string;
-  order: string;
+  rank: number;
+  type: string;
 }
 
 interface VisitSummaryProps {
@@ -70,14 +71,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         );
       }
 
-      //Check if there is a diagnosis associated with this encounter
+      // Check if there is a diagnosis associated with this encounter
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
           enc.diagnoses.forEach((diagnosis: Diagnosis) => {
             // Putting all the diagnoses in a single array.
             diagnoses.push({
               diagnosis: diagnosis.display,
-              order: diagnosis.rank === 1 ? 'Primary' : 'Secondary',
+              type: diagnosis.rank === 1 ? 'red' : 'blue',
+              rank: diagnosis.rank,
             });
           });
         }
@@ -102,6 +104,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
     });
 
+    // Sort the diagnoses by rank, so that primary diagnoses come first
+    diagnoses.sort((a, b) => a.rank - b.rank);
+
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
@@ -118,7 +123,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
           diagnoses.map((diagnosis, i) => (
-            <Tag key={i} type={diagnosis.order === 'Primary' ? 'red' : 'blue'}>
+            <Tag key={`${diagnosis.diagnosis}-${i}`} type={diagnosis.type}>
               {diagnosis.diagnosis}
             </Tag>
           ))

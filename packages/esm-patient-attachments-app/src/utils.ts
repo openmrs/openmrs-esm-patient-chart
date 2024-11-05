@@ -28,7 +28,7 @@ export function createGalleryEntry(data: AttachmentResponse): Attachment {
   return {
     id: data.uuid,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
-    filename: data.filename,
+    filename: data.filename.replace(/\.[^\\/.]+$/, ''),
     description: data.comment,
     dateTime: formatDate(new Date(data.dateTime), {
       mode: 'wide',

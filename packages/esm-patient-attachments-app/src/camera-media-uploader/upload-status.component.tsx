@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, FileUploaderItem, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
@@ -27,7 +27,7 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
 
   useEffect(() => {
     Promise.all(
-      filesToUpload.map((file, indx) =>
+      filesToUpload.map((file, index) =>
         saveFile(file)
           .then(() => {
             showSnackbar({
@@ -37,8 +37,8 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
               isLowContrast: true,
             });
             setFilesUploading((prevfilesToUpload) =>
-              prevfilesToUpload.map((file, ind) =>
-                ind === indx
+              prevfilesToUpload.map((file, prevFileIndex) =>
+                prevFileIndex === index
                   ? {
                       ...file,
                       status: 'complete',
@@ -47,16 +47,15 @@ const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) 
               ),
             );
           })
-          .catch((err) => {
+          .catch((error) => {
             showSnackbar({
               kind: 'error',
-              subtitle: err,
+              subtitle: error?.message,
               title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
             });
           }),
       ),
     ).then(() => {
-      true;
       onCompletion?.();
     });
   }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);

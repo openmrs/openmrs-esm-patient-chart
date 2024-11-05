@@ -1,6 +1,6 @@
 import { useStoreWithActions } from '@openmrs/esm-framework';
 import type { OrderBasketItem, PostDataPrepFunction } from './types';
-import { getPatientUuidFromUrl } from '../get-patient-uuid-from-url';
+import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { useEffect } from 'react';
 import { type OrderBasketStore, orderBasketStore } from './store';
 
@@ -10,7 +10,7 @@ const orderBasketStoreActions = {
     grouping: string,
     value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>),
   ) {
-    const patientUuid = getPatientUuidFromUrl();
+    const patientUuid = getPatientUuidFromStore();
     if (!Object.keys(state.postDataPrepFunctions).includes(grouping)) {
       console.warn(`Programming error: You must register a postDataPrepFunction for grouping ${grouping} `);
     }
@@ -35,7 +35,7 @@ const orderBasketStoreActions = {
 };
 
 function getOrderItems(items: OrderBasketStore['items'], grouping?: string | null): Array<OrderBasketItem> {
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const patientItems = items?.[patientUuid] ?? {};
   return grouping ? patientItems[grouping] ?? [] : Object.values(patientItems).flat();
 }
@@ -46,7 +46,7 @@ export interface ClearOrdersOptions {
 
 function clearOrders(options?: ClearOrdersOptions) {
   const exceptThoseMatchingFcn = options?.exceptThoseMatching ?? (() => false);
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const items = orderBasketStore.getState().items;
   const patientItems = items[patientUuid] ?? {};
   const newPatientItems = Object.fromEntries(

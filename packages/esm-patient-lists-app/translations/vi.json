@@ -1,0 +1,21 @@
+{
+  "backToPatientLists": "Back to patient lists",
+  "checkFilters": "Check the filters above",
+  "createdOn": "Created on",
+  "identifier": "Mã định danh",
+  "listName": "List name",
+  "listType": "List type",
+  "name": "Tên",
+  "noMatchingListsFound": "No matching lists to display",
+  "noMatchingPatients": "No matching patients to display",
+  "noPatientListsToDisplay": "No patient lists to display",
+  "noPatientsInList": "There are no patients in this list",
+  "numberOfPatients": "No. of patients",
+  "patientListDetailWorkspaceTitle": "Patient List Details",
+  "patientLists": "Patient lists",
+  "patientListsWorkspaceTitle": "Patient Lists",
+  "patients": "bệnh nhân",
+  "searchThisList": "Search this list",
+  "sex": "Giới tính",
+  "startDate": "Start Date"
+}

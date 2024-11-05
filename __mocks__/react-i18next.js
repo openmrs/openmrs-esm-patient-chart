@@ -43,10 +43,9 @@ useMock.i18n = { language: 'en_US' };
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
-  Trans: ({ children }) => renderNodes(children),
+  Trans: ({ children }) => (Array.isArray(children) ? renderNodes(children) : renderNodes([children])),
   Translation: ({ children }) => children((k) => k, { i18n: {} }),
   useTranslation: () => useMock,
-
   // mock if needed
   I18nextProvider: reactI18next.I18nextProvider,
   initReactI18next: reactI18next.initReactI18next,

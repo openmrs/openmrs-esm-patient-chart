@@ -1,12 +1,12 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { of, throwError } from 'rxjs';
 import { render, screen } from '@testing-library/react';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import userEvent from '@testing-library/user-event';
 import {
   getDefaultsFromConfigSchema,
   openmrsFetch,
+  restBaseUrl,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -255,16 +255,14 @@ describe('Visit form', () => {
   it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 
@@ -323,17 +321,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '183299');
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ uuid: string; visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -347,13 +343,13 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
@@ -393,17 +389,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '1873290');
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -417,7 +411,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -426,7 +420,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -466,17 +460,15 @@ describe('Visit form', () => {
     const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
     await user.clear(insuranceNumberInput);
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -490,12 +482,12 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       { method: 'DELETE' },
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       { method: 'DELETE' },
     );
 
@@ -511,7 +503,8 @@ describe('Visit form', () => {
 
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
-    mockSaveVisit.mockReturnValue(throwError(() => ({ status: 500, statusText: 'Internal server error' })));
+
+    mockSaveVisit.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
 
     renderVisitForm();
 
@@ -575,16 +568,14 @@ describe('Visit form', () => {
       ],
     });
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 

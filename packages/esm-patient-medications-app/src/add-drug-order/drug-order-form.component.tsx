@@ -51,6 +51,7 @@ import type {
 } from '../types';
 import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -354,7 +355,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patient, isLoading: isLoadingPatientDetails } = usePatient();
+  const { patientUuid } = usePatientChartStore();
+  const { patient, isLoading: isLoadingPatientDetails } = usePatient(patientUuid);
   const patientName = patient ? getPatientName(patient) : '';
   const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 

@@ -57,7 +57,7 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('Then I should see the file I uploaded displayed in the attachments table', async () => {
-    await expect(page.getByRole('button', { name: /brainScan.jpeg/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /brainScan/i })).toBeVisible();
   });
 
   await test.step('When I click on the `Table view` tab', async () => {
@@ -78,7 +78,7 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted attachment in the list', async () => {
-    await expect(page.getByRole('button', { name: /brainScan.jpeg/i })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /brainScan/i })).not.toBeVisible();
   });
 
   await test.step('And the attachments table should be empty', async () => {

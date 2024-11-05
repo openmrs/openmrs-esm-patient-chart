@@ -23,7 +23,9 @@
       "name": "capture-photo-widget",
       "component": "capturePhotoWidget",
       "slot": "capture-patient-photo-slot"
-    },
+    }
+  ],
+  "modals": [
     {
       "name": "capture-photo-modal",
       "component": "capturePhotoModal"

@@ -2,16 +2,15 @@ import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } 
 import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody, InlineNotification } from '@carbon/react';
 import { type FetchResponse, type UploadedFile } from '@openmrs/esm-framework';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraComponent from './camera.component';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import FileReviewContainer from './file-review.component';
 import MediaUploaderComponent from './media-uploader.component';
 import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
-import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 
 interface CameraMediaUploaderModalProps {
-  allowedExtensions: Array<string> | null;
   cameraOnly?: boolean;
   closeModal: () => void;
   collectDescription?: boolean;
@@ -26,7 +25,6 @@ interface CameraMediaUploadTabsProps {
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
-  allowedExtensions,
   cameraOnly,
   closeModal,
   collectDescription,

@@ -47,6 +47,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl(),
+    getPatientUuidFromStore: () => mockGetPatientUuidFromUrl(),
     launchPatientWorkspace: (arg) => mockLaunchPatientWorkspace(arg),
   };
 });
@@ -61,8 +62,11 @@ jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
   return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/get-patient-uuid-from-url', () => {
-  return { getPatientUuidFromUrl: () => mockGetPatientUuidFromUrl() };
+jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => {
+  return {
+    getPatientUuidFromStore: () => mockGetPatientUuidFromUrl(),
+    usePatientChartStore: () => ({ patientUuid: mockPatient.id }),
+  };
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {

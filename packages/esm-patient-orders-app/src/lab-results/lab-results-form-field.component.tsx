@@ -1,7 +1,7 @@
 import React from 'react';
 import { NumberInput, Select, SelectItem, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Control, Controller } from 'react-hook-form';
+import { type Control, Controller, type FieldErrors } from 'react-hook-form';
 import { type LabOrderConcept } from './lab-results.resource';
 import styles from './lab-results-form.scss';
 
@@ -9,9 +9,10 @@ interface ResultFormFieldProps {
   concept: LabOrderConcept;
   control: Control<any, any>;
   defaultValue: any;
+  errors: FieldErrors;
 }
 
-const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue }) => {
+const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue, errors }) => {
   const { t } = useTranslation();
 
   const isCoded = (concept: LabOrderConcept) => concept.datatype?.display === 'Coded';
@@ -42,12 +43,14 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
           name={concept.uuid}
           render={({ field }) => (
             <TextInput
+              {...field}
               className={styles.textInput}
               id={concept.uuid}
               key={concept.uuid}
               labelText={concept?.display ?? ''}
               type="text"
-              {...field}
+              invalidText={errors[concept.uuid]?.message}
+              invalid={!!errors[concept.uuid]}
             />
           )}
         />
@@ -66,8 +69,10 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               id={concept.uuid}
               key={concept.uuid}
               label={concept?.display + printValueRange(concept)}
-              onChange={(event) => field.onChange(event.target.value)}
+              onChange={(event) => field.onChange(parseFloat(event.target.value))}
               value={field.value || ''}
+              invalidText={errors[concept.uuid]?.message}
+              invalid={!!errors[concept.uuid]}
             />
           )}
         />
@@ -85,6 +90,8 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               id={`select-${concept.uuid}`}
               key={concept.uuid}
               labelText={concept?.display}
+              invalidText={errors[concept.uuid]?.message}
+              invalid={!!errors[concept.uuid]}
             >
               <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
               {concept?.answers?.length &&
@@ -113,6 +120,8 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     key={member.uuid}
                     labelText={member?.display ?? ''}
                     type="text"
+                    invalidText={errors[member.uuid]?.message}
+                    invalid={!!errors[member.uuid]}
                   />
                 )}
               />
@@ -130,8 +139,10 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     id={`number-${member.uuid}`}
                     key={member.uuid}
                     label={member?.display + printValueRange(member)}
-                    onChange={(event) => field.onChange(event.target.value)}
+                    onChange={(event) => field.onChange(parseFloat(event.target.value))}
                     value={field.value || ''}
+                    invalidText={errors[member.uuid]?.message}
+                    invalid={!!errors[member.uuid]}
                   />
                 )}
               />
@@ -149,6 +160,8 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     key={member.uuid}
                     labelText={member?.display}
                     type="text"
+                    invalidText={errors[member.uuid]?.message}
+                    invalid={!!errors[member.uuid]}
                   >
                     <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
 

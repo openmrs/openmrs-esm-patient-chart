@@ -87,7 +87,7 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
         <Button
           className={styles.button}
           kind="ghost"
-          size="sm"
+          size={tablet ? 'md' : 'sm'}
           onClick={() => setExpandAll((prevValue) => !prevValue)}
         >
           <span>{t(!expandAll ? `Expand all` : `Collapse all`)}</span>
@@ -112,7 +112,7 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
             id={root?.flatName}
             checked={root.hasData && allChildrenChecked}
             indeterminate={indeterminate}
-            labelText={`${root?.display} (${parents?.[root?.flatName]?.length ?? 0})`}
+            labelText={root?.display}
             onChange={() => updateParent(root.flatName)}
             disabled={!root.hasData}
           />

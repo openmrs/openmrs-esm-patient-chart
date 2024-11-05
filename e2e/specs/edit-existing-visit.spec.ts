@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient, generateRandomPatient, deletePatient, startVisit } from '../commands';
+import { deletePatient, generateRandomPatient, type Patient, startVisit } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
@@ -27,18 +27,24 @@ test('Edit an existing visit', async ({ page }) => {
 
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
-    const datePickerInput = chartPage.page.getByPlaceholder(/dd\/mm\/yyyy/i);
-    await expect(datePickerInput).toBeVisible();
-    const dateValue = await datePickerInput.inputValue();
+
+    const startDateInput = chartPage.page.locator('input#visitStartDateInput');
+    const startTimeInput = chartPage.page.locator('input#visitStartTime');
+
+    await expect(startDateInput).toBeVisible();
+    const dateValue = await startDateInput.inputValue();
     expect(dateValue).not.toBe('');
     expect(dateValue).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
 
-    await expect(chartPage.page.getByPlaceholder(/hh\:mm/i)).toBeVisible();
+    await expect(startTimeInput).toBeVisible();
+    const timeValue = await startTimeInput.inputValue();
+    expect(timeValue).toMatch(/^(1[0-2]|0?[1-9]):([0-5][0-9])$/);
+
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toHaveValue('Outpatient Clinic');
     await expect(chartPage.page.getByText(/visit type/i)).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeChecked();
-    await expect(chartPage.page.getByRole('search', { name: /search for a visit type/i })).toBeVisible();
+    await expect(chartPage.page.getByRole('search', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeVisible();
     await expect(chartPage.page.getByLabel(/home visit/i)).toBeVisible();
     await expect(chartPage.page.getByLabel(/opd visit/i)).toBeVisible();

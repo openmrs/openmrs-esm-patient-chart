@@ -74,6 +74,7 @@
 .high,
 .low {
   @include type.type-style('heading-compact-01');
+  color: colors.$gray-100 !important;
 }
 
 .criticallyLow::after {

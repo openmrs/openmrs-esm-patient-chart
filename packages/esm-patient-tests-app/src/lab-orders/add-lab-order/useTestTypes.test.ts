@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { renderHook, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { useTestTypes } from './useTestTypes';
 
@@ -43,7 +43,7 @@ describe('useTestTypes is configurable', () => {
   it('should return all test concepts when no labOrderableConcepts are provided', async () => {
     const { result } = renderHook(() => useTestTypes());
     expect(mockOpenrsFetch).toHaveBeenCalledWith(
-      '/ws/rest/v1/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))',
+      `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     );
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBeFalsy();
@@ -54,7 +54,7 @@ describe('useTestTypes is configurable', () => {
     const { result } = renderHook(() => useTestTypes());
     expect(mockOpenrsFetch).toHaveBeenCalledWith(
       expect.stringContaining(
-        '/ws/rest/v1/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))',
+        `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
       ),
     );
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
