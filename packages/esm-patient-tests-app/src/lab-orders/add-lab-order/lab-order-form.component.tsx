@@ -106,6 +106,10 @@ export function LabOrderForm({
 
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
+  const filterItemsByName = useCallback((menu) => {
+    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+  }, []);
+
   const handleFormSubmission = useCallback(
     (data: LabOrderBasketItem) => {
       const finalizedOrder: LabOrderBasketItem = {
@@ -216,6 +220,7 @@ export function LabOrderForm({
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
                       selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      shouldFilterItem={filterItemsByName}
                       size={responsiveSize}
                       titleText={t('priority', 'Priority')}
                     />
@@ -241,6 +246,7 @@ export function LabOrderForm({
                         onBlur={onBlur}
                         onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
                         selectedItem={''}
+                        shouldFilterItem={filterItemsByName}
                         size={responsiveSize}
                         titleText={t('orderReason', 'Order reason')}
                       />
