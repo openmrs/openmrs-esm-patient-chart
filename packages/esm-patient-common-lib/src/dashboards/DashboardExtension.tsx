@@ -15,8 +15,8 @@ import {
   DocumentAttachmentIcon,
   TableIcon,
   EventScheduleIcon,
+  ReportIcon
 } from '@openmrs/esm-framework';
-import { Report } from '@carbon/react/icons';
 import styles from './dashboard-extension.scss';
 
 export interface DashboardExtensionProps {
@@ -45,7 +45,7 @@ export const DashboardExtension = ({
     Conditions: ListCheckedIcon,
     Medications: MedicationIcon,
     Orders: ShoppingCartIcon,
-    'Patient Summary': Report,
+    'Patient Summary': ReportIcon,
     Programs: TableIcon,
     Results: ChartAverageIcon,
     Visits: CalendarHeatMapIcon,
