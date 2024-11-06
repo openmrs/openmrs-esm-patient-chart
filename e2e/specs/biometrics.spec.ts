@@ -27,12 +27,12 @@ test('Record biometrics', async ({ page }) => {
     await expect(biometricsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
   });
 
-  await test.step('When I fill `170` as the height', async () => {
-    await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('170');
+  await test.step('When I fill `65` as the weight', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('65');
   });
 
-  await test.step('And I fill `65` as the weight', async () => {
-    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('65');
+  await test.step('And I fill `170` as the height', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('170');
   });
 
   await test.step('Then I should see `22.51` as the auto calculated body mass index', async () => {
@@ -63,6 +63,52 @@ test('Record biometrics', async ({ page }) => {
     await expect(dataRow).toContainText('170');
     await expect(dataRow).toContainText('22.5');
     await expect(dataRow).toContainText('25');
+  });
+});
+
+test('Record abnormal biometrics', async ({ page }) => {
+  const biometricsPage = new BiometricsAndVitalsPage(page);
+
+  await test.step('When I visit the vitals and biometrics page', async () => {
+    await biometricsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click on the `Record biometrics` link to launch the form', async () => {
+    await biometricsPage.page.getByText(/record biometrics/i).click();
+  });
+
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
+    await expect(biometricsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step('When I fill `255` as the weight', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('255');
+  });
+
+  await test.step('And I fill `275` as the height', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('275');
+  });
+
+  await test.step('Then I should see `33.7` as the auto calculated body mass index', async () => {
+    await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('33.7');
+  });
+
+  await test.step('When I fill `25` as the mid upper arm circumference ', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /muac/i }).fill('25');
+  });
+
+  await test.step('And I click on the `Save and close` button', async () => {
+    await biometricsPage.page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then the system should not save the abnormal biometrics', async () => {
+    await expect(biometricsPage.page.getByText(/some of the values entered are invalid/i)).toBeVisible();
+    await expect(biometricsPage.page.getByText(/error saving vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step(`And the abnormal vitals should be visible in the 'Biometrics' section with an indication that they exceed normal thresholds.`, async () => {
+    await expect(biometricsPage.page.getByText(/value must be between 0 and 250/i)).toBeVisible();
+    await expect(biometricsPage.page.getByText(/value must be between 10 and 272/i)).toBeVisible();
   });
 });
 
