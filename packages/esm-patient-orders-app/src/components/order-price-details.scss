@@ -10,7 +10,7 @@
 
 .priceLabel {
   @include type.type-style('heading-compact-01');
-  padding-right: layout.$spacing-02;
+  padding-inline-end: layout.$spacing-02;
 }
 
 .priceToolTip {

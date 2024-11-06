@@ -3,8 +3,15 @@ import { type FetchResponse, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-fram
 import useSWR from 'swr';
 import { useMemo } from 'react';
 
+/*
+This implementation depends on these backend modules
+- fhirproxy
+- stockmanagement
+- billing
+*/
+
 export const useOrderPrice = (orderItemUuid: string) => {
-  const { data, isLoading } = useSWR<FetchResponse<OrderPriceData>>(
+  const { data, isLoading, error } = useSWR<FetchResponse<OrderPriceData>>(
     orderItemUuid ? `${fhirBaseUrl}/ChargeItemDefinition?code=${orderItemUuid}` : null,
     openmrsFetch,
   );
@@ -13,6 +20,7 @@ export const useOrderPrice = (orderItemUuid: string) => {
     () => ({
       data: data?.data || null,
       isLoading,
+      error,
     }),
     [data, isLoading],
   );

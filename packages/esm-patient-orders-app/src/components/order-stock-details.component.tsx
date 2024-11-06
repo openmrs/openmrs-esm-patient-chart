@@ -11,7 +11,7 @@ interface OrderStockDetailsComponentProps {
 
 const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({ orderItemUuid }) => {
   const { t } = useTranslation();
-  const { data: stockData, isLoading } = useOrderStockInfo(orderItemUuid);
+  const { data: stockData, isLoading, error } = useOrderStockInfo(orderItemUuid);
 
   const isInStock = useMemo(() => {
     if (!stockData || stockData.entry.length === 0) {
@@ -25,7 +25,7 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     return <SkeletonText width="100px" data-testid="skeleton-text" />;
   }
 
-  if (!stockData) {
+  if (!stockData || error) {
     return null;
   }
 
@@ -33,11 +33,11 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     <div>
       {isInStock ? (
         <div className={styles.itemInStock}>
-          <CheckmarkFilledIcon size={16} className={styles.itemInStockIcon} /> {t('inStock', 'In Stock')}
+          <CheckmarkFilledIcon size={16} className={styles.itemInStockIcon} /> {t('inStock', 'In stock')}
         </div>
       ) : (
         <div className={styles.itemOutOfStock}>
-          <CloseFilledIcon size={16} className={styles.itemOutOfStockIcon} /> {t('outOfStock', 'Out of Stock')}
+          <CloseFilledIcon size={16} className={styles.itemOutOfStockIcon} /> {t('outOfStock', 'Out of stock')}
         </div>
       )}
     </div>

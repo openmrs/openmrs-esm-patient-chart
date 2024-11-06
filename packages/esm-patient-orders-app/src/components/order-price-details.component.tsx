@@ -3,15 +3,16 @@ import { useOrderPrice } from '../hooks/useOrderPrice';
 import styles from './order-price-details.scss';
 import { SkeletonText, Tooltip } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { InformationIcon } from '@openmrs/esm-framework';
+import { getLocale, InformationIcon } from '@openmrs/esm-framework';
 
 interface OrderPriceDetailsComponentProps {
   orderItemUuid: string;
 }
 
 const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({ orderItemUuid }) => {
-  const { t, i18n } = useTranslation();
-  const { data: priceData, isLoading } = useOrderPrice(orderItemUuid);
+  const { t } = useTranslation();
+  const locale = getLocale();
+  const { data: priceData, isLoading, error } = useOrderPrice(orderItemUuid);
 
   const amount = useMemo(() => {
     if (!priceData || priceData.entry.length === 0) {
@@ -20,13 +21,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
   }, [priceData]);
 
-  const formatPrice = (
-    amount: {
-      value: number;
-      currency: string;
-    },
-    locale: string,
-  ): string => {
+  const formatPrice = (amount: { value: number; currency: string }): string => {
     if (!amount) return '';
 
     return new Intl.NumberFormat(locale, {
@@ -41,14 +36,14 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return <SkeletonText width="100px" data-testid="skeleton-text" />;
   }
 
-  if (!priceData || !amount) {
+  if (!priceData || !amount || error) {
     return null;
   }
 
   return (
     <div className={styles.priceDetailsContainer}>
       <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
-      {formatPrice(amount, i18n.language)}
+      {formatPrice(amount)}
       <Tooltip
         align="bottom-left"
         className={styles.priceToolTip}

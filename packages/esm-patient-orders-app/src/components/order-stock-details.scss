@@ -10,7 +10,7 @@
 
   .itemInStockIcon {
     fill: $support-02;
-    margin-right: layout.$spacing-02;
+    margin-inline-end: layout.$spacing-02;
   }
 }
 
@@ -23,6 +23,6 @@
 
   .itemOutOfStockIcon {
     fill: $danger;
-    margin-right: layout.$spacing-02;
+    margin-inline-end: layout.$spacing-02;
   }
 }
