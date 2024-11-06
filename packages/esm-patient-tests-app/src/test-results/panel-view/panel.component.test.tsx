@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import LabSetPanel from './panel.component';
-import { useTranslation } from 'react-i18next';
-import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, useLayoutType, type LayoutType } from '@openmrs/esm-framework';
 import { type ObsRecord } from '../../types';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
@@ -18,19 +18,8 @@ jest.mock('@openmrs/esm-framework', () => ({
   useLayoutType: jest.fn().mockReturnValue('desktop'),
 }));
 
-jest.mock('./helper', () => ({
-  getClass: jest.fn((interpretation) => {
-    switch (interpretation) {
-      case 'HIGH':
-        return 'high';
-      case 'LOW':
-        return 'low';
-      case 'NORMAL':
-      default:
-        return '';
-    }
-  }),
-}));
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockIsDesktop = jest.mocked(isDesktop);
 
 const mockConceptMeta = {
   display: '',
@@ -110,6 +99,7 @@ const mockObservations: Array<ObsRecord> = [
 
 describe('LabSetPanel', () => {
   const mockSetActivePanel = jest.fn();
+  const user = userEvent.setup();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -143,7 +133,7 @@ describe('LabSetPanel', () => {
     expect(within(hematocritRow).getByText('35-45 %')).toBeInTheDocument();
   });
 
-  it('should handle panel selection', () => {
+  it('should handle panel selection', async () => {
     render(
       <LabSetPanel
         panel={mockBasePanel}
@@ -156,7 +146,8 @@ describe('LabSetPanel', () => {
     const buttonElement = screen.getByRole('button', {
       name: /Complete Blood Count/i,
     });
-    fireEvent.click(buttonElement);
+
+    await user.click(buttonElement);
     expect(mockSetActivePanel).toHaveBeenCalledWith(mockBasePanel);
   });
 
@@ -258,8 +249,8 @@ describe('LabSetPanel', () => {
   });
 
   it('should adjust table size based on layout', () => {
-    (useLayoutType as unknown as jest.Mock).mockReturnValue('desktop');
-    (isDesktop as unknown as jest.Mock).mockReturnValue(true);
+    mockUseLayoutType.mockReturnValue('large-desktop');
+    mockIsDesktop.mockReturnValue(true);
 
     const { rerender } = render(
       <LabSetPanel
@@ -272,8 +263,8 @@ describe('LabSetPanel', () => {
 
     expect(screen.getByRole('table')).toHaveClass('cds--data-table--sm');
 
-    (useLayoutType as unknown as jest.Mock).mockReturnValue('tablet');
-    (isDesktop as unknown as jest.Mock).mockReturnValue(false);
+    mockUseLayoutType.mockReturnValue('tablet');
+    mockIsDesktop.mockReturnValue(false);
 
     rerender(
       <LabSetPanel
