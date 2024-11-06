@@ -93,6 +93,7 @@ export function prepLabOrderPostData(
       instructions: order.instructions,
       orderReason: order.orderReason,
       accessionNumber: order.accessionNumber,
+      urgency: order.urgency,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -107,6 +108,7 @@ export function prepLabOrderPostData(
       orderReason: order.orderReason,
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
+      urgency: order.urgency,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -120,6 +122,7 @@ export function prepLabOrderPostData(
       orderReason: order.orderReason,
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
+      urgency: order.urgency,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);
