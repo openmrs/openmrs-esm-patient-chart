@@ -21,7 +21,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
   }, [priceData]);
 
-  const formatPrice = (amount: { value: number; currency: string }, locale = 'en'): string => {
+  const formatedPrice = useMemo((): string => {
     if (!amount) return '';
     try {
       new Intl.NumberFormat(locale, {
@@ -42,7 +42,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
         maximumFractionDigits: 2,
       }).format(amount.value)} ${amount.currency}`;
     }
-  };
+  }, [locale, amount]);
 
   if (isLoading) {
     return <SkeletonText width="100px" role="progressbar" />;
@@ -55,7 +55,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   return (
     <div className={styles.priceDetailsContainer}>
       <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
-      {formatPrice(amount)}
+      {formatedPrice}
       <Tooltip
         align="bottom-left"
         className={styles.priceToolTip}

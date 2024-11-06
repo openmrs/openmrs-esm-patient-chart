@@ -3,29 +3,22 @@ import { screen } from '@testing-library/react';
 import OrderPriceDetailsComponent from './order-price-details.component';
 import { useOrderPrice } from '../hooks/useOrderPrice';
 import { renderWithSwr } from 'tools';
-import { useTranslation } from 'react-i18next';
 import { mockOrderPriceData } from '__mocks__';
+import { getLocale } from '@openmrs/esm-framework';
 
+const mockGetLocale = jest.mocked(getLocale);
 const mockUseOrderPrice = jest.mocked(useOrderPrice);
 
 jest.mock('../hooks/useOrderPrice', () => ({
   useOrderPrice: jest.fn(),
 }));
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
-}));
-
-const mockUseTranslation = useTranslation as jest.Mock;
 
 describe('OrderPriceDetailsComponent', () => {
   const mockOrderItemUuid = 'test-uuid';
 
   beforeEach(() => {
     jest.resetAllMocks();
-    mockUseTranslation.mockImplementation(() => ({
-      t: (key: string, fallback: string) => fallback,
-      i18n: { language: 'en-US' },
-    }));
+    mockGetLocale.mockReturnValue('en-US');
   });
 
   it('renders loading skeleton when data is loading', () => {
@@ -74,10 +67,7 @@ describe('OrderPriceDetailsComponent', () => {
     });
 
     // Change to German locale for this test
-    mockUseTranslation.mockImplementation(() => ({
-      t: (key: string, fallback: string) => fallback,
-      i18n: { language: 'de-DE' },
-    }));
+    mockGetLocale.mockReturnValue('de-DE');
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
