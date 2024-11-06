@@ -15,7 +15,8 @@ import {
   DocumentAttachmentIcon,
   TableIcon,
   EventScheduleIcon,
-  ReportIcon
+  ReportIcon,
+  SyringeIcon,
 } from '@openmrs/esm-framework';
 import styles from './dashboard-extension.scss';
 
@@ -39,17 +40,18 @@ export const DashboardExtension = ({
   type MenuTitle = keyof typeof MenuIcons;
 
   const MenuIcons = {
-    Allergies: WarningIcon,
-    Appointments: EventScheduleIcon,
-    Attachments: DocumentAttachmentIcon,
-    Conditions: ListCheckedIcon,
+    'Patient Summary': ReportIcon,
+    'Vitals & Biometrics': ActivityIcon,
     Medications: MedicationIcon,
     Orders: ShoppingCartIcon,
-    'Patient Summary': ReportIcon,
-    Programs: TableIcon,
     Results: ChartAverageIcon,
     Visits: CalendarHeatMapIcon,
-    'Vitals & Biometrics': ActivityIcon,
+    Allergies: WarningIcon,
+    Conditions: ListCheckedIcon,
+    Immunizations: SyringeIcon,
+    Attachments: DocumentAttachmentIcon,
+    Programs: TableIcon,
+    Appointments: EventScheduleIcon,
   } as const;
 
   const menuIcon = (title: MenuTitle) => {
