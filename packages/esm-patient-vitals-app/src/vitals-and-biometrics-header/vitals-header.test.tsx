@@ -208,10 +208,7 @@ describe('VitalsHeader', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByRole('link', { name: /vitals history/i })).toBeInTheDocument();
-
-    // TODO: I don't know why this doesn't work:
-    // screen.getByRole('button', {name: /record vitals/i})
-    expect(screen.getByText(/record vitals/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^record vitals$/i })).toBeInTheDocument();
   });
 
   it('should show not links in vitals header when hideLinks is true', async () => {
