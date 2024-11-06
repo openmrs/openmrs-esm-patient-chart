@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { type LabOrderBasketItem, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 
 const mockUseOrderBasket = jest.fn();
@@ -44,7 +44,7 @@ describe('LabOrderBasketPanel', () => {
       },
     ];
     let orders = [...labs];
-    const mockSetOrders = jest.fn((newOrders: Array<OrderBasketItem>) => {
+    const mockSetOrders = jest.fn((newOrders: Array<LabOrderBasketItem>) => {
       orders = newOrders;
     });
     mockUseOrderBasket.mockImplementation(() => ({
@@ -55,10 +55,12 @@ describe('LabOrderBasketPanel', () => {
     expect(screen.getByText(/Lab orders \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV VIRAL LOAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
+
     const removeHivButton = screen.getAllByRole('button', { name: /remove from basket/i })[0];
     expect(removeHivButton).toBeVisible();
+
     await user.click(removeHivButton);
-    rerender(<LabOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
+    rerender(<LabOrderBasketPanel />);
     await expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
     expect(screen.queryByText(/HIV VIRAL LOAD/i)).not.toBeInTheDocument();
