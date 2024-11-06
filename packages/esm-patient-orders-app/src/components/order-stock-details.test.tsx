@@ -59,7 +59,7 @@ describe('OrderStockDetailsComponent', () => {
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
-    expect(screen.getByText('In Stock')).toBeInTheDocument();
+    expect(screen.getByText(/In stock/i)).toBeInTheDocument();
     expect(screen.getByText('CheckmarkFilledIcon')).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe('OrderStockDetailsComponent', () => {
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
-    expect(screen.getByText('Out of Stock')).toBeInTheDocument();
+    expect(screen.getByText(/Out of stock/i)).toBeInTheDocument();
     expect(screen.getByText('CloseFilledIcon')).toBeInTheDocument();
   });
 
@@ -114,7 +114,7 @@ describe('OrderStockDetailsComponent', () => {
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
-    expect(screen.getByText('Out of Stock')).toBeInTheDocument();
+    expect(screen.getByText(/Out of stock/i)).toBeInTheDocument();
     expect(screen.getByText('CloseFilledIcon')).toBeInTheDocument();
   });
 
@@ -132,7 +132,7 @@ describe('OrderStockDetailsComponent', () => {
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
-    expect(screen.getByText('Out of Stock')).toBeInTheDocument();
+    expect(screen.getByText(/Out of stock/i)).toBeInTheDocument();
     expect(screen.getByText('CloseFilledIcon')).toBeInTheDocument();
   });
 });
