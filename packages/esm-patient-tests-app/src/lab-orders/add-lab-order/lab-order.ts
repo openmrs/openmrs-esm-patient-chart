@@ -1,9 +1,7 @@
-import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type LabOrderBasketItem, type OrderUrgency } from '@openmrs/esm-patient-common-lib';
 import { type TestType } from './useTestTypes';
 
 type LabOrderRequest = Pick<LabOrderBasketItem, 'action' | 'testType'>;
-
-type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
 
 type PriorityOption = {
   label: string;
