@@ -6,7 +6,12 @@ import { renderWithSwr } from 'tools';
 import { useTranslation } from 'react-i18next';
 import { mockOrderStockData } from '../../../../__mocks__/order-stock-data.mock';
 
-jest.mock('../hooks/useOrderStockInfo');
+const mockUseOrderStockInfo = jest.mocked(useOrderStockInfo);
+
+jest.mock('../hooks/useOrderStockInfo', () => ({
+  useOrderStockInfo: jest.fn(),
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
 }));
@@ -24,9 +29,10 @@ describe('OrderStockDetailsComponent', () => {
   });
 
   it('renders loading skeleton when data is loading', () => {
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: null,
       isLoading: true,
+      error: null,
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -34,9 +40,10 @@ describe('OrderStockDetailsComponent', () => {
   });
 
   it('renders nothing when stock data is null', () => {
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: null,
       isLoading: false,
+      error: null,
     });
 
     const { container } = renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -44,9 +51,10 @@ describe('OrderStockDetailsComponent', () => {
   });
 
   it('renders "In Stock" when item is active and has positive quantity', () => {
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: mockOrderStockData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -72,9 +80,10 @@ describe('OrderStockDetailsComponent', () => {
       ],
     };
 
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: outOfStockData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -97,9 +106,10 @@ describe('OrderStockDetailsComponent', () => {
       ],
     };
 
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: inactiveData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -114,9 +124,10 @@ describe('OrderStockDetailsComponent', () => {
       entry: [],
     };
 
-    (useOrderStockInfo as jest.Mock).mockReturnValue({
+    mockUseOrderStockInfo.mockReturnValue({
       data: emptyData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);

@@ -2,17 +2,13 @@ import useSWR from 'swr';
 import { type FetchResponse, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import { type OrderStockData } from '../types/order';
-
-/*
-This implementation depends on these backend modules
-- fhirproxy
-- stockmanagement
-- billing
-*/
+import { useIsBackendModuleInstalled } from './useIsBackendModuleInstalled';
 
 export const useOrderStockInfo = (orderItemUuid: string) => {
+  const { isInstalled, isLoading: isCheckingModules } = useIsBackendModuleInstalled(['fhirproxy', 'stockmanagement']);
+
   const { data, isLoading, error } = useSWR<FetchResponse<OrderStockData>>(
-    orderItemUuid ? `${fhirBaseUrl}/InventoryItem?code=${orderItemUuid}` : null,
+    orderItemUuid && isInstalled && !isCheckingModules ? `${fhirBaseUrl}/InventoryItem?code=${orderItemUuid}` : null,
     openmrsFetch,
   );
 
@@ -22,6 +18,6 @@ export const useOrderStockInfo = (orderItemUuid: string) => {
       isLoading,
       error,
     }),
-    [data, isLoading],
+    [data, isLoading, error],
   );
 };

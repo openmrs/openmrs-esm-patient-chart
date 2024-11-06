@@ -6,7 +6,11 @@ import { renderWithSwr } from 'tools';
 import { useTranslation } from 'react-i18next';
 import { mockOrderPriceData } from '../../../../__mocks__/order-price-data.mock';
 
-jest.mock('../hooks/useOrderPrice');
+const mockUseOrderPrice = jest.mocked(useOrderPrice);
+
+jest.mock('../hooks/useOrderPrice', () => ({
+  useOrderPrice: jest.fn(),
+}));
 jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
 }));
@@ -25,9 +29,10 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('renders loading skeleton when data is loading', () => {
-    (useOrderPrice as jest.Mock).mockReturnValue({
+    mockUseOrderPrice.mockReturnValue({
       data: null,
       isLoading: true,
+      error: null,
     });
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -35,12 +40,13 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('renders nothing when amount is null', () => {
-    (useOrderPrice as jest.Mock).mockReturnValue({
+    mockUseOrderPrice.mockReturnValue({
       data: {
         ...mockOrderPriceData,
         entry: [],
       },
       isLoading: false,
+      error: null,
     });
 
     const { container } = renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -48,9 +54,10 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('renders price correctly with USD currency', () => {
-    (useOrderPrice as jest.Mock).mockReturnValue({
+    mockUseOrderPrice.mockReturnValue({
       data: mockOrderPriceData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
@@ -60,9 +67,10 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('formats price correctly for different locales', () => {
-    (useOrderPrice as jest.Mock).mockReturnValue({
+    mockUseOrderPrice.mockReturnValue({
       data: mockOrderPriceData,
       isLoading: false,
+      error: null,
     });
 
     // Change to German locale for this test
@@ -78,9 +86,10 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('displays tooltip with price disclaimer', () => {
-    (useOrderPrice as jest.Mock).mockReturnValue({
+    mockUseOrderPrice.mockReturnValue({
       data: mockOrderPriceData,
       isLoading: false,
+      error: null,
     });
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);

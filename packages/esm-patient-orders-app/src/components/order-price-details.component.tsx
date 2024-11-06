@@ -32,7 +32,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     }).format(amount.value);
   };
 
-  if (isLoading || !priceData) {
+  if (isLoading) {
     return <SkeletonText width="100px" data-testid="skeleton-text" />;
   }
 
