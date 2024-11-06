@@ -7,14 +7,14 @@
   "countyDistrict": "Huyện",
   "district": "Huyện",
   "implementationLogo": "Logo triển khai",
-  "patientAge": "Age:",
-  "patientDateOfBirthWithSeparator": "Date of birth:",
-  "patientGenderWithSeparator": "Gender:",
-  "patientIdentifierSticker": "Patient identifier sticker",
-  "patientNameWithSeparator": "Patient name:",
-  "postalCode": "Postal code",
-  "printIdentifierSticker": "Print identifier sticker",
+  "patientAge": "Tuổi\"",
+  "patientDateOfBirthWithSeparator": "Ngày sinh:",
+  "patientGenderWithSeparator": "Giới tính:",
+  "patientIdentifierSticker": "Nhãn dán nhận dạng bệnh nhân",
+  "patientNameWithSeparator": "Tên bệnh nhân:",
+  "postalCode": "Mã bưu chính",
+  "printIdentifierSticker": "In nhãn dán nhận dạng",
   "state": "State",
   "stateProvince": "State",
-  "telephoneNumberWithSeparator": "Telephone number:"
+  "telephoneNumberWithSeparator": "Số điện thoại:"
 }
