@@ -1,7 +1,7 @@
-import React, { type ComponentProps, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ClickableTile, Tile } from '@carbon/react';
+import { ClickableTile, IconButton, Tile } from '@carbon/react';
 import { ExtensionSlot, TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './lab-order-basket-item-tile.scss';
@@ -52,18 +52,18 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
             )}
           </span>
         </div>
-        <Button
-          className={styles.removeButton}
+        <IconButton
+          size={isTablet ? 'lg' : 'sm'}
           kind="ghost"
-          hasIconOnly={true}
-          renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
-          iconDescription={t('removeFromBasket', 'Remove from basket')}
+          label={t('removeFromBasket', 'Remove from basket')}
           onClick={() => {
             shouldOnClickBeCalled.current = false;
             onRemoveClick();
           }}
-          tooltipPosition="left"
-        />
+          align="left"
+        >
+          <TrashCanIcon size={16} className={styles.removeButton} />
+        </IconButton>
       </div>
       <ExtensionSlot
         name="order-item-additional-info-slot"

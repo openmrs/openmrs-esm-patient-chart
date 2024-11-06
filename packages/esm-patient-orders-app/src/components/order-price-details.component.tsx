@@ -21,19 +21,31 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
   }, [priceData]);
 
-  const formatPrice = (amount: { value: number; currency: string }): string => {
+  const formatPrice = (amount: { value: number; currency: string }, locale = 'en'): string => {
     if (!amount) return '';
+    try {
+      new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: amount.currency,
+      });
 
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: amount.currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount.value);
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: amount.currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount.value);
+    } catch (error) {
+      console.error(`Invalid currency code: ${amount.currency}. Error: ${error.message}`);
+      return `${new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount.value)} ${amount.currency}`;
+    }
   };
 
   if (isLoading) {
-    return <SkeletonText width="100px" data-testid="skeleton-text" />;
+    return <SkeletonText width="100px" role="progressbar" />;
   }
 
   if (!priceData || !amount || error) {
@@ -49,7 +61,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
         className={styles.priceToolTip}
         label={t(
           'priceDisclaimer',
-          'This price is indicative and may not reflect final costs, which could vary due to discounts, insurance coverage, or other pricing rules.',
+          'This price is indicative and may not reflect final costs, which could vary due to discounts, insurance coverage, or other pricing rules',
         )}
       >
         <button className={styles.priceToolTipTrigger} type="button">

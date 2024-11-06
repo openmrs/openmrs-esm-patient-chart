@@ -4,7 +4,7 @@ import OrderPriceDetailsComponent from './order-price-details.component';
 import { useOrderPrice } from '../hooks/useOrderPrice';
 import { renderWithSwr } from 'tools';
 import { useTranslation } from 'react-i18next';
-import { mockOrderPriceData } from '../../../../__mocks__/order-price-data.mock';
+import { mockOrderPriceData } from '__mocks__';
 
 const mockUseOrderPrice = jest.mocked(useOrderPrice);
 
@@ -36,7 +36,7 @@ describe('OrderPriceDetailsComponent', () => {
     });
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
-    expect(screen.getByTestId('skeleton-text')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders nothing when amount is null', () => {
@@ -81,8 +81,44 @@ describe('OrderPriceDetailsComponent', () => {
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
 
-    // German locale uses comma as decimal separator
     expect(screen.getByText('99,99 $')).toBeInTheDocument();
+  });
+
+  it('handles invalid currency codes gracefully', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    mockUseOrderPrice.mockReturnValue({
+      data: {
+        ...mockOrderPriceData,
+        entry: [
+          {
+            resource: {
+              ...mockOrderPriceData.entry[0].resource,
+              propertyGroup: [
+                {
+                  priceComponent: [
+                    {
+                      type: 'base',
+                      amount: { value: 99.99, currency: 'INVALID' },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
+
+    expect(screen.getByText('Price:')).toBeInTheDocument();
+    expect(screen.getByText('99.99 INVALID')).toBeInTheDocument();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid currency code: INVALID'));
+
+    consoleSpy.mockRestore();
   });
 
   it('displays tooltip with price disclaimer', () => {

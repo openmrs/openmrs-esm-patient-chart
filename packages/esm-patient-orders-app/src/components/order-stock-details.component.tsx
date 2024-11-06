@@ -14,15 +14,17 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
   const { data: stockData, isLoading, error } = useOrderStockInfo(orderItemUuid);
 
   const isInStock = useMemo(() => {
-    if (!stockData || stockData.entry.length === 0) {
+    if (!stockData?.entry?.length) {
       return false;
     }
     const resource = stockData.entry[0]?.resource;
-    return resource.status === 'active' && resource.netContent?.value > 0;
+    return (
+      resource?.status === 'active' && typeof resource?.netContent?.value === 'number' && resource.netContent.value > 0
+    );
   }, [stockData]);
 
   if (isLoading) {
-    return <SkeletonText width="100px" data-testid="skeleton-text" />;
+    return <SkeletonText width="100px" role="progressbar" />;
   }
 
   if (!stockData || error) {

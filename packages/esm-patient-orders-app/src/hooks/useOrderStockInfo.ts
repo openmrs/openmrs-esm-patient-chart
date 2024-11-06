@@ -14,7 +14,7 @@ export const useOrderStockInfo = (orderItemUuid: string) => {
 
   return useMemo(
     () => ({
-      data: data?.data || null,
+      data: data?.data ?? null,
       isLoading,
       error,
     }),

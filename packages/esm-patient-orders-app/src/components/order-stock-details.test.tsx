@@ -4,7 +4,7 @@ import OrderStockDetailsComponent from './order-stock-details.component';
 import { useOrderStockInfo } from '../hooks/useOrderStockInfo';
 import { renderWithSwr } from 'tools';
 import { useTranslation } from 'react-i18next';
-import { mockOrderStockData } from '../../../../__mocks__/order-stock-data.mock';
+import { mockOrderStockData } from '__mocks__';
 
 const mockUseOrderStockInfo = jest.mocked(useOrderStockInfo);
 
@@ -36,7 +36,7 @@ describe('OrderStockDetailsComponent', () => {
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
-    expect(screen.getByTestId('skeleton-text')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders nothing when stock data is null', () => {
