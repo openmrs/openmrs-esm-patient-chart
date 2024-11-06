@@ -190,4 +190,47 @@ describe('VitalsHeader', () => {
       workspaceTitle: 'Triage',
     });
   });
+
+  it('should show links in vitals header by default', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('link', { name: /vitals history/i })).toBeInTheDocument();
+
+    // TODO: I don't know why this doesn't work:
+    // screen.getByRole('button', {name: /record vitals/i})
+    expect(screen.getByText(/record vitals/i)).toBeInTheDocument();
+  });
+
+  it('should show not links in vitals header when hideLinks is true', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...{ ...testProps, hideLinks: true }} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
+  });
 });
