@@ -2,11 +2,14 @@ import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
+export type Urgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+
 export interface ExtractedOrderErrorObject {
   message: string;
   fieldErrors: string[];
   globalErrors: string[];
 }
+
 export interface OrderErrorObject {
   responseBody?: {
     error?: {
@@ -128,7 +131,7 @@ export interface Order {
   quantityUnits: OpenmrsResource;
   route: OpenmrsResource;
   scheduleDate: null;
-  urgency: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  urgency: Urgency;
 
   // additional properties
   accessionNumber: string;
@@ -143,7 +146,7 @@ export interface Order {
     changedBy: string;
     dateChanged: string;
   };
-  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONINTUED';
+  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONTINUED';
   fulfillerComment: string;
   specimenSource: string;
   laterality: string;
@@ -207,7 +210,7 @@ export interface LabOrderBasketItem extends OrderBasketItem {
     label: string;
     conceptUuid: string;
   };
-  urgency?: string;
+  urgency?: Urgency;
   instructions?: string;
   previousOrder?: string;
   orderReason?: string;
