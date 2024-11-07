@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type ConfigObject, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema } from '../../config-schema';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../../config-schema';
 import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
 import { mockResults } from '__mocks__';
 
@@ -10,10 +10,17 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();
 
 mockUseConfig.mockReturnValue({
-  resultsViewerConcepts: {
-    conceptUuid: '9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7',
-    defaultOpen: false,
+  resultsViewerConcepts: [
+    {
+      conceptUuid: '9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7',
+      defaultOpen: false,
+    },
+  ],
+  orders: {
+    labOrderTypeUuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
+    labOrderableConcepts: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
   },
+  labTestsWithOrderReasons: [],
 });
 
 jest.mock('../grouped-timeline', () => ({
