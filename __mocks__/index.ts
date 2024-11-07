@@ -4,6 +4,7 @@ export * from './conditions.mock';
 export * from './encounters.mock';
 export * from './forms.mock';
 export * from './generic-widgets.mock';
+export * from './groupedResults.mock';
 export * from './immunizations.mock';
 export * from './location.mock';
 export * from './medication.mock';
