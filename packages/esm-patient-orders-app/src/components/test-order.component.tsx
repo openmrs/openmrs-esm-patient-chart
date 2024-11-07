@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import styles from './test-order.scss';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -14,7 +13,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounter, useOrderConceptByUuid } from '@openmrs/esm-patient-common-lib';
+import { useLabEncounter, useOrderConceptByUuid, type Order } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType } from '@openmrs/esm-framework';
 
 interface TestOrderProps {
