@@ -6,8 +6,8 @@ interface ModuleData {
   results: Array<{ uuid: string }>;
 }
 
-export const useIsBackendModuleInstalled = (modules: string | string[]) => {
-  const { data, isLoading, error } = useSWR<FetchResponse<ModuleData>>(
+export const useAreBackendModuleInstalled = (modules: string | string[]) => {
+  const { data, isLoading, error } = useSWR<FetchResponse<ModuleData>, Error>(
     `${restBaseUrl}/module?v=custom:(uuid)`,
     openmrsFetch,
   );
@@ -16,12 +16,12 @@ export const useIsBackendModuleInstalled = (modules: string | string[]) => {
     const installedModules = data?.data?.results?.map((module) => module.uuid) ?? [];
     const modulesToCheck = Array.isArray(modules) ? modules : [modules];
 
-    const isInstalled = modulesToCheck.every((module) => installedModules.includes(module));
+    const areModulesInstalled = modulesToCheck.every((module) => installedModules.includes(module));
 
     return {
-      isInstalled,
-      isLoading,
-      error,
+      areModulesInstalled,
+      isCheckingModules: isLoading,
+      moduleCheckError: error,
     };
   }, [data, isLoading, error, modules]);
 };

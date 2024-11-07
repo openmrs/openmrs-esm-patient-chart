@@ -21,7 +21,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
   }, [priceData]);
 
-  const formatedPrice = useMemo((): string => {
+  const formattedPrice = useMemo((): string => {
     if (!amount) return '';
     try {
       new Intl.NumberFormat(locale, {
@@ -55,7 +55,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   return (
     <div className={styles.priceDetailsContainer}>
       <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
-      {formatedPrice}
+      {formattedPrice}
       <Tooltip
         align="bottom-left"
         className={styles.priceToolTip}
