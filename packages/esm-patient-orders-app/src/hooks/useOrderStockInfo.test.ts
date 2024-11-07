@@ -8,7 +8,6 @@ const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 
 describe('useOrderStockInfo', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockedOpenmrsFetch.mockImplementation((url) => {
       if (url.includes('/ws/rest/v1/module')) {
         return Promise.resolve({
