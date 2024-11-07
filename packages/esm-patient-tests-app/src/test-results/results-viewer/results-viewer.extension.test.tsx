@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { type ConfigObject, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema } from '../../config-schema';
 import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
-import { mockResults } from '../../../../../__mocks__/results.mock';
+import { mockResults } from '__mocks__';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();
