@@ -297,7 +297,7 @@ export const mockGroupedResults = {
   ],
 };
 
-export type OBSERVATION_INTERPRETATION =
+type OBSERVATION_INTERPRETATION =
   | 'NORMAL'
   | 'HIGH'
   | 'CRITICALLY_HIGH'

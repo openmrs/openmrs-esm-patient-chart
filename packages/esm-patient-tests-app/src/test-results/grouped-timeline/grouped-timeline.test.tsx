@@ -1,13 +1,9 @@
-import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 import GroupedTimeline from './grouped-timeline.component';
-import { mockGroupedResults } from '../../../../../__mocks__/grouped-results.mock';
+import { mockGroupedResults } from '__mocks__';
 import FilterContext from '../filter/filter-context';
 import { type FilterContextProps } from '../filter/filter-types';
-
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
 
 describe('GroupedTimeline', () => {
   const mockFilterContext: FilterContextProps = {
@@ -42,8 +38,8 @@ describe('GroupedTimeline', () => {
       },
     });
 
-    expect(screen.getByText('dataTimelineText')).toBeInTheDocument();
-    expect(screen.getByText('emptyStateText')).toBeInTheDocument();
+    expect(screen.getByText(/Data timeline/)).toBeInTheDocument();
+    expect(screen.getByText(/There are no data to display for this patient/)).toBeInTheDocument();
   });
 
   it('renders timeline header and data when activeTests, timelineData, and loaded are present', () => {
