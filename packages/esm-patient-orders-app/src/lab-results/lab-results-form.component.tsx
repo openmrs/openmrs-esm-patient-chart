@@ -11,6 +11,13 @@ import {
   useLabEncounter,
   useObservation,
   createObservationPayload,
+  LabOrderConcept,
+  updateObservation,
+  useCompletedLabResults,
+  isCoded,
+  isNumeric,
+  isText,
+  isPanel,
 } from './lab-results.resource';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
@@ -30,19 +37,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const { t } = useTranslation();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
-  const [obsUuid, setObsUuid] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [initialValues, setInitialValues] = useState(null);
-  const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
-  const { encounter, isLoading: isLoadingEncounter, mutate: mutateLabOrders } = useLabEncounter(order.encounter.uuid);
-  const { data, isLoading: isLoadingObs, error: isErrorObs } = useObservation(obsUuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const schema = useLabResultsFormSchema(order.concept.uuid);
+  const { completeLabResult, error, isLoading, mutate } = useCompletedLabResults(order);
 
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
+    setValue,
     handleSubmit,
   } = useForm<{ testResult: Record<string, unknown> }>({
     defaultValues: {},
@@ -50,37 +53,30 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     mode: 'all',
   });
 
-  const mutateOrderData = useCallback(() => {
-    mutate(
-      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
-      undefined,
-      { revalidate: true },
-    );
-  }, [order.patient.uuid]);
-
   useEffect(() => {
-    if (!isLoadingEncounter && encounter?.obs?.length > 0 && !isEditing) {
-      const obs = encounter.obs.find((obs) => obs.concept?.uuid === order?.concept.uuid);
-      if (obs) {
-        setObsUuid(obs.uuid);
-        setIsEditing(true);
+    if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+      if (isCoded(concept) && completeLabResult?.value?.uuid) {
+        setValue(concept.uuid as any, completeLabResult?.value?.uuid);
+      } else if (isNumeric(concept) && completeLabResult?.value) {
+        setValue(concept.uuid as any, parseFloat(completeLabResult?.value as any));
+      } else if (isText(concept) && completeLabResult?.value) {
+        setValue(concept.uuid as any, completeLabResult?.value);
+      } else if (isPanel(concept)) {
+        concept.setMembers.forEach((member) => {
+          const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
+          let value: any;
+          if (isCoded(member)) {
+            value = obs?.value?.uuid;
+          } else if (isNumeric(member)) {
+            value = obs?.value ? parseFloat(obs?.value as any) : undefined;
+          } else if (isText(member)) {
+            value = obs?.value;
+          }
+          if (value) setValue(member.uuid as any, value);
+        });
       }
     }
-  }, [isLoadingEncounter, encounter, isEditing, order]);
-
-  useEffect(() => {
-    const loadInitialValues = async () => {
-      if (isEditing && obsUuid) {
-        setIsLoadingInitialValues(true);
-        if (data && !isLoadingObs) {
-          setInitialValues(data);
-        }
-        setIsLoadingInitialValues(false);
-      }
-    };
-
-    loadInitialValues();
-  }, [isEditing, obsUuid, data, isLoadingObs]);
+  }, [concept, completeLabResult, order, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -107,6 +103,45 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       setShowEmptyFormErrorNotification(true);
       return;
     }
+
+    const showNotification = (kind: 'error' | 'success', message: string) => {
+      showSnackbar({
+        title:
+          kind === 'success'
+            ? t('saveLabResults', 'Save lab results')
+            : t('errorSavingLabResults', 'Error saving lab results'),
+        kind: kind,
+        subtitle: message,
+      });
+    };
+
+    if (order.fulfillerStatus === 'COMPLETED') {
+      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid);
+        return updateObservation(obs?.uuid, { value });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+        if (curr.status === 'rejected') {
+          return [...prev, Object.keys(formValues).at(index)];
+        }
+        return prev;
+      }, []);
+
+      if (failedObsconceptUuids.length) {
+        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+      } else {
+        closeWorkspaceWithSavedChanges();
+        showNotification(
+          'success',
+          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+            orderNumber: order?.orderNumber,
+          }),
+        );
+      }
+      return setShowEmptyFormErrorNotification(false);
+    }
+
     // Set the observation status to 'FINAL' as we're not capturing it in the form
     const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
     const orderDiscontinuationPayload = {
@@ -134,21 +169,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         abortController,
       );
       closeWorkspaceWithSavedChanges();
-      mutateLabOrders();
-      mutateOrderData();
-      showSnackbar({
-        title: t('saveLabResults', 'Save lab results'),
-        kind: 'success',
-        subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+      mutate();
+      showNotification(
+        'success',
+        t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
           orderNumber: order?.orderNumber,
         }),
-      });
+      );
     } catch (err) {
-      showSnackbar({
-        title: t('errorSavingLabResults', 'Error saving lab results'),
-        kind: 'error',
-        subtitle: err?.message,
-      });
+      showNotification('error', err?.message);
     } finally {
       setShowEmptyFormErrorNotification(false);
     }
@@ -160,8 +189,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
         {concept && (
           <Stack gap={5}>
-            {!isLoadingInitialValues ? (
-              <ResultFormField defaultValue={initialValues} concept={concept} control={control} errors={errors} />
+            {!isLoading ? (
+              <ResultFormField defaultValue={completeLabResult} concept={concept} control={control} errors={errors} />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
