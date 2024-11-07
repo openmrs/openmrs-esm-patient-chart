@@ -1,15 +1,15 @@
 {
   "cancel": "Hủy",
-  "closeThisPanel": "Close this panel",
-  "collapseAll": "Collapse all",
-  "deleteQuestion": "Delete question",
-  "deleteQuestionConfirmation": "Are you sure you want to delete this question?",
-  "deleteQuestionExplainerText": "This action cannot be undone.",
-  "errorTitle": "There was an error with this form",
-  "expandAll": "Expand all",
+  "closeThisPanel": "Đóng bảng điều khiển này",
+  "collapseAll": "Thu gọn tất cả",
+  "deleteQuestion": "Xóa câu hỏi",
+  "deleteQuestionConfirmation": "Bạn có chắc chắn muốn xóa câu hỏi này không?",
+  "deleteQuestionExplainerText": "Không thể hoàn tác hành động này.",
+  "errorTitle": "Có lỗi với mẫu này",
+  "expandAll": "Mở rộng tất cả",
   "loading": "Đang tải",
   "or": "hoặc",
-  "thisList": "this list",
-  "toggleCollapseOrExpand": "Toggle collapse or expand",
-  "tryAgainMessage": "Try opening another form from"
+  "thisList": "danh sách này",
+  "toggleCollapseOrExpand": "Chuyển đổi thu gọn hoặc mở rộng",
+  "tryAgainMessage": "Hãy thử mở một biểu mẫu khác từ"
 }
