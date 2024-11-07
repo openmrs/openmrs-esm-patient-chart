@@ -45,7 +45,10 @@ export interface OrderBasketItem {
   accessionNumber?: string;
 }
 
+export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+
 export interface OrderPost {
+  urgency?: OrderUrgency;
   action?: OrderAction;
   patient?: string;
   careSetting?: string;
@@ -207,7 +210,7 @@ export interface LabOrderBasketItem extends OrderBasketItem {
     label: string;
     conceptUuid: string;
   };
-  urgency?: string;
+  urgency?: OrderUrgency;
   instructions?: string;
   previousOrder?: string;
   orderReason?: string;
