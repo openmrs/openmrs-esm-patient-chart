@@ -117,7 +117,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
     if (order.fulfillerStatus === 'COMPLETED') {
       const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid);
+        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
         return updateObservation(obs?.uuid, { value });
       });
       const updateResults = await Promise.allSettled(updateTasks);
