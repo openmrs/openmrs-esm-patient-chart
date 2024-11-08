@@ -40,7 +40,14 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const schema = useLabResultsFormSchema(order.concept.uuid);
-  const { completeLabResult, error, isLoading, mutate } = useCompletedLabResults(order);
+  const { completeLabResult, error, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const mutateOrderData = useCallback(() => {
+    mutate(
+      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
+      undefined,
+      { revalidate: true },
+    );
+  }, [order.patient.uuid]);
 
   const {
     control,
@@ -115,6 +122,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       });
     };
 
+    // Handle update operation for completed lab order results
     if (order.fulfillerStatus === 'COMPLETED') {
       const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
         const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
@@ -139,8 +147,11 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }),
         );
       }
+      mutateResults();
       return setShowEmptyFormErrorNotification(false);
     }
+
+    // Handle Creation logic
 
     // Set the observation status to 'FINAL' as we're not capturing it in the form
     const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
@@ -169,7 +180,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         abortController,
       );
       closeWorkspaceWithSavedChanges();
-      mutate();
+      mutateResults();
+      mutateOrderData();
       showNotification(
         'success',
         t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
