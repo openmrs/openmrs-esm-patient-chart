@@ -84,6 +84,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
 
   const tableRows = useMemo(
     () =>
+      subRows?.entries.length &&
       subRows.entries.map((row, i) => {
         const { units = '', range = '' } = row;
         const isString = isNaN(parseFloat(row.value));

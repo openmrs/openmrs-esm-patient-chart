@@ -12,7 +12,6 @@ import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
-import RecentOverview from '../overview/recent-overview.component';
 
 interface TreeViewProps {
   patientUuid: string;
