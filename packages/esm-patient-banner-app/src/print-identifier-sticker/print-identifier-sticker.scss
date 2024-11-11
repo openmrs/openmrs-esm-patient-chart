@@ -142,8 +142,8 @@
 
 .labelsContainer {
   display: grid;
-  column-gap: 1.3rem;
-  row-gap: 1rem;
+  column-gap: 1.25rem;
+  row-gap: layout.$spacing-05;
   place-items: center;
   background-color: white;
 }
