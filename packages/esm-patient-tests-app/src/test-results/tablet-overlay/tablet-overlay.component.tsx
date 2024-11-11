@@ -1,5 +1,6 @@
-import React, { type ComponentProps } from 'react';
-import { Button, Header } from '@carbon/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Header, IconButton } from '@carbon/react';
 import { ArrowLeftIcon } from '@openmrs/esm-framework';
 import styles from './tablet-overlay.scss';
 
@@ -10,18 +11,21 @@ interface OverlayProps {
   buttonsGroup?: React.ReactElement;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsGroup }) => (
-  <div className={styles.tabletOverlay}>
-    <Header className={styles.tabletOverlayHeader}>
-      <Button
-        onClick={close}
-        icon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={16} {...props} />}
-      />
-      <div className={styles.headerContent}>{headerText}</div>
-    </Header>
-    <div className={styles.overlayContent}>{children}</div>
-    <div className={styles.buttonsGroup}>{buttonsGroup}</div>
-  </div>
-);
+const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsGroup }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.tabletOverlay}>
+      <Header aria-label={headerText} className={styles.tabletOverlayHeader}>
+        <IconButton className={styles.backButton} label={t('back', 'Back')} onClick={close}>
+          <ArrowLeftIcon size={16} />
+        </IconButton>
+        <div className={styles.headerContent}>{headerText}</div>
+      </Header>
+      <div className={styles.overlayContent}>{children}</div>
+      <div className={styles.buttonsGroup}>{buttonsGroup}</div>
+    </div>
+  );
+};
 
 export default Overlay;

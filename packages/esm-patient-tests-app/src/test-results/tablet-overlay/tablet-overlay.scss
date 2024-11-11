@@ -2,6 +2,12 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.backButton {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
 .tabletOverlay {
   position: fixed;
   top: 0;
@@ -27,7 +33,6 @@
 
 .headerContent {
   @include type.type-style('heading-compact-02');
-  padding: 0 layout.$spacing-05;
   color: $ui-05;
 }
 
