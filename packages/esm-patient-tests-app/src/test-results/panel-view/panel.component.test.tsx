@@ -6,12 +6,6 @@ import { isDesktop, useLayoutType, type LayoutType } from '@openmrs/esm-framewor
 import { type ObsRecord } from '../../types';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn().mockReturnValue({
-    t: (key: string) => key,
-  }),
-}));
-
 jest.mock('@openmrs/esm-framework', () => ({
   formatDate: jest.fn().mockReturnValue('January 1, 2024'),
   isDesktop: jest.fn().mockReturnValue(true),
@@ -118,9 +112,9 @@ describe('LabSetPanel', () => {
     expect(screen.getByText('Complete Blood Count')).toBeInTheDocument();
     expect(screen.getByText(/January 1, 2024/)).toBeInTheDocument();
 
-    expect(screen.getByText('testName')).toBeInTheDocument();
-    expect(screen.getByText('value')).toBeInTheDocument();
-    expect(screen.getByText('referenceRange')).toBeInTheDocument();
+    expect(screen.getByText('Test name')).toBeInTheDocument();
+    expect(screen.getByText('Value')).toBeInTheDocument();
+    expect(screen.getByText('Reference range')).toBeInTheDocument();
 
     const rows = screen.getAllByRole('row');
     const hemoglobinRow = rows.find((row) => within(row).queryByText('Hemoglobin'));
@@ -196,9 +190,9 @@ describe('LabSetPanel', () => {
       />,
     );
 
-    expect(screen.getByText('testName')).toBeInTheDocument();
-    expect(screen.getByText('value')).toBeInTheDocument();
-    expect(screen.queryByText('referenceRange')).not.toBeInTheDocument();
+    expect(screen.getByText('Test name')).toBeInTheDocument();
+    expect(screen.getByText('Value')).toBeInTheDocument();
+    expect(screen.queryByText('Reference range')).not.toBeInTheDocument();
 
     const rows = screen.getAllByRole('row');
     const hemoglobinRow = rows.find((row) => within(row).queryByText('Hemoglobin'));
