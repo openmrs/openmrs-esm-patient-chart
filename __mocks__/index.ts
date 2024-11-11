@@ -8,6 +8,7 @@ export * from './groupedResults.mock';
 export * from './immunizations.mock';
 export * from './location.mock';
 export * from './medication.mock';
+export * from './mockBasePanel.mock';
 export * from './mockDeceasedPatient';
 export * from './patient-flags.mock';
 export * from './programs.mock';
