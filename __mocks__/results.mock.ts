@@ -1,3 +1,423 @@
+import { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
+
+export const mockPanelData = {
+  isLoading: false,
+  conceptData: {},
+  panels: [
+    {
+      resourceType: 'Observation',
+      id: '29c6587f-0342-49eb-8849-da5b7d76d3a6',
+      category: [
+        {
+          coding: [
+            {
+              system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'laboratory',
+              display: 'Laboratory',
+            },
+          ],
+        },
+      ],
+      code: {
+        coding: [
+          {
+            code: '679AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Red blood cells',
+          },
+          {
+            system: 'http://loinc.org',
+            code: '23859-2',
+          },
+          {
+            system: 'https://cielterminology.org',
+            code: '679',
+          },
+          {
+            system: 'http://snomed.info/sct/',
+            code: '14089001',
+          },
+        ],
+        text: 'Red blood cells',
+      },
+      reference: 'Patient/b6b227cb-b906-45c8-961e-4fb564bc0aaf',
+      type: 'Patient',
+      display: 'Michelle Lewis (OpenMRS ID: 100010X)',
+      encounter: {
+        reference: 'Encounter/f7dd682d-f468-4d4a-953b-cdef192e5808',
+        type: 'Encounter',
+      },
+      effectiveDateTime: '2023-10-30T21:41:55+00:00',
+      issued: '2024-11-05T21:44:00.000+00:00',
+      valueQuantity: {
+        value: 5.9,
+        unit: '10^6/uL',
+        system: 'http://unitsofmeasure.org',
+        code: '10^6/uL',
+      },
+      referenceRange: [
+        {
+          low: {
+            value: 4,
+          },
+          high: {
+            value: 6.1,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                code: 'normal',
+              },
+            ],
+          },
+        },
+        {
+          low: {
+            value: 2.3,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                code: 'treatment',
+              },
+            ],
+          },
+        },
+        {
+          low: {
+            value: 0,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://fhir.openmrs.org/ext/obs/reference-range',
+                code: 'absolute',
+              },
+            ],
+          },
+        },
+      ],
+      conceptUuid: '679AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: '5.9',
+      name: 'Red blood cells',
+      relatedObs: [],
+    },
+    {
+      resourceType: 'Observation',
+      id: '27746dee-0a77-4d35-a383-a3bce387546f',
+      category: [
+        {
+          coding: [
+            {
+              system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'laboratory',
+              display: 'Laboratory',
+            },
+          ],
+        },
+      ],
+      code: {
+        coding: [
+          {
+            code: '1015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Hematocrit',
+          },
+          {
+            system: 'http://loinc.org',
+            code: '20570-8',
+          },
+          {
+            system: 'https://cielterminology.org',
+            code: '1015',
+          },
+          {
+            system: 'http://snomed.info/sct/',
+            code: '365616005',
+          },
+        ],
+        text: 'Hematocrit',
+      },
+      encounter: {
+        reference: 'Encounter/a6ecb1ec-ea4d-49ec-a5eb-e58f8b9bd375',
+        type: 'Encounter',
+      },
+      effectiveDateTime: '2023-05-17T03:30:55+00:00',
+      issued: '2024-11-05T21:43:59.000+00:00',
+      valueQuantity: {
+        value: 46,
+        unit: '%',
+        system: 'http://unitsofmeasure.org',
+        code: '%',
+      },
+      referenceRange: [
+        {
+          low: {
+            value: 32.3,
+          },
+          high: {
+            value: 51.9,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                code: 'normal',
+              },
+            ],
+          },
+        },
+        {
+          low: {
+            value: 21,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                code: 'treatment',
+              },
+            ],
+          },
+        },
+        {
+          low: {
+            value: 0,
+          },
+          high: {
+            value: 100,
+          },
+          type: {
+            coding: [
+              {
+                system: 'http://fhir.openmrs.org/ext/obs/reference-range',
+                code: 'absolute',
+              },
+            ],
+          },
+        },
+      ],
+      conceptUuid: '1015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: '46',
+      name: 'Hematocrit',
+      relatedObs: [],
+    },
+  ] as ObsRecord[],
+  groupedObservations: {
+    '679AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': [
+      {
+        resourceType: 'Observation',
+        id: '29c6587f-0342-49eb-8849-da5b7d76d3a6',
+        status: 'final',
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+                code: 'laboratory',
+                display: 'Laboratory',
+              },
+            ],
+          },
+        ],
+        code: {
+          coding: [
+            {
+              code: '679AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+              display: 'Red blood cells',
+            },
+            {
+              system: 'http://loinc.org',
+              code: '23859-2',
+            },
+            {
+              system: 'https://cielterminology.org',
+              code: '679',
+            },
+            {
+              system: 'http://snomed.info/sct/',
+              code: '14089001',
+            },
+          ],
+          text: 'Red blood cells',
+        },
+        subject: {
+          reference: 'Patient/b6b227cb-b906-45c8-961e-4fb564bc0aaf',
+          type: 'Patient',
+          display: 'Michelle Lewis (OpenMRS ID: 100010X)',
+        },
+        encounter: {
+          reference: 'Encounter/f7dd682d-f468-4d4a-953b-cdef192e5808',
+          type: 'Encounter',
+        },
+        effectiveDateTime: '2023-10-30T21:41:55+00:00',
+        issued: '2024-11-05T21:44:00.000+00:00',
+        valueQuantity: {
+          value: 5.9,
+          unit: '10^6/uL',
+          system: 'http://unitsofmeasure.org',
+          code: '10^6/uL',
+        },
+        referenceRange: [
+          {
+            low: {
+              value: 4,
+            },
+            high: {
+              value: 6.1,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                  code: 'normal',
+                },
+              ],
+            },
+          },
+          {
+            low: {
+              value: 2.3,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                  code: 'treatment',
+                },
+              ],
+            },
+          },
+          {
+            low: {
+              value: 0,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
+                  code: 'absolute',
+                },
+              ],
+            },
+          },
+        ],
+        conceptUuid: '679AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        value: '5.9',
+        name: 'Red blood cells',
+        relatedObs: [],
+      },
+    ],
+    '1015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': [
+      {
+        resourceType: 'Observation',
+        id: '27746dee-0a77-4d35-a383-a3bce387546f',
+        status: 'final',
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+                code: 'laboratory',
+                display: 'Laboratory',
+              },
+            ],
+          },
+        ],
+        code: {
+          coding: [
+            {
+              code: '1015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+              display: 'Hematocrit',
+            },
+            {
+              system: 'http://loinc.org',
+              code: '20570-8',
+            },
+            {
+              system: 'https://cielterminology.org',
+              code: '1015',
+            },
+            {
+              system: 'http://snomed.info/sct/',
+              code: '365616005',
+            },
+          ],
+          text: 'Hematocrit',
+        },
+        subject: {
+          reference: 'Patient/b6b227cb-b906-45c8-961e-4fb564bc0aaf',
+          type: 'Patient',
+          display: 'Michelle Lewis (OpenMRS ID: 100010X)',
+        },
+        encounter: {
+          reference: 'Encounter/a6ecb1ec-ea4d-49ec-a5eb-e58f8b9bd375',
+          type: 'Encounter',
+        },
+        effectiveDateTime: '2023-05-17T03:30:55+00:00',
+        issued: '2024-11-05T21:43:59.000+00:00',
+        valueQuantity: {
+          value: 46,
+          unit: '%',
+          system: 'http://unitsofmeasure.org',
+          code: '%',
+        },
+        referenceRange: [
+          {
+            low: {
+              value: 32.3,
+            },
+            high: {
+              value: 51.9,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                  code: 'normal',
+                },
+              ],
+            },
+          },
+          {
+            low: {
+              value: 21,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
+                  code: 'treatment',
+                },
+              ],
+            },
+          },
+          {
+            low: {
+              value: 0,
+            },
+            high: {
+              value: 100,
+            },
+            type: {
+              coding: [
+                {
+                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
+                  code: 'absolute',
+                },
+              ],
+            },
+          },
+        ],
+        conceptUuid: '1015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        value: '46',
+        name: 'Hematocrit',
+        relatedObs: [],
+      },
+    ],
+  } as unknown as Record<string, ObsRecord[]>,
+};
+
 export const mockResults = [
   {
     display: 'Hematology',
