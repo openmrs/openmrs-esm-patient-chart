@@ -1,28 +1,25 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { mutate } from 'swr';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import {
-  useOrderConceptByUuid,
-  updateOrderResult,
-  useLabEncounter,
-  useObservation,
-  createObservationPayload,
-  LabOrderConcept,
-  updateObservation,
-  useCompletedLabResults,
-  isCoded,
-  isNumeric,
-  isText,
-  isPanel,
-} from './lab-results.resource';
+import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import {
+  createObservationPayload,
+  isCoded,
+  isNumeric,
+  isPanel,
+  isText,
+  updateObservation,
+  updateOrderResult,
+  useCompletedLabResults,
+  useOrderConceptByUuid,
+} from './lab-results.resource';
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
