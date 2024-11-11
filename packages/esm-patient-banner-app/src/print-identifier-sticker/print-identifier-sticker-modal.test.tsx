@@ -1,12 +1,11 @@
 import React from 'react';
 import Barcode from 'react-barcode';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useReactToPrint } from 'react-to-print';
 import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { getByTextWithMarkup } from 'tools';
 import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockedCloseModal = jest.fn();
@@ -76,7 +75,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
       {},
     );
-    expect(screen.getAllByTestId('openmrs-logo')[0]).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Identifier sticker implementation logo')[0]).toBeInTheDocument();
   });
 
   it("should not render a barcode if it's disabled via config", async () => {
@@ -124,6 +123,28 @@ describe('PrintIdentifierStickerModal', () => {
     expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });
+});
+
+it('should not render multiple sticker inputs if multiple stickers are disabled via config', async () => {
+  mockedUseConfig.mockReturnValue({
+    ...defaultConfig,
+    printPatientSticker: {
+      ...defaultConfig.printPatientSticker,
+      printMultipleStickers: {
+        enabled: false,
+        totalStickers: 1,
+        stickerColumnsPerPage: 1,
+        stickerRowsPerPage: 1,
+      },
+      stickerSize: { height: '2in', width: '2in' },
+    },
+  });
+
+  renderPrintIdentifierStickerModal();
+
+  expect(screen.queryByLabelText('columnsPerPage')).not.toBeInTheDocument();
+  expect(screen.queryByLabelText('rowsPerPage')).not.toBeInTheDocument();
+  expect(screen.queryByLabelText('totalNumber')).not.toBeInTheDocument();
 });
 
 function renderPrintIdentifierStickerModal() {
