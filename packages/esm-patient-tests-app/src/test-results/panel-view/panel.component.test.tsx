@@ -2,102 +2,17 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LabSetPanel from './panel.component';
-import { isDesktop, useLayoutType, type LayoutType } from '@openmrs/esm-framework';
-import { type ObsRecord } from '../../types';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { mockBasePanel, mockObservations, mockConceptMeta, mockObservationsWithInterpretations } from '__mocks__';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-
-jest.mock('@openmrs/esm-framework', () => ({
-  formatDate: jest.fn().mockReturnValue('January 1, 2024'),
-  isDesktop: jest.fn().mockReturnValue(true),
-  useLayoutType: jest.fn().mockReturnValue('desktop'),
-}));
+import { type ObsRecord } from '../../types';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
 
-const mockConceptMeta = {
-  display: '',
-  hiNormal: 0,
-  hiAbsolute: 0,
-  hiCritical: 0,
-  lowNormal: 0,
-  lowAbsolute: 0,
-  lowCritical: 0,
-  units: 'g/dL',
-  range: '12-16',
-  getInterpretation: function (value: string): OBSERVATION_INTERPRETATION {
-    return 'NORMAL';
-  },
-};
-
-const mockBasePanel: ObsRecord = {
-  resourceType: 'Observation',
-  id: 'test-id',
-  conceptUuid: 'test-uuid',
-  category: [
-    {
-      coding: [
-        {
-          system: 'test-system',
-          code: 'test-code',
-          display: 'Laboratory',
-        },
-      ],
-    },
-  ],
-  code: {
-    coding: [
-      {
-        code: 'test-code',
-        display: 'Test Display',
-      },
-    ],
-    text: 'Test Text',
-  },
-  effectiveDateTime: '2024-01-01T10:00:00Z',
-  issued: '2024-01-01T10:00:00Z',
-  name: 'Complete Blood Count',
-  value: '120',
-  interpretation: 'NORMAL',
-  relatedObs: [],
-  meta: mockConceptMeta,
-  referenceRange: [],
-};
-
-const mockObservations: Array<ObsRecord> = [
-  {
-    ...mockBasePanel,
-    id: '1',
-    name: 'Hemoglobin',
-    value: '14',
-    interpretation: 'NORMAL',
-    meta: {
-      ...mockConceptMeta,
-      units: 'g/dL',
-      range: '12-16',
-    },
-  },
-  {
-    ...mockBasePanel,
-    id: '2',
-    name: 'Hematocrit',
-    value: '42',
-    interpretation: 'HIGH',
-    meta: {
-      ...mockConceptMeta,
-      units: '%',
-      range: '35-45',
-    },
-  },
-];
-
 describe('LabSetPanel', () => {
   const mockSetActivePanel = jest.fn();
   const user = userEvent.setup();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   it('should render panel with basic information and observations', () => {
     render(
@@ -110,7 +25,7 @@ describe('LabSetPanel', () => {
     );
 
     expect(screen.getByText('Complete Blood Count')).toBeInTheDocument();
-    expect(screen.getByText(/January 1, 2024/)).toBeInTheDocument();
+    expect(screen.getByText('01 — Jan — 2024 • 10:0')).toBeInTheDocument();
 
     expect(screen.getByText('Test name')).toBeInTheDocument();
     expect(screen.getByText('Value')).toBeInTheDocument();
@@ -146,7 +61,7 @@ describe('LabSetPanel', () => {
   });
 
   it('should render panel without reference range when not provided', () => {
-    const panelWithoutRange: ObsRecord = {
+    const panelWithoutRange = {
       ...mockBasePanel,
       meta: {
         ...mockConceptMeta,
@@ -160,7 +75,7 @@ describe('LabSetPanel', () => {
         id: '1',
         name: 'Hemoglobin',
         value: '14',
-        interpretation: 'NORMAL',
+        interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
         meta: {
           ...mockConceptMeta,
           units: 'g/dL',
@@ -172,7 +87,7 @@ describe('LabSetPanel', () => {
         id: '2',
         name: 'Hematocrit',
         value: '42',
-        interpretation: 'HIGH',
+        interpretation: 'HIGH' as OBSERVATION_INTERPRETATION,
         meta: {
           ...mockConceptMeta,
           units: '%',
@@ -203,34 +118,10 @@ describe('LabSetPanel', () => {
   });
 
   it('should handle different interpretation styles', () => {
-    const observationsWithInterpretations: Array<ObsRecord> = [
-      {
-        ...mockBasePanel,
-        id: '1',
-        name: 'Normal Test',
-        value: '14',
-        interpretation: 'NORMAL',
-      },
-      {
-        ...mockBasePanel,
-        id: '2',
-        name: 'High Test',
-        value: '42',
-        interpretation: 'HIGH',
-      },
-      {
-        ...mockBasePanel,
-        id: '3',
-        name: 'Low Test',
-        value: '2',
-        interpretation: 'LOW',
-      },
-    ];
-
     render(
       <LabSetPanel
         panel={mockBasePanel}
-        observations={observationsWithInterpretations}
+        observations={mockObservationsWithInterpretations}
         activePanel={null}
         setActivePanel={mockSetActivePanel}
       />,
