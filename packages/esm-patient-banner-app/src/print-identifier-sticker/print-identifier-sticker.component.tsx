@@ -1,7 +1,7 @@
-import React, { forwardRef, useMemo } from 'react';
+import React from 'react';
 import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
-import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
 import { type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
@@ -27,7 +27,7 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
         )}
       </div>
       <div className={styles.fieldsContainer}>
-        {printPatientSticker.fields.map((field) => {
+        {printPatientSticker?.fields?.map((field) => {
           const Component = getPatientField(field);
           return (
             <div key={field} className={styles.fieldRow}>
@@ -48,7 +48,13 @@ const ImplementationLogo: React.FC = () => {
     <img alt={t('implementationLogo', 'Implementation logo')} src={printPatientSticker?.header?.logo} />
   ) : (
     // TODO: Figure out why #omrs-logo-full-mono sprite is not working
-    <svg data-testid="openmrs-logo" role="img" viewBox="0 0 380 119" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      aria-label={t('identifierStickerImplementationLogo', 'Identifier sticker implementation logo')}
+      role="img"
+      viewBox="0 0 380 119"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {' '}
       <path
         fillRule="evenodd"
         clipRule="evenodd"

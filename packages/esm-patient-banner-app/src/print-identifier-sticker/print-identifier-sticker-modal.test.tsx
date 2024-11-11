@@ -120,7 +120,7 @@ describe('PrintIdentifierStickerModal', () => {
     renderPrintIdentifierStickerModal();
 
     expect(screen.getAllByText(/Joshua Johnson/i)[0]).toBeInTheDocument();
-    expect(screen.getAllByText(/\+255777053243/di)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/\+255777053243/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });

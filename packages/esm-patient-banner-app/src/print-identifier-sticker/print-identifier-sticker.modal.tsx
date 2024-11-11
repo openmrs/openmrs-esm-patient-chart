@@ -27,7 +27,7 @@ interface PrintIdentifierStickerProps {
 
 interface PrintMultipleStickersComponentProps extends Partial<ConfigObject> {
   pageSize: string;
-  multipleStickers: {
+  printMultipleStickers: {
     enabled: boolean;
     totalStickers: number;
     stickerColumnsPerPage: number;
@@ -43,7 +43,7 @@ interface PrintMultipleStickersComponentProps extends Partial<ConfigObject> {
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
-  const { pageSize, multipleStickers, stickerSize } = printPatientSticker ?? {};
+  const { pageSize, printMultipleStickers, stickerSize } = printPatientSticker ?? {};
   const [isPrinting, setIsPrinting] = useState(false);
   const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
 
@@ -103,10 +103,10 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         closeModal={closeModal}
         title={getCoreTranslation('printIdentifierSticker', 'Print identifier sticker')}
       />
-      <ModalBody aria-label="Print identifier sticker modal" hasScrollingContent>
+      <ModalBody aria-label={t('printIdentifierStickerModal', 'Print identifier sticker modal')} hasScrollingContent>
         <PrintMultipleStickersComponent
           pageSize={pageSize}
-          multipleStickers={multipleStickers}
+          printMultipleStickers={printMultipleStickers}
           stickerSize={stickerSize}
           patient={patient}
           ref={contentToPrintRef}
@@ -129,20 +129,20 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
 };
 
 const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleStickersComponentProps>(
-  ({ pageSize, multipleStickers, stickerSize, patient }, ref) => {
+  ({ pageSize, printMultipleStickers, stickerSize, patient }, ref) => {
     const divRef = useRef<HTMLDivElement>();
     const { t } = useTranslation();
 
     const { height: printIdentifierStickerHeight, width: printIdentifierStickerWidth } = stickerSize ?? {};
     const [numberOfLabelColumnsPage, setNumberOfLabelColumnsPage] = useState<number>(
-      multipleStickers.stickerColumnsPerPage,
+      printMultipleStickers.stickerColumnsPerPage,
     );
     const [numberOfLabelRowsPerPage, setNumberOfLabelRowsPerPage] = useState<number>(
-      multipleStickers.stickerRowsPerPage,
+      printMultipleStickers.stickerRowsPerPage,
     );
-    const [numberOfLabels, setNumberOfLabels] = useState<number>(multipleStickers.totalStickers);
+    const [numberOfLabels, setNumberOfLabels] = useState<number>(printMultipleStickers.totalStickers);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
-    const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(multipleStickers.enabled);
+    const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(printMultipleStickers.enabled);
 
     const labels = Array.from({ length: numberOfLabels });
 
@@ -152,7 +152,7 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
       if (divRef.current) {
         const style = divRef.current.style;
         style.setProperty('--omrs-print-label-paper-size', pageSize);
-        style.setProperty('--omrs-print-label-colums', numberOfLabelColumnsPage.toString());
+        style.setProperty('--omrs-print-label-columns', numberOfLabelColumnsPage.toString());
         style.setProperty('--omrs-print-label-rows', numberOfLabelRowsPerPage.toString());
         style.setProperty('--omrs-print-label-sticker-height', printIdentifierStickerHeight.toString());
         style.setProperty('--omrs-print-label-sticker-width', printIdentifierStickerWidth.toString());
@@ -176,11 +176,6 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
       return;
     }
 
-    const handleOnToggle = (value: boolean) => {
-      const FormCollapseToggleEvent = new CustomEvent('openmrs:form-collapse-toggle', { detail: { value } });
-      window.dispatchEvent(FormCollapseToggleEvent);
-    };
-
     return (
       <Stack gap={5}>
         <PrintComponent patient={patient} />
@@ -196,47 +191,50 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
               onToggle={() => setIsMultipleStickersEnabled(!isMultipleStickersEnabled)}
             />
           </Column>
-          <Column lg={10} md={8} sm={4} className={!isMultipleStickersEnabled ? styles.hidePreviewContainer : ''}>
-            <div className={styles.multipleStickerInputs}>
-              <NumberInput
-                hideSteppers
-                id="columnsPerPageInput"
-                label={t('columnsPerPage', 'Columns per page')}
-                min={1}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setNumberOfLabelColumnsPage(parseInt(event.target.value || '1'))
-                }
-                value={numberOfLabelColumnsPage}
-              />
-              <NumberInput
-                hideSteppers
-                id="rowsPerPageInput"
-                label={t('rowsPerPage', 'Rows per page')}
-                min={1}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setNumberOfLabelRowsPerPage(parseInt(event.target.value || '1'))
-                }
-                value={numberOfLabelRowsPerPage}
-              />
-              <NumberInput
-                hideSteppers
-                id="totalNumberInput"
-                label={t('totalNumber', 'Total number')}
-                min={1}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setNumberOfLabels(parseInt(event.target.value || '1'))
-                }
-                value={numberOfLabels}
-              />
-            </div>
-            <Button
-              className={styles.previewButton}
-              kind="ghost"
-              onClick={() => setIsPreviewVisible(!isPreviewVisible)}
-            >
-              {!isPreviewVisible ? t('showPreview', 'Show preview') : t('hidePreview', 'Hide preview')}
-            </Button>
-          </Column>
+
+          {isMultipleStickersEnabled ? (
+            <Column lg={10} md={8} sm={4}>
+              <div className={styles.multipleStickerInputs}>
+                <NumberInput
+                  hideSteppers
+                  id="columnsPerPageInput"
+                  label={t('columnsPerPage', 'Columns per page')}
+                  min={1}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setNumberOfLabelColumnsPage(parseInt(event.target.value || '1'))
+                  }
+                  value={numberOfLabelColumnsPage}
+                />
+                <NumberInput
+                  hideSteppers
+                  id="rowsPerPageInput"
+                  label={t('rowsPerPage', 'Rows per page')}
+                  min={1}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setNumberOfLabelRowsPerPage(parseInt(event.target.value || '1'))
+                  }
+                  value={numberOfLabelRowsPerPage}
+                />
+                <NumberInput
+                  hideSteppers
+                  id="totalNumberInput"
+                  label={t('totalNumber', 'Total number')}
+                  min={1}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setNumberOfLabels(parseInt(event.target.value || '1'))
+                  }
+                  value={numberOfLabels}
+                />
+              </div>
+              <Button
+                className={styles.previewButton}
+                kind="ghost"
+                onClick={() => setIsPreviewVisible(!isPreviewVisible)}
+              >
+                {!isPreviewVisible ? t('showPreview', 'Show preview') : t('hidePreview', 'Hide preview')}
+              </Button>
+            </Column>
+          ) : null}
         </Grid>
         <div className={classNames(styles.previewContainer, !isPreviewVisible ? styles.hidePreviewContainer : '')}>
           <div ref={divRef} className={styles.printRoot}>

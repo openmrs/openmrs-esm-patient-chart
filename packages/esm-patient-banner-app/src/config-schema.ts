@@ -45,10 +45,10 @@ export const configSchema = {
         'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
       _default: 'A4',
     },
-    multipleStickers: {
+    printMultipleStickers: {
       enabled: {
         _type: Type.Boolean,
-        _description: 'Whether to allow printing multiple patient sticker',
+        _description: 'Whether to allow printing multiple patient ID stickers',
       },
       totalStickers: {
         _type: Type.Number,
@@ -60,7 +60,7 @@ export const configSchema = {
       },
       stickerRowsPerPage: {
         _type: Type.Number,
-        _description: 'The number of rows for patient ID stickers to print per page',
+        _description: 'The number of rows of patient ID stickers to print per page',
       },
       _default: {
         enabled: false,
@@ -113,7 +113,7 @@ export interface ConfigObject {
     };
     fields: Array<AllowedPatientFields>;
     pageSize: string;
-    multipleStickers: {
+    printMultipleStickers: {
       enabled: boolean;
       totalStickers: number;
       stickerColumnsPerPage: number;

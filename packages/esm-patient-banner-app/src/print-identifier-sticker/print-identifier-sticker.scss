@@ -129,7 +129,7 @@
   }
 
   .labelsContainer {
-    grid-template-columns: repeat(var(--omrs-print-label-colums, 1), 1fr);
+    grid-template-columns: repeat(var(--omrs-print-label-columns, 1), 1fr);
     grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
   }
 }
