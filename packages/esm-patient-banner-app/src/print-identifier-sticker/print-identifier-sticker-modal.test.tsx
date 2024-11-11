@@ -1,7 +1,7 @@
 import React from 'react';
 import Barcode from 'react-barcode';
 import userEvent from '@testing-library/user-event';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { useReactToPrint } from 'react-to-print';
 import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
