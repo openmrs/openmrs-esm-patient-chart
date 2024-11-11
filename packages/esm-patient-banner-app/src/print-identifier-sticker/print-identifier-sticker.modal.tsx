@@ -72,13 +72,13 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     closeModal();
   }, [closeModal]);
 
-  const handlePrintOverflow = useCallback((iframe: HTMLIFrameElement | null): Promise<void> => {
+  const handlePrintWindow = useCallback((printWindow: HTMLIFrameElement | null): Promise<void> => {
     return new Promise<void>((resolve) => {
-      if (iframe) {
-        const printContent = iframe.contentDocument || iframe.contentWindow?.document;
+      if (printWindow) {
+        const printContent = printWindow.contentDocument || printWindow.contentWindow?.document;
         if (printContent) {
           printContent.body.style.overflow = 'initial !important';
-          iframe.contentWindow?.print();
+          printWindow.contentWindow?.print();
         }
       }
       resolve();
@@ -106,7 +106,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     onAfterPrint: handleAfterPrint,
     onBeforeGetContent: handleBeforeGetContent,
     onPrintError: handlePrintError,
-    print: handlePrintOverflow,
+    print: handlePrintWindow,
     copyStyles: true,
   });
 
