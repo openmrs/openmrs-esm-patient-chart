@@ -1,66 +1,61 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import LabSetPanel from './panel.component';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { mockBasePanel, mockObservations, mockConceptMeta, mockObservationsWithInterpretations } from '__mocks__';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type ObsRecord } from '../../types';
+import { mockBasePanel, mockObservations, mockConceptMeta, mockObservationsWithInterpretations } from '__mocks__';
+import LabSetPanel from './panel.component';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
 
 describe('LabSetPanel', () => {
-  const mockSetActivePanel = jest.fn();
   const user = userEvent.setup();
+  const mockSetActivePanel = jest.fn();
 
-  it('should render panel with basic information and observations', () => {
+  it('renders the panel header, columns, and observations when provided', () => {
     render(
       <LabSetPanel
-        panel={mockBasePanel}
-        observations={mockObservations}
         activePanel={null}
+        observations={mockObservations}
+        panel={mockBasePanel}
         setActivePanel={mockSetActivePanel}
       />,
     );
 
-    expect(screen.getByText('Complete Blood Count')).toBeInTheDocument();
-    expect(screen.getByText('01 — Jan — 2024 • 10:0')).toBeInTheDocument();
-
-    expect(screen.getByText('Test name')).toBeInTheDocument();
-    expect(screen.getByText('Value')).toBeInTheDocument();
-    expect(screen.getByText('Reference range')).toBeInTheDocument();
-
-    const rows = screen.getAllByRole('row');
-    const hemoglobinRow = rows.find((row) => within(row).queryByText('Hemoglobin'));
-    const hematocritRow = rows.find((row) => within(row).queryByText('Hematocrit'));
-
-    expect(within(hemoglobinRow).getByText('14 g/dL')).toBeInTheDocument();
-    expect(within(hemoglobinRow).getByText('12-16 g/dL')).toBeInTheDocument();
-
-    expect(within(hematocritRow).getByText('42 %')).toBeInTheDocument();
-    expect(within(hematocritRow).getByText('35-45 %')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
+    expect(screen.getByText('01 — Jan — 2024 • 10:00')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /test name/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /value/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /reference range/i })).toBeInTheDocument();
+    expect(screen.getByText(/test name/i)).toBeInTheDocument();
+    expect(screen.getByText(/value/i)).toBeInTheDocument();
+    expect(screen.getByText(/reference range/i)).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hemoglobin 14 g\/dL 12-16 g\/dL/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hematocrit 42 % 35-45 %/i })).toBeInTheDocument();
   });
 
-  it('should handle panel selection', async () => {
+  it('clicking on the panel header sets the active panel', async () => {
     render(
       <LabSetPanel
-        panel={mockBasePanel}
-        observations={mockObservations}
         activePanel={null}
+        observations={mockObservations}
+        panel={mockBasePanel}
         setActivePanel={mockSetActivePanel}
       />,
     );
 
     const buttonElement = screen.getByRole('button', {
-      name: /Complete Blood Count/i,
+      name: /complete blood count 01 — jan — 2024 • 10:00 test name value reference range hemoglobin 14 g\/dL 12-16 g\/dL hematocrit 42 % 35-45 %/i,
     });
 
     await user.click(buttonElement);
     expect(mockSetActivePanel).toHaveBeenCalledWith(mockBasePanel);
   });
 
-  it('should render panel without reference range when not provided', () => {
+  it('renders the panel without reference ranges when not provided', () => {
     const panelWithoutRange = {
       ...mockBasePanel,
       meta: {
@@ -98,50 +93,49 @@ describe('LabSetPanel', () => {
 
     render(
       <LabSetPanel
-        panel={panelWithoutRange}
-        observations={observationsWithoutRange}
         activePanel={null}
+        observations={observationsWithoutRange}
+        panel={panelWithoutRange}
         setActivePanel={mockSetActivePanel}
       />,
     );
 
-    expect(screen.getByText('Test name')).toBeInTheDocument();
-    expect(screen.getByText('Value')).toBeInTheDocument();
-    expect(screen.queryByText('Reference range')).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /test name/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /value/i })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: /reference range/i })).not.toBeInTheDocument();
 
-    const rows = screen.getAllByRole('row');
-    const hemoglobinRow = rows.find((row) => within(row).queryByText('Hemoglobin'));
-    const hematocritRow = rows.find((row) => within(row).queryByText('Hematocrit'));
-
-    expect(within(hemoglobinRow).getByText('14 g/dL')).toBeInTheDocument();
-    expect(within(hematocritRow).getByText('42 %')).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hemoglobin 14 g\/dL/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hematocrit/i })).toBeInTheDocument();
   });
 
-  it('should handle different interpretation styles', () => {
+  it('correctly highlights the interpretation of the observations', () => {
     render(
       <LabSetPanel
-        panel={mockBasePanel}
-        observations={mockObservationsWithInterpretations}
         activePanel={null}
+        observations={mockObservationsWithInterpretations}
+        panel={mockBasePanel}
         setActivePanel={mockSetActivePanel}
       />,
     );
 
-    const rows = screen.getAllByRole('row').slice(1);
-    expect(rows[0]).toHaveClass('check');
-    expect(rows[1]).toHaveClass('high', 'check');
-    expect(rows[2]).toHaveClass('low', 'check');
+    const normalTest = screen.getByRole('row', { name: /normal test 14 g\/dL 12-16 g\/dL/i });
+    const highTest = screen.getByRole('row', { name: /high test 42 g\/dL 12-16 g\/dL/i });
+    const lowTest = screen.getByRole('row', { name: /low test 2 g\/dL 12-16 g\/dL/i });
+
+    expect(normalTest).toHaveClass('check');
+    expect(highTest).toHaveClass('high', 'check');
+    expect(lowTest).toHaveClass('low', 'check');
   });
 
-  it('should adjust table size based on layout', () => {
+  it('adjusts the table size based on the layout', () => {
     mockUseLayoutType.mockReturnValue('large-desktop');
     mockIsDesktop.mockReturnValue(true);
 
     const { rerender } = render(
       <LabSetPanel
-        panel={mockBasePanel}
-        observations={mockObservations}
         activePanel={null}
+        observations={mockObservations}
+        panel={mockBasePanel}
         setActivePanel={mockSetActivePanel}
       />,
     );
@@ -153,9 +147,9 @@ describe('LabSetPanel', () => {
 
     rerender(
       <LabSetPanel
-        panel={mockBasePanel}
-        observations={mockObservations}
         activePanel={null}
+        observations={mockObservations}
+        panel={mockBasePanel}
         setActivePanel={mockSetActivePanel}
       />,
     );

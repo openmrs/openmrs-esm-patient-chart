@@ -1,4 +1,3 @@
-// __mocks__/lab-panel.mock.ts
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
 
@@ -13,6 +12,9 @@ export const mockConceptMeta = {
   units: 'g/dL',
   range: '12-16',
   getInterpretation: function (value: string): OBSERVATION_INTERPRETATION {
+    const numValue = Number(value);
+    if (numValue > this.hiNormal) return 'HIGH';
+    if (numValue < this.lowNormal) return 'LOW';
     return 'NORMAL';
   },
 };
