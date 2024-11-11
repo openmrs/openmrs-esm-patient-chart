@@ -31,7 +31,7 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
   const selectedCheckboxes = Object.keys(checkboxes).filter((key) => checkboxes[key]);
 
-  if (tableData && tableData?.length === 0) {
+  if (!tableData?.length) {
     return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
   }
 
@@ -61,9 +61,9 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
 };
 
 const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, isLoading, expanded, type, view }) => {
+  const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
-  const { t } = useTranslation();
 
   const { timelineData, resetTree } = useContext(FilterContext);
   const { isLoading: isLoadingPanelData } = usePanelData();
@@ -71,7 +71,9 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   if (tablet) {
     return (
       <>
-        <div>{!isLoading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton />}</div>
+        <div>
+          {!isLoading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton role="progressbar" />}
+        </div>
         <div className={styles.floatingTreeButton}>
           <Button
             renderIcon={TreeViewAltIcon}
