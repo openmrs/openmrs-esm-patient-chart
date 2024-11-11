@@ -54,7 +54,6 @@ const ImplementationLogo: React.FC = () => {
       viewBox="0 0 380 119"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {' '}
       <path
         fillRule="evenodd"
         clipRule="evenodd"

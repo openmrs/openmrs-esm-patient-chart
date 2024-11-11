@@ -1,5 +1,4 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import {
@@ -183,6 +182,7 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
           <Column lg={6} md={8} sm={4}>
             <Toggle
               className={styles.multipleStickerToggle}
+              defaultToggled={isMultipleStickersEnabled}
               size="sm"
               labelText={t('printMultipleStickers', 'Print multiple stickers')}
               id="print-multiple-stickers-toggle"
@@ -241,7 +241,7 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
             {pages.map((pageLabels, pageIndex) => (
               <div key={pageIndex} className={pageIndex < pages.length - 1 ? styles.pageBreak : ''}>
                 <div className={styles.labelsContainer}>
-                  {pageLabels.map((label, index) => (
+                  {pageLabels.map((_label, index) => (
                     <div key={index} className={styles.printContainer}>
                       <PrintComponent patient={patient} />
                     </div>
