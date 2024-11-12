@@ -49,7 +49,7 @@ export function useObservations() {
   const results = useMemo(() => {
     const observations: Array<FHIRObservationResource> = data
       ? []
-          .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource) ?? []))
+          .concat(...data?.map((resp) => resp?.data?.entry?.map((e) => e.resource) ?? []))
           .sort((obs1, obs2) => Date.parse(obs2.effectiveDateTime) - Date.parse(obs1.effectiveDateTime))
       : null;
     return {
