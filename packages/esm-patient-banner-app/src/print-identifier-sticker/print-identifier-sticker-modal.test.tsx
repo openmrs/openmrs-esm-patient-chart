@@ -31,7 +31,7 @@ describe('PrintIdentifierStickerModal', () => {
     const mockHandlePrint = jest.fn();
     mockedUseReactToPrint.mockReturnValue(mockHandlePrint);
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.getByText(/print identifier sticker/i)).toBeInTheDocument();
     const printButton = screen.getByRole('button', { name: /print/i });
@@ -57,7 +57,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.getAllByTestId('barcode')[0]).toBeInTheDocument();
     expect(Barcode).toHaveBeenCalledWith(
@@ -91,7 +91,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.queryByTestId('barcode')).not.toBeInTheDocument();
     expect(screen.queryByTestId('openmrs-logo')).not.toBeInTheDocument();
@@ -110,43 +110,39 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.getAllByRole('img')[0]).toHaveAttribute('src', '/openmrs/spa/logo.png');
   });
 
   it("renders the patient's details in the print modal", () => {
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.getAllByText(/Joshua Johnson/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/\+255777053243/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });
-});
 
-it('should not render multiple sticker inputs if multiple stickers are disabled via config', async () => {
-  mockedUseConfig.mockReturnValue({
-    ...defaultConfig,
-    printPatientSticker: {
-      ...defaultConfig.printPatientSticker,
-      printMultipleStickers: {
-        enabled: false,
-        totalStickers: 1,
-        stickerColumnsPerPage: 1,
-        stickerRowsPerPage: 1,
+  it('should not render multiple sticker inputs if multiple stickers are disabled via config', async () => {
+    mockedUseConfig.mockReturnValue({
+      ...defaultConfig,
+      printPatientSticker: {
+        ...defaultConfig.printPatientSticker,
+        printMultipleStickers: {
+          enabled: false,
+          totalStickers: 1,
+          stickerColumnsPerPage: 1,
+          stickerRowsPerPage: 1,
+        },
+        stickerSize: { height: '2in', width: '2in' },
       },
-      stickerSize: { height: '2in', width: '2in' },
-    },
+    });
+
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
+
+    expect(screen.queryByLabelText('columnsPerPage')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('rowsPerPage')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('totalNumber')).not.toBeInTheDocument();
   });
-
-  renderPrintIdentifierStickerModal();
-
-  expect(screen.queryByLabelText('columnsPerPage')).not.toBeInTheDocument();
-  expect(screen.queryByLabelText('rowsPerPage')).not.toBeInTheDocument();
-  expect(screen.queryByLabelText('totalNumber')).not.toBeInTheDocument();
 });
-
-function renderPrintIdentifierStickerModal() {
-  return render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
-}

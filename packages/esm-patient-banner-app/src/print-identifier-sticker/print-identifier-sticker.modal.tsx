@@ -1,23 +1,23 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import {
   Button,
+  Column,
+  Grid,
   InlineLoading,
   ModalBody,
   ModalFooter,
   ModalHeader,
   NumberInput,
   Stack,
-  Grid,
-  Column,
   Toggle,
 } from '@carbon/react';
-import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import { getPatientName, getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import styles from './print-identifier-sticker.scss';
-import classNames from 'classnames';
 import PrintComponent from './print-identifier-sticker.component';
+import styles from './print-identifier-sticker.scss';
 
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
@@ -26,17 +26,17 @@ interface PrintIdentifierStickerProps {
 
 interface PrintMultipleStickersComponentProps extends Partial<ConfigObject> {
   pageSize: string;
+  patient: fhir.Patient;
   printMultipleStickers: {
     enabled: boolean;
-    totalStickers: number;
     stickerColumnsPerPage: number;
     stickerRowsPerPage: number;
+    totalStickers: number;
   };
   stickerSize: {
     height: string;
     width: string;
   };
-  patient: fhir.Patient;
 }
 
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
