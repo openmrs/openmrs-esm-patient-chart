@@ -4,12 +4,12 @@ import isEmpty from 'lodash/isEmpty';
 import { ComboBox } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
-import { type Location, type OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
+import { type Location, type OpenmrsResource, useConfig, useSession, useLocations } from '@openmrs/esm-framework';
 import { type VisitFormData } from './visit-form.resource';
-import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
-import { useLocations } from '../hooks/useLocations';
+import { useDefaultFacilityLocation } from '../hooks/useDefaultFacilityLocation';
 import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
+import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 
 interface LocationSelectorProps {
   control: Control<VisitFormData>;
@@ -17,21 +17,15 @@ interface LocationSelectorProps {
 
 const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
   const { t } = useTranslation();
-  const session = useSession();
-  const [searchTerm, setSearchTerm] = useState('');
-  const selectedSessionLocation = useSession().sessionLocation;
-  const { locations } = useLocations(searchTerm);
-  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
   const config = useConfig<ChartConfig>();
+  const sessionLocation = useSession().sessionLocation;
+  const defaultVisitLocation = useDefaultVisitLocation(sessionLocation, config.restrictByVisitLocationTag);
+  const [searchTerm, setSearchTerm] = useState('');
+  const locations = useLocations(config.restrictByVisitLocationTag ? 'Visit Location' : null, searchTerm);
+  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultFacilityLocation();
   const disableChangingVisitLocation = config?.disableChangingVisitLocation;
   const locationsToShow: Array<OpenmrsResource> =
-    !loadingDefaultFacility && !isEmpty(defaultFacility)
-      ? [defaultFacility]
-      : locations
-      ? locations
-      : selectedSessionLocation
-      ? [selectedSessionLocation]
-      : [];
+    !loadingDefaultFacility && !isEmpty(defaultFacility) ? [defaultFacility] : locations ? locations : [];
 
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
@@ -62,7 +56,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
             )}
           />
         ) : (
-          <p className={styles.bodyShort02}>{session?.sessionLocation?.display}</p>
+          <p className={styles.bodyShort02}>{defaultVisitLocation?.display}</p>
         )}
       </div>
     </section>

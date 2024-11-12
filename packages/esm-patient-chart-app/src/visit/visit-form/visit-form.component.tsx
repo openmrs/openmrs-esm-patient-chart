@@ -41,6 +41,7 @@ import {
   useVisit,
   useVisitTypes,
   type Visit,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -54,7 +55,6 @@ import { type VisitFormData } from './visit-form.resource';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
-import { useLocations } from '../hooks/useLocations';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
@@ -65,6 +65,8 @@ import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
+import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
+import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 
 dayjs.extend(isSameOrBefore);
 
@@ -84,12 +86,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
   const isOnline = useConnectivity();
+  const config = useConfig<ChartConfig>();
   const sessionUser = useSession();
-  const { error } = useLocations();
-  const errorFetchingLocations = isOnline ? error : false;
   const sessionLocation = sessionUser?.sessionLocation;
-  const config = useConfig() as ChartConfig;
+  const defaultVisitLocation = useDefaultVisitLocation(sessionLocation, config.restrictByVisitLocationTag);
+  const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
   const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -203,9 +206,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
       visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
-
-      visitType: visitToEdit?.visitType?.uuid,
-      visitLocation: visitToEdit?.location ?? sessionLocation ?? {},
+      visitType: visitToEdit?.visitType?.uuid ?? emrConfiguration?.atFacilityVisitType?.uuid,
+      visitLocation: visitToEdit?.location ?? defaultVisitLocation ?? {},
       visitAttributes:
         visitToEdit?.attributes.reduce(
           (acc, curr) => ({
@@ -226,7 +228,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     }
 
     return defaultValues;
-  }, [visitToEdit, sessionLocation]);
+  }, [visitToEdit, defaultVisitLocation, emrConfiguration]);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -240,7 +242,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     getValues,
     formState: { errors, isDirty },
     setError,
+    reset,
   } = methods;
+
+  // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -664,14 +672,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
   minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
 
-  useEffect(() => {
-    if (errorFetchingLocations) {
-      setErrorFetchingResources((prev) => ({
-        blockSavingForm: prev?.blockSavingForm || false,
-      }));
-    }
-  }, [errorFetchingLocations]);
-
   return (
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
@@ -769,38 +769,40 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </section>
             )}
 
-            {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
-            <section>
-              <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
-              <div className={styles.sectionField}>
-                {config.showRecommendedVisitTypeTab ? (
-                  <>
-                    <ContentSwitcher
-                      selectedIndex={contentSwitcherIndex}
-                      onChange={({ index }) => setContentSwitcherIndex(index)}
-                    >
-                      <Switch name="recommended" text={t('recommended', 'Recommended')} />
-                      <Switch name="all" text={t('all', 'All')} />
-                    </ContentSwitcher>
-                    {contentSwitcherIndex === 0 && !isLoading && (
-                      <MemoizedRecommendedVisitType
-                        patientUuid={patientUuid}
-                        patientProgramEnrollment={(() => {
-                          return activePatientEnrollment?.find(
-                            ({ program }) => program.uuid === getValues('programType'),
-                          );
-                        })()}
-                        locationUuid={getValues('visitLocation')?.uuid}
-                      />
-                    )}
-                    {contentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
-                  </>
-                ) : (
-                  // Defaults to showing all possible visit types if recommended visits are not enabled
-                  <BaseVisitType visitTypes={allVisitTypes} />
-                )}
-              </div>
-            </section>
+            {/* Lists available visit types if no atFacilityVisitType enabled. The content switcher only gets shown when recommended visit types are enabled */}
+            {!emrConfiguration?.atFacilityVisitType && (
+              <section>
+                <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
+                <div className={styles.sectionField}>
+                  {config.showRecommendedVisitTypeTab ? (
+                    <>
+                      <ContentSwitcher
+                        selectedIndex={contentSwitcherIndex}
+                        onChange={({ index }) => setContentSwitcherIndex(index)}
+                      >
+                        <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                        <Switch name="all" text={t('all', 'All')} />
+                      </ContentSwitcher>
+                      {contentSwitcherIndex === 0 && !isLoading && (
+                        <MemoizedRecommendedVisitType
+                          patientUuid={patientUuid}
+                          patientProgramEnrollment={(() => {
+                            return activePatientEnrollment?.find(
+                              ({ program }) => program.uuid === getValues('programType'),
+                            );
+                          })()}
+                          locationUuid={getValues('visitLocation')?.uuid}
+                        />
+                      )}
+                      {contentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
+                    </>
+                  ) : (
+                    // Defaults to showing all possible visit types if recommended visits are not enabled
+                    <BaseVisitType visitTypes={allVisitTypes} />
+                  )}
+                </div>
+              </section>
+            )}
 
             {errors?.visitType && (
               <section>
