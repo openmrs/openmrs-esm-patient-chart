@@ -5,6 +5,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
 import { type AllowedPatientFields, type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
+import { Column, Grid } from '@carbon/react';
 
 interface PrintComponentProps {
   patient: fhir.Patient;
@@ -20,16 +21,20 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
   const primaryIdentifierValue = patient?.identifier?.find((identifier) => identifier.use === 'official')?.value;
   return (
     <div className={styles.stickerContainer}>
-      <div className={styles.documentHeader}>
+      <Grid className={styles.gridHeaderContainer}>
         {printPatientSticker?.header?.showBarcode && (
-          <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
+          <Column lg={12} md={6} sm={4}>
+            <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
+          </Column>
         )}
         {printPatientSticker?.header?.showLogo && (
-          <div className={styles.implementationLogo}>
-            <ImplementationLogo />
-          </div>
+          <Column lg={4} md={2} sm={4}>
+            <div className={styles.implementationLogo}>
+              <ImplementationLogo />
+            </div>
+          </Column>
         )}
-      </div>
+      </Grid>
 
       <div
         className={styles.fieldsContainer}

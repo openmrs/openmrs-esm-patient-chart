@@ -11,12 +11,17 @@
   padding-left: 0;
 }
 
-.documentHeader {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  border-bottom: 1px solid $brand-01;
-  margin-bottom: layout.$spacing-08;
-  padding-bottom: layout.$spacing-08;
+.gridHeaderContainer {
+  padding: 0;
+
+  :global(.cds--css-grid-column) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  img {
+    width: -webkit-fill-available;
+  }
 }
 
 .row {
@@ -87,6 +92,7 @@
 
 .implementationLogo {
   display: flex;
+  height: 100%;
 }
 
 .previewContainer {
@@ -133,6 +139,24 @@
   .stickerContainer {
     height: var(--omrs-print-label-sticker-height, auto);
     width: var(--omrs-print-label-sticker-width, auto);
+  }
+
+  .implementationLogo {
+    display: flex;
+    height: 100%;
+  }
+
+  .gridHeaderContainer {
+    padding: 0;
+
+    :global(.cds--css-grid-column) {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    img {
+      width: -webkit-fill-available;
+    }
   }
 }
 
