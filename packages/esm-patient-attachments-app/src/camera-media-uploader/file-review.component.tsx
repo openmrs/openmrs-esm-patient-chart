@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, TextArea, TextInput } from '@carbon/react';
 import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './file-review.scss';
@@ -74,7 +75,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   clearData,
 }) => {
   const { t } = useTranslation();
-  const { allowedExtensions } = useContext(CameraMediaUploaderContext);
+  const { allowedFileExtensions } = useAllowedFileExtensions();
   const fileNameWithoutExtension = uploadedFile.fileName.trim().replace(/\.[^\\/.]+$/, '');
 
   const schema = z.object({
@@ -99,7 +100,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     const { fileName, fileDescription } = data;
 
     const sanitizedFileName =
-      allowedExtensions?.reduce((name, extension) => {
+      allowedFileExtensions?.reduce((name, extension) => {
         const regex = new RegExp(`\\.(${extension})+$`, 'i');
         return name.replace(regex, '');
       }, fileName) || fileName;
