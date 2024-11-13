@@ -63,7 +63,7 @@ describe('PrintIdentifierStickerModal', () => {
     expect(Barcode).toHaveBeenCalledWith(
       {
         value: '100008E',
-        width: 2,
+        width: 3,
         background: '#f4f4f4',
         displayValue: true,
         renderer: 'img',
