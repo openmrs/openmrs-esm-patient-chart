@@ -12,7 +12,9 @@
 }
 
 .gridHeaderContainer {
-  padding: 0;
+  padding: 0 0 layout.$spacing-08 0;
+  border-bottom: 1px solid $brand-01;
+  margin-bottom: layout.$spacing-08;
 
   :global(.cds--css-grid-column) {
     margin-left: 0;
@@ -147,7 +149,9 @@
   }
 
   .gridHeaderContainer {
-    padding: 0;
+    padding: 0 0 layout.$spacing-08 0;
+    border-bottom: 1px solid $brand-01;
+    margin-bottom: layout.$spacing-08;
 
     :global(.cds--css-grid-column) {
       margin-left: 0;
