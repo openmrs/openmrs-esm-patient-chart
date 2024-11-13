@@ -8,9 +8,9 @@ export const configSchema = {
   },
   showPrintButton: {
     _type: Type.Boolean,
-    _default: false,
     _description:
       'Determines whether or not to display a Print button in the Orders details table. If set to true, a Print button gets shown in both the orders table headers. When clicked, this button enables the user to print out the contents of the table',
+    _default: false,
   },
 };
 
