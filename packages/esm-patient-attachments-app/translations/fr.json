@@ -39,6 +39,7 @@
   "imagePreview": "Aperçu de l'image",
   "name": "Nom",
   "nameIsRequired": "Name is required",
+  "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "Aucune image à afficher",
   "options": "Options",
   "successfullyDeleted": "Supprimé avec succès",
