@@ -8,16 +8,14 @@ import {
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
-import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
-import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
+import genericDashboardComponent, { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
+import genericNavGroupComponent, { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 import { moduleName } from './constants';
 import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
-import genericDashboardComponent from './side-nav/generic-dashboard.component';
-import genericNavGroupComponent from './side-nav/generic-nav-group.component';
 import markPatientAliveActionButtonComponent from './actions-buttons/mark-patient-alive.component';
 import markPatientDeceasedActionButtonComponent from './actions-buttons/mark-patient-deceased.component';
 import pastVisitsDetailOverviewComponent from './visit/past-visit-overview.component';
