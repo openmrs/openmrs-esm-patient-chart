@@ -123,26 +123,4 @@ describe('PrintIdentifierStickerModal', () => {
     expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });
-
-  it('should not render multiple sticker inputs if multiple stickers are disabled via config', async () => {
-    mockedUseConfig.mockReturnValue({
-      ...defaultConfig,
-      printPatientSticker: {
-        ...defaultConfig.printPatientSticker,
-        printMultipleStickers: {
-          enabled: false,
-          totalStickers: 1,
-          stickerColumnsPerPage: 1,
-          stickerRowsPerPage: 1,
-        },
-        stickerSize: { height: '2in', width: '2in' },
-      },
-    });
-
-    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
-
-    expect(screen.queryByLabelText('columnsPerPage')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('rowsPerPage')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('totalNumber')).not.toBeInTheDocument();
-  });
 });

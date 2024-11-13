@@ -5,8 +5,6 @@
 
 .stickerContainer {
   padding: layout.$spacing-03 layout.$spacing-05;
-  height: var(--omrs-print-label-sticker-height, auto);
-  width: var(--omrs-print-label-sticker-width, auto);
 }
 
 .gridContainer {
@@ -14,10 +12,8 @@
 }
 
 .documentHeader {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
   border-bottom: 1px solid $brand-01;
   margin-bottom: layout.$spacing-05;
 }
@@ -66,10 +62,8 @@
   }
 }
 
-.strong {
-  @include type.type-style('heading-04');
-  font-weight: 700;
-  margin-inline-end: layout.$spacing-03;
+.patientDetailLabel {
+  @include type.type-style('heading-03');
 }
 
 .multipleStickerToggle {
@@ -84,12 +78,14 @@
 }
 
 .patientDetail {
-  @include type.type-style('heading-03');
+  @include type.type-style('heading-04');
+  font-weight: 700;
+  margin-inline-end: layout.$spacing-03;
   text-align: left;
 }
 
 .implementationLogo {
-  width: 40%;
+  display: flex;
 }
 
 .previewContainer {
@@ -132,6 +128,11 @@
     grid-template-columns: repeat(var(--omrs-print-label-columns, 1), 1fr);
     grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
   }
+
+  .stickerContainer {
+    height: var(--omrs-print-label-sticker-height, auto);
+    width: var(--omrs-print-label-sticker-width, auto);
+  }
 }
 
 .printContainer {
@@ -161,8 +162,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: layout.$spacing-05 layout.$spacing-05;
+  padding-bottom: layout.$spacing-05;
 }
 
 .fieldRow {
   display: contents;
+}
+
+.fieldsTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.fieldsTableCell div {
+  display: grid;
+  gap: layout.$spacing-05;
 }

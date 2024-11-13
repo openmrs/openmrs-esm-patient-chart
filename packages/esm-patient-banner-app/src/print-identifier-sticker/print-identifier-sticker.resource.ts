@@ -12,7 +12,7 @@ import {
 } from './patient-detail.component';
 
 export const defaultBarcodeParams: Options = {
-  width: 2,
+  width: 3,
   format: 'CODE39',
   background: '#f4f4f4',
   displayValue: true,

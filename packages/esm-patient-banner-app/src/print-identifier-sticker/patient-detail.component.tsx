@@ -13,9 +13,7 @@ export const PatientName: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span>
-        <strong className={styles.strong}>{t('patientNameWithSeparator', 'Patient name:')}</strong>
-      </span>
+      <span className={styles.patientDetailLabel}>{t('patientNameWithSeparator', 'Patient name:')}</span>
       <span className={styles.patientDetail}>{getPatientName(patient)}</span>
     </div>
   );
@@ -25,9 +23,7 @@ export const PatientAge: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span>
-        <strong className={styles.strong}>{t('patientAge', 'Age:')}</strong>
-      </span>
+      <span className={styles.patientDetailLabel}>{t('patientAge', 'Age:')}</span>
       <span className={styles.patientDetail}>{age(patient.birthDate)}</span>
     </div>
   );
@@ -37,9 +33,7 @@ export const PatientDob: React.FC<PatientDetailProps> = ({ patient }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span>
-        <strong className={styles.strong}>{t('patientDateOfBirthWithSeparator', 'Date of birth:')}</strong>
-      </span>
+      <span className={styles.patientDetailLabel}>{t('patientDateOfBirthWithSeparator', 'Date of birth:')}</span>
       <span className={styles.patientDetail}>{dayjs(patient.birthDate).format('DD-MM-YYYY')}</span>
     </div>
   );
@@ -63,9 +57,7 @@ export const PatientGender: React.FC<PatientDetailProps> = ({ patient }) => {
   };
   return (
     <div className={styles.fieldRow}>
-      <span>
-        <strong className={styles.strong}>{t('patientGenderWithSeparator', 'Gender:')}</strong>
-      </span>
+      <span className={styles.patientDetailLabel}>{t('patientGenderWithSeparator', 'Gender:')}</span>
       <span className={styles.patientDetail}>{getGender(patient.gender)}</span>
     </div>
   );
@@ -82,9 +74,7 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
     <div className={styles.fieldRow}>
       {patientIdentifiers?.map((identifier) => (
         <div key={identifier.id} className={styles.fieldRow}>
-          <span>
-            <strong className={styles.strong}>{identifier.type.text}:</strong>
-          </span>
+          <span className={styles.patientDetailLabel}>{identifier.type.text}:</span>
           <span className={styles.patientDetail}>{identifier.value}</span>
         </div>
       ))}
@@ -101,9 +91,7 @@ export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
 
   return (
     <div className={styles.fieldRow}>
-      <span>
-        <strong className={styles.strong}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</strong>
-      </span>
+      <span className={styles.patientDetailLabel}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</span>
       <span className={styles.patientDetail}>{patient.telecom?.[0]?.value}</span>
     </div>
   );
@@ -122,7 +110,7 @@ export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
             key === 'extension' ? (
               address.extension?.[0]?.extension?.map((add, i) => (
                 <div key={`address-${key}-${i}`} className={styles.fieldRow}>
-                  <span className={styles.strong}>
+                  <span className={styles.patientDetailLabel}>
                     {getCoreTranslation(
                       getAddressKey(add.url) as CoreTranslationKey,
                       getAddressKey(add.url) as CoreTranslationKey,
@@ -134,7 +122,7 @@ export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
               ))
             ) : (
               <div key={`address-${key}`} className={styles.fieldRow}>
-                <span className={styles.strong}>{getCoreTranslation(key as CoreTranslationKey, key)}:</span>
+                <span className={styles.patientDetailLabel}>{getCoreTranslation(key as CoreTranslationKey, key)}:</span>
                 <span className={styles.patientDetail}>{value}</span>
               </div>
             ),

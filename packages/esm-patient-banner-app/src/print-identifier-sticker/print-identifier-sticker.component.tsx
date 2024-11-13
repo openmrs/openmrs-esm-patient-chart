@@ -3,7 +3,7 @@ import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
-import { type ConfigObject } from '../config-schema';
+import { type AllowedPatientFields, type ConfigObject } from '../config-schema';
 import styles from './print-identifier-sticker.scss';
 
 interface PrintComponentProps {
@@ -12,6 +12,10 @@ interface PrintComponentProps {
 
 const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
   const { printPatientSticker } = useConfig<ConfigObject>();
+  const fieldsTableGroups: Array<Array<AllowedPatientFields>> =
+    printPatientSticker?.printStickerFields?.fieldsTableGroups;
+  const individualFields =
+    printPatientSticker?.printStickerFields.fields?.filter((field) => !fieldsTableGroups.flat().includes(field)) || [];
 
   const primaryIdentifierValue = patient?.identifier?.find((identifier) => identifier.use === 'official')?.value;
   return (
@@ -26,8 +30,12 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
           </div>
         )}
       </div>
-      <div className={styles.fieldsContainer}>
-        {printPatientSticker?.fields?.map((field) => {
+
+      <div
+        className={styles.fieldsContainer}
+        style={printPatientSticker?.printStickerFields?.fieldsContainerStyleOverrides}
+      >
+        {individualFields.map((field) => {
           const Component = getPatientField(field);
           return (
             <div key={field} className={styles.fieldRow}>
@@ -36,6 +44,24 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
           );
         })}
       </div>
+      {fieldsTableGroups.length > 0
+        ? fieldsTableGroups.map((group, index) => (
+            <table key={`group-${index}`} className={styles.fieldsTable}>
+              <tbody>
+                <tr>
+                  {group.map((field) => {
+                    const Component = getPatientField(field);
+                    return (
+                      <td key={field} className={styles.fieldsTableCell}>
+                        <Component patient={patient} />
+                      </td>
+                    );
+                  })}
+                </tr>
+              </tbody>
+            </table>
+          ))
+        : null}
     </div>
   );
 };

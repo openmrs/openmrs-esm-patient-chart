@@ -34,10 +34,27 @@ export const configSchema = {
         logo: '',
       },
     },
-    fields: {
-      _type: Type.Array,
-      _description: 'Patient demographics to include in the patient sticker printout',
-      _default: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
+    printStickerFields: {
+      _type: Type.Object,
+      _description: 'Configuration of the patient sticker fields for the patient identifier stickers',
+      fields: {
+        _type: Type.Array,
+        _description: 'Patient demographics to include in the patient sticker printout',
+      },
+      fieldsTableGroups: {
+        _type: Type.Array,
+        _description:
+          'Groups of patient demographic fields to be displayed as distinct tables in the patient sticker. Each group contains a set of related fields that will appear together in one table ie a single line.',
+      },
+      fieldsContainerStyleOverrides: {
+        _type: Type.Object,
+        _description: 'CSS style elements override how fields appear in the field container.',
+      },
+      _default: {
+        fields: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
+        fieldsTableGroups: [],
+        fieldsContainerStyleOverrides: {},
+      },
     },
     pageSize: {
       _type: Type.String,
@@ -46,11 +63,9 @@ export const configSchema = {
       _default: 'A4',
     },
     printMultipleStickers: {
-      enabled: {
-        _type: Type.Boolean,
-        _description: 'Whether to allow printing multiple patient ID stickers',
-      },
-      totalStickers: {
+      _type: Type.Object,
+      _description: 'Configuration of how many stickers to print, together with the columns and rows to print per page',
+      numberOfStickers: {
         _type: Type.Number,
         _description: 'The number of patient ID stickers to print',
       },
@@ -64,20 +79,22 @@ export const configSchema = {
       },
       _default: {
         enabled: false,
-        totalStickers: 1,
+        numberOfStickers: 1,
         stickerColumnsPerPage: 1,
         stickerRowsPerPage: 1,
       },
     },
     stickerSize: {
+      _type: Type.Object,
+      _description: 'Configuration of the patient sticker height and width for the patient identifier stickers',
       height: {
         _type: Type.String,
         _description:
-          'Specifies the height of each patient ID sticker in the printout in units such as px or rem e.g. "15px", "5rem"',
+          'Specifies the height of each patient ID sticker in the printout in units such as inches or centimetres.',
       },
       width: {
         _type: Type.String,
-        _description: 'The width of each patient ID sticker in the printout in units such as px or rem',
+        _description: 'The width of each patient ID sticker in the printout in units such as inches or centimetres.',
       },
       _default: {
         height: 'auto',
@@ -111,11 +128,14 @@ export interface ConfigObject {
       showLogo: boolean;
       logo: string;
     };
-    fields: Array<AllowedPatientFields>;
+    printStickerFields: {
+      fields: Array<AllowedPatientFields>;
+      fieldsTableGroups: Array<Array<AllowedPatientFields>>;
+      fieldsContainerStyleOverrides: Record<string, string | number>;
+    };
     pageSize: string;
     printMultipleStickers: {
-      enabled: boolean;
-      totalStickers: number;
+      numberOfStickers: number;
       stickerColumnsPerPage: number;
       stickerRowsPerPage: number;
     };

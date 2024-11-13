@@ -24,14 +24,14 @@ interface PrintIdentifierStickerProps {
   patient: fhir.Patient;
 }
 
-interface PrintMultipleStickersComponentProps extends Partial<ConfigObject> {
+interface PrintMultipleStickersComponentProps
+  extends Pick<ConfigObject['printPatientSticker'], 'pageSize' | 'printMultipleStickers' | 'stickerSize'> {
   pageSize: string;
   patient: fhir.Patient;
   printMultipleStickers: {
-    enabled: boolean;
+    numberOfStickers: number;
     stickerColumnsPerPage: number;
     stickerRowsPerPage: number;
-    totalStickers: number;
   };
   stickerSize: {
     height: string;
@@ -153,9 +153,11 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
     const [numberOfLabelRowsPerPage, setNumberOfLabelRowsPerPage] = useState<number>(
       printMultipleStickers.stickerRowsPerPage,
     );
-    const [numberOfLabels, setNumberOfLabels] = useState<number>(printMultipleStickers.totalStickers);
+    const [numberOfLabels, setNumberOfLabels] = useState<number>(printMultipleStickers.numberOfStickers);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
-    const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(printMultipleStickers.enabled);
+    const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(
+      printMultipleStickers.numberOfStickers > 1,
+    );
 
     const labels = Array.from({ length: numberOfLabels });
 
