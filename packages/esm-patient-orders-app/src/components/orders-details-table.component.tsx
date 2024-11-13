@@ -61,7 +61,6 @@ import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
-
 interface OrderDetailsProps {
   patientUuid: string;
   showAddButton?: boolean;
@@ -353,8 +352,18 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             handleDateFilterChange([startDate, endDate]);
           }}
         >
-          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" />
-          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" />
+          <DatePickerInput
+            id="startDatePickerInput"
+            data-testid="startDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
+          <DatePickerInput
+            id="endDatePickerInput"
+            data-testid="endDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
         </DatePicker>
       </div>
 
