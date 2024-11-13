@@ -15,7 +15,8 @@
   display: grid;
   grid-template-columns: 3fr 1fr;
   border-bottom: 1px solid $brand-01;
-  margin-bottom: layout.$spacing-05;
+  margin-bottom: layout.$spacing-08;
+  padding-bottom: layout.$spacing-08;
 }
 
 .row {
@@ -162,6 +163,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: layout.$spacing-05 layout.$spacing-05;
+  align-items: baseline;
   padding-bottom: layout.$spacing-05;
 }
 
