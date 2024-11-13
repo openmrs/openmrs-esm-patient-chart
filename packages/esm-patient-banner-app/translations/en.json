@@ -10,10 +10,14 @@
   "hidePreview": "Hide preview",
   "identifierStickerImplementationLogo": "Identifier sticker implementation logo",
   "implementationLogo": "Implementation logo",
-  "patientAge": "Age:",
+  "patientAge": "Age",
+  "patientAgeWithSeparator": "Age:",
+  "patientDateOfBirth": "Date of birth",
   "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGender": "Gender",
   "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientName": "Patient name",
   "patientNameWithSeparator": "Patient name:",
   "postalCode": "Postal code",
   "printIdentifierSticker": "Print identifier sticker",
@@ -23,6 +27,7 @@
   "showPreview": "Show preview",
   "state": "State",
   "stateProvince": "State",
+  "telephoneNumber": "Telephone number",
   "telephoneNumberWithSeparator": "Telephone number:",
   "totalNumber": "Total number"
 }

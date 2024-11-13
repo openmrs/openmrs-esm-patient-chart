@@ -18,6 +18,7 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
   const individualFields =
     printPatientSticker?.printStickerFields.fields?.filter((field) => !fieldsTableGroups.flat().includes(field)) || [];
 
+  const showFieldSeparator = printPatientSticker?.printStickerFields?.fieldSeparator;
   const primaryIdentifierValue = patient?.identifier?.find((identifier) => identifier.use === 'official')?.value;
   return (
     <div className={styles.stickerContainer}>
@@ -44,7 +45,7 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
           const Component = getPatientField(field);
           return (
             <div key={field} className={styles.fieldRow}>
-              <Component patient={patient} />
+              <Component patient={patient} showFieldSeparator={showFieldSeparator} />
             </div>
           );
         })}
@@ -58,7 +59,7 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
                     const Component = getPatientField(field);
                     return (
                       <td key={field} className={styles.fieldsTableCell}>
-                        <Component patient={patient} />
+                        <Component patient={patient} showFieldSeparator={showFieldSeparator} />
                       </td>
                     );
                   })}

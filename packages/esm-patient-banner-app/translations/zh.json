@@ -7,7 +7,7 @@
   "countyDistrict": "区县",
   "district": "区县",
   "implementationLogo": "Implementation logo",
-  "patientAge": "Age:",
+  "patientAgeWithSeparator": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
   "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "患者标识符贴纸",

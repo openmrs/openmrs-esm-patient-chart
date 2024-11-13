@@ -7,39 +7,48 @@ import styles from './print-identifier-sticker.scss';
 
 export interface PatientDetailProps {
   patient: fhir.Patient;
+  showFieldSeparator: boolean;
 }
 
-export const PatientName: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientName: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span className={styles.patientDetailLabel}>{t('patientNameWithSeparator', 'Patient name:')}</span>
+      <span className={styles.patientDetailLabel}>
+        {showFieldSeparator ? t('patientNameWithSeparator', 'Patient name:') : t('patientName', 'Patient name')}
+      </span>
       <span className={styles.patientDetail}>{getPatientName(patient)}</span>
     </div>
   );
 };
 
-export const PatientAge: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientAge: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span className={styles.patientDetailLabel}>{t('patientAge', 'Age:')}</span>
+      <span className={styles.patientDetailLabel}>
+        {showFieldSeparator ? t('patientAgeWithSeparator', 'Age:') : t('patientAge', 'Age')}
+      </span>
       <span className={styles.patientDetail}>{age(patient.birthDate)}</span>
     </div>
   );
 };
 
-export const PatientDob: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientDob: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.fieldRow}>
-      <span className={styles.patientDetailLabel}>{t('patientDateOfBirthWithSeparator', 'Date of birth:')}</span>
+      <span className={styles.patientDetailLabel}>
+        {showFieldSeparator
+          ? t('patientDateOfBirthWithSeparator', 'Date of birth:')
+          : t('patientDateOfBirth', 'Date of birth')}
+      </span>
       <span className={styles.patientDetail}>{dayjs(patient.birthDate).format('DD-MM-YYYY')}</span>
     </div>
   );
 };
 
-export const PatientGender: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientGender: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { t } = useTranslation();
   const getGender = (gender: string): string => {
     switch (gender) {
@@ -57,13 +66,15 @@ export const PatientGender: React.FC<PatientDetailProps> = ({ patient }) => {
   };
   return (
     <div className={styles.fieldRow}>
-      <span className={styles.patientDetailLabel}>{t('patientGenderWithSeparator', 'Gender:')}</span>
+      <span className={styles.patientDetailLabel}>
+        {showFieldSeparator ? t('patientGenderWithSeparator', 'Gender:') : t('patientGender', 'Gender')}
+      </span>
       <span className={styles.patientDetail}>{getGender(patient.gender)}</span>
     </div>
   );
 };
 
-export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { printPatientSticker } = useConfig<ConfigObject>();
   const { identifiersToDisplay } = printPatientSticker ?? {};
   const patientIdentifiers =
@@ -74,7 +85,10 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
     <div className={styles.fieldRow}>
       {patientIdentifiers?.map((identifier) => (
         <div key={identifier.id} className={styles.fieldRow}>
-          <span className={styles.patientDetailLabel}>{identifier.type.text}:</span>
+          <span className={styles.patientDetailLabel}>
+            {identifier.type.text}
+            {showFieldSeparator ? ':' : ''}
+          </span>
           <span className={styles.patientDetail}>{identifier.value}</span>
         </div>
       ))}
@@ -82,7 +96,7 @@ export const PatientIdentifier: React.FC<PatientDetailProps> = ({ patient }) => 
   );
 };
 
-export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientContact: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const { t } = useTranslation();
 
   if (!patient?.telecom?.length) {
@@ -91,13 +105,17 @@ export const PatientContact: React.FC<PatientDetailProps> = ({ patient }) => {
 
   return (
     <div className={styles.fieldRow}>
-      <span className={styles.patientDetailLabel}>{t('telephoneNumberWithSeparator', 'Telephone number:')}</span>
+      <span className={styles.patientDetailLabel}>
+        {showFieldSeparator
+          ? t('telephoneNumberWithSeparator', 'Telephone number:')
+          : t('telephoneNumber', 'Telephone number')}
+      </span>
       <span className={styles.patientDetail}>{patient.telecom?.[0]?.value}</span>
     </div>
   );
 };
 
-export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
+export const PatientAddress: React.FC<PatientDetailProps> = ({ patient, showFieldSeparator }) => {
   const address = patient?.address?.find((a) => a.use === 'home');
   const getAddressKey = (url: string) => url.split('#')[1];
 
@@ -115,14 +133,17 @@ export const PatientAddress: React.FC<PatientDetailProps> = ({ patient }) => {
                       getAddressKey(add.url) as CoreTranslationKey,
                       getAddressKey(add.url) as CoreTranslationKey,
                     )}
-                    :
+                    {showFieldSeparator ? ':' : ''}
                   </span>
                   <span className={styles.patientDetail}>{add.valueString}</span>
                 </div>
               ))
             ) : (
               <div key={`address-${key}`} className={styles.fieldRow}>
-                <span className={styles.patientDetailLabel}>{getCoreTranslation(key as CoreTranslationKey, key)}:</span>
+                <span className={styles.patientDetailLabel}>
+                  {getCoreTranslation(key as CoreTranslationKey, key)}
+                  {showFieldSeparator ? ':' : ''}
+                </span>
                 <span className={styles.patientDetail}>{value}</span>
               </div>
             ),

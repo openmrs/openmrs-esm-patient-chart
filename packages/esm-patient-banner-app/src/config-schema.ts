@@ -41,6 +41,10 @@ export const configSchema = {
         _type: Type.Array,
         _description: 'Patient demographics to include in the patient sticker printout',
       },
+      fieldSeparator: {
+        _type: Type.Boolean,
+        _description: 'Whether to display a colon symbol alongside each field label',
+      },
       fieldsTableGroups: {
         _type: Type.Array,
         _description:
@@ -52,6 +56,7 @@ export const configSchema = {
       },
       _default: {
         fields: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
+        fieldSeparator: false,
         fieldsTableGroups: [],
         fieldsContainerStyleOverrides: {},
       },
@@ -130,6 +135,7 @@ export interface ConfigObject {
     };
     printStickerFields: {
       fields: Array<AllowedPatientFields>;
+      fieldSeparator: boolean;
       fieldsTableGroups: Array<Array<AllowedPatientFields>>;
       fieldsContainerStyleOverrides: Record<string, string | number>;
     };
