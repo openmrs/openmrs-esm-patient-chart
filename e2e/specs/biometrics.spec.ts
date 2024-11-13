@@ -66,7 +66,7 @@ test('Record biometrics', async ({ page }) => {
   });
 });
 
-test('Record abnormal biometrics', async ({ page }) => {
+test('Record invalid biometrics', async ({ page }) => {
   const biometricsPage = new BiometricsAndVitalsPage(page);
 
   await test.step('When I visit the vitals and biometrics page', async () => {
@@ -81,16 +81,16 @@ test('Record abnormal biometrics', async ({ page }) => {
     await expect(biometricsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
   });
 
-  await test.step('When I fill `255` as the weight', async () => {
-    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('255');
+  await test.step('When I fill `1000` as the weight', async () => {
+    await biometricsPage.page.getByRole('spinbutton', { name: /weight/i }).fill('1000');
   });
 
   await test.step('And I fill `275` as the height', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /height/i }).fill('275');
   });
 
-  await test.step('Then I should see `33.7` as the auto calculated body mass index', async () => {
-    await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('33.7');
+  await test.step('Then I should see `132.2` as the auto calculated body mass index', async () => {
+    await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('132.2');
   });
 
   await test.step('When I fill `25` as the mid upper arm circumference ', async () => {
