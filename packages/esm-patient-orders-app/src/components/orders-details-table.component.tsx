@@ -59,6 +59,8 @@ import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
+import { DatePicker } from '@carbon/react';
+import { DatePickerInput } from '@carbon/react';
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -114,13 +116,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
+  const [selectedFromDate, setSelectedFromDate] = useState(null);
+  const [selectedToDate, setSelectedToDate] = useState(null);
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
   const {
     data: allOrders,
     error: error,
     isLoading,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid, selectedFromDate, selectedToDate);
 
   // launch respective order basket based on order type
   const openOrderForm = useCallback(
@@ -303,25 +307,54 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     [orderTypes, t],
   );
 
+  const handleDateFilterChange = ([startDate, endDate]) => {
+    if (startDate) {
+      setSelectedFromDate(startDate);
+      if (selectedToDate && startDate && selectedToDate < startDate) {
+        setSelectedToDate(startDate);
+      }
+    }
+    if (endDate) {
+      setSelectedToDate(endDate);
+      if (selectedFromDate && endDate && selectedFromDate > endDate) {
+        setSelectedFromDate(endDate);
+      }
+    }
+  };
   return (
     <>
-      <div className={styles.dropdownContainer}>
-        <Dropdown
-          id="orderTypeDropdown"
-          items={orderTypesToDisplay}
-          itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-          label={t('allOrders', 'All orders')}
-          onChange={(e: { selectedItem: Order }) => {
-            if (e.selectedItem.display === 'All') {
-              setSelectedOrderTypeUuid(null);
-              return;
-            }
-            setSelectedOrderTypeUuid(e.selectedItem.uuid);
+      <div className={styles.filterContainer}>
+        <div className={styles.dropdownContainer}>
+          <Dropdown
+            id="orderTypeDropdown"
+            items={orderTypesToDisplay}
+            itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+            label={t('allOrders', 'All orders')}
+            onChange={(e: { selectedItem: Order }) => {
+              if (e.selectedItem.display === 'All') {
+                setSelectedOrderTypeUuid(null);
+                return;
+              }
+              setSelectedOrderTypeUuid(e.selectedItem.uuid);
+            }}
+            selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
+            titleText={t('selectOrderType', 'Select order type') + ':'}
+            type="inline"
+          />
+        </div>
+        <p className={styles.helperText}>{t('dateRange', 'Date range')} :</p>
+        <DatePicker
+          datePickerType="range"
+          dateFormat={'d/m/Y'}
+          className={styles.fullWidthDatePickerContainer}
+          value={''}
+          onChange={([startDate, endDate]) => {
+            handleDateFilterChange([startDate, endDate]);
           }}
-          selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
-          titleText={t('selectOrderType', 'Select order type') + ':'}
-          type="inline"
-        />
+        >
+          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" value={formatDate(selectedFromDate)} />
+          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" value={formatDate(selectedToDate)} />
+        </DatePicker>
       </div>
 
       {(() => {

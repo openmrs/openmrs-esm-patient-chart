@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
 import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 
 export type Status = 'ACTIVE' | 'any';
@@ -14,7 +14,13 @@ export const drugCustomRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
-export function usePatientOrders(patientUuid: string, status?: Status, orderType?: string) {
+export function usePatientOrders(
+  patientUuid: string,
+  status?: Status,
+  orderType?: string,
+  startDate?: string,
+  endDate?: string,
+) {
   const { mutate } = useSWRConfig();
   const baseOrdersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderType=${orderType}` : baseOrdersUrl;
@@ -30,13 +36,18 @@ export function usePatientOrders(patientUuid: string, status?: Status, orderType
     [data, mutate, patientUuid],
   );
 
-  const orders = useMemo(
-    () =>
-      data?.data?.results
-        ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
-        : null,
-    [data],
-  );
+  const orders = useMemo(() => {
+    if (!data?.data?.results) return null;
+
+    const filteredResults =
+      startDate && endDate
+        ? data.data.results.filter((order) => {
+            return order.dateActivated >= toOmrsIsoString(startDate) && order.dateActivated <= toOmrsIsoString(endDate);
+          })
+        : data.data.results;
+
+    return filteredResults.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1));
+  }, [data, startDate, endDate]);
 
   return {
     data: orders,
