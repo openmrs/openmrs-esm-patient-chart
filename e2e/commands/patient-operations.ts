@@ -1,5 +1,7 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 
+const DOCTOR_PROVIDER_UUID = '705f5791-07a7-44b8-932f-a81f3526fc98';
+
 export interface Patient {
   uuid: string;
   identifiers: Identifier[];
@@ -136,7 +138,7 @@ export const createImmunizations = async (api: APIRequestContext, uuid: string, 
       {
         actor: {
           type: 'Practitioner',
-          reference: 'Practitioner/f39e57d8-1185-4199-8567-6f1eeb160f05',
+          reference: `Practitioner/${DOCTOR_PROVIDER_UUID}`,
         },
       },
     ],
