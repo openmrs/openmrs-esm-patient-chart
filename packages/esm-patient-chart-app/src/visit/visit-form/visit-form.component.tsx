@@ -91,7 +91,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const config = useConfig<ChartConfig>();
   const sessionUser = useSession();
   const sessionLocation = sessionUser?.sessionLocation;
-  const defaultVisitLocation = useDefaultVisitLocation(sessionLocation, config.restrictByVisitLocationTag);
+  const defaultVisitLocation = useDefaultVisitLocation(
+    sessionLocation,
+    config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
+  );
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
   const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);

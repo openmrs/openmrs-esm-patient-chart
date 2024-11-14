@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { ComboBox } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
-import { type Location, type OpenmrsResource, useConfig, useSession, useLocations } from '@openmrs/esm-framework';
+import {
+  type Location,
+  type OpenmrsResource,
+  useConfig,
+  useSession,
+  useLocations,
+  useFeatureFlag,
+} from '@openmrs/esm-framework';
 import { type VisitFormData } from './visit-form.resource';
 import { useDefaultFacilityLocation } from '../hooks/useDefaultFacilityLocation';
 import { type ChartConfig } from '../../config-schema';
@@ -18,10 +25,17 @@ interface LocationSelectorProps {
 const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
   const { t } = useTranslation();
   const config = useConfig<ChartConfig>();
-  const sessionLocation = useSession().sessionLocation;
-  const defaultVisitLocation = useDefaultVisitLocation(sessionLocation, config.restrictByVisitLocationTag);
   const [searchTerm, setSearchTerm] = useState('');
-  const locations = useLocations(config.restrictByVisitLocationTag ? 'Visit Location' : null, searchTerm);
+  const sessionLocation = useSession().sessionLocation;
+  const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
+  const defaultVisitLocation = useDefaultVisitLocation(
+    sessionLocation,
+    config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
+  );
+  const locations = useLocations(
+    config.restrictByVisitLocationTag && isEmrApiModuleInstalled ? 'Visit Location' : null,
+    searchTerm,
+  );
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultFacilityLocation();
   const disableChangingVisitLocation = config?.disableChangingVisitLocation;
   const locationsToShow: Array<OpenmrsResource> =
@@ -30,6 +44,12 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
   const handleSearch = (searchString) => {
     setSearchTerm(searchString);
   };
+
+  useEffect(() => {
+    if (config.restrictByVisitLocationTag && !isEmrApiModuleInstalled) {
+      console.warn('EMR API module is not installed. Visit location will not be restricted by location tag.');
+    }
+  }, [config.restrictByVisitLocationTag, isEmrApiModuleInstalled]);
 
   return (
     <section data-testid="combo">
