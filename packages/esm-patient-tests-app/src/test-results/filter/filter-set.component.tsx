@@ -70,13 +70,15 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
 
   if (!root.subSets) return;
 
-  const filterParent = root.subSets.map((node) => {
+  const filterParent = root.subSets.map((node, key) => {
     return (
-      <FilterNode
-        root={node}
-        level={0}
-        open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
-      />
+      <div key={key}>
+        <FilterNode
+          root={node}
+          level={0}
+          open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
+        />
+      </div>
     );
   });
 

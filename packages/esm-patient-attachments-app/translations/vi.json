@@ -39,6 +39,7 @@
   "imagePreview": "Xem trước hình ảnh",
   "name": "tên",
   "nameIsRequired": "Tên là bắt buộc",
+  "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "Không có hình ảnh để hiển thị",
   "options": "Tùy chọn",
   "successfullyDeleted": "đã xóa thành công",

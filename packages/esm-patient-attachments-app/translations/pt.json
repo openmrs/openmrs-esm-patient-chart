@@ -39,6 +39,7 @@
   "imagePreview": "Visualizar imagem",
   "name": "nome",
   "nameIsRequired": "Nome é obrigatório",
+  "noAttachmentsToDisplay": "Não há anexos por mostrar para este utente",
   "noImageToDisplay": "Nemhuma imagem para mostrar",
   "options": "Opções",
   "successfullyDeleted": "apagado com sucesso",
