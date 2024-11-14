@@ -22,7 +22,7 @@
   }
 
   img {
-    width: -webkit-fill-available;
+    width: 100%;
   }
 }
 
@@ -159,15 +159,13 @@
     }
 
     img {
-      width: -webkit-fill-available;
+      width: 100%;
     }
   }
 }
 
 .printContainer {
   background-color: $ui-01;
-  height: -webkit-fill-available;
-  width: -webkit-fill-available;
 }
 
 .labelsContainer {
