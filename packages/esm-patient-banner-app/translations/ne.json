@@ -1,0 +1,20 @@
+{
+  "address1": "Address line 1",
+  "address2": "Address line 2",
+  "city": "City",
+  "cityVillage": "city",
+  "country": "Country",
+  "countyDistrict": "District",
+  "district": "District",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
+  "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
+  "postalCode": "Postal code",
+  "printIdentifierSticker": "Print identifier sticker",
+  "state": "State",
+  "stateProvince": "State",
+  "telephoneNumberWithSeparator": "Telephone number:"
+}
