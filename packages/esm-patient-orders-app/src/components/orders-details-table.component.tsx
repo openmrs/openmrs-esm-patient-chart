@@ -309,15 +309,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
 
   const handleDateFilterChange = ([startDate, endDate]) => {
     if (startDate) {
-      setSelectedFromDate(startDate);
+      setSelectedFromDate(startDate.toISOString());
       if (selectedToDate && startDate && selectedToDate < startDate) {
-        setSelectedToDate(startDate);
+        setSelectedToDate(startDate.toISOString());
       }
     }
     if (endDate) {
-      setSelectedToDate(endDate);
+      setSelectedToDate(endDate.toISOString());
       if (selectedFromDate && endDate && selectedFromDate > endDate) {
-        setSelectedFromDate(endDate);
+        setSelectedFromDate(endDate.toISOString());
       }
     }
   };
@@ -352,8 +352,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             handleDateFilterChange([startDate, endDate]);
           }}
         >
-          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" value={formatDate(selectedFromDate)} />
-          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" value={formatDate(selectedToDate)} />
+          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" />
+          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" />
         </DatePicker>
       </div>
 
