@@ -23,7 +23,15 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
     error: null,
   });
 
-  renderFlagsList();
+  render(
+    <FlagsList
+      closeWorkspace={jest.fn()}
+      closeWorkspaceWithSavedChanges={jest.fn()}
+      patientUuid={mockPatient.id}
+      promptBeforeClosing={jest.fn()}
+      setTitle={jest.fn()}
+    />,
+  );
 
   const searchbox = screen.getByRole('searchbox', { name: /search for a flag/i });
   const clearSearchInputButton = screen.getByRole('button', { name: /clear search input/i });
@@ -38,15 +46,3 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   expect(screen.getByText(/needs follow up/i)).toBeInTheDocument();
   expect(screen.getByText(/social/i)).toBeInTheDocument();
 });
-
-function renderFlagsList() {
-  render(
-    <FlagsList
-      closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      promptBeforeClosing={jest.fn()}
-      setTitle={jest.fn()}
-    />,
-  );
-}

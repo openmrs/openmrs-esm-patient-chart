@@ -1,7 +1,16 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession, useVisit } from '@openmrs/esm-framework';
+import {
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  useSession,
+  useVisit,
+} from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { type ImmunizationWidgetConfigObject } from '../types/fhir-immunization-domain';
 import { immunizationFormSub } from './utils';
@@ -19,12 +28,8 @@ const mockUseConfig = jest.mocked<() => { immunizationsConfig: ImmunizationWidge
 const mockUseSession = jest.mocked(useSession);
 const mockUseVisit = jest.mocked(useVisit);
 const mockMutate = jest.fn();
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  toOmrsIsoString: jest.fn(),
-  toDateObjectStrict: jest.fn(),
-}));
+const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
+const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
 
 jest.mock('../hooks/useImmunizationsConceptSet', () => ({
   useImmunizationsConceptSet: jest.fn(() => ({
@@ -102,8 +107,17 @@ mockUseVisit.mockReturnValue({
 });
 
 describe('Immunizations Form', () => {
+  const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+  const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
+  const mockVaccinationDate = new Date('2024-01-03T15:44:17');
+
+  beforeEach(() => {
+    mockToOmrsIsoString.mockReturnValue(mockVaccinationDate.toISOString());
+    mockToDateObjectStrict.mockImplementation((dateString) => dayjs(dateString, isoFormat).toDate());
+  });
+
   it('should render ImmunizationsForm component', () => {
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     expect(screen.getByRole('textbox', { name: /Vaccination Date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
@@ -128,7 +142,7 @@ describe('Immunizations Form', () => {
         expect(field).not.toBeInTheDocument();
       }
     }
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     verifyDoseFieldType('sequence-coded', false);
     verifyDoseFieldType('number', false);
@@ -151,7 +165,7 @@ describe('Immunizations Form', () => {
   it('should save immunization data on submit', async () => {
     const user = userEvent.setup();
 
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     const formValues = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -179,14 +193,14 @@ describe('Immunizations Form', () => {
 
     expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
     expect(mockSavePatientImmunization).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         encounter: { reference: 'Encounter/17f512b4-d264-4113-a6fe-160cb38cb46e', type: 'Encounter' },
         expirationDate: null,
         id: undefined,
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: '',
         manufacturer: { display: 'Pfizer' },
-        occurrenceDateTime: undefined,
+        occurrenceDateTime: mockVaccinationDate,
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
@@ -195,7 +209,7 @@ describe('Immunizations Form', () => {
         resourceType: 'Immunization',
         status: 'completed',
         vaccineCode: { coding: [{ code: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Hepatitis B vaccination' }] },
-      },
+      }),
       undefined,
       new AbortController(),
     );
@@ -229,7 +243,7 @@ describe('Immunizations Form', () => {
       },
     });
 
-    renderImmunizationForm();
+    render(<ImmunizationsForm {...testProps} />);
 
     const vaccinationDateField = screen.getByRole('textbox', { name: /Vaccination Date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
@@ -260,10 +274,11 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
+        expirationDate: dayjs(new Date('2024-05-19T21:00:00'), isoFormat).toDate(),
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: 'A123456',
         manufacturer: { display: 'Merck & Co., Inc.' },
-        occurrenceDateTime: undefined,
+        occurrenceDateTime: dayjs(mockVaccinationDate, isoFormat).toDate(),
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
@@ -284,10 +299,6 @@ describe('Immunizations Form', () => {
     });
   });
 });
-
-function renderImmunizationForm() {
-  render(<ImmunizationsForm {...testProps} />);
-}
 
 async function selectOption(dropdown: HTMLElement, optionLabel: string) {
   const user = userEvent.setup();

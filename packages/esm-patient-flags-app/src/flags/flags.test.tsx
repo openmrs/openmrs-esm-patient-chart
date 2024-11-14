@@ -38,7 +38,7 @@ it('renders flags in the patient flags slot', async () => {
     mutate: jest.fn(),
   });
 
-  renderFlags();
+  render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={jest.fn()} showHighlightBar={false} />);
 
   const flags = screen.getAllByRole('button', { name: /flag/i });
   expect(flags).toHaveLength(3);
@@ -53,7 +53,3 @@ it('renders flags in the patient flags slot', async () => {
 
   expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
 });
-
-function renderFlags() {
-  render(<Flags patientUuid={mockPatient.id} onHandleCloseHighlightBar={() => {}} showHighlightBar={false} />);
-}

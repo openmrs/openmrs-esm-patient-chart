@@ -1,5 +1,7 @@
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
 
-.title {
-  @extend .productiveHeading03;
+.productiveHeading03 {
+  @include type.type-style('heading-03');
+  margin-bottom: layout.$spacing-05;
 }

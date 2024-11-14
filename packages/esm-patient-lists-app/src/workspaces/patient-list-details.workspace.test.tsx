@@ -23,10 +23,6 @@ const defaultProps = {
   setTitle: jest.fn(),
 };
 
-function renderPatientListDetails() {
-  render(<PatientListDetailsWorkspace {...defaultProps} />);
-}
-
 const mockPatientListData = [
   {
     display: '10000F1-Mary Smith',
@@ -115,7 +111,7 @@ const mockPatientListData = [
 it('renders the patient list details workspace', async () => {
   mockOpenmrsFetch.mockResolvedValue({ data: { results: mockPatientListData } });
 
-  renderPatientListDetails();
+  render(<PatientListDetailsWorkspace {...defaultProps} />);
 
   await screen.findByRole('heading', { name: defaultProps.list.description });
 

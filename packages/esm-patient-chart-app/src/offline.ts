@@ -29,7 +29,7 @@ export function setupOfflineVisitsSync() {
       stopDatetime: new Date(),
     };
 
-    const res = await saveVisit(visitPayload, options.abort).toPromise();
+    const res = await saveVisit(visitPayload, options.abort);
     if (!res.ok) {
       throw new Error(
         `Failed to synchronize offline visit with the UUID: ${visit.uuid}. Error: ${JSON.stringify(res.data)}`,

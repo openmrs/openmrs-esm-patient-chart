@@ -1,5 +1,6 @@
-import React, { Fragment, useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
@@ -29,15 +30,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
-import styles from './immunizations-form.scss';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { type ConfigObject } from '../config-schema';
 import { type ImmunizationFormData } from '../types';
-import dayjs from 'dayjs';
 import { immunizationFormSub } from './utils';
 import { DoseInput } from './components/dose-input.component';
 import { useImmunizations } from '../hooks/useImmunizations';
+import styles from './immunizations-form.scss';
 
 interface ResponsiveWrapperProps {
   children: React.ReactNode;

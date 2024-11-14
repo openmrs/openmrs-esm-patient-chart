@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-notes-app",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "license": "MPL-2.0",
   "description": "Patient notes microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-notes-app.js",
@@ -37,7 +37,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@openmrs/esm-patient-common-lib": "^8.1.0",
+    "@openmrs/esm-patient-common-lib": "^8.2.0",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.88.2"
+    "webpack": "^5.94.0"
   }
 }

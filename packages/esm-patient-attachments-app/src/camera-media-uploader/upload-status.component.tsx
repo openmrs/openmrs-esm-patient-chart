@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, FileUploaderItem, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './upload-status.scss';
 
-const UploadStatusComponent: React.FC = () => {
+interface UploadStatusComponentProps {
+  title?: string;
+}
+
+const UploadStatusComponent: React.FC<UploadStatusComponentProps> = ({ title }) => {
   const { t } = useTranslation();
   const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
@@ -23,7 +27,7 @@ const UploadStatusComponent: React.FC = () => {
 
   useEffect(() => {
     Promise.all(
-      filesToUpload.map((file, indx) =>
+      filesToUpload.map((file, index) =>
         saveFile(file)
           .then(() => {
             showSnackbar({
@@ -33,8 +37,8 @@ const UploadStatusComponent: React.FC = () => {
               isLowContrast: true,
             });
             setFilesUploading((prevfilesToUpload) =>
-              prevfilesToUpload.map((file, ind) =>
-                ind === indx
+              prevfilesToUpload.map((file, prevFileIndex) =>
+                prevFileIndex === index
                   ? {
                       ...file,
                       status: 'complete',
@@ -43,16 +47,15 @@ const UploadStatusComponent: React.FC = () => {
               ),
             );
           })
-          .catch((err) => {
+          .catch((error) => {
             showSnackbar({
               kind: 'error',
-              subtitle: err,
+              subtitle: error?.message,
               title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
             });
           }),
       ),
     ).then(() => {
-      true;
       onCompletion?.();
     });
   }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);
@@ -61,8 +64,8 @@ const UploadStatusComponent: React.FC = () => {
     <div className={styles.cameraSection}>
       <ModalHeader
         closeModal={closeModal}
-        className={styles.productiveHeading03}
-        title={t('addAttachment_title', 'Add Attachment')}
+        className={styles.modalHeader}
+        title={title || t('addAttachment_title', 'Add Attachment')}
       />
       <ModalBody>
         <p className="cds--label-description">

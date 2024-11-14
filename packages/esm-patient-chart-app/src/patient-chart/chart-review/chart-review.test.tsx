@@ -1,48 +1,34 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
-import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
+import {
+  type AssignedExtension,
+  type ExtensionSlotState,
+  useExtensionStore,
+  useExtensionSlotMeta,
+} from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
-const mockUseExtensionStore = useExtensionStore as jest.Mock;
-const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
+const mockUseExtensionStore = jest.mocked(useExtensionStore);
+const mockUseExtensionSlotMeta = jest.mocked(useExtensionSlotMeta);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
   };
 });
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
 
-  return {
-    ...originalModule,
-    useExtensionStore: jest.fn(),
-    useExtensionSlotMeta: jest.fn(),
-  };
-});
-
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom');
-
-  return {
-    ...originalModule,
-    Redirect: jest.fn(),
-    useMatch: jest.fn().mockReturnValue({
-      params: {
-        url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
-        view: 'Patient Summary',
-      },
-    }),
-  };
-});
-
-const testProps = {
-  patient: mockPatient,
-  patientUuid: mockPatient.id,
-  view: 'Patient Summary',
-};
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Redirect: jest.fn(),
+  useMatch: jest.fn().mockReturnValue({
+    params: {
+      url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
+      view: 'Patient Summary',
+    },
+  }),
+}));
 
 function slotMetaFromStore(store, slotName) {
   return Object.fromEntries(
@@ -53,7 +39,7 @@ function slotMetaFromStore(store, slotName) {
 }
 
 describe('ChartReview', () => {
-  test(`renders a grid-based layout`, () => {
+  test('renders a grid-based layout', () => {
     const mockStore = {
       slots: {
         'patient-chart-dashboard-slot': {
@@ -74,26 +60,23 @@ describe('ChartReview', () => {
                 title: 'Test Results',
               },
             },
-          ],
+          ] as unknown as AssignedExtension[],
         },
         'patient-chart-summary-dashboard-slot': {
           assignedExtensions: [],
         },
-      },
+      } as Record<string, ExtensionSlotState>,
     };
-    mockUseExtensionStore.mockReturnValue(mockStore);
+
+    mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
     mockUseExtensionSlotMeta.mockImplementation((slotName) => slotMetaFromStore(mockStore, slotName));
 
-    renderChartReview();
+    render(
+      <BrowserRouter>
+        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="Patient Summary" />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByRole('heading')).toHaveTextContent(/Patient summary/i);
   });
 });
-
-function renderChartReview() {
-  render(
-    <BrowserRouter>
-      <ChartReview {...testProps} />
-    </BrowserRouter>,
-  );
-}

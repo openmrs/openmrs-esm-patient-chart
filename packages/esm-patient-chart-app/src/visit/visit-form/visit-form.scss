@@ -1,7 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '../../root.scss';
 
 .container {
   margin: layout.$spacing-05;
@@ -38,7 +37,7 @@
 .dataGridRow {
   display: grid;
   grid-template-columns: 50% 10% 1fr;
-  margin: 0.5rem 1rem;
+  margin: layout.$spacing-03 layout.$spacing-05;
 }
 
 .form {
@@ -54,7 +53,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -62,12 +61,12 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: white;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 @media screen and (max-width: 600px) {
@@ -79,7 +78,7 @@
 .inlineNotification {
   width: 100%;
   max-width: unset;
-  padding: '0rem';
+  padding: '0';
 }
 
 .queueSection {
@@ -95,7 +94,7 @@
   .container {
     & section {
       display: flex;
-      gap: 4rem;
+      gap: layout.$spacing-10;
 
       .sectionTitle {
         flex-basis: 30%;
@@ -116,6 +115,14 @@
 
 .spinner {
   &:global(.cds--inline-loading) {
-    min-height: 1rem !important;
+    min-height: layout.$spacing-05 !important;
   }
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+}
+
+.datePicker {
+  padding-bottom: layout.$spacing-05;
 }

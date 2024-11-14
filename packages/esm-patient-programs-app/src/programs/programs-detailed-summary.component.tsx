@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import {
@@ -16,17 +16,18 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
 import {
+  AddIcon,
+  type ConfigObject,
+  EditIcon,
   formatDate,
   formatDatetime,
   useConfig,
-  type ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePrograms } from './programs.resource';
+import { findLastState, usePrograms } from './programs.resource';
 import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
@@ -40,7 +41,7 @@ interface ProgramEditButtonProps {
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { hideAddProgramButton } = useConfig<ConfigObject>();
+  const { hideAddProgramButton, showProgramStatusField } = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
@@ -49,8 +50,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
 
   const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
-    () => [
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(() => {
+    const headers = [
       {
         key: 'display',
         header: t('activePrograms', 'Active programs'),
@@ -67,21 +68,31 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
-    ],
-    [t],
-  );
+    ];
+    if (showProgramStatusField) {
+      headers.push({
+        key: 'state',
+        header: t('programStatus', 'Program status'),
+      });
+    }
+    return headers;
+  }, [t, showProgramStatusField]);
 
   const tableRows = useMemo(
     () =>
-      enrollments?.map((program) => ({
-        id: program.uuid,
-        display: program.display,
-        location: program.location?.display ?? '--',
-        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
-        status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
-          : t('active', 'Active'),
-      })),
+      enrollments?.map((program) => {
+        const state = program ? findLastState(program.states) : null;
+        return {
+          id: program.uuid,
+          display: program.display,
+          location: program.location?.display ?? '--',
+          dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
+          status: program.dateCompleted
+            ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
+            : t('active', 'Active'),
+          state: state ? state.state.concept.display : '--',
+        };
+      }),
     [enrollments, t],
   );
 
@@ -107,7 +118,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             <Button
               disabled={isEnrolledInAllPrograms}
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription={t('addPrograms', 'Add programs')}
               onClick={launchProgramsForm}
             >
@@ -117,7 +128,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         </CardHeader>
         {isEnrolledInAllPrograms && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}
@@ -176,7 +187,7 @@ function ProgramEditButton({ programEnrollmentId, t }: ProgramEditButtonProps) {
     <Button
       aria-label="edit program"
       kind="ghost"
-      renderIcon={(props) => <Edit size={16} {...props} />}
+      renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
       iconDescription={t('editProgram', 'Edit Program')}
       onClick={launchEditProgramsForm}
       hasIconOnly

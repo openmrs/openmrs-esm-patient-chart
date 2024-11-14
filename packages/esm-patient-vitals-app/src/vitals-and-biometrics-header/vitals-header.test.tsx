@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
@@ -10,7 +11,12 @@ import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const testProps = {
+  patientUuid: mockPatient.id,
+  showRecordVitalsButton: true,
+};
+
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
@@ -52,7 +58,7 @@ describe('VitalsHeader', () => {
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -66,7 +72,7 @@ describe('VitalsHeader', () => {
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -83,14 +89,13 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {
     const user = userEvent.setup();
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -102,12 +107,33 @@ describe('VitalsHeader', () => {
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 
+  it('displays correct overdue tag for vitals 5 days old', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    // TODO: Fix pluralization so that the string reads "5 days old"
+    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
+  });
+
   it('does not flag normal values that lie within the provided reference ranges', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -133,7 +159,7 @@ describe('VitalsHeader', () => {
       data: abnormalVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -148,7 +174,7 @@ describe('VitalsHeader', () => {
       vitals: { ...mockVitalsConfig.vitals, useFormEngine: true, formName: 'Triage' },
     } as ConfigObject);
 
-    renderVitalsHeader();
+    renderWithSwr(<VitalsHeader {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -164,13 +190,44 @@ describe('VitalsHeader', () => {
       workspaceTitle: 'Triage',
     });
   });
+
+  it('should show links in vitals header by default', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('link', { name: /vitals history/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^record vitals$/i })).toBeInTheDocument();
+  });
+
+  it('should show not links in vitals header when hideLinks is true', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...{ ...testProps, hideLinks: true }} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
+  });
 });
-
-function renderVitalsHeader() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-    showRecordVitalsButton: true,
-  };
-
-  renderWithSwr(<VitalsHeader {...testProps} />);
-}

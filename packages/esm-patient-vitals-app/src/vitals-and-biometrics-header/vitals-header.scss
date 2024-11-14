@@ -1,46 +1,72 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
-.vitals-header {
+.container {
+  background-color: $openmrs-background-grey;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-05;
+  border-bottom: 1px solid $ui-03;
+}
+
+.vitalsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: layout.$spacing-09;
-  margin-left: layout.$spacing-05;
+  min-height: layout.$spacing-07;
   outline: none;
   pointer-events: visibleFill;
 }
 
-.container {
+.emptyStateVitalsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 layout.$spacing-05;
+  min-height: layout.$spacing-09;
+  outline: none;
+  pointer-events: visibleFill;
+  border-bottom: 1px solid $ui-03;
+
+  .container {
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .bodyText {
+    margin-left: layout.$spacing-03;
+  }
+}
+
+.headerItems {
   display: flex;
   align-items: baseline;
+  flex-flow: row wrap;
+  gap: layout.$spacing-02 layout.$spacing-04;
 }
 
-.background {
-  background-color: $openmrs-background-grey;
+.heading {
+  @include type.type-style('heading-compact-02');
+  color: $ui-05 !important;
 }
 
-.row-container {
+.rowContainer {
   width: 100%;
-  border-bottom: 1px solid $ui-03;
-  padding-bottom: 0.75rem;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0rem 1rem;
   max-width: 100vw;
 }
 
-
-:global(.omrs-breakpoint-lt-desktop), .workspace-open {
+:global(.omrs-breakpoint-lt-desktop),
+.workspaceOpen {
   .row {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: 5rem;
+    column-gap: layout.$spacing-11;
   }
 }
 
@@ -51,59 +77,50 @@
   min-height: layout.$spacing-09;
 }
 
-.container-row {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .tag {
-  margin-left: 0.5rem;
+  margin-right: 0;
 }
 
 .overdueIndicator {
   display: flex;
   align-items: center;
+  min-inline-size: max-content;
+  color: colors.$red-70;
 
   svg {
-    margin-right: 0.25rem;
+    margin-right: layout.$spacing-02;
   }
 }
 
-.button-container {
+.buttonContainer {
   display: flex;
   align-items: center;
+  justify-content: right;
 }
 
-.arrow-up-button {
+.recordVitalsButton {
+  @include type.type-style('body-compact-01');
+
+  &:not([disabled]) svg {
+    fill: $color-blue-60-2;
+  }
+}
+
+.recordVitalsIconButton {
   display: flex;
   align-items: baseline;
   justify-content: center;
   cursor: pointer;
-  margin-left: 0.5rem;
+  margin-left: layout.$spacing-03;
 }
 
-.arrow-up-icon:not([disabled]) svg {
-  fill: $color-blue-60-2;
-}
-
-.heading {
-  @include type.type-style("heading-compact-02");
-  margin-right: layout.$spacing-03;
-  color: $text-02;
-}
-
-.record-vitals {
-  @include type.type-style('body-compact-01');
-}
-
-.body-text {
+.bodyText {
   @include type.type-style('label-01');
   color: $text-02;
 }
 
 .link {
-  margin-left: 0.5rem;
-  @extend .body-text;
+  @extend .bodyText;
   text-decoration-line: none;
   color: $interactive-01;
 }

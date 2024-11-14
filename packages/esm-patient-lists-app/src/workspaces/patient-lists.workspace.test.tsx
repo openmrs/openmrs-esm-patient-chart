@@ -22,7 +22,7 @@ it('renders an empty state if patient list data is unavailable', async () => {
     patientLists: [],
   });
 
-  renderPatientListsWorkspace();
+  render(<PatientListsWorkspace />);
 
   expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
   expect(screen.getByText(/no patient lists to display/i)).toBeInTheDocument();
@@ -48,7 +48,7 @@ it('renders a tabular overview of the available patient lists', async () => {
     ],
   });
 
-  renderPatientListsWorkspace();
+  render(<PatientListsWorkspace />);
 
   await screen.findByRole('table');
 
@@ -71,7 +71,3 @@ it('renders a tabular overview of the available patient lists', async () => {
   await user.type(searchbox, 'COTD');
   expect(screen.getByRole('row', { name: /COTD Study My List 2/i })).toBeInTheDocument();
 });
-
-function renderPatientListsWorkspace() {
-  render(<PatientListsWorkspace />);
-}

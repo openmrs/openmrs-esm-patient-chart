@@ -1,21 +1,23 @@
-@import "../root.scss";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .link > div a:nth-child(1) {
-  height: 3rem;
-  padding: 1.5rem 0 1.5rem 1.2rem;
+  height: layout.$spacing-09;
+  padding: layout.$spacing-06 0 layout.$spacing-06 1.25rem;
   color: $ui-04;
   @extend .productiveHeading01;
-  border-left: 0.25rem solid transparent;
+  border-left: layout.$spacing-02 solid transparent;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .link > div {
-  padding-top: 1rem;
+  padding-top: layout.$spacing-05;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .link > div a:nth-child(1) {
-  height: 2rem;
+  height: layout.$spacing-07;
   color: $ui-04;
-  padding: 0 0 0 1rem;
+  padding-left: layout.$spacing-05;
 }
 
 .link > div a:nth-child(1):hover {
@@ -29,4 +31,8 @@
   outline: none;
   color: $ui-05;
   border-left: var(--brand-01);
+}
+
+.productiveHeading01 {
+  @include type.type-style('heading-compact-01');
 }

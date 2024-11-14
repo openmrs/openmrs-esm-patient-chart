@@ -15,23 +15,10 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    restBaseUrl: '/ws/rest/v1',
-  };
-});
-
-jest.mock('../queue-entry/queue.resource', () => {
-  const originalModule = jest.requireActual('../queue-entry/queue.resource');
-
-  return {
-    ...originalModule,
-    useVisitQueueEntry: jest.fn(),
-  };
-});
+jest.mock('../queue-entry/queue.resource', () => ({
+  ...jest.requireActual('../queue-entry/queue.resource'),
+  useVisitQueueEntry: jest.fn(),
+}));
 
 jest.mock('../hooks/useServiceQueue', () => {
   const originalModule = jest.requireActual('../hooks/useServiceQueue');
@@ -73,7 +60,7 @@ describe('Cancel visit', () => {
     });
     mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -121,7 +108,7 @@ describe('Cancel visit', () => {
 
     mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -144,7 +131,3 @@ describe('Cancel visit', () => {
     });
   });
 });
-
-function renderCancelVisitDialog() {
-  render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
-}

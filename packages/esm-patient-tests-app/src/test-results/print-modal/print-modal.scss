@@ -1,0 +1,114 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+@media screen {
+  .printPage {
+    background-color: colors.$white;
+    display: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: colors.$white;
+}
+
+.patientDetails {
+  @include type.type-style('body-compact-02');
+  margin: 0 layout.$spacing-03;
+}
+
+.patientInfo {
+  color: colors.$gray-80;
+  @include type.type-style('body-compact-02');
+}
+
+.name {
+  @include type.type-style('heading-compact-02');
+  margin-right: layout.$spacing-03;
+}
+
+.date {
+  margin-left: layout.$spacing-06;
+}
+
+.gender {
+  text-transform: capitalize;
+}
+
+.printedBy {
+  @include type.type-style('body-compact-01');
+  margin: 0 layout.$spacing-02;
+  font-size: smaller;
+}
+
+.subheader {
+  @include type.type-style('heading-03');
+  color: colors.$gray-70;
+  padding: layout.$spacing-03;
+  text-align: center;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: layout.$spacing-08;
+  }
+}
+
+.datePickerContainers {
+  display: flex;
+  margin: layout.$spacing-03 0;
+  justify-content: flex-start;
+}
+
+.modalBody {
+  overflow-y: auto;
+  background-color: colors.$white;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tileContainer {
+  margin: layout.$spacing-05 0;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
+  padding: layout.$spacing-09 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}
+
+.printContainer {
+  margin: layout.$spacing-07 0;
+}
+
+.heading {
+  @include type.type-style('heading-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}

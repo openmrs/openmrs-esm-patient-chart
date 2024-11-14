@@ -1,17 +1,16 @@
-@use '@carbon/styles/scss/spacing';
-@use '~@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/type';
-@import '../root.scss';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.attachmentThumbnailSkeleton {
+  width: 100%;
+}
 
 .galleryContainer {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: spacing.$spacing-05;
-  padding: spacing.$spacing-05;
-}
-
-.attachmentThumbnailSkeleton {
-  width: 100%;
+  grid-gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .galleryContainer img {
@@ -19,13 +18,13 @@
 }
 
 .muted {
-  color: $color-gray-70;
-  @include type.type-style("label-01");
-  margin: 0.25rem;
+  color: colors.$gray-70;
+  @include type.type-style('label-01');
+  margin: layout.$spacing-02;
 }
 
 .title {
-  @extend .bodyLong01;
+  @include type.type-style('body-long-01');
   color: colors.$gray-100;
-  margin: 0.25rem;
+  margin: layout.$spacing-02;
 }

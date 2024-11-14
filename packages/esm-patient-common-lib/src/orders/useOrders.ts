@@ -1,8 +1,9 @@
+import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { useCallback, useMemo } from 'react';
 import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 
+export type Status = 'ACTIVE' | 'any';
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
 export const drugCustomRepresentation =
@@ -13,7 +14,7 @@ export const drugCustomRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
-export function usePatientOrders(patientUuid: string, status?: 'ACTIVE' | 'any', orderType?: string) {
+export function usePatientOrders(patientUuid: string, status?: Status, orderType?: string) {
   const { mutate } = useSWRConfig();
   const baseOrdersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderType=${orderType}` : baseOrdersUrl;
@@ -25,10 +26,8 @@ export function usePatientOrders(patientUuid: string, status?: 'ACTIVE' | 'any',
 
   const mutateOrders = useCallback(
     () =>
-      mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
-      }, data),
-    [patientUuid, data, mutate],
+      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`), data),
+    [data, mutate, patientUuid],
   );
 
   const orders = useMemo(
@@ -56,7 +55,7 @@ export function useOrderTypes() {
   );
 
   return {
-    data: data?.data?.results,
+    data: data?.data?.results ?? null,
     error,
     isLoading,
     isValidating,

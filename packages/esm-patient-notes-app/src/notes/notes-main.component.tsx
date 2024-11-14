@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { AddIcon, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -54,7 +53,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
         <span>{isValidating ? <InlineLoading /> : null}</span>
         <Button
           kind="ghost"
-          renderIcon={(props) => <Add size={16} {...props} />}
+          renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
           iconDescription="Add visit note"
           onClick={launchVisitNoteForm}
         >

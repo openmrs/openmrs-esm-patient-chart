@@ -1,8 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { type FetchResponse, getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { mockAllergens, mockAllergicReactions } from '__mocks__';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
   type NewAllergy,
@@ -11,7 +11,6 @@ import {
   useAllergicReactions,
   updatePatientAllergy,
 } from './allergy-form.resource';
-import { mockAllergy } from '__mocks__';
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
 import { AllergenType } from '../../types';
 import AllergyForm from './allergy-form.workspace';
@@ -21,7 +20,7 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdatePatientAllergy = jest.mocked(updatePatientAllergy);
 const mockUseAllergens = jest.mocked(useAllergens);
 const mockUseAllergicReactions = jest.mocked(useAllergicReactions);
-const mockUseConfig = jest.mocked<() => AllergiesConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<AllergiesConfigObject>);
 
 jest.mock('./allergy-form.resource', () => ({
   ...jest.requireActual('./allergy-form.resource'),

@@ -10,7 +10,7 @@ import styles from './biometrics-chart.scss';
 
 enum ScaleTypes {
   LABELS = 'labels',
-  LABELS_RATIO = 'labels_ratio',
+  LABELS_RATIO = 'labels-ratio',
   LINEAR = 'linear',
   LOG = 'log',
   TIME = 'time',

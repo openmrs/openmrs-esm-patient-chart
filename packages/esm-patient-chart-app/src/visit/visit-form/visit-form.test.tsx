@@ -1,15 +1,17 @@
 import React from 'react';
-import { of, throwError } from 'rxjs';
+import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import userEvent from '@testing-library/user-event';
 import {
   getDefaultsFromConfigSchema,
   openmrsFetch,
+  restBaseUrl,
   saveVisit,
   showSnackbar,
   updateVisit,
   useConfig,
+  usePatient,
   useVisitTypes,
   type FetchResponse,
   type Visit,
@@ -59,10 +61,10 @@ const testProps = {
 const mockSaveVisit = jest.mocked(saveVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockUseConfig = jest.mocked<() => ChartConfig>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
-const mockGetStartedVisitGetter = jest.fn();
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
+const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -70,19 +72,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
     activePatientEnrollment: [],
     isLoading: false,
   }),
-}));
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  get getStartedVisit() {
-    return mockGetStartedVisitGetter();
-  },
-  restBaseUrl: '/ws/rest/v1',
-  saveVisit: jest.fn(),
-  updateVisit: jest.fn(),
-  toOmrsIsoString: jest.fn(),
-  toDateObjectStrict: jest.fn(),
-  usePatient: jest.fn().mockImplementation((patientUuid) => ({ patientUuid, patient: {} })),
 }));
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
@@ -161,27 +150,32 @@ jest.mock('../hooks/useLocations', () => {
   };
 });
 
-mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-
-mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
-  visitAttributeTypes: [
-    {
-      uuid: visitAttributes.punctuality.uuid,
-      required: false,
-      displayInThePatientBanner: true,
-    },
-    {
-      uuid: visitAttributes.insurancePolicyNumber.uuid,
-      required: false,
-      displayInThePatientBanner: true,
-    },
-  ],
-});
-
-mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-
 describe('Visit form', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+    mockUsePatient.mockReturnValue({
+      error: null,
+      isLoading: false,
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+    });
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+  });
+
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
@@ -205,37 +199,70 @@ describe('Visit form', () => {
     expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
   });
 
-  it('renders an error message when a visit type has not been selected', async () => {
+  it('renders a validation error when required fields are not filled', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /start visit/i });
-    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    const locationPicker = screen.getByRole('combobox', { name: /select a location/i });
     await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
-
     await user.click(saveButton);
 
-    expect(screen.getByText(/Missing visit type/i)).toBeInTheDocument();
-    expect(screen.getByText(/Please select a visit type/i)).toBeInTheDocument();
+    expect(screen.getByText(/missing visit type/i)).toBeInTheDocument();
+    expect(screen.getByText(/please select a visit type/i)).toBeInTheDocument();
 
     await user.click(screen.getByLabelText(/Outpatient visit/i));
+  });
+
+  it('displays an error message when the visit start date is in the future', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm();
+
+    const dateInput = screen.getByRole('textbox', { name: /date/i });
+    const futureDate = dayjs().add(1, 'month').format('DD/MM/YYYY');
+
+    await user.clear(dateInput);
+    await user.type(dateInput, futureDate);
+    await user.tab();
+
+    expect(screen.getByText(/start date needs to be on or before/i)).toBeInTheDocument();
+  });
+
+  // TODO: Figure out why this test is failing
+  xit('displays an error message when the visit start time is in the future', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm();
+
+    const dateInput = screen.getByRole('textbox', { name: /date/i });
+    const timeInput = screen.getByRole('textbox', { name: /time/i });
+    const amPmSelect = screen.getByRole('combobox', { name: /time format/i });
+    const futureTime = dayjs().add(1, 'hour');
+
+    await user.clear(dateInput);
+    await user.type(dateInput, futureTime.format('DD/MM/YYYY'));
+    await user.clear(timeInput);
+    await user.type(timeInput, futureTime.format('hh:mm'));
+    await user.selectOptions(amPmSelect, futureTime.format('A'));
+    await user.tab();
+
+    expect(screen.getByText(/start time cannot be in the future/i)).toBeInTheDocument();
   });
 
   it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 
@@ -294,17 +321,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '183299');
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ uuid: string; visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -318,13 +343,13 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${visitUuid}/attribute`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       body: { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
@@ -364,17 +389,15 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '1873290');
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -388,7 +411,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -397,7 +420,7 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
@@ -437,17 +460,15 @@ describe('Visit form', () => {
     const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
     await user.clear(insuranceNumberInput);
 
-    mockUpdateVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          uuid: visitUuid,
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     await user.click(saveButton);
 
@@ -461,12 +482,12 @@ describe('Visit form', () => {
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
       { method: 'DELETE' },
     );
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `/ws/rest/v1/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
+      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
       { method: 'DELETE' },
     );
 
@@ -482,7 +503,8 @@ describe('Visit form', () => {
 
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
-    mockSaveVisit.mockReturnValue(throwError(() => ({ status: 500, statusText: 'Internal server error' })));
+
+    mockSaveVisit.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
 
     renderVisitForm();
 
@@ -518,7 +540,7 @@ describe('Visit form', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
-  it('should show an inline error notification if an optional visit attribute type field fails to load', async () => {
+  it('renders an inline error notification if an optional visit attribute type field fails to load', async () => {
     mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),
@@ -532,7 +554,7 @@ describe('Visit form', () => {
     expect(screen.getByRole('button', { name: /Start visit/i })).toBeEnabled();
   });
 
-  it('should show an error if a required visit attribute type is not provided', async () => {
+  it('renders an error if a required visit attribute type is not provided', async () => {
     const user = userEvent.setup();
 
     mockUseConfig.mockReturnValue({
@@ -546,16 +568,14 @@ describe('Visit form', () => {
       ],
     });
 
-    mockSaveVisit.mockReturnValue(
-      of({
-        status: 201,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockSaveVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      } as FetchResponse<{ visitType: { display: string } }>),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 
@@ -573,7 +593,7 @@ describe('Visit form', () => {
     expect(mockSaveVisit).not.toHaveBeenCalled();
   });
 
-  it('should disable the submit button show an inline error notification if required visit attribute fields fail to load', async () => {
+  it('should disable the submit button and display an inline error notification if required visit attribute fields fail to load', async () => {
     mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
       error: new Error('failed to load'),

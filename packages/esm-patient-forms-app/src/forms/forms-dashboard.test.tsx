@@ -6,7 +6,7 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { mockCurrentVisit } from '__mocks__';
 import FormsDashboard from './forms-dashboard.component';
 
-const mockUseConfig = jest.mocked<() => ConfigObject>(useConfig);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('../hooks/use-forms', () => ({
@@ -37,20 +37,16 @@ describe('FormsDashboard', () => {
       error: null,
     });
 
-    renderFormDashboard();
+    render(
+      <FormsDashboard
+        promptBeforeClosing={jest.fn()}
+        closeWorkspace={jest.fn()}
+        closeWorkspaceWithSavedChanges={jest.fn()}
+        patientUuid=""
+        setTitle={jest.fn()}
+      />,
+    );
 
     expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
   });
 });
-
-function renderFormDashboard() {
-  render(
-    <FormsDashboard
-      promptBeforeClosing={jest.fn()}
-      closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid=""
-      setTitle={jest.fn()}
-    />,
-  );
-}

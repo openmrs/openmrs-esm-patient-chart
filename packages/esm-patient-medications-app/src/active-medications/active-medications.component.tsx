@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { usePatientOrders } from '../api/api';
+import { useActivePatientOrders } from '../api/api';
 
 interface ActiveMedicationsProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) => {
+const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
+  const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
@@ -31,10 +31,11 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid }) =>
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
-        patientUuid={patientUuid}
+        patient={patient}
       />
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
 };
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { EmptyState } from '.';
 import { launchPatientWorkspace } from '..';
+import { EmptyState } from '.';
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -15,7 +15,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
 describe('EmptyState', () => {
   it('renders an empty state widget card', () => {
-    renderEmptyState();
+    render(
+      <EmptyState
+        headerTitle="appointments"
+        displayText="appointments"
+        launchForm={() => launchPatientWorkspace('sample-form-workspace')}
+      />,
+    );
 
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
@@ -25,7 +31,13 @@ describe('EmptyState', () => {
   it('renders a link that launches a form in the workspace when the launchForm prop is provided', async () => {
     const user = userEvent.setup();
 
-    renderEmptyState();
+    render(
+      <EmptyState
+        headerTitle="appointments"
+        displayText="appointments"
+        launchForm={() => launchPatientWorkspace('sample-form-workspace')}
+      />,
+    );
 
     const recordAppointmentsLink = screen.getByText(/record appointments/i);
     expect(recordAppointmentsLink).toBeInTheDocument();
@@ -36,11 +48,3 @@ describe('EmptyState', () => {
     expect(launchPatientWorkspace).toHaveBeenCalledWith('sample-form-workspace');
   });
 });
-
-function renderEmptyState() {
-  render(<EmptyState headerTitle="appointments" displayText="appointments" launchForm={launchAppointmentsForm} />);
-}
-
-function launchAppointmentsForm() {
-  launchPatientWorkspace('sample-form-workspace');
-}

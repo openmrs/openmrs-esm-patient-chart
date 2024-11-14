@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import {
   DataTable,
   Button,
@@ -15,20 +15,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
+  Tooltip,
 } from '@carbon/react';
 import {
   CardHeader,
+  compare,
+  PatientChartPagination,
   type Order,
-  useOrderBasket,
   useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { Add, User, Printer } from '@carbon/react/icons';
-import { age, getPatientName, formatDate, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import {
+  AddIcon,
+  age,
+  getPatientName,
+  formatDate,
+  PrinterIcon,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  UserIcon,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
 import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 
@@ -40,7 +53,7 @@ export interface ActiveMedicationsProps {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
 const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
@@ -51,19 +64,20 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
-  patientUuid,
+  patient,
 }) => {
+  const pageSize = 5;
   const { t } = useTranslation();
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
   const config = useConfig() as ConfigObject;
   const showPrintButton = config.showPrintButton;
   const contentToPrintRef = useRef(null);
-  const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
+  const { results, goTo, currentPage } = usePagination(medications, pageSize);
 
   const tableHeaders = [
     {
@@ -80,7 +94,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     },
   ];
 
-  const tableRows = medications?.map((medication, id) => ({
+  const tableRows = results?.map((medication, id) => ({
     id: `${id}`,
     details: {
       sortKey: medication.drug?.display,
@@ -91,6 +105,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
+              {medication.dateStopped && (
+                <Tooltip align="right" label={<>{formatDate(new Date(medication.dateStopped))}</>}>
+                  <Tag type="gray" className={styles.tag}>
+                    {t('discontinued', 'Discontinued')}
+                  </Tag>
+                </Tooltip>
+              )}
             </p>
             <p className={styles.bodyLong01}>
               <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
@@ -117,24 +138,18 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </p>
           </div>
           <p className={styles.bodyLong01}>
-            {medication.orderReasonNonCoded ? (
+            {medication.orderReasonNonCoded && (
               <span>
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            ) : null}
-            {medication.quantity ? (
+            )}
+            {medication.quantity && (
               <span>
                 <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                 {medication.quantity} {medication?.quantityUnits?.display}
               </span>
-            ) : null}
-            {medication.dateStopped ? (
-              <span>
-                <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
-                {formatDate(new Date(medication.dateStopped))}
-              </span>
-            ) : null}
+            )}
           </p>
         </div>
       ),
@@ -173,16 +188,16 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     };
 
     const identifiers =
-      patient?.patient?.identifier?.filter(
+      patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      name: patient?.patient ? getPatientName(patient?.patient) : '',
-      age: age(patient?.patient?.birthDate),
-      gender: getGender(patient?.patient?.gender),
-      location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      name: patient ? getPatientName(patient) : '',
+      age: age(patient?.birthDate),
+      gender: getGender(patient?.gender),
+      location: patient?.address?.[0].city,
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
@@ -199,7 +214,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
-        if (patient && patient.patient && title) {
+        if (patient && title) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
@@ -222,7 +237,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
           {showPrintButton && (
             <Button
               kind="ghost"
-              renderIcon={Printer}
+              renderIcon={PrinterIcon}
               iconDescription="Add vitals"
               className={styles.printButton}
               onClick={handlePrint}
@@ -233,7 +248,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
           {showAddButton ?? true ? (
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
               onClick={launchAddDrugOrder}
             >
@@ -256,7 +271,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-label="medications" {...getTableProps()}>
+              <Table aria-label="medications" className={styles.table} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -301,6 +316,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </TableContainer>
           )}
         </DataTable>
+        <PatientChartPagination
+          pageNumber={currentPage}
+          totalItems={medications.length}
+          currentItems={results.length}
+          pageSize={pageSize}
+          onPageNumberChange={({ page }) => goTo(page)}
+        />
       </div>
     </div>
   );
@@ -313,7 +335,7 @@ function InfoTooltip({ orderer }: { orderer: string }) {
       align="top-left"
       direction="top"
       label={orderer}
-      renderIcon={(props) => <User size={16} {...props} />}
+      renderIcon={(props: ComponentProps<typeof UserIcon>) => <UserIcon size={16} {...props} />}
       iconDescription={orderer}
       kind="ghost"
       size="sm"
@@ -530,26 +552,6 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
-}
-
-/**
- * Enables a comparison of arbitrary values with support for undefined/null.
- * Requires the `<` and `>` operators to return something reasonable for the provided values.
- */
-function compare<T>(x?: T, y?: T) {
-  if (x == undefined && y == undefined) {
-    return 0;
-  } else if (x == undefined) {
-    return -1;
-  } else if (y == undefined) {
-    return 1;
-  } else if (x < y) {
-    return -1;
-  } else if (x > y) {
-    return 1;
-  } else {
-    return 0;
-  }
 }
 
 export default MedicationsDetailsTable;

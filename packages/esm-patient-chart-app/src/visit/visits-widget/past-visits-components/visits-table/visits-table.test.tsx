@@ -16,16 +16,6 @@ const mockShowModal = jest.mocked(showModal);
 const mockGetConfig = getConfig as jest.Mock;
 const mockUserHasAccess = userHasAccess as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    getConfig: jest.fn().mockResolvedValue({ htmlFormEntryForms: [] }),
-    userHasAccess: jest.fn().mockImplementation((privilege, _) => (privilege ? false : true)),
-  };
-});
-
 describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });

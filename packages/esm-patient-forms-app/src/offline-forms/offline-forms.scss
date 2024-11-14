@@ -1,0 +1,66 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.heading {
+  @include type.type-style('heading-04');
+}
+
+.productiveHeading03 {
+  @include type.type-style('heading-03');
+}
+
+.pageHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
+
+  .pageHeader {
+    @extend .productiveHeading03;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+.contentContainer {
+  margin: 0 layout.$spacing-05;
+}
+
+.tableHeaderContainer {
+  display: grid;
+  grid-template-columns: 1fr 50%;
+
+  .tableSearch {
+    grid-column: 2;
+    align-self: end;
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) .tableHeaderContainer {
+  grid-template-columns: 1fr 250px;
+
+  .tableSearch {
+    grid-column: 3;
+  }
+}
+
+.availableOfflineToggle {
+  :global(.cds--toggle__switch) {
+    /*
+    Carbon's Toggle component always has a margin-top value, despite no label being used.
+    Per designs, this is unintended.
+    */
+    margin-top: 0 !important;
+  }
+
+  :global(.cds--toggle__label-text) {
+    display: none;
+  }
+}
+
+.availableOfflineToggleSkeleton {
+  width: layout.$spacing-07;
+  height: layout.$spacing-05;
+}

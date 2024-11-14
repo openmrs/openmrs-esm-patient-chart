@@ -54,19 +54,6 @@ jest.mock('../api/api', () => ({
     .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
 }));
 
-function renderDrugSearch() {
-  render(
-    <AddDrugOrderWorkspace
-      order={undefined as any}
-      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-      promptBeforeClosing={() => false}
-      patientUuid={'mock-patient-uuid'}
-      setTitle={jest.fn()}
-    />,
-  );
-}
-
 describe('AddDrugOrderWorkspace drug search', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
@@ -91,7 +78,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('looks ok', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    renderAddDrugOrderWorkspace();
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     await screen.findAllByRole('listitem');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
@@ -114,7 +103,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
       data: [mockPatientDrugOrdersApiData[0]],
     });
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    renderAddDrugOrderWorkspace();
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
     const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('div').parentElement;
@@ -123,7 +114,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can add items directly to the basket', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    renderAddDrugOrderWorkspace();
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
@@ -145,7 +138,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can open the drug form ', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    renderAddDrugOrderWorkspace();
+
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
@@ -159,7 +154,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
   test('can open an item in the medication form and on saving, it should add the order in the order basket store', async () => {
     const user = userEvent.setup();
-    renderDrugSearch();
+
+    renderAddDrugOrderWorkspace();
+
     const { result: hookResult } = renderHook(() =>
       useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
@@ -191,3 +188,16 @@ describe('AddDrugOrderWorkspace drug search', () => {
     );
   });
 });
+
+function renderAddDrugOrderWorkspace() {
+  render(
+    <AddDrugOrderWorkspace
+      order={undefined as any}
+      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
+      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
+      promptBeforeClosing={() => false}
+      patientUuid={'mock-patient-uuid'}
+      setTitle={jest.fn()}
+    />,
+  );
+}

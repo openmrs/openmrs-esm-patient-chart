@@ -9,14 +9,14 @@
 }
 
 .orderForm {
-  flex-grow:1;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: layout.$spacing-03 0 0 layout.$spacing-05;
 
   input[data-invalid]:focus {
-    outline: 2px solid  colors.$red-60;
+    outline: layout.$spacing-01 solid colors.$red-60;
     outline-offset: -2px;
   }
 
@@ -32,12 +32,12 @@
     margin: 0 calc(layout.$spacing-03 * -1) !important;
   }
 
-  :global(.cds--number--nosteppers.cds--number input[type=number]) {
+  :global(.cds--number--nosteppers.cds--number input[type='number']) {
     padding-right: layout.$spacing-05;
   }
 
   :global(.cds--list-box) {
-    border: none;
+    border: 0;
   }
 
   :global(.cds--number__control-btn) {
@@ -81,14 +81,14 @@
   span:first-of-type {
     margin-right: layout.$spacing-03;
   }
+}
 
-  .text02 {
-    color: colors.$gray-70;
-  }
+.text02 {
+  color: colors.$gray-70;
 }
 
 .orderFormHeading {
-  @include type.type-style("heading-03");
+  @include type.type-style('heading-03');
   margin-bottom: 0;
 }
 
@@ -97,12 +97,16 @@
 }
 
 .sectionHeader {
-  @include type.type-style("heading-01");
+  @include type.type-style('heading-01');
   margin-bottom: layout.$spacing-05;
 }
 
-.pullColumnContentRight > div {
-  float: right;
+.freeTextDosageToggle {
+  justify-self: flex-end;
+
+  :global(.cds--toggle__label-text) {
+    margin-bottom: layout.$spacing-03;
+  }
 }
 
 .fullWidthDatePickerContainer {
@@ -125,8 +129,8 @@
 
 .numberInput {
   :global(.cds--number__input-wrapper) input {
-  min-width: unset !important;
-  padding-right: layout.$spacing-05;
+    min-width: unset !important;
+    padding-right: layout.$spacing-05;
   }
 }
 
@@ -138,11 +142,13 @@
 
   button {
     display: flex;
-   padding-left: 0 !important;
+    padding-left: 0 !important;
+
     svg {
       order: 1;
       margin-right: layout.$spacing-03;
       margin-left: 0 !important;
+      fill: currentColor !important;
     }
 
     span {
@@ -158,11 +164,15 @@
 
 /* Desktop */
 :global(.omrs-breakpoint-lt-desktop) .gridRow {
-  align-items: baseline;
+  align-items: center;
 }
 
 .field {
   margin-bottom: layout.$spacing-05;
+
+  :global(.cds--label) {
+    vertical-align: middle;
+  }
 }
 
 .buttonSet {
@@ -186,8 +196,8 @@
 }
 
 .linkedInput::after {
-  content: "";
-  border: 1px solid colors.$gray-40;
+  content: '';
+  border: 0.5px solid colors.$gray-40;
   width: layout.$spacing-05;
   margin-right: calc(layout.$spacing-05 * -1);
 }
@@ -206,12 +216,23 @@
       text-align: center;
     }
   }
+
+  svg {
+    fill: currentColor !important;
+  }
 }
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
     height: 100%;
+  }
+
+  .durationUnit,
+  .prn {
+    .field {
+      margin-bottom: 0;
+    }
   }
 
   .orderForm {
@@ -229,11 +250,12 @@
 }
 
 .fieldError {
-  :global(.cds--number input[type=number]):focus {
+  :global(.cds--number input[type='number']):focus {
     outline: 2.5px solid colors.$red-60;
   }
 
-  input:focus, textarea:focus {
+  input:focus,
+  textarea:focus {
     outline: 2.5px solid colors.$red-60;
   }
 }
@@ -243,3 +265,23 @@
   margin-top: layout.$spacing-02;
 }
 
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-05;
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+}
+
+.bodyLong01 {
+  @include type.type-style('body-01');
+}
+
+.caption01 {
+  @include type.type-style('legal-01');
+}

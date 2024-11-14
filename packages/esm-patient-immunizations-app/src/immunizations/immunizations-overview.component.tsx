@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { AddIcon, formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import {
   launchPatientWorkspace,
   CardHeader,
@@ -22,7 +22,6 @@ import {
   ErrorState,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './immunizations-overview.scss';
 import { useImmunizations } from '../hooks/useImmunizations';
 
@@ -77,7 +76,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add immunizations"
             onClick={launchImmunizationsForm}
           >

@@ -1,16 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { of, throwError } from 'rxjs';
-import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.component';
 
 const endVisitPayload = {
-  location: '6351fcf4-e311-4a19-90f9-35667d99a8af',
-  startDatetime: new Date('2021-03-16T08:16:00.000Z'),
-  stopDatetime: expect.anything(),
-  visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+  stopDatetime: expect.any(Date),
 };
 
 const mockCloseModal = jest.fn();
@@ -18,14 +14,6 @@ const mockMutate = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    updateVisit: jest.fn(),
-  };
-});
 
 describe('End visit dialog', () => {
   beforeEach(() => {
@@ -43,18 +31,16 @@ describe('End visit dialog', () => {
   test('displays a success snackbar when the visit is ended successfully', async () => {
     const user = userEvent.setup();
 
-    mockUpdateVisit.mockReturnValueOnce(
-      of({
-        status: 200,
-        data: {
-          visitType: {
-            display: 'Facility Visit',
-          },
+    mockUpdateVisit.mockResolvedValue({
+      status: 200,
+      data: {
+        visitType: {
+          display: 'Facility Visit',
         },
-      }),
-    );
+      },
+    } as unknown as FetchResponse<Visit>);
 
-    renderEndVisitDialog();
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     const closeModalButton = screen.getByRole('button', { name: /close/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -86,9 +72,18 @@ describe('End visit dialog', () => {
 
   test('displays an error snackbar if there was a problem ending a visit', async () => {
     const user = userEvent.setup();
-    mockUpdateVisit.mockReturnValue(throwError(() => new Error('Internal error message')));
 
-    renderEndVisitDialog();
+    const error = {
+      message: 'Internal error message',
+      response: {
+        status: 500,
+        statusText: 'Internal server error',
+      },
+    };
+
+    mockUpdateVisit.mockRejectedValue(error);
+
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(
       screen.getByText(
@@ -101,7 +96,7 @@ describe('End visit dialog', () => {
 
     await user.click(endVisitButton);
 
-    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
+    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, new AbortController());
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'Internal error message',
       kind: 'error',
@@ -110,7 +105,3 @@ describe('End visit dialog', () => {
     });
   });
 });
-
-function renderEndVisitDialog() {
-  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
-}

@@ -1,9 +1,8 @@
-import React, { useRef } from 'react';
+import React, { type ComponentProps, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile, Tile } from '@carbon/react';
-import { TrashCan, Warning } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '../types';
 import styles from './order-basket-item-tile.scss';
 
@@ -70,8 +69,8 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             <>
               <br />
               <span className={styles.orderErrorText}>
-                <Warning size={16} /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span>{' '}
-                &nbsp;
+                <WarningIcon size={16} /> &nbsp;{' '}
+                <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
                 {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
               </span>
             </>
@@ -82,7 +81,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         className={styles.removeButton}
         kind="ghost"
         hasIconOnly={true}
-        renderIcon={(props) => <TrashCan size={16} {...props} />}
+        renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
         iconDescription={t('removeFromBasket', 'Remove from basket')}
         onClick={() => {
           shouldOnClickBeCalled.current = false;

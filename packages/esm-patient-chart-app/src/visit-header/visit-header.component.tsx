@@ -7,12 +7,12 @@ import {
   ConfigurableLink,
   useAssignedExtensions,
   useLayoutType,
-  usePatient,
   useVisit,
   useConfig,
   showModal,
   ExtensionSlot,
   interpolateUrl,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { type MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
@@ -26,38 +26,33 @@ interface PatientInfoProps {
   patient: fhir.Patient;
 }
 
+function getGender(gender: string) {
+  switch (gender) {
+    case 'male':
+      return getCoreTranslation('male', 'Male');
+    case 'female':
+      return getCoreTranslation('female', 'Female');
+    case 'other':
+      return getCoreTranslation('other', 'Other');
+    case 'unknown':
+      return getCoreTranslation('unknown', 'Unknown');
+    default:
+      return gender;
+  }
+}
+
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  // Render translated gender
-  const getGender = useCallback(
-    (gender) => {
-      switch (gender) {
-        case 'male':
-          return t('male', 'Male');
-        case 'female':
-          return t('female', 'Female');
-        case 'other':
-          return t('other', 'Other');
-        case 'unknown':
-          return t('unknown', 'Unknown');
-        default:
-          return gender;
-      }
-    },
-    [t],
-  );
-
   const name = patient ? getPatientName(patient) : '';
   const patientUuid = `${patient?.id}`;
-  const { currentVisit } = useVisit(patientUuid);
   const patientNameIsTooLong = !isTablet && name.trim().length > 25;
+  const { currentVisit } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
-
   const getServiceString = useCallback(() => {
     if (queueEntry?.status && queueEntry.service) {
       return `${t(queueEntry.status)} - ${t(queueEntry.service)}`;
@@ -97,7 +92,12 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       ) : (
         <span className={styles.patientName}>{name} </span>
       )}
-      <span className={styles.patientInfo}>{`${age(patient?.birthDate)}, ${getGender(patient?.gender)}`}</span>
+
+      <span className={styles.patientInfo}>
+        {patient?.birthDate ? `${age(patient.birthDate)}, ` : ''}
+        {patient?.gender ? getGender(patient.gender) : ''}
+      </span>
+
       {queueEntry && (
         <>
           <div className={styles.navDivider} />
@@ -121,9 +121,8 @@ function launchStartVisitForm() {
   launchPatientWorkspace('start-visit-workspace-form');
 }
 
-const VisitHeader: React.FC = () => {
+const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
   const { t } = useTranslation();
-  const { patient } = usePatient();
   const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(patient?.id);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
@@ -138,7 +137,7 @@ const VisitHeader: React.FC = () => {
     [],
   );
 
-  const openModal = useCallback((patientUuid) => {
+  const openModal = useCallback((patientUuid: string) => {
     const dispose = showModal('end-visit-dialog', {
       closeModal: () => dispose(),
       patientUuid,
@@ -154,7 +153,7 @@ const VisitHeader: React.FC = () => {
           aria-label="Open menu"
           isCollapsible
           className={styles.headerMenuButton}
-          onClick={(event) => {
+          onClick={(event: React.MouseEvent) => {
             event.stopPropagation();
             toggleSideMenu();
           }}
@@ -182,18 +181,27 @@ const VisitHeader: React.FC = () => {
           <>
             <ExtensionSlot name="visit-header-right-slot" />
             {!isLoading && !currentVisit && !isDeceased && (
-              <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
+              <Button
+                className={styles.startVisitButton}
+                onClick={launchStartVisitForm}
+                size="lg"
+                aria-label={t('startAVisit', 'Start a visit')}
+              >
                 {t('startAVisit', 'Start a visit')}
               </Button>
             )}
             {!isLoading && !!currentVisit && (
-              <Button onClick={() => openModal(patient?.id)} className={styles.startVisitButton}>
+              <Button
+                onClick={() => openModal(patient?.id)}
+                className={styles.startVisitButton}
+                aria-label={t('endVisit', 'End visit')}
+              >
                 {t('endVisit', 'End visit')}
               </Button>
             )}
           </>
         )}
-        <CloseButton />
+        <CloseButton patientUuid={patient?.id} />
       </HeaderGlobalBar>
       <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
     </Header>

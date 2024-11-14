@@ -1,7 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  showSnackbar,
+  useLocations,
+  useConfig,
+  getDefaultsFromConfigSchema,
+} from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -11,28 +17,36 @@ import {
   useEnrollments,
 } from './programs.resource';
 import ProgramsForm from './programs-form.workspace';
+import { type ConfigObject, configSchema } from '../config-schema';
 
 const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
 const mockUseEnrollments = jest.mocked(useEnrollments);
 const mockCreateProgramEnrollment = jest.mocked(createProgramEnrollment);
 const mockUpdateProgramEnrollment = jest.mocked(updateProgramEnrollment);
 const mockShowSnackbar = jest.mocked(showSnackbar);
-
+const mockUseLocations = jest.mocked(useLocations);
 const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
-}));
+const testProps = {
+  closeWorkspace: mockCloseWorkspace,
+  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: mockPromptBeforeClosing,
+  setTitle: jest.fn(),
+};
 
 jest.mock('./programs.resource', () => ({
   createProgramEnrollment: jest.fn(),
   updateProgramEnrollment: jest.fn(),
   useAvailablePrograms: jest.fn(),
   useEnrollments: jest.fn(),
+  findLastState: jest.fn(),
 }));
+
+mockUseLocations.mockReturnValue(mockLocationsResponse);
 
 mockUseAvailablePrograms.mockReturnValue({
   data: mockCareProgramsResponse,
@@ -137,16 +151,19 @@ describe('ProgramsForm', () => {
       }),
     );
   });
+
+  it('renders the programs status field if the config property is set to true', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showProgramStatusField: true,
+    });
+
+    renderProgramsForm();
+
+    expect(screen.getByLabelText(/program status/i)).toBeInTheDocument();
+  });
 });
 
 function renderProgramsForm(programEnrollmentUuidToEdit?: string) {
-  const testProps = {
-    closeWorkspace: mockCloseWorkspace,
-    closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: mockPromptBeforeClosing,
-    setTitle: jest.fn(),
-  };
-
   render(<ProgramsForm {...testProps} programEnrollmentId={programEnrollmentUuidToEdit} />);
 }

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } 
 import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody, InlineNotification } from '@carbon/react';
 import { type FetchResponse, type UploadedFile } from '@openmrs/esm-framework';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraComponent from './camera.component';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import FileReviewContainer from './file-review.component';
@@ -10,27 +11,32 @@ import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
 
 interface CameraMediaUploaderModalProps {
-  allowedExtensions: Array<string> | null;
   cameraOnly?: boolean;
   closeModal: () => void;
   collectDescription?: boolean;
   multipleFiles?: boolean;
   onCompletion?: () => void;
   saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
+  title?: string;
+}
+
+interface CameraMediaUploadTabsProps {
+  title?: string;
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
-  allowedExtensions,
   cameraOnly,
   closeModal,
   collectDescription,
   multipleFiles,
   onCompletion,
   saveFile,
+  title,
 }) => {
   const [error, setError] = useState<Error>(null);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
   const [uploadFilesToServer, setUploadFilesToServer] = useState(false);
+  const { allowedFileExtensions } = useAllowedFileExtensions();
 
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
@@ -57,20 +63,20 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   const returnComponent = useMemo(() => {
     // If the files are all set to upload, then filesUploader is visible on the screen.
     if (uploadFilesToServer) {
-      return <UploadStatusComponent />;
+      return <UploadStatusComponent title={title} />;
     }
 
     if (filesToUpload.length) {
-      return <FileReviewContainer onCompletion={startUploadingToServer} />;
+      return <FileReviewContainer title={title} onCompletion={startUploadingToServer} />;
     }
 
-    return <CameraMediaUploadTabs />;
-  }, [uploadFilesToServer, filesToUpload, startUploadingToServer]);
+    return <CameraMediaUploadTabs title={title} />;
+  }, [uploadFilesToServer, filesToUpload, startUploadingToServer, title]);
 
   return (
     <CameraMediaUploaderContext.Provider
       value={{
-        allowedExtensions,
+        allowedExtensions: allowedFileExtensions,
         cameraOnly,
         clearData,
         closeModal,
@@ -92,7 +98,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   );
 };
 
-const CameraMediaUploadTabs = () => {
+const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) => {
   const { t } = useTranslation();
   const [view, setView] = useState('upload');
 
@@ -115,7 +121,7 @@ const CameraMediaUploadTabs = () => {
 
   return (
     <div className={styles.cameraSection}>
-      <ModalHeader closeModal={closeModal} title={t('addAttachment_title', 'Add Attachment')} />
+      <ModalHeader closeModal={closeModal} title={title || t('addAttachment_title', 'Add Attachment')} />
       <ModalBody className={styles.modalBody}>
         <Tabs className={styles.tabs} defaultSelectedIndex={1}>
           <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
