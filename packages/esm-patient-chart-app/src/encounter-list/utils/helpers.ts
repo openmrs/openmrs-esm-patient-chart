@@ -1,33 +1,28 @@
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { type FormSchema } from '@openmrs/esm-form-engine-lib';
-import { formatDate, parseDate, formatDatetime, type Concept, age } from '@openmrs/esm-framework';
-import { type Observation, type Encounter } from '../../encounter-list/types';
+import { formatDate, parseDate, formatDatetime, type Concept, age, type Visit } from '@openmrs/esm-framework';
+import { type Observation, type Encounter, type Form } from '../types';
 import { esmPatientChartSchema } from '../../config-schema';
 import { type TFunction } from 'i18next';
 
 type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
-  form: FormSchema,
+  form: Form,
+  visit: Visit,
   action: LaunchAction = 'add',
   onFormSave: () => void,
-  title?: string,
   encounterUuid?: string,
   intent: string = '*',
-  workspaceWindowSize?: 'minimized' | 'maximized',
   patientUuid?: string,
 ) {
   launchPatientWorkspace('patient-form-entry-workspace', {
-    workspaceTitle: form.name,
+    workspaceTitle: form?.name,
     mutateForm: onFormSave,
     formInfo: {
       encounterUuid,
-      formUuid: form.name,
+      formUuid: form?.uuid,
       patientUuid: patientUuid,
-      visitTypeUuid: '',
-      visitUuid: '',
-      visitStartDatetime: '',
-      visitStopDatetime: '',
+      visit: visit,
       additionalProps: {
         mode: action === 'add' ? 'enter' : action,
         formSessionIntent: intent,
@@ -116,18 +111,12 @@ export function getObsFromEncounter(
     return '--';
   }
 
-  // Not sure if these concepts are similar in all implementations,
-  // There might be a better way to use a generic value
   if (isTrueFalseConcept) {
     if (typeof obs?.value === 'object') {
       if (
-        (obs?.value?.uuid != esmPatientChartSchema.trueConceptUuid._default && obs?.value?.name?.name !== 'Unknown') ||
-        obs?.value?.name?.name === 'FALSE'
+        obs?.value?.uuid === esmPatientChartSchema.falseConceptUuid._default ||
+        obs?.value?.uuid === esmPatientChartSchema.trueConceptUuid._default
       ) {
-        return 'No';
-      } else if (obs?.value?.uuid == esmPatientChartSchema.trueConceptUuid._default) {
-        return 'Yes';
-      } else {
         return obs?.value?.name?.name;
       }
     }
@@ -155,10 +144,11 @@ export function getObsFromEncounter(
     return age(encounter.patient.birthDate, encounter.encounterDatetime);
   }
 
+  //
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
     const primaryValue =
-      obs.value.names.find((conceptName) => conceptName.conceptNameType === t('SHORT'))?.name || obs.value.name.name;
-    if (primaryValue === t('Other non-coded')) {
+      obs.value.names.find((conceptName) => conceptName.conceptNameType === 'SHORT')?.name || obs.value.name.name;
+    if (primaryValue === esmPatientChartSchema.otherConceptUuid._default) {
       const secondaryObs = findObs(encounter, secondaryConcept);
       return secondaryObs ? secondaryObs.value : '--';
     }

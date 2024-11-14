@@ -1,37 +1,29 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { navigate, showModal, showSnackbar } from '@openmrs/esm-framework';
+import { navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { EncounterListDataTable } from './table.component';
-import {
-  Button,
-  Link,
-  OverflowMenu,
-  OverflowMenuItem,
-  DataTableSkeleton,
-  MenuButton,
-  MenuItem,
-  Pagination,
-} from '@carbon/react';
+import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchEncounterForm } from '../../clinical-views/utils/helpers';
+import { launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../encounter-list.resource';
-import { useEncounterRows, useFormsJson, usePatientDeathStatus } from '../hooks';
+import { useEncounterRows, useFormsJson } from '../hooks';
 
 import styles from './encounter-list.scss';
 import { type TableRow, type Encounter, type Mode } from '../types';
+import { type FormattedColumn } from '../utils/encounter-list-config-builder';
 
 export interface EncounterListColumn {
   key: string;
   header: string;
-  getValue: (encounter: any) => string;
+  getValue: (encounter: Encounter) => string;
   link?: any;
 }
 
 export interface EncounterListProps {
   patientUuid: string;
   encounterType: string;
-  columns: Array<any>;
+  columns: Array<FormattedColumn>;
   headerTitle: string;
   description: string;
   formList?: Array<{
@@ -46,8 +38,10 @@ export interface EncounterListProps {
     displayText?: string;
     workspaceWindowSize?: 'minimized' | 'maximized';
   };
-  filter?: (encounter: any) => boolean;
+  filter?: (encounter: Encounter) => boolean;
   afterFormSaveAction?: () => void;
+  deathStatus?: boolean;
+  currentVisit: Visit;
 }
 
 export const EncounterList: React.FC<EncounterListProps> = ({
@@ -60,16 +54,15 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   filter,
   launchOptions,
   afterFormSaveAction,
+  currentVisit,
+  deathStatus,
 }) => {
   const { t } = useTranslation();
-  const { isDead } = usePatientDeathStatus(patientUuid);
-  const formUuids = useMemo(() => formList.map((form) => form.uuid), [formList]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const { formsJson, isLoading: isLoadingFormsJson } = useFormsJson(formUuids);
-
+  const { formsJson, isLoading: isLoadingFormsJson } = useFormsJson(formList?.[0]?.uuid);
   const { encounters, total, isLoading, onFormSave, mutate } = useEncounterRows(
     patientUuid,
     encounterType,
@@ -79,14 +72,14 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     currentPage,
   );
 
-  const { workspaceWindowSize, displayText, hideFormLauncher } = launchOptions;
+  const { displayText, hideFormLauncher } = launchOptions;
 
   const defaultActions = useMemo(
     () => [
       {
         label: t('viewEncounter', 'View'),
         form: {
-          name: formsJson[0]?.name,
+          name: formsJson?.name,
         },
         mode: 'view',
         intent: '*',
@@ -94,7 +87,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       {
         label: t('editEncounter', 'Edit'),
         form: {
-          name: formsJson[0]?.name,
+          name: formsJson?.name,
         },
         mode: 'edit',
         intent: '*',
@@ -102,7 +95,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       {
         label: t('deleteEncounter', 'Delete'),
         form: {
-          name: formsJson[0]?.name,
+          name: formsJson?.name,
         },
         mode: 'delete',
         intent: '*',
@@ -113,13 +106,13 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   const createLaunchFormAction = useCallback(
     (encounter: Encounter, mode: Mode) => () => {
-      launchEncounterForm(formsJson[0], mode, onFormSave, null, encounter.uuid, null, workspaceWindowSize, patientUuid);
+      launchEncounterForm(formsJson, currentVisit, mode, onFormSave, encounter.uuid, null, patientUuid);
     },
-    [formsJson, onFormSave, patientUuid, workspaceWindowSize],
+    [formsJson, onFormSave, patientUuid, currentVisit],
   );
 
   const handleDeleteEncounter = useCallback(
-    (encounterUuid, encounterTypeName) => {
+    (encounterUuid: string, encounterTypeName: string) => {
       const close = showModal('delete-encounter-modal', {
         close: () => close(),
         encounterTypeName: encounterTypeName || '',
@@ -172,7 +165,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                 if (column.link.handleNavigate) {
                   column.link.handleNavigate(encounter);
                 } else {
-                  column.link?.getUrl && navigate({ to: column.link.getUrl() });
+                  column.link?.getUrl && navigate({ to: column.link.getUrl(encounter) });
                 }
               }}
             >
@@ -189,10 +182,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       tableRow['actions'] = (
         <OverflowMenu flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
           {actions.map((actionItem, index) => {
-            const form =
-              formsJson.length && actionItem?.form?.name
-                ? formsJson.find((form) => form.name === actionItem.form.name)
-                : null;
+            const form = formsJson && actionItem?.form?.name ? formsJson.name === actionItem.form.name : null;
 
             return (
               form && (
@@ -205,13 +195,12 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                     actionItem.mode === 'delete'
                       ? handleDeleteEncounter(encounter.uuid, encounter.encounterType.name)
                       : launchEncounterForm(
-                          form,
+                          formsJson,
+                          currentVisit,
                           actionItem.mode === 'enter' ? 'add' : actionItem.mode,
                           onFormSave,
-                          null,
                           encounter.uuid,
                           actionItem.intent,
-                          workspaceWindowSize,
                           patientUuid,
                         );
                   }}
@@ -233,8 +222,8 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     t,
     handleDeleteEncounter,
     onFormSave,
-    workspaceWindowSize,
     patientUuid,
+    currentVisit,
   ]);
 
   const headers = useMemo(() => {
@@ -247,7 +236,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   }, [columns, t]);
 
   const formLauncher = useMemo(() => {
-    if (formsJson.length == 1 && !formsJson[0]['availableIntents']?.length) {
+    if (formsJson && !formsJson['availableIntents']?.length) {
       return (
         <Button
           kind="ghost"
@@ -255,29 +244,15 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
-            launchEncounterForm(formsJson[0], 'add', onFormSave, null, '', '*', workspaceWindowSize, patientUuid);
+            launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid);
           }}
         >
           {t(displayText)}
         </Button>
       );
-    } else if (formsJson.length && !(hideFormLauncher ?? isDead)) {
-      return (
-        <MenuButton label={t('add', 'Add')} kind="ghost" menuAlignment="bottom-end">
-          {formsJson.map((form, index) => (
-            <MenuItem
-              key={index}
-              label={form.name}
-              onClick={() =>
-                launchEncounterForm(form, 'add', onFormSave, null, '', '*', workspaceWindowSize, patientUuid)
-              }
-            />
-          ))}
-        </MenuButton>
-      );
     }
     return null;
-  }, [formsJson, hideFormLauncher, isDead, displayText, onFormSave, workspaceWindowSize, patientUuid, t]);
+  }, [formsJson, displayText, onFormSave, patientUuid, t, currentVisit]);
 
   if (isLoading === true || isLoadingFormsJson === true) {
     return <DataTableSkeleton rowCount={10} />;
@@ -290,8 +265,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t(headerTitle)}</h4>
-              {/* @ts-ignore */}
-              {!(hideFormLauncher ?? isDead) && <div className={styles.toggleButtons}>{formLauncher}</div>}
+              {!(hideFormLauncher ?? deathStatus) && <div className={styles.toggleButtons}>{formLauncher}</div>}
             </div>
             <EncounterListDataTable tableHeaders={headers} tableRows={tableRows} />
             <Pagination
@@ -311,10 +285,9 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           displayText={description}
           headerTitle={t(headerTitle)}
           launchForm={
-            hideFormLauncher || isDead
+            hideFormLauncher || deathStatus
               ? null
-              : () =>
-                  launchEncounterForm(formsJson[0], 'add', onFormSave, null, '', '*', workspaceWindowSize, patientUuid)
+              : () => launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid)
           }
         />
       )}

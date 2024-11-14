@@ -185,3 +185,18 @@ export interface TableRow {
   id: string;
   actions: Action[] | ReactElement | null;
 }
+
+export interface NamedColumn {
+  uuid: string;
+  name: { name: string };
+  names?: { uuid: string; name: string };
+  conceptNameType: string;
+}
+
+export interface FormColumn {
+  form: { name: string };
+  encounterUuid: string;
+  intent: string;
+  label: string;
+  mode: string;
+}

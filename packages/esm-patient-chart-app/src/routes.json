@@ -24,7 +24,7 @@
       "offline": true
     },
     {
-      "name": "encounter-list-table-tabs",
+      "name": "encounter-list",
       "component": "encounterListTableTabs",
       "online": true,
       "offline": true

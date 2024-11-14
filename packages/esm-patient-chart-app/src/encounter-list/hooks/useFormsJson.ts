@@ -1,35 +1,15 @@
-import { useEffect, useState } from 'react';
-import useSWRImmutable from 'swr';
-import { fetchOpenMRSForms } from '../encounter-list.resource';
-import { type FormSchema } from '@openmrs/esm-form-engine-lib';
+import useSWR from 'swr';
 
-export function useFormsJson(formUuids: string[]) {
-  const [openmrsForms, setOpenmrsForms] = useState<FormSchema[]>([]);
-  const { data: responses, isLoading: isLoadingOpenmrsForms } = useSWRImmutable<any, Error>(
-    formUuids,
-    fetchOpenMRSForms,
-  );
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type Form } from '../types';
 
-  useEffect(() => {
-    if (responses?.length) {
-      setOpenmrsForms(
-        responses
-          .map((response, index) => {
-            const match =
-              response?.data ?? response?.data?.find((result) => !result.retired && result.name === formUuids[index]);
-            if (!match) {
-              console.error('Form not found: ' + formUuids[index]);
-              return null;
-            }
-            return match;
-          })
-          .filter(Boolean),
-      );
-    }
-  }, [formUuids, responses]);
+export function useFormsJson(formUuid: string) {
+  const url = `${restBaseUrl}/form/${formUuid}`;
+  const { data, isLoading, error } = useSWR<{ data: Form }, Error>(url, openmrsFetch);
 
   return {
-    formsJson: openmrsForms,
-    isLoading: isLoadingOpenmrsForms,
+    formsJson: data?.data ?? null,
+    isLoading,
+    error,
   };
 }

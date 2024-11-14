@@ -11,21 +11,16 @@ import {
   type TabSchema,
   type ActionProps,
   type ConditionalActionProps,
-} from '../../encounter-list/types';
-import { renderTag } from '../../encounter-list/components/tag.component';
+  type FormColumn,
+  type NamedColumn,
+} from '../types';
+import { renderTag } from '../components/tag.component';
 
-interface FormattedColumn {
+export interface FormattedColumn {
   key: string;
   header: string;
-  getValue: (
-    encounter: any,
-  ) =>
-    | string
-    | number
-    | Element
-    | { uuid: string; name: { name: string }; names?: { uuid: string; name: string; conceptNameType: string }[] }
-    | { form: { name: string }; encounterUuid: string; intent: string; label: string; mode: string }[];
-  link?: { getUrl: (encounter: any) => string; handleNavigate?: (encounter: any) => void };
+  getValue: (encounter: Encounter) => string | number | JSX.Element | Array<NamedColumn> | Array<FormColumn>;
+  link?: { getUrl: (encounter: Encounter) => string; handleNavigate?: (encounter: Encounter) => void };
   concept?: string;
 }
 
@@ -112,12 +107,7 @@ export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>) => {
     header: column.title,
     concept: column.concept,
     getValue: (encounter) =>
-      getColumnValue(encounter, column) as
-        | string
-        | number
-        | Element
-        | { uuid: string; name: { name: string }; names?: { uuid: string; name: string; conceptNameType: string }[] }
-        | { form: { name: string }; encounterUuid: string; intent: string; label: string; mode: string }[],
+      getColumnValue(encounter, column) as string | number | JSX.Element | NamedColumn[] | FormColumn[],
     link: column.isLink
       ? {
           getUrl: (encounter) => encounter.url,

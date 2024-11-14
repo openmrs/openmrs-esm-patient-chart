@@ -136,7 +136,17 @@ export const esmPatientChartSchema = {
   trueConceptUuid: {
     _type: Type.String,
     _description: 'Default concept uuid for true in forms',
-    _default: 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3',
+    _default: '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  falseConceptUuid: {
+    _type: Type.String,
+    _description: 'Default concept uuid for false in forms',
+    _default: '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  otherConceptUuid: {
+    _type: Type.String,
+    _description: 'Default concept uuid for other in forms',
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
 };
 
@@ -167,4 +177,6 @@ export interface ChartConfig {
   }>;
   visitDiagnosisConceptUuid: string;
   trueConceptUuid: string;
+  falseConceptUuid: string;
+  otherConceptUuid: string;
 }
