@@ -71,6 +71,10 @@ export function useOrderTypes() {
   };
 }
 
+export function useOrderType(orderTypeUuid: string) {
+  return useSWR(`${restBaseUrl}/ordertype/${orderTypeUuid}`);
+}
+
 export function getDrugOrderByUuid(orderUuid: string) {
   return openmrsFetch(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
 }
