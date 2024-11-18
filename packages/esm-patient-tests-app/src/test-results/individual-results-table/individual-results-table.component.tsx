@@ -55,6 +55,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
   const { t } = useTranslation();
   const layout = useLayoutType();
   const patientUuid = getPatientUuidFromStore();
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const headerTitle = t(title);
 
@@ -83,6 +84,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
 
   const tableRows = useMemo(
     () =>
+      subRows?.entries.length &&
       subRows.entries.map((row, i) => {
         const { units = '', range = '' } = row;
         const isString = isNaN(parseFloat(row.value));
@@ -137,7 +139,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
                 </Button>
               </div>
             </div>
-            <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
+            <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

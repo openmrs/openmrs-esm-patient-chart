@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -12,13 +13,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
-import { type Attachment, useLayoutType } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
+import { type Attachment, ResponsiveWrapper, useLayoutType } from '@openmrs/esm-framework';
+import { compare, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { type AttachmentTableData } from '../utils';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {
-  attachments: Array<Attachment>;
+  attachments: Array<AttachmentTableData>;
   isLoading: boolean;
   onDeleteAttachment: (attachment: Attachment) => void;
   onOpenAttachment: (attachment: Attachment) => void;
@@ -51,7 +54,10 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
           </Button>
         ),
         type: attachment.bytesContentFamily,
-        dateUploaded: attachment.dateTime,
+        dateUploaded: {
+          content: attachment.dateTime,
+          sortKey: new Date(attachment.dateTimeValue).getTime(),
+        },
       })),
     [attachments, onOpenAttachment, responsiveSize],
   );
@@ -72,10 +78,31 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
         key: 'dateUploaded',
         header: t('dateUploaded', 'Date uploaded'),
         colSpan: 2,
+        isSortable: true,
       },
     ],
     [t],
   );
+
+  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
+    if (sortDirection === sortStates.DESC) {
+      return compare(cellA?.sortKey, cellB?.sortKey);
+    }
+    return compare(cellB?.sortKey, cellA?.sortKey);
+  };
+
+  if (!rows.length) {
+    return (
+      <ResponsiveWrapper>
+        <Tile className={styles.emptyState}>
+          <EmptyDataIllustration />
+          <p className={styles.emptyStateContent}>
+            {t('noAttachmentsToDisplay', 'There are no attachments to display for this patient')}
+          </p>
+        </Tile>
+      </ResponsiveWrapper>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -93,6 +120,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
         overflowMenuOnHover={isDesktop}
         // `xs` on desktop to account for the overflow menu
         size={isTablet ? 'lg' : 'xs'}
+        sortRow={sortRow}
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <Table {...getTableProps()} useZebraStyles>

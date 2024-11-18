@@ -23,6 +23,14 @@ enum TickRotations {
   NEVER = 'never',
 }
 
+interface TrendlineProps {
+  patientUuid: string;
+  conceptUuid: string;
+  basePath: string;
+  hideTrendlineHeader?: boolean;
+  showBackToTimelineButton?: boolean;
+}
+
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
 const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, showBackToTimelineButton }) => {
@@ -50,14 +58,6 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
     </div>
   );
 };
-
-interface TrendlineProps {
-  patientUuid: string;
-  conceptUuid: string;
-  basePath: string;
-  hideTrendlineHeader?: boolean;
-  showBackToTimelineButton?: boolean;
-}
 
 const Trendline: React.FC<TrendlineProps> = ({
   patientUuid,
@@ -103,8 +103,6 @@ const Trendline: React.FC<TrendlineProps> = ({
     min?: number;
     max?: number;
   }> = [];
-
-  //
 
   const tableData: Array<{
     id: string;
@@ -207,7 +205,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   );
 
   if (isLoading) {
-    return <SkeletonText />;
+    return <SkeletonText role="progressbar" />;
   }
 
   if (obs.length === 0) {

@@ -88,15 +88,15 @@ export interface LabTestReason {
 
 export interface OrderReason {
   labTestUuid: string;
-  required: boolean;
   orderReasons: Array<string>;
+  required: boolean;
 }
 
 export interface ConfigObject {
-  resultsViewerConcepts: Array<ObsTreeEntry>;
+  labTestsWithOrderReasons: Array<OrderReason>;
   orders: {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
   };
-  labTestsWithOrderReasons: Array<OrderReason>;
+  resultsViewerConcepts: Array<ObsTreeEntry>;
 }

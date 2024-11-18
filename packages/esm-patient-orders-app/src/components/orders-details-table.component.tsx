@@ -276,10 +276,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
     documentTitle: `OpenMRS - ${patientDetails.name} - ${title}`,
-    onBeforeGetContent: (): Promise<void> =>
+    onBeforeGetContent: () =>
       new Promise((resolve) => {
         if (patient && title) {
-          onBeforeGetContentResolve.current = resolve();
+          onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
       }),
@@ -362,17 +362,18 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                     <div className={styles.buttons}>
                       {showPrintButton && (
                         <Button
-                          kind="ghost"
-                          renderIcon={PrinterIcon}
-                          iconDescription={t('printOrder', 'Print order')}
                           className={styles.printButton}
+                          iconDescription={t('printOrder', 'Print order')}
+                          kind="ghost"
                           onClick={handlePrint}
+                          renderIcon={PrinterIcon}
                         >
                           {t('print', 'Print')}
                         </Button>
                       )}
                       {showAddButton && (
                         <Button
+                          className={styles.addButton}
                           kind="ghost"
                           renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
