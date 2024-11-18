@@ -24,7 +24,9 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
- DatePicker , DatePickerInput } from '@carbon/react';
+  DatePicker,
+  DatePickerInput,
+} from '@carbon/react';
 import {
   CardHeader,
   EmptyState,
@@ -307,15 +309,17 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
 
   const handleDateFilterChange = ([startDate, endDate]) => {
     if (startDate) {
-      setSelectedFromDate(startDate.toISOString());
-      if (selectedToDate && startDate && selectedToDate < startDate) {
-        setSelectedToDate(startDate.toISOString());
+      const isoStartDate = startDate.toISOString();
+      setSelectedFromDate(isoStartDate);
+      if (selectedToDate && selectedToDate < startDate) {
+        setSelectedToDate(isoStartDate);
       }
     }
     if (endDate) {
-      setSelectedToDate(endDate.toISOString());
-      if (selectedFromDate && endDate && selectedFromDate > endDate) {
-        setSelectedFromDate(endDate.toISOString());
+      const isoEndDate = endDate.toISOString();
+      setSelectedToDate(isoEndDate);
+      if (selectedFromDate && selectedFromDate > endDate) {
+        setSelectedFromDate(isoEndDate);
       }
     }
   };
@@ -328,7 +332,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             items={orderTypesToDisplay}
             itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
             label={t('allOrders', 'All orders')}
-            onChange={(e: { selectedItem: Order }) => {
+            onChange={(e: { selectedItem: OrderType }) => {
               if (e.selectedItem.display === 'All') {
                 setSelectedOrderTypeUuid(null);
                 return;
@@ -340,7 +344,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             type="inline"
           />
         </div>
-        <p className={styles.helperText}>{t('dateRange', 'Date range')} :</p>
+        <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
         <DatePicker
           datePickerType="range"
           dateFormat={'d/m/Y'}
