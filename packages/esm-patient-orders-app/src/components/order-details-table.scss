@@ -192,21 +192,3 @@
   display: flex;
   align-items: center;
 }
-
-.fullWidthDatePickerContainer {
-  :global .cds--date-picker {
-    width: 40%;
-
-    :global .cds--date-picker-container {
-      width: 100%;
-
-      :global .cds--date-picker-input__wrapper {
-        width: 100%;
-
-        :global .cds--date-picker__input {
-          width: 100%;
-        }
-      }
-    }
-  }
-}

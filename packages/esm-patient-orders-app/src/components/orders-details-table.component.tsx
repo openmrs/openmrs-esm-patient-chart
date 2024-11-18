@@ -24,7 +24,7 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
-} from '@carbon/react';
+ DatePicker , DatePickerInput } from '@carbon/react';
 import {
   CardHeader,
   EmptyState,
@@ -59,8 +59,6 @@ import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
-import { DatePicker } from '@carbon/react';
-import { DatePickerInput } from '@carbon/react';
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -346,7 +344,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         <DatePicker
           datePickerType="range"
           dateFormat={'d/m/Y'}
-          className={styles.fullWidthDatePickerContainer}
           value={''}
           onChange={([startDate, endDate]) => {
             handleDateFilterChange([startDate, endDate]);
