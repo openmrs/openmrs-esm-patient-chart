@@ -3,6 +3,17 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies": {
+    "fhirproxy": {
+      "version": "1.0.0-SNAPSHOT"
+    },
+    "stockmanagement": {
+      "version": "2.0.2-SNAPSHOT"
+    },
+    "billing": {
+      "version": "1.2.0-SNAPSHOT"
+    }
+  },
   "extensions": [
     {
       "name": "order-price-details",
