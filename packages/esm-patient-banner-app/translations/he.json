@@ -6,15 +6,15 @@
   "country": "מדינה",
   "countyDistrict": "מחוז",
   "district": "מחוז",
-  "implementationLogo": "Implementation logo",
-  "patientAge": "Age:",
-  "patientDateOfBirthWithSeparator": "Date of birth:",
-  "patientGenderWithSeparator": "Gender:",
+  "implementationLogo": "לוגו הטמעה",
+  "patientAge": "גיל:",
+  "patientDateOfBirthWithSeparator": "תאריך לידה:",
+  "patientGenderWithSeparator": "מגדר:",
   "patientIdentifierSticker": "Patient identifier sticker",
-  "patientNameWithSeparator": "Patient name:",
+  "patientNameWithSeparator": "שם המטופל/ת:",
   "postalCode": "מיקוד",
-  "printIdentifierSticker": "Print identifier sticker",
+  "printIdentifierSticker": "הדפסת מדבקת זיהוי",
   "state": "מדינה",
   "stateProvince": "מדינה",
-  "telephoneNumberWithSeparator": "Telephone number:"
+  "telephoneNumberWithSeparator": "מספר טלפון:"
 }
