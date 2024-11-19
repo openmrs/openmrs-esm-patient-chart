@@ -48,6 +48,12 @@ export const configSchema = {
       _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
+  showLabReferenceNumberInput: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'A boolean config, that determines whether the order lab reference number input is displayed or not, default value is true',
+  },
   labTestsWithOrderReasons: {
     _type: Type.Array,
     _elements: {
@@ -98,5 +104,6 @@ export interface ConfigObject {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
   };
+  showLabReferenceNumberInput: boolean;
   resultsViewerConcepts: Array<ObsTreeEntry>;
 }
