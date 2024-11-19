@@ -71,8 +71,21 @@ export function useOrderTypes() {
   };
 }
 
+interface OrderTypeResponse {
+  uuid: string;
+  display: string;
+  name: string;
+  javaClassName: 'org.openmrs.Order';
+  retired: false;
+  description: string;
+  conceptClasses: Array<{
+    uuid: string;
+    display: string;
+  }>;
+}
+
 export function useOrderType(orderTypeUuid: string) {
-  return useSWR(`${restBaseUrl}/ordertype/${orderTypeUuid}`);
+  return useSWR<FetchResponse<OrderTypeResponse>>(`${restBaseUrl}/ordertype/${orderTypeUuid}`);
 }
 
 export function getDrugOrderByUuid(orderUuid: string) {

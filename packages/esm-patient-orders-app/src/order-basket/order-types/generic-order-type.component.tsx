@@ -15,14 +15,17 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 
 interface GenericOrderTypeProps {
   orderTypeUuid: string;
+  conceptClass: string;
+  orderableConcepts: Array<string>;
 }
 
-const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid }) => {
+const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, conceptClass, orderableConcepts }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { data, isLoading, error } = useOrderType(orderTypeUuid);
+  const orderType = data?.data;
   const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepOrderPostFunc);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -63,7 +66,12 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid }) =>
   const openConceptSearch = () => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order'),
+      onWorkspaceClose: () =>
+        launchPatientWorkspace('orderable-concept-workspace', {
+          orderTypeUuid,
+          conceptClass,
+          orderableConcepts,
+        }),
     });
   };
 
@@ -94,8 +102,8 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid }) =>
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           {/* <RxIcon isTablet={isTablet} /> */}
-          {/* Add Icon */}
-          <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
+          {/* TODO: Add Icon */}
+          <h4 className={styles.heading}>{`${orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

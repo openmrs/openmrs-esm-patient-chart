@@ -74,6 +74,12 @@
       "component": "testResultsFormWorkspace",
       "type": "lab-results",
       "canHide": false
+    },
+    {
+      "name": "orderable-concept-workspace",
+      "title": "searchConcepts",
+      "component": "orderableConceptSearch",
+      "type": "order"
     }
   ]
 }

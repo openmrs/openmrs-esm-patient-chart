@@ -1,5 +1,4 @@
 import { Type } from '@openmrs/esm-framework';
-import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   orderEncounterType: {
@@ -15,7 +14,13 @@ export const configSchema = {
   },
   orderTypes: {
     _type: Type.Array,
-    _default: [],
+    _default: [
+      {
+        orderTypeUuid: '425ae793-e776-4f84-8be1-2f322744644d',
+        conceptClass: '',
+        orderableConcepts: ['06393843-1790-43cd-acba-cd497300c734'],
+      },
+    ],
     _elements: {
       orderTypeUuid: {
         _type: Type.String,
@@ -43,6 +48,6 @@ export interface ConfigObject {
   orderTypes: Array<{
     orderTypeUuid: string;
     conceptClass: string;
-    orderableConcepts: string;
+    orderableConcepts: Array<string>;
   }>;
 }
