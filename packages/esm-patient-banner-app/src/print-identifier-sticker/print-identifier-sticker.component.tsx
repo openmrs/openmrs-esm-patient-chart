@@ -37,6 +37,79 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
         )}
       </Grid>
 
+      {/* <FlexGrid>
+        <Row>
+          <Grid className={styles.gridHeaderContainer}>
+            {printPatientSticker?.header?.showBarcode && (
+              <Column lg={12} md={6} sm={4}>
+                <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
+              </Column>
+            )}
+            {printPatientSticker?.header?.showLogo && (
+              <Column lg={4} md={2} sm={4}>
+                <div className={styles.implementationLogo}>
+                  <ImplementationLogo />
+                </div>
+              </Column>
+            )}
+          </Grid>
+        </Row>
+        <div>
+          {individualFields.map((field) => {
+            const Component = getPatientField(field);
+            return (
+              <Component patient={patient} showFieldSeparator={showFieldSeparator} />
+            );
+          })}
+          {fieldsTableGroups.length > 0
+              ? fieldsTableGroups.map((group, index) => (
+                <Row>
+                <table key={`group-${index}`}>
+                  <tbody>
+                    <tr>
+                      {group.map((field) => {
+                        const Component = getPatientField(field);
+                        return (
+                          <td key={field}>
+                            <Component patient={patient} showFieldSeparator={showFieldSeparator} />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </tbody>
+                </table>
+                </Row>
+              ))
+              : null}
+        </div>
+      </FlexGrid> */}
+
+      {/* 
+<svg xmlns="http//www.w3.org/2000/svg" viewBox="0 0 700 500">
+      <rect fill="#f0f0f0" height="150" width="700" y="0" x="0"></rect>
+      <text fill="#333" font-size="40" y="90" x="20">
+        Barcode
+      </text>
+      <text fill="#333" font-size="40" y="90" x="510">
+        logo
+      </text>
+
+      <text fill="#555" font-size="20" y="210" x="20">Patient ID</text>
+      <text font-size="40" y="250" x="20">100008E</text>
+
+      <text fill="#555" font-size="20" y="310" x="20">Patient Name</text>
+      <text font-size="40" y="350" x="20">Joshua Johnson</text>
+
+      <text fill="#555" font-size="20" y="410" x="20">Gender</text>
+      <text font-size="40" y="450" x="20">Male</text>
+
+      <text fill="#555" font-size="20" y="410" x="240">Date of Birth</text>
+      <text font-size="40" y="450" x="240"></text>
+
+      <text fill="#555" font-size="20" y="410" x="510">Age</text>
+      <text font-size="40" y="450" x="510">25-Sept-2019</text>
+    </svg> */}
+
       <div
         className={styles.fieldsContainer}
         style={printPatientSticker?.printStickerFields?.fieldsContainerStyleOverrides}
@@ -68,6 +141,53 @@ const PrintComponent: React.FC<PrintComponentProps> = ({ patient }) => {
             </table>
           ))
         : null}
+
+      {/* <Grid className={styles.gridHeaderContainer}>
+         {printPatientSticker?.header?.showBarcode && (
+          <Column lg={12} md={6} sm={4}>
+            <Barcode value={primaryIdentifierValue} {...defaultBarcodeParams} />
+          </Column>
+        )}
+        {printPatientSticker?.header?.showLogo && (
+          <Column lg={4} md={2} sm={4}>
+            <div className={styles.implementationLogo}>
+              <ImplementationLogo />
+            </div>
+          </Column>
+        )}
+      </Grid> */}
+
+      {/* <div
+        className={styles.fieldsContainer}
+        style={printPatientSticker?.printStickerFields?.fieldsContainerStyleOverrides}
+      >
+        {individualFields.map((field) => {
+          const Component = getPatientField(field);
+          return (
+            <div key={field} className={styles.fieldRow}>
+              <Component patient={patient} showFieldSeparator={showFieldSeparator} />
+            </div>
+          );
+        })}
+      </div>
+      {fieldsTableGroups.length > 0
+        ? fieldsTableGroups.map((group, index) => (
+            <table key={`group-${index}`} className={styles.fieldsTable}>
+              <tbody>
+                <tr>
+                  {group.map((field) => {
+                    const Component = getPatientField(field);
+                    return (
+                      <td key={field} className={styles.fieldsTableCell}>
+                        <Component patient={patient} showFieldSeparator={showFieldSeparator} />
+                      </td>
+                    );
+                  })}
+                </tr>
+              </tbody>
+            </table>
+          ))
+        : null} */}
     </div>
   );
 };

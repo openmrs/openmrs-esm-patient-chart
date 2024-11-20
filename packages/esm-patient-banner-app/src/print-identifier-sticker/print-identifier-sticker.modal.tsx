@@ -18,7 +18,8 @@ import { getPatientName, getCoreTranslation, showSnackbar, useConfig } from '@op
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from './print-identifier-sticker.component';
 import styles from './print-identifier-sticker.scss';
-
+import { toSvg } from 'html-to-image';
+import PrintSizeWrapper from './print-size-wrapper.component';
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
   patient: fhir.Patient;
@@ -143,6 +144,8 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
 
 const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleStickersComponentProps>(
   ({ pageSize, printMultipleStickers, stickerSize, patient }, ref) => {
+    const svgDivRef = useRef<HTMLDivElement>();
+
     const divRef = useRef<HTMLDivElement>();
     const { t } = useTranslation();
 
@@ -158,6 +161,8 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
     const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(
       printMultipleStickers.numberOfStickers > 1,
     );
+
+    const [svgDataSource, setSvgDataSource] = useState('');
 
     const labels = Array.from({ length: numberOfLabels });
 
@@ -180,6 +185,23 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
       printIdentifierStickerWidth,
     ]);
 
+    useEffect(() => {
+      if (svgDivRef.current) {
+        toSvg(svgDivRef.current, { cacheBust: true })
+          .then((dataUrl) => {
+            setSvgDataSource(dataUrl);
+          })
+          .catch((err) => {
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'error',
+              title: getCoreTranslation('printError', 'Print error'),
+              subtitle: err,
+            });
+          });
+      }
+    }, [svgDivRef]);
+
     const maxLabelsPerPage = numberOfLabelRowsPerPage * numberOfLabelColumnsPage;
     const pages: Array<typeof labels> = [];
 
@@ -193,7 +215,9 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
 
     return (
       <Stack gap={5}>
-        <PrintComponent patient={patient} />
+        <div ref={svgDivRef}>
+          <PrintComponent patient={patient} />
+        </div>
         <Grid className={styles.gridContainer}>
           <Column lg={6} md={8} sm={4}>
             <Toggle
@@ -259,7 +283,9 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
                 <div className={styles.labelsContainer}>
                   {pageLabels.map((_label, index) => (
                     <div key={index} className={styles.printContainer}>
-                      <PrintComponent patient={patient} />
+                      <PrintSizeWrapper>
+                        <img id="svg-sample" src={svgDataSource} />
+                      </PrintSizeWrapper>
                     </div>
                   ))}
                 </div>

@@ -86,7 +86,7 @@
 }
 
 .patientDetail {
-  @include type.type-style('heading-04');
+  @include type.type-style('heading-06');
   font-weight: 700;
   margin-inline-end: layout.$spacing-03;
   text-align: left;
@@ -129,18 +129,21 @@
     }
 
     .pageBreak {
-      page-break-after: always;
+      break-after: page;
+    }
+
+    .stickerContainer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      box-sizing: border-box;
+      overflow: hidden;
     }
   }
 
   .labelsContainer {
     grid-template-columns: repeat(var(--omrs-print-label-columns, 1), 1fr);
     grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
-  }
-
-  .stickerContainer {
-    height: var(--omrs-print-label-sticker-height, auto);
-    width: var(--omrs-print-label-sticker-width, auto);
   }
 
   .implementationLogo {
@@ -165,7 +168,8 @@
 }
 
 .printContainer {
-  background-color: $ui-01;
+  height: auto;
+  width: auto;
 }
 
 .labelsContainer {
