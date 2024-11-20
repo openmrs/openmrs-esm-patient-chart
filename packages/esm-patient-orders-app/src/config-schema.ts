@@ -6,6 +6,12 @@ export const configSchema = {
     _description: 'The encounter type of the encounter encapsulating orders',
     _default: '39da3525-afe4-45ff-8977-c53b7b359158',
   },
+  debounceDelayInMs: {
+    _type: Type.Number,
+    _description:
+      'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
+    _default: 300,
+  },
   showPrintButton: {
     _type: Type.Boolean,
     _description:
@@ -16,19 +22,18 @@ export const configSchema = {
     _type: Type.Array,
     _default: [
       {
-        orderTypeUuid: '425ae793-e776-4f84-8be1-2f322744644d',
-        conceptClass: '',
-        orderableConcepts: ['06393843-1790-43cd-acba-cd497300c734'],
+        orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
+        orderableConcepts: [],
+      },
+      {
+        orderTypeUuid: '67a9328e-0f88-11ea-8d71-362b9e155667',
+        orderableConcepts: [],
       },
     ],
     _elements: {
       orderTypeUuid: {
         _type: Type.String,
         _description: 'Order type UUID to be displayed on the order basket',
-      },
-      conceptClass: {
-        _type: Type.String,
-        _description: 'Concept with the given class name will be ordered',
       },
       orderableConcepts: {
         _type: Type.Array,
@@ -47,7 +52,7 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orderTypes: Array<{
     orderTypeUuid: string;
-    conceptClass: string;
     orderableConcepts: Array<string>;
   }>;
+  debounceDelayInMs: number;
 }

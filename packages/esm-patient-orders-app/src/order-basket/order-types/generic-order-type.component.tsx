@@ -2,7 +2,13 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './generic-order-panel.scss';
-import { AddIcon, ChevronDownIcon, ChevronUpIcon, closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import {
+  AddIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  type DefaultWorkspaceProps,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   type DrugOrderBasketItem,
@@ -15,14 +21,15 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 
 interface GenericOrderTypeProps {
   orderTypeUuid: string;
-  conceptClass: string;
   orderableConcepts: Array<string>;
+  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, conceptClass, orderableConcepts }) => {
+const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orderableConcepts, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { data, isLoading, error } = useOrderType(orderTypeUuid);
+  const conceptClass = data?.data?.conceptClasses?.[0]?.uuid;
   const orderType = data?.data;
   const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
@@ -64,7 +71,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, conc
   }, [orders]);
 
   const openConceptSearch = () => {
-    closeWorkspace('order-basket', {
+    closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () =>
         launchPatientWorkspace('orderable-concept-workspace', {
@@ -76,7 +83,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, conc
   };
 
   const openOrderForm = (order: DrugOrderBasketItem) => {
-    closeWorkspace('order-basket', {
+    closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
     });
@@ -94,6 +101,10 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, conc
   useEffect(() => {
     setIsExpanded(orders.length > 0);
   }, [orders]);
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Tile

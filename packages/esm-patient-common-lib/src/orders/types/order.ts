@@ -1,4 +1,5 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { Drug } from './drug-order';
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
@@ -131,7 +132,7 @@ export interface Order {
   quantityUnits: OpenmrsResource;
   route: OpenmrsResource;
   scheduleDate: null;
-  urgency: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  urgency: OrderUrgency;
 
   // additional properties
   accessionNumber: string;
@@ -167,54 +168,10 @@ export interface OrderType {
   description: string;
 }
 
-export interface Drug {
-  uuid: string;
-  strength: string;
-  concept: OpenmrsResource;
-  dosageForm: OpenmrsResource;
-  display: string;
-}
+export type FulfillerStatus = 'EXCEPTION' | 'RECEIVED' | 'COMPLETED' | 'IN_PROGRESS' | 'ON_HOLD' | 'DECLINED';
 
 export type PostDataPrepFunction = (
   order: OrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
 ) => OrderPost;
-
-// Adopted from @openmrs/esm-patient-medications-app package. We should consider maintaining a single shared types file
-export interface DrugOrderBasketItem extends OrderBasketItem {
-  drug: Drug;
-  unit: any;
-  commonMedicationName: string;
-  dosage: number;
-  frequency: any;
-  route: any;
-  quantityUnits: any;
-  patientInstructions: string;
-  asNeeded: boolean;
-  asNeededCondition: string;
-  startDate: Date | string;
-  durationUnit: any;
-  duration: number | null;
-  pillsDispensed: number;
-  numRefills: number;
-  indication: string;
-  isFreeTextDosage: boolean;
-  freeTextDosage: string;
-  previousOrder?: string;
-  template?: any;
-}
-
-export interface LabOrderBasketItem extends OrderBasketItem {
-  testType?: {
-    label: string;
-    conceptUuid: string;
-  };
-  urgency?: OrderUrgency;
-  instructions?: string;
-  previousOrder?: string;
-  orderReason?: string;
-  orderNumber?: string;
-}
-
-export type FulfillerStatus = 'EXCEPTION' | 'RECEIVED' | 'COMPLETED' | 'IN_PROGRESS' | 'ON_HOLD' | 'DECLINED';

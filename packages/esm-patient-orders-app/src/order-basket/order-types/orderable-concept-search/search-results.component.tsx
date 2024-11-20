@@ -1,5 +1,5 @@
 import React, { type ComponentProps, useCallback } from 'react';
-import { launchPatientWorkspace, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderType, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRightIcon,
@@ -16,7 +16,7 @@ import { Button } from '@carbon/react';
 import { SkeletonText } from '@carbon/react';
 import { ButtonSkeleton } from '@carbon/react';
 import styles from './search-results.scss';
-import { type ConceptType, useGenericOrderBasket, useOrderableConcepts } from '../resources';
+import { type ConceptType, matchOrder, useGenericOrderBasket, useOrderableConcepts } from '../resources';
 
 interface OrderableConceptSearchResultsProps {
   searchTerm: string;
@@ -41,19 +41,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { concepts, isLoading, error } = useOrderableConcepts(conceptClass, orderableConcepts);
-
-  const filteredTestTypes = useMemo(() => {
-    if (!searchTerm) {
-      return concepts;
-    }
-
-    if (searchTerm && searchTerm.trim() !== '') {
-      return concepts?.filter((testType) =>
-        testType.synonyms.some((name) => name.toLowerCase().includes(searchTerm.toLowerCase())),
-      );
-    }
-  }, [searchTerm, concepts]);
+  const { concepts, isLoading, error } = useOrderableConcepts(searchTerm, conceptClass, orderableConcepts);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -76,7 +64,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
     );
   }
 
-  if (filteredTestTypes?.length) {
+  if (concepts?.length) {
     return (
       <>
         <div className={styles.container}>
@@ -84,7 +72,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
                 {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
-                  count: filteredTestTypes?.length,
+                  count: concepts?.length,
                   searchTerm,
                 })}
               </span>
@@ -94,11 +82,11 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
             </div>
           )}
           <div className={styles.resultsContainer}>
-            {filteredTestTypes.map((testType) => (
+            {concepts.map((concept) => (
               <TestTypeSearchResultItem
-                key={testType.conceptUuid}
+                key={concept.conceptUuid}
                 openOrderForm={openOrderForm}
-                testType={testType}
+                concept={concept}
                 orderTypeUuid={orderTypeUuid}
                 closeWorkspace={closeWorkspace}
               />
@@ -162,14 +150,14 @@ const TestTypeSearchSkeleton = () => {
 };
 
 interface TestTypeSearchResultItemProps {
-  testType: ConceptType;
+  concept: ConceptType;
   openOrderForm: (searchResult: OrderBasketItem) => void;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
-  testType,
+  concept,
   openOrderForm,
   orderTypeUuid,
   closeWorkspace,
@@ -178,11 +166,12 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useGenericOrderBasket(orderTypeUuid);
+  const { data, isLoading } = useOrderType(orderTypeUuid);
 
-  // const testTypeAlreadyInBasket = useMemo(
-  //   () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
-  //   [orders, testType],
-  // );
+  const orderAlreadyInBasket = useMemo(
+    () => orders?.some((order) => matchOrder(data?.data?.javaClassName, order, concept)),
+    [orders, data, concept],
+  );
 
   // const createLabOrder = useCallback(
   //   (testType: TestType) => {
@@ -212,7 +201,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
         <p>
-          <span className={styles.heading}>{testType.label}</span>{' '}
+          <span className={styles.heading}>{concept.label}</span>{' '}
         </p>
       </div>
       <div className={styles.searchResultActions}>

@@ -40,18 +40,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import type {
-  CommonMedicationValueCoded,
-  DosingUnit,
-  DrugOrderBasketItem,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  QuantityUnit,
-} from '../types';
 import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  usePatientChartStore,
+  type CommonMedicationValueCoded,
+  type DosingUnit,
+  type DrugOrderBasketItem,
+  type DurationUnit,
+  type MedicationFrequency,
+  type MedicationRoute,
+  type QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;

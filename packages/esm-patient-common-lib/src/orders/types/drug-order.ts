@@ -1,4 +1,13 @@
-import { type Drug, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { OrderBasketItem } from './order';
+
+export interface Drug {
+  uuid: string;
+  strength: string;
+  concept: OpenmrsResource;
+  dosageForm: OpenmrsResource;
+  display: string;
+}
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
   drug: Drug;
@@ -73,4 +82,28 @@ interface CommonMedicationProps {
 export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
   names?: string[];
+}
+
+export interface DrugOrderBasketItem extends OrderBasketItem {
+  drug: Drug;
+  unit: DosingUnit;
+  commonMedicationName: string;
+  dosage: number;
+  frequency: MedicationFrequency;
+  route: MedicationRoute;
+  quantityUnits: QuantityUnit;
+  patientInstructions: string;
+  asNeeded: boolean;
+  asNeededCondition: string;
+  // TODO: This is unused
+  startDate: Date | string;
+  durationUnit: DurationUnit;
+  duration: number | null;
+  pillsDispensed: number;
+  numRefills: number;
+  indication: string;
+  isFreeTextDosage: boolean;
+  freeTextDosage: string;
+  previousOrder?: string;
+  template?: OrderTemplate;
 }

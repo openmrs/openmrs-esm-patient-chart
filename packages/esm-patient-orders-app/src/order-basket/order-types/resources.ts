@@ -1,7 +1,29 @@
-import { type Concept, type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type OrderBasketItem, prepOrderPostData, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  type LabOrderBasketItem,
+  type OrderBasketItem,
+  type OrderTypeJavaClassName,
+  prepOrderPostData,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
+
+export interface Concept {
+  uuid: string;
+  name: {
+    display: string;
+  };
+  names: Array<{
+    display: string;
+  }>;
+  conceptClass: {
+    uuid: string;
+  };
+  answers: Array<Concept>;
+  setMembers: Array<Concept>;
+  display: string;
+}
 
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;
@@ -18,15 +40,15 @@ function openmrsFetchMultiple(urls: Array<string>) {
   return Promise.all(urls.map((url) => openmrsFetch<{ results: Array<Concept> }>(url)));
 }
 
-function useOrderableConceptSWR(conceptClass: string, orderableConcepts?: Array<string>) {
-  const { data, isLoading, error } = useSWRImmutable(
+function useOrderableConceptSWR(searchTerm: string, conceptClass: string, orderableConcepts?: Array<string>) {
+  const { data, isLoading, error } = useSWRImmutable<Array<ConceptResult> | ConceptResults>(
     () =>
       orderableConcepts?.length
         ? orderableConcepts.map(
             (c) =>
               `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
           )
-        : `${restBaseUrl}/concept?class=${conceptClass}&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
+        : `${restBaseUrl}/concept?class=${conceptClass}&name=${searchTerm}&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     (orderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -37,10 +59,19 @@ function useOrderableConceptSWR(conceptClass: string, orderableConcepts?: Array<
 
   const results = useMemo(() => {
     if (isLoading || error) return null;
-    return orderableConcepts
-      ? (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers)
-      : (data as ConceptResults)?.data.results ?? ([] as Concept[]);
-  }, [data, isLoading, error, orderableConcepts]);
+
+    if (orderableConcepts) {
+      const concepts = (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers);
+      if (searchTerm) {
+        return concepts?.filter((concept) =>
+          concept.names.some((name) => name.display.toLowerCase().includes(searchTerm.toLowerCase())),
+        );
+      }
+      return concepts;
+    } else {
+      return (data as ConceptResults)?.data.results ?? ([] as Concept[]);
+    }
+  }, [isLoading, error, orderableConcepts, data, searchTerm]);
 
   return {
     data: results,
@@ -55,8 +86,9 @@ export interface ConceptType {
   synonyms: Array<string>;
 }
 
-export function useOrderableConcepts(conceptClass: string, orderableConcepts: Array<string>) {
+export function useOrderableConcepts(searchTerm: string, conceptClass: string, orderableConcepts: Array<string>) {
   const { data, isLoading, error } = useOrderableConceptSWR(
+    searchTerm,
     conceptClass,
     orderableConcepts.length ? orderableConcepts : null,
   );
@@ -85,4 +117,13 @@ export function useOrderableConcepts(conceptClass: string, orderableConcepts: Ar
     isLoading: isLoading,
     error: error,
   };
+}
+
+export function matchOrder(javaClassName: OrderTypeJavaClassName, order: OrderBasketItem, concept: ConceptType) {
+  switch (javaClassName) {
+    // case 'org.openmrs.DrugOrder':
+    //   return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
+    case 'org.openmrs.TestOrder':
+      return (order as LabOrderBasketItem).testType.conceptUuid === concept.conceptUuid;
+  }
 }

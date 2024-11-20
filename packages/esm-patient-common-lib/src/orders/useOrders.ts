@@ -71,11 +71,13 @@ export function useOrderTypes() {
   };
 }
 
+export type OrderTypeJavaClassName = 'org.openmrs.Order' | 'org.openmrs.TestOrder' | 'org.openmrs.DrugOrder';
+
 interface OrderTypeResponse {
   uuid: string;
   display: string;
   name: string;
-  javaClassName: 'org.openmrs.Order';
+  javaClassName: OrderTypeJavaClassName;
   retired: false;
   description: string;
   conceptClasses: Array<{

@@ -12,18 +12,19 @@ import {
   type OrderBasketItem,
   prepOrderPostData,
   useOrderBasket,
+  useOrderType,
 } from '@openmrs/esm-patient-common-lib';
 import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './orderable-concept-search.scss';
 import { Button } from '@carbon/react';
-import { ConfigObject } from '../../../config-schema';
 import { Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
+import { type ConfigObject } from '../../../config-schema';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
-  orderTypeUuid: string;
   order: OrderBasketItem;
+  orderTypeUuid: string;
   conceptClass: string;
   orderableConcepts: Array<string>;
 }
@@ -49,7 +50,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
 
-  const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  // const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
@@ -61,16 +62,16 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   const openOrderForm = useCallback(
     (searchResult: OrderBasketItem) => {
       const existingOrder = orders.find((order) => ordersEqual(order, searchResult));
-      if (existingOrder) {
-        setCurrentOrder(existingOrder);
-      } else {
-        setCurrentOrder(searchResult);
-      }
+      // if (existingOrder) {
+      //   setCurrentOrder(existingOrder);
+      // } else {
+      //   setCurrentOrder(searchResult);
+      // }
     },
     [orders],
   );
 
-  const saveDrugOrder = useCallback(
+  const saveOrderForm = useCallback(
     (finalizedOrder: OrderBasketItem) => {
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
@@ -135,10 +136,11 @@ function ConceptSearch({
   orderableConcepts,
 }: ConceptSearchProps) {
   const { t } = useTranslation();
+  const { data } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
-  // const { debounceDelayInMs } = useConfig<ConfigObject>();
-  const debouncedSearchTerm = useDebounce(searchTerm);
+  const { debounceDelayInMs } = useConfig<ConfigObject>();
+  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
   const cancelDrugOrder = useCallback(() => {
@@ -161,8 +163,12 @@ function ConceptSearch({
         <Search
           autoFocus
           size="lg"
-          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-          labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          placeholder={t('searchFieldOrder', 'Search for {{orderType}} order', {
+            orderType: data?.data?.display ?? '',
+          })}
+          labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
+            orderType: data?.data?.display ?? '',
+          })}
           onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}
