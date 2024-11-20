@@ -7,14 +7,14 @@ import { type ConfigObject } from '../../config-schema';
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;
 
-export interface TestType {
+export interface OrderableConcept {
   label: string;
   conceptUuid: string;
   synonyms: string[];
 }
 
 export interface UseTestType {
-  testTypes: Array<TestType>;
+  orderableConcepts: Array<OrderableConcept>;
   isLoading: boolean;
   error: Error;
 }
@@ -26,16 +26,22 @@ function openmrsFetchMultiple(urls: Array<string>) {
   return Promise.all(urls.map((url) => openmrsFetch<{ results: Array<Concept> }>(url)));
 }
 
-function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
+function useOrderableConceptSetsSWR(
+  searchTerm: string,
+  orderableConcepts?: Array<string>,
+  conceptClassUuid: string = 'Test',
+) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
-      labOrderableConcepts
-        ? labOrderableConcepts.map(
-            (c) =>
-              `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-          )
-        : `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-    (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
+      orderableConcepts || conceptClassUuid
+        ? orderableConcepts
+          ? orderableConcepts.map(
+              (c) =>
+                `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
+            )
+          : `${restBaseUrl}/concept?class=${conceptClassUuid}&searchType=fuzzy&name=${searchTerm}&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`
+        : null,
+    (orderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
         return err instanceof Response;
@@ -45,10 +51,18 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
 
   const results = useMemo(() => {
     if (isLoading || error) return null;
-    return labOrderableConcepts
-      ? (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers)
-      : (data as ConceptResults)?.data.results ?? ([] as Concept[]);
-  }, [data, isLoading, error, labOrderableConcepts]);
+    if (orderableConcepts) {
+      const concepts = (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers);
+      if (searchTerm) {
+        return concepts?.filter((concept) =>
+          concept.names.some((name) => name.display.toLowerCase().includes(searchTerm.toLowerCase())),
+        );
+      }
+      return concepts;
+    } else {
+      return (data as ConceptResults)?.data.results ?? ([] as Concept[]);
+    }
+  }, [isLoading, error, orderableConcepts, data, searchTerm]);
 
   return {
     data: results,
@@ -57,9 +71,16 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   };
 }
 
-export function useTestTypes(): UseTestType {
-  const { labOrderableConcepts } = useConfig<ConfigObject>().orders;
-  const { data, isLoading, error } = useTestConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
+export function useOrderableConcepts(
+  searchTerm: string,
+  conceptClassUuid: string,
+  orderableConceptSets: Array<string>,
+): UseTestType {
+  const { data, isLoading, error } = useOrderableConceptSetsSWR(
+    searchTerm,
+    orderableConceptSets.length ? orderableConceptSets : null,
+    conceptClassUuid,
+  );
 
   useEffect(() => {
     if (error) {
@@ -67,7 +88,7 @@ export function useTestTypes(): UseTestType {
     }
   }, [error]);
 
-  const testConcepts = useMemo(
+  const orderableConcepts = useMemo(
     () =>
       data
         ?.map((concept) => ({
@@ -81,7 +102,7 @@ export function useTestTypes(): UseTestType {
   );
 
   return {
-    testTypes: testConcepts,
+    orderableConcepts,
     isLoading: isLoading,
     error: error,
   };

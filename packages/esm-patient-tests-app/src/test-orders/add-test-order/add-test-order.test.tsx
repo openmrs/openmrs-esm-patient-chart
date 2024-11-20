@@ -15,8 +15,8 @@ import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
-import { createEmptyLabOrder } from './lab-order';
-import AddLabOrderWorkspace from './add-lab-order.workspace';
+import { createEmptyLabOrder } from './test-order';
+import AddLabOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -86,6 +86,8 @@ function renderAddLabOrderWorkspace() {
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
       setTitle={jest.fn()}
+      orderTypeUuid=""
+      orderableConceptSets={[]}
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };

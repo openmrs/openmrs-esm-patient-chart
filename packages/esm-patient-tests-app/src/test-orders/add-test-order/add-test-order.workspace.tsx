@@ -15,16 +15,19 @@ import {
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
-  type LabOrderBasketItem,
+  type TestOrderBasketItem,
   launchPatientWorkspace,
   usePatientChartStore,
+  useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { LabOrderForm } from './lab-order-form.component';
+import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
-import styles from './add-lab-order.scss';
+import styles from './add-test-order.scss';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
+  orderTypeUuid: string;
+  orderableConceptSets: Array<string>;
 }
 
 export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
@@ -32,15 +35,18 @@ export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddL
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({
   order: initialOrder,
+  orderTypeUuid,
+  orderableConceptSets,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
+  const { orderType, isLoadingOrderType, errorFetchingOrderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
   const { patientUuid } = usePatientChartStore();
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
-  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
+  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -83,9 +89,15 @@ export default function AddLabOrderWorkspace({
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
           setTitle={() => {}}
+          orderTypeUuid={orderTypeUuid}
+          orderableConceptSets={orderableConceptSets}
         />
       ) : (
-        <TestTypeSearch openLabForm={setCurrentLabOrder} />
+        <TestTypeSearch
+          orderTypeUuid={orderTypeUuid}
+          orderableConceptSets={orderableConceptSets}
+          openLabForm={setCurrentLabOrder}
+        />
       )}
     </div>
   );

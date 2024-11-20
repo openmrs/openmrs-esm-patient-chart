@@ -81,7 +81,7 @@ export interface Concept {
     display: string;
   }>;
   answers: [];
-  setMembers: [];
+  setMembers: Array<Concept>;
   hiNormal: number;
   hiAbsolute: number;
   hiCritical: number;

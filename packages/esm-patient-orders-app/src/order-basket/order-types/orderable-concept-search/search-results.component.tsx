@@ -166,11 +166,11 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useGenericOrderBasket(orderTypeUuid);
-  const { data, isLoading } = useOrderType(orderTypeUuid);
+  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
   const orderAlreadyInBasket = useMemo(
-    () => orders?.some((order) => matchOrder(data?.data?.javaClassName, order, concept)),
-    [orders, data, concept],
+    () => orders?.some((order) => matchOrder(orderType?.javaClassName, order, concept)),
+    [orders, orderType, concept],
   );
 
   // const createLabOrder = useCallback(

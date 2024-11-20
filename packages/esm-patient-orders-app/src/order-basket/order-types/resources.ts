@@ -1,6 +1,6 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import {
-  type LabOrderBasketItem,
+  type TestOrderBasketItem,
   type OrderBasketItem,
   type OrderTypeJavaClassName,
   prepOrderPostData,
@@ -124,6 +124,6 @@ export function matchOrder(javaClassName: OrderTypeJavaClassName, order: OrderBa
     // case 'org.openmrs.DrugOrder':
     //   return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
     case 'org.openmrs.TestOrder':
-      return (order as LabOrderBasketItem).testType.conceptUuid === concept.conceptUuid;
+      return (order as TestOrderBasketItem).testType.conceptUuid === concept.conceptUuid;
   }
 }

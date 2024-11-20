@@ -28,9 +28,8 @@ interface GenericOrderTypeProps {
 const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orderableConcepts, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { data, isLoading, error } = useOrderType(orderTypeUuid);
-  const conceptClass = data?.data?.conceptClasses?.[0]?.uuid;
-  const orderType = data?.data;
+  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
+  const conceptClass = orderType?.conceptClasses?.[0]?.uuid;
   const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
@@ -102,7 +101,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
     setIsExpanded(orders.length > 0);
   }, [orders]);
 
-  if (isLoading) {
+  if (isLoadingOrderType) {
     return null;
   }
 

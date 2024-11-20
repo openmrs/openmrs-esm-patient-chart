@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   resultsViewerConcepts: {
@@ -54,6 +55,31 @@ export const configSchema = {
     _description:
       'Whether to display the Lab Reference number field in the Lab Order form. This field maps to the accesion_number property in the Order data model',
   },
+  additionalOrderTypes: {
+    _type: Type.Array,
+    _description: '',
+    _elements: {
+      orderTypeUuid: {
+        _type: Type.UUID,
+        _description: 'UUID for the new order type',
+      },
+      orderableConceptSets: {
+        _type: Type.UUID,
+        _description:
+          'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderType` will be considered orderable.',
+      },
+    },
+    _default: [
+      {
+        orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
+        orderableConceptSets: [],
+      },
+      {
+        orderTypeUuid: '5338a5b1-2cbc-4081-9a9b-9e479e2acaad',
+        orderableConceptSets: [],
+      },
+    ],
+  },
   labTestsWithOrderReasons: {
     _type: Type.Array,
     _elements: {
@@ -105,5 +131,9 @@ export interface ConfigObject {
     labOrderableConcepts: Array<string>;
   };
   showLabReferenceNumberField: boolean;
+  additionalOrderTypes: Array<{
+    orderTypeUuid: string;
+    orderableConceptSets: Array<string>;
+  }>;
   resultsViewerConcepts: Array<ObsTreeEntry>;
 }

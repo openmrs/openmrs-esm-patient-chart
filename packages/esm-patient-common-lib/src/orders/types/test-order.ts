@@ -1,6 +1,6 @@
 import type { OrderBasketItem, OrderUrgency } from './order';
 
-export interface LabOrderBasketItem extends OrderBasketItem {
+export interface TestOrderBasketItem extends OrderBasketItem {
   testType?: {
     label: string;
     conceptUuid: string;

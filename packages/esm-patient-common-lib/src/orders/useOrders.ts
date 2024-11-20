@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
 import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import useSWRImmutable from 'swr/immutable';
 
 export type Status = 'ACTIVE' | 'any';
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -87,7 +88,19 @@ interface OrderTypeResponse {
 }
 
 export function useOrderType(orderTypeUuid: string) {
-  return useSWR<FetchResponse<OrderTypeResponse>>(`${restBaseUrl}/ordertype/${orderTypeUuid}`);
+  const { data, isLoading, isValidating, error } = useSWRImmutable<FetchResponse<OrderTypeResponse>>(
+    `${restBaseUrl}/ordertype/${orderTypeUuid}`,
+  );
+  const results = useMemo(
+    () => ({
+      isLoadingOrderType: isLoading,
+      orderType: data?.data,
+      errorFetchingOrderType: error,
+      isValidatingOrderType: isValidating,
+    }),
+    [data?.data, error, isLoading, isValidating],
+  );
+  return results;
 }
 
 export function getDrugOrderByUuid(orderUuid: string) {

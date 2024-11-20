@@ -136,7 +136,7 @@ function ConceptSearch({
   orderableConcepts,
 }: ConceptSearchProps) {
   const { t } = useTranslation();
-  const { data } = useOrderType(orderTypeUuid);
+  const { orderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
   const { debounceDelayInMs } = useConfig<ConfigObject>();
@@ -164,10 +164,10 @@ function ConceptSearch({
           autoFocus
           size="lg"
           placeholder={t('searchFieldOrder', 'Search for {{orderType}} order', {
-            orderType: data?.data?.display ?? '',
+            orderType: orderType?.display ?? '',
           })}
           labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
-            orderType: data?.data?.display ?? '',
+            orderType: orderType?.display ?? '',
           })}
           onChange={handleSearchTermChange}
           ref={searchInputRef}

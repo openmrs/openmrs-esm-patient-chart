@@ -12,30 +12,36 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { type TestType, useTestTypes } from './useTestTypes';
+import {
+  type TestOrderBasketItem,
+  launchPatientWorkspace,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
+import { type OrderableConcept, useOrderableConcepts } from './useOrderableConceptSets';
 import { prepLabOrderPostData } from '../api';
-import { createEmptyLabOrder } from './lab-order';
+import { createEmptyLabOrder } from './test-order';
 import styles from './test-type-search.scss';
 
-interface TestTypeSearchResultsProps {
+export interface TestTypeSearchProps {
+  openLabForm: (searchResult: TestOrderBasketItem) => void;
+  orderTypeUuid: string;
+  orderableConceptSets: Array<string>;
+}
+
+interface TestTypeSearchResultsProps extends TestTypeSearchProps {
   cancelOrder: () => void;
   searchTerm: string;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
 interface TestTypeSearchResultItemProps {
-  t: TFunction;
-  testType: TestType;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
+  orderTypeUuid: string;
+  testType: OrderableConcept;
+  openOrderForm: (searchResult: TestOrderBasketItem) => void;
 }
 
-export interface TestTypeSearchProps {
-  openLabForm: (searchResult: LabOrderBasketItem) => void;
-}
-
-export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
+export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets }: TestTypeSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -72,8 +78,10 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
       </ResponsiveWrapper>
       <TestTypeSearchResults
         cancelOrder={cancelOrder}
+        orderTypeUuid={orderTypeUuid}
+        orderableConceptSets={orderableConceptSets}
         focusAndClearSearchInput={focusAndClearSearchInput}
-        openOrderForm={openLabForm}
+        openLabForm={openLabForm}
         searchTerm={debouncedSearchTerm}
       />
     </>
@@ -83,26 +91,21 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
 function TestTypeSearchResults({
   cancelOrder,
   searchTerm,
-  openOrderForm,
+  orderTypeUuid,
+  orderableConceptSets,
+  openLabForm,
   focusAndClearSearchInput,
 }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { testTypes, isLoading, error } = useTestTypes();
+  const { orderType, isLoadingOrderType, errorFetchingOrderType } = useOrderType(orderTypeUuid);
+  const { orderableConcepts, isLoading, error } = useOrderableConcepts(
+    searchTerm,
+    orderType?.conceptClasses?.[0]?.uuid,
+    orderableConceptSets,
+  );
 
-  const filteredTestTypes = useMemo(() => {
-    if (!searchTerm) {
-      return testTypes;
-    }
-
-    if (searchTerm && searchTerm.trim() !== '') {
-      return testTypes?.filter((testType) =>
-        testType.synonyms.some((name) => name.toLowerCase().includes(searchTerm.toLowerCase())),
-      );
-    }
-  }, [searchTerm, testTypes]);
-
-  if (isLoading) {
+  if (isLoadingOrderType || isLoading) {
     return <TestTypeSearchSkeleton />;
   }
 
@@ -123,7 +126,7 @@ function TestTypeSearchResults({
     );
   }
 
-  if (filteredTestTypes?.length) {
+  if (orderableConcepts?.length) {
     return (
       <>
         <div className={styles.container}>
@@ -131,7 +134,7 @@ function TestTypeSearchResults({
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
                 {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
-                  count: filteredTestTypes?.length,
+                  count: orderableConcepts?.length,
                   searchTerm,
                 })}
               </span>
@@ -141,12 +144,12 @@ function TestTypeSearchResults({
             </div>
           )}
           <div className={styles.resultsContainer}>
-            {filteredTestTypes.map((testType) => (
+            {orderableConcepts.map((orderableConcept) => (
               <TestTypeSearchResultItem
-                key={testType.conceptUuid}
-                openOrderForm={openOrderForm}
-                t={t}
-                testType={testType}
+                key={orderableConcept.conceptUuid}
+                orderTypeUuid={orderTypeUuid}
+                openOrderForm={openLabForm}
+                testType={orderableConcept}
               />
             ))}
           </div>
@@ -183,10 +186,15 @@ function TestTypeSearchResults({
   );
 }
 
-const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, testType, openOrderForm }) => {
+const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
+  testType,
+  openOrderForm,
+  orderTypeUuid,
+}) => {
+  const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
 
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
@@ -194,8 +202,8 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ t, 
   );
 
   const createLabOrder = useCallback(
-    (testType: TestType) => {
-      return createEmptyLabOrder(testType, session.currentProvider?.uuid);
+    (orderableConcept: OrderableConcept) => {
+      return createEmptyLabOrder(orderableConcept, session.currentProvider?.uuid);
     },
     [session.currentProvider.uuid],
   );

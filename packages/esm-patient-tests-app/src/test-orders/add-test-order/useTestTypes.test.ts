@@ -3,7 +3,7 @@ import useSWRImmutable from 'swr/immutable';
 import { renderHook, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import { useTestTypes } from './useTestTypes';
+import { useOrderableConcepts } from './useOrderableConceptSets';
 
 jest.mock('swr/immutable');
 
@@ -41,17 +41,17 @@ mockOpenrsFetch.mockImplementation((url: string) => {
 
 describe('useTestTypes is configurable', () => {
   it('should return all test concepts when no labOrderableConcepts are provided', async () => {
-    const { result } = renderHook(() => useTestTypes());
+    const { result } = renderHook(() => useOrderableConcepts('', '', []));
     expect(mockOpenrsFetch).toHaveBeenCalledWith(
       `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     );
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBeFalsy();
-    expect(result.current.testTypes).toEqual([expect.objectContaining({ label: 'Test concept' })]);
+    expect(result.current.orderableConcepts).toEqual([expect.objectContaining({ label: 'Test concept' })]);
   });
 
   it('should return children of labOrderableConcepts when provided', async () => {
-    const { result } = renderHook(() => useTestTypes());
+    const { result } = renderHook(() => useOrderableConcepts('', '', []));
     expect(mockOpenrsFetch).toHaveBeenCalledWith(
       expect.stringContaining(
         `${restBaseUrl}/concept?class=Test?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
@@ -59,7 +59,7 @@ describe('useTestTypes is configurable', () => {
     );
     await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBeFalsy();
-    expect(result.current.testTypes).toEqual([
+    expect(result.current.orderableConcepts).toEqual([
       expect.objectContaining({ conceptUuid: undefined, label: 'Test concept' }),
     ]);
   });

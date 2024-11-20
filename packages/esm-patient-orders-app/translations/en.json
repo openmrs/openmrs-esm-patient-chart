@@ -83,7 +83,7 @@
   "saving": "Saving",
   "searchAgain": "search again",
   "searchConcepts": "Search concepts",
-  "searchFieldPlaceholder": "Search for a drug or orderset (e.g. \"Aspirin\")",
+  "searchFieldOrder": "Search for {{orderType}} order",
   "searchResultsMatchesForTerm_one": "{{count}} results for \"{{searchTerm}}\"",
   "searchResultsMatchesForTerm_other": "{{count}} results for \"{{searchTerm}}\"",
   "searchTable": "Search table",

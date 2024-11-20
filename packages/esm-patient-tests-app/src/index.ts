@@ -44,13 +44,13 @@ export const testResultsDashboardLink =
   );
 
 export const labOrderPanel = getAsyncLifecycle(
-  () => import('./lab-orders/lab-order-basket-panel/lab-order-basket-panel.extension'),
+  () => import('./test-orders/lab-order-basket-panel/lab-order-basket-panel.extension'),
   options,
 );
 
 // t('addLabOrderWorkspaceTitle', 'Add lab order')
 export const addLabOrderWorkspace = getAsyncLifecycle(
-  () => import('./lab-orders/add-lab-order/add-lab-order.workspace'),
+  () => import('./test-orders/add-test-order/add-test-order.workspace'),
   options,
 );
 

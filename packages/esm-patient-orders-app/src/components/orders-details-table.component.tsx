@@ -35,7 +35,7 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
   type DrugOrderBasketItem,
-  type LabOrderBasketItem,
+  type TestOrderBasketItem,
   type Order,
   type OrderBasketItem,
   type OrderType,
@@ -95,7 +95,7 @@ interface DataTableRow {
   isExpanded: boolean;
 }
 
-type MutableOrderBasketItem = OrderBasketItem | LabOrderBasketItem | DrugOrderBasketItem;
+type MutableOrderBasketItem = OrderBasketItem | TestOrderBasketItem | DrugOrderBasketItem;
 
 const medicationsOrderBasket = 'medications';
 const labsOrderBasket = 'labs';
@@ -134,7 +134,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
           launchAddDrugOrder({ order: buildMedicationOrder(orderItem, 'REVISE') });
           break;
         case 'testorder':
-          launchModifyLabOrder({ order: buildLabOrder(orderItem, 'REVISE') });
+          launchModifyLabOrder({
+            order: buildLabOrder(orderItem, 'REVISE'),
+            orderTypeUuid: orderItem?.orderType?.uuid,
+          });
           break;
         default:
           launchOrderBasket();

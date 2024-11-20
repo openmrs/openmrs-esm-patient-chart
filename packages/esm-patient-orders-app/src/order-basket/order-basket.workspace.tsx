@@ -120,7 +120,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             })}
             name="order-basket-slot"
           />
-          {config?.orderTypes?.length &&
+          {config?.orderTypes?.length > 0 &&
             config?.orderTypes?.map((orderType) => (
               <GenericOrderType
                 key={orderType.orderTypeUuid}
