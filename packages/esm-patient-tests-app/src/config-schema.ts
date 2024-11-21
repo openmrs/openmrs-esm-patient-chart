@@ -48,7 +48,7 @@ export const configSchema = {
       _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
-  showLabReferenceNumberInput: {
+  showLabReferenceNumberField: {
     _type: Type.Boolean,
     _default: true,
     _description:
