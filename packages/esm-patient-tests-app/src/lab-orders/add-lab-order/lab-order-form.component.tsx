@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
-  type LabOrderBasketItem,
   type DefaultPatientWorkspaceProps,
+  type LabOrderBasketItem,
   launchPatientWorkspace,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { prepLabOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
@@ -182,29 +182,31 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="accessionNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      invalid={!!errors.accessionNumber}
-                      invalidText={errors.accessionNumber?.message}
-                      labelText={t('labReferenceNumber', 'Lab reference number')}
-                      maxLength={150}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      size={responsiveSize}
-                      value={value}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
+          {config.showLabReferenceNumberField ? (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="accessionNumber"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        id="labReferenceNumberInput"
+                        invalid={!!errors.accessionNumber}
+                        invalidText={errors.accessionNumber?.message}
+                        labelText={t('labReferenceNumber', 'Lab reference number')}
+                        maxLength={150}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        size={responsiveSize}
+                        value={value}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          ) : null}
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>

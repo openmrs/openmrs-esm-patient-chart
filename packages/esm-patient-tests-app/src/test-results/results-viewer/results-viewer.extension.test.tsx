@@ -10,6 +10,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();
 
 mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
   resultsViewerConcepts: [
     {
       conceptUuid: '9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7',
