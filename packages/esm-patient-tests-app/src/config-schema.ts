@@ -52,7 +52,7 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'A boolean config, that determines whether the order lab reference number input is displayed or not, default value is true',
+      'Whether to display the Lab Reference number input in the Lab Order form. This field maps to the accesion_number property in the Order data model',
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
