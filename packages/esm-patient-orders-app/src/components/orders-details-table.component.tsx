@@ -75,7 +75,7 @@ interface OrderBasketItemActionsProps {
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
   responsiveSize: string;
-  setOrderItems: (orderType: 'labs' | 'medications', items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (orderType: string, items: Array<MutableOrderBasketItem>) => void;
 }
 
 interface OrderHeaderProps {
@@ -602,7 +602,7 @@ function OrderBasketItemActions({
         });
     } else {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrderItems(labsOrderBasket, [...items, labItem]);
+      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
       openOrderForm({ order: labItem });
     }
   }, [orderItem, openOrderForm, items, setOrderItems]);
@@ -619,7 +619,7 @@ function OrderBasketItemActions({
         openOrderBasket();
       });
     } else {
-      setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      setOrderItems(orderItem.orderType.uuid, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     }
   }, [orderItem, items, setOrderItems, openOrderBasket]);

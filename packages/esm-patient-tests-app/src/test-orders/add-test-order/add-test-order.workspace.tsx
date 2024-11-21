@@ -42,7 +42,6 @@ export default function AddLabOrderWorkspace({
   promptBeforeClosing,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
-  const { orderType, isLoadingOrderType, errorFetchingOrderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
   const { patientUuid } = usePatientChartStore();
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
