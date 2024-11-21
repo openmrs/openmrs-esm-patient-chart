@@ -52,7 +52,7 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'Whether to display the Lab Reference number input in the Lab Order form. This field maps to the accesion_number property in the Order data model',
+      'Whether to display the Lab Reference number field in the Lab Order form. This field maps to the accesion_number property in the Order data model',
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
@@ -104,6 +104,6 @@ export interface ConfigObject {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
   };
-  showLabReferenceNumberInput: boolean;
+  showLabReferenceNumberField: boolean;
   resultsViewerConcepts: Array<ObsTreeEntry>;
 }

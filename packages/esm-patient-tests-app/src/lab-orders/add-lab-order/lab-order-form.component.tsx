@@ -182,7 +182,7 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          {config.showLabReferenceNumberInput ? (
+          {config.showLabReferenceNumberField ? (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
                 <InputWrapper>
