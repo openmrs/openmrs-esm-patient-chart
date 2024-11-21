@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
-import { type ConfigObject } from '../../config-schema';
+import { type ConfigObject, configSchema } from '../../config-schema';
 import { type FilterContextProps } from '../filter/filter-types';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import TreeViewWrapper from './tree-view-wrapper.component';
@@ -69,6 +69,7 @@ describe('TreeViewWrapper', () => {
     });
 
     mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
       resultsViewerConcepts: [
         {
           conceptUuid: '9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7',
