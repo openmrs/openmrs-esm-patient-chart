@@ -11,6 +11,7 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
+  useLocations,
   usePatient,
   useVisitTypes,
   type FetchResponse,
@@ -18,6 +19,7 @@ import {
 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
+import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
 
@@ -65,6 +67,8 @@ const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 const mockUsePatient = jest.mocked(usePatient);
+const mockUseLocations = jest.mocked(useLocations);
+const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -126,26 +130,18 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
   })),
 }));
 
-jest.mock('../hooks/useDefaultLocation', () => {
-  const requireActual = jest.requireActual('../hooks/useDefaultLocation');
+jest.mock('../hooks/useEmrConfiguration', () => ({
+  useEmrConfiguration: jest.fn(() => ({})),
+}));
+
+jest.mock('../hooks/useDefaultFacilityLocation', () => {
+  const requireActual = jest.requireActual('../hooks/useDefaultFacilityLocation');
 
   return {
     ...requireActual,
     useDefaultLoginLocation: jest.fn(() => ({
       defaultFacility: null,
       isLoading: false,
-    })),
-  };
-});
-
-jest.mock('../hooks/useLocations', () => {
-  const requireActual = jest.requireActual('../hooks/useLocations');
-  return {
-    ...requireActual,
-    useLocations: jest.fn(() => ({
-      locations: mockLocations,
-      isLoading: false,
-      error: null,
     })),
   };
 });
@@ -174,6 +170,15 @@ describe('Visit form', () => {
       patientUuid: mockPatient.id,
     });
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+    mockUseLocations.mockReturnValue(mockLocations);
+    mockUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: {
+        atFacilityVisitType: null,
+      },
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+      mutateEmrConfiguration: null,
+    });
   });
 
   it('renders the Start Visit form with all the relevant fields and values', async () => {
@@ -197,6 +202,21 @@ describe('Visit form', () => {
     await userEvent.click(combobox);
     expect(screen.getByText(/Mosoriot/i)).toBeInTheDocument();
     expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
+  });
+
+  it('does not render visit type combo box if atFacilityVisitType set', async () => {
+    mockUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: {
+        atFacilityVisitType: {
+          uuid: 'some-uuid1',
+        },
+      },
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+      mutateEmrConfiguration: null,
+    });
+    renderVisitForm();
+    expect(screen.queryByRole('radio', { name: /HIV Return Visit/ })).not.toBeInTheDocument();
   });
 
   it('renders a validation error when required fields are not filled', async () => {
