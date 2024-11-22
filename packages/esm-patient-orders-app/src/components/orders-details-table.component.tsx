@@ -24,6 +24,8 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
+  DatePicker,
+  DatePickerInput,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -114,13 +116,15 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
+  const [selectedFromDate, setSelectedFromDate] = useState(null);
+  const [selectedToDate, setSelectedToDate] = useState(null);
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
   const {
     data: allOrders,
     error: error,
     isLoading,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid, selectedFromDate, selectedToDate);
 
   // launch respective order basket based on order type
   const openOrderForm = useCallback(
@@ -303,25 +307,55 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     [orderTypes, t],
   );
 
+  const handleDateFilterChange = ([startDate, endDate]) => {
+    if (startDate) {
+      const isoStartDate = startDate.toISOString();
+      setSelectedFromDate(isoStartDate);
+      if (selectedToDate && selectedToDate < startDate) {
+        setSelectedToDate(isoStartDate);
+      }
+    }
+    if (endDate) {
+      const isoEndDate = endDate.toISOString();
+      setSelectedToDate(isoEndDate);
+      if (selectedFromDate && selectedFromDate > endDate) {
+        setSelectedFromDate(isoEndDate);
+      }
+    }
+  };
   return (
     <>
-      <div className={styles.dropdownContainer}>
-        <Dropdown
-          id="orderTypeDropdown"
-          items={orderTypesToDisplay}
-          itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
-          label={t('allOrders', 'All orders')}
-          onChange={(e: { selectedItem: Order }) => {
-            if (e.selectedItem.display === 'All') {
-              setSelectedOrderTypeUuid(null);
-              return;
-            }
-            setSelectedOrderTypeUuid(e.selectedItem.uuid);
+      <div className={styles.filterContainer}>
+        <div className={styles.dropdownContainer}>
+          <Dropdown
+            id="orderTypeDropdown"
+            items={orderTypesToDisplay}
+            itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+            label={t('allOrders', 'All orders')}
+            onChange={(e: { selectedItem: OrderType }) => {
+              if (e.selectedItem.display === 'All') {
+                setSelectedOrderTypeUuid(null);
+                return;
+              }
+              setSelectedOrderTypeUuid(e.selectedItem.uuid);
+            }}
+            selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
+            titleText={t('selectOrderType', 'Select order type') + ':'}
+            type="inline"
+          />
+        </div>
+        <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
+        <DatePicker
+          datePickerType="range"
+          dateFormat={'d/m/Y'}
+          value={''}
+          onChange={([startDate, endDate]) => {
+            handleDateFilterChange([startDate, endDate]);
           }}
-          selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
-          titleText={t('selectOrderType', 'Select order type') + ':'}
-          type="inline"
-        />
+        >
+          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" />
+          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" />
+        </DatePicker>
       </div>
 
       {(() => {
