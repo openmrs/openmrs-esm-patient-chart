@@ -57,52 +57,6 @@ export function usePatientOrders(
   };
 }
 
-export function useOrderTypes() {
-  const orderTypesUrl = `${restBaseUrl}/ordertype`;
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<OrderTypeFetchResponse>, Error>(
-    orderTypesUrl,
-    openmrsFetch,
-  );
-
-  return {
-    data: data?.data?.results ?? null,
-    error,
-    isLoading,
-    isValidating,
-  };
-}
-
-export type OrderTypeJavaClassName = 'org.openmrs.Order' | 'org.openmrs.TestOrder' | 'org.openmrs.DrugOrder';
-
-interface OrderTypeResponse {
-  uuid: string;
-  display: string;
-  name: string;
-  javaClassName: OrderTypeJavaClassName;
-  retired: false;
-  description: string;
-  conceptClasses: Array<{
-    uuid: string;
-    display: string;
-  }>;
-}
-
-export function useOrderType(orderTypeUuid: string) {
-  const { data, isLoading, isValidating, error } = useSWRImmutable<FetchResponse<OrderTypeResponse>>(
-    `${restBaseUrl}/ordertype/${orderTypeUuid}`,
-  );
-  const results = useMemo(
-    () => ({
-      isLoadingOrderType: isLoading,
-      orderType: data?.data,
-      errorFetchingOrderType: error,
-      isValidatingOrderType: isValidating,
-    }),
-    [data?.data, error, isLoading, isValidating],
-  );
-  return results;
-}
-
 export function getDrugOrderByUuid(orderUuid: string) {
   return openmrsFetch(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
 }

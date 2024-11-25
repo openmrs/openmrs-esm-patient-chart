@@ -20,7 +20,6 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
-  // TODO: This is unused
   startDate: Date | string;
   durationUnit: DurationUnit;
   duration: number | null;
