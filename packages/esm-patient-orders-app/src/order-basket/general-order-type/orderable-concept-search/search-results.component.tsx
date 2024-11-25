@@ -24,7 +24,7 @@ interface OrderableConceptSearchResultsProps {
   openOrderForm: (order: OrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
   cancelOrder: () => void;
-  conceptClasses: Array<string>;
+  orderableConceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
@@ -35,14 +35,18 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   openOrderForm,
   focusAndClearSearchInput,
   cancelOrder,
-  conceptClasses,
+  orderableConceptClasses,
   orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, conceptClasses, orderableConceptSets);
+  const { concepts, isLoading, error } = useOrderableConceptSets(
+    searchTerm,
+    orderableConceptClasses,
+    orderableConceptSets,
+  );
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;

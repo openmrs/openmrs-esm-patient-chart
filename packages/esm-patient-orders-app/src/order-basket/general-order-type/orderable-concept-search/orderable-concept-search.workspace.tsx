@@ -28,7 +28,7 @@ import { prepOrderPostData } from '../resources';
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
   order: OrderBasketItem;
   orderTypeUuid: string;
-  conceptClasses: Array<string>;
+  orderableConceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
 }
 
@@ -45,7 +45,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   orderTypeUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  conceptClasses,
+  orderableConceptClasses,
   orderableConceptSets,
   promptBeforeClosing,
 }) => {
@@ -105,7 +105,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
         <ConceptSearch
           openOrderForm={openOrderForm}
           closeWorkspace={closeWorkspace}
-          conceptClasses={conceptClasses}
+          orderableConceptClasses={orderableConceptClasses}
           orderableConceptSets={orderableConceptSets}
           orderTypeUuid={orderTypeUuid}
         />
@@ -118,7 +118,7 @@ interface ConceptSearchProps {
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
   openOrderForm: (search: OrderBasketItem) => void;
   orderTypeUuid: string;
-  conceptClasses: Array<string>;
+  orderableConceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
 }
 
@@ -126,7 +126,7 @@ function ConceptSearch({
   closeWorkspace,
   orderTypeUuid,
   openOrderForm,
-  conceptClasses,
+  orderableConceptClasses,
   orderableConceptSets,
 }: ConceptSearchProps) {
   const { t } = useTranslation();
@@ -174,7 +174,7 @@ function ConceptSearch({
         closeWorkspace={closeWorkspace}
         orderTypeUuid={orderTypeUuid}
         cancelOrder={() => {}}
-        conceptClasses={conceptClasses}
+        orderableConceptClasses={orderableConceptClasses}
         orderableConceptSets={orderableConceptSets}
       />
       {isTablet && (

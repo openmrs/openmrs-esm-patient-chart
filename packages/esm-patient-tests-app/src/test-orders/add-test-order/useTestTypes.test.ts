@@ -26,7 +26,11 @@ mockUseSWRImmutable.mockImplementation((keyFcn: () => any, fetcher: any) => {
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  orders: { labOrderableConcepts: [], labOrderTypeUuid: 'lab-order-type-uuid' },
+  orders: {
+    labOrderableConcepts: [],
+    labOrderTypeUuid: 'lab-order-type-uuid',
+    labOrderConceptClasses: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
+  },
 });
 
 mockOpenrsFetch.mockImplementation((url: string) => {

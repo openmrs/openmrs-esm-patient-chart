@@ -20,11 +20,13 @@ export function useTestTypes(
 
   const results = useMemo(
     () => ({
-      testTypes: concepts.map(({ display, uuid, synonyms }) => ({
-        label: display,
-        conceptUuid: uuid,
-        synonyms,
-      })),
+      testTypes: concepts
+        ? concepts.map(({ display, uuid, synonyms }) => ({
+            label: display,
+            conceptUuid: uuid,
+            synonyms,
+          }))
+        : [],
       isLoading,
       error,
     }),

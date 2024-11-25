@@ -21,7 +21,7 @@ import { prepOrderPostData } from './resources';
 
 interface GeneralOrderTypeProps {
   orderTypeUuid: string;
-  conceptClasses: Array<string>;
+  orderableConceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
@@ -29,13 +29,15 @@ interface GeneralOrderTypeProps {
 const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
   orderTypeUuid,
   orderableConceptSets,
-  conceptClasses,
+  orderableConceptClasses,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const orderableConceptClasses = conceptClasses ?? orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [];
+  const conceptClasses = orderableConceptClasses?.length
+    ? orderableConceptClasses
+    : orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [];
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -80,7 +82,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
       onWorkspaceClose: () =>
         launchPatientWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
-          orderableConceptClasses,
+          orderableConceptClasses: conceptClasses,
           orderableConceptSets,
         }),
     });
@@ -89,7 +91,13 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
   const openOrderForm = (order: DrugOrderBasketItem) => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('orderable-concept-workspace', { order }),
+      onWorkspaceClose: () =>
+        launchPatientWorkspace('orderable-concept-workspace', {
+          order,
+          orderTypeUuid,
+          orderableConceptClasses: conceptClasses,
+          orderableConceptSets,
+        }),
     });
   };
 

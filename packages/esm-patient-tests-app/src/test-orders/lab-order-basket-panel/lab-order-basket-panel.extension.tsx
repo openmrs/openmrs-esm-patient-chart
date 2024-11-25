@@ -59,8 +59,11 @@ function LabOrderBasketPanel({
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const conceptClasses = useMemo(
-    () => orderableConceptClasses ?? orderType.conceptClasses.map(({ uuid }) => uuid) ?? [],
-    [orderType.conceptClasses, orderableConceptClasses],
+    () =>
+      orderableConceptClasses?.length > 0
+        ? orderableConceptClasses
+        : orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [],
+    [orderType?.conceptClasses, orderableConceptClasses],
   );
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
