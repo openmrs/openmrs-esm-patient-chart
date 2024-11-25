@@ -84,7 +84,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
   const openOrderForm = (order: DrugOrderBasketItem) => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
+      onWorkspaceClose: () => launchPatientWorkspace('orderable-concept-workspace', { order }),
     });
   };
 

@@ -1,5 +1,10 @@
 import React, { type ComponentProps, useCallback } from 'react';
-import { launchPatientWorkspace, useOrderType, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import {
+  launchPatientWorkspace,
+  useOrderBasket,
+  useOrderType,
+  type OrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRightIcon,
@@ -16,7 +21,13 @@ import { Button } from '@carbon/react';
 import { SkeletonText } from '@carbon/react';
 import { ButtonSkeleton } from '@carbon/react';
 import styles from './search-results.scss';
-import { type ConceptType, matchOrder, useGenericOrderBasket, useOrderableConcepts } from '../resources';
+import {
+  createEmptyOrder,
+  matchOrder,
+  type OrderableConcept,
+  prepOrderPostData,
+  useOrderableConcepts,
+} from '../resources';
 
 interface OrderableConceptSearchResultsProps {
   searchTerm: string;
@@ -84,7 +95,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
           <div className={styles.resultsContainer}>
             {concepts.map((concept) => (
               <TestTypeSearchResultItem
-                key={concept.conceptUuid}
+                key={concept.uuid}
                 openOrderForm={openOrderForm}
                 concept={concept}
                 orderTypeUuid={orderTypeUuid}
@@ -150,7 +161,7 @@ const TestTypeSearchSkeleton = () => {
 };
 
 interface TestTypeSearchResultItemProps {
-  concept: ConceptType;
+  concept: OrderableConcept;
   openOrderForm: (searchResult: OrderBasketItem) => void;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
@@ -165,7 +176,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useGenericOrderBasket(orderTypeUuid);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
   const orderAlreadyInBasket = useMemo(
@@ -173,26 +184,26 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     [orders, orderType, concept],
   );
 
-  // const createLabOrder = useCallback(
-  //   (testType: TestType) => {
-  //     return createEmptyLabOrder(testType, session.currentProvider?.uuid);
-  //   },
-  //   [session.currentProvider.uuid],
-  // );
+  const createOrderBasketItem = useCallback(
+    (testType: OrderableConcept) => {
+      return createEmptyOrder(testType, session.currentProvider?.uuid);
+    },
+    [session.currentProvider.uuid],
+  );
 
-  // const addToBasket = useCallback(() => {
-  //   const labOrder = createLabOrder(testType);
-  //   labOrder.isOrderIncomplete = true;
-  //   setOrders([...orders, labOrder]);
-  //   closeWorkspace({
-  //     ignoreChanges: true,
-  //     onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
-  //   });
-  // }, [orders, setOrders, createLabOrder, testType, closeWorkspace]);
+  const addToBasket = useCallback(() => {
+    const orderBasketItem = createOrderBasketItem(concept);
+    orderBasketItem.isOrderIncomplete = true;
+    setOrders([...orders, orderBasketItem]);
+    closeWorkspace({
+      ignoreChanges: true,
+      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+    });
+  }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace]);
 
-  // const removeFromBasket = useCallback(() => {
-  //   setOrders(orders.filter((order) => order.testType.conceptUuid !== testType.conceptUuid));
-  // }, [orders, setOrders, testType.conceptUuid]);
+  const removeFromBasket = useCallback(() => {
+    setOrders(orders.filter((order) => order?.concept?.uuid !== concept?.uuid));
+  }, [setOrders, orders, concept?.uuid]);
 
   return (
     <Tile
@@ -201,11 +212,11 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
         <p>
-          <span className={styles.heading}>{concept.label}</span>{' '}
+          <span className={styles.heading}>{concept.display}</span>{' '}
         </p>
       </div>
       <div className={styles.searchResultActions}>
-        {/* {testTypeAlreadyInBasket ? (
+        {orderAlreadyInBasket ? (
           <Button
             kind="danger--ghost"
             renderIcon={(props) => <ShoppingCartArrowUp size={16} {...props} />}
@@ -223,11 +234,11 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
           >
             {t('directlyAddToBasket', 'Add to basket')}
           </Button>
-        )} */}
+        )}
         <Button
           kind="ghost"
           renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-          // onClick={() => openOrderForm(createLabOrder(testType))}
+          onClick={() => openOrderForm(createOrderBasketItem(concept))}
         >
           {t('goToDrugOrderForm', 'Order form')}
         </Button>

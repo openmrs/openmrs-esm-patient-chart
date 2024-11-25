@@ -15,5 +15,6 @@ export const genericPostDataPrepFunction: PostDataPrepFunction = (order, patient
     ...order,
     patient: patientUuid,
     encounter: encounterUuid,
+    concept: order?.concept?.uuid,
   };
 };

@@ -56,11 +56,12 @@ import {
   usePagination,
   usePatient,
 } from '@openmrs/esm-framework';
-import { buildLabOrder, buildMedicationOrder } from '../utils';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
+import GeneralOrderTable from './general-order-table.component';
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -109,6 +110,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
   const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
+  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -139,11 +141,17 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             orderTypeUuid: orderItem?.orderType?.uuid,
           });
           break;
+        case 'order':
+          launchModifyGeneralOrder({
+            order: buildGeneralOrder(orderItem, 'REVISE'),
+            orderTypeUuid: orderItem?.orderType?.uuid,
+          });
+          break;
         default:
           launchOrderBasket();
       }
     },
-    [launchAddDrugOrder, launchModifyLabOrder, launchOrderBasket],
+    [launchAddDrugOrder, launchModifyGeneralOrder, launchModifyLabOrder, launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -521,6 +529,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                                 return <MedicationRecord medication={matchingOrder} />;
                                               } else if (matchingOrder?.type === 'testorder') {
                                                 return <TestOrder testOrder={matchingOrder} />;
+                                              } else if (matchingOrder?.type === 'order') {
+                                                return <GeneralOrderTable order={matchingOrder} />;
                                               } else {
                                                 return (
                                                   <span className={styles.unknownOrderTypeText}>
@@ -600,10 +610,14 @@ function OrderBasketItemActions({
         .catch((e) => {
           console.error('Error modifying drug order: ', e);
         });
-    } else {
+    } else if (orderItem.type === 'testorder') {
       const labItem = buildLabOrder(orderItem, 'REVISE');
       setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
       openOrderForm({ order: labItem });
+    } else {
+      const order = buildGeneralOrder(orderItem, 'REVISE');
+      setOrderItems(orderItem.orderType.uuid, [...items, order]);
+      openOrderForm({ order });
     }
   }, [orderItem, openOrderForm, items, setOrderItems]);
 

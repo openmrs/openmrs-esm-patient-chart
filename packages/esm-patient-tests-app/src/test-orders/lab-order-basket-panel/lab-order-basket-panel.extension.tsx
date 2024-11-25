@@ -35,6 +35,7 @@ export default function LabOrderBasketPanelExtension() {
     },
     ...additionalOrderTypes,
   ];
+
   return (
     <>
       {allOrderTypes.map(({ orderTypeUuid, orderableConceptSets }) => (
@@ -122,7 +123,7 @@ function LabOrderBasketPanel({ orderTypeUuid, orderableConceptSets }: LabOrderBa
     setIsExpanded(orders.length > 0);
   }, [orders]);
 
-  if (isLoadingOrderType) {
+  if (isLoadingOrderType || orderType.javaClassName !== 'org.openmrs.TestOrder') {
     return null;
   }
 

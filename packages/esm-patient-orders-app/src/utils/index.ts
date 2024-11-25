@@ -1,4 +1,10 @@
-import { type DrugOrderBasketItem, type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
+import {
+  type TestOrderBasketItem,
+  type DrugOrderBasketItem,
+  type Order,
+  type OrderAction,
+  type OrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
@@ -69,7 +75,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
 /**
  * Builds lab order object from the given order object
  */
-export function buildLabOrder(order: Order, action?: OrderAction) {
+export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBasketItem {
   return {
     action: action,
     display: order.display,
@@ -84,8 +90,29 @@ export function buildLabOrder(order: Order, action?: OrderAction) {
       conceptUuid: order.concept.uuid,
     },
     orderNumber: order.orderNumber,
-    concept: order.concept.uuid,
+    concept: {
+      uuid: order.concept.uuid,
+    },
     orderType: order.orderType.uuid,
     specimenSource: null,
+  };
+}
+
+/**
+ * Builds general order object from the given order object
+ */
+export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBasketItem {
+  return {
+    action: action,
+    display: order.display,
+    previousOrder: action !== 'NEW' ? order.uuid : null,
+    orderer: order.orderer.uuid,
+    careSetting: order.careSetting.uuid,
+    instructions: order.instructions,
+    urgency: order.urgency,
+    accessionNumber: order.accessionNumber,
+    concept: order.concept,
+    orderNumber: order.orderNumber,
+    orderType: order.orderType.uuid,
   };
 }

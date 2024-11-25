@@ -1,5 +1,6 @@
 import {
   ArrowLeftIcon,
+  launchWorkspace,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
@@ -13,6 +14,7 @@ import {
   prepOrderPostData,
   useOrderBasket,
   useOrderType,
+  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +23,7 @@ import { Button } from '@carbon/react';
 import { Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
 import { type ConfigObject } from '../../../config-schema';
+import { OrderForm } from '../order-form/order-form.component';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
   order: OrderBasketItem;
@@ -44,13 +47,15 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   closeWorkspaceWithSavedChanges,
   conceptClass,
   orderableConcepts,
+  promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
+  const { patientUuid } = usePatientChartStore();
 
-  // const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
@@ -60,13 +65,13 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   }, [closeWorkspace]);
 
   const openOrderForm = useCallback(
-    (searchResult: OrderBasketItem) => {
-      const existingOrder = orders.find((order) => ordersEqual(order, searchResult));
-      // if (existingOrder) {
-      //   setCurrentOrder(existingOrder);
-      // } else {
-      //   setCurrentOrder(searchResult);
-      // }
+    (order: OrderBasketItem) => {
+      const existingOrder = orders.find((prevOrder) => ordersEqual(prevOrder, order));
+      if (existingOrder) {
+        setCurrentOrder(existingOrder);
+      } else {
+        setCurrentOrder(order);
+      }
     },
     [orders],
   );
@@ -95,7 +100,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   );
 
   return (
-    <>
+    <div className={styles.workspaceWrapper}>
       {!isTablet && (
         <div className={styles.backButton}>
           <Button
@@ -109,14 +114,27 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           </Button>
         </div>
       )}
-      <ConceptSearch
-        openOrderForm={openOrderForm}
-        closeWorkspace={closeWorkspace}
-        conceptClass={conceptClass}
-        orderableConcepts={orderableConcepts}
-        orderTypeUuid={orderTypeUuid}
-      />
-    </>
+      {currentOrder ? (
+        <OrderForm
+          initialOrder={currentOrder}
+          closeWorkspace={closeWorkspace}
+          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+          promptBeforeClosing={promptBeforeClosing}
+          orderTypeUuid={orderTypeUuid}
+          orderableConceptSets={orderableConcepts}
+          patientUuid={patientUuid}
+          setTitle={() => {}}
+        />
+      ) : (
+        <ConceptSearch
+          openOrderForm={openOrderForm}
+          closeWorkspace={closeWorkspace}
+          conceptClass={conceptClass}
+          orderableConcepts={orderableConcepts}
+          orderTypeUuid={orderTypeUuid}
+        />
+      )}
+    </div>
   );
 };
 

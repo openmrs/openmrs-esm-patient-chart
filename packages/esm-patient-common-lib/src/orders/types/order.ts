@@ -44,6 +44,12 @@ export interface OrderBasketItem {
    * An optional identifier from the fulfiller (e.g., lab system) for the specimen or record associated with the order.
    */
   accessionNumber?: string;
+  concept?: OpenmrsResource;
+  instructions?: string;
+  urgency?: OrderUrgency;
+  previousOrder?: string;
+  orderType?: string;
+  orderNumber?: string;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';

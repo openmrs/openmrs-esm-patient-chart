@@ -70,14 +70,14 @@ export const configSchema = {
       },
     },
     _default: [
-      {
-        orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
-        orderableConceptSets: [],
-      },
-      {
-        orderTypeUuid: '5338a5b1-2cbc-4081-9a9b-9e479e2acaad',
-        orderableConceptSets: [],
-      },
+      // {
+      //   orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
+      //   orderableConceptSets: [],
+      // },
+      // {
+      //   orderTypeUuid: '5338a5b1-2cbc-4081-9a9b-9e479e2acaad',
+      //   orderableConceptSets: [],
+      // },
     ],
   },
   labTestsWithOrderReasons: {
