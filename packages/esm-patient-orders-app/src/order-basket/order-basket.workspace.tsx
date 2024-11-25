@@ -14,7 +14,7 @@ import {
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
-import GenericOrderType from './order-types/generic-order-type.component';
+import GeneralOrderType from './general-order-type/general-order-type.component';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -122,7 +122,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           />
           {config?.orderTypes?.length > 0 &&
             config.orderTypes.map((orderType) => (
-              <GenericOrderType
+              <GeneralOrderType
                 key={orderType.orderTypeUuid}
                 orderTypeUuid={orderType.orderTypeUuid}
                 orderableConceptSets={orderType.orderableConceptSets}

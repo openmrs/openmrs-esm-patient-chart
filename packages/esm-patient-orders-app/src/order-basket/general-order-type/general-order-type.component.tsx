@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
-import styles from './generic-order-panel.scss';
+import styles from './general-order-panel.scss';
 import {
   AddIcon,
   ChevronDownIcon,
@@ -19,13 +19,13 @@ import {
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import { prepOrderPostData } from './resources';
 
-interface GenericOrderTypeProps {
+interface GeneralOrderTypeProps {
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orderableConceptSets, closeWorkspace }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, orderableConceptSets, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -211,4 +211,4 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
   );
 };
 
-export default GenericOrderType;
+export default GeneralOrderType;

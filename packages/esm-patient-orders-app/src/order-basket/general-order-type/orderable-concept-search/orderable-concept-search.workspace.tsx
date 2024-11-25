@@ -22,7 +22,7 @@ import { Button } from '@carbon/react';
 import { Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
 import { type ConfigObject } from '../../../config-schema';
-import { OrderForm } from '../order-form/order-form.component';
+import { OrderForm } from '../general-order-form/order-form.component';
 import { prepOrderPostData } from '../resources';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {

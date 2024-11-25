@@ -58,6 +58,6 @@ export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);
 
 // t('searchOrderables','Search orderables')
 export const orderableConceptSearch = getAsyncLifecycle(
-  () => import('./order-basket/order-types/orderable-concept-search/orderable-concept-search.workspace'),
+  () => import('./order-basket/general-order-type/orderable-concept-search/orderable-concept-search.workspace'),
   options,
 );
