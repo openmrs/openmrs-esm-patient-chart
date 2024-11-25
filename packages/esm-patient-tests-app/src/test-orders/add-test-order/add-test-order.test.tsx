@@ -87,8 +87,6 @@ function renderAddLabOrderWorkspace() {
       patientUuid={ptUuid}
       setTitle={jest.fn()}
       orderTypeUuid=""
-      orderableConceptSets={[]}
-      orderableConceptClasses={[]}
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };

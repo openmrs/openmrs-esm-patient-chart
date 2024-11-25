@@ -34,7 +34,7 @@ export const configSchema = {
       orderableConceptClasses: {
         _type: Type.Array,
         _description:
-          'The concept class of the orderable concepts. By default it will look for concept class in the order type properties',
+          'The concept class of the orderable concepts. By default it will look for concept class in the order type response',
         _elements: {
           _type: Type.UUID,
         },

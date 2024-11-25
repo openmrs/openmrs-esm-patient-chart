@@ -1,11 +1,9 @@
 import {
   ArrowLeftIcon,
-  launchWorkspace,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
   useLayoutType,
-  useSession,
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
 import {
@@ -22,7 +20,7 @@ import { Button } from '@carbon/react';
 import { Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
 import { type ConfigObject } from '../../../config-schema';
-import { OrderForm } from '../general-order-form/order-form.component';
+import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
@@ -45,17 +43,29 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   orderTypeUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  orderableConceptClasses,
-  orderableConceptSets,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
+  const { orders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const { patientUuid } = usePatientChartStore();
+  const { orderType } = useOrderType(orderTypeUuid);
+  const { orderTypes } = useConfig<ConfigObject>();
 
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const session = useSession();
+
+  const { orderableConceptClasses, orderableConceptSets } = useMemo(
+    () => orderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid),
+    [orderTypeUuid, orderTypes],
+  );
+
+  const conceptClasses = useMemo(
+    () =>
+      orderableConceptClasses?.length
+        ? orderableConceptClasses
+        : orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [],
+    [orderType?.conceptClasses, orderableConceptClasses],
+  );
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
@@ -105,7 +115,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
         <ConceptSearch
           openOrderForm={openOrderForm}
           closeWorkspace={closeWorkspace}
-          orderableConceptClasses={orderableConceptClasses}
+          orderableConceptClasses={conceptClasses}
           orderableConceptSets={orderableConceptSets}
           orderTypeUuid={orderTypeUuid}
         />

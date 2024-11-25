@@ -50,21 +50,11 @@ type OrderTypeConfig = ConfigObject['additionalOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {}
 
-function LabOrderBasketPanel({
-  orderTypeUuid,
-  orderableConceptSets,
-  orderableConceptClasses,
-}: LabOrderBasketPanelProps) {
+function LabOrderBasketPanel({ orderTypeUuid }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const conceptClasses = useMemo(
-    () =>
-      orderableConceptClasses?.length > 0
-        ? orderableConceptClasses
-        : orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [],
-    [orderType?.conceptClasses, orderableConceptClasses],
-  );
+
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -109,11 +99,9 @@ function LabOrderBasketPanel({
       onWorkspaceClose: () =>
         launchPatientWorkspace('add-lab-order', {
           orderTypeUuid: orderTypeUuid,
-          orderableConceptSets: orderableConceptSets,
-          orderableConceptClasses: conceptClasses,
         }),
     });
-  }, [orderTypeUuid, orderableConceptSets, conceptClasses]);
+  }, [orderTypeUuid]);
 
   const openEditLabForm = useCallback(
     (order: OrderBasketItem) => {
@@ -123,12 +111,10 @@ function LabOrderBasketPanel({
           launchPatientWorkspace('add-lab-order', {
             order,
             orderTypeUuid: orderTypeUuid,
-            orderableConceptSets: orderableConceptSets,
-            orderableConceptClasses: conceptClasses,
           }),
       });
     },
-    [conceptClasses, orderTypeUuid, orderableConceptSets],
+    [orderTypeUuid],
   );
 
   const removeLabOrder = useCallback(

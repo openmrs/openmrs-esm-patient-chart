@@ -1,6 +1,7 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import type { OrderTypeFetchResponse } from './types';
+import { useMemo } from 'react';
 
 export function useOrderTypes() {
   const orderTypesUrl = `${restBaseUrl}/ordertype`;
@@ -9,10 +10,15 @@ export function useOrderTypes() {
     openmrsFetch,
   );
 
-  return {
-    data: data?.data?.results ?? null,
-    error,
-    isLoading,
-    isValidating,
-  };
+  const results = useMemo(
+    () => ({
+      data: data?.data?.results,
+      error,
+      isLoading,
+      isValidating,
+    }),
+    [data?.data?.results, error, isLoading, isValidating],
+  );
+
+  return results;
 }

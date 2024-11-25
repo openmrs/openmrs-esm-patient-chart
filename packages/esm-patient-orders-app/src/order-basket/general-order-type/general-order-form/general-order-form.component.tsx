@@ -26,7 +26,7 @@ import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
-import styles from './order-form.scss';
+import styles from './general-order-form.scss';
 import type { ConfigObject } from '../../../config-schema';
 import { ordersEqual, prepOrderPostData } from '../resources';
 
@@ -53,11 +53,7 @@ export function OrderForm({
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const config = useConfig<ConfigObject>();
-  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  // const orderReasonRequired = (
-  //   config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
-  // ).required;
+  const { orderType } = useOrderType(orderTypeUuid);
 
   const OrderFormSchema = useMemo(
     () =>
@@ -78,20 +74,6 @@ export function OrderForm({
             ),
           },
         ),
-        // orderReason: orderReasonRequired
-        //   ? z
-        //       .string({
-        //         required_error: translateFrom(
-        //           moduleName,
-        //           'addLabOrderLabOrderReasonRequired',
-        //           'Order reason is required',
-        //         ),
-        //       })
-        //       .refine(
-        //         (value) => !!value,
-        //         translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-        //       )
-        //   : z.string().optional(),
       }),
     [],
   );

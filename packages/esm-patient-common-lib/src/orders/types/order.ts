@@ -54,6 +54,11 @@ export interface OrderBasketItem {
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
 
+export type PriorityOption = {
+  label: string;
+  value: OrderUrgency;
+};
+
 export interface OrderPost {
   urgency?: OrderUrgency;
   action?: OrderAction;
