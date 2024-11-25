@@ -1,10 +1,5 @@
 import React, { type ComponentProps, useCallback } from 'react';
-import {
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-  type OrderBasketItem,
-} from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderBasket, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRightIcon,
@@ -21,14 +16,15 @@ import { Button } from '@carbon/react';
 import { SkeletonText } from '@carbon/react';
 import { ButtonSkeleton } from '@carbon/react';
 import styles from './search-results.scss';
-import { createEmptyOrder, type OrderableConcept, prepOrderPostData, useOrderableConcepts } from '../resources';
+import { createEmptyOrder, prepOrderPostData } from '../resources';
+import { useOrderableConceptSets, type OrderableConcept } from '@openmrs/esm-patient-common-lib';
 
 interface OrderableConceptSearchResultsProps {
   searchTerm: string;
   openOrderForm: (order: OrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
   cancelOrder: () => void;
-  conceptClass: string;
+  conceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
@@ -39,14 +35,14 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   openOrderForm,
   focusAndClearSearchInput,
   cancelOrder,
-  conceptClass,
+  conceptClasses,
   orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { concepts, isLoading, error } = useOrderableConcepts(searchTerm, conceptClass, orderableConceptSets);
+  const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, conceptClasses, orderableConceptSets);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;

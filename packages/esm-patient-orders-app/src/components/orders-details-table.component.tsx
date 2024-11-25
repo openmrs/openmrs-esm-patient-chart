@@ -632,11 +632,16 @@ function OrderBasketItemActions({
         setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
+    } else if (orderItem.type === 'testorder') {
+      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
+      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
+      openOrderBasket();
     } else {
-      setOrderItems(orderItem.orderType.uuid, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
+      setOrderItems(orderItem.orderType.uuid, [...items, order]);
       openOrderBasket();
     }
-  }, [orderItem, items, setOrderItems, openOrderBasket]);
+  }, [orderItem, setOrderItems, items, openOrderBasket]);
 
   return (
     <Layer className={styles.layer}>

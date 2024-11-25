@@ -29,7 +29,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const conceptClass = orderType?.conceptClasses?.[0]?.uuid;
+  const conceptClasses = orderType?.conceptClasses.map(({ uuid }) => uuid);
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -74,7 +74,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
       onWorkspaceClose: () =>
         launchPatientWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
-          conceptClass,
+          conceptClasses,
           orderableConceptSets,
         }),
     });

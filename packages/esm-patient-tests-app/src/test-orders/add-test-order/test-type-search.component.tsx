@@ -21,7 +21,7 @@ import {
 import { prepLabOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import styles from './test-type-search.scss';
-import { type OrderableConcept, useOrderableConcepts } from './useOrderableConceptSets';
+import { useTestTypes, type TestType } from './useTestTypes';
 
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;
@@ -37,7 +37,7 @@ interface TestTypeSearchResultsProps extends TestTypeSearchProps {
 
 interface TestTypeSearchResultItemProps {
   orderTypeUuid: string;
-  testType: OrderableConcept;
+  testType: TestType;
   openOrderForm: (searchResult: TestOrderBasketItem) => void;
 }
 
@@ -99,9 +99,9 @@ function TestTypeSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType, errorFetchingOrderType } = useOrderType(orderTypeUuid);
-  const { orderableConcepts, isLoading, error } = useOrderableConcepts(
+  const { testTypes, isLoading, error } = useTestTypes(
     searchTerm,
-    orderType?.conceptClasses?.[0]?.uuid,
+    orderType?.conceptClasses.map(({ uuid }) => uuid),
     orderableConceptSets,
   );
 
@@ -126,7 +126,7 @@ function TestTypeSearchResults({
     );
   }
 
-  if (orderableConcepts?.length) {
+  if (testTypes?.length) {
     return (
       <>
         <div className={styles.container}>
@@ -134,7 +134,7 @@ function TestTypeSearchResults({
             <div className={styles.orderBasketSearchResultsHeader}>
               <span className={styles.searchResultsCount}>
                 {t('searchResultsMatchesForTerm', '{{count}} results for "{{searchTerm}}"', {
-                  count: orderableConcepts?.length,
+                  count: testTypes?.length,
                   searchTerm,
                 })}
               </span>
@@ -144,12 +144,12 @@ function TestTypeSearchResults({
             </div>
           )}
           <div className={styles.resultsContainer}>
-            {orderableConcepts.map((orderableConcept) => (
+            {testTypes.map((testType) => (
               <TestTypeSearchResultItem
-                key={orderableConcept.conceptUuid}
+                key={testType.conceptUuid}
                 orderTypeUuid={orderTypeUuid}
                 openOrderForm={openLabForm}
-                testType={orderableConcept}
+                testType={testType}
               />
             ))}
           </div>
@@ -202,7 +202,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   );
 
   const createLabOrder = useCallback(
-    (orderableConcept: OrderableConcept) => {
+    (orderableConcept: TestType) => {
       return createEmptyLabOrder(orderableConcept, session.currentProvider?.uuid);
     },
     [session.currentProvider.uuid],
