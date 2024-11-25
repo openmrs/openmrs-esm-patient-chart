@@ -6,12 +6,6 @@ export const configSchema = {
     _description: 'The encounter type of the encounter encapsulating orders',
     _default: '39da3525-afe4-45ff-8977-c53b7b359158',
   },
-  debounceDelayInMs: {
-    _type: Type.Number,
-    _description:
-      'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
-    _default: 300,
-  },
   showPrintButton: {
     _type: Type.Boolean,
     _description:
@@ -33,9 +27,9 @@ export const configSchema = {
     _elements: {
       orderTypeUuid: {
         _type: Type.String,
-        _description: 'Order type UUID to be displayed on the order basket',
+        _description: 'The UUID of the order type listed in the order basket',
       },
-      orderableConcepts: {
+      orderableConceptSets: {
         _type: Type.Array,
         _description:
           'UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the orderableConcepts',
@@ -52,7 +46,6 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orderTypes: Array<{
     orderTypeUuid: string;
-    orderableConcepts: Array<string>;
+    orderableConceptSets: Array<string>;
   }>;
-  debounceDelayInMs: number;
 }

@@ -13,25 +13,24 @@ import { useTranslation } from 'react-i18next';
 import {
   type DrugOrderBasketItem,
   launchPatientWorkspace,
-  prepOrderPostData,
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
 import OrderBasketItemTile from './order-basket-item-tile.component';
+import { prepOrderPostData } from './resources';
 
 interface GenericOrderTypeProps {
   orderTypeUuid: string;
-  orderableConcepts: Array<string>;
+  orderableConceptSets: Array<string>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orderableConcepts, closeWorkspace }) => {
+const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orderableConceptSets, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const conceptClass = orderType?.conceptClasses?.[0]?.uuid;
-  const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -76,7 +75,7 @@ const GenericOrderType: React.FC<GenericOrderTypeProps> = ({ orderTypeUuid, orde
         launchPatientWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
           conceptClass,
-          orderableConcepts,
+          orderableConceptSets,
         }),
     });
   };

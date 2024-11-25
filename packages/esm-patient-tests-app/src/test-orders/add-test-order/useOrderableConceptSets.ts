@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, reportError } from '@openmrs/esm-framework';
 import { type Concept } from '../../types';
-import { type ConfigObject } from '../../config-schema';
 
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;

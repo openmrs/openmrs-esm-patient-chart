@@ -21,13 +21,7 @@ import { Button } from '@carbon/react';
 import { SkeletonText } from '@carbon/react';
 import { ButtonSkeleton } from '@carbon/react';
 import styles from './search-results.scss';
-import {
-  createEmptyOrder,
-  matchOrder,
-  type OrderableConcept,
-  prepOrderPostData,
-  useOrderableConcepts,
-} from '../resources';
+import { createEmptyOrder, type OrderableConcept, prepOrderPostData, useOrderableConcepts } from '../resources';
 
 interface OrderableConceptSearchResultsProps {
   searchTerm: string;
@@ -35,7 +29,7 @@ interface OrderableConceptSearchResultsProps {
   focusAndClearSearchInput: () => void;
   cancelOrder: () => void;
   conceptClass: string;
-  orderableConcepts: Array<string>;
+  orderableConceptSets: Array<string>;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
@@ -46,13 +40,13 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   focusAndClearSearchInput,
   cancelOrder,
   conceptClass,
-  orderableConcepts,
+  orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { concepts, isLoading, error } = useOrderableConcepts(searchTerm, conceptClass, orderableConcepts);
+  const { concepts, isLoading, error } = useOrderableConcepts(searchTerm, conceptClass, orderableConceptSets);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -177,11 +171,10 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
-  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
   const orderAlreadyInBasket = useMemo(
-    () => orders?.some((order) => matchOrder(orderType?.javaClassName, order, concept)),
-    [orders, orderType, concept],
+    () => orders?.some((order) => order.concept.uuid === concept.uuid),
+    [orders, concept],
   );
 
   const createOrderBasketItem = useCallback(

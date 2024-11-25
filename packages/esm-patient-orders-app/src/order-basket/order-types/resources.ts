@@ -1,9 +1,6 @@
 import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
 import {
-  type TestOrderBasketItem,
   type OrderBasketItem,
-  type OrderTypeJavaClassName,
-  useOrderBasket,
   priorityOptions,
   type OrderUrgency,
   type OrderPost,
@@ -114,16 +111,7 @@ export function useOrderableConcepts(searchTerm: string, conceptClass: string, o
   };
 }
 
-export function matchOrder(javaClassName: OrderTypeJavaClassName, order: OrderBasketItem, concept: OrderableConcept) {
-  switch (javaClassName) {
-    // case 'org.openmrs.DrugOrder':
-    //   return order1.action === order2.action && order1.commonMedicationName === order2.commonMedicationName;
-    case 'org.openmrs.TestOrder':
-      return (order as TestOrderBasketItem).testType.conceptUuid === concept.conceptUuid;
-  }
-}
-
-export function createEmptyOrder(concept: OrderableConcept, orderer: string): TestOrderBasketItem {
+export function createEmptyOrder(concept: OrderableConcept, orderer: string): OrderBasketItem {
   return {
     action: 'NEW',
     urgency: priorityOptions[0].value as OrderUrgency,
@@ -161,7 +149,7 @@ export function prepOrderPostData(
   } else if (order.action === 'REVISE') {
     return {
       action: 'REVISE',
-      type: 'testorder',
+      type: 'order',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,
@@ -176,7 +164,7 @@ export function prepOrderPostData(
   } else if (order.action === 'DISCONTINUE') {
     return {
       action: 'DISCONTINUE',
-      type: 'testorder',
+      type: 'order',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,

@@ -11,7 +11,6 @@ import {
 import {
   launchPatientWorkspace,
   type OrderBasketItem,
-  prepOrderPostData,
   useOrderBasket,
   useOrderType,
   usePatientChartStore,
@@ -24,12 +23,13 @@ import { Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
 import { type ConfigObject } from '../../../config-schema';
 import { OrderForm } from '../order-form/order-form.component';
+import { prepOrderPostData } from '../resources';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
   order: OrderBasketItem;
   orderTypeUuid: string;
   conceptClass: string;
-  orderableConcepts: Array<string>;
+  orderableConceptSets: Array<string>;
 }
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -46,13 +46,12 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   conceptClass,
-  orderableConcepts,
+  orderableConceptSets,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const prepOrderPostFunc = useMemo(() => prepOrderPostData(orderTypeUuid), [orderTypeUuid]);
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostFunc);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const { patientUuid } = usePatientChartStore();
 
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
@@ -74,29 +73,6 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
       }
     },
     [orders],
-  );
-
-  const saveOrderForm = useCallback(
-    (finalizedOrder: OrderBasketItem) => {
-      finalizedOrder.careSetting = careSettingUuid;
-      finalizedOrder.orderer = session.currentProvider.uuid;
-      const newOrders = [...orders];
-      const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
-      if (existingOrder) {
-        newOrders[orders.indexOf(existingOrder)] = {
-          ...finalizedOrder,
-          // Incomplete orders should be marked completed on saving the form
-          isOrderIncomplete: false,
-        };
-      } else {
-        newOrders.push(finalizedOrder);
-      }
-      setOrders(newOrders);
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
-      });
-    },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
   );
 
   return (
@@ -121,7 +97,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
           orderTypeUuid={orderTypeUuid}
-          orderableConceptSets={orderableConcepts}
+          orderableConceptSets={orderableConceptSets}
           patientUuid={patientUuid}
           setTitle={() => {}}
         />
@@ -130,7 +106,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           openOrderForm={openOrderForm}
           closeWorkspace={closeWorkspace}
           conceptClass={conceptClass}
-          orderableConcepts={orderableConcepts}
+          orderableConceptSets={orderableConceptSets}
           orderTypeUuid={orderTypeUuid}
         />
       )}
@@ -143,7 +119,7 @@ interface ConceptSearchProps {
   openOrderForm: (search: OrderBasketItem) => void;
   orderTypeUuid: string;
   conceptClass: string;
-  orderableConcepts: Array<string>;
+  orderableConceptSets: Array<string>;
 }
 
 function ConceptSearch({
@@ -151,14 +127,13 @@ function ConceptSearch({
   orderTypeUuid,
   openOrderForm,
   conceptClass,
-  orderableConcepts,
+  orderableConceptSets,
 }: ConceptSearchProps) {
   const { t } = useTranslation();
   const { orderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
-  const { debounceDelayInMs } = useConfig<ConfigObject>();
-  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const searchInputRef = useRef(null);
 
   const cancelDrugOrder = useCallback(() => {
@@ -200,7 +175,7 @@ function ConceptSearch({
         orderTypeUuid={orderTypeUuid}
         cancelOrder={() => {}}
         conceptClass={conceptClass}
-        orderableConcepts={orderableConcepts}
+        orderableConceptSets={orderableConceptSets}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>

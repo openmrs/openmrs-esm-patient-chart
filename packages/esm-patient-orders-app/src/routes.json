@@ -77,7 +77,7 @@
     },
     {
       "name": "orderable-concept-workspace",
-      "title": "searchConcepts",
+      "title": "searchOrderables",
       "component": "orderableConceptSearch",
       "type": "order"
     }

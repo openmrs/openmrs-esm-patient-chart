@@ -138,13 +138,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         case 'testorder':
           launchModifyLabOrder({
             order: buildLabOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem?.orderType?.uuid,
+            orderTypeUuid: orderItem.orderType.uuid,
           });
           break;
         case 'order':
           launchModifyGeneralOrder({
             order: buildGeneralOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem?.orderType?.uuid,
+            orderTypeUuid: orderItem.orderType.uuid,
           });
           break;
         default:

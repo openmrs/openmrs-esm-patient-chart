@@ -18,10 +18,10 @@ import {
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { type OrderableConcept, useOrderableConcepts } from './useOrderableConceptSets';
 import { prepLabOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import styles from './test-type-search.scss';
+import { type OrderableConcept, useOrderableConcepts } from './useOrderableConceptSets';
 
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;

@@ -169,16 +169,6 @@ export function OrderForm({
 
   return (
     <>
-      {/* {errorLoadingTestTypes && (
-        <InlineNotification
-          className={styles.inlineNotification}
-          kind="error"
-          lowContrast
-          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
-        />
-      )} */}
-
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -239,33 +229,6 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          {/* {orderReasons.length > 0 && (
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={8} sm={4}>
-                <InputWrapper>
-                  <Controller
-                    name="orderReason"
-                    control={control}
-                    render={({ field: { onBlur, onChange } }) => (
-                      <ComboBox
-                        id="orderReasonInput"
-                        invalid={!!errors.orderReason}
-                        invalidText={errors.orderReason?.message}
-                        items={orderReasons}
-                        itemToString={(item) => item?.display}
-                        onBlur={onBlur}
-                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
-                        selectedItem={''}
-                        shouldFilterItem={filterItemsByName}
-                        size={responsiveSize}
-                        titleText={t('orderReason', 'Order reason')}
-                      />
-                    )}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          )} */}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
