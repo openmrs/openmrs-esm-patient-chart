@@ -21,15 +21,21 @@ import { prepOrderPostData } from './resources';
 
 interface GeneralOrderTypeProps {
   orderTypeUuid: string;
+  conceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, orderableConceptSets, closeWorkspace }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
+  orderTypeUuid,
+  orderableConceptSets,
+  conceptClasses,
+  closeWorkspace,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const conceptClasses = orderType?.conceptClasses.map(({ uuid }) => uuid);
+  const orderableConceptClasses = conceptClasses ?? orderType?.conceptClasses.map(({ uuid }) => uuid) ?? [];
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -74,7 +80,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, orde
       onWorkspaceClose: () =>
         launchPatientWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
-          conceptClasses,
+          orderableConceptClasses,
           orderableConceptSets,
         }),
     });

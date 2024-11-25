@@ -31,6 +31,7 @@ export default function LabOrderBasketPanelExtension() {
   const allOrderTypes: ConfigObject['additionalOrderTypes'] = [
     {
       orderTypeUuid: orders.labOrderTypeUuid,
+      orderableConceptClasses: orders.labOrderConceptClasses,
       orderableConceptSets: orders.labOrderableConcepts,
     },
     ...additionalOrderTypes,
@@ -38,22 +39,29 @@ export default function LabOrderBasketPanelExtension() {
 
   return (
     <>
-      {allOrderTypes.map(({ orderTypeUuid, orderableConceptSets }) => (
-        <LabOrderBasketPanel orderTypeUuid={orderTypeUuid} orderableConceptSets={orderableConceptSets} />
+      {allOrderTypes.map((orderTypeConfig) => (
+        <LabOrderBasketPanel {...orderTypeConfig} />
       ))}
     </>
   );
 }
 
-interface LabOrderBasketPanelProps {
-  orderTypeUuid: string;
-  orderableConceptSets: Array<string>;
-}
+type OrderTypeConfig = ConfigObject['additionalOrderTypes'][0];
 
-function LabOrderBasketPanel({ orderTypeUuid, orderableConceptSets }: LabOrderBasketPanelProps) {
+interface LabOrderBasketPanelProps extends OrderTypeConfig {}
+
+function LabOrderBasketPanel({
+  orderTypeUuid,
+  orderableConceptSets,
+  orderableConceptClasses,
+}: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
+  const conceptClasses = useMemo(
+    () => orderableConceptClasses ?? orderType.conceptClasses.map(({ uuid }) => uuid) ?? [],
+    [orderType.conceptClasses, orderableConceptClasses],
+  );
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -99,16 +107,26 @@ function LabOrderBasketPanel({ orderTypeUuid, orderableConceptSets }: LabOrderBa
         launchPatientWorkspace('add-lab-order', {
           orderTypeUuid: orderTypeUuid,
           orderableConceptSets: orderableConceptSets,
+          orderableConceptClasses: conceptClasses,
         }),
     });
-  }, [orderTypeUuid, orderableConceptSets]);
+  }, [orderTypeUuid, orderableConceptSets, conceptClasses]);
 
-  const openEditLabForm = useCallback((order: OrderBasketItem) => {
-    closeWorkspace('order-basket', {
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
-    });
-  }, []);
+  const openEditLabForm = useCallback(
+    (order: OrderBasketItem) => {
+      closeWorkspace('order-basket', {
+        ignoreChanges: true,
+        onWorkspaceClose: () =>
+          launchPatientWorkspace('add-lab-order', {
+            order,
+            orderTypeUuid: orderTypeUuid,
+            orderableConceptSets: orderableConceptSets,
+            orderableConceptClasses: conceptClasses,
+          }),
+      });
+    },
+    [conceptClasses, orderTypeUuid, orderableConceptSets],
+  );
 
   const removeLabOrder = useCallback(
     (order: TestOrderBasketItem) => {

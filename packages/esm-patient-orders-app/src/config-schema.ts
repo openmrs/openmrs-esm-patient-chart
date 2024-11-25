@@ -17,10 +17,12 @@ export const configSchema = {
     _default: [
       {
         orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
+        conceptClasses: [],
         orderableConcepts: [],
       },
       {
         orderTypeUuid: '67a9328e-0f88-11ea-8d71-362b9e155667',
+        conceptClasses: [],
         orderableConcepts: [],
       },
     ],
@@ -29,10 +31,18 @@ export const configSchema = {
         _type: Type.String,
         _description: 'The UUID of the order type listed in the order basket',
       },
+      orderableConceptClasses: {
+        _type: Type.Array,
+        _description:
+          'The concept class of the orderable concepts. By default it will look for concept class in the order type properties',
+        _elements: {
+          _type: Type.UUID,
+        },
+      },
       orderableConceptSets: {
         _type: Type.Array,
         _description:
-          'UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the orderableConcepts',
+          "UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the `orderableConcepts`. If the orderableConcepts are not given, then it'll search concepts by concept class.",
         _elements: {
           _type: Type.UUID,
         },
@@ -47,5 +57,6 @@ export interface ConfigObject {
   orderTypes: Array<{
     orderTypeUuid: string;
     orderableConceptSets: Array<string>;
+    orderableConceptClasses: Array<string>;
   }>;
 }

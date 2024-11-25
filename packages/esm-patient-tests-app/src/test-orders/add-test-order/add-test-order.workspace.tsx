@@ -28,6 +28,7 @@ export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  orderableConceptClasses: Array<string>;
 }
 
 export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
@@ -37,6 +38,7 @@ export default function AddLabOrderWorkspace({
   order: initialOrder,
   orderTypeUuid,
   orderableConceptSets,
+  orderableConceptClasses,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -95,6 +97,7 @@ export default function AddLabOrderWorkspace({
         <TestTypeSearch
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
+          orderableConceptClasses={orderableConceptClasses}
           openLabForm={setCurrentLabOrder}
         />
       )}

@@ -39,10 +39,15 @@ export const configSchema = {
       _description: "UUID for the 'Lab' order type",
       _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
     },
+    labOrderConceptClasses: {
+      _type: Type.UUID,
+      _description: 'Concept class of the orderable lab concepts',
+      _default: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
+    },
     labOrderableConcepts: {
       _type: Type.Array,
       _description:
-        'UUIDs of concepts that represent orderable lab tests or lab sets. If an empty array `[]` is provided, every concept with class `Test` will be considered orderable.',
+        'UUIDs of concepts that represent orderable lab tests or lab sets. If an empty array `[]` is provided, every concept with mentioned concept classes will be considered orderable.',
       _elements: {
         _type: Type.UUID,
       },
@@ -62,6 +67,14 @@ export const configSchema = {
       orderTypeUuid: {
         _type: Type.UUID,
         _description: 'UUID for the new order type',
+      },
+      orderableConceptClasses: {
+        _type: Type.Array,
+        _description:
+          'The concept class of the orderable concepts. By default it will look for concept class in the order type properties',
+        _elements: {
+          _type: Type.UUID,
+        },
       },
       orderableConceptSets: {
         _type: Type.UUID,
@@ -129,10 +142,12 @@ export interface ConfigObject {
   orders: {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
+    labOrderConceptClasses: Array<string>;
   };
   showLabReferenceNumberField: boolean;
   additionalOrderTypes: Array<{
     orderTypeUuid: string;
+    orderableConceptClasses: Array<string>;
     orderableConceptSets: Array<string>;
   }>;
   resultsViewerConcepts: Array<ObsTreeEntry>;
