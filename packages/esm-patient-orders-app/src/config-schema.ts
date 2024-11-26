@@ -14,18 +14,8 @@ export const configSchema = {
   },
   orderTypes: {
     _type: Type.Array,
-    _default: [
-      {
-        orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
-        conceptClasses: [],
-        orderableConcepts: [],
-      },
-      {
-        orderTypeUuid: '67a9328e-0f88-11ea-8d71-362b9e155667',
-        conceptClasses: [],
-        orderableConcepts: [],
-      },
-    ],
+    _default: [],
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
     _elements: {
       orderTypeUuid: {
         _type: Type.String,

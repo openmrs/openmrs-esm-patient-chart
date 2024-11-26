@@ -42,9 +42,7 @@ export const configSchema = {
     labOrderConceptClasses: {
       _type: Type.UUID,
       _description: 'Concept class of the orderable lab concepts',
-      _default: [
-        // '8d4907b2-c2cc-11de-8d13-0010c6dffd0f'
-      ],
+      _default: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
     },
     labOrderableConcepts: {
       _type: Type.Array,
@@ -53,9 +51,7 @@ export const configSchema = {
       _elements: {
         _type: Type.UUID,
       },
-      _default: [
-        // '1748a953-d12e-4be1-914c-f6b096c6cdef'
-      ],
+      _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
   showLabReferenceNumberField: {
@@ -66,7 +62,7 @@ export const configSchema = {
   },
   additionalTestOrderTypes: {
     _type: Type.Array,
-    _description: '',
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
     _elements: {
       _type: Type.Object,
       orderTypeUuid: {
@@ -84,19 +80,10 @@ export const configSchema = {
       orderableConceptSets: {
         _type: Type.UUID,
         _description:
-          'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderType` will be considered orderable.',
+          'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderableConceptClasses` will be considered orderable.',
       },
     },
-    _default: [
-      // {
-      //   orderTypeUuid: '67a92e56-0f88-11ea-8d71-362b9e155667',
-      //   orderableConceptSets: [],
-      // },
-      // {
-      //   orderTypeUuid: '5338a5b1-2cbc-4081-9a9b-9e479e2acaad',
-      //   orderableConceptSets: [],
-      // },
-    ],
+    _default: [],
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
