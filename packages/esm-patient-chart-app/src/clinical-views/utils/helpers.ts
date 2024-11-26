@@ -1,7 +1,6 @@
 import { age, formatDate, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
-import { type TFunction } from 'i18next';
 import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
-import { esmPatientChartSchema } from '../../config-schema';
+import { type ConfigConcepts } from '.';
 
 export interface Observation {
   uuid: string;
@@ -63,9 +62,9 @@ export function findObs(encounter: Encounter, obsConcept: string): Observation {
   return allObs?.length == 1 ? allObs[0] : allObs.sort(obsArrayDateComparator)[0];
 }
 
-export function getObsFromEncounters(encounters: Encounter, obsConcept: string) {
+export function getObsFromEncounters(encounters: Encounter, obsConcept: string, config: ConfigConcepts) {
   const filteredEnc = encounters?.find((enc) => enc.obs.find((obs) => obs.concept.uuid === obsConcept));
-  return getObsFromEncounter(filteredEnc, obsConcept);
+  return getObsFromEncounter(filteredEnc, obsConcept, false, false, null, null, null, config);
 }
 
 export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings) {
@@ -78,13 +77,18 @@ export function resolveValueUsingMappings(encounter: Encounter, concept: string,
   return '--';
 }
 
-export function getConditionalConceptValue(encounter: Encounter, conditionalConceptMappings, isDate: Boolean) {
+export function getConditionalConceptValue(
+  encounter: Encounter,
+  conditionalConceptMappings,
+  isDate: Boolean,
+  config: ConfigConcepts,
+) {
   const { trueConcept, nonTrueConcept, dependantConcept, conditionalConcept } = conditionalConceptMappings;
   const dependantValue = findObs(encounter, dependantConcept)?.value;
   const dependantUuid =
     typeof dependantValue === 'object' && 'uuid' in dependantValue ? dependantValue.uuid : undefined;
   const finalConcept = dependantUuid === conditionalConcept ? trueConcept : nonTrueConcept;
-  return getObsFromEncounter(encounter, finalConcept, isDate);
+  return getObsFromEncounter(encounter, finalConcept, isDate, false, null, null, null, config);
 }
 
 export function getConceptFromMappings(encounter: Encounter, concepts: Array<string>) {
@@ -97,10 +101,10 @@ export function getConceptFromMappings(encounter: Encounter, concepts: Array<str
   return null;
 }
 
-export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>) {
+export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>, config: ConfigConcepts) {
   let observations = [];
   obsConcepts.map((concept) => {
-    const obs = getObsFromEncounter(encounter, concept);
+    const obs = getObsFromEncounter(encounter, concept, null, null, null, null, null, config);
     if (obs !== '--') {
       observations.push(obs);
     }
@@ -130,7 +134,7 @@ export function getObsFromEncounter(
   type?: EncounterPropertyType,
   fallbackConcepts?: Array<string>,
   secondaryConcept?: string,
-  t?: TFunction,
+  config?: ConfigConcepts,
 ) {
   let obs = findObs(encounter, obsConcept);
   if (!encounter || !obsConcept) {
@@ -150,7 +154,7 @@ export function getObsFromEncounter(
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
     const primaryValue = obs.value.name.display;
-    if (primaryValue === esmPatientChartSchema.otherConceptUuid._default) {
+    if (primaryValue === config.otherConceptUuid) {
       const secondaryObs = findObs(encounter, secondaryConcept);
       return secondaryObs ? secondaryObs.value : '--';
     }

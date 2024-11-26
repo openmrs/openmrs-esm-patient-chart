@@ -15,11 +15,17 @@ const ClinicalViewsSummary: React.FC<OverviewListProps> = memo(({ patientUuid })
   const tileDefinitions = config.tilesDefinitions;
 
   const tilesData = useMemo(() => {
+    const configConcepts = {
+      trueConceptUuid: config.trueConceptUuid,
+      falseConceptUuid: config.falseConceptUuid,
+      otherConceptUuid: config.otherConceptUuid,
+    };
+
     return tileDefinitions?.map((tile: MenuCardProps) => ({
       title: t(tile.tileHeader),
-      columns: getEncounterTileColumns(tile, t),
+      columns: getEncounterTileColumns(tile, configConcepts),
     }));
-  }, [tileDefinitions, t]);
+  }, [tileDefinitions, t, config.trueConceptUuid, config.falseConceptUuid, config.otherConceptUuid]);
 
   return (
     <>
