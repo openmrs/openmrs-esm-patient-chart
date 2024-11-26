@@ -1,5 +1,4 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-
 import useSWR from 'swr';
 import { type Encounter } from '../utils/helpers';
 

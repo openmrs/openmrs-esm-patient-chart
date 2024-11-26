@@ -1,6 +1,7 @@
 import { type TFunction } from 'i18next';
-import { type EncounterPropertyType, getConceptFromMappings, getObsFromEncounter } from './helpers';
+import { type Encounter, type EncounterPropertyType, getConceptFromMappings, getObsFromEncounter } from './helpers';
 import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
+import { OpenmrsEncounter } from '@openmrs/esm-patient-common-lib';
 
 export interface MenuCardProps {
   tileHeader: string;
@@ -34,9 +35,15 @@ export interface FormattedCardColumn {
   concept: string;
   encounterUuid: string;
   title?: string;
-  getObsValue: (encounter: any) => string;
-  getSummaryObsValue?: (encounter: any) => string;
+  getObsValue: (encounter: Encounter) => string;
+  getSummaryObsValue?: (encounter: Encounter) => string;
   hasSummary: boolean;
+}
+
+export interface ConfigConcepts {
+  trueConceptUuid: string;
+  falseConceptUuid: string;
+  otherConceptUuid: string;
 }
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
@@ -45,10 +52,10 @@ const calculateDateDifferenceInDate = (givenDate: string): string => {
   return `${totalDays} days`;
 };
 
-export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunction) => {
+export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: ConfigConcepts) => {
   const columns: Array<EncounterTileColumn> = tileDefinition.columns?.map((column: ColumnDefinition) => ({
     key: column.title,
-    header: t(column.title),
+    header: column.title,
     concept: column.concept,
     encounterUuid: column.encounterType,
     hasSummary: column.hasSummary || false,
@@ -63,9 +70,11 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunc
           column.isTrueFalseConcept,
           column.type,
           column.fallbackConcepts,
+          column.summaryConcept?.secondaryConcept,
+          config,
         );
       } else {
-        obsValue = getObsFromEncounter(encounter, column.concept, column.isDate);
+        obsValue = getObsFromEncounter(encounter, column.concept, column.isDate, null, null, null, null, config);
       }
       return typeof obsValue === 'string' ? obsValue : obsValue?.name?.name || '--';
     },
@@ -74,17 +83,40 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunc
           let summaryValue;
 
           if (column.summaryConcept?.secondaryConcept) {
-            const primaryConceptType = getObsFromEncounter(encounter, column.summaryConcept.primaryConcept);
+            const primaryConceptType = getObsFromEncounter(
+              encounter,
+              column.summaryConcept.primaryConcept,
+              null,
+              null,
+              null,
+              null,
+              null,
+              config,
+            );
             if (primaryConceptType !== '--') {
               summaryValue = primaryConceptType;
             } else {
-              summaryValue = getObsFromEncounter(encounter, column.summaryConcept.secondaryConcept);
+              summaryValue = getObsFromEncounter(
+                encounter,
+                null,
+                null,
+                null,
+                null,
+                null,
+                column.summaryConcept.secondaryConcept,
+                config,
+              );
             }
           } else if (column.summaryConcept?.hasCalculatedDate) {
             const primaryDate = getObsFromEncounter(
               encounter,
               column.summaryConcept.primaryConcept,
               column.summaryConcept.isDate,
+              null,
+              null,
+              null,
+              null,
+              config,
             );
 
             if (typeof primaryDate === 'string' && primaryDate !== '--') {
@@ -97,6 +129,11 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunc
               encounter,
               column.summaryConcept?.primaryConcept,
               column.summaryConcept?.isDate,
+              null,
+              null,
+              null,
+              null,
+              config,
             );
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';
