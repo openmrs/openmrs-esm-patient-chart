@@ -1,21 +1,45 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { useOrderType, type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../../config-schema';
 
 const mockUseOrderBasket = jest.fn();
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseOrderType = jest.mocked(useOrderType);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderBasket: () => mockUseOrderBasket(),
+  useOrderType: jest.fn(),
 }));
+
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+});
+
+mockUseOrderType.mockReturnValue({
+  orderType: {
+    uuid: 'test-order-type-uuid',
+    display: 'Test order',
+    javaClassName: 'org.openmrs.TestOrder',
+    name: 'Test order',
+    retired: false,
+    description: '',
+    conceptClasses: [],
+  },
+  isLoadingOrderType: false,
+  isValidatingOrderType: false,
+  errorFetchingOrderType: undefined,
+});
 
 describe('LabOrderBasketPanel', () => {
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
     render(<LabOrderBasketPanel />);
-    expect(screen.getByRole('heading', { name: /Lab orders \(0\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Test order \(0\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
   });
 
@@ -52,7 +76,7 @@ describe('LabOrderBasketPanel', () => {
       setOrders: mockSetOrders,
     }));
     const { rerender } = render(<LabOrderBasketPanel />);
-    expect(screen.getByText(/Lab orders \(2\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test order \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV VIRAL LOAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
 
@@ -61,7 +85,7 @@ describe('LabOrderBasketPanel', () => {
 
     await user.click(removeHivButton);
     rerender(<LabOrderBasketPanel />);
-    await expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument();
+    await expect(screen.getByText(/Test order \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
     expect(screen.queryByText(/HIV VIRAL LOAD/i)).not.toBeInTheDocument();
   });

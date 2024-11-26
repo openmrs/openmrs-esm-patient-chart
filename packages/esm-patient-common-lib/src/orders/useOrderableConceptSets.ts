@@ -1,4 +1,10 @@
-import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  type OpenmrsResource,
+  reportError,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -28,18 +34,21 @@ function openmrsFetchMultiple(urls: Array<string>) {
   return Promise.all(urls.map((url) => openmrsFetch<{ results: Array<Concept> }>(url)));
 }
 
-function useOrderableConceptSWR(searchTerm: string, conceptClasses: Array<string>, orderableConcepts?: Array<string>) {
+function useOrderableConceptSWR(
+  searchTerm: string,
+  conceptClasses: Array<string>,
+  orderableConceptSets?: Array<string>,
+) {
   const { data, isLoading, error } = useSWRImmutable<Array<ConceptResult> | Array<ConceptResults>>(
-    () =>
-      orderableConcepts?.length
-        ? orderableConcepts.map(
-            (c) =>
-              `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-          )
-        : conceptClasses.map(
-            (conceptClass) =>
-              `${restBaseUrl}/concept?class=${conceptClass}&name=${searchTerm}&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-          ),
+    orderableConceptSets?.length
+      ? orderableConceptSets.map(
+          (c) =>
+            `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
+        )
+      : conceptClasses.map(
+          (conceptClass) =>
+            `${restBaseUrl}/concept?class=${conceptClass}&name=${searchTerm}&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
+        ),
     openmrsFetchMultiple as any,
     {
       shouldRetryOnError(err) {
@@ -51,7 +60,7 @@ function useOrderableConceptSWR(searchTerm: string, conceptClasses: Array<string
   const results = useMemo(() => {
     if (isLoading || error) return null;
 
-    if (orderableConcepts) {
+    if (orderableConceptSets) {
       const concepts = (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers);
       if (searchTerm) {
         return concepts?.filter((concept) =>
@@ -62,7 +71,7 @@ function useOrderableConceptSWR(searchTerm: string, conceptClasses: Array<string
     } else {
       return (data as Array<ConceptResults>)?.flatMap((d) => d.data.results) ?? ([] as Concept[]);
     }
-  }, [isLoading, error, orderableConcepts, data, searchTerm]);
+  }, [isLoading, error, orderableConceptSets, data, searchTerm]);
 
   return {
     data: results,

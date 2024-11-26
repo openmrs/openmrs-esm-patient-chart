@@ -72,7 +72,7 @@ export default function AddLabOrderWorkspace({
       orderableConceptClasses?.length
         ? orderableConceptClasses
         : orderType.conceptClasses.map(({ uuid }) => uuid) ?? [],
-    [orderType.conceptClasses, orderableConceptClasses],
+    [orderType?.conceptClasses, orderableConceptClasses],
   );
 
   const patientName = patient ? getPatientName(patient) : '';

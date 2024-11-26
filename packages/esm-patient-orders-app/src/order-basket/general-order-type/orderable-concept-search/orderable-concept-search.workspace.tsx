@@ -16,8 +16,7 @@ import {
 import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './orderable-concept-search.scss';
-import { Button } from '@carbon/react';
-import { Search } from '@carbon/react';
+import { Button, Search } from '@carbon/react';
 import OrderableConceptSearchResults from './search-results.component';
 import { type ConfigObject } from '../../../config-schema';
 import { OrderForm } from '../general-order-form/general-order-form.component';

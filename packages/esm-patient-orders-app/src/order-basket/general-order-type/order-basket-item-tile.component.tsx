@@ -3,9 +3,7 @@ import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import React, { type ComponentProps, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './order-basket-item-tile.scss';
-import { Button } from '@carbon/react';
-import { Tile } from '@carbon/react';
-import { ClickableTile } from '@carbon/react';
+import { Button, Tile, ClickableTile } from '@carbon/react';
 import classNames from 'classnames';
 
 export interface OrderBasketItemTileProps {
