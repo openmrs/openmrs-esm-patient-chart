@@ -1,5 +1,6 @@
 import { type TFunction } from 'i18next';
-import { getConceptFromMappings, getObsFromEncounter } from './helpers';
+import { type EncounterPropertyType, getConceptFromMappings, getObsFromEncounter } from './helpers';
+import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
 
 export interface MenuCardProps {
   tileHeader: string;
@@ -23,7 +24,7 @@ export interface ColumnDefinition {
   conceptMappings?: Array<string>;
   summaryConcept?: SummaryConcept;
   isTrueFalseConcept?: boolean;
-  type?: string;
+  type?: EncounterPropertyType;
   fallbackConcepts?: Array<string>;
 }
 
@@ -45,7 +46,7 @@ const calculateDateDifferenceInDate = (givenDate: string): string => {
 };
 
 export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunction) => {
-  const columns: Array<FormattedCardColumn> = tileDefinition.columns?.map((column: ColumnDefinition) => ({
+  const columns: Array<EncounterTileColumn> = tileDefinition.columns?.map((column: ColumnDefinition) => ({
     key: column.title,
     header: t(column.title),
     concept: column.concept,
@@ -72,14 +73,14 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunc
       ? (encounter) => {
           let summaryValue;
 
-          if (column.summaryConcept.secondaryConcept) {
+          if (column.summaryConcept?.secondaryConcept) {
             const primaryConceptType = getObsFromEncounter(encounter, column.summaryConcept.primaryConcept);
             if (primaryConceptType !== '--') {
               summaryValue = primaryConceptType;
             } else {
               summaryValue = getObsFromEncounter(encounter, column.summaryConcept.secondaryConcept);
             }
-          } else if (column.summaryConcept.hasCalculatedDate) {
+          } else if (column.summaryConcept?.hasCalculatedDate) {
             const primaryDate = getObsFromEncounter(
               encounter,
               column.summaryConcept.primaryConcept,
@@ -94,8 +95,8 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, t?: TFunc
           } else {
             summaryValue = getObsFromEncounter(
               encounter,
-              column.summaryConcept.primaryConcept,
-              column.summaryConcept.isDate,
+              column.summaryConcept?.primaryConcept,
+              column.summaryConcept?.isDate,
             );
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';

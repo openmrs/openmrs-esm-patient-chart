@@ -140,7 +140,7 @@ export const esmPatientChartSchema = {
   },
   trueConceptUuid: {
     _type: Type.String,
-    _description: 'Default concept uuid for true in forms',
+    _description: 'The UUID of the concept for true',
     _default: 'cf82933b-3f3f-45e7-a5ab-5d31aaee3da3',
   },
 };
