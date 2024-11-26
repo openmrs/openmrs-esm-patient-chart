@@ -6,6 +6,8 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  DatePicker,
+  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -24,8 +26,6 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
-  DatePicker,
-  DatePickerInput,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -353,8 +353,18 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
             handleDateFilterChange([startDate, endDate]);
           }}
         >
-          <DatePickerInput id="startDatePickerInput" placeholder="dd/mm/yyyy" />
-          <DatePickerInput id="endDatePickerInput" placeholder="dd/mm/yyyy" />
+          <DatePickerInput
+            id="startDatePickerInput"
+            data-testid="startDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
+          <DatePickerInput
+            id="endDatePickerInput"
+            data-testid="endDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
         </DatePicker>
       </div>
 
@@ -449,6 +459,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                   <Layer>
                                     <Search
                                       expanded
+                                      labelText=""
                                       onChange={onInputChange}
                                       placeholder={t('searchTable', 'Search table')}
                                       size="lg"
