@@ -6,6 +6,8 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  DatePicker,
+  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -24,8 +26,6 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
-  DatePicker,
-  DatePickerInput,
 } from '@carbon/react';
 import {
   CardHeader,
@@ -61,6 +61,7 @@ import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
+
 interface OrderDetailsProps {
   patientUuid: string;
   showAddButton?: boolean;
@@ -458,6 +459,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                   <Layer>
                                     <Search
                                       expanded
+                                      labelText=""
                                       onChange={onInputChange}
                                       placeholder={t('searchTable', 'Search table')}
                                       size="lg"
