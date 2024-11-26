@@ -64,10 +64,11 @@ export const configSchema = {
     _description:
       'Whether to display the Lab Reference number field in the Lab Order form. This field maps to the accesion_number property in the Order data model',
   },
-  additionalOrderTypes: {
+  additionalTestOrderTypes: {
     _type: Type.Array,
     _description: '',
     _elements: {
+      _type: Type.Object,
       orderTypeUuid: {
         _type: Type.UUID,
         _description: 'UUID for the new order type',
@@ -149,7 +150,7 @@ export interface ConfigObject {
     labOrderConceptClasses: Array<string>;
   };
   showLabReferenceNumberField: boolean;
-  additionalOrderTypes: Array<{
+  additionalTestOrderTypes: Array<{
     orderTypeUuid: string;
     orderableConceptClasses: Array<string>;
     orderableConceptSets: Array<string>;

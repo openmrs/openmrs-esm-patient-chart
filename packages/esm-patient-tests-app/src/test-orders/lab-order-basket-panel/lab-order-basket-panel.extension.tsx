@@ -27,14 +27,14 @@ import type { ConfigObject } from '../../config-schema';
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
  */
 export default function LabOrderBasketPanelExtension() {
-  const { orders, additionalOrderTypes } = useConfig<ConfigObject>();
-  const allOrderTypes: ConfigObject['additionalOrderTypes'] = [
+  const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
+  const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
     {
       orderTypeUuid: orders.labOrderTypeUuid,
       orderableConceptClasses: orders.labOrderConceptClasses,
       orderableConceptSets: orders.labOrderableConcepts,
     },
-    ...additionalOrderTypes,
+    ...additionalTestOrderTypes,
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function LabOrderBasketPanelExtension() {
   );
 }
 
-type OrderTypeConfig = ConfigObject['additionalOrderTypes'][0];
+type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {}
 

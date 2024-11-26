@@ -47,20 +47,20 @@ export default function AddLabOrderWorkspace({
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const { additionalOrderTypes, orders } = useConfig<ConfigObject>();
+  const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
 
   const { orderableConceptSets, orderableConceptClasses } = useMemo(() => {
-    const allOrderTypes: ConfigObject['additionalOrderTypes'] = [
+    const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
       {
         orderTypeUuid: orders.labOrderTypeUuid,
         orderableConceptClasses: orders.labOrderConceptClasses,
         orderableConceptSets: orders.labOrderableConcepts,
       },
-      ...additionalOrderTypes,
+      ...additionalTestOrderTypes,
     ];
     return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid);
   }, [
-    additionalOrderTypes,
+    additionalTestOrderTypes,
     orderTypeUuid,
     orders.labOrderConceptClasses,
     orders.labOrderTypeUuid,

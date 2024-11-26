@@ -89,7 +89,7 @@ describe('TreeViewWrapper', () => {
         labOrderableConcepts: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
         labOrderConceptClasses: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
       },
-      additionalOrderTypes: [],
+      additionalTestOrderTypes: [],
       labTestsWithOrderReasons: [],
     });
   });

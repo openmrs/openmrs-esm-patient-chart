@@ -90,9 +90,7 @@ export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBask
       conceptUuid: order.concept.uuid,
     },
     orderNumber: order.orderNumber,
-    concept: {
-      uuid: order.concept.uuid,
-    },
+    concept: order.concept,
     orderType: order.orderType.uuid,
     specimenSource: null,
   };

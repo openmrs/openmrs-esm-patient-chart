@@ -90,12 +90,6 @@ export function OrderForm({
     },
   });
 
-  // const orderReasonUuids =
-  //   (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
-  //     .orderReasons || [];
-
-  // const { orderReasons } = useOrderReasons(orderReasonUuids);
-
   const filterItemsByName = useCallback((menu) => {
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
