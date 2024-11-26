@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { EncounterTile } from './encounter-tile/encounter-tile.component';
 import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
-import { getEncounterTileColumns, type MenuCardProps } from '../utils/encounter-tile-config-builder';
+import { getEncounterTileColumns, type MenuCardProps } from '../utils';
 
 interface OverviewListProps {
   patientUuid: string;
 }
 
-const ClinicalViewsSummary: React.FC<OverviewListProps> = ({ patientUuid }) => {
+const ClinicalViewsSummary: React.FC<OverviewListProps> = memo(({ patientUuid }) => {
   const config = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const tileDefinitions = config.tilesDefinitions;
@@ -29,6 +29,6 @@ const ClinicalViewsSummary: React.FC<OverviewListProps> = ({ patientUuid }) => {
         ))}
     </>
   );
-};
+});
 
 export default ClinicalViewsSummary;

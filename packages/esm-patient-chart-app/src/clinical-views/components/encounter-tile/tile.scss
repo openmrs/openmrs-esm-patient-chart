@@ -15,21 +15,14 @@
 }
 
 .tileTitle {
-  @include type.type-style('label-01');
+  @include type.type-style('body-long-01');
   display: block;
   padding-top: layout.$spacing-05;
 }
 
 .columnContainer {
-  margin: 0px 0px layout.$spacing-06 layout.$spacing-06;
   display: flex;
   flex-direction: row;
-}
-
-.tileBoxColumn {
-  width: 100%;
-  display: 'flex';
-  flex-direction: 'row';
 }
 
 .tileSubTitle {
@@ -37,15 +30,14 @@
 }
 
 .tileValue {
-  @include type.type-style('body-long-01');
-  margin: layout.$spacing-05 layout.$spacing-10 layout.$spacing-06 0;
+  @include type.type-style('label-01');
+  margin: layout.$spacing-04 0 layout.$spacing-04;
+  display: block;
 }
 
 .tileBox {
-  width: 25%;
   display: flex;
-  flex-direction: row;
-  flex: 1;
+  gap: layout.$spacing-04;
 }
 
 .desktopHeading {
@@ -72,7 +64,7 @@
     content: '';
     display: block;
     width: layout.$spacing-07;
-    padding-top: 0.188rem;
+    padding-top: layout.$spacing-01;
     border-bottom: 0.375rem solid var(--brand-03);
   }
 }
@@ -81,7 +73,7 @@
   content: '';
   display: block;
   width: layout.$spacing-07;
-  padding-top: 0.188rem;
+  padding-top: layout.$spacing-01;
   border-bottom: 0.375rem solid var(--brand-03);
 }
 

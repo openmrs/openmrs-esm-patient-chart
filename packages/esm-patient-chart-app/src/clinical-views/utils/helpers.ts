@@ -1,6 +1,6 @@
 import { age, formatDate, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { type TFunction } from 'i18next';
-import { esmPatientChartSchema } from '../../config-schema';
+import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
 
 export interface Observation {
   uuid: string;
@@ -41,9 +41,16 @@ export interface Encounter extends OpenmrsResource {
   visit?: string;
 }
 
+export enum EncounterPropertyType {
+  location = 'location',
+  provider = 'provider',
+  visitType = 'visitType',
+  ageAtEncounter = 'ageAtEncounter',
+}
+
 export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
   if (isDate) return formatDate(encounter[param]);
-  else return encounter[param] ? encounter[param] : '--';
+  else return encounter[param] ?? '--';
 }
 
 export function obsArrayDateComparator(left: Observation, right: Observation) {
@@ -52,7 +59,7 @@ export function obsArrayDateComparator(left: Observation, right: Observation) {
 
 export function findObs(encounter: Encounter, obsConcept: string): Observation {
   const allObs = encounter?.obs?.filter((observation) => observation.concept.uuid === obsConcept) || [];
-  return allObs?.length == 1 ? allObs[0] : allObs?.sort(obsArrayDateComparator)[0];
+  return allObs?.length == 1 ? allObs[0] : allObs.sort(obsArrayDateComparator)[0];
 }
 
 export function getObsFromEncounters(encounters: Encounter, obsConcept: string) {
@@ -106,7 +113,7 @@ export function getObsFromEncounter(
   obsConcept: string,
   isDate?: Boolean,
   isTrueFalseConcept?: Boolean,
-  type?: string,
+  type?: EncounterPropertyType,
   fallbackConcepts?: Array<string>,
   secondaryConcept?: string,
   t?: TFunction,
@@ -118,33 +125,12 @@ export function getObsFromEncounter(
 
   if (isTrueFalseConcept) {
     if (typeof obs?.value === 'object') {
-      if (
-        (obs?.value?.uuid != esmPatientChartSchema.trueConceptUuid._default && obs?.value?.name?.name !== 'Unknown') ||
-        obs?.value?.name?.name === t('FALSE')
-      ) {
-        return t('No');
-      } else if (obs?.value?.uuid == esmPatientChartSchema.trueConceptUuid._default) {
-        return t('Yes');
-      } else {
-        return obs?.value?.name?.name;
-      }
+      return obs?.value?.name?.name;
     }
   }
 
-  if (type === 'location') {
-    return encounter.location.display;
-  }
-
-  if (type === 'provider') {
-    return encounter.encounterProviders.map((p) => p.provider.name).join(' | ');
-  }
-
-  if (type === 'visitType') {
-    return encounter.encounterType.name;
-  }
-
-  if (type === 'ageAtHivTest') {
-    return age(encounter.patient.birthDate, encounter.encounterDatetime);
+  if (type) {
+    getEncounterProperty(encounter, type);
   }
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
@@ -178,12 +164,30 @@ export function getObsFromEncounter(
   return obs.value;
 }
 
-export const groupColumnsByEncounterType = (columns) => {
-  return columns.reduce((acc, column) => {
-    if (!acc[column.encounterType]) {
-      acc[column.encounterType] = [];
+export const groupColumnsByEncounterType = (columns: EncounterTileColumn[]): Record<string, EncounterTileColumn[]> => {
+  return columns.reduce((acc: Record<string, EncounterTileColumn[]>, column) => {
+    if (!acc[column.encounterUuid]) {
+      acc[column.encounterUuid] = [];
     }
-    acc[column.encounterType].push(column);
+    acc[column.encounterUuid].push(column);
     return acc;
   }, {});
+};
+
+export const getEncounterProperty = (encounter: Encounter, type: EncounterPropertyType) => {
+  if (type === 'location') {
+    return encounter.location.display;
+  }
+
+  if (type === 'provider') {
+    return encounter.encounterProviders.map((p) => p.provider.name).join(' | ');
+  }
+
+  if (type === 'visitType') {
+    return encounter.encounterType.name;
+  }
+
+  if (type === 'ageAtEncounter') {
+    return age(encounter.patient.birthDate, encounter.encounterDatetime);
+  }
 };

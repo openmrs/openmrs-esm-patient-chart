@@ -9,19 +9,41 @@ export const encounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,display,name:(uuid,name)),value:(uuid,name:(uuid,name,display),' +
   'names:(uuid,conceptNameType,name,display))),form:(uuid,name))';
 
+const cache = new Map();
+
 export function useLastEncounter(patientUuid: string, encounterType: string) {
   const query = `encounterType=${encounterType}&patient=${patientUuid}&limit=1&order=desc&startIndex=0`;
-  const endpointUrl = `/ws/rest/v1/encounter?${query}&v=${encounterRepresentation}`;
+  const endpointUrl =
+    patientUuid && encounterType ? `/ws/rest/v1/encounter?${query}&v=${encounterRepresentation}` : null;
 
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<OpenmrsEncounter> } }, Error>(
-    endpointUrl,
-    openmrsFetch,
-    { dedupingInterval: 5000, refreshInterval: 0 },
+  const cacheKey = endpointUrl;
+
+  const { data, error, isValidating, isLoading } = useSWR<{ results: Array<OpenmrsEncounter> }, Error>(
+    cacheKey,
+    async (url) => {
+      const cachedData = cache.get(url);
+      if (cachedData) {
+        return cachedData;
+      }
+      const response = await openmrsFetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const responseData = await response.json();
+      cache.set(url, responseData);
+      return responseData;
+    },
+    {
+      dedupingInterval: 50000,
+      refreshInterval: 0,
+    },
   );
+
   return {
-    lastEncounter: data ? data?.data?.results.shift() : null,
+    lastEncounter: data ? data.results?.length > 0 && data.results[0] : null,
     error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
