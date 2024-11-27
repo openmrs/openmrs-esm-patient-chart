@@ -62,7 +62,7 @@ export function LabOrderForm({
         urgency: z.string().refine((value) => value !== '', {
           message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
         }),
-        accessionNumber: z.string().optional(),
+        accessionNumber: z.string().optional().nullable(),
         testType: z.object(
           { label: z.string(), conceptUuid: z.string() },
           {
