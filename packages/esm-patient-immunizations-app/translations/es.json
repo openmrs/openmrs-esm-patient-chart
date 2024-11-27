@@ -13,7 +13,7 @@
   "Immunizations": "Inmunizaciones",
   "immunizations__lower": "inmunizaciones",
   "immunizationWorkspaceTitle": "Formulario de Inmunización",
-  "lotNumber": "Número de lote",
+  "lotNumber": "Número de Lote",
   "manufacturer": "Fabricante",
   "pleaseSelect": "Por favor, seleccione",
   "recentVaccination": "Vacunación reciente",
@@ -24,8 +24,8 @@
   "time": "Hora",
   "timeFormat ": "Formato de Hora",
   "vaccinationDate": "Fecha de vacunación",
-  "vaccinationDateRequired": "La fecha de vacunación es obligatoria",
-  "vaccinationSaved": "Vacunación guardada con éxito",
+  "vaccinationDateRequired": "Se requiere una fecha de vacunación",
+  "vaccinationSaved": "Vacunación guardada exitosamente",
   "vaccine": "Vacuna",
-  "vaccineRequired": "La vacuna es obligatoria"
+  "vaccineRequired": "Se requiere una vacuna"
 }
