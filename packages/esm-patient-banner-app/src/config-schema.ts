@@ -115,6 +115,11 @@ export const configSchema = {
         _type: Type.UUID,
       },
     },
+    autoPrint: {
+      _type: Type.Boolean,
+      _description: 'Whether to print the patient sticker by default',
+      _default: false,
+    },
   },
   useRelationshipNameLink: {
     _type: Type.Boolean,
@@ -150,6 +155,7 @@ export interface ConfigObject {
       width: string;
     };
     identifiersToDisplay: Array<string>;
+    autoPrint: boolean;
   };
   useRelationshipNameLink: boolean;
 }

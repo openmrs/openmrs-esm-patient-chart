@@ -19,7 +19,7 @@ import { type ConfigObject } from '../config-schema';
 import PrintComponent from './print-identifier-sticker.component';
 import styles from './print-identifier-sticker.scss';
 import { toSvg } from 'html-to-image';
-import PrintSizeWrapper from './print-size-wrapper.component';
+
 interface PrintIdentifierStickerProps {
   closeModal: () => void;
   patient: fhir.Patient;
@@ -38,15 +38,18 @@ interface PrintMultipleStickersComponentProps
     height: string;
     width: string;
   };
+  stickerSVGDataSource: string;
+  setStickerSVGDataSource: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
-  const { pageSize, printMultipleStickers, stickerSize } = printPatientSticker ?? {};
+  const { pageSize, autoPrint, printMultipleStickers, stickerSize } = printPatientSticker ?? {};
   const [isPrinting, setIsPrinting] = useState(false);
-  const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
+  const [stickerSVGDataSource, setStickerSVGDataSource] = useState<string>('');
 
+  const headerTitle = t('patientIdentifierSticker', 'Patient identifier sticker');
   const contentToPrintRef = useRef(null);
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
 
@@ -73,18 +76,59 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     closeModal();
   }, [closeModal]);
 
-  const handlePrintWindow = useCallback((printWindow: HTMLIFrameElement | null): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      if (printWindow) {
-        const printContent = printWindow.contentDocument || printWindow.contentWindow?.document;
-        if (printContent) {
-          printContent.body.style.overflow = 'initial !important';
-          printWindow.contentWindow?.print();
+  const handlePrintWindow = useCallback(
+    (printWindow: HTMLIFrameElement | null): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        if (printWindow) {
+          const printContent = printWindow.contentDocument || printWindow.contentWindow?.document;
+          if (printContent) {
+            printContent.body.style.overflow = 'initial !important';
+
+            const style = printContent.createElement('style');
+            style.textContent = `
+          @page {
+            size: ${pageSize};
+            margin: 15px 20px 0 20px;
+          }
+          
+          @media print {
+            #print-wrapper {
+              width: 100vw !important;
+              height: 100vh !important;
+              transform-origin: top left;
+              transform: scale(var(--print-scale));
+            }
+            
+            #print-content {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+            }
+          }
+        `;
+            printContent.head.appendChild(style);
+
+            const content = printContent.getElementById('print-wrapper');
+            const contentWidth = content.scrollWidth;
+            const contentHeight = content.scrollHeight;
+            const pageWidth = window.innerWidth;
+            const pageHeight = window.innerHeight;
+            const scaleX = pageWidth / contentWidth;
+            const scaleY = pageHeight / contentHeight;
+            const scale = Math.min(scaleX, scaleY) * 0.95;
+
+            printContent.documentElement.style.setProperty('--print-scale', scale.toString());
+
+            printWindow.contentWindow?.print();
+          }
         }
-      }
-      resolve();
-    });
-  }, []);
+        resolve();
+      });
+    },
+    [pageSize],
+  );
 
   const handlePrintError = useCallback((errorLocation, error) => {
     onBeforeGetContentResolve.current = null;
@@ -111,6 +155,12 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     copyStyles: true,
   });
 
+  useEffect(() => {
+    if (!isPrinting && autoPrint && stickerSVGDataSource && contentToPrintRef.current) {
+      handlePrint();
+    }
+  }, [autoPrint, handlePrint, isPrinting, stickerSVGDataSource]);
+
   return (
     <>
       <ModalHeader
@@ -123,6 +173,8 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
           printMultipleStickers={printMultipleStickers}
           stickerSize={stickerSize}
           patient={patient}
+          stickerSVGDataSource={stickerSVGDataSource}
+          setStickerSVGDataSource={setStickerSVGDataSource}
           ref={contentToPrintRef}
         />
       </ModalBody>
@@ -130,7 +182,12 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         <Button kind="secondary" onClick={closeModal}>
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} disabled={isPrinting} onClick={handlePrint} kind="primary">
+        <Button
+          className={styles.button}
+          disabled={isPrinting && !stickerSVGDataSource}
+          onClick={handlePrint}
+          kind="primary"
+        >
           {isPrinting ? (
             <InlineLoading className={styles.loader} description={getCoreTranslation('printing', 'Printing') + '...'} />
           ) : (
@@ -143,11 +200,11 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
 };
 
 const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleStickersComponentProps>(
-  ({ pageSize, printMultipleStickers, stickerSize, patient }, ref) => {
-    const svgDivRef = useRef<HTMLDivElement>();
-
-    const divRef = useRef<HTMLDivElement>();
+  ({ pageSize, printMultipleStickers, stickerSize, patient, stickerSVGDataSource, setStickerSVGDataSource }, ref) => {
     const { t } = useTranslation();
+
+    const svgDivRef = useRef<HTMLDivElement>();
+    const divRef = useRef<HTMLDivElement>();
 
     const { height: printIdentifierStickerHeight, width: printIdentifierStickerWidth } = stickerSize ?? {};
     const [numberOfLabelColumnsPage, setNumberOfLabelColumnsPage] = useState<number>(
@@ -161,8 +218,6 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
     const [isMultipleStickersEnabled, setIsMultipleStickersEnabled] = useState(
       printMultipleStickers.numberOfStickers > 1,
     );
-
-    const [svgDataSource, setSvgDataSource] = useState('');
 
     const labels = Array.from({ length: numberOfLabels });
 
@@ -187,20 +242,35 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
 
     useEffect(() => {
       if (svgDivRef.current) {
-        toSvg(svgDivRef.current, { cacheBust: true })
+        const images = svgDivRef.current.querySelectorAll('img');
+
+        const imageLoadPromises = Array.from(images).map(
+          (img) =>
+            new Promise<void>((resolve, reject) => {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = () => resolve();
+                img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+              }
+            }),
+        );
+
+        Promise.all(imageLoadPromises)
+          .then(() => toSvg(svgDivRef.current, { cacheBust: true }))
           .then((dataUrl) => {
-            setSvgDataSource(dataUrl);
+            setStickerSVGDataSource(dataUrl);
           })
           .catch((err) => {
             showSnackbar({
               isLowContrast: false,
               kind: 'error',
               title: getCoreTranslation('printError', 'Print error'),
-              subtitle: err,
+              subtitle: err.message || 'An error occurred while generating the SVG.',
             });
           });
       }
-    }, [svgDivRef]);
+    }, [setStickerSVGDataSource, svgDivRef]);
 
     const maxLabelsPerPage = numberOfLabelRowsPerPage * numberOfLabelColumnsPage;
     const pages: Array<typeof labels> = [];
@@ -215,7 +285,7 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
 
     return (
       <Stack gap={5}>
-        <div ref={svgDivRef}>
+        <div className={styles.svgContainer} ref={svgDivRef}>
           <PrintComponent patient={patient} />
         </div>
         <Grid className={styles.gridContainer}>
@@ -277,18 +347,18 @@ const PrintMultipleStickersComponent = forwardRef<HTMLDivElement, PrintMultipleS
           ) : null}
         </Grid>
         <div className={classNames(styles.previewContainer, !isPreviewVisible ? styles.hidePreviewContainer : '')}>
-          <div ref={divRef} className={styles.printRoot}>
+          <div ref={divRef} className={`${styles.printRoot} ${styles.svgContainer}`}>
             {pages.map((pageLabels, pageIndex) => (
-              <div key={pageIndex} className={pageIndex < pages.length - 1 ? styles.pageBreak : ''}>
-                <div className={styles.labelsContainer}>
-                  {pageLabels.map((_label, index) => (
-                    <div key={index} className={styles.printContainer}>
-                      <PrintSizeWrapper>
-                        <img id="svg-sample" src={svgDataSource} />
-                      </PrintSizeWrapper>
-                    </div>
-                  ))}
-                </div>
+              <div
+                id="print-wrapper"
+                key={pageIndex}
+                className={`${styles.labelsContainer} ${pageIndex < pages.length - 1 ? styles.pageBreak : ''}`}
+              >
+                {pageLabels.map((_label, index) => (
+                  <div id="print-content" key={index} className={styles.printContainer}>
+                    <img id="svg-sample" src={stickerSVGDataSource} />
+                  </div>
+                ))}
               </div>
             ))}
           </div>

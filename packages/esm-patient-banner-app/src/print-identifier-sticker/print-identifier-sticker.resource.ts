@@ -14,9 +14,9 @@ import {
 export const defaultBarcodeParams: Options = {
   width: 3,
   format: 'CODE39',
-  background: '#f4f4f4',
+  background: '#ffffff',
   displayValue: true,
-  renderer: 'img',
+  renderer: 'svg',
   font: 'IBM Plex Sans',
   textAlign: 'center',
   textPosition: 'bottom',

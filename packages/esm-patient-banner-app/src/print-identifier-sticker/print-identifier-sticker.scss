@@ -7,11 +7,17 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.svgContainer {
+  background-color: white;
+}
+
 .gridContainer {
   padding-left: 0;
 }
 
 .gridHeaderContainer {
+  display: flex;
+  gap: 1rem;
   padding: 0;
   border-bottom: 1px solid $brand-01;
   margin-bottom: layout.$spacing-05;
@@ -94,7 +100,12 @@
 
 .implementationLogo {
   display: flex;
+  align-items: center;
   height: 100%;
+}
+
+.stickerBarcode svg {
+  max-width: 100%;
 }
 
 .previewContainer {
@@ -114,6 +125,14 @@
 
 .hidePreviewContainer {
   display: none;
+}
+
+.stickerBarcodeContainer {
+  flex: 7;
+}
+
+.logoContainer {
+  flex: 3;
 }
 
 .printRoot {
@@ -148,10 +167,25 @@
 
   .implementationLogo {
     display: flex;
+    align-items: center;
     height: 100%;
   }
 
+  .stickerBarcodeContainer {
+    flex: 7;
+  }
+
+  .logoContainer {
+    flex: 3;
+  }
+
+  .stickerBarcode svg {
+    max-width: 100%;
+  }
+
   .gridHeaderContainer {
+    display: flex;
+    gap: 1rem;
     padding: 0;
     border-bottom: 1px solid $brand-01;
     margin-bottom: layout.$spacing-05;
