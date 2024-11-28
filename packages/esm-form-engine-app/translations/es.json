@@ -2,8 +2,8 @@
   "cancel": "Cancelar",
   "closeThisPanel": "Cerrar este panel",
   "collapseAll": "Colapsar todo",
-  "deleteQuestion": "Borrar pregunta",
-  "deleteQuestionConfirmation": "¿Estás seguro de que deseas eliminar esta pregunta?",
+  "deleteQuestion": "Eliminar pregunta",
+  "deleteQuestionConfirmation": "¿Está seguro de que desea eliminar esta pregunta?",
   "deleteQuestionExplainerText": "Esta acción no puede ser deshecha.",
   "errorTitle": "Hubo un error con este formulario",
   "expandAll": "Expandir todo",
@@ -11,5 +11,5 @@
   "or": "o",
   "thisList": "esta lista",
   "toggleCollapseOrExpand": "Alternar entre colapsar o expandir",
-  "tryAgainMessage": "Intentar abrir otro formulario de"
+  "tryAgainMessage": "Intente abrir otro formulario de"
 }

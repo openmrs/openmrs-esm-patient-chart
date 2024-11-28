@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
 import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 
 export type Status = 'ACTIVE' | 'any';
@@ -14,9 +14,18 @@ export const drugCustomRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
-export function usePatientOrders(patientUuid: string, status?: Status, orderType?: string) {
+export function usePatientOrders(
+  patientUuid: string,
+  status?: Status,
+  orderType?: string,
+  startDate?: string,
+  endDate?: string,
+) {
   const { mutate } = useSWRConfig();
-  const baseOrdersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
+  const baseOrdersUrl =
+    startDate && endDate
+      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}`
+      : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderType=${orderType}` : baseOrdersUrl;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
