@@ -187,3 +187,13 @@
     page-break-inside: avoid;
   }
 }
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
+.rangeLabel {
+  @extend .helperText;
+  margin-right: layout.$spacing-02;
+}
