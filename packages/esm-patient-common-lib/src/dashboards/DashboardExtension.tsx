@@ -13,10 +13,10 @@ import {
   WarningIcon,
   ListCheckedIcon,
   DocumentAttachmentIcon,
-  TableIcon,
   EventScheduleIcon,
   ReportIcon,
   SyringeIcon,
+  ProgramsIcon
 } from '@openmrs/esm-framework';
 import styles from './dashboard-extension.scss';
 
@@ -50,7 +50,7 @@ export const DashboardExtension = ({
     Conditions: ListCheckedIcon,
     Immunizations: SyringeIcon,
     Attachments: DocumentAttachmentIcon,
-    Programs: TableIcon,
+    Programs: ProgramsIcon,
     Appointments: EventScheduleIcon,
   } as const;
 
