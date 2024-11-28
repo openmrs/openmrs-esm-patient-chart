@@ -16,7 +16,7 @@ import {
   EventScheduleIcon,
   ReportIcon,
   SyringeIcon,
-  ProgramsIcon
+  ProgramsIcon,
 } from '@openmrs/esm-framework';
 import styles from './dashboard-extension.scss';
 
