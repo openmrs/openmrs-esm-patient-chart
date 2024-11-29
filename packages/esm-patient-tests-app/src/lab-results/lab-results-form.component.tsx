@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import {
+  type DefaultPatientWorkspaceProps, 
+  type Order,
   useOrderConceptByUuid,
   updateOrderResult,
   useLabEncounter,
   useObservation,
   createObservationPayload,
-} from './lab-results.resource';
+} from '@openmrs/esm-patient-common-lib';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';

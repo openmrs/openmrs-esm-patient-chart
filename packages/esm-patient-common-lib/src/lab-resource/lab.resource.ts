@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { type Observation, type Encounter } from '../types/encounter';
-import { type OrderDiscontinuationPayload } from '../types/order';
+import { type Observation, type Encounter } from './types/encounter';
+import { type OrderDiscontinuationPayload } from './types/order';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 
 const labEncounterRepresentation =

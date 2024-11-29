@@ -49,6 +49,13 @@
       "type": "order",
       "component": "addLabOrderWorkspace",
       "title": "addLabOrderWorkspaceTitle"
+    },
+    {
+      "name": "test-results-form-workspace",
+      "title": "enterTestResults",
+      "component": "testResultsFormWorkspace",
+      "type": "lab-results",
+      "canHide": false
     }
   ]
 }

@@ -44,13 +44,6 @@
       "component": "patientOrdersFormWorkspace",
       "type": "order",
       "canHide": false
-    },
-    {
-      "name": "test-results-form-workspace",
-      "title": "enterTestResults",
-      "component": "testResultsFormWorkspace",
-      "type": "lab-results",
-      "canHide": false
     }
   ]
 }
