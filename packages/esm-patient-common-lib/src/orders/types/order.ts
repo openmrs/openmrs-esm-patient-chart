@@ -88,6 +88,7 @@ export interface OrderPost {
   orderReason?: string;
   instructions?: string;
   accessionNumber?: string;
+  orderType?: string;
 }
 
 export interface PatientOrderFetchResponse {
