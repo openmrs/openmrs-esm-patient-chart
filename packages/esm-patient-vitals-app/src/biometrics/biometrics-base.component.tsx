@@ -29,7 +29,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const config = useConfig<ConfigObject>();
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { data: conceptUnits } = useVitalsConceptMetadata(config.concepts.vitalsSignsUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const launchBiometricsForm = useCallback(

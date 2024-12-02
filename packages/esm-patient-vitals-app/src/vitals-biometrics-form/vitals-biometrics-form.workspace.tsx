@@ -86,7 +86,12 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
-  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
+  const {
+    data: conceptUnits,
+    conceptMetadata,
+    conceptRanges,
+    isLoading,
+  } = useVitalsConceptMetadata(config.concepts.vitalsSignsUuid);
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');

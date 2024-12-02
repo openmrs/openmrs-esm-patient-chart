@@ -34,7 +34,7 @@ interface VitalsHeaderProps {
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = false }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata(config.concepts.vitalsSignsUuid);
   const { data: vitals, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid, 'both');
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
