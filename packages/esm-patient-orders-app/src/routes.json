@@ -11,6 +11,14 @@
       "order": 0
     },
     {
+      "name": "lab-result",
+      "component": "labResult",
+      "slot": "completed-lab-order-results-slot",
+      "meta": {
+        "fullWidth": false
+      }
+    },
+    {
       "name": "patient-orders-summary-dashboard",
       "component": "ordersDashboardLink",
       "slot": "patient-chart-dashboard-slot",
