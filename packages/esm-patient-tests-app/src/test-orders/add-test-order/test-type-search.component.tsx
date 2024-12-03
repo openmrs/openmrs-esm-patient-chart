@@ -27,7 +27,6 @@ export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
-  orderableConceptClasses: Array<string>;
 }
 
 interface TestTypeSearchResultsProps extends TestTypeSearchProps {
@@ -40,15 +39,9 @@ interface TestTypeSearchResultItemProps {
   orderTypeUuid: string;
   testType: TestType;
   openOrderForm: (searchResult: TestOrderBasketItem) => void;
-  orderableConceptClasses: Array<string>;
 }
 
-export function TestTypeSearch({
-  openLabForm,
-  orderTypeUuid,
-  orderableConceptSets,
-  orderableConceptClasses,
-}: TestTypeSearchProps) {
+export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets }: TestTypeSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -87,7 +80,6 @@ export function TestTypeSearch({
         cancelOrder={cancelOrder}
         orderTypeUuid={orderTypeUuid}
         orderableConceptSets={orderableConceptSets}
-        orderableConceptClasses={orderableConceptClasses}
         focusAndClearSearchInput={focusAndClearSearchInput}
         openLabForm={openLabForm}
         searchTerm={debouncedSearchTerm}
@@ -101,13 +93,12 @@ function TestTypeSearchResults({
   searchTerm,
   orderTypeUuid,
   orderableConceptSets,
-  orderableConceptClasses,
   openLabForm,
   focusAndClearSearchInput,
 }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { testTypes, isLoading, error } = useTestTypes(searchTerm, orderableConceptClasses, orderableConceptSets);
+  const { testTypes, isLoading, error } = useTestTypes(searchTerm, orderableConceptSets);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -151,7 +142,6 @@ function TestTypeSearchResults({
             {testTypes.map((testType) => (
               <TestTypeSearchResultItem
                 key={testType.conceptUuid}
-                orderableConceptClasses={orderableConceptClasses}
                 orderTypeUuid={orderTypeUuid}
                 openOrderForm={openLabForm}
                 testType={testType}

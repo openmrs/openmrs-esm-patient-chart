@@ -21,14 +21,6 @@ export const configSchema = {
         _type: Type.String,
         _description: 'The UUID of the order type listed in the order basket',
       },
-      orderableConceptClasses: {
-        _type: Type.Array,
-        _description:
-          'The concept class of the orderable concepts. By default it will look for concept class in the order type response',
-        _elements: {
-          _type: Type.UUID,
-        },
-      },
       orderableConceptSets: {
         _type: Type.Array,
         _description:
@@ -47,6 +39,5 @@ export interface ConfigObject {
   orderTypes: Array<{
     orderTypeUuid: string;
     orderableConceptSets: Array<string>;
-    orderableConceptClasses: Array<string>;
   }>;
 }

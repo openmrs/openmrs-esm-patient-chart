@@ -31,7 +31,6 @@ export default function LabOrderBasketPanelExtension() {
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
     {
       orderTypeUuid: orders.labOrderTypeUuid,
-      orderableConceptClasses: orders.labOrderConceptClasses,
       orderableConceptSets: orders.labOrderableConcepts,
     },
     ...additionalTestOrderTypes,

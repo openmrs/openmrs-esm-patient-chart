@@ -34,21 +34,14 @@ function openmrsFetchMultiple(urls: Array<string>) {
   return Promise.all(urls.map((url) => openmrsFetch<{ results: Array<Concept> }>(url)));
 }
 
-function useOrderableConceptSWR(
-  searchTerm: string,
-  conceptClasses: Array<string>,
-  orderableConceptSets?: Array<string>,
-) {
+function useOrderableConceptSWR(searchTerm: string, orderableConceptSets?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable<Array<ConceptResult> | Array<ConceptResults>>(
     orderableConceptSets?.length
       ? orderableConceptSets.map(
           (c) =>
             `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
         )
-      : conceptClasses.map(
-          (conceptClass) =>
-            `${restBaseUrl}/concept?class=${conceptClass}&name=${searchTerm}&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-        ),
+      : null,
     openmrsFetchMultiple as any,
     {
       shouldRetryOnError(err) {
@@ -84,14 +77,9 @@ export interface OrderableConcept extends OpenmrsResource {
   synonyms: Array<string>;
 }
 
-export function useOrderableConceptSets(
-  searchTerm: string,
-  conceptClasses: Array<string>,
-  orderableConcepts: Array<string>,
-) {
+export function useOrderableConceptSets(searchTerm: string, orderableConcepts: Array<string>) {
   const { data, isLoading, error } = useOrderableConceptSWR(
     searchTerm,
-    conceptClasses,
     orderableConcepts?.length ? orderableConcepts : null,
   );
 

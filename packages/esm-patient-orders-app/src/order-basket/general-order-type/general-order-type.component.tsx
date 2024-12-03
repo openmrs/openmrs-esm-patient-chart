@@ -21,17 +21,11 @@ import { prepOrderPostData } from './resources';
 
 interface GeneralOrderTypeProps {
   orderTypeUuid: string;
-  orderableConceptClasses: Array<string>;
   orderableConceptSets: Array<string>;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
-  orderTypeUuid,
-  orderableConceptSets,
-  orderableConceptClasses,
-  closeWorkspace,
-}) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);

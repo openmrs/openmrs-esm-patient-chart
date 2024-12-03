@@ -126,7 +126,6 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 <GeneralOrderType
                   key={orderType.orderTypeUuid}
                   orderTypeUuid={orderType.orderTypeUuid}
-                  orderableConceptClasses={orderType.orderableConceptClasses}
                   orderableConceptSets={orderType.orderableConceptSets}
                   closeWorkspace={closeWorkspace}
                 />

@@ -98,7 +98,6 @@ mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   orders: {
     labOrderTypeUuid: 'test-lab-order-type-uuid',
-    labOrderConceptClasses: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
     labOrderableConcepts: [],
   },
   additionalTestOrderTypes: [],

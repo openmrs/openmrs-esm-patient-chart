@@ -9,14 +9,13 @@ export interface TestType {
 
 export function useTestTypes(
   searchTerm: string,
-  conceptClasses: Array<string>,
   orderableConceptSets: Array<string>,
 ): {
   testTypes: Array<TestType>;
   isLoading: Boolean;
   error: Error;
 } {
-  const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, conceptClasses, orderableConceptSets);
+  const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, orderableConceptSets);
 
   const results = useMemo(
     () => ({

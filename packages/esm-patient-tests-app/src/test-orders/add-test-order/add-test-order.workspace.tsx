@@ -49,31 +49,16 @@ export default function AddLabOrderWorkspace({
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
 
-  const { orderableConceptSets, orderableConceptClasses } = useMemo(() => {
+  const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
       {
         orderTypeUuid: orders.labOrderTypeUuid,
-        orderableConceptClasses: orders.labOrderConceptClasses,
         orderableConceptSets: orders.labOrderableConcepts,
       },
       ...additionalTestOrderTypes,
     ];
-    return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid);
-  }, [
-    additionalTestOrderTypes,
-    orderTypeUuid,
-    orders.labOrderConceptClasses,
-    orders.labOrderTypeUuid,
-    orders.labOrderableConcepts,
-  ]);
-
-  const conceptClasses = useMemo(
-    () =>
-      orderableConceptClasses?.length
-        ? orderableConceptClasses
-        : orderType.conceptClasses.map(({ uuid }) => uuid) ?? [],
-    [orderType?.conceptClasses, orderableConceptClasses],
-  );
+    return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets;
+  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts]);
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -123,7 +108,6 @@ export default function AddLabOrderWorkspace({
         <TestTypeSearch
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
-          orderableConceptClasses={conceptClasses}
           openLabForm={setCurrentLabOrder}
         />
       )}

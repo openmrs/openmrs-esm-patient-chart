@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
 import { renderHook, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../../esm-patient-tests-app/src/config-schema';
@@ -13,7 +11,6 @@ mockUseConfig.mockReturnValue({
   orders: {
     labOrderableConcepts: [],
     labOrderTypeUuid: 'lab-order-type-uuid',
-    labOrderConceptClasses: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
   },
 });
 
@@ -41,7 +38,7 @@ mockOpenrsFetch.mockImplementation((url: string) => {
 
 describe('useOrderableConceptSets is configurable', () => {
   it('should fetch orderable concept sets if passed', async () => {
-    const { result } = renderHook(() => useOrderableConceptSets('', [], ['concept-set-uuid']));
+    const { result } = renderHook(() => useOrderableConceptSets('', ['concept-set-uuid']));
     expect(openmrsFetch).toHaveBeenCalledWith(
       `${restBaseUrl}/concept/concept-set-uuid?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     );
@@ -54,7 +51,7 @@ describe('useOrderableConceptSets is configurable', () => {
   });
 
   xit('should filter through fetched concepts sets based on the search term', async () => {
-    const { result } = renderHook(() => useOrderableConceptSets('another', [], ['concept-set-uuid']));
+    const { result } = renderHook(() => useOrderableConceptSets('another', ['concept-set-uuid']));
     expect(openmrsFetch).toHaveBeenCalledWith(
       `${restBaseUrl}/concept/concept-set-uuid?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
     );
@@ -63,26 +60,6 @@ describe('useOrderableConceptSets is configurable', () => {
       expect.objectContaining({ display: 'Another configured concept' }),
       // expect.objectContaining({ display: 'Configured concept' }),
     ]);
-    expect(result.current.error).toBeFalsy();
-  });
-
-  it('should fetch concept class if orderable concept set is not passed', async () => {
-    const { result } = renderHook(() => useOrderableConceptSets('', ['concept-class-uuid'], []));
-    expect(openmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/concept?class=concept-class-uuid&name=&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-    );
-    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
-    expect(result.current.concepts).toEqual([expect.objectContaining({ display: 'Test concept' })]);
-    expect(result.current.error).toBeFalsy();
-  });
-
-  it('should fetch concept class if orderable concept set is not passed and search term is passed', async () => {
-    const { result } = renderHook(() => useOrderableConceptSets('concept', ['concept-class-uuid'], []));
-    expect(openmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/concept?class=concept-class-uuid&name=concept&searchType=fuzzy&v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
-    );
-    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
-    expect(result.current.concepts).toEqual([expect.objectContaining({ display: 'Test concept' })]);
     expect(result.current.error).toBeFalsy();
   });
 });

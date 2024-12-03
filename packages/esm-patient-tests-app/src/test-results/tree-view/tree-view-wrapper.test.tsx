@@ -87,7 +87,6 @@ describe('TreeViewWrapper', () => {
       orders: {
         labOrderTypeUuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
         labOrderableConcepts: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
-        labOrderConceptClasses: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
       },
       additionalTestOrderTypes: [],
       labTestsWithOrderReasons: [],
