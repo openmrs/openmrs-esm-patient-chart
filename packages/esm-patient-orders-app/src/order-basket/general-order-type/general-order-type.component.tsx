@@ -18,14 +18,13 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import { prepOrderPostData } from './resources';
+import { type OrderTypeDefinition } from '../../config-schema';
 
-interface GeneralOrderTypeProps {
-  orderTypeUuid: string;
-  orderableConceptSets: Array<string>;
+interface GeneralOrderTypeProps extends OrderTypeDefinition {
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -114,7 +113,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
         <div className={styles.iconAndLabel}>
           {/* <RxIcon isTablet={isTablet} /> */}
           {/* TODO: Add Icon */}
-          <h4 className={styles.heading}>{`${orderType?.display} (${orders.length})`}</h4>
+          <h4 className={styles.heading}>{`${label ? label : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

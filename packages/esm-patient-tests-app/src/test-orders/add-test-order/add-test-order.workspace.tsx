@@ -18,7 +18,6 @@ import {
   type OrderBasketItem,
   type TestOrderBasketItem,
   launchPatientWorkspace,
-  useOrderType,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderForm } from './test-order-form.component';
@@ -46,19 +45,19 @@ export default function AddLabOrderWorkspace({
   const { patientUuid } = usePatientChartStore();
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
-  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
 
   const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
       {
+        label: t('labOrders', 'Lab orders'),
         orderTypeUuid: orders.labOrderTypeUuid,
         orderableConceptSets: orders.labOrderableConcepts,
       },
       ...additionalTestOrderTypes,
     ];
     return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets;
-  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts]);
+  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
 
   const patientName = patient ? getPatientName(patient) : '';
 

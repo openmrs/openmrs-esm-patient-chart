@@ -29,15 +29,22 @@ export const configSchema = {
           _type: Type.UUID,
         },
       },
+      label: {
+        _type: Type.UUID,
+        _description: 'The custom label to be shown for the order type',
+      },
     },
   },
 };
 
+export interface OrderTypeDefinition {
+  label?: string;
+  orderTypeUuid: string;
+  orderableConceptSets: Array<string>;
+}
+
 export interface ConfigObject {
   orderEncounterType: string;
   showPrintButton: boolean;
-  orderTypes: Array<{
-    orderTypeUuid: string;
-    orderableConceptSets: Array<string>;
-  }>;
+  orderTypes: Array<OrderTypeDefinition>;
 }

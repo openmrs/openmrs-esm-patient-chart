@@ -28,8 +28,10 @@ import type { ConfigObject } from '../../config-schema';
  */
 export default function LabOrderBasketPanelExtension() {
   const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
+  const { t } = useTranslation();
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
     {
+      label: t('labOrders', 'Lab orders'),
       orderTypeUuid: orders.labOrderTypeUuid,
       orderableConceptSets: orders.labOrderableConcepts,
     },
@@ -49,7 +51,7 @@ type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {}
 
-function LabOrderBasketPanel({ orderTypeUuid }: LabOrderBasketPanelProps) {
+function LabOrderBasketPanel({ orderTypeUuid, label }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -140,7 +142,7 @@ function LabOrderBasketPanel({ orderTypeUuid }: LabOrderBasketPanelProps) {
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           <LabIcon isTablet={isTablet} />
-          <h4 className={styles.heading}>{`${orderType?.display} (${orders.length})`}</h4>
+          <h4 className={styles.heading}>{`${label ? label : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

@@ -60,7 +60,10 @@ export const configSchema = {
         _type: Type.UUID,
         _description: 'UUID for the new order type',
       },
-
+      label: {
+        _type: Type.UUID,
+        _description: 'The custom label to be shown for the order type',
+      },
       orderableConceptSets: {
         _type: Type.UUID,
         _description:
@@ -121,7 +124,7 @@ export interface ConfigObject {
   };
   showLabReferenceNumberField: boolean;
   additionalTestOrderTypes: Array<{
-    label: string;
+    label?: string;
     orderTypeUuid: string;
     orderableConceptSets: Array<string>;
   }>;
