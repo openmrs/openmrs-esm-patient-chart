@@ -6,11 +6,11 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import {
   ArrowRightIcon,
   closeWorkspace,
+  ResponsiveWrapper,
   ShoppingCartArrowDownIcon,
   useDebounce,
   useLayoutType,
   useSession,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { type LabOrderBasketItem, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type TestType, useTestTypes } from './useTestTypes';

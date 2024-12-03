@@ -83,9 +83,7 @@
 }
 
 .removeButton {
-  svg {
-    fill: $danger;
-  }
+  fill: $danger;
 }
 
 .label01 {
@@ -98,4 +96,17 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.additionalInfoContainer {
+  padding: layout.$spacing-05 0;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: layout.$spacing-05;
+}
+
+.additionalInfoContainer:not(:has(div:not(:empty))) {
+  padding: 0;
 }
