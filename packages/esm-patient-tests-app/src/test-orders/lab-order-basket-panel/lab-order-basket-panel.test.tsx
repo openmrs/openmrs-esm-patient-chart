@@ -39,7 +39,7 @@ describe('LabOrderBasketPanel', () => {
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
     render(<LabOrderBasketPanel />);
-    expect(screen.getByRole('heading', { name: /Test order \(0\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Lab orders \(0\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
   });
 
@@ -76,7 +76,7 @@ describe('LabOrderBasketPanel', () => {
       setOrders: mockSetOrders,
     }));
     const { rerender } = render(<LabOrderBasketPanel />);
-    expect(screen.getByText(/Test order \(2\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Lab orders \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV VIRAL LOAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
 
@@ -85,7 +85,7 @@ describe('LabOrderBasketPanel', () => {
 
     await user.click(removeHivButton);
     rerender(<LabOrderBasketPanel />);
-    await expect(screen.getByText(/Test order \(1\)/i)).toBeInTheDocument();
+    await expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
     expect(screen.queryByText(/HIV VIRAL LOAD/i)).not.toBeInTheDocument();
   });
