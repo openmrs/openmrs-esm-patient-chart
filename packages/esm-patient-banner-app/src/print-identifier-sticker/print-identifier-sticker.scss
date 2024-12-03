@@ -95,7 +95,7 @@
   @include type.type-style('heading-06');
   font-weight: 700;
   margin-inline-end: layout.$spacing-03;
-  text-align: left;
+  padding-bottom: 0.5rem;
 }
 
 .implementationLogo {
@@ -226,9 +226,7 @@
 .fieldsContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: layout.$spacing-05 layout.$spacing-05;
   align-items: baseline;
-  padding-bottom: layout.$spacing-05;
 }
 
 .fieldRow {
@@ -242,5 +240,4 @@
 
 .fieldsTableCell div {
   display: grid;
-  gap: layout.$spacing-05;
 }
