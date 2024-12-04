@@ -34,6 +34,11 @@
       "order": 0
     },
     {
+      "name": "order-basket-ward-action-menu",
+      "component": "orderBasketActionMenu",
+      "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
       "name": "patient-orders-summary-dashboard",
       "component": "ordersDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -59,7 +64,8 @@
       "title": "orderBasketWorkspaceTitle",
       "component": "orderBasketWorkspace",
       "type": "order",
-      "canHide": true
+      "canHide": true,
+      "groups": ["ward-patient"]
     },
     {
       "name": "patient-orders-form-workspace",

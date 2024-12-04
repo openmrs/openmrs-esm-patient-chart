@@ -62,6 +62,7 @@ export default function LabOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-lab-order'),
+      closeWorkspaceGroup: false,
     });
   }, []);
 
@@ -69,6 +70,7 @@ export default function LabOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
+      closeWorkspaceGroup: false,
     });
   }, []);
 
