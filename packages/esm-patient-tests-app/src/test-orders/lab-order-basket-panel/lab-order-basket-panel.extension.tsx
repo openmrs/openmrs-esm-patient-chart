@@ -142,7 +142,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label }: LabOrderBasketPanelProps)
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           <LabIcon isTablet={isTablet} />
-          <h4 className={styles.heading}>{`${label ? label : orderType?.display} (${orders.length})`}</h4>
+          <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

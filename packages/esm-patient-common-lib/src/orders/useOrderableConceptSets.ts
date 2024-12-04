@@ -4,6 +4,7 @@ import {
   type OpenmrsResource,
   reportError,
   restBaseUrl,
+  showSnackbar,
 } from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -12,7 +13,7 @@ import type { Concept } from './types';
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;
 
-function openmrsFetchMultiple(urls: Array<string>) {
+function openmrsFetchMultipleConcepts(urls: Array<string>) {
   // SWR has an RFC for `useSWRList`:
   // https://github.com/vercel/swr/discussions/1988
   // If that ever is implemented we should switch to using that.
@@ -20,20 +21,21 @@ function openmrsFetchMultiple(urls: Array<string>) {
 }
 
 function useOrderableConceptSWR(searchTerm: string, orderableConceptSets?: Array<string>) {
-  const { data, isLoading, error } = useSWRImmutable<Array<ConceptResult> | Array<ConceptResults>>(
+  const { data, isLoading, error } = useSWRImmutable<Array<ConceptResult> | Array<ConceptResults>, Error>(
     orderableConceptSets?.length
       ? orderableConceptSets.map(
           (c) =>
             `${restBaseUrl}/concept/${c}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,names:(display),setMembers:(display,uuid,names:(display))))`,
         )
       : null,
-    openmrsFetchMultiple as any,
-    {
-      shouldRetryOnError(err) {
-        return err instanceof Response;
-      },
-    },
+    openmrsFetchMultipleConcepts,
   );
+
+  useEffect(() => {
+    if (error) {
+      reportError(error);
+    }
+  });
 
   const results = useMemo(() => {
     if (isLoading || error) return null;
@@ -42,7 +44,7 @@ function useOrderableConceptSWR(searchTerm: string, orderableConceptSets?: Array
       const concepts = (data as Array<ConceptResult>)?.flatMap((d) => d.data.setMembers);
       if (searchTerm) {
         return concepts?.filter((concept) =>
-          concept.names.some((name) => name.display.toLowerCase().includes(searchTerm.toLowerCase())),
+          concept.names.some((name) => name.display.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())),
         );
       }
       return concepts;
@@ -58,9 +60,7 @@ function useOrderableConceptSWR(searchTerm: string, orderableConceptSets?: Array
   };
 }
 
-export interface OrderableConcept extends OpenmrsResource {
-  synonyms: Array<string>;
-}
+export interface OrderableConcept extends OpenmrsResource {}
 
 export function useOrderableConceptSets(searchTerm: string, orderableConcepts: Array<string>) {
   const { data, isLoading, error } = useOrderableConceptSWR(
@@ -74,14 +74,9 @@ export function useOrderableConceptSets(searchTerm: string, orderableConcepts: A
     }
   }, [error]);
 
-  const concepts = useMemo(
+  const concepts: Array<OrderableConcept> = useMemo(
     () =>
       data
-        ?.map((concept) => ({
-          display: concept.display,
-          uuid: concept.uuid,
-          synonyms: concept.names?.flatMap((name) => name.display) ?? [],
-        }))
         ?.sort((testConcept1, testConcept2) => testConcept1.display.localeCompare(testConcept2.display))
         ?.filter((item, pos, array) => !pos || array[pos - 1].uuid !== item.uuid),
     [data],

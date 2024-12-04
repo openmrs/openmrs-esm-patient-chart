@@ -18,7 +18,7 @@ export const configSchema = {
     _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
     _elements: {
       orderTypeUuid: {
-        _type: Type.String,
+        _type: Type.UUID,
         _description: 'The UUID of the order type listed in the order basket',
       },
       orderableConceptSets: {
