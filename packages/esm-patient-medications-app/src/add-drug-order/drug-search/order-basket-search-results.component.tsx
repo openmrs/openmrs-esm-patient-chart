@@ -22,8 +22,8 @@ import {
   useDrugSearch,
   useDrugTemplate,
 } from './drug-search.resource';
-import styles from './order-basket-search-results.scss';
 import type { DrugOrderBasketItem } from '../../types';
+import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import { useConfig, useDebounce, ResponsiveWrapper, closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { type DrugOrderBasketItem } from '../../types';
 import { type ConfigObject } from '../../config-schema';
+import { type DrugOrderBasketItem } from '../../types';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';
 

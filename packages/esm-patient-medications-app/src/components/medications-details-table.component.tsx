@@ -40,10 +40,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
-import type { DrugOrderBasketItem } from '../types';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;

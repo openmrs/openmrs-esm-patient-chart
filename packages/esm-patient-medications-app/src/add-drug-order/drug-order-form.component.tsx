@@ -40,8 +40,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useRequireOutpatientQuantity } from '../api';
-import styles from './drug-order-form.scss';
 import {
   type CommonMedicationValueCoded,
   type DosingUnit,
@@ -51,6 +49,8 @@ import {
   type MedicationRoute,
   type QuantityUnit,
 } from '../types';
+import { useRequireOutpatientQuantity } from '../api';
+import styles from './drug-order-form.scss';
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderFormProps {
