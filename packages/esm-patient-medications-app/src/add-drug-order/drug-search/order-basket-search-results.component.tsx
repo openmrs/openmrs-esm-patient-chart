@@ -3,12 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
-import {
-  type DrugOrderBasketItem,
-  launchPatientWorkspace,
-  useOrderBasket,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderBasket, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
   closeWorkspace,
@@ -28,6 +23,7 @@ import {
   useDrugTemplate,
 } from './drug-search.resource';
 import styles from './order-basket-search-results.scss';
+import type { DrugOrderBasketItem } from '../../types';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;

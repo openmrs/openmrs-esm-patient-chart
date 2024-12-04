@@ -7,22 +7,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-
-export interface Concept {
-  uuid: string;
-  name: {
-    display: string;
-  };
-  names: Array<{
-    display: string;
-  }>;
-  conceptClass: {
-    uuid: string;
-  };
-  answers: Array<Concept>;
-  setMembers: Array<Concept>;
-  display: string;
-}
+import type { Concept } from './types';
 
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;

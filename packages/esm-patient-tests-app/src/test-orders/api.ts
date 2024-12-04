@@ -2,7 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { chunk } from 'lodash-es';
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import type { TestOrderBasketItem, OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { TestOrderBasketItem } from '../types';
 import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 

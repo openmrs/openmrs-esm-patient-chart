@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ClickableTile, IconButton, Tile } from '@carbon/react';
 import { ExtensionSlot, TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket-item-tile.scss';
+import type { DrugOrderBasketItem } from '../types';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: DrugOrderBasketItem;

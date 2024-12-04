@@ -1,5 +1,25 @@
 import type { OpenmrsResource } from '@openmrs/esm-framework';
-import type { Drug } from './drug-order';
+
+export interface Concept extends OpenmrsResource {
+  name?: {
+    display: string;
+  };
+  names?: Array<{
+    display: string;
+  }>;
+  conceptClass?: {
+    uuid: string;
+  };
+  answers?: Array<Concept>;
+  setMembers?: Array<Concept>;
+}
+export interface Drug {
+  uuid: string;
+  strength: string;
+  concept: Concept;
+  dosageForm: OpenmrsResource;
+  display: string;
+}
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
@@ -24,7 +44,7 @@ export interface OrderErrorObject {
 }
 
 export interface OrderBasketItem {
-  action?: OrderAction;
+  action: OrderAction;
   display: string;
   uuid?: string;
   orderer?: string;
@@ -44,7 +64,7 @@ export interface OrderBasketItem {
    * An optional identifier from the fulfiller (e.g., lab system) for the specimen or record associated with the order.
    */
   accessionNumber?: string;
-  concept?: OpenmrsResource;
+  concept?: Concept;
   instructions?: string;
   urgency?: OrderUrgency;
   previousOrder?: string;
@@ -104,7 +124,7 @@ export interface Order {
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
-  concept: OpenmrsResource;
+  concept: Concept;
   dateActivated: string;
   dateStopped?: string | null;
   dispenseAsWritten: boolean;

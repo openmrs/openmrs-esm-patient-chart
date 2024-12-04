@@ -11,7 +11,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
-  type DrugOrderBasketItem,
+  type OrderBasketItem,
   launchPatientWorkspace,
   useOrderBasket,
   useOrderType,
@@ -29,7 +29,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(orderTypeUuid, prepOrderPostData);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -38,11 +38,11 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     revisedOrderBasketItems,
     discontinuedOrderBasketItems,
   } = useMemo(() => {
-    const incompleteOrderBasketItems: Array<DrugOrderBasketItem> = [];
-    const newOrderBasketItems: Array<DrugOrderBasketItem> = [];
-    const renewedOrderBasketItems: Array<DrugOrderBasketItem> = [];
-    const revisedOrderBasketItems: Array<DrugOrderBasketItem> = [];
-    const discontinuedOrderBasketItems: Array<DrugOrderBasketItem> = [];
+    const incompleteOrderBasketItems: Array<OrderBasketItem> = [];
+    const newOrderBasketItems: Array<OrderBasketItem> = [];
+    const renewedOrderBasketItems: Array<OrderBasketItem> = [];
+    const revisedOrderBasketItems: Array<OrderBasketItem> = [];
+    const discontinuedOrderBasketItems: Array<OrderBasketItem> = [];
 
     orders.forEach((order) => {
       if (order?.isOrderIncomplete) {
@@ -77,7 +77,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     });
   };
 
-  const openOrderForm = (order: DrugOrderBasketItem) => {
+  const openOrderForm = (order: OrderBasketItem) => {
     closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () =>
@@ -89,7 +89,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
   };
 
   const removeOrder = useCallback(
-    (order: DrugOrderBasketItem) => {
+    (order: OrderBasketItem) => {
       const newOrders = [...orders];
       newOrders.splice(orders.indexOf(order), 1);
       setOrders(newOrders);

@@ -25,7 +25,6 @@ import {
   type Order,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
-  type DrugOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -44,6 +43,7 @@ import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
+import type { DrugOrderBasketItem } from '../types';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;

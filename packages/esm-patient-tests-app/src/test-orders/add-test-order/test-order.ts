@@ -1,5 +1,6 @@
-import { type TestOrderBasketItem, type OrderUrgency, type OrderableConcept } from '@openmrs/esm-patient-common-lib';
+import { type OrderUrgency, type OrderableConcept } from '@openmrs/esm-patient-common-lib';
 import { type TestType } from './useTestTypes';
+import type { TestOrderBasketItem } from '../../types';
 
 type LabOrderRequest = Pick<TestOrderBasketItem, 'action' | 'testType'>;
 
@@ -12,6 +13,7 @@ type PriorityOption = {
 export const priorityOptions: PriorityOption[] = [
   { value: 'ROUTINE', label: 'Routine' },
   { value: 'STAT', label: 'Stat' },
+  { value: 'ON_SCHEDULED_DATE', label: 'On scheduled date' },
 ];
 // TODO add priority option `{ value: "ON_SCHEDULED_DATE", label: "On scheduled date" }` once the form supports a date.
 

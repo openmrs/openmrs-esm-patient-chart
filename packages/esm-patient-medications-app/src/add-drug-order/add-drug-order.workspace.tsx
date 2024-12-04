@@ -6,13 +6,13 @@ import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
   useOrderBasket,
-  type DrugOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import { DrugOrderForm } from './drug-order-form.component';
 import DrugSearch from './drug-search/drug-search.component';
 import styles from './add-drug-order.scss';
+import type { DrugOrderBasketItem } from '../types';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;

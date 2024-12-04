@@ -34,8 +34,6 @@ import {
   getDrugOrderByUuid,
   launchPatientWorkspace,
   PatientChartPagination,
-  type DrugOrderBasketItem,
-  type TestOrderBasketItem,
   type Order,
   type OrderBasketItem,
   type OrderType,
@@ -97,7 +95,7 @@ interface DataTableRow {
   isExpanded: boolean;
 }
 
-type MutableOrderBasketItem = OrderBasketItem | TestOrderBasketItem | DrugOrderBasketItem;
+type MutableOrderBasketItem = OrderBasketItem;
 
 const medicationsOrderBasket = 'medications';
 const labsOrderBasket = 'labs';

@@ -12,12 +12,8 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import {
-  type TestOrderBasketItem,
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import type { TestOrderBasketItem } from '../../types';
 import { prepLabOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import styles from './test-type-search.scss';

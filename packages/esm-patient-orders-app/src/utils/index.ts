@@ -1,10 +1,4 @@
-import {
-  type TestOrderBasketItem,
-  type DrugOrderBasketItem,
-  type Order,
-  type OrderAction,
-  type OrderBasketItem,
-} from '@openmrs/esm-patient-common-lib';
+import { type Order, type OrderAction, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
@@ -29,7 +23,7 @@ export function compare<T>(x?: T, y?: T) {
 /**
  * Builds medication order object from the given order object
  */
-export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOrderBasketItem {
+export function buildMedicationOrder(order: Order, action?: OrderAction) {
   return {
     display: order.drug?.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
@@ -75,7 +69,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
 /**
  * Builds lab order object from the given order object
  */
-export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBasketItem {
+export function buildLabOrder(order: Order, action?: OrderAction) {
   return {
     action: action,
     display: order.display,

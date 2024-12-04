@@ -14,9 +14,9 @@ import {
   launchPatientWorkspace,
   type OrderBasketItem,
   useOrderBasket,
-  type TestOrderBasketItem,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
+import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepLabOrderPostData } from '../api';
 import LabIcon from './lab-icon.component';

@@ -43,7 +43,6 @@ import { type ConfigObject } from '../config-schema';
 import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
 import {
-  usePatientChartStore,
   type CommonMedicationValueCoded,
   type DosingUnit,
   type DrugOrderBasketItem,
@@ -51,7 +50,8 @@ import {
   type MedicationFrequency,
   type MedicationRoute,
   type QuantityUnit,
-} from '@openmrs/esm-patient-common-lib';
+} from '../types';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
