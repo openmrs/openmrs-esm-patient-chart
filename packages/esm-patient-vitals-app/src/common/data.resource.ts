@@ -181,6 +181,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           return 'weight';
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
+        case concepts.generalPatientNoteUuid:
+          return 'generalPatientNote';
         default:
           return ''; // or throw an error for unknown conceptUuid
       }
@@ -195,6 +197,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       concepts.respiratoryRateUuid,
       concepts.temperatureUuid,
       concepts.weightUuid,
+      concepts.generalPatientNoteUuid,
     ],
   );
 
@@ -209,7 +212,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         if (vitalsHashTable.has(recordedDate) && vitalsHashTable.get(recordedDate)) {
           vitalsHashTable.set(recordedDate, {
             ...vitalsHashTable.get(recordedDate),
-            [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
+            [getVitalsMapKey(vitalSign.code)]: vitalSign.valueString || vitalSign.value,
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
@@ -300,6 +303,7 @@ function vitalsProperties(conceptMetadata: Array<ConceptMetadata> | undefined) {
     ),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
+    valueString: resource?.valueString,
   });
 }
 
