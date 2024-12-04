@@ -7,7 +7,7 @@ import {
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { prepLabOrderPostData, useOrderReasons } from '../api';
+import { prepTestOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -51,7 +51,7 @@ export function LabOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);

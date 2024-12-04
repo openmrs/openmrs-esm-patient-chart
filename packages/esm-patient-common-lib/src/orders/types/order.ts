@@ -86,20 +86,7 @@ export interface OrderPost {
   careSetting?: string;
   orderer?: string;
   encounter?: string;
-  drug?: string;
-  dose?: number;
-  doseUnits?: string;
-  route?: string;
-  frequency?: string;
-  asNeeded?: boolean;
-  numRefills?: number;
-  quantity?: number;
-  quantityUnits?: string;
   type?: string;
-  duration?: number;
-  durationUnits?: string;
-  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
-  dosingInstructions?: string;
   concept?: string;
   dateActivated?: string;
   previousOrder?: string;
@@ -110,6 +97,24 @@ export interface OrderPost {
   accessionNumber?: string;
   orderType?: string;
 }
+
+export interface DrugOrderPost extends OrderPost {
+  drug?: string;
+  dose?: number;
+  doseUnits?: string;
+  route?: string;
+  frequency?: string;
+  asNeeded?: boolean;
+  numRefills?: number;
+  quantity?: number;
+  quantityUnits?: string;
+  duration?: number;
+  durationUnits?: string;
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
+  dosingInstructions?: string;
+}
+
+export interface TestOrderPost extends OrderPost {}
 
 export interface PatientOrderFetchResponse {
   results: Array<Order>;

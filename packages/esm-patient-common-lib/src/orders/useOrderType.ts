@@ -8,6 +8,7 @@ export function useOrderType(orderTypeUuid: string) {
     `${restBaseUrl}/ordertype/${orderTypeUuid}`,
     openmrsFetch,
   );
+
   const results = useMemo(
     () => ({
       isLoadingOrderType: isLoading,
@@ -17,5 +18,6 @@ export function useOrderType(orderTypeUuid: string) {
     }),
     [data?.data, error, isLoading, isValidating],
   );
+
   return results;
 }

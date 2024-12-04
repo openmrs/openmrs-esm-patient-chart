@@ -14,7 +14,7 @@ import {
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import type { TestOrderBasketItem } from '../../types';
-import { prepLabOrderPostData } from '../api';
+import { prepTestOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import styles from './test-type-search.scss';
 import { useTestTypes, type TestType } from './useTestTypes';
@@ -185,7 +185,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
 
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),

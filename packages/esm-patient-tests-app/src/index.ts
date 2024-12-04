@@ -10,8 +10,7 @@ import { configSchema } from './config-schema';
 import { dashboardMeta } from './test-results/dashboard.meta';
 import externalOverviewComponent from './test-results/overview/external-overview.extension';
 import resultsViewerComponent from './test-results/results-viewer';
-
-const moduleName = '@openmrs/esm-patient-tests-app';
+import { moduleName } from './constants';
 
 const options = {
   featureName: 'patient-tests',

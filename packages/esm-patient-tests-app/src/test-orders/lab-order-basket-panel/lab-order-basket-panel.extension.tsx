@@ -18,7 +18,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
-import { prepLabOrderPostData } from '../api';
+import { prepTestOrderPostData } from '../api';
 import LabIcon from './lab-icon.component';
 import styles from './lab-order-basket-panel.scss';
 import type { ConfigObject } from '../../config-schema';
@@ -56,7 +56,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label }: LabOrderBasketPanelProps)
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
