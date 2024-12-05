@@ -144,7 +144,7 @@ describe('AddLabOrder', () => {
     expect(testTypeLabel).toBeInTheDocument();
     expect(testTypeValue).toBeInTheDocument();
 
-    const labReferenceNumber = screen.getByRole('textbox', { name: 'Test order reference number' });
+    const labReferenceNumber = screen.getByRole('textbox', { name: 'Reference number' });
     expect(labReferenceNumber).toBeInTheDocument();
     await user.type(labReferenceNumber, 'lba-000124');
 

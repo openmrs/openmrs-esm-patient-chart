@@ -38,10 +38,13 @@ export const configSchema = {
       _description: "UUID for the 'Lab' order type",
       _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
     },
-    labOrderConceptClasses: {
-      _type: Type.UUID,
-      _description: 'Concept class of the orderable lab concepts',
-      _default: ['8d4907b2-c2cc-11de-8d13-0010c6dffd0f'],
+    labOrderableConcepts: {
+      _type: Type.Array,
+      _description: 'UUIDs of concepts that represent orderable lab tests or lab sets.',
+      _elements: {
+        _type: Type.UUID,
+      },
+      _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
   showLabReferenceNumberField: {
@@ -60,8 +63,9 @@ export const configSchema = {
         _description: 'UUID for the new order type',
       },
       label: {
-        _type: Type.UUID,
-        _description: 'The custom label to be shown for the order type',
+        _type: Type.String,
+        _description:
+          'The custom label to be shown for the order type. The label will be translated using the label as the key itself.',
       },
       orderableConceptSets: {
         _type: Type.UUID,

@@ -30,8 +30,9 @@ export const configSchema = {
         },
       },
       label: {
-        _type: Type.UUID,
-        _description: 'The custom label to be shown for the order type',
+        _type: Type.String,
+        _description:
+          'The custom label to be shown for the order type. The label will be translated with the key as the label itself.',
       },
     },
   },

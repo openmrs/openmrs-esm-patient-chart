@@ -167,7 +167,7 @@ export function OrderForm({
                       id="labReferenceNumberInput"
                       invalid={!!errors.accessionNumber}
                       invalidText={errors.accessionNumber?.message}
-                      labelText={t('testOrderReferenceNumber', '{{orderType}} reference number', {
+                      labelText={t('referenceNumber', 'Reference number', {
                         orderType: orderType?.display,
                       })}
                       maxLength={150}
