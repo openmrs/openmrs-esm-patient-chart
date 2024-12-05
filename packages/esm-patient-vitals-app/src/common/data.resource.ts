@@ -115,8 +115,8 @@ const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>(
  * @returns An SWR-like structure that includes the cleaned-up vitals
  */
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
-  const { concepts } = useConfig<ConfigObject>();
   const { conceptMetadata } = useVitalsConceptMetadata();
+  const { concepts } = useConfig<ConfigObject>();
   const biometricsConcepts = useMemo(
     () => [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
     [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
