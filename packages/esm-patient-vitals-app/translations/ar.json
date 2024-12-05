@@ -12,7 +12,7 @@
   "calculatedBmi": "مؤشر كتلة الجسم (محسوب)",
   "checkForValidity": "بعض القيم المدخلة غير صالحة",
   "date": "Date",
-  "dateAndTime": "Date and time",
+  "dateAndTime": "التاريخ والوقت",
   "daysOldVitals_one": "<0>These vitals are <1>{{count}} day old</1></0>",
   "daysOldVitals_other": "<0>These vitals are <1>{{count}} days old</1></0>",
   "diastolic": "الانقباضي",

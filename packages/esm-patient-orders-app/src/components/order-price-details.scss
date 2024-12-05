@@ -1,0 +1,28 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+
+.priceDetailsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.priceLabel {
+  @include type.type-style('heading-compact-01');
+  padding-inline-end: layout.$spacing-02;
+}
+
+.priceToolTip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.priceToolTipTrigger {
+  display: flex;
+  padding: 0 0 0 layout.$spacing-02;
+  border: none;
+  outline: none;
+}
