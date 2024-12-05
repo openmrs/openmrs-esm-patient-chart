@@ -6,7 +6,6 @@ import { useReactToPrint } from 'react-to-print';
 import { age, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockFhirPatient } from '../../../../__mocks__/patient.mock';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { getByTextWithMarkup } from 'tools';
 import PrintIdentifierSticker from './print-identifier-sticker.modal';
 
 const mockedCloseModal = jest.fn();
@@ -32,7 +31,7 @@ describe('PrintIdentifierStickerModal', () => {
     const mockHandlePrint = jest.fn();
     mockedUseReactToPrint.mockReturnValue(mockHandlePrint);
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.getByText(/print identifier sticker/i)).toBeInTheDocument();
     const printButton = screen.getByRole('button', { name: /print/i });
@@ -58,13 +57,13 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
-    expect(screen.getByTestId('barcode')).toBeInTheDocument();
+    expect(screen.getAllByTestId('barcode')[0]).toBeInTheDocument();
     expect(Barcode).toHaveBeenCalledWith(
       {
         value: '100008E',
-        width: 2,
+        width: 3,
         background: '#f4f4f4',
         displayValue: true,
         renderer: 'img',
@@ -76,7 +75,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
       {},
     );
-    expect(screen.getByTestId('openmrs-logo')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Identifier sticker implementation logo')[0]).toBeInTheDocument();
   });
 
   it("should not render a barcode if it's disabled via config", async () => {
@@ -92,7 +91,7 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
     expect(screen.queryByTestId('barcode')).not.toBeInTheDocument();
     expect(screen.queryByTestId('openmrs-logo')).not.toBeInTheDocument();
@@ -111,21 +110,17 @@ describe('PrintIdentifierStickerModal', () => {
       },
     });
 
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
-    expect(screen.getByRole('img')).toHaveAttribute('src', '/openmrs/spa/logo.png');
+    expect(screen.getAllByRole('img')[0]).toHaveAttribute('src', '/openmrs/spa/logo.png');
   });
 
   it("renders the patient's details in the print modal", () => {
-    renderPrintIdentifierStickerModal();
+    render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
 
-    expect(getByTextWithMarkup(/Joshua Johnson/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/\+255777053243/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/100008E/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(age(mockFhirPatient.birthDate))).toBeInTheDocument();
+    expect(screen.getAllByText(/Joshua Johnson/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/\+255777053243/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/100008E/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(age(mockFhirPatient.birthDate))[0]).toBeInTheDocument();
   });
 });
-
-function renderPrintIdentifierStickerModal() {
-  return render(<PrintIdentifierSticker closeModal={mockedCloseModal} patient={mockFhirPatient} />);
-}

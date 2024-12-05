@@ -7,7 +7,7 @@
   "countyDistrict": "District",
   "district": "District",
   "implementationLogo": "Implementation logo",
-  "patientAge": "Age:",
+  "patientAgeWithSeparator": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
   "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",

@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/_vars' as *;
@@ -6,12 +7,29 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
-.documentHeader {
+.svgContainer {
+  background-color: white;
+}
+
+.gridContainer {
+  padding-left: 0;
+}
+
+.gridHeaderContainer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 1rem;
+  padding: 0;
   border-bottom: 1px solid $brand-01;
   margin-bottom: layout.$spacing-05;
+
+  :global(.cds--css-grid-column) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  img {
+    width: 100%;
+  }
 }
 
 .row {
@@ -22,13 +40,13 @@
 }
 
 .gridRow {
-  padding: 0px;
+  padding: 0;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 
   div {
-    margin-left: 0px;
+    margin-left: 0;
     margin-bottom: 5px;
   }
 }
@@ -58,26 +76,168 @@
   }
 }
 
-.strong {
-  @include type.type-style('heading-04');
-  font-weight: 700;
-  margin-inline-end: layout.$spacing-03;
-}
-
-.patientDetail {
+.patientDetailLabel {
   @include type.type-style('heading-03');
 }
 
-.implementationLogo {
-  width: 40%;
+.multipleStickerToggle {
+  :global(.cds--toggle__label-text) {
+    @include type.type-style('heading-03');
+    font-weight: 700;
+  }
+
+  :global(.cds--toggle__switch--checked) {
+    background-color: colors.$green-50;
+  }
 }
 
-@media print {
-  html,
-  body {
-    height: 100vh;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
+.patientDetail {
+  @include type.type-style('heading-06');
+  font-weight: 700;
+  margin-inline-end: layout.$spacing-03;
+  padding-bottom: 0.5rem;
+}
+
+.implementationLogo {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.stickerBarcode svg {
+  max-width: 100%;
+}
+
+.previewContainer {
+  max-height: layout.$spacing-13;
+  overflow: scroll;
+  background-color: white;
+  width: 100%;
+  border: 1px solid $ui-03;
+  margin-left: auto;
+  margin-right: auto;
+  padding: layout.$spacing-07;
+}
+
+.labelNumberInput {
+  padding: layout.$spacing-05;
+}
+
+.hidePreviewContainer {
+  display: none;
+}
+
+.stickerBarcodeContainer {
+  flex: 7;
+}
+
+.logoContainer {
+  flex: 3;
+}
+
+.printRoot {
+  @media print {
+    @page {
+      size: var(--omrs-print-label-paper-size, auto);
+    }
+
+    html,
+    body {
+      height: initial !important;
+      background-color: white;
+    }
+
+    .pageBreak {
+      break-after: page;
+    }
+
+    .stickerContainer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
   }
+
+  .labelsContainer {
+    grid-template-columns: repeat(var(--omrs-print-label-columns, 1), 1fr);
+    grid-template-rows: repeat(var(--omrs-print-label-rows, 1), auto);
+  }
+
+  .implementationLogo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .stickerBarcodeContainer {
+    flex: 7;
+  }
+
+  .logoContainer {
+    flex: 3;
+  }
+
+  .stickerBarcode svg {
+    max-width: 100%;
+  }
+
+  .gridHeaderContainer {
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    border-bottom: 1px solid $brand-01;
+    margin-bottom: layout.$spacing-05;
+
+    :global(.cds--css-grid-column) {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+}
+
+.printContainer {
+  height: auto;
+  width: auto;
+}
+
+.labelsContainer {
+  display: grid;
+  column-gap: 1.25rem;
+  row-gap: layout.$spacing-05;
+  place-items: center;
+  background-color: white;
+}
+
+.multipleStickerInputs {
+  display: flex;
+  gap: layout.$spacing-05;
+}
+
+.previewButton {
+  margin-top: layout.$spacing-05;
+}
+
+.fieldsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: baseline;
+}
+
+.fieldRow {
+  display: contents;
+}
+
+.fieldsTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.fieldsTableCell div {
+  display: grid;
 }

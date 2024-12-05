@@ -7,7 +7,7 @@
   "countyDistrict": "Huyện",
   "district": "Huyện",
   "implementationLogo": "Logo triển khai",
-  "patientAge": "Tuổi\"",
+  "patientAgeWithSeparator": "Tuổi\"",
   "patientDateOfBirthWithSeparator": "Ngày sinh:",
   "patientGenderWithSeparator": "Giới tính:",
   "patientIdentifierSticker": "Nhãn dán nhận dạng bệnh nhân",

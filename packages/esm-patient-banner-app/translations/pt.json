@@ -7,7 +7,7 @@
   "countyDistrict": "Distrito",
   "district": "Distrito",
   "implementationLogo": "Logotipo de implementação",
-  "patientAge": "Idade:",
+  "patientAgeWithSeparator": "Idade:",
   "patientDateOfBirthWithSeparator": "Data de nascimento:",
   "patientGenderWithSeparator": "Sexo:",
   "patientIdentifierSticker": "Etiqueta de Identificador do Utente",

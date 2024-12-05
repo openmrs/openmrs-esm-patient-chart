@@ -29,7 +29,7 @@
   "from": "Desde",
   "futureDateRestriction": "¡No se permite una fecha futura!",
   "hoursAgo": " horas atrás",
-  "invalidDate": "¡La fecha proporcionada es inválida!",
+  "invalidDate": "¡La fecha proporcionada no válida!",
   "loading": "Cargando...",
   "loadingComponent": "Cargando Componente...",
   "max": "El valor máximo debe ser {max}",

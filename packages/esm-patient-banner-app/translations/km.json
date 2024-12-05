@@ -7,7 +7,7 @@
   "countyDistrict": "ស្រុក/ខ័ណ្ឌ",
   "district": "ស្រុក/ខ័ណ្ឌ",
   "implementationLogo": "Implementation logo",
-  "patientAge": "Age:",
+  "patientAgeWithSeparator": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
   "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",

@@ -7,7 +7,7 @@
   "countyDistrict": "District",
   "district": "District",
   "implementationLogo": "Logo de mise en œuvre",
-  "patientAge": "Age:",
+  "patientAgeWithSeparator": "Age:",
   "patientDateOfBirthWithSeparator": "Date de Naissance:",
   "patientGenderWithSeparator": "Genre:",
   "patientIdentifierSticker": "Autocollant d'identification du patient",
