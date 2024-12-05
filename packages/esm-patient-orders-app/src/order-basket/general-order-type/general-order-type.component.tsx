@@ -111,8 +111,6 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     >
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
-          {/* <RxIcon isTablet={isTablet} /> */}
-          {/* TODO: Add Icon */}
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
