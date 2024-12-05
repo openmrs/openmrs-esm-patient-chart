@@ -1,4 +1,5 @@
 export * from './cards';
+export * from './compare';
 export * from './dashboards/createDashboardLink';
 export * from './dashboards/DashboardExtension';
 export * from './empty-state';
@@ -15,9 +16,9 @@ export * from './orders';
 export * from './pagination';
 export * from './patient-summary/patient-summary-extension-order';
 export * from './programs/usePatientProgramEnrollment';
+export * from './store/patient-chart-store';
 export * from './time-helper';
 export * from './types';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
 export * from './workspaces';
-export * from './store/patient-chart-store';

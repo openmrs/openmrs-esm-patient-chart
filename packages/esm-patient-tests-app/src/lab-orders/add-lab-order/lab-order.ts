@@ -1,10 +1,15 @@
-import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type LabOrderBasketItem, type OrderUrgency } from '@openmrs/esm-patient-common-lib';
 import { type TestType } from './useTestTypes';
 
 type LabOrderRequest = Pick<LabOrderBasketItem, 'action' | 'testType'>;
 
+type PriorityOption = {
+  label: string;
+  value: OrderUrgency;
+};
+
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
-export const priorityOptions = [
+export const priorityOptions: PriorityOption[] = [
   { value: 'ROUTINE', label: 'Routine' },
   { value: 'STAT', label: 'Stat' },
 ];
@@ -13,7 +18,7 @@ export const priorityOptions = [
 export function createEmptyLabOrder(testType: TestType, orderer: string): LabOrderBasketItem {
   return {
     action: 'NEW',
-    urgency: priorityOptions[0].value,
+    urgency: priorityOptions[0].value as OrderUrgency,
     display: testType.label,
     testType,
     orderer,

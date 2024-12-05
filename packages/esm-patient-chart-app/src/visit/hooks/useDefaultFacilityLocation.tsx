@@ -2,7 +2,7 @@ import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framew
 import useSWRImmutable from 'swr/immutable';
 import { type ChartConfig } from '../../config-schema';
 
-export const useDefaultLoginLocation = () => {
+export const useDefaultFacilityLocation = () => {
   const config = useConfig() as ChartConfig;
   const apiUrl = config.defaultFacilityUrl;
   const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);

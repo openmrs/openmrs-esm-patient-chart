@@ -39,7 +39,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
   shadow = false,
   isString = false,
 }) => {
-  const launchResultsDialog = useCallback(() => {
+  const handleLaunchResultsModal = useCallback(() => {
     const dispose = showModal('timeline-results-modal', {
       closeDeleteModal: () => dispose(),
       patientUuid,
@@ -57,7 +57,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
     >
       <span className={styles['trendline-link']}>
         {!isString ? (
-          <span className={styles['trendline-link-view']} onClick={launchResultsDialog}>
+          <span className={styles['trendline-link-view']} onClick={handleLaunchResultsModal}>
             {title}
           </span>
         ) : (
@@ -100,7 +100,10 @@ const GridItems = React.memo<{
 }>(({ sortedTimes, obs, zebra }) => (
   <>
     {sortedTimes.map((_, i) => {
-      if (!obs[i]) return <TimelineCell key={i} text={''} zebra={zebra} />;
+      if (!obs[i]) {
+        return <TimelineCell key={i} text={''} zebra={zebra} />;
+      }
+
       return <TimelineCell key={i} text={obs[i].value} interpretation={obs[i].interpretation} zebra={zebra} />;
     })}
   </>

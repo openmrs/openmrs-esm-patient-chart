@@ -8,8 +8,7 @@ export const esmPatientChartSchema = {
   },
   disableChangingVisitLocation: {
     _type: Type.Boolean,
-    _description:
-      "Whether the visit location field in the Start Visit form should be view-only. If so, the visit location will always be set to the user's login location.",
+    _description: 'Whether the visit location field in the Start Visit form should be view-only.',
     _default: false,
   },
   disableEmptyTabs: {
@@ -60,6 +59,12 @@ export const esmPatientChartSchema = {
     _type: Type.UUID,
     _description: 'The UUID of the visit type to be used for the automatically created offline visits.',
     _default: 'a22733fa-3501-4020-a520-da024eeff088',
+  },
+  restrictByVisitLocationTag: {
+    _type: Type.Boolean,
+    _description:
+      'On the start visit form, whether to restrict the visit location to locations with the Visit Location tag',
+    _default: false,
   },
   showAllEncountersTab: {
     _type: Type.Boolean,
@@ -147,6 +152,7 @@ export interface ChartConfig {
   notesConceptUuids: string[];
   numberOfVisitsToLoad: number;
   offlineVisitTypeUuid: string;
+  restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
   showExtraVisitAttributesSlot: boolean;
   showRecommendedVisitTypeTab: boolean;

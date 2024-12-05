@@ -27,6 +27,7 @@
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid $grey-2;
+
   &:not(:last-of-type) {
     margin-bottom: layout.$spacing-03;
   }

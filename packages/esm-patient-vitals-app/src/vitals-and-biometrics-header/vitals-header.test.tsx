@@ -8,7 +8,7 @@ import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { useVitalsAndBiometrics } from '../common';
+import { invalidateCachedVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -188,6 +188,47 @@ describe('VitalsHeader', () => {
         formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
       },
       workspaceTitle: 'Triage',
+      mutateForm: invalidateCachedVitalsAndBiometrics,
     });
+  });
+
+  it('should show links in vitals header by default', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('link', { name: /vitals history/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^record vitals$/i })).toBeInTheDocument();
+  });
+
+  it('should show not links in vitals header when hideLinks is true', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...{ ...testProps, hideLinks: true }} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
   });
 });

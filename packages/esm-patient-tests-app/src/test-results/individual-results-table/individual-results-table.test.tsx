@@ -1,53 +1,50 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import IndividualResultsTable from './individual-results-table.component';
+import { type GroupedObservation } from '../../types';
 
 describe('IndividualResultsTable', () => {
-  const mockSubRows = [
-    {
-      obs: [
-        {
-          obsDatetime: '2021-01-13 02:10:06.0',
-          value: '52.1',
-          interpretation: 'NORMAL' as const as OBSERVATION_INTERPRETATION,
-        },
-      ],
-      datatype: 'Numeric',
-      lowAbsolute: 0,
-      display: 'Prothrombin time',
-      conceptUuid: '161481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      units: 'Minute',
-      flatName: 'Hematology-Prothrombin Time (with INR)-Prothrombin time',
-      hasData: true,
-      entries: [
-        null,
-        null,
-        null,
-        {
-          obsDatetime: '2021-01-13 02:10:06.0',
-          value: '52.1',
-          interpretation: 'NORMAL' as const as OBSERVATION_INTERPRETATION,
-        },
-      ],
-    },
-  ];
+  const mockSubRows = {
+    key: 'HIV viral load',
+    date: '2024-10-15',
+    flatName: 'HIV viral load-HIV viral load',
+    entries: [
+      {
+        obsDatetime: '2024-10-15 03:20:19.0',
+        value: '45',
+        interpretation: 'NORMAL',
+        key: 'HIV viral load-HIV viral load',
+        datatype: 'Numeric',
+        lowAbsolute: 0,
+        display: 'HIV viral load',
+        conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        units: 'copies/ml',
+        flatName: 'HIV viral load-HIV viral load',
+        hasData: true,
+      },
+    ],
+  } as GroupedObservation;
+
+  const mockEmptySubRows = {
+    key: 'HIV viral load',
+    date: '2024-10-15',
+    flatName: 'HIV viral load-HIV viral load',
+    entries: [],
+  } as GroupedObservation;
 
   it('renders a loading skeleton when fetching results data', () => {
-    render(<IndividualResultsTable isLoading={true} parent={{ display: 'Parent Test' }} subRows={[]} index={0} />);
+    render(<IndividualResultsTable isLoading={true} subRows={mockEmptySubRows} index={0} title={'HIV viral load'} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders a tabular overview of the available test result data', () => {
-    render(
-      <IndividualResultsTable isLoading={false} parent={{ display: 'Parent Test' }} subRows={mockSubRows} index={0} />,
-    );
+    render(<IndividualResultsTable isLoading={false} subRows={mockSubRows} index={0} title={'HIV viral load'} />);
 
-    expect(screen.getByText(/13-jan-2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/15-Oct-2024/i)).toBeInTheDocument();
     expect(screen.getByText(/test name/i)).toBeInTheDocument();
     expect(screen.getByText(/reference range/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /view timeline/i })).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /prothrombin time 52.1 minute -- minute/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv viral load 45 copies\/ml -- copies\/ml/i })).toBeInTheDocument();
   });
 });
