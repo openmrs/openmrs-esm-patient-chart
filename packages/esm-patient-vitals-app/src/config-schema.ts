@@ -42,7 +42,7 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    vitalsSignsUuid: {
+    vitalSignsConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: '1114AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
@@ -120,7 +120,7 @@ export interface ConfigObject {
     weightUuid: string;
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
-    vitalsSignsUuid: string;
+    vitalSignsConceptSetUuid: string;
   };
   vitals: {
     useFormEngine: boolean;

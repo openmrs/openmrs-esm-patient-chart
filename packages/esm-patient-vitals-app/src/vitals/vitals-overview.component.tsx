@@ -42,7 +42,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
-  const { data: conceptUnits } = useVitalsConceptMetadata(config.concepts.vitalsSignsUuid);
+  const { data: conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
   const launchVitalsBiometricsForm = useCallback(() => {

@@ -13,7 +13,7 @@ interface WeightTileInterface {
 const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { data: conceptUnits } = useVitalsConceptMetadata(config.concepts.vitalsSignsUuid);
+  const { data: conceptUnits } = useVitalsConceptMetadata();
   const { data: biometrics, isLoading } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const weightData = biometrics?.filter((result) => result.weight);
 
