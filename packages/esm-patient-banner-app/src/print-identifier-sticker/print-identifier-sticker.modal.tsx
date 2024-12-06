@@ -20,7 +20,7 @@ interface PrintComponentProps extends Partial<ConfigObject> {
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
-  const { pageSize } = printPatientSticker ?? {};
+  const { pageSize, printScale = '1' } = printPatientSticker ?? {};
   const contentToPrintRef = useRef(null);
   const onBeforeGetContentResolve = useRef<() => void | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -64,12 +64,29 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
     setIsPrinting(false);
   }, []);
 
+  const handleInitiatePrint = useCallback(
+    (printWindow: HTMLIFrameElement | null): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        if (printWindow) {
+          const printContent = printWindow.contentDocument || printWindow.contentWindow?.document;
+          if (printContent) {
+            printContent.documentElement.style.setProperty('--print-scale', printScale);
+            printWindow.contentWindow?.print();
+            resolve();
+          }
+        }
+      });
+    },
+    [printScale],
+  );
+
   const handlePrint = useReactToPrint({
     content: () => contentToPrintRef.current,
     documentTitle: `${getPatientName(patient)} - ${headerTitle}`,
     onAfterPrint: handleAfterPrint,
     onBeforeGetContent: handleBeforeGetContent,
     onPrintError: handlePrintError,
+    print: handleInitiatePrint,
     copyStyles: true,
   });
 

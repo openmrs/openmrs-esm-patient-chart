@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { deleteCondition, useConditions } from './conditions.resource';
+import styles from './delete-condition.scss';
 
 interface DeleteConditionModalProps {
   closeDeleteModal: () => void;
@@ -19,17 +20,15 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
     setIsDeleting(true);
 
     try {
-      const res = await deleteCondition(conditionId);
+      await deleteCondition(conditionId);
+      await mutate();
 
-      if (res.status === 200) {
-        mutate();
-        closeDeleteModal();
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          title: t('conditionDeleted', 'Condition deleted'),
-        });
-      }
+      closeDeleteModal();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        title: t('conditionDeleted', 'Condition deleted'),
+      });
     } catch (error) {
       console.error('Error deleting condition: ', error);
 
@@ -52,7 +51,7 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         <Button kind="secondary" onClick={closeDeleteModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={handleDelete} disabled={isDeleting}>
+        <Button className={styles.deleteButton} kind="danger" onClick={handleDelete} disabled={isDeleting}>
           {isDeleting ? (
             <InlineLoading description={t('deleting', 'Deleting') + '...'} />
           ) : (
