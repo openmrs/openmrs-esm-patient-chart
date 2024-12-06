@@ -80,4 +80,9 @@
     padding: 0 !important;
     overflow: hidden;
   }
+
+  .stickerContainer {
+    transform: scale(var(--print-scale));
+    transform-origin: left top;
+  }
 }
