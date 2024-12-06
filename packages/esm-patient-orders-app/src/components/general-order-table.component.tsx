@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import styles from './test-order.scss';
+import styles from './general-order-table.scss';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
@@ -17,75 +17,81 @@ import { useTranslation } from 'react-i18next';
 import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import { useLayoutType } from '@openmrs/esm-framework';
 
-interface TestOrderProps {
-  testOrder: Order;
+interface GeneralOrderProps {
+  order: Order;
 }
 
-const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
+const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder.concept.uuid);
-  const { encounter, isLoading: isLoadingResult } = useLabEncounter(testOrder.encounter.uuid);
+  const { concept, isLoading: isLoadingConcept } = useOrderConceptByUuid(order.concept.uuid);
+  const { encounter, isLoading: isLoadingResult } = useLabEncounter(order.encounter.uuid);
 
   const tableHeaders: Array<{ key: string; header: string }> = [
     {
-      key: 'testType',
-      header: testOrder.orderType.display,
+      key: 'orderName',
+      header: order?.orderType?.display,
     },
     {
-      key: 'result',
-      header: t('result', 'Result'),
+      key: 'instructions',
+      header: t('instructions', 'Instructions'),
     },
     {
-      key: 'normalRange',
-      header: t('normalRange', 'Normal range'),
+      key: 'referenceNumber',
+      header: t('referenceNumberTableHeader', '{{orderType}} reference number', {
+        orderType: order?.orderType?.display,
+      }),
     },
   ];
 
-  const testResultObs = useMemo(() => {
+  const obs = useMemo(() => {
     if (encounter && concept) {
       return encounter.obs?.find((obs) => obs.concept.uuid === concept.uuid);
     }
   }, [concept, encounter]);
 
-  const testRows = useMemo(() => {
+  const rows = useMemo(() => {
     if (concept && concept.setMembers.length > 0) {
       return concept?.setMembers.map((memberConcept) => ({
         id: memberConcept.uuid,
-        testType: <div className={styles.testType}>{memberConcept.display}</div>,
+        orderName: <div className={styles.type}>{memberConcept.display}</div>,
+        instructions: '--',
         result: isLoadingResult ? (
           <SkeletonText />
         ) : (
-          testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value.display ?? '--'
+          obs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value.display ?? '--'
         ),
         normalRange:
           memberConcept.hiNormal && memberConcept.lowNormal
             ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
             : 'N/A',
+        referenceNumber: order?.accessionNumber,
       }));
     } else if (concept && concept.setMembers.length === 0) {
       return [
         {
           id: concept.uuid,
-          testType: <div className={styles.testType}>{concept.display}</div>,
-          result: isLoadingResult ? <SkeletonText /> : testResultObs?.value.display ?? '--',
+          orderName: <div className={styles.type}>{concept.display}</div>,
+          instructions: order?.instructions ?? '--',
+          result: isLoadingResult ? <SkeletonText /> : obs?.value.display ?? '--',
           normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+          referenceNumber: order?.accessionNumber,
         },
       ];
     } else {
       return [];
     }
-  }, [concept, isLoadingResult, testResultObs?.groupMembers, testResultObs?.value?.display]);
+  }, [concept, isLoadingResult, obs?.groupMembers, obs?.value.display, order?.accessionNumber, order?.instructions]);
 
   return (
-    <div className={styles.testOrder}>
-      {isLoadingTestConcepts ? (
+    <div className={styles.order}>
+      {isLoadingConcept ? (
         <DataTableSkeleton role="progressbar" compact={isTablet} zebra />
       ) : (
-        <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+        <DataTable rows={rows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
             <TableContainer {...getTableContainerProps()}>
-              <Table {...getTableProps()} aria-label="testorders">
+              <Table {...getTableProps()} aria-label="orders">
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -97,7 +103,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
                   {rows.map((row) => (
                     <TableRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id} className={styles.testCell}>
+                        <TableCell key={cell.id} className={styles.cell}>
                           {cell.value}
                         </TableCell>
                       ))}
@@ -113,4 +119,4 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   );
 };
 
-export default TestOrder;
+export default GeneralOrderTable;

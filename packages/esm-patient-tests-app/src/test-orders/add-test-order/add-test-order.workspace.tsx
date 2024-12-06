@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
@@ -11,20 +11,23 @@ import {
   parseDate,
   useLayoutType,
   usePatient,
+  useConfig,
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
-  type LabOrderBasketItem,
   launchPatientWorkspace,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
-import { LabOrderForm } from './lab-order-form.component';
+import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
-import styles from './add-lab-order.scss';
+import styles from './add-test-order.scss';
+import { type ConfigObject } from '../../config-schema';
+import type { TestOrderBasketItem } from '../../types';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
+  orderTypeUuid: string;
 }
 
 export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
@@ -32,6 +35,7 @@ export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddL
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({
   order: initialOrder,
+  orderTypeUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -40,7 +44,20 @@ export default function AddLabOrderWorkspace({
   const isTablet = useLayoutType() === 'tablet';
   const { patientUuid } = usePatientChartStore();
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
-  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
+  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
+  const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
+
+  const orderableConceptSets = useMemo(() => {
+    const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
+      {
+        label: t('labOrders', 'Lab orders'),
+        orderTypeUuid: orders.labOrderTypeUuid,
+        orderableConceptSets: orders.labOrderableConcepts,
+      },
+      ...additionalTestOrderTypes,
+    ];
+    return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets;
+  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -83,9 +100,15 @@ export default function AddLabOrderWorkspace({
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}
           setTitle={() => {}}
+          orderTypeUuid={orderTypeUuid}
+          orderableConceptSets={orderableConceptSets}
         />
       ) : (
-        <TestTypeSearch openLabForm={setCurrentLabOrder} />
+        <TestTypeSearch
+          orderTypeUuid={orderTypeUuid}
+          orderableConceptSets={orderableConceptSets}
+          openLabForm={setCurrentLabOrder}
+        />
       )}
     </div>
   );

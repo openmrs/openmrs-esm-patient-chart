@@ -31,7 +31,7 @@ const renderNodes = (reactNodes) => {
 
 const useMock = [(key) => key, {}];
 useMock.t = (key, defaultValue, options = {}) => {
-  let translatedString = defaultValue;
+  let translatedString = defaultValue ? defaultValue : key;
   Object.keys(options).forEach((key) => {
     translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
   });

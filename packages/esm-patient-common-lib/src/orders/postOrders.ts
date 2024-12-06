@@ -1,7 +1,14 @@
 import { openmrsFetch, type OpenmrsResource, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { type OrderBasketStore, orderBasketStore } from './store';
-import { type ExtractedOrderErrorObject, type OrderBasketItem, type OrderErrorObject, type OrderPost } from './types';
+import type {
+  DrugOrderPost,
+  TestOrderPost,
+  ExtractedOrderErrorObject,
+  OrderBasketItem,
+  OrderErrorObject,
+  OrderPost,
+} from './types';
 
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
@@ -26,7 +33,7 @@ export async function postOrdersOnNewEncounter(
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
-  const orders: Array<OrderPost> = [];
+  const orders: Array<DrugOrderPost | TestOrderPost> = [];
 
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {

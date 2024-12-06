@@ -46,7 +46,7 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('When I fill in the fields in the form for the Blood urea nitrogen test and submit the form', async () => {
-      await page.getByLabel(/lab reference number/i).fill(' 20240419-1234');
+      await page.getByLabel(/reference number/i).fill(' 20240419-1234');
       await page.getByLabel(/additional instructions/i).fill(' N/A');
     });
 

@@ -1,0 +1,18 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.order {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid colors.$gray-20;
+  border-bottom: none;
+}
+
+.cell {
+  padding-left: layout.$spacing-05 !important;
+}
+
+.type {
+  color: colors.$blue-60;
+}

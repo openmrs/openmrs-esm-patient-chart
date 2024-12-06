@@ -2,7 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { chunk } from 'lodash-es';
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import type { LabOrderBasketItem, OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost, PatientOrderFetchResponse, TestOrderPost } from '@openmrs/esm-patient-common-lib';
+import type { TestOrderBasketItem } from '../types';
 import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 
@@ -76,11 +77,11 @@ function getConceptReferenceUrls(conceptUuids: Array<string>) {
   );
 }
 
-export function prepLabOrderPostData(
-  order: LabOrderBasketItem,
+export function prepTestOrderPostData(
+  order: TestOrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
-): OrderPost {
+): TestOrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
@@ -130,7 +131,7 @@ export function prepLabOrderPostData(
 }
 
 export type PostDataPrepLabOrderFunction = (
-  order: LabOrderBasketItem,
+  order: TestOrderBasketItem,
   patientUuid: string,
   encounterUuid: string,
 ) => OrderPost;
