@@ -9,6 +9,7 @@ import {
   ChevronUpIcon,
   useLayoutType,
   useConfig,
+  MaybeIcon,
 } from '@openmrs/esm-framework';
 import {
   launchPatientWorkspace,
@@ -19,7 +20,6 @@ import {
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepTestOrderPostData } from '../api';
-import LabIcon from './lab-icon.component';
 import styles from './lab-order-basket-panel.scss';
 import type { ConfigObject } from '../../config-schema';
 
@@ -34,6 +34,7 @@ export default function LabOrderBasketPanelExtension() {
       label: t('labOrders', 'Lab orders'),
       orderTypeUuid: orders.labOrderTypeUuid,
       orderableConceptSets: orders.labOrderableConcepts,
+      icon: 'omrs-icon-lab-order',
     },
     ...additionalTestOrderTypes,
   ];
@@ -51,7 +52,7 @@ type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {}
 
-function LabOrderBasketPanel({ orderTypeUuid, label }: LabOrderBasketPanelProps) {
+function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -131,17 +132,19 @@ function LabOrderBasketPanel({ orderTypeUuid, label }: LabOrderBasketPanelProps)
     setIsExpanded(orders.length > 0);
   }, [orders]);
 
-  if (isLoadingOrderType || orderType.javaClassName !== 'org.openmrs.TestOrder') {
+  if (isLoadingOrderType || orderType?.javaClassName !== 'org.openmrs.TestOrder') {
     return null;
   }
 
   return (
     <Tile
-      className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
+      className={classNames(styles.tile, isTablet ? styles.tabletTile : styles.desktopTile, {
+        [styles.collapsedTile]: !isExpanded,
+      })}
     >
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
-          <LabIcon isTablet={isTablet} />
+          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>

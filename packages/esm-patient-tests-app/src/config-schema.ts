@@ -72,6 +72,11 @@ export const configSchema = {
         _description:
           'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderableConceptClasses` will be considered orderable.',
       },
+      icon: {
+        _type: Type.String,
+        _description: 'Icon to be shown for the order type. Icons are from the OpenMRS icon library.',
+        _default: '',
+      },
     },
     _default: [],
   },
@@ -130,6 +135,7 @@ export interface ConfigObject {
     label?: string;
     orderTypeUuid: string;
     orderableConceptSets: Array<string>;
+    icon?: string;
   }>;
   resultsViewerConcepts: Array<ObsTreeEntry>;
 }

@@ -34,6 +34,11 @@ export const configSchema = {
         _description:
           'The custom label to be shown for the order type. The label will be translated with the key as the label itself.',
       },
+      icon: {
+        _type: Type.String,
+        _description: 'Icon to be shown for the order type. Icons are from the OpenMRS icon library.',
+        _default: '',
+      },
     },
   },
 };
@@ -42,6 +47,7 @@ export interface OrderTypeDefinition {
   label?: string;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  icon?: string;
 }
 
 export interface ConfigObject {

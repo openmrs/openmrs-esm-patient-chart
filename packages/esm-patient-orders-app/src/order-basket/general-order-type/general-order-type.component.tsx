@@ -7,6 +7,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   type DefaultWorkspaceProps,
+  MaybeIcon,
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +25,7 @@ interface GeneralOrderTypeProps extends OrderTypeDefinition {
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label, icon }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -111,6 +112,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     >
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
+          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
