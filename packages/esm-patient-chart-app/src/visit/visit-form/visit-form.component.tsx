@@ -663,7 +663,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <div className={styles.sectionTitle}></div>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
-                  name="upcoming-appointment-slot"
+                  name="visit-form-top-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
                   setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
@@ -774,7 +774,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <div className={styles.sectionTitle}></div>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
-                  name="visit-form-queue-slot"
+                  name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
                   setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
