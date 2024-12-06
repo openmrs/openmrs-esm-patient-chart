@@ -204,7 +204,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu condition={row} />
+                          <ConditionsActionMenu condition={row} patientUuid={patientUuid} />
                         </TableCell>
                       </TableRow>
                     ))}
