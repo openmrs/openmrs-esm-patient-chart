@@ -128,11 +128,6 @@ export const esmPatientChartSchema = {
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
   },
-  visitQueueNumberAttributeUuid: {
-    _type: Type.ConceptUuid,
-    _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  },
   visitTypeResourceUrl: {
     _type: Type.String,
     _default: '/etl-latest/etl/patient/',
@@ -156,9 +151,8 @@ export interface ChartConfig {
   showAllEncountersTab: boolean;
   showExtraVisitAttributesSlot: boolean;
   showRecommendedVisitTypeTab: boolean;
-  showServiceQueueFields: boolean;
-  showUpcomingAppointments: boolean;
-  visitQueueNumberAttributeUuid: string;
+  showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
+  showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
   visitTypeResourceUrl: string;
   visitAttributeTypes: Array<{
     displayInThePatientBanner: boolean;

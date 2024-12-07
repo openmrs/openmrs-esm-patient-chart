@@ -1,7 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import {
   Button,
   ButtonSet,
@@ -16,18 +12,12 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { first } from 'rxjs/operators';
-import { from } from 'rxjs';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Extension,
   ExtensionSlot,
   formatDatetime,
   type NewVisitPayload,
-  openmrsFetch,
-  restBaseUrl,
   saveVisit,
   showSnackbar,
   toDateObjectStrict,
@@ -35,13 +25,12 @@ import {
   updateVisit,
   useConfig,
   useConnectivity,
+  useFeatureFlag,
   useLayoutType,
   usePatient,
   useSession,
   useVisit,
-  useVisitTypes,
   type Visit,
-  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -50,27 +39,45 @@ import {
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { type ChartConfig } from '../../config-schema';
-import { type VisitFormData } from './visit-form.resource';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { saveQueueEntry } from '../hooks/useServiceQueue';
-import { updateAppointmentStatus } from '../hooks/useUpcomingAppointments';
-import { useMutateAppointments } from '../hooks/useMutateAppointments';
-import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+
+import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
+import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
+import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeField from './visit-date-time.component';
+import {
+  createVisitAttribute,
+  deleteVisitAttribute,
+  type OnVisitCreatedOrUpdatedCallback,
+  updateVisitAttribute,
+  useConditionalVisitTypes,
+  useOnVisitCreatedOrUpdatedCallbacks,
+  type VisitFormData,
+} from './visit-form.resource';
 import styles from './visit-form.scss';
-import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 
 dayjs.extend(isSameOrBefore);
 
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
+  /**
+   * A unique string identifying where the visit form is opened from.
+   * This string is passed into various extensions within the form to
+   * affect how / if they should be rendered.
+   */
+  openedFrom: string;
+
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
@@ -83,6 +90,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   showPatientHeader = false,
   showVisitEndDateTimeFields,
   visitToEdit,
+  openedFrom,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -104,28 +112,15 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits } = useVisits(patientUuid);
   const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
-  const { mutateAppointments } = useMutateAppointments();
   const allVisitTypes = useConditionalVisitTypes();
 
-  const { mutate } = useVisit(patientUuid);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
-  const [upcomingAppointment, setUpcomingAppointment] = useState(null);
-  const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
-  const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const [visitUuid, setVisitUuid] = useState('');
-  const { mutate: mutateQueueEntry } = useVisitQueueEntry(patientUuid, visitUuid);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
-  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
-    service: null,
-    priority: null,
-    status: null,
-    sortWeight: null,
-    queueLocation: null,
-  });
 
+  const [OnVisitCreatedOrUpdatedCallbacks, setOnVisitCreatedOrUpdatedCallbacks] = useOnVisitCreatedOrUpdatedCallbacks();
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
@@ -358,11 +353,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             if (value) {
               // Update attribute with new value
               promises.push(
-                openmrsFetch(`${restBaseUrl}/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
-                  method: 'POST',
-                  headers: { 'Content-type': 'application/json' },
-                  body: { value },
-                }).catch((err) => {
+                updateVisitAttribute(visitUuid, attributeToEdit.uuid, value).catch((err) => {
                   showSnackbar({
                     title: t('errorUpdatingVisitAttribute', 'Error updating the {{attributeName}} visit attribute', {
                       attributeName: attributeToEdit.attributeType.display,
@@ -371,14 +362,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     isLowContrast: false,
                     subtitle: err?.message,
                   });
+                  return Promise.reject(err); // short-circuit promise chain
                 }),
               );
             } else {
               // Delete attribute if no value is provided
               promises.push(
-                openmrsFetch(`${restBaseUrl}/visit/${visitUuid}/attribute/${attributeToEdit.uuid}`, {
-                  method: 'DELETE',
-                }).catch((err) => {
+                deleteVisitAttribute(visitUuid, attributeToEdit.uuid).catch((err) => {
                   showSnackbar({
                     title: t('errorDeletingVisitAttribute', 'Error deleting the {{attributeName}} visit attribute', {
                       attributeName: attributeToEdit.attributeType.display,
@@ -387,6 +377,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     isLowContrast: false,
                     subtitle: err?.message,
                   });
+                  return Promise.reject(err); // short-circuit promise chain
                 }),
               );
             }
@@ -394,11 +385,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         } else {
           if (value) {
             promises.push(
-              openmrsFetch(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
-                method: 'POST',
-                headers: { 'Content-type': 'application/json' },
-                body: { attributeType, value },
-              }).catch((err) => {
+              createVisitAttribute(visitUuid, attributeType, value).catch((err) => {
                 showSnackbar({
                   title: t('errorCreatingVisitAttribute', 'Error creating the {{attributeName}} visit attribute', {
                     attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType)?.display,
@@ -407,6 +394,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   isLowContrast: false,
                   subtitle: err?.message,
                 });
+                return Promise.reject(err); // short-circuit promise chain
               }),
             );
           }
@@ -435,8 +423,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         visitStopTime,
         visitStopTimeFormat,
       } = data;
-
-      setIsSubmitting(true);
 
       const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
 
@@ -489,115 +475,29 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
       }
 
+      setIsSubmitting(true);
       if (isOnline) {
-        (visitToEdit?.uuid
+        const visitRequest = visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
-          : saveVisit(payload, abortController)
-        )
+          : saveVisit(payload, abortController);
+
+        visitRequest
           .then((response) => {
-            if (config.showServiceQueueFields && queueLocation && service && priority) {
-              // retrieve values from the queue extension
-              setVisitUuid(response.data.uuid);
-
-              saveQueueEntry(
-                response.data.uuid,
-                service,
-                patientUuid,
-                priority,
-                status,
-                sortWeight,
-                queueLocation,
-                visitQueueNumberAttributeUuid,
-                abortController,
-              ).then(
-                () => {
-                  mutateCurrentVisit();
-                  mutateVisits();
-                  mutateInfiniteVisits();
-                  mutateQueueEntry();
-                  showSnackbar({
-                    kind: 'success',
-                    title: t('visitStarted', 'Visit started'),
-                    subtitle: t('queueAddedSuccessfully', `Patient added to the queue successfully.`),
-                  });
-                },
-                (error) => {
-                  showSnackbar({
-                    title: t('queueEntryError', 'Error adding patient to the queue'),
-                    kind: 'error',
-                    isLowContrast: false,
-                    subtitle: error?.message,
-                  });
-                },
-              );
-
-              if (config.showUpcomingAppointments && upcomingAppointment) {
-                updateAppointmentStatus('CheckedIn', upcomingAppointment.uuid, abortController).then(
-                  () => {
-                    mutateCurrentVisit();
-                    mutateVisits();
-                    mutateInfiniteVisits();
-                    mutateAppointments();
-                    showSnackbar({
-                      isLowContrast: true,
-                      kind: 'success',
-                      subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
-                      title: t('appointmentCheckedIn', 'Appointment Checked In'),
-                    });
-                  },
-                  (error) => {
-                    showSnackbar({
-                      title: t('updateError', 'Error updating upcoming appointment'),
-                      kind: 'error',
-                      isLowContrast: false,
-                      subtitle: error?.message,
-                    });
-                  },
-                );
-              }
-            }
-
-            // TODO: Refactor this to use Promises
-            from(handleVisitAttributes(visitAttributes, response.data.uuid))
-              .pipe(first())
-              .subscribe({
-                next: (attributesResponses) => {
-                  setIsSubmitting(false);
-                  // Check for no undefined,
-                  // that if there was no failed requests on either creating, updating or deleting an attribute
-                  // then continue and close workspace
-                  if (!attributesResponses.includes(undefined)) {
-                    mutateCurrentVisit();
-                    mutateVisits();
-                    mutateInfiniteVisits();
-                    closeWorkspace({ ignoreChanges: true });
-                    showSnackbar({
-                      isLowContrast: true,
-                      kind: 'success',
-                      subtitle: !visitToEdit
-                        ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                            visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                          })
-                        : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                            visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                          }),
-                      title: !visitToEdit
-                        ? t('visitStarted', 'Visit started')
-                        : t('visitDetailsUpdated', 'Visit details updated'),
-                    });
-                  }
-                },
-                error: (error) => {
-                  showSnackbar({
-                    title: !visitToEdit
-                      ? t('startVisitError', 'Error starting visit')
-                      : t('errorUpdatingVisitDetails', 'Error updating visit details'),
-                    kind: 'error',
-                    isLowContrast: false,
-                    subtitle: error?.message,
-                  });
-                },
-              });
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: !visitToEdit
+                ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                  })
+                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                  }),
+              title: !visitToEdit
+                ? t('visitStarted', 'Visit started')
+                : t('visitDetailsUpdated', 'Visit details updated'),
+            });
+            return response;
           })
           .catch((error) => {
             showSnackbar({
@@ -608,6 +508,47 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               isLowContrast: false,
               subtitle: error?.message,
             });
+            return Promise.reject(error); // short-circuit promise chain
+          })
+          .then((response) => {
+            // now that visit is created / updated, we run post-submit actions
+            // to update visit attributes or any other OnVisitCreatedOrUpdated actions
+            const visit = response.data;
+
+            // handleVisitAttributes already has code to show error snackbar when attribute fails to update
+            // no need for catch block here
+            const visitAttributesRequest = handleVisitAttributes(visitAttributes, response.data.uuid).then(
+              (visitAttributesResponses) => {
+                if (visitAttributesResponses.length > 0) {
+                  showSnackbar({
+                    isLowContrast: true,
+                    kind: 'success',
+                    title: t(
+                      'additionalVisitInformationUpdatedSuccessfully',
+                      'Additional visit information updated successfully',
+                    ),
+                  });
+                }
+              },
+            );
+
+            const OnVisitCreatedOrUpdatedRequests = [...OnVisitCreatedOrUpdatedCallbacks.values()].map(
+              (OnVisitCreatedOrUpdated) => OnVisitCreatedOrUpdated(visit, patientUuid),
+            );
+
+            return Promise.all([visitAttributesRequest, ...OnVisitCreatedOrUpdatedRequests]);
+          })
+          .then(() => {
+            closeWorkspace({ ignoreChanges: true });
+          })
+          .catch(() => {
+            // do nothing, this catches any reject promises used for short-circuiting
+          })
+          .finally(() => {
+            setIsSubmitting(false);
+            mutateCurrentVisit();
+            mutateVisits();
+            mutateInfiniteVisits();
           });
       } else {
         createOfflineVisitForPatient(
@@ -615,28 +556,33 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           visitLocation.uuid,
           config.offlineVisitTypeUuid,
           payload.startDatetime,
-        ).then(
-          () => {
-            mutate();
-            closeWorkspace({ ignoreChanges: true });
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                visit: t('offlineVisit', 'Offline Visit'),
-              }),
-              title: t('visitStarted', 'Visit started'),
-            });
-          },
-          (error: Error) => {
-            showSnackbar({
-              title: t('startVisitError', 'Error starting visit'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message,
-            });
-          },
-        );
+        )
+          .then(
+            () => {
+              mutateCurrentVisit();
+              closeWorkspace({ ignoreChanges: true });
+              showSnackbar({
+                isLowContrast: true,
+                kind: 'success',
+                subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                  visit: t('offlineVisit', 'Offline Visit'),
+                }),
+                title: t('visitStarted', 'Visit started'),
+              });
+            },
+            (error: Error) => {
+              showSnackbar({
+                title: t('startVisitError', 'Error starting visit'),
+                kind: 'error',
+                isLowContrast: false,
+                subtitle: error?.message,
+              });
+            },
+          )
+          .finally(() => {
+            setIsSubmitting(false);
+          });
+
         return;
       }
     },
@@ -644,28 +590,17 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       closeWorkspace,
       config.offlineVisitTypeUuid,
       config.showExtraVisitAttributesSlot,
-      config.showServiceQueueFields,
-      config.showUpcomingAppointments,
       displayVisitStopDateTimeFields,
       extraVisitInfo,
       handleVisitAttributes,
       isOnline,
-      mutate,
-      mutateAppointments,
       mutateCurrentVisit,
-      mutateQueueEntry,
       mutateVisits,
       mutateInfiniteVisits,
+      OnVisitCreatedOrUpdatedCallbacks,
       patientUuid,
-      priority,
-      queueLocation,
-      service,
-      sortWeight,
-      status,
       t,
-      upcomingAppointment,
       validateVisitStartStopDatetime,
-      visitQueueNumberAttributeUuid,
       visitToEdit,
     ],
   );
@@ -726,15 +661,18 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               />
             )}
 
-            {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
-            {config.showUpcomingAppointments && (
-              <section>
-                <div className={styles.sectionTitle}></div>
-                <div className={styles.sectionField}>
-                  <ExtensionSlot state={upcomingAppointmentState} name="upcoming-appointment-slot" />
-                </div>
-              </section>
-            )}
+            {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
+            <section>
+              <div className={styles.sectionTitle}></div>
+              <div className={styles.sectionField}>
+                <VisitFormExtensionSlot
+                  name="visit-form-top-slot"
+                  patientUuid={patientUuid}
+                  visitFormOpenedFrom={openedFrom}
+                  setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
+                />
+              </div>
+            </section>
 
             {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
             <LocationSelector control={control} />
@@ -833,15 +771,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               </div>
             </section>
 
-            {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
-            {config.showServiceQueueFields && (
-              <section>
-                <div className={styles.sectionTitle}></div>
-                <div className={styles.sectionField}>
-                  <ExtensionSlot name="visit-form-queue-slot" state={{ setFormFields: setVisitFormFields }} />
-                </div>
-              </section>
-            )}
+            {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
+                or when the form is opened from the queues app */}
+            <section>
+              <div className={styles.sectionTitle}></div>
+              <div className={styles.sectionField}>
+                <VisitFormExtensionSlot
+                  name="visit-form-bottom-slot"
+                  patientUuid={patientUuid}
+                  visitFormOpenedFrom={openedFrom}
+                  setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
+                />
+              </div>
+            </section>
           </Stack>
         </div>
         <ButtonSet
@@ -878,12 +820,56 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   );
 };
 
-function useConditionalVisitTypes() {
-  const isOnline = useConnectivity();
-
-  const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
-
-  return visitTypesHook();
+interface VisitFormExtensionSlotProps {
+  name: string;
+  patientUuid: string;
+  visitFormOpenedFrom: string;
+  setOnVisitCreatedOrUpdatedCallbacks: React.Dispatch<
+    React.SetStateAction<Map<string, OnVisitCreatedOrUpdatedCallback>>
+  >;
 }
+
+type VisitFormExtensionState = {
+  patientUuid: string;
+
+  /**
+   * This function allows an extension to register a callback to run after a visit has been created.
+   * This callback can be used to make further requests. The callback should handle its own UI notification
+   * on success / failure, and its returned Promise MUST resolve on success and MUST reject on failure.
+   * @param callback
+   * @returns
+   */
+  setOnVisitCreatedOrUpdated: (callback: OnVisitCreatedOrUpdatedCallback) => void;
+
+  visitFormOpenedFrom: string;
+  patientChartConfig: ChartConfig;
+};
+
+const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = ({
+  name,
+  patientUuid,
+  visitFormOpenedFrom,
+  setOnVisitCreatedOrUpdatedCallbacks,
+}) => {
+  const config = useConfig<ChartConfig>();
+
+  return (
+    <ExtensionSlot name={name}>
+      {(extension) => {
+        const state: VisitFormExtensionState = {
+          patientUuid,
+          setOnVisitCreatedOrUpdated: (callback) => {
+            setOnVisitCreatedOrUpdatedCallbacks((old) => {
+              return new Map(old).set(extension.id, callback);
+            });
+          },
+          visitFormOpenedFrom,
+          patientChartConfig: config,
+        };
+        return <Extension state={state} />;
+      }}
+    </ExtensionSlot>
+  );
+};
 
 export default StartVisitForm;

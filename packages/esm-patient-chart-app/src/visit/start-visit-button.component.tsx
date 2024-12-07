@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
-import { navigate } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const StartVisitButton = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -11,6 +10,9 @@ const StartVisitButton = ({ patientUuid }) => {
     launchPatientChartWithWorkspaceOpen({
       patientUuid,
       workspaceName: 'start-visit-workspace-form',
+      additionalProps: {
+        openedFrom: 'patient-chart-start-visit'
+      }
     });
   }, [patientUuid]);
 
