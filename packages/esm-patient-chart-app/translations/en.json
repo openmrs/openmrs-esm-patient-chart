@@ -1,5 +1,6 @@
 {
   "addAPastVisit": "Add a past visit",
+  "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
   "all": "All",
@@ -153,7 +154,6 @@
   "updatingVisit": "Updating visit",
   "visit": "Visit",
   "visitAttributes": "Visit attributes",
-  "visitAttributesUpdatedSuccessfully": "Visit attributes updated successfully",
   "visitCancelled": "Visit cancelled",
   "visitCancelSuccessMessage": "Active {{visit}} cancelled successfully",
   "visitDeleted": "{{visit}} deleted",

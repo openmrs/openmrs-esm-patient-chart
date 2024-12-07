@@ -402,7 +402,7 @@ describe('Visit form', () => {
     });
     expect(showSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
-      title: expect.stringContaining('Visit attributes updated successfully'),
+      title: expect.stringContaining('Additional visit information updated successfully'),
       kind: 'success',
     });
   });

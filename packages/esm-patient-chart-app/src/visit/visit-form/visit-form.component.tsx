@@ -523,7 +523,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   showSnackbar({
                     isLowContrast: true,
                     kind: 'success',
-                    title: t('visitAttributesUpdatedSuccessfully', 'Visit attributes updated successfully'),
+                    title: t(
+                      'additionalVisitInformationUpdatedSuccessfully',
+                      'Additional visit information updated successfully',
+                    ),
                   });
                 }
               },
