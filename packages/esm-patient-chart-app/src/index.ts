@@ -27,6 +27,7 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
+import encounterListTabsComponent from './encounter-list/components/encounter-list-tabs.component';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -224,4 +225,9 @@ export const deleteVisitActionButton = getAsyncLifecycle(
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
+);
+
+export const encounterListTableTabs = getAsyncLifecycle(
+  () => import('./encounter-list/components/encounter-list-tabs.component'),
+  { featureName: 'encounter-list-table-tabs', moduleName },
 );
