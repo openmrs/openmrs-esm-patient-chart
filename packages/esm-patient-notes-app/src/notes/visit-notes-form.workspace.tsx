@@ -112,7 +112,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
   const [isLoadingSecondaryDiagnoses, setIsLoadingSecondaryDiagnoses] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -149,7 +148,14 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     [visitNoteFormSchema, selectedPrimaryDiagnoses, t],
   );
 
-  const { control, handleSubmit, watch, setValue, formState, clearErrors } = useForm<VisitNotesFormData>({
+  const {
+    clearErrors,
+    control,
+    formState: { errors, isDirty, isSubmitting },
+    handleSubmit,
+    setValue,
+    watch,
+  } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
     resolver: customResolver,
     defaultValues: {
@@ -157,8 +163,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       noteDate: new Date(),
     },
   });
-
-  const { isDirty } = formState;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -317,10 +321,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
       const { noteDate, clinicalNote, images } = data;
-      setIsSubmitting(true);
 
       if (!selectedPrimaryDiagnoses.length) {
-        setIsSubmitting(false);
         return;
       }
 
@@ -413,9 +415,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             isLowContrast: false,
             subtitle: err?.message,
           });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
         });
     },
     [
@@ -524,7 +523,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
                 placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
                 handleSearch={handleSearch}
-                error={formState?.errors?.primaryDiagnosisSearch}
+                error={errors?.primaryDiagnosisSearch}
                 setIsSearching={setIsSearching}
               />
               {error ? (
