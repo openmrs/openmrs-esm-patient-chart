@@ -25,15 +25,8 @@ export interface ConditionDataTableRow {
 }
 
 export type CodedCondition = {
-  concept: {
-    uuid: string;
-    display: string;
-  };
-  conceptName: {
-    uuid: string;
-    display: string;
-  };
   display: string;
+  uuid: string;
 };
 
 type CreatePayload = {

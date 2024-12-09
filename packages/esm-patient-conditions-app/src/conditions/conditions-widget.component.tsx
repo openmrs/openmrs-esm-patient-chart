@@ -110,8 +110,8 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
     const payload: FormFields = {
       clinicalStatus: getValues('clinicalStatus'),
-      conceptId: selectedCondition?.concept?.uuid,
-      display: selectedCondition?.concept?.display,
+      conceptId: selectedCondition?.uuid,
+      display: selectedCondition?.display,
       abatementDateTime: getValues('abatementDateTime') ? dayjs(getValues('abatementDateTime')).format() : null,
       onsetDateTime: getValues('onsetDateTime') ? dayjs(getValues('onsetDateTime')).format() : null,
       patientId: patientUuid,
@@ -196,7 +196,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     searchInputRef?.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
+  const handleSearchTermChange = (searchTerm: string) => {
+    setSearchTerm(searchTerm);
+  };
 
   useEffect(() => {
     if (errors?.conditionName) {
@@ -233,9 +235,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       disabled={isEditing}
                       id="conditionsSearch"
                       labelText={t('enterCondition', 'Enter condition')}
-                      onChange={(e) => {
-                        onChange(e);
-                        handleSearchTermChange(e);
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        onChange(value);
+                        handleSearchTermChange(value);
                       }}
                       onClear={() => {
                         setSearchTerm('');
@@ -376,7 +379,7 @@ function SearchResults({
         {searchResults?.map((searchResult) => (
           <li
             className={styles.condition}
-            key={searchResult?.concept?.uuid}
+            key={searchResult?.uuid}
             onClick={() => onConditionChange(searchResult)}
             role="menuitem"
           >
