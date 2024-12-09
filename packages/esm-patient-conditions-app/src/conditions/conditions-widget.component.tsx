@@ -49,6 +49,15 @@ interface RequiredFieldLabelProps {
   t: TFunction;
 }
 
+interface SearchResultsProps {
+  isSearching: boolean;
+  onConditionChange: (condition: CodedCondition) => void;
+  searchResults: CodedCondition[];
+  selectedCondition: CodedCondition;
+  t: TFunction;
+  value: string;
+}
+
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspaceWithSavedChanges,
   conditionToEdit,
@@ -218,24 +227,23 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   <ResponsiveWrapper>
                     <Search
                       autoFocus
-                      ref={searchInputRef}
-                      size="md"
-                      id="conditionsSearch"
-                      labelText={t('enterCondition', 'Enter condition')}
-                      placeholder={t('searchConditions', 'Search conditions')}
                       className={classNames({
                         [styles.conditionsError]: errors?.conditionName,
                       })}
+                      disabled={isEditing}
+                      id="conditionsSearch"
+                      labelText={t('enterCondition', 'Enter condition')}
                       onChange={(e) => {
                         onChange(e);
                         handleSearchTermChange(e);
                       }}
-                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
                       onClear={() => {
                         setSearchTerm('');
                         setSelectedCondition(null);
                       }}
-                      disabled={isEditing}
+                      placeholder={t('searchConditions', 'Search conditions')}
+                      ref={searchInputRef}
+                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
                       value={(() => {
                         if (selectedCondition) {
                           return selectedCondition.display;
@@ -249,36 +257,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 )}
               />
               {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
-              {(() => {
-                if (!debouncedSearchTerm || selectedCondition) return null;
-                if (isSearching)
-                  return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
-                if (searchResults && searchResults.length) {
-                  return (
-                    <ul className={styles.conditionsList}>
-                      {searchResults?.map((searchResult) => (
-                        <li
-                          role="menuitem"
-                          className={styles.condition}
-                          key={searchResult?.concept?.uuid}
-                          onClick={() => handleConditionChange(searchResult)}
-                        >
-                          {searchResult.display}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                }
-                return (
-                  <Layer>
-                    <Tile className={styles.emptyResults}>
-                      <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{debouncedSearchTerm}"</strong>
-                      </span>
-                    </Tile>
-                  </Layer>
-                );
-              })()}
+              <SearchResults
+                isSearching={isSearching}
+                onConditionChange={handleConditionChange}
+                searchResults={searchResults}
+                selectedCondition={selectedCondition}
+                t={t}
+                value={searchTerm}
+              />
             </>
           )}
         </FormGroup>
@@ -365,6 +351,50 @@ function RequiredFieldLabel({ label, t }: RequiredFieldLabelProps) {
         *
       </span>
     </span>
+  );
+}
+
+function SearchResults({
+  isSearching,
+  onConditionChange,
+  searchResults,
+  selectedCondition,
+  t,
+  value,
+}: SearchResultsProps) {
+  if (!value || selectedCondition) {
+    return null;
+  }
+
+  if (isSearching) {
+    return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+  }
+
+  if (!isSearching && searchResults?.length > 0) {
+    return (
+      <ul className={styles.conditionsList}>
+        {searchResults?.map((searchResult) => (
+          <li
+            className={styles.condition}
+            key={searchResult?.concept?.uuid}
+            onClick={() => onConditionChange(searchResult)}
+            role="menuitem"
+          >
+            {searchResult.display}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  return (
+    <Layer>
+      <Tile className={styles.emptyResults}>
+        <span>
+          {t('noResultsFor', 'No results for')} <strong>"{value}"</strong>
+        </span>
+      </Tile>
+    </Layer>
   );
 }
 
