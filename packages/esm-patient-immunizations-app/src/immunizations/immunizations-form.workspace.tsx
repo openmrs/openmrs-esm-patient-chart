@@ -53,8 +53,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { immunizationsConfig } = useConfig() as ConfigObject;
+  const { immunizationsConfig } = useConfig<ConfigObject>();
   const currentUser = useSession();
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
@@ -103,7 +102,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
 
@@ -140,7 +139,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   const onSubmit = useCallback(
     (data: ImmunizationFormInputData) => {
-      setIsSubmitting(true);
       const {
         vaccineUuid,
         vaccinationDate,
@@ -188,7 +186,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         abortController,
       ).then(
         () => {
-          setIsSubmitting(false);
           closeWorkspaceWithSavedChanges();
           mutate();
           showSnackbar({
@@ -198,7 +195,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           });
         },
         (err) => {
-          setIsSubmitting(false);
           showSnackbar({
             title: t('errorSaving', 'Error saving vaccination'),
             kind: 'error',

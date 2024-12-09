@@ -106,7 +106,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
   const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
@@ -238,7 +237,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     handleSubmit,
     control,
     getValues,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     setError,
     reset,
   } = methods;
@@ -475,7 +474,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
       }
 
-      setIsSubmitting(true);
       if (isOnline) {
         const visitRequest = visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
@@ -545,7 +543,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
-            setIsSubmitting(false);
             mutateCurrentVisit();
             mutateVisits();
             mutateInfiniteVisits();
@@ -556,32 +553,28 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           visitLocation.uuid,
           config.offlineVisitTypeUuid,
           payload.startDatetime,
-        )
-          .then(
-            () => {
-              mutateCurrentVisit();
-              closeWorkspace({ ignoreChanges: true });
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                  visit: t('offlineVisit', 'Offline Visit'),
-                }),
-                title: t('visitStarted', 'Visit started'),
-              });
-            },
-            (error: Error) => {
-              showSnackbar({
-                title: t('startVisitError', 'Error starting visit'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
-              });
-            },
-          )
-          .finally(() => {
-            setIsSubmitting(false);
-          });
+        ).then(
+          () => {
+            mutateCurrentVisit();
+            closeWorkspace({ ignoreChanges: true });
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
+            });
+          },
+          (error: Error) => {
+            showSnackbar({
+              title: t('startVisitError', 'Error starting visit'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+          },
+        );
 
         return;
       }
