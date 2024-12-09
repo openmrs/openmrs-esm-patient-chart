@@ -43,7 +43,7 @@
   "male": "Nam",
   "medicationDurationAndUnit": "for {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Indefinite duration",
-  "medications": "Thuốc",
+  "Medications": "Medications",
   "modify": "Chỉnh sửa",
   "none": "Không có",
   "noResultsForDrugSearch": "No results to display for \"{{searchTerm}}\"",
