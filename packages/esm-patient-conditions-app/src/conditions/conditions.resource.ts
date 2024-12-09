@@ -106,7 +106,8 @@ export function useConditions(patientUuid: string) {
 export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
-  const conditionsSearchUrl = `${restBaseUrl}/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+  const conditionsSearchUrl = `${restBaseUrl}/concept?name=${conditionToLookup}&searchType=fuzzy&class=${conditionConceptClassUuid}&v=custom:(uuid,display)`;
+
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
     conditionToLookup ? conditionsSearchUrl : null,
     openmrsFetch,
@@ -114,7 +115,7 @@ export function useConditionsSearch(conditionToLookup: string) {
 
   return {
     searchResults: data?.data?.results ?? [],
-    error: error,
+    error,
     isSearching: isLoading,
   };
 }
