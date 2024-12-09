@@ -1,5 +1,15 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "optionalBackendDependencies": {
+    "emrapi": {
+      "version": "^2.0.0",
+      "feature": {
+        "flagName": "emrapi-module",
+        "label": "EMR API Module",
+        "description": "This module, if installed, provides core EMR business logic."
+      }
+    }
+  },
   "extensions": [
     {
       "name": "charts-summary-dashboard",
@@ -112,6 +122,7 @@
     },
     {
       "name": "start-visit-workspace-form",
+      "slot": "start-visit-workspace-form-slot",
       "component": "startVisitForm",
       "meta": {
         "title": "Start a visit"

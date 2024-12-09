@@ -1,6 +1,6 @@
 import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
 import { CloseIcon, navigate, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -21,6 +21,7 @@ interface PanelViewProps {
   basePath: string;
   patientUuid: string;
 }
+
 interface PanelViewHeaderProps {
   isTablet: boolean;
   searchTerm: string;
@@ -34,6 +35,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
   const isTablet = layout === 'tablet';
   const trendlineView = testUuid && type === 'trendline';
   const { panels, isLoading, groupedObservations } = usePanelData();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);
 
@@ -90,7 +92,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
               <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
             )
           ) : (
-            <DataTableSkeleton columns={3} />
+            <DataTableSkeleton columns={3} role="progressbar" />
           )}
         </div>
         {activePanel ? (
@@ -123,11 +125,11 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
                 filteredPanels?.length ? (
                   filteredPanels.map((panel) => (
                     <LabSetPanel
-                      key={panel.conceptUuid} // Add a unique key prop
-                      panel={panel}
-                      observations={[panel, ...panel.relatedObs]}
-                      setActivePanel={setActivePanel}
                       activePanel={activePanel}
+                      key={panel.conceptUuid}
+                      observations={[panel, ...panel.relatedObs]}
+                      panel={panel}
+                      setActivePanel={setActivePanel}
                     />
                   ))
                 ) : (
@@ -137,7 +139,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
                 <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
               )
             ) : (
-              <DataTableSkeleton columns={3} />
+              <DataTableSkeleton columns={3} role="progressbar" />
             )}
           </>
         </div>
@@ -147,7 +149,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
       >
         <div className={styles.stickySection}>
           {isLoading ? (
-            <DataTableSkeleton columns={3} />
+            <DataTableSkeleton columns={3} role="progressbar" />
           ) : trendlineView ? (
             <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
           ) : activePanel ? (
@@ -173,10 +175,14 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
     setShowSearchFields((prev) => !prev);
   }, [setShowSearchFields]);
 
-  const handleSearchTerm = () => {
-    setSearchTerm(localSearchTerm);
-    handleToggleSearchFields();
-  };
+  const handleSearchTerm = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setSearchTerm(localSearchTerm);
+      handleToggleSearchFields();
+    },
+    [localSearchTerm, setSearchTerm, handleToggleSearchFields],
+  );
 
   const handleClear = useCallback(() => {
     setSearchTerm('');
@@ -189,7 +195,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
         <>
           <div className={styles.flex}>
             <h4 className={styles.heading}>
-              {!searchTerm
+              {!searchTerm || totalSearchResults === 0
                 ? t('panel', 'Panel')
                 : t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
                     searchTerm,
@@ -202,7 +208,13 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
               </Button>
             ) : null}
           </div>
-          <Button kind="ghost" size={isTablet ? 'md' : 'sm'} renderIcon={SearchIcon} onClick={handleToggleSearchFields}>
+          <Button
+            data-testid="toggle-search-button"
+            kind="ghost"
+            size={isTablet ? 'md' : 'sm'}
+            renderIcon={SearchIcon}
+            onClick={handleToggleSearchFields}
+          >
             {t('search', 'Search')}
           </Button>
         </>
@@ -210,13 +222,14 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
         <>
           <Form onSubmit={handleSearchTerm} className={styles.flex}>
             <Search
-              size="sm"
-              value={localSearchTerm}
+              autoFocus
+              labelText=""
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               placeholder={t('searchByTestName', 'Search by test name')}
-              autoFocus
+              size="sm"
+              value={localSearchTerm}
             />
-            <Button kind="secondary" size="sm" onClick={handleSearchTerm}>
+            <Button data-testid="execute-search-button" kind="secondary" size="sm" onClick={handleSearchTerm}>
               {t('search', 'Search')}
             </Button>
           </Form>
@@ -234,11 +247,12 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
           <Overlay close={handleToggleSearchFields} headerText={t('search', 'Search')}>
             <Form onSubmit={handleSearchTerm} className={classNames(styles.flex, styles.tabletSearch)}>
               <Search
-                value={localSearchTerm}
+                autoFocus
+                labelText=""
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
-                autoFocus
                 size="lg"
+                value={localSearchTerm}
               />
               <Button kind="secondary" onClick={handleSearchTerm}>
                 {t('search', 'Search')}

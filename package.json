@@ -48,6 +48,7 @@
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
     "eslint": "^8.50.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest-dom": "^5.4.0",
     "eslint-plugin-playwright": "^0.16.0",
     "eslint-plugin-react-hooks": "^4.6.0",

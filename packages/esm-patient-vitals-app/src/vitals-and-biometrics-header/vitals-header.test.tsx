@@ -8,7 +8,7 @@ import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { useVitalsAndBiometrics } from '../common';
+import { invalidateCachedVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -188,6 +188,7 @@ describe('VitalsHeader', () => {
         formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
       },
       workspaceTitle: 'Triage',
+      mutateForm: invalidateCachedVitalsAndBiometrics,
     });
   });
 

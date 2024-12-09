@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { FilterProvider } from '../filter/filter-context';
@@ -18,7 +19,7 @@ interface TreeViewWrapperProps {
 
 const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const { t } = useTranslation();
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
 

@@ -38,7 +38,9 @@ describe('StartVisitOverflowMenuItem', () => {
 
     await user.click(startVisitButton);
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      openedFrom: 'patient-chart-start-visit',
+    });
   });
 
   it('should not show start visit button for a deceased patient', () => {

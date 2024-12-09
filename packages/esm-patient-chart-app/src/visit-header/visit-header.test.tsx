@@ -84,7 +84,9 @@ describe('Visit header', () => {
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      openedFrom: 'patient-chart-start-visit',
+    });
   });
 
   test('should display a truncated name when the patient name is very long', async () => {

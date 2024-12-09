@@ -10,6 +10,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();
 
 mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
   resultsViewerConcepts: [
     {
       conceptUuid: '9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7',
@@ -20,6 +21,7 @@ mockUseConfig.mockReturnValue({
     labOrderTypeUuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
     labOrderableConcepts: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
   },
+  additionalTestOrderTypes: [],
   labTestsWithOrderReasons: [],
 });
 

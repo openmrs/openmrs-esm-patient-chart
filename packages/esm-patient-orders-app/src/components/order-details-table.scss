@@ -162,8 +162,19 @@
   @include type.type-style('helper-text-02');
 }
 
+.button {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
 .printButton {
   margin-left: 1.25rem;
+  @extend .button;
+}
+
+.addButton {
+  @extend .button;
 }
 
 @media print {
@@ -175,4 +186,14 @@
     overflow: hidden;
     page-break-inside: avoid;
   }
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
+.rangeLabel {
+  @extend .helperText;
+  margin-right: layout.$spacing-02;
 }
