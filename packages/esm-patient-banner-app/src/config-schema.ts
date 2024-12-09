@@ -47,7 +47,8 @@ export const configSchema = {
     },
     printScale: {
       _type: Type.String,
-      _description: 'Set the scale for the printed content. A value between 0 and 1 shrinks the content, while a value greater than 1 enlarges it. The scale must be greater than 0.',
+      _description:
+        'Set the scale for the printed content. A value between 0 and 1 shrinks the content, while a value greater than 1 enlarges it. The scale must be greater than 0.',
       _default: '1',
     },
     identifiersToDisplay: {

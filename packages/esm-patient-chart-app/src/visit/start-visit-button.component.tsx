@@ -11,8 +11,8 @@ const StartVisitButton = ({ patientUuid }) => {
       patientUuid,
       workspaceName: 'start-visit-workspace-form',
       additionalProps: {
-        openedFrom: 'patient-chart-start-visit'
-      }
+        openedFrom: 'patient-chart-start-visit',
+      },
     });
   }, [patientUuid]);
 
