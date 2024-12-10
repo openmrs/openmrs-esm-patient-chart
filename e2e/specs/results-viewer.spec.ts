@@ -214,7 +214,7 @@ test('Record and edit test results', async ({ page }) => {
   });
 
   await test.step('And I click on the `Clinical forms` button on the siderail', async () => {
-    await page.getByLabel(/clinical forms/i).click();
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
   });
 
   await test.step('Then I should see the clinical forms workspace', async () => {

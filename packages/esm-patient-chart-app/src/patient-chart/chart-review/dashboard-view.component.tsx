@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useMatch } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Extension, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
 
 /**
  * The layout mode dictates the width occuppied by the chart dashboard widgets.
@@ -21,6 +22,7 @@ export interface DashboardConfig {
   path: string;
   hideDashboardTitle?: boolean;
   layoutMode?: LayoutMode;
+  moduleName: string;
 }
 
 interface DashboardViewProps {
@@ -31,6 +33,7 @@ interface DashboardViewProps {
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
   const widgetMetas = useExtensionSlotMeta(dashboard.slot);
+  const { t } = useTranslation(dashboard.moduleName);
   const {
     params: { view },
   } = useMatch(dashboardPath);
@@ -61,7 +64,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   return (
     <>
       <ExtensionSlot state={state} name="top-of-all-patient-dashboards-slot" />
-      {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
+      {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{t(resolvedTitle)}</h1>}
       <div className={styles.dashboardContainer}>
         <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
           {(extension) => {
