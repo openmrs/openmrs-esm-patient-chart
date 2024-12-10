@@ -27,6 +27,10 @@
         "path": "Programs"
       },
       "order": 10
+    },
+    {
+      "name": "program-delete-confirmation-dialog",
+      "component": "deleteProgramConfirmationDialog"
     }
   ],
   "pages": [],
