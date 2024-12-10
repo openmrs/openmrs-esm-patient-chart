@@ -1,5 +1,5 @@
 {
-  "activeFirst": "Activo em primeiro",
+  "activeFirst": "Activo primeiro",
   "alphabetically": "A - Z",
   "clearSearch": "Limpar pesquisa",
   "closeFlagsBar": "Fechar barra de alertas",
@@ -13,8 +13,8 @@
   "enablingFlag": "Activando alerta...",
   "flagCount_one": "{{count}} alerta de risco",
   "flagCount_other": "{{count}} alertas de risco",
-  "flagDisabled": "Alerta desactivada",
-  "flagDisabledSuccessfully": "Alerta desactivada com sucesso",
+  "flagDisabled": "Alerta desactivado",
+  "flagDisabledSuccessfully": "Alerta desactivado com sucesso",
   "flagDisableError": "Erro ao desabilitar alerta",
   "flagEnabled": "alerta activado",
   "flagEnabledSuccessfully": "Alerta activado com sucesso",
