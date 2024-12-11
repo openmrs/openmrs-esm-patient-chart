@@ -1,4 +1,5 @@
 {
+  "add": "Add",
   "addAPastVisit": "Add a past visit",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addPastVisit": "Add past visit",
@@ -34,6 +35,7 @@
   "diagnoses": "Diagnoses",
   "discard": "Discard",
   "dose": "Dose",
+  "editEncounter": "Edit",
   "editPastVisit": "Edit past visit",
   "editThisEncounter": "Edit this encounter",
   "editThisVisit": "Edit this visit",
@@ -152,6 +154,7 @@
   "undo": "Undo",
   "updateVisit": "Update visit",
   "updatingVisit": "Updating visit",
+  "viewEncounter": "View",
   "visit": "Visit",
   "visitAttributes": "Visit attributes",
   "visitCancelled": "Visit cancelled",
