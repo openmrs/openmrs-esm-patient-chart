@@ -9,9 +9,12 @@ import styles from './end-visit-dialog.scss';
 interface EndVisitDialogProps {
   patientUuid: string;
   closeModal: () => void;
+
+  // for test mock only
+  stopDatetime?: Date;
 }
 
-const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
+const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal, stopDatetime = new Date() }) => {
   const { t } = useTranslation();
   const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
@@ -21,9 +24,9 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
       setCurrentVisit(null, null);
       closeModal();
     } else {
-      const endVisitPayload = {
-        stopDatetime: new Date(),
-      };
+      const stopDatetimeTruncated = new Date(stopDatetime);
+      stopDatetimeTruncated.setSeconds(0, 0);
+      const endVisitPayload = { stopDatetime: stopDatetimeTruncated };
 
       const abortController = new AbortController();
 

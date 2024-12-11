@@ -5,10 +5,6 @@ import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } f
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.component';
 
-const endVisitPayload = {
-  stopDatetime: expect.any(Date),
-};
-
 const mockCloseModal = jest.fn();
 const mockMutate = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -30,7 +26,8 @@ describe('End visit dialog', () => {
 
   test('displays a success snackbar when the visit is ended successfully', async () => {
     const user = userEvent.setup();
-
+    const mockCurrentTime = new Date('2024-12-11T01:20:25.1234');
+    const mockCurrentTimeTruncated = new Date('2024-12-11T01:20:00');
     mockUpdateVisit.mockResolvedValue({
       status: 200,
       data: {
@@ -40,7 +37,13 @@ describe('End visit dialog', () => {
       },
     } as unknown as FetchResponse<Visit>);
 
-    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+    const expectedEndVisitPayload = {
+      stopDatetime: mockCurrentTimeTruncated,
+    };
+
+    render(
+      <EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} stopDatetime={mockCurrentTime} />,
+    );
 
     const closeModalButton = screen.getByRole('button', { name: /close/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -60,7 +63,7 @@ describe('End visit dialog', () => {
 
     await user.click(endVisitButton);
 
-    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, expect.anything());
+    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, expectedEndVisitPayload, expect.anything());
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
@@ -81,6 +84,10 @@ describe('End visit dialog', () => {
       },
     };
 
+    const expectedEndVisitPayload = {
+      stopDatetime: expect.any(Date),
+    };
+
     mockUpdateVisit.mockRejectedValue(error);
 
     render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
@@ -96,7 +103,7 @@ describe('End visit dialog', () => {
 
     await user.click(endVisitButton);
 
-    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, endVisitPayload, new AbortController());
+    expect(updateVisit).toHaveBeenCalledWith(mockCurrentVisit.uuid, expectedEndVisitPayload, new AbortController());
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'Internal error message',
       kind: 'error',
