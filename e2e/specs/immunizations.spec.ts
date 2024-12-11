@@ -97,9 +97,9 @@ test('Add and edit an immunization', async ({ page }) => {
     await expect(page.getByText(/vaccination saved successfully/i)).toBeVisible();
   });
 
-  // await test.step('Then I click the collapse All rows in the table header with the updated recorded immunization', async () => {
-  //   await page.getByRole('button', { name: /collapse all rows/i }).click();
-  // });
+  await test.step('Then I click the collapse All rows in the table header with the updated recorded immunization', async () => {
+    await page.getByRole('button', { name: /collapse all rows/i }).click();
+  });
 
   await test.step('And I should see the updated immunization in the list', async () => {
     await expect(headerRow).toContainText(/vaccine/i);
