@@ -15,6 +15,7 @@ type ObsResult = fhir.Observation & {
   valueDateTime?: string;
   encounter?: {
     name?: string;
+    reference: string;
   };
 };
 
