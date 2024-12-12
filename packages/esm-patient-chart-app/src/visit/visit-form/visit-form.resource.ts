@@ -28,11 +28,12 @@ export function useConditionalVisitTypes() {
 
   return visitTypesHook();
 }
+export interface VisitFormCallbacks {
+  onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
+}
 
-export type OnVisitCreatedOrUpdatedCallback = (visit: Visit, patientUuid: string) => Promise<any>;
-
-export function useOnVisitCreatedOrUpdatedCallbacks() {
-  return useState<Map<string, OnVisitCreatedOrUpdatedCallback>>(new Map());
+export function useVisitFormCallbacks() {
+  return useState<Map<string, VisitFormCallbacks>>(new Map());
 }
 
 export function createVisitAttribute(visitUuid: string, attributeType: string, value: string) {
