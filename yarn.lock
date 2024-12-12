@@ -5764,7 +5764,7 @@ __metadata:
     webpack: "npm:~5.94.0"
     zone.js: "npm:~0.14.8"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 5.x
     single-spa: 6.x
   languageName: unknown
   linkType: soft
@@ -5939,7 +5939,7 @@ __metadata:
     webpack: "npm:^5.94.0"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 5.x
     "@openmrs/esm-patient-common-lib": "*"
     dayjs: 1.x
     lodash-es: 4.x
@@ -6026,7 +6026,7 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     uuid: "npm:^8.3.2"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 5.x
     react: 18.x
     single-spa: 6.x
   languageName: unknown
