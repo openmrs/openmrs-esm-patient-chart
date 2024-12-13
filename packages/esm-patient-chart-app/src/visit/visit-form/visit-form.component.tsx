@@ -120,7 +120,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
-  const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
+  const visitFormCallbacksRef = useVisitFormCallbacks();
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
@@ -243,7 +243,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     reset,
   } = methods;
 
-  // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
@@ -531,7 +530,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               },
             );
 
-            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
+            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacksRef.current.values()].map((callbacks) =>
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
@@ -580,6 +579,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         return;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       closeWorkspace,
       config.offlineVisitTypeUuid,
@@ -591,7 +591,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       mutateInfiniteVisits,
-      visitFormCallbacks,
       patientUuid,
       t,
       validateVisitStartStopDatetime,
@@ -660,10 +659,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <div className={styles.sectionTitle}></div>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
-                  name="visit-form-top-slot"
+                  name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                  setVisitFormCallbacks={setVisitFormCallbacks}
+                  visitFormCallbacksRef={visitFormCallbacksRef} // Pass the ref instead
                 />
               </div>
             </section>
@@ -774,7 +773,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                  setVisitFormCallbacks={setVisitFormCallbacks}
+                  visitFormCallbacksRef={visitFormCallbacksRef}
                 />
               </div>
             </section>
@@ -818,7 +817,7 @@ interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
   visitFormOpenedFrom: string;
-  setVisitFormCallbacks: React.Dispatch<React.SetStateAction<Map<string, VisitFormCallbacks>>>;
+  visitFormCallbacksRef: React.MutableRefObject<Map<string, VisitFormCallbacks>>; // Replaced `setVisitFormCallbacks` with `visitFormCallbacksRef`
 }
 
 type VisitFormExtensionState = {
@@ -838,18 +837,16 @@ type VisitFormExtensionState = {
 };
 
 const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
-  ({ name, patientUuid, visitFormOpenedFrom, setVisitFormCallbacks }) => {
+  ({ name, patientUuid, visitFormOpenedFrom, visitFormCallbacksRef }) => {
     const config = useConfig<ChartConfig>();
 
     return (
       <ExtensionSlot name={name}>
         {(extension: AssignedExtension) => {
-          const state: VisitFormExtensionState = {
+          const state = {
             patientUuid,
-            setVisitFormCallbacks: (callbacks) => {
-              setVisitFormCallbacks((old) => {
-                return new Map(old).set(extension.id, callbacks);
-              });
+            setVisitFormCallbacks: (callbacks: VisitFormCallbacks) => {
+              visitFormCallbacksRef.current.set(extension.id, callbacks);
             },
             visitFormOpenedFrom,
             patientChartConfig: config,
