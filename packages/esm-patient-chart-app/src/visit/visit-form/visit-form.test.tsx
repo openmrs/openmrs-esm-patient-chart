@@ -24,7 +24,7 @@ import {
   createVisitAttribute,
   deleteVisitAttribute,
   updateVisitAttribute,
-  useOnVisitCreatedOrUpdatedCallbacks,
+  useVisitFormCallbacks,
 } from './visit-form.resource';
 
 const visitUuid = 'test_visit_uuid';
@@ -76,10 +76,9 @@ const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = jest.fn();
-jest.mocked(useOnVisitCreatedOrUpdatedCallbacks).mockReturnValue([
-  new Map([['test-extension-id', mockOnVisitCreatedOrUpdatedCallback]]), // OnVisitCreatedOrUpdatedCallbacks
-  jest.fn(), // setOnVisitCreatedOrUpdatedCallbacks
-]);
+jest.mocked(useVisitFormCallbacks).mockReturnValue({
+  current: new Map([['test-extension-id', { onVisitCreatedOrUpdated: mockOnVisitCreatedOrUpdatedCallback }]]),
+});
 const mockCreateVisitAttribute = jest.mocked(createVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockUpdateVisitAttribute = jest.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockDeleteVisitAttribute = jest.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
@@ -164,7 +163,7 @@ jest.mock('./visit-form.resource', () => {
   const requireActual = jest.requireActual('./visit-form.resource');
   return {
     ...requireActual,
-    useOnVisitCreatedOrUpdatedCallbacks: jest.fn(),
+    useVisitFormCallbacks: jest.fn(),
     createVisitAttribute: jest.fn(),
     updateVisitAttribute: jest.fn(),
     deleteVisitAttribute: jest.fn(),

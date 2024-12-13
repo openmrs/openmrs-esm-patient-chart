@@ -1,7 +1,7 @@
 import { openmrsFetch, restBaseUrl, useConnectivity, useVisitTypes, type Visit } from '@openmrs/esm-framework';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
-import { useState } from 'react';
+import { useRef } from 'react';
 
 export type VisitFormData = {
   visitStartDate: Date;
@@ -28,11 +28,15 @@ export function useConditionalVisitTypes() {
 
   return visitTypesHook();
 }
+export interface VisitFormCallbacks {
+  onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
+}
 
-export type OnVisitCreatedOrUpdatedCallback = (visit: Visit, patientUuid: string) => Promise<any>;
-
-export function useOnVisitCreatedOrUpdatedCallbacks() {
-  return useState<Map<string, OnVisitCreatedOrUpdatedCallback>>(new Map());
+// export function useVisitFormCallbacks() {
+//   return useState<Map<string, VisitFormCallbacks>>(new Map());
+// }
+export function useVisitFormCallbacks() {
+  return useRef<Map<string, VisitFormCallbacks>>(new Map());
 }
 
 export function createVisitAttribute(visitUuid: string, attributeType: string, value: string) {
