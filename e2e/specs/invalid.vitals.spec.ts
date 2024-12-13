@@ -15,7 +15,7 @@ test.beforeEach(async ({ api }) => {
 test('Flagging abnormal vitals in the Patient Chart', async ({ page }) => {
   const biometricsPage = new BiometricsAndVitalsPage(page);
 
-  await test.step('Given a patient record exists and the user is on the "Patient Chart" page', async () => {
+  await test.step('When I visit the vitals and biometrics page', async () => {
     await biometricsPage.goTo(patient.uuid);
   });
 
