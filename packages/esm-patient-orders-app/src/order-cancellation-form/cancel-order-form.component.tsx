@@ -4,19 +4,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Button,
-  TextArea,
-  ButtonSet,
-  Column,
-  Form,
-  InlineNotification,
-  Stack,
-  DatePicker,
-  DatePickerInput,
-  InlineLoading,
-} from '@carbon/react';
-import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { Button, TextArea, ButtonSet, Column, Form, InlineNotification, Stack, InlineLoading } from '@carbon/react';
+import { OpenmrsDatePicker, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
 import { cancelOrder } from './cancel-order.resource';
 import styles from './cancel-order-form.scss';
@@ -121,24 +110,15 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <div className={styles.row}>
-                  <DatePicker
+                  <OpenmrsDatePicker
                     id="cancellationDate"
                     minDate={dayjs().startOf('day')}
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
                     value={value}
-                    onChange={([date]) => onChange(date)}
-                    autocomplete="off"
-                  >
-                    <DatePickerInput
-                      id="date-picker-calendar-id"
-                      placeholder="dd/mm/yyyy"
-                      labelText={t('cancellationDate', 'Cancellation date')}
-                      type="text"
-                      invalid={!!errors['cancellationDate']}
-                      invalidText={!!errors['cancellationDate'] && errors['cancellationDate'].message}
-                    />
-                  </DatePicker>
+                    onChange={(date) => onChange(date)}
+                    invalid={!!errors['cancellationDate']}
+                    invalidText={errors['cancellationDate']?.message}
+                    label={t('cancellationDate', 'Cancellation date')}
+                  />
                 </div>
               )}
             />

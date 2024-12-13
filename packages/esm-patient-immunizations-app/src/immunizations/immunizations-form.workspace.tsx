@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   Form,
   InlineNotification,
@@ -24,6 +22,7 @@ import {
   toDateObjectStrict,
   showSnackbar,
   ResponsiveWrapper,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -229,25 +228,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   name="vaccinationDate"
                   control={control}
                   render={({ field: { onChange, value } }) => (
-                    <DatePicker
+                    <OpenmrsDatePicker
                       id="vaccinationDate"
                       maxDate={new Date().toISOString()}
-                      dateFormat={datePickerFormat}
-                      datePickerType="single"
                       value={value}
-                      onChange={([date]) => onChange(date)}
-                      style={{ paddingBottom: '1rem' }}
-                    >
-                      <DatePickerInput
-                        id="vaccinationDateInput"
-                        placeholder="dd/mm/yyyy"
-                        labelText={t('vaccinationDate', 'Vaccination date')}
-                        type="text"
-                        invalid={!!errors['vaccinationDate']}
-                        invalidText={errors['vaccinationDate']?.message}
-                        style={{ width: '100%' }}
-                      />
-                    </DatePicker>
+                      onChange={(date) => onChange(date)}
+                      style={{ paddingBottom: '1rem', width: '100%' }}
+                      invalid={!!errors['vaccinationDate']}
+                      invalidText={errors['vaccinationDate']?.message}
+                      labelText={t('vaccinationDate', 'Vaccination date')}
+                    />
                   )}
                 />
               </ResponsiveWrapper>
@@ -380,22 +370,14 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <div className={styles.row}>
-                    <DatePicker
+                    <OpenmrsDatePicker
                       id="vaccinationExpiration"
                       className="vaccinationExpiration"
                       minDate={immunizationToEditMeta ? null : new Date().toISOString()}
-                      dateFormat={datePickerFormat}
-                      datePickerType="single"
                       value={value}
-                      onChange={([date]) => onChange(date)}
-                    >
-                      <DatePickerInput
-                        id="date-picker-calendar-id"
-                        placeholder="dd/mm/yyyy"
-                        labelText={t('expirationDate', 'Expiration date')}
-                        type="text"
-                      />
-                    </DatePicker>
+                      onChange={(date) => onChange(date)}
+                      labelText={t('expirationDate', 'Expiration date')}
+                    />
                   </div>
                 )}
               />

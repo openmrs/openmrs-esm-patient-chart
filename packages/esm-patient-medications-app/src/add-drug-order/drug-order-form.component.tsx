@@ -7,8 +7,6 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  DatePicker,
-  DatePickerInput,
   IconButton,
   Form,
   FormGroup,
@@ -30,6 +28,7 @@ import {
   ExtensionSlot,
   formatDate,
   getPatientName,
+  OpenmrsDatePicker,
   parseDate,
   useConfig,
   useLayoutType,
@@ -607,21 +606,13 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       name="startDate"
                       control={control}
                       render={({ field: { onBlur, value, onChange, ref } }) => (
-                        <DatePicker
-                          datePickerType="single"
+                        <OpenmrsDatePicker
                           maxDate={new Date().toISOString()}
                           value={value}
-                          onChange={([newStartDate]) => onChange(newStartDate)}
+                          onChange={(newStartDate) => onChange(newStartDate)}
                           onBlur={onBlur}
                           ref={ref}
-                        >
-                          <DatePickerInput
-                            id="startDatePicker"
-                            placeholder="dd/mm/yyyy"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                          />
-                        </DatePicker>
+                        />
                       )}
                     />
                   </InputWrapper>
