@@ -1,17 +1,10 @@
-import { Tile, InlineLoading } from '@carbon/react';
+import { Tile, InlineLoading , InlineNotification } from '@carbon/react';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  isCoded,
-  isNumeric,
-  isPanel,
-  isText,
-  useCompletedLabResults,
-  useOrderConceptByUuid,
-} from './lab-results.resource';
-import { InlineNotification } from '@carbon/react';
+import { useCompletedLabResults, useOrderConceptByUuid } from './lab-results.resource';
 import styles from './lab-result.scss';
+import TestOrder from '../components/test-order.component';
 
 type LabResultsProps = {
   order: Order;
@@ -41,46 +34,13 @@ const LabResults: React.FC<LabResultsProps> = ({ order }) => {
 
   return (
     <Tile className={styles.resultsCiontainer}>
-      {isCoded(concept) && (
-        <OrderDetail
-          label={concept?.display}
-          value={completeLabResult?.value?.display ?? (completeLabResult?.value as any)}
-        />
-      )}
-      {isText(concept) && (
-        <OrderDetail
-          label={concept?.display}
-          value={completeLabResult?.value?.display ?? (completeLabResult?.value as any)}
-        />
-      )}
-      {isNumeric(concept) && (
-        <OrderDetail
-          label={concept?.display}
-          value={completeLabResult?.value?.display ?? (completeLabResult?.value as any)}
-        />
-      )}
-      {isPanel(concept) && (
-        <div className={styles.detailsContainer}>
-          {concept.setMembers.map((member, index) => {
-            const obs = completeLabResult?.groupMembers.find((v) => v?.concept?.uuid === member.uuid);
-            return (
-              <OrderDetail key={index} label={member.display} value={obs?.value?.display ?? (obs?.value as any)} />
-            );
-          })}
-        </div>
-      )}
+      <OrderDetail order={order} />
     </Tile>
   );
 };
 
 export default LabResults;
 
-const OrderDetail = ({ label, value }: { label: string; value?: string }) => {
-  return (
-    <div className={styles.resultDetail}>
-      <span>{label}</span>
-      <span>:</span>
-      <strong>{value ?? '--'}</strong>
-    </div>
-  );
+const OrderDetail = ({ order }: { order: Order }) => {
+  return <TestOrder testOrder={order} />;
 };
