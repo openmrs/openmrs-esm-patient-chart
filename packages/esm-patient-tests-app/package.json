@@ -46,7 +46,7 @@
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "6.x",
     "@openmrs/esm-patient-common-lib": "8.x",
     "react": "18.x",
     "react-i18next": "11.x",

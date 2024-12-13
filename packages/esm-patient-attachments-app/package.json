@@ -44,7 +44,7 @@
     "react-html5-camera-photo": "^1.5.11"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "6.x",
     "@openmrs/esm-patient-common-lib": "8.x",
     "dayjs": "1.x",
     "react": "^18.2.0",
