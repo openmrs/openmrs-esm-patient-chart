@@ -156,6 +156,6 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
 });
 
 test.afterAll(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
 });

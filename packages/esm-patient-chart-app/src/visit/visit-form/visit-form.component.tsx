@@ -14,6 +14,7 @@ import {
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  type AssignedExtension,
   Extension,
   ExtensionSlot,
   formatDatetime,
@@ -60,10 +61,10 @@ import VisitDateTimeField from './visit-date-time.component';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
-  type OnVisitCreatedOrUpdatedCallback,
   updateVisitAttribute,
   useConditionalVisitTypes,
-  useOnVisitCreatedOrUpdatedCallbacks,
+  useVisitFormCallbacks,
+  type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
 import styles from './visit-form.scss';
@@ -106,7 +107,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
   const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
@@ -120,7 +120,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
-  const [OnVisitCreatedOrUpdatedCallbacks, setOnVisitCreatedOrUpdatedCallbacks] = useOnVisitCreatedOrUpdatedCallbacks();
+  const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
@@ -238,7 +238,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     handleSubmit,
     control,
     getValues,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     setError,
     reset,
   } = methods;
@@ -475,7 +475,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
       }
 
-      setIsSubmitting(true);
       if (isOnline) {
         const visitRequest = visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
@@ -532,11 +531,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               },
             );
 
-            const OnVisitCreatedOrUpdatedRequests = [...OnVisitCreatedOrUpdatedCallbacks.values()].map(
-              (OnVisitCreatedOrUpdated) => OnVisitCreatedOrUpdated(visit, patientUuid),
+            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
+              callbacks.onVisitCreatedOrUpdated(visit),
             );
 
-            return Promise.all([visitAttributesRequest, ...OnVisitCreatedOrUpdatedRequests]);
+            return Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
           })
           .then(() => {
             closeWorkspace({ ignoreChanges: true });
@@ -545,7 +544,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
-            setIsSubmitting(false);
             mutateCurrentVisit();
             mutateVisits();
             mutateInfiniteVisits();
@@ -556,32 +554,28 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           visitLocation.uuid,
           config.offlineVisitTypeUuid,
           payload.startDatetime,
-        )
-          .then(
-            () => {
-              mutateCurrentVisit();
-              closeWorkspace({ ignoreChanges: true });
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                  visit: t('offlineVisit', 'Offline Visit'),
-                }),
-                title: t('visitStarted', 'Visit started'),
-              });
-            },
-            (error: Error) => {
-              showSnackbar({
-                title: t('startVisitError', 'Error starting visit'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
-              });
-            },
-          )
-          .finally(() => {
-            setIsSubmitting(false);
-          });
+        ).then(
+          () => {
+            mutateCurrentVisit();
+            closeWorkspace({ ignoreChanges: true });
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
+            });
+          },
+          (error: Error) => {
+            showSnackbar({
+              title: t('startVisitError', 'Error starting visit'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+          },
+        );
 
         return;
       }
@@ -597,7 +591,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       mutateInfiniteVisits,
-      OnVisitCreatedOrUpdatedCallbacks,
+      visitFormCallbacks,
       patientUuid,
       t,
       validateVisitStartStopDatetime,
@@ -669,7 +663,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-top-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                  setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
+                  setVisitFormCallbacks={setVisitFormCallbacks}
                 />
               </div>
             </section>
@@ -780,7 +774,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                  setOnVisitCreatedOrUpdatedCallbacks={setOnVisitCreatedOrUpdatedCallbacks}
+                  setVisitFormCallbacks={setVisitFormCallbacks}
                 />
               </div>
             </section>
@@ -824,52 +818,47 @@ interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
   visitFormOpenedFrom: string;
-  setOnVisitCreatedOrUpdatedCallbacks: React.Dispatch<
-    React.SetStateAction<Map<string, OnVisitCreatedOrUpdatedCallback>>
-  >;
+  setVisitFormCallbacks: React.Dispatch<React.SetStateAction<Map<string, VisitFormCallbacks>>>;
 }
 
 type VisitFormExtensionState = {
   patientUuid: string;
 
   /**
-   * This function allows an extension to register a callback to run after a visit has been created.
-   * This callback can be used to make further requests. The callback should handle its own UI notification
+   * This function allows an extension to register callbacks for visit form submission.
+   * This callbacks can be used to make further requests. The callbacks should handle its own UI notification
    * on success / failure, and its returned Promise MUST resolve on success and MUST reject on failure.
    * @param callback
    * @returns
    */
-  setOnVisitCreatedOrUpdated: (callback: OnVisitCreatedOrUpdatedCallback) => void;
+  setVisitFormCallbacks(callbacks: VisitFormCallbacks);
 
   visitFormOpenedFrom: string;
   patientChartConfig: ChartConfig;
 };
 
-const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = ({
-  name,
-  patientUuid,
-  visitFormOpenedFrom,
-  setOnVisitCreatedOrUpdatedCallbacks,
-}) => {
-  const config = useConfig<ChartConfig>();
+const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
+  ({ name, patientUuid, visitFormOpenedFrom, setVisitFormCallbacks }) => {
+    const config = useConfig<ChartConfig>();
 
-  return (
-    <ExtensionSlot name={name}>
-      {(extension) => {
-        const state: VisitFormExtensionState = {
-          patientUuid,
-          setOnVisitCreatedOrUpdated: (callback) => {
-            setOnVisitCreatedOrUpdatedCallbacks((old) => {
-              return new Map(old).set(extension.id, callback);
-            });
-          },
-          visitFormOpenedFrom,
-          patientChartConfig: config,
-        };
-        return <Extension state={state} />;
-      }}
-    </ExtensionSlot>
-  );
-};
+    return (
+      <ExtensionSlot name={name}>
+        {(extension: AssignedExtension) => {
+          const state: VisitFormExtensionState = {
+            patientUuid,
+            setVisitFormCallbacks: (callbacks) => {
+              setVisitFormCallbacks((old) => {
+                return new Map(old).set(extension.id, callbacks);
+              });
+            },
+            visitFormOpenedFrom,
+            patientChartConfig: config,
+          };
+          return <Extension state={state} />;
+        }}
+      </ExtensionSlot>
+    );
+  },
+);
 
 export default StartVisitForm;
