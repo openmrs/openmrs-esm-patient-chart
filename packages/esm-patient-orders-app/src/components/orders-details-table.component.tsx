@@ -6,8 +6,6 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -49,6 +47,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
+  OpenmrsDatePicker,
   PrinterIcon,
   useConfig,
   useLayoutType,
@@ -358,27 +357,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
           />
         </div>
         <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
-        <DatePicker
-          datePickerType="range"
-          dateFormat={'d/m/Y'}
+        <OpenmrsDatePicker
           value={''}
-          onChange={([startDate, endDate]) => {
-            handleDateFilterChange([startDate, endDate]);
+          onChange={(date: Date) => {
+            handleDateFilterChange([date, date]);
           }}
-        >
-          <DatePickerInput
-            id="startDatePickerInput"
-            data-testid="startDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-          <DatePickerInput
-            id="endDatePickerInput"
-            data-testid="endDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-        </DatePicker>
+          labelText={t('dateRange', 'Select Date')}
+        />
       </div>
 
       {(() => {
