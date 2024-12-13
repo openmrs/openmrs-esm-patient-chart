@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -18,7 +16,15 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -57,7 +63,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const { showProgramStatusField } = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
@@ -90,7 +95,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     control,
     handleSubmit,
     watch,
-    formState: { isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
     mode: 'all',
     resolver: zodResolver(programsFormSchema),
@@ -126,8 +131,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       };
 
       try {
-        setIsSubmittingForm(true);
-
         const abortController = new AbortController();
 
         if (currentEnrollment) {
@@ -155,8 +158,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           subtitle: error instanceof Error ? error.message : 'An unknown error occurred',
         });
       }
-
-      setIsSubmittingForm(false);
     },
     [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
@@ -165,12 +166,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgram"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label="program name"
             id="program"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgram}
+            invalidText={errors?.selectedProgram?.message}
             labelText={t('programName', 'Program name')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -183,7 +185,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                 </SelectItem>
               ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -194,18 +195,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
+        <OpenmrsDatePicker
           aria-label="enrollment date"
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={onChange}
           value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          labelText={t('dateEnrolled', 'Date enrolled')}
+        />
       )}
     />
   );
@@ -215,19 +212,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="completionDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
+        <OpenmrsDatePicker
           aria-label="completion date"
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
           minDate={new Date(watch('enrollmentDate')).toISOString()}
           maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={onChange}
           value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          labelText={t('dateCompleted', 'Date completed')}
+        />
       )}
     />
   );
@@ -267,12 +260,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgramStatus"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label={t('programStatus', 'Program status')}
             id="programStatus"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgramStatus}
+            invalidText={errors?.selectedProgramStatus?.message}
             labelText={t('programStatus', 'Program status')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -284,7 +278,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
               </SelectItem>
             ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -343,8 +336,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
-          {isSubmittingForm ? (
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
             <span>{t('saveAndClose', 'Save and close')}</span>
