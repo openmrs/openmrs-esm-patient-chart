@@ -9,3 +9,4 @@ export * from './program-page';
 export * from './results-viewer-page';
 export * from './visits-page';
 export * from './vitals-and-biometrics-page';
+export * from './mark-patient-deceased-page';
