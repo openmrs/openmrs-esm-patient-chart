@@ -120,8 +120,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
+
   const visitFormCallbacksRef = useVisitFormCallbacks();
-  // const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
+
+
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
@@ -531,7 +533,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               },
             );
 
+
             const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacksRef.current.values()].map((callbacks) =>
+
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
@@ -592,6 +596,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       mutateInfiniteVisits,
+
       patientUuid,
       t,
       validateVisitStartStopDatetime,
@@ -663,7 +668,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
+
                   visitFormCallbacksRef={visitFormCallbacksRef} // Pass the ref instead
+
                 />
               </div>
             </section>
@@ -774,7 +781,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
+                 
                   visitFormCallbacksRef={visitFormCallbacksRef}
+
                 />
               </div>
             </section>
@@ -818,8 +827,9 @@ interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
   visitFormOpenedFrom: string;
+
   visitFormCallbacksRef: React.MutableRefObject<Map<string, VisitFormCallbacks>>; // Replaced `setVisitFormCallbacks` with `visitFormCallbacksRef`
-}
+
 
 type VisitFormExtensionState = {
   patientUuid: string;
@@ -838,16 +848,20 @@ type VisitFormExtensionState = {
 };
 
 const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
+
   ({ name, patientUuid, visitFormOpenedFrom, visitFormCallbacksRef }) => {
+
     const config = useConfig<ChartConfig>();
 
     return (
       <ExtensionSlot name={name}>
         {(extension: AssignedExtension) => {
+
           const state = {
             patientUuid,
             setVisitFormCallbacks: (callbacks: VisitFormCallbacks) => {
               visitFormCallbacksRef.current.set(extension.id, callbacks);
+
             },
             visitFormOpenedFrom,
             patientChartConfig: config,

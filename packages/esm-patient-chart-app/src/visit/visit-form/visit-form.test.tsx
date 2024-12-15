@@ -76,9 +76,11 @@ const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = jest.fn();
+
 jest.mocked(useVisitFormCallbacks).mockReturnValue({
   current: new Map([['test-extension-id', { onVisitCreatedOrUpdated: mockOnVisitCreatedOrUpdatedCallback }]]),
 });
+
 const mockCreateVisitAttribute = jest.mocked(createVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockUpdateVisitAttribute = jest.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockDeleteVisitAttribute = jest.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);

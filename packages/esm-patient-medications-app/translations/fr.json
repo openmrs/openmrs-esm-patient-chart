@@ -43,7 +43,7 @@
   "male": "Masculin",
   "medicationDurationAndUnit": "pour {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Durée indéfinie",
-  "medications": "Médicaments",
+  "Medications": "Médicaments",
   "modify": "Modifier",
   "none": "Aucun",
   "noResultsForDrugSearch": "Aucun résultat à afficher pour « {{searchTerm}} »",

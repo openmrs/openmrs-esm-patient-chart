@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -27,31 +28,27 @@
 
 .orderActionNewLabel {
   @extend .label;
-  color: black;
-  background-color: #c4f4cc;
+  background-color: colors.$green-10-hover;
   padding: 0 layout.$spacing-02;
 }
 
 .orderActionIncompleteLabel {
-  @extend .label;
+  @extend .orderActionNewLabel;
+  background-color: colors.$red-60;
   color: white;
-  background-color: $danger;
-  padding: 0 layout.$spacing-02;
 }
 
 .orderActionRenewLabel {
-  @extend .label;
-  color: $support-02;
+  @extend .orderActionNewLabel;
 }
 
-.orderActionRevisedLabel {
-  @extend .label;
-  color: #943d00;
+.orderActionReviseLabel {
+  @extend .orderActionNewLabel;
 }
 
 .orderActionDiscontinueLabel {
-  @extend .label;
-  color: $danger;
+  @extend .orderActionNewLabel;
+  background-color: colors.$gray-20;
 }
 
 .orderErrorText {

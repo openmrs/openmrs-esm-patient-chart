@@ -2,14 +2,22 @@
   "env": {
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest-dom/recommended",
-    "plugin:testing-library/react"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:jest-dom/recommended"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import", "jest-dom", "react-hooks", "testing-library"],
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx"],
+      "extends": ["plugin:testing-library/react"]
+    },
+    {
+      "files": ["e2e/**/*.spec.ts"],
+      "extends": ["plugin:playwright/recommended"],
+      "rules": {
+        "testing-library/prefer-screen-queries": "off"
+      }
+    }
+  ],
   "rules": {
     "react-hooks/exhaustive-deps": "warn",
     "react-hooks/rules-of-hooks": "error",

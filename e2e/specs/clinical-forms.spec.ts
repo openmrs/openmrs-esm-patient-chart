@@ -273,6 +273,6 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
 });

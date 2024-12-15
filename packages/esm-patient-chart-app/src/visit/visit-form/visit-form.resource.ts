@@ -32,12 +32,10 @@ export interface VisitFormCallbacks {
   onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
 }
 
-// export function useVisitFormCallbacks() {
-//   return useState<Map<string, VisitFormCallbacks>>(new Map());
-// }
+
 export function useVisitFormCallbacks() {
   return useRef<Map<string, VisitFormCallbacks>>(new Map());
-}
+
 
 export function createVisitAttribute(visitUuid: string, attributeType: string, value: string) {
   return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
