@@ -45,7 +45,7 @@ import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 
-export interface ActiveMedicationsProps {
+export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
@@ -56,7 +56,7 @@ export interface ActiveMedicationsProps {
   patient: fhir.Patient;
 }
 
-const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
+const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   isValidating,
   title,
   medications,
