@@ -2,7 +2,7 @@ import React from 'react';
 import { NumberInput, Select, SelectItem, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller, type FieldErrors } from 'react-hook-form';
-import { type LabOrderConcept } from './lab-results.resource';
+import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import styles from './lab-results-form.scss';
 
 interface ResultFormFieldProps {
@@ -14,11 +14,6 @@ interface ResultFormFieldProps {
 
 const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue, errors }) => {
   const { t } = useTranslation();
-
-  const isCoded = (concept: LabOrderConcept) => concept.datatype?.display === 'Coded';
-  const isNumeric = (concept: LabOrderConcept) => concept.datatype?.display === 'Numeric';
-  const isPanel = (concept: LabOrderConcept) => concept.setMembers?.length > 0;
-  const isText = (concept: LabOrderConcept) => concept.datatype?.display === 'Text';
 
   const printValueRange = (concept: LabOrderConcept) => {
     if (concept?.datatype?.display === 'Numeric') {
