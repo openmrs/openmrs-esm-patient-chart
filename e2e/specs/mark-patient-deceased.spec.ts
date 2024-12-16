@@ -47,7 +47,8 @@ test('Mark a patient as deceased', async ({ page }) => {
   await markPatientDeceasedPage.saveAndCloseButton().click();
   });
 
-  await test.step('Then I should see a “deceased” tag in the patient banner', async () => {
+   await test.step('Then I should see a “deceased” tag in the patient banner', async () => {
+    // Wait for the "Deceased" tag to be visible before asserting
     await markPatientDeceasedPage.verifyDeceasedTag();
   });
 });
