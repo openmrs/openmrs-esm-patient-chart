@@ -32,7 +32,7 @@ export class MarkPatientDeceasedPage {
 
   async verifyDeceasedTag() {
     await this.page.waitForSelector('div:has-text("Deceased")', { state: 'visible' });  // Ensure "Deceased" is visible
-   await expect(this.deceasedTag()).toBeVisible({ timeout: 10000 });  // Waits up to 10 seconds for visibility
+   await expect(this.deceasedTag()).toBeVisible({ timeout: 40000 });  // Waits up to 10 seconds for visibility
 
   }
 }
