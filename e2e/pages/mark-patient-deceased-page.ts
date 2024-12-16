@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';  // Importing expect
 
 export class MarkPatientDeceasedPage {
   constructor(private readonly page: Page) {}
@@ -30,6 +30,6 @@ export class MarkPatientDeceasedPage {
   }
 
   async verifyDeceasedTag() {
-    await expect(this.deceasedTag()).toBeVisible();
+    await expect(this.deceasedTag()).toBeVisible();  // Ensure expect is used for the assertion
   }
 }
