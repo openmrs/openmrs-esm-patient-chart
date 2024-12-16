@@ -530,9 +530,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               },
             );
 
-
             const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacksRef.current.values()].map((callbacks) =>
-
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
