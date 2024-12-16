@@ -9,8 +9,7 @@ export class MarkPatientDeceasedPage {
   readonly dateOfDeathInput = () => this.page.getByPlaceholder(/dd\/mm\/yyyy/i);
   readonly causeOfDeathRadio = (cause: string) => this.page.getByRole('radio', { name: cause });
   readonly saveAndCloseButton = () => this.page.getByRole('button', { name: /save and close/i });
-  readonly deceasedTag = () => this.page.locator('div:has-text("Deceased")');  // Adjust if needed
-
+ readonly deceasedTag = () => this.page.getByText(/deceased/i);
 
   async goToPatientChart(patientUuid: string) {
     await this.page.goto(`/openmrs/spa/patient/${patientUuid}/chart/Patient%20Summary`);
@@ -31,8 +30,6 @@ export class MarkPatientDeceasedPage {
   }
 
   async verifyDeceasedTag() {
-    await this.page.waitForSelector('div:has-text("Deceased")', { state: 'visible' });  // Ensure "Deceased" is visible
-   await expect(this.deceasedTag()).toBeVisible({ timeout: 40000 });  // Waits up to 10 seconds for visibility
-
-  }
+    await expect(this.deceasedTag()).toBeVisible();
+  }
 }
