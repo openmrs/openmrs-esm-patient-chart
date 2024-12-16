@@ -40,7 +40,11 @@ test('Mark a patient as deceased', async ({ page }) => {
     await page.locator('text=Neoplasm/cancer').click();
 
     // Save and close
-    await markPatientDeceasedPage.saveAndClose();
+    await expect(markPatientDeceasedPage.saveAndCloseButton()).toBeVisible();
+  await expect(markPatientDeceasedPage.saveAndCloseButton()).not.toBeDisabled();
+  
+  // Save and close
+  await markPatientDeceasedPage.saveAndCloseButton().click();
   });
 
   await test.step('Then I should see a “deceased” tag in the patient banner', async () => {
