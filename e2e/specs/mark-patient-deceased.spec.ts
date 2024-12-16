@@ -32,11 +32,12 @@ test('Mark a patient as deceased', async ({ page }) => {
   // Fill the date input directly
   await markPatientDeceasedPage.dateOfDeathInput().fill(todayDate);
 
-  // Select the cause of death radio button
-  await page.locator('text=Neoplasm/cancer').click(); // Updated locator
-  
-  // Close the date picker if still open
+    // Close the date picker if still open
   await page.keyboard.press('Enter');
+
+  // Select the cause of death radio button
+ await page.locator('text=Neoplasm/cancer').waitFor({ state: 'visible' });
+  await page.locator('text=Neoplasm/cancer').click();
 
   // Save and close
   await markPatientDeceasedPage.saveAndClose();
