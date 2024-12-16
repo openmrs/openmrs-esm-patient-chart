@@ -120,10 +120,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
-
   const visitFormCallbacksRef = useVisitFormCallbacks();
-
-
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
