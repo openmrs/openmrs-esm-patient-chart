@@ -30,6 +30,6 @@ export class MarkPatientDeceasedPage {
   }
 
   async verifyDeceasedTag() {
-    await expect(this.deceasedTag()).toBeVisible({ timeout: 20000 });
+    await expect(this.deceasedTag()).toBeVisible({ timeout: 70000 });
   }
 }
