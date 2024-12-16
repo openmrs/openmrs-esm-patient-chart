@@ -1,4 +1,25 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
+
+export interface Concept extends OpenmrsResource {
+  name?: {
+    display: string;
+  };
+  names?: Array<{
+    display: string;
+  }>;
+  conceptClass?: {
+    uuid: string;
+  };
+  answers?: Array<Concept>;
+  setMembers?: Array<Concept>;
+}
+export interface Drug {
+  uuid: string;
+  strength: string;
+  concept: Concept;
+  dosageForm: OpenmrsResource;
+  display: string;
+}
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
 
@@ -23,7 +44,7 @@ export interface OrderErrorObject {
 }
 
 export interface OrderBasketItem {
-  action?: OrderAction;
+  action: OrderAction;
   display: string;
   uuid?: string;
   orderer?: string;
@@ -43,9 +64,20 @@ export interface OrderBasketItem {
    * An optional identifier from the fulfiller (e.g., lab system) for the specimen or record associated with the order.
    */
   accessionNumber?: string;
+  concept?: Concept;
+  instructions?: string;
+  urgency?: OrderUrgency;
+  previousOrder?: string;
+  orderType?: string;
+  orderNumber?: string;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+
+export type PriorityOption = {
+  label: string;
+  value: OrderUrgency;
+};
 
 export interface OrderPost {
   urgency?: OrderUrgency;
@@ -54,6 +86,19 @@ export interface OrderPost {
   careSetting?: string;
   orderer?: string;
   encounter?: string;
+  type?: string;
+  concept?: string;
+  dateActivated?: string;
+  previousOrder?: string;
+  asNeededCondition?: string;
+  orderReasonNonCoded?: string;
+  orderReason?: string;
+  instructions?: string;
+  accessionNumber?: string;
+  orderType?: string;
+}
+
+export interface DrugOrderPost extends OrderPost {
   drug?: string;
   dose?: number;
   doseUnits?: string;
@@ -63,20 +108,13 @@ export interface OrderPost {
   numRefills?: number;
   quantity?: number;
   quantityUnits?: string;
-  type?: string;
   duration?: number;
   durationUnits?: string;
   dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   dosingInstructions?: string;
-  concept?: string;
-  dateActivated?: string;
-  previousOrder?: string;
-  asNeededCondition?: string;
-  orderReasonNonCoded?: string;
-  orderReason?: string;
-  instructions?: string;
-  accessionNumber?: string;
 }
+
+export interface TestOrderPost extends OrderPost {}
 
 export interface PatientOrderFetchResponse {
   results: Array<Order>;
@@ -91,7 +129,7 @@ export interface Order {
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
-  concept: OpenmrsResource;
+  concept: Concept;
   dateActivated: string;
   dateStopped?: string | null;
   dispenseAsWritten: boolean;
@@ -131,7 +169,7 @@ export interface Order {
   quantityUnits: OpenmrsResource;
   route: OpenmrsResource;
   scheduleDate: null;
-  urgency: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  urgency: OrderUrgency;
 
   // additional properties
   accessionNumber: string;
@@ -167,54 +205,10 @@ export interface OrderType {
   description: string;
 }
 
-export interface Drug {
-  uuid: string;
-  strength: string;
-  concept: OpenmrsResource;
-  dosageForm: OpenmrsResource;
-  display: string;
-}
+export type FulfillerStatus = 'EXCEPTION' | 'RECEIVED' | 'COMPLETED' | 'IN_PROGRESS' | 'ON_HOLD' | 'DECLINED';
 
 export type PostDataPrepFunction = (
   order: OrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
 ) => OrderPost;
-
-// Adopted from @openmrs/esm-patient-medications-app package. We should consider maintaining a single shared types file
-export interface DrugOrderBasketItem extends OrderBasketItem {
-  drug: Drug;
-  unit: any;
-  commonMedicationName: string;
-  dosage: number;
-  frequency: any;
-  route: any;
-  quantityUnits: any;
-  patientInstructions: string;
-  asNeeded: boolean;
-  asNeededCondition: string;
-  startDate: Date | string;
-  durationUnit: any;
-  duration: number | null;
-  pillsDispensed: number;
-  numRefills: number;
-  indication: string;
-  isFreeTextDosage: boolean;
-  freeTextDosage: string;
-  previousOrder?: string;
-  template?: any;
-}
-
-export interface LabOrderBasketItem extends OrderBasketItem {
-  testType?: {
-    label: string;
-    conceptUuid: string;
-  };
-  urgency?: OrderUrgency;
-  instructions?: string;
-  previousOrder?: string;
-  orderReason?: string;
-  orderNumber?: string;
-}
-
-export type FulfillerStatus = 'EXCEPTION' | 'RECEIVED' | 'COMPLETED' | 'IN_PROGRESS' | 'ON_HOLD' | 'DECLINED';

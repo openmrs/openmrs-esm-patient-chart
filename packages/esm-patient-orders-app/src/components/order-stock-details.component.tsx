@@ -27,7 +27,7 @@ const OrderStockDetailsComponent: React.FC<OrderStockDetailsComponentProps> = ({
     return <SkeletonText width="100px" role="progressbar" />;
   }
 
-  if (!stockData || error) {
+  if (!stockData?.entry || error) {
     return null;
   }
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
-import { type OrderTypeFetchResponse, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import type { PatientOrderFetchResponse, PriorityOption } from './types';
 
 export type Status = 'ACTIVE' | 'any';
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -56,21 +56,12 @@ export function usePatientOrders(
   };
 }
 
-export function useOrderTypes() {
-  const orderTypesUrl = `${restBaseUrl}/ordertype`;
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<OrderTypeFetchResponse>, Error>(
-    orderTypesUrl,
-    openmrsFetch,
-  );
-
-  return {
-    data: data?.data?.results ?? null,
-    error,
-    isLoading,
-    isValidating,
-  };
-}
-
 export function getDrugOrderByUuid(orderUuid: string) {
   return openmrsFetch(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
 }
+
+// See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
+export const priorityOptions: PriorityOption[] = [
+  { value: 'ROUTINE', label: 'Routine' },
+  { value: 'STAT', label: 'Stat' },
+];

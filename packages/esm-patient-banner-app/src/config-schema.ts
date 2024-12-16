@@ -45,6 +45,11 @@ export const configSchema = {
         'Specifies the paper size for printing the sticker. You can define the size using units (e.g., mm, in) or named sizes (e.g., "148mm 210mm", "A1", "A2", "A4", "A5").',
       _default: 'A4',
     },
+    printScale: {
+      _type: Type.String,
+      _description: 'Set the scale for the printed content. A value between 0 and 1 shrinks the content, while a value greater than 1 enlarges it. The scale must be greater than 0.',
+      _default: '1',
+    },
     identifiersToDisplay: {
       _type: Type.Array,
       _description:
@@ -74,6 +79,7 @@ export interface ConfigObject {
     };
     fields: Array<AllowedPatientFields>;
     pageSize: string;
+    printScale: string;
     identifiersToDisplay: Array<string>;
   };
   useRelationshipNameLink: boolean;

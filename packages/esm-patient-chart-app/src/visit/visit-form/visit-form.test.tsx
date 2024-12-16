@@ -1,12 +1,5 @@
-import React from 'react';
-import dayjs from 'dayjs';
-import { render, screen } from '@testing-library/react';
-import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
-import userEvent from '@testing-library/user-event';
 import {
   getDefaultsFromConfigSchema,
-  openmrsFetch,
-  restBaseUrl,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -17,11 +10,22 @@ import {
   type FetchResponse,
   type Visit,
 } from '@openmrs/esm-framework';
-import { mockPatient } from 'tools';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
+import dayjs from 'dayjs';
+import React from 'react';
+import { mockPatient } from 'tools';
+import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.component';
+import {
+  createVisitAttribute,
+  deleteVisitAttribute,
+  updateVisitAttribute,
+  useVisitFormCallbacks,
+} from './visit-form.resource';
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -52,6 +56,7 @@ const mockPromptBeforeClosing = jest.fn();
 const mockSetTitle = jest.fn();
 
 const testProps = {
+  openedFrom: 'test',
   patientUuid: mockPatient.id,
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
@@ -62,13 +67,22 @@ const testProps = {
 
 const mockSaveVisit = jest.mocked(saveVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+
+// from ./visit-form.resource
+const mockOnVisitCreatedOrUpdatedCallback = jest.fn();
+jest.mocked(useVisitFormCallbacks).mockReturnValue([
+  new Map([['test-extension-id', { onVisitCreatedOrUpdated: mockOnVisitCreatedOrUpdatedCallback }]]), // visitFormCallbacks
+  jest.fn(), // setVisitFormCallbacks
+]);
+const mockCreateVisitAttribute = jest.mocked(createVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
+const mockUpdateVisitAttribute = jest.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
+const mockDeleteVisitAttribute = jest.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -98,7 +112,7 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
   useVisitAttributeTypes: jest.fn(() => ({
     isLoading: false,
     error: null,
-    data: [visitAttributes.punctuality, visitAttributes.insurancePolicyNumber],
+    visitAttributeTypes: [visitAttributes.punctuality, visitAttributes.insurancePolicyNumber],
   })),
   useConceptAnswersForVisitAttributeType: jest.fn(() => ({
     isLoading: false,
@@ -145,6 +159,27 @@ jest.mock('../hooks/useDefaultFacilityLocation', () => {
     })),
   };
 });
+
+jest.mock('./visit-form.resource', () => {
+  const requireActual = jest.requireActual('./visit-form.resource');
+  return {
+    ...requireActual,
+    useVisitFormCallbacks: jest.fn(),
+    createVisitAttribute: jest.fn(),
+    updateVisitAttribute: jest.fn(),
+    deleteVisitAttribute: jest.fn(),
+  };
+});
+
+mockSaveVisit.mockResolvedValue({
+  status: 201,
+  data: {
+    uuid: visitUuid,
+    visitType: {
+      display: 'Facility Visit',
+    },
+  },
+} as unknown as FetchResponse<Visit>);
 
 describe('Visit form', () => {
   beforeEach(() => {
@@ -275,15 +310,6 @@ describe('Visit form', () => {
   it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockSaveVisit.mockResolvedValue({
-      status: 201,
-      data: {
-        visitType: {
-          display: 'Facility Visit',
-        },
-      },
-    } as unknown as FetchResponse<Visit>);
-
     renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
@@ -320,8 +346,6 @@ describe('Visit form', () => {
   it('starts a new visit with attributes upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValue({} as unknown as FetchResponse);
-
     renderVisitForm();
 
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
@@ -341,16 +365,6 @@ describe('Visit form', () => {
     await user.clear(insuranceNumberInput);
     await user.type(insuranceNumberInput, '183299');
 
-    mockSaveVisit.mockResolvedValue({
-      status: 201,
-      data: {
-        uuid: visitUuid,
-        visitType: {
-          display: 'Facility Visit',
-        },
-      },
-    } as unknown as FetchResponse<Visit>);
-
     await user.click(saveButton);
 
     expect(mockSaveVisit).toHaveBeenCalledTimes(1);
@@ -363,32 +377,38 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json' },
-      body: { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
-    });
+    expect(mockCreateVisitAttribute).toHaveBeenCalledTimes(2);
+    expect(mockCreateVisitAttribute).toHaveBeenCalledWith(
+      visitUuid,
+      visitAttributes.punctuality.uuid,
+      '66cdc0a1-aa19-4676-af51-80f66d78d9eb',
+    );
+    expect(mockCreateVisitAttribute).toHaveBeenCalledWith(
+      visitUuid,
+      visitAttributes.insurancePolicyNumber.uuid,
+      '183299',
+    );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`${restBaseUrl}/visit/${visitUuid}/attribute`, {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json' },
-      body: { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
-    });
+    expect(mockOnVisitCreatedOrUpdatedCallback).toHaveBeenCalled();
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
 
+    expect(showSnackbar).toHaveBeenCalledTimes(2);
     expect(showSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
     });
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      title: expect.stringContaining('Additional visit information updated successfully'),
+      kind: 'success',
+    });
   });
 
   it('updates visit attributes when editing an existing visit', async () => {
     const user = userEvent.setup();
-
-    mockOpenmrsFetch.mockResolvedValue({} as unknown as FetchResponse);
 
     renderVisitForm(mockVisitWithAttributes);
 
@@ -430,23 +450,13 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
-      {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json' },
-        body: { value: '66cdc0a1-aa19-4676-af51-80f66d78d9ec' },
-      },
+    expect(mockUpdateVisitAttribute).toHaveBeenCalledTimes(2);
+    expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(
+      visitUuid,
+      'c98e66d7-7db5-47ae-b46f-91a0f3b6dda1',
+      '66cdc0a1-aa19-4676-af51-80f66d78d9ec',
     );
-
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
-      {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json' },
-        body: { value: '1873290' },
-      },
-    );
+    expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(visitUuid, 'd6d7d26a-5975-4f03-8abb-db073c948897', '1873290');
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalledWith({
@@ -459,8 +469,6 @@ describe('Visit form', () => {
 
   it('deletes visit attributes if the value of the field is cleared when editing an existing visit', async () => {
     const user = userEvent.setup();
-
-    mockOpenmrsFetch.mockResolvedValue({} as FetchResponse);
 
     renderVisitForm(mockVisitWithAttributes);
 
@@ -501,15 +509,9 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/visit/${visitUuid}/attribute/c98e66d7-7db5-47ae-b46f-91a0f3b6dda1`,
-      { method: 'DELETE' },
-    );
-
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
-      `${restBaseUrl}/visit/${visitUuid}/attribute/d6d7d26a-5975-4f03-8abb-db073c948897`,
-      { method: 'DELETE' },
-    );
+    expect(mockDeleteVisitAttribute).toHaveBeenCalledTimes(2);
+    expect(mockDeleteVisitAttribute).toHaveBeenCalledWith(visitUuid, 'c98e66d7-7db5-47ae-b46f-91a0f3b6dda1');
+    expect(mockDeleteVisitAttribute).toHaveBeenCalledWith(visitUuid, 'd6d7d26a-5975-4f03-8abb-db073c948897');
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
 
@@ -524,7 +526,7 @@ describe('Visit form', () => {
   it('renders an error message if there was a problem starting a new visit', async () => {
     const user = userEvent.setup();
 
-    mockSaveVisit.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
+    mockSaveVisit.mockRejectedValueOnce({ status: 500, statusText: 'Internal server error' });
 
     renderVisitForm();
 
@@ -533,7 +535,7 @@ describe('Visit form', () => {
     const saveButton = screen.getByRole('button', { name: /Start Visit/i });
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
     await user.click(locationPicker);
-    await user.click(screen.getByText('Inpatient Ward'));
+    await user.click(screen.getByText(/Inpatient Ward/i));
 
     await user.click(saveButton);
 
@@ -544,6 +546,56 @@ describe('Visit form', () => {
         title: 'Error starting visit',
       }),
     );
+
+    expect(mockOnVisitCreatedOrUpdatedCallback).not.toHaveBeenCalled();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('renders an error message if there was a problem updating visit attributes after starting a new visit', async () => {
+    const user = userEvent.setup();
+
+    mockCreateVisitAttribute.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
+
+    renderVisitForm();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText(/Inpatient Ward/i));
+
+    const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
+    await user.selectOptions(punctualityPicker, 'On time');
+
+    const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
+    await user.clear(insuranceNumberInput);
+    await user.type(insuranceNumberInput, '183299');
+
+    await user.click(saveButton);
+
+    expect(showSnackbar).toHaveBeenCalledTimes(3);
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      subtitle: expect.stringContaining('started successfully'),
+      kind: 'success',
+      title: 'Visit started',
+    });
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
+      subtitle: undefined,
+      kind: 'error',
+      title: 'Error creating the Punctuality visit attribute',
+    });
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: false,
+      subtitle: undefined,
+      kind: 'error',
+      title: 'Error creating the Insurance Policy Number visit attribute',
+    });
+
+    expect(mockOnVisitCreatedOrUpdatedCallback).toHaveBeenCalled();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 
   it('displays a warning modal if the user attempts to discard the visit form with unsaved changes', async () => {
@@ -587,15 +639,6 @@ describe('Visit form', () => {
         },
       ],
     });
-
-    mockSaveVisit.mockResolvedValue({
-      status: 201,
-      data: {
-        visitType: {
-          display: 'Facility Visit',
-        },
-      },
-    } as unknown as FetchResponse<Visit>);
 
     renderVisitForm();
 

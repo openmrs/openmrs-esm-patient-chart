@@ -32,7 +32,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
   const { freeTextFieldConceptUuid } = useConfig<ChartConfig>();
@@ -74,7 +73,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
 
   const {
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     watch,
   } = useForm<MarkPatientDeceasedFormSchema>({
@@ -91,7 +90,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
 
   const onSubmit: SubmitHandler<MarkPatientDeceasedFormSchema> = useCallback(
     (data) => {
-      setIsSubmitting(true);
       const { causeOfDeath, deathDate, nonCodedCauseOfDeath } = data;
 
       markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
@@ -106,9 +104,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
             subtitle: error?.message,
             title: t('errorMarkingPatientDeceased', 'Error marking patient deceased'),
           });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
         });
     },
     [closeWorkspace, patientUuid, t],

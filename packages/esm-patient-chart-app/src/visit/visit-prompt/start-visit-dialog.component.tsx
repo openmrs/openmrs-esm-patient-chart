@@ -38,9 +38,10 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
       launchPatientChartWithWorkspaceOpen({
         patientUuid,
         workspaceName: 'start-visit-workspace-form',
+        additionalProps: {openedFrom: 'patient-chart-start-visit'}
       });
     } else {
-      launchPatientWorkspace('start-visit-workspace-form');
+      launchPatientWorkspace('start-visit-workspace-form', {openedFrom: 'patient-chart-start-visit'});
     }
 
     closeModal();

@@ -30,7 +30,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const tableHeaders: Array<{ key: string; header: string }> = [
     {
       key: 'testType',
-      header: t('testType', 'Test type'),
+      header: testOrder.orderType.display,
     },
     {
       key: 'result',

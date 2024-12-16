@@ -1,7 +1,14 @@
 import { openmrsFetch, type OpenmrsResource, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { type OrderBasketStore, orderBasketStore } from './store';
-import { type ExtractedOrderErrorObject, type OrderBasketItem, type OrderErrorObject, type OrderPost } from './types';
+import type {
+  DrugOrderPost,
+  TestOrderPost,
+  ExtractedOrderErrorObject,
+  OrderBasketItem,
+  OrderErrorObject,
+  OrderPost,
+} from './types';
 
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
@@ -26,7 +33,7 @@ export async function postOrdersOnNewEncounter(
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
-  const orders: Array<OrderPost> = [];
+  const orders: Array<DrugOrderPost | TestOrderPost> = [];
 
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {
@@ -64,8 +71,14 @@ export async function postOrders(encounterUuid: string, abortController: AbortCo
     const orders = patientItems[grouping];
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      const dto = postDataPrepFunctions[grouping](order, patientUuid, encounterUuid);
-      await postOrder(dto, abortController).catch((error) => {
+      const dataPrepFn = postDataPrepFunctions[grouping];
+
+      if (typeof dataPrepFn !== 'function') {
+        console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
+        continue;
+      }
+
+      await postOrder(dataPrepFn(order, patientUuid, encounterUuid), abortController).catch((error) => {
         erroredItems.push({
           ...order,
           orderError: error,

@@ -1,0 +1,81 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.desktopTile {
+  border-left: layout.$spacing-02 solid colors.$cyan-20;
+  background-color: $ui-02;
+  border-top: 1px solid colors.$cyan-20;
+  border-right: none;
+  padding: 0;
+}
+
+.tabletTile {
+  @extend .desktopTile;
+  border-top: 1px solid #3778c1;
+}
+
+.collapsedTile {
+  border-bottom: none;
+  min-height: 0;
+
+  .orderBasketHeader {
+    margin-bottom: 0;
+  }
+}
+
+.tabletTile .collapsedTile {
+  border-bottom: 1px solid $grey-2;
+}
+
+.container {
+  background-color: $ui-02;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.desktopTile .container {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.tabletTile .container {
+  padding: layout.$spacing-03;
+
+  h4 {
+    @include type.type-style('heading-03');
+    color: $ui-05;
+  }
+}
+
+.heading {
+  margin-left: layout.$spacing-03;
+}
+
+.iconAndLabel {
+  display: flex;
+  align-items: center;
+  margin: layout.$spacing-03;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+}
+
+.addButton {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
+.chevron {
+  svg {
+    fill: currentColor;
+  }
+}

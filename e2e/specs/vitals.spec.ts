@@ -80,6 +80,6 @@ test('Record vital signs', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
 });
