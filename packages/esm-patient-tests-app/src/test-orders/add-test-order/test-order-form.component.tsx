@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type DefaultPatientWorkspaceProps,
-  type LabOrderBasketItem,
   launchPatientWorkspace,
   useOrderBasket,
+  useOrderType,
 } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { prepLabOrderPostData, useOrderReasons } from '../api';
+import { prepTestOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
@@ -21,17 +21,19 @@ import {
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { ordersEqual, priorityOptions } from './lab-order';
-import { useTestTypes } from './useTestTypes';
+import { ordersEqual, priorityOptions } from './test-order';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
-import styles from './lab-order-form.scss';
+import styles from './test-order-form.scss';
+import type { TestOrderBasketItem } from '../../types';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
-  initialOrder: LabOrderBasketItem;
+  initialOrder: TestOrderBasketItem;
+  orderTypeUuid: string;
+  orderableConceptSets: Array<string>;
 }
 
 // Designs:
@@ -42,15 +44,17 @@ export function LabOrderForm({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  orderTypeUuid,
+  orderableConceptSets,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
-  const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
+  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
   ).required;
@@ -92,7 +96,7 @@ export function LabOrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
-  } = useForm<LabOrderBasketItem>({
+  } = useForm<TestOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
@@ -112,8 +116,8 @@ export function LabOrderForm({
   }, []);
 
   const handleFormSubmission = useCallback(
-    (data: LabOrderBasketItem) => {
-      const finalizedOrder: LabOrderBasketItem = {
+    (data: TestOrderBasketItem) => {
+      const finalizedOrder: TestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
@@ -148,7 +152,7 @@ export function LabOrderForm({
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
-  const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
+  const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
     if (errors) {
       setShowErrorNotification(true);
     }
@@ -162,7 +166,7 @@ export function LabOrderForm({
 
   return (
     <>
-      {errorLoadingTestTypes && (
+      {/* {errorLoadingTestTypes && (
         <InlineNotification
           className={styles.inlineNotification}
           kind="error"
@@ -170,7 +174,7 @@ export function LabOrderForm({
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
         />
-      )}
+      )} */}
 
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
@@ -195,7 +199,9 @@ export function LabOrderForm({
                         id="labReferenceNumberInput"
                         invalid={!!errors.accessionNumber}
                         invalidText={errors.accessionNumber?.message}
-                        labelText={t('labReferenceNumber', 'Lab reference number')}
+                        labelText={t('referenceNumber', 'Reference number', {
+                          orderType: orderType?.display,
+                        })}
                         maxLength={150}
                         onBlur={onBlur}
                         onChange={onChange}

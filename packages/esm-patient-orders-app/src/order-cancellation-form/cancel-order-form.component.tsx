@@ -33,7 +33,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const { mutate } = usePatientOrders(patientUuid);
 
@@ -57,7 +56,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<CancelOrderFormData>({
     mode: 'all',
     resolver: zodResolver(cancelOrderSchema),
@@ -77,7 +76,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
     (data: CancelOrderFormData) => {
       const formData = data;
       setShowErrorNotification(false);
-      setIsSubmitting(true);
 
       const payload = {
         fulfillerStatus: 'DECLINED',
@@ -86,7 +84,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
 
       cancelOrder(order, payload).then(
         (res) => {
-          setIsSubmitting(false);
           closeWorkspace();
           mutate();
 
@@ -99,7 +96,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
           });
         },
         (err) => {
-          setIsSubmitting(false);
           showSnackbar({
             isLowContrast: true,
             title: t('errorCancellingOrder', 'Error cancelling order'),

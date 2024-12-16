@@ -1,4 +1,5 @@
-import { type Drug, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsResource } from '@openmrs/esm-framework';
+import type { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
   drug: Drug;
@@ -11,7 +12,6 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
-  // TODO: This is unused
   startDate: Date | string;
   durationUnit: DurationUnit;
   duration: number | null;

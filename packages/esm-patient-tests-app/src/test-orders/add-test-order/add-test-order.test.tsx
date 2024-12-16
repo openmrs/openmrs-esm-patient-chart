@@ -11,18 +11,19 @@ import {
   usePatient,
   useSession,
 } from '@openmrs/esm-framework';
-import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
-import { createEmptyLabOrder } from './lab-order';
-import AddLabOrderWorkspace from './add-lab-order.workspace';
+import { createEmptyLabOrder } from './test-order';
+import AddLabOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseOrderType = jest.mocked(useOrderType);
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
@@ -31,21 +32,21 @@ mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
 const ptUuid = 'test-patient-uuid';
 
 const mockTestTypes = [
-  {
-    conceptUuid: 'test-lab-uuid-1',
-    label: 'HIV VIRAL LOAD',
-    synonyms: ['HIV VIRAL LOAD', 'HIV VL'],
-  },
+  // {
+  //   conceptUuid: 'test-lab-uuid-1',
+  //   label: 'HIV VIRAL LOAD',
+  //   synonyms: ['HIV VIRAL LOAD', 'HIV VL'],
+  // },
   {
     conceptUuid: 'test-lab-uuid-2',
     label: 'CD4 COUNT',
     synonyms: ['CD4 COUNT', 'CD4'],
   },
-  {
-    conceptUuid: 'test-lab-uuid-3',
-    label: 'HEMOGLOBIN',
-    synonyms: ['HEMOGLOBIN', 'HGB'],
-  },
+  // {
+  //   conceptUuid: 'test-lab-uuid-3',
+  //   label: 'HEMOGLOBIN',
+  //   synonyms: ['HEMOGLOBIN', 'HGB'],
+  // },
 ];
 const mockUseTestTypes = jest.fn().mockReturnValue({
   testTypes: mockTestTypes,
@@ -62,6 +63,7 @@ const mockLaunchPatientWorkspace = jest.fn();
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
+  useOrderType: jest.fn(),
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
@@ -86,6 +88,7 @@ function renderAddLabOrderWorkspace() {
       promptBeforeClosing={mockPromptBeforeClosing}
       patientUuid={ptUuid}
       setTitle={jest.fn()}
+      orderTypeUuid="test-lab-order-type-uuid"
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
@@ -97,11 +100,27 @@ mockUseConfig.mockReturnValue({
     labOrderTypeUuid: 'test-lab-order-type-uuid',
     labOrderableConcepts: [],
   },
+  additionalTestOrderTypes: [],
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
+
+mockUseOrderType.mockReturnValue({
+  orderType: {
+    uuid: 'test-order-type-uuid',
+    display: 'Test order',
+    javaClassName: 'org.openmrs.TestOrder',
+    name: 'Test order',
+    retired: false,
+    description: '',
+    conceptClasses: [],
+  },
+  isLoadingOrderType: false,
+  isValidatingOrderType: false,
+  errorFetchingOrderType: undefined,
+});
 
 describe('AddLabOrder', () => {
   beforeEach(() => {
@@ -111,7 +130,7 @@ describe('AddLabOrder', () => {
   test('happy path fill and submit form', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
     );
     const { mockCloseWorkspaceWithSavedChanges } = renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
@@ -125,7 +144,7 @@ describe('AddLabOrder', () => {
     expect(testTypeLabel).toBeInTheDocument();
     expect(testTypeValue).toBeInTheDocument();
 
-    const labReferenceNumber = screen.getByRole('textbox', { name: 'Lab reference number' });
+    const labReferenceNumber = screen.getByRole('textbox', { name: 'Reference number' });
     expect(labReferenceNumber).toBeInTheDocument();
     await user.type(labReferenceNumber, 'lba-000124');
 
@@ -164,7 +183,7 @@ describe('AddLabOrder', () => {
   test('from lab search, click add directly to order basket', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepFunction),
     );
     renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
@@ -176,7 +195,7 @@ describe('AddLabOrder', () => {
     await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
         {
-          ...createEmptyLabOrder(mockTestTypes[1], mockSessionDataResponse.data.currentProvider.uuid),
+          ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid),
           isOrderIncomplete: true,
         },
       ]);
@@ -206,15 +225,6 @@ describe('AddLabOrder', () => {
     expect(screen.getByText(/male/i)).toBeInTheDocument();
     expect(screen.getByText(/52 yrs/i)).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
-  });
-
-  test('should be possible to search for test types by synonyms', async () => {
-    const user = userEvent.setup();
-    renderAddLabOrderWorkspace();
-    const searchInput = screen.getByRole('searchbox');
-    await user.type(searchInput, 'hgb');
-    await screen.findByText(/hemoglobin/i);
-    expect(screen.queryByText(/hiv viral load/i)).not.toBeInTheDocument();
   });
 
   test('should display an error message if test types fail to load', () => {

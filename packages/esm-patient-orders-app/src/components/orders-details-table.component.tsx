@@ -34,8 +34,6 @@ import {
   getDrugOrderByUuid,
   launchPatientWorkspace,
   PatientChartPagination,
-  type DrugOrderBasketItem,
-  type LabOrderBasketItem,
   type Order,
   type OrderBasketItem,
   type OrderType,
@@ -47,6 +45,7 @@ import {
 import {
   AddIcon,
   age,
+  ExtensionSlot,
   formatDate,
   getCoreTranslation,
   getPatientName,
@@ -56,11 +55,12 @@ import {
   usePagination,
   usePatient,
 } from '@openmrs/esm-framework';
-import { buildLabOrder, buildMedicationOrder } from '../utils';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
+import GeneralOrderTable from './general-order-table.component';
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -75,7 +75,7 @@ interface OrderBasketItemActionsProps {
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
   responsiveSize: string;
-  setOrderItems: (orderType: 'labs' | 'medications', items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (orderType: string, items: Array<MutableOrderBasketItem>) => void;
 }
 
 interface OrderHeaderProps {
@@ -95,7 +95,7 @@ interface DataTableRow {
   isExpanded: boolean;
 }
 
-type MutableOrderBasketItem = OrderBasketItem | LabOrderBasketItem | DrugOrderBasketItem;
+type MutableOrderBasketItem = OrderBasketItem;
 
 const medicationsOrderBasket = 'medications';
 const labsOrderBasket = 'labs';
@@ -109,6 +109,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
   const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
+  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
   const contentToPrintRef = useRef(null);
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
@@ -134,13 +135,22 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
           launchAddDrugOrder({ order: buildMedicationOrder(orderItem, 'REVISE') });
           break;
         case 'testorder':
-          launchModifyLabOrder({ order: buildLabOrder(orderItem, 'REVISE') });
+          launchModifyLabOrder({
+            order: buildLabOrder(orderItem, 'REVISE'),
+            orderTypeUuid: orderItem.orderType.uuid,
+          });
+          break;
+        case 'order':
+          launchModifyGeneralOrder({
+            order: buildGeneralOrder(orderItem, 'REVISE'),
+            orderTypeUuid: orderItem.orderType.uuid,
+          });
           break;
         default:
           launchOrderBasket();
       }
     },
-    [launchAddDrugOrder, launchModifyLabOrder, launchOrderBasket],
+    [launchAddDrugOrder, launchModifyGeneralOrder, launchModifyLabOrder, launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -323,6 +333,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
       }
     }
   };
+
+  const isOmrsOrder = useCallback(
+    (orderItem: Order) => ['order', 'testorder', 'drugorder'].includes(orderItem.type),
+    [],
+  );
+
   return (
     <>
       <div className={styles.filterContainer}>
@@ -494,14 +510,25 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                         ))}
                                         {!isPrinting && (
                                           <TableCell className="cds--table-column-menu">
-                                            <OrderBasketItemActions
-                                              items={orders}
-                                              openOrderBasket={launchOrderBasket}
-                                              openOrderForm={() => openOrderForm(matchingOrder)}
-                                              orderItem={matchingOrder}
-                                              setOrderItems={setOrders}
-                                              responsiveSize={responsiveSize}
-                                            />
+                                            {isOmrsOrder(matchingOrder) ? (
+                                              <OrderBasketItemActions
+                                                items={orders}
+                                                openOrderBasket={launchOrderBasket}
+                                                openOrderForm={() => openOrderForm(matchingOrder)}
+                                                orderItem={matchingOrder}
+                                                setOrderItems={setOrders}
+                                                responsiveSize={responsiveSize}
+                                              />
+                                            ) : (
+                                              <ExtensionSlot
+                                                name={`${matchingOrder.type}-action-menu-items-slot`}
+                                                state={{
+                                                  className: styles.menuItem,
+                                                  orderItem: matchingOrder,
+                                                  responsiveSize,
+                                                }}
+                                              />
+                                            )}
                                           </TableCell>
                                         )}
                                       </TableExpandRow>
@@ -513,19 +540,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                           })}
                                         >
                                           <>
-                                            {(() => {
-                                              if (matchingOrder?.type === 'drugorder') {
-                                                return <MedicationRecord medication={matchingOrder} />;
-                                              } else if (matchingOrder?.type === 'testorder') {
-                                                return <TestOrder testOrder={matchingOrder} />;
-                                              } else {
-                                                return (
-                                                  <span className={styles.unknownOrderTypeText}>
-                                                    {t('unknownOrderType', 'Unknown order type')}
-                                                  </span>
-                                                );
-                                              }
-                                            })()}
+                                            {matchingOrder?.type === 'drugorder' ? (
+                                              <MedicationRecord medication={matchingOrder} />
+                                            ) : matchingOrder?.type === 'testorder' ? (
+                                              <TestOrder testOrder={matchingOrder} />
+                                            ) : matchingOrder?.type === 'order' ? (
+                                              <GeneralOrderTable order={matchingOrder} />
+                                            ) : (
+                                              <ExtensionSlot
+                                                name={`${matchingOrder.type}-detail-slot`}
+                                                state={{
+                                                  orderItem: matchingOrder,
+                                                }}
+                                              />
+                                            )}
                                           </>
                                         </TableExpandedRow>
                                       ) : (
@@ -597,10 +625,14 @@ function OrderBasketItemActions({
         .catch((e) => {
           console.error('Error modifying drug order: ', e);
         });
-    } else {
+    } else if (orderItem.type === 'testorder') {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrderItems(labsOrderBasket, [...items, labItem]);
+      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
       openOrderForm({ order: labItem });
+    } else if (orderItem.type === 'order') {
+      const order = buildGeneralOrder(orderItem, 'REVISE');
+      setOrderItems(orderItem.orderType.uuid, [...items, order]);
+      openOrderForm({ order });
     }
   }, [orderItem, openOrderForm, items, setOrderItems]);
 
@@ -615,11 +647,16 @@ function OrderBasketItemActions({
         setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
+    } else if (orderItem.type === 'testorder') {
+      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
+      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
+      openOrderBasket();
     } else {
-      setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
+      setOrderItems(orderItem.orderType.uuid, [...items, order]);
       openOrderBasket();
     }
-  }, [orderItem, items, setOrderItems, openOrderBasket]);
+  }, [orderItem, setOrderItems, items, openOrderBasket]);
 
   return (
     <Layer className={styles.layer}>

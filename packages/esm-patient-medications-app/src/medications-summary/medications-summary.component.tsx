@@ -62,7 +62,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
-          if (isValidatingPastOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
 
           if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
 
@@ -72,6 +72,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 isValidating={isValidatingPastOrders}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
+                showAddButton={false}
                 showDiscontinueButton={false}
                 showModifyButton={false}
                 showReorderButton={true}
