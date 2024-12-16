@@ -9,7 +9,7 @@ export class MarkPatientDeceasedPage {
   readonly dateOfDeathInput = () => this.page.getByPlaceholder(/dd\/mm\/yyyy/i);
   readonly causeOfDeathRadio = (cause: string) => this.page.getByRole('radio', { name: cause });
   readonly saveAndCloseButton = () => this.page.getByRole('button', { name: /save and close/i });
-  readonly deceasedTag = () => this.page.locator('div:has-text("Deceased")');
+  readonly deceasedTag = () => this.page.locator('div:has-text("Deceased")');  // Adjust if needed
 
 
   async goToPatientChart(patientUuid: string) {
@@ -30,8 +30,8 @@ export class MarkPatientDeceasedPage {
     await this.saveAndCloseButton().click();
   }
 
- async verifyDeceasedTag() {
-  await expect(this.deceasedTag()).toBeVisible();  // Verifying the "Deceased" label
-}
-
+  async verifyDeceasedTag() {
+    await this.page.waitForSelector('div:has-text("Deceased")', { state: 'visible' });  // Ensure "Deceased" is visible
+    await expect(this.deceasedTag()).toBeVisible();  // Verifying the "Deceased" label
+  }
 }
