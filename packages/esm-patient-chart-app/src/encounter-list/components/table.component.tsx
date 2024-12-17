@@ -25,8 +25,9 @@ export const EncounterListDataTable: React.FC<TableProps> = ({ tableHeaders, tab
           <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
-                {headers.map((header) => (
+                {headers.map((header, index) => (
                   <TableHeader
+                    key={index}
                     className={`${styles.productiveHeading01} ${styles.text02}`}
                     {...getHeaderProps({
                       header,
