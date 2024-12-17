@@ -102,8 +102,8 @@ test('Add and edit an immunization', async ({ page }) => {
   });
 
   await test.step('And I should see the updated immunization in the list', async () => {
-    await expect(headerRow).toContainText(/vaccine/i);
-    await expect(headerRow).toContainText(/recent vaccination/i);
+    await expect(page.getByRole('columnheader', { name: /vaccine/i })).toContainText(/vaccine/i);
+    await expect(page.getByText(/recent vaccination/i)).toBeVisible();
     await expect(immunizationType).toContainText(/measles vaccination/i);
   });
 
