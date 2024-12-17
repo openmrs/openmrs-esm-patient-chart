@@ -104,7 +104,7 @@ test('Add and edit an immunization', async ({ page }) => {
   await test.step('And I should see the updated immunization in the list', async () => {
     await expect(page.getByRole('columnheader', { name: /vaccine/i })).toContainText(/vaccine/i);
     await expect(page.getByText(/recent vaccination/i)).toBeVisible();
-    await expect(immunizationType).toContainText(/measles vaccination/i);
+    await expect(page.getByRole('cell', { name: /measles vaccination/i })).toBeVisible();
   });
 
   await test.step('When I click the collapse All rows in the table header with the updated recorded immunization', async () => {
