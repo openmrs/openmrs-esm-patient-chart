@@ -1,3 +1,5 @@
+export const clinicalFormsWorkspace = 'clinical-forms-workspace';
+export const formEntryWorkspace = 'patient-form-entry-workspace';
 export const spaRoot = window['getOpenmrsSpaBase']();
 export const basePath = '/patient/:patientUuid/chart';
 export const dashboardPath = `${basePath}/:view/*`;
