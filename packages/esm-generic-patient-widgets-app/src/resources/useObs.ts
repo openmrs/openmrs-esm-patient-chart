@@ -15,6 +15,9 @@ type ObsResult = fhir.Observation & {
   valueDateTime?: string;
   encounter?: {
     name?: string;
+    /**
+     * Reference to the encounter resource, in the format `Encounter/{uuid}`
+     */
     reference: string;
   };
 };
