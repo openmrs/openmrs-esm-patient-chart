@@ -15,8 +15,13 @@ interface EncounterListTabsComponentProps {
 const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { tabDefinitions = [] } = config;
+  const configConcepts = {
+    trueConceptUuid: config.trueConceptUuid,
+    falseConceptUuid: config.falseConceptUuid,
+    otherConceptUuid: config.otherConceptUuid,
+  };
   const { t } = useTranslation();
-  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions);
+  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions, configConcepts);
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
   const tabFilters = useMemo(() => {

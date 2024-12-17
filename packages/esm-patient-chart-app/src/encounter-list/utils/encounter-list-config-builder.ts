@@ -11,33 +11,34 @@ import {
   type TabSchema,
   type ActionProps,
   type ConditionalActionProps,
-  type FormColumn,
+  type ColumnValue,
   type NamedColumn,
+  type ConfigConcepts,
 } from '../types';
 import { renderTag } from '../components/tag.component';
 
 export interface FormattedColumn {
   key: string;
   header: string;
-  getValue: (encounter: Encounter) => string | number | JSX.Element | Array<NamedColumn> | Array<FormColumn>;
+  getValue: (encounter: Encounter) => ColumnValue;
   link?: { getUrl: (encounter: Encounter) => string; handleNavigate?: (encounter: Encounter) => void };
   concept?: string;
 }
 
-const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
+const getColumnValue = (encounter: Encounter, column: ColumnDefinition, config: ConfigConcepts): ColumnValue => {
   if (column.id === 'actions') {
-    return getActions(encounter, column);
+    return getActions(encounter, column, config);
   }
   if (column.statusColorMappings) {
-    return renderTag(encounter, column.concept, column.statusColorMappings);
+    return renderTag(encounter, column.concept, column.statusColorMappings, config);
   }
 
   if (column.isConditionalConcept) {
-    return getConditionalConceptValue(encounter, column.conditionalConceptMappings, column.isDate);
+    return getConditionalConceptValue(encounter, column.conditionalConceptMappings, column.isDate, config);
   }
 
   if (column.useMultipleObs) {
-    return getMultipleObsFromEncounter(encounter, column.multipleConcepts);
+    return getMultipleObsFromEncounter(encounter, column.multipleConcepts, config);
   }
 
   if (column.valueMappings) {
@@ -45,7 +46,7 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
   }
 
   if (column.conceptMappings) {
-    return getMappedConceptValue(encounter, column);
+    return getMappedConceptValue(encounter, column, config);
   }
 
   return getObsFromEncounter(
@@ -55,6 +56,8 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition) => {
     column.isTrueFalseConcept,
     column.type,
     column.fallbackConcepts,
+    column.secondaryConcept,
+    config,
   );
 };
 
@@ -66,17 +69,28 @@ const createActionObject = (encounter: Encounter, action: ActionProps | Conditio
   mode: action.mode,
 });
 
-const getActions = (encounter: Encounter, column: ColumnDefinition) => {
+const getActions = (encounter: Encounter, column: ColumnDefinition, config: ConfigConcepts) => {
   const baseActions = column.actionOptions?.map((action: ActionProps) => createActionObject(encounter, action)) || [];
 
   const conditionalActions =
-    column.conditionalActionOptions?.map((action) => createConditionalAction(encounter, action)).filter(Boolean) || [];
+    column.conditionalActionOptions
+      ?.map((action) => createConditionalAction(encounter, action, config))
+      .filter(Boolean) || [];
 
   return [...baseActions, ...conditionalActions];
 };
 
-const createConditionalAction = (encounter: Encounter, action: ConditionalActionProps) => {
-  const dependantObsValue = getObsFromEncounter(encounter, action.dependantConcept);
+const createConditionalAction = (encounter: Encounter, action: ConditionalActionProps, config: ConfigConcepts) => {
+  const dependantObsValue = getObsFromEncounter(
+    encounter,
+    action.dependantConcept,
+    false,
+    false,
+    undefined,
+    undefined,
+    undefined,
+    config,
+  );
   if (dependantObsValue === action.dependsOn) {
     return createActionObject(encounter, action);
   }
@@ -89,7 +103,7 @@ const createConditionalAction = (encounter: Encounter, action: ConditionalAction
   return null;
 };
 
-const getMappedConceptValue = (encounter: Encounter, column: ColumnDefinition) => {
+const getMappedConceptValue = (encounter: Encounter, column: ColumnDefinition, config: ConfigConcepts): NamedColumn => {
   const concept = getConceptFromMappings(encounter, column.conceptMappings);
   return getObsFromEncounter(
     encounter,
@@ -98,16 +112,17 @@ const getMappedConceptValue = (encounter: Encounter, column: ColumnDefinition) =
     column.isTrueFalseConcept,
     column.type,
     column.fallbackConcepts,
+    column.secondaryConcept,
+    config,
   );
 };
 
-export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>) => {
+export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>, config: ConfigConcepts) => {
   const columns: Array<FormattedColumn> = columnsDefinition.map((column: ColumnDefinition) => ({
     key: column.id,
     header: column.title,
     concept: column.concept,
-    getValue: (encounter) =>
-      getColumnValue(encounter, column) as string | number | JSX.Element | NamedColumn[] | FormColumn[],
+    getValue: (encounter) => getColumnValue(encounter, column, config),
     link: column.isLink
       ? {
           getUrl: (encounter) => encounter.url,
@@ -119,7 +134,7 @@ export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>) => {
   return columns;
 };
 
-export const getMenuItemTabsConfiguration = (tabDefinitions: Array<TabSchema>) => {
+export const getMenuItemTabsConfiguration = (tabDefinitions: Array<TabSchema>, config: ConfigConcepts) => {
   const tabs = tabDefinitions.map((tab) => {
     return {
       name: tab.tabName,
@@ -128,7 +143,7 @@ export const getMenuItemTabsConfiguration = (tabDefinitions: Array<TabSchema>) =
       headerTitle: tab.headerTitle,
       description: tab.displayText,
       formList: tab.formList,
-      columns: getTabColumns(tab.columns),
+      columns: getTabColumns(tab.columns, config),
       launchOptions: tab.launchOptions,
     };
   });

@@ -10,13 +10,13 @@ import { deleteEncounter } from '../encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
 
 import styles from './encounter-list.scss';
-import { type TableRow, type Encounter, type Mode } from '../types';
+import { type TableRow, type Encounter, type Mode, type ColumnValue } from '../types';
 import { type FormattedColumn } from '../utils/encounter-list-config-builder';
 
 export interface EncounterListColumn {
   key: string;
   header: string;
-  getValue: (encounter: Encounter) => string;
+  getValue: (encounter: Encounter) => ColumnValue;
   link?: any;
 }
 

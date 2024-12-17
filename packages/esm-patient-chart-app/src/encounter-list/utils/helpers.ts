@@ -1,8 +1,6 @@
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { formatDate, parseDate, formatDatetime, type Concept, age, type Visit } from '@openmrs/esm-framework';
-import { type Observation, type Encounter, type Form } from '../types';
-import { esmPatientChartSchema } from '../../config-schema';
-import { type TFunction } from 'i18next';
+import { type Observation, type Encounter, type Form, type ConfigConcepts } from '../types';
 
 type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
@@ -65,12 +63,17 @@ export function resolveValueUsingMappings(encounter: Encounter, concept: string,
   return '--';
 }
 
-export function getConditionalConceptValue(encounter: any, conditionalConceptMappings, isDate) {
+export function getConditionalConceptValue(
+  encounter: Encounter,
+  conditionalConceptMappings,
+  isDate: boolean,
+  config: ConfigConcepts,
+) {
   const { trueConcept, nonTrueConcept, dependantConcept, conditionalConcept } = conditionalConceptMappings;
   const obsValue = findObs(encounter, dependantConcept)?.value;
   const dependantUuid = typeof obsValue === 'object' && 'uuid' in obsValue ? obsValue.uuid : null;
   const finalConcept = dependantUuid === conditionalConcept ? trueConcept : nonTrueConcept;
-  return getObsFromEncounter(encounter, finalConcept, isDate);
+  return getObsFromEncounter(encounter, finalConcept, isDate, false, undefined, undefined, undefined, config);
 }
 
 export function getConceptFromMappings(encounter: Encounter, concepts) {
@@ -83,10 +86,10 @@ export function getConceptFromMappings(encounter: Encounter, concepts) {
   return null;
 }
 
-export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>) {
+export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>, config: ConfigConcepts) {
   let observations = [];
   obsConcepts.map((concept) => {
-    const obs = getObsFromEncounter(encounter, concept);
+    const obs = getObsFromEncounter(encounter, concept, false, false, undefined, undefined, undefined, config);
     if (obs !== '--') {
       observations.push(obs);
     }
@@ -103,7 +106,7 @@ export function getObsFromEncounter(
   type?: string,
   fallbackConcepts?: Array<string>,
   secondaryConcept?: string,
-  t?: TFunction,
+  config?: ConfigConcepts,
 ) {
   let obs = findObs(encounter, obsConcept);
 
@@ -113,10 +116,7 @@ export function getObsFromEncounter(
 
   if (isTrueFalseConcept) {
     if (typeof obs?.value === 'object') {
-      if (
-        obs?.value?.uuid === esmPatientChartSchema.falseConceptUuid._default ||
-        obs?.value?.uuid === esmPatientChartSchema.trueConceptUuid._default
-      ) {
+      if (obs?.value?.uuid === config.falseConceptUuid || obs?.value?.uuid === config.trueConceptUuid) {
         return obs?.value?.name?.name;
       }
     }
@@ -148,7 +148,7 @@ export function getObsFromEncounter(
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
     const primaryValue =
       obs.value.names.find((conceptName) => conceptName.conceptNameType === 'SHORT')?.name || obs.value.name.name;
-    if (primaryValue === esmPatientChartSchema.otherConceptUuid._default) {
+    if (primaryValue === config.otherConceptUuid) {
       const secondaryObs = findObs(encounter, secondaryConcept);
       return secondaryObs ? secondaryObs.value : '--';
     }

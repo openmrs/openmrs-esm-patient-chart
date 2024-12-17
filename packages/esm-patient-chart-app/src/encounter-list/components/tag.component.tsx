@@ -1,10 +1,15 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
 import { getObsFromEncounter, findObs } from '../utils/helpers';
-import { type Encounter } from '../types';
+import { type ConfigConcepts, type Encounter } from '../types';
 
-export const renderTag = (encounter: Encounter, concept: string, statusColorMappings: Record<string, string>) => {
-  const columnStatus = getObsFromEncounter(encounter, concept);
+export const renderTag = (
+  encounter: Encounter,
+  concept: string,
+  statusColorMappings: Record<string, string>,
+  config: ConfigConcepts,
+) => {
+  const columnStatus = getObsFromEncounter(encounter, concept, false, false, undefined, undefined, undefined, config);
   const columnStatusObs = findObs(encounter, concept);
 
   if (columnStatus == '--') {

@@ -186,17 +186,26 @@ export interface TableRow {
   actions: Action[] | ReactElement | null;
 }
 
-export interface NamedColumn {
-  uuid: string;
-  name: { name: string };
-  names?: { uuid: string; name: string };
-  conceptNameType: string;
-}
-
 export interface FormColumn {
   form: { name: string };
   encounterUuid: string;
   intent: string;
   label: string;
   mode: string;
+}
+
+export type NamedColumn =
+  | string
+  | {
+      uuid: string;
+      name: { name: string };
+      names?: { uuid: string; name: string; conceptNameType: string }[];
+    };
+
+export type ColumnValue = string | number | JSX.Element | NamedColumn | Array<NamedColumn> | Array<FormColumn> | null;
+
+export interface ConfigConcepts {
+  trueConceptUuid: string;
+  falseConceptUuid: string;
+  otherConceptUuid: string;
 }
