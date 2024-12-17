@@ -1,8 +1,8 @@
-import useSWR from 'swr';
-import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { type Observation, type Encounter } from '../types/encounter';
-import { type OrderDiscontinuationPayload } from '../types/order';
+import { openmrsFetch, restBaseUrl, type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
+import useSWR from 'swr';
+import { type Encounter, type Observation } from '../types/encounter';
+import { type OrderDiscontinuationPayload } from '../types/order';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -108,13 +108,41 @@ export function useLabEncounter(encounterUuid: string) {
 export function useObservation(obsUuid: string) {
   const url = `${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(url, openmrsFetch);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(
+    obsUuid ? url : null,
+    openmrsFetch,
+  );
   return {
     data: data?.data,
     isLoading,
     error,
     isValidating,
     mutate,
+  };
+}
+
+export function useCompletedLabResults(order: Order) {
+  const {
+    encounter,
+    isLoading: isLoadingEncounter,
+    mutate: mutateLabOrders,
+    error: encounterError,
+  } = useLabEncounter(order.encounter.uuid);
+  const {
+    data: observation,
+    isLoading: isLoadingObs,
+    error: isErrorObs,
+    mutate: mutateObs,
+  } = useObservation(encounter?.obs.find((obs) => obs?.concept?.uuid === order?.concept?.uuid)?.uuid ?? '');
+
+  return {
+    isLoading: isLoadingEncounter || isLoadingObs,
+    completeLabResult: observation,
+    mutate: () => {
+      mutateLabOrders();
+      mutateObs();
+    },
+    error: isErrorObs ?? encounterError,
   };
 }
 
@@ -186,6 +214,16 @@ export function createObservationPayload(
   }
 }
 
+export function updateObservation(observationUuid: string, payload: Record<string, any>) {
+  return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
 function createGroupMember(member: LabOrderConcept, order: Order, values: Record<string, unknown>, status: string) {
   const value = getValue(member, values);
   if (value === null || value === undefined) {
@@ -228,3 +266,8 @@ function getValue(concept: LabOrderConcept, values: Record<string, unknown>) {
 
   return null;
 }
+
+export const isCoded = (concept: LabOrderConcept) => concept.datatype?.display === 'Coded';
+export const isNumeric = (concept: LabOrderConcept) => concept.datatype?.display === 'Numeric';
+export const isPanel = (concept: LabOrderConcept) => concept.setMembers?.length > 0;
+export const isText = (concept: LabOrderConcept) => concept.datatype?.display === 'Text';
