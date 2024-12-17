@@ -22,9 +22,11 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid, config.showEncounterType);
-  const uniqueDates = [...new Set(obss.map((o) => o.encounter.reference.split('#')[1]))].sort();
-  const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.encounter.reference.split('#')[1] === date));
+  const { data: obss } = useObs(patientUuid, config.showEncounterType);
+  const uniqueEncounterUuids = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const obssGroupedByEncounters = uniqueEncounterUuids.map((date) =>
+    obss.filter((o) => o.encounter.reference === date),
+  );
 
   const tableHeaders = [
     { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
@@ -40,7 +42,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
   const tableRows = React.useMemo(
     () =>
-      obssByDate?.map((obss, index) => {
+      obssGroupedByEncounters?.map((obss, index) => {
         const rowData = {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
@@ -91,7 +93,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
         return rowData;
       }),
-    [config, obssByDate],
+    [config.data, config?.dateFormat, obssGroupedByEncounters],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);
