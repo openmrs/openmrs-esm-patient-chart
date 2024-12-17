@@ -65,6 +65,7 @@ export default function AddLabOrderWorkspace({
     closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      closeWorkspaceGroup: false,
     });
   }, [closeWorkspace]);
 
