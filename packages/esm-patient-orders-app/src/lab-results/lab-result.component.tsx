@@ -1,4 +1,4 @@
-import { Tile, InlineLoading , InlineNotification } from '@carbon/react';
+import { Tile, InlineLoading, InlineNotification } from '@carbon/react';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
