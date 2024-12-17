@@ -125,7 +125,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               showSnackbar({
                 isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
-                subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                subtitle: t('encounterSuccessfullyDeleted', 'The encounter has been deleted successfully'),
                 kind: 'success',
               });
             })
@@ -133,7 +133,10 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               showSnackbar({
                 isLowContrast: false,
                 title: t('error', 'Error'),
-                subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                subtitle: t(
+                  'encounterWithError',
+                  'The encounter could not be deleted successfully. If the error persists, please contact your system administrator.',
+                ),
                 kind: 'error',
               });
             })

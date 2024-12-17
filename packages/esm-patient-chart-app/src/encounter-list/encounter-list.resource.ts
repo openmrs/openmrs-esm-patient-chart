@@ -21,9 +21,6 @@ export function fetchPatientRelationships(patientUuid: string) {
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     signal: abortController.signal,
   });
 }
