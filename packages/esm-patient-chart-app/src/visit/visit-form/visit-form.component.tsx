@@ -663,9 +663,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-
-                  visitFormCallbacksRef={visitFormCallbacksRef} // Pass the ref instead
-
+                  visitFormCallbacksRef={visitFormCallbacksRef}
                 />
               </div>
             </section>
@@ -734,7 +732,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       {contentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
                     </>
                   ) : (
-                    // Defaults to showing all possible visit types if recommended visits are not enabled
                     <BaseVisitType visitTypes={allVisitTypes} />
                   )}
                 </div>
@@ -776,9 +773,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                 
                   visitFormCallbacksRef={visitFormCallbacksRef}
-
                 />
               </div>
             </section>
@@ -817,14 +812,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     </FormProvider>
   );
 };
-
 interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
   visitFormOpenedFrom: string;
 
-  visitFormCallbacksRef: React.MutableRefObject<Map<string, VisitFormCallbacks>>; // Replaced `setVisitFormCallbacks` with `visitFormCallbacksRef`
-
+  visitFormCallbacksRef: React.MutableRefObject<Map<string, VisitFormCallbacks>>;
+}
 
 type VisitFormExtensionState = {
   patientUuid: string;
@@ -843,20 +837,16 @@ type VisitFormExtensionState = {
 };
 
 const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
-
   ({ name, patientUuid, visitFormOpenedFrom, visitFormCallbacksRef }) => {
-
     const config = useConfig<ChartConfig>();
 
     return (
       <ExtensionSlot name={name}>
         {(extension: AssignedExtension) => {
-
           const state = {
             patientUuid,
             setVisitFormCallbacks: (callbacks: VisitFormCallbacks) => {
               visitFormCallbacksRef.current.set(extension.id, callbacks);
-
             },
             visitFormOpenedFrom,
             patientChartConfig: config,
