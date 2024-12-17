@@ -1,11 +1,14 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "地址行1",
   "address2": "地址行2",
   "city": "城市",
   "cityVillage": "城市",
   "country": "国家",
   "countyDistrict": "区县",
+  "deceased": "Deceased",
   "district": "区县",
+  "from_lower": "from",
   "implementationLogo": "Implementation logo",
   "patientAge": "Age:",
   "patientDateOfBirthWithSeparator": "Date of birth:",
@@ -14,6 +17,7 @@
   "patientNameWithSeparator": "Patient name:",
   "postalCode": "邮政编码",
   "printIdentifierSticker": "Print identifier sticker",
+  "started": "Started",
   "state": "省份",
   "stateProvince": "省份",
   "telephoneNumberWithSeparator": "Telephone number:"

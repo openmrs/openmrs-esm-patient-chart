@@ -1,11 +1,14 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "Ligne d'adresse 1",
   "address2": "Ligne d'adresse 2",
   "city": "Ville",
   "cityVillage": "ville",
   "country": "Pays",
   "countyDistrict": "District",
+  "deceased": "Deceased",
   "district": "District",
+  "from_lower": "from",
   "implementationLogo": "Logo de mise en œuvre",
   "patientAge": "Age:",
   "patientDateOfBirthWithSeparator": "Date de Naissance:",
@@ -14,6 +17,7 @@
   "patientNameWithSeparator": "Nom du Patient:",
   "postalCode": "Code postal",
   "printIdentifierSticker": "Imprimer l'autocollant d'identification",
+  "started": "Started",
   "state": "État",
   "stateProvince": "État",
   "telephoneNumberWithSeparator": "Numéro de téléphone:"

@@ -50,8 +50,12 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
       await page.getByLabel(/additional instructions/i).fill(' N/A');
     });
 
-    await test.step('Add I save the lab order form', async () => {
+    await test.step('And I save the lab order form', async () => {
       await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('And I click the `Sign and close` button', async () => {
+      await expect(page.getByRole('status', { name: /new/i })).toBeVisible();
       await page.getByRole('button', { name: /sign and close/i }).click();
     });
 
@@ -70,7 +74,6 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
 
   test('Modify a lab order', async ({ page }) => {
     const ordersPage = new OrdersPage(page);
-    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
@@ -101,8 +104,8 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('Then the order status should be changed to `Modify`', async () => {
-      await expect(orderBasket.getByText(/new/i)).not.toBeVisible();
-      await expect(orderBasket.getByText(/modify/i)).toBeVisible();
+      await expect(page.getByRole('status', { name: /new/i })).not.toBeVisible();
+      await expect(page.getByRole('status', { name: /modify/i })).toBeVisible();
     });
 
     await test.step('When I click on the `Sign and close` button', async () => {
@@ -116,7 +119,6 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
 
   test('Discontinue a lab order', async ({ page }) => {
     const ordersPage = new OrdersPage(page);
-    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
@@ -138,7 +140,7 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('Then the order status should be changed to `Discontinue`', async () => {
-      await expect(orderBasket.getByText(/discontinue/i)).toBeVisible();
+      await expect(page.getByRole('status', { name: /discontinue/i })).toBeVisible();
     });
 
     await test.step('And I click on the `Sign and close` button', async () => {

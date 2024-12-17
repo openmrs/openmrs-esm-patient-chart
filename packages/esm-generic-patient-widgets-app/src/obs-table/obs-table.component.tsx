@@ -23,8 +23,8 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig();
   const { data: obss } = useObs(patientUuid, config.showEncounterType);
-  const uniqueEncounterUuids = [...new Set(obss.map((o) => o.encounter.reference))].sort();
-  const obssGroupedByEncounters = uniqueEncounterUuids.map((date) =>
+  const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const obssGroupedByEncounters = uniqueEncounterReferences.map((date) =>
     obss.filter((o) => o.encounter.reference === date),
   );
 

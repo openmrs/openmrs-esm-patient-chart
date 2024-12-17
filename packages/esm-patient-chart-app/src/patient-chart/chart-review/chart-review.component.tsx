@@ -19,8 +19,8 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   return parts.join('/');
 }
 
-function getDashboardDefinition(meta: object, config: ConfigObject) {
-  return { ...meta, ...config };
+function getDashboardDefinition(meta: object, config: ConfigObject, moduleName: string) {
+  return { ...meta, ...config, moduleName };
 }
 
 interface ChartReviewProps {
@@ -35,11 +35,13 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
   const { navGroups } = useNavGroups();
 
   const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
-    getDashboardDefinition(e.meta, e.config),
+    getDashboardDefinition(e.meta, e.config, e.moduleName),
   );
   const groupedDashboards = navGroups
     .map((slotName) =>
-      extensionStore.slots[slotName].assignedExtensions.map((e) => getDashboardDefinition(e.meta, e.config)),
+      extensionStore.slots[slotName].assignedExtensions.map((e) =>
+        getDashboardDefinition(e.meta, e.config, e.moduleName),
+      ),
     )
     .flat();
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
