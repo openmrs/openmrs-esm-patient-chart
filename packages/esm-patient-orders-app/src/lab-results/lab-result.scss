@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.resultsCiontainer {
+  margin-top: layout.$spacing-05;
+}
+
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+}
+
+.resultDetail {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-05;
+}
