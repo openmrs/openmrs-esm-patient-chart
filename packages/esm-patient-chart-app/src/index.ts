@@ -103,6 +103,11 @@ export const stopVisitPatientSearchActionButton = getSyncLifecycle(stopVisitActi
   moduleName,
 });
 
+export const clinicalViewsSummary = getAsyncLifecycle(
+  () => import('./clinical-views/encounter-tile/clinical-views-summary.component'),
+  { featureName: 'clinical-views-summary', moduleName },
+);
+
 export const cancelVisitPatientSearchActionButton = getSyncLifecycle(cancelVisitActionButtonComponent, {
   featureName: 'patient-actions-slot-cancel-visit-button',
   moduleName,
@@ -224,4 +229,9 @@ export const deleteVisitActionButton = getAsyncLifecycle(
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
+);
+
+export const encounterListTableTabs = getAsyncLifecycle(
+  () => import('./clinical-views/encounter-list/encounter-list-tabs.component'),
+  { featureName: 'encounter-list-table-tabs', moduleName },
 );

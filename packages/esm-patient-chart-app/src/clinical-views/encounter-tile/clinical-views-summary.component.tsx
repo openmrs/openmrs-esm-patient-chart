@@ -1,9 +1,10 @@
 import React, { memo, useMemo } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { EncounterTile } from './encounter-tile/encounter-tile.component';
 import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
-import { getEncounterTileColumns, type MenuCardProps } from '../utils';
+import { getEncounterTileColumns } from '../utils';
+import { EncounterTile } from './encounter-tile.component';
+import { type MenuCardProps } from '../types';
 
 interface OverviewListProps {
   patientUuid: string;

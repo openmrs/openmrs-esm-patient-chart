@@ -15,7 +15,7 @@ import {
   type NamedColumn,
   type ConfigConcepts,
 } from '../types';
-import { renderTag } from '../components/tag.component';
+import { renderTag } from '../encounter-list/tag.component';
 
 export interface FormattedColumn {
   key: string;
