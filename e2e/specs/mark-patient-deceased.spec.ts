@@ -29,11 +29,18 @@ test('Mark a patient as deceased', async ({ page }) => {
   });
 
   await test.step('When I add all the death details and save', async () => {
-    await markPatientDeceasedPage.fillDeathDetails(todayDate, causeOfDeath);
+   
+    await markPatientDeceasedPage.dateOfDeathInput().fill(todayDate);
 
-    // Ensure Save and Close button is visible and then click
-    await markPatientDeceasedPage.saveAndCloseButton().waitFor({ state: 'visible' });
-    await markPatientDeceasedPage.saveAndClose();
+    
+    await page.keyboard.press('Enter'); 
+
+    
+    await page.locator('text=Neoplasm/cancer').waitFor({ state: 'visible' });
+    await page.locator('text=Neoplasm/cancer').click();
+
+     
+  await markPatientDeceasedPage.saveAndCloseButton().click();
   });
 
   await test.step('Then I should see a “deceased” patient tag in the patient banner', async () => {
