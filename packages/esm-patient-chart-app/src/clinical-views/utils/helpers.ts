@@ -1,51 +1,40 @@
-import { age, formatDate, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
-import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
-import { type ConfigConcepts } from '.';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { age, formatDate, parseDate, type Visit } from '@openmrs/esm-framework';
+import {
+  type ConfigConcepts,
+  type Encounter,
+  type EncounterPropertyType,
+  type EncounterTileColumn,
+  type Form,
+  type Observation,
+} from '../types';
 
-export interface Observation {
-  uuid: string;
-  concept: { uuid: string; name: string };
-  value:
-    | {
-        uuid: string;
-        name: {
-          name: string;
-          display: string;
-        };
-        names?: Array<{ uuid: string; name: string; conceptNameType: string }>;
-      }
-    | string;
-  groupMembers?: Array<Observation>;
-  obsDatetime: string;
-}
+type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
-export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
-  encounterType: { uuid: string; name: string };
-  patient: {
-    uuid: string;
-    display: string;
-    age: number;
-    birthDate: string;
-  };
-  location: {
-    uuid: string;
-    display: string;
-    name: string;
-  };
-  encounterProviders?: Array<{ encounterRole: string; provider: { uuid: string; name: string } }>;
-  obs: Array<Observation>;
-  form?: {
-    uuid: string;
-  };
-  visit?: string;
-}
-
-export enum EncounterPropertyType {
-  location = 'location',
-  provider = 'provider',
-  visitType = 'visitType',
-  ageAtEncounter = 'ageAtEncounter',
+export function launchEncounterForm(
+  form: Form,
+  visit: Visit,
+  action: LaunchAction = 'add',
+  onFormSave: () => void,
+  encounterUuid?: string,
+  intent: string = '*',
+  patientUuid?: string,
+) {
+  launchPatientWorkspace('patient-form-entry-workspace', {
+    workspaceTitle: form?.name,
+    mutateForm: onFormSave,
+    formInfo: {
+      encounterUuid,
+      formUuid: form?.uuid,
+      patientUuid: patientUuid,
+      visit: visit,
+      additionalProps: {
+        mode: action === 'add' ? 'enter' : action,
+        formSessionIntent: intent,
+        openClinicalFormsWorkspaceOnFormClose: false,
+      },
+    },
+  });
 }
 
 export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
@@ -211,3 +200,5 @@ export const getEncounterProperty = (encounter: Encounter, type: EncounterProper
     return age(encounter.patient.birthDate, encounter.encounterDatetime);
   }
 };
+
+export const filter = (encounter: Encounter, formUuid: string) => encounter?.form?.uuid === formUuid;

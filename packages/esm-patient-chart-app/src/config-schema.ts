@@ -148,11 +148,6 @@ export const esmPatientChartSchema = {
     _description: 'Default concept uuid for other in forms',
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
-  otherConceptUuid: {
-    _type: Type.String,
-    _description: 'The UUID of the concept for other',
-    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  },
 };
 
 export interface ChartConfig {

@@ -1,50 +1,5 @@
-import { type TFunction } from 'i18next';
-import { type Encounter, type EncounterPropertyType, getConceptFromMappings, getObsFromEncounter } from './helpers';
-import { type EncounterTileColumn } from '../components/encounter-tile/encounter-tile.component';
-import { OpenmrsEncounter } from '@openmrs/esm-patient-common-lib';
-
-export interface MenuCardProps {
-  tileHeader: string;
-  columns: Array<ColumnDefinition>;
-}
-
-interface SummaryConcept {
-  primaryConcept: string;
-  secondaryConcept?: string;
-  isDate?: boolean;
-  hasCalculatedDate?: boolean;
-}
-
-export interface ColumnDefinition {
-  id: string;
-  title: string;
-  concept: string;
-  encounterType: string;
-  isDate?: boolean;
-  hasSummary?: boolean;
-  conceptMappings?: Array<string>;
-  summaryConcept?: SummaryConcept;
-  isTrueFalseConcept?: boolean;
-  type?: EncounterPropertyType;
-  fallbackConcepts?: Array<string>;
-}
-
-export interface FormattedCardColumn {
-  key: string;
-  header: string;
-  concept: string;
-  encounterUuid: string;
-  title?: string;
-  getObsValue: (encounter: Encounter) => string;
-  getSummaryObsValue?: (encounter: Encounter) => string;
-  hasSummary: boolean;
-}
-
-export interface ConfigConcepts {
-  trueConceptUuid: string;
-  falseConceptUuid: string;
-  otherConceptUuid: string;
-}
+import { getConceptFromMappings, getObsFromEncounter } from './helpers';
+import { type ColumnDefinition, type ConfigConcepts, type EncounterTileColumn, type MenuCardProps } from '../types';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
   const dateDifference = new Date().getTime() - new Date(givenDate).getTime();

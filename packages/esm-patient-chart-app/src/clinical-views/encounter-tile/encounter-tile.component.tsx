@@ -2,26 +2,10 @@ import React, { useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
 import styles from './tile.scss';
-import { type Encounter, groupColumnsByEncounterType } from '../../utils/helpers';
-import { useLastEncounter } from '../../hooks/useLastEncounter';
+import { groupColumnsByEncounterType } from '../utils/helpers';
 import { useTranslation } from 'react-i18next';
-
-export interface EncounterTileColumn {
-  key: string;
-  header: string;
-  encounterUuid: string;
-  concept: string;
-  title?: string;
-  getObsValue: (encounter: Encounter) => string;
-  getSummaryObsValue?: (encounter: Encounter) => string;
-  encounter?: Encounter;
-  hasSummary?: Boolean;
-}
-export interface EncounterTileProps {
-  patientUuid: string;
-  columns: Array<EncounterTileColumn>;
-  headerTitle: string;
-}
+import { type EncounterTileColumn, type EncounterTileProps } from '../types';
+import { useLastEncounter } from '../hooks';
 
 export const EncounterTile = React.memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
   const columnsByEncounterType = useMemo(() => groupColumnsByEncounterType(columns), [columns]);
