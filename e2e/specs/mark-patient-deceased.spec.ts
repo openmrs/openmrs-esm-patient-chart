@@ -29,7 +29,11 @@ test('Mark a patient as deceased', async ({ page }) => {
   });
 
   await test.step('When I enter the "Date of death" to today\'s date, "Cause of death" to Neoplasm, and click "Save and close"', async () => {
-    await markPatientDeceasedPage.fillDeathDetails(todayDate, causeOfDeath);
+     // Fill the date input directly
+    await markPatientDeceasedPage.dateOfDeathInput().fill(todayDate);
+    // Close the date picker if still open
+    await page.keyboard.press('Enter'); 
+    await markPatientDeceasedPage.fillDeathDetails(causeOfDeath);
     await markPatientDeceasedPage.saveAndClose();
   });
 
