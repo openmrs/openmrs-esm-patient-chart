@@ -57,7 +57,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const { showProgramStatusField } = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
@@ -90,7 +89,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     control,
     handleSubmit,
     watch,
-    formState: { isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
     mode: 'all',
     resolver: zodResolver(programsFormSchema),
@@ -126,8 +125,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       };
 
       try {
-        setIsSubmittingForm(true);
-
         const abortController = new AbortController();
 
         if (currentEnrollment) {
@@ -155,8 +152,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           subtitle: error instanceof Error ? error.message : 'An unknown error occurred',
         });
       }
-
-      setIsSubmittingForm(false);
     },
     [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
@@ -165,12 +160,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgram"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label="program name"
             id="program"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgram}
+            invalidText={errors?.selectedProgram?.message}
             labelText={t('programName', 'Program name')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -183,7 +179,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                 </SelectItem>
               ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -267,12 +262,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgramStatus"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label={t('programStatus', 'Program status')}
             id="programStatus"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgramStatus}
+            invalidText={errors?.selectedProgramStatus?.message}
             labelText={t('programStatus', 'Program status')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -284,7 +280,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
               </SelectItem>
             ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -343,8 +338,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
-          {isSubmittingForm ? (
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
             <span>{t('saveAndClose', 'Save and close')}</span>
