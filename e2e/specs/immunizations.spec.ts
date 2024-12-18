@@ -61,7 +61,6 @@ test('Add and edit an immunization', async ({ page }) => {
   });
 
   await test.step('When I click the expand All rows in the table header with the newly recorded immunization', async () => {
-    await expect(page.getByRole('button', { name: /expand all rows/i })).toBeVisible();
     await page.getByRole('button', { name: /expand all rows/i }).click();
   });
 
