@@ -10,7 +10,7 @@ export class MarkPatientDeceasedPage {
   readonly causeOfDeathRadio = (cause: string) => this.page.getByRole('radio', { name: cause });
   readonly saveAndCloseButton = () => this.page.getByRole('button', { name: /save and close/i });
 
-  // Use a more specific selector for the deceased tag
+ 
   readonly deceasedTag = () =>
     this.page.locator('[data-extension-id="deceased-patient-tag"] span', { hasText: 'Deceased' });
 
@@ -33,8 +33,14 @@ export class MarkPatientDeceasedPage {
   }
 
   async verifyDeceasedTag() {
-    // Explicitly wait for the deceased tag with a refined selector
-    const deceasedTagLocator = this.deceasedTag();
+   
+    const deceasedTagLocator = this.page.locator(
+      '[data-extension-id="deceased-patient-tag"] span[title="Deceased"]'
+    );
+
+    
     await expect(deceasedTagLocator).toBeVisible({ timeout: 70000 });
   }
+
+
 }
