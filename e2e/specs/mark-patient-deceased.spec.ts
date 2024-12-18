@@ -12,7 +12,7 @@ test.beforeEach(async ({ api }) => {
 test('Mark a patient as deceased', async ({ page }) => {
   const markPatientDeceasedPage = new MarkPatientDeceasedPage(page);
   const todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-  const causeOfDeath = 'Neoplasm';
+  const causeOfDeath = 'Neoplasm/cancer';
 
   await test.step('Given that I have a patient and I am on the Patient’s chart page', async () => {
     await markPatientDeceasedPage.goToPatientChart(patient.uuid);
@@ -28,14 +28,22 @@ test('Mark a patient as deceased', async ({ page }) => {
     await expect(markPatientDeceasedPage.causeOfDeathRadio(causeOfDeath)).toBeVisible();
   });
 
-  await test.step('When I enter the "Date of death" to today\'s date, "Cause of death" to Neoplasm, and click "Save and close"', async () => {
-     // Fill the date input directly
+  await test.step('When I add all the death details and save', async () => {
+    // Fill the date input directly
     await markPatientDeceasedPage.dateOfDeathInput().fill(todayDate);
+
     // Close the date picker if still open
-    await page.keyboard.press('Enter'); 
-    await markPatientDeceasedPage.fillDeathDetails(causeOfDeath);
-    await markPatientDeceasedPage.saveAndClose();
+    await page.keyboard.press('Enter'); // Ensure the date picker closes
+
+    // Wait for the "Neoplasm/cancer" radio button to be visible and select it
+    await page.locator('text=Neoplasm/cancer').waitFor({ state: 'visible' });
+    await page.locator('text=Neoplasm/cancer').click();
+
+     // Save and close
+  await markPatientDeceasedPage.saveAndCloseButton().click();
   });
+  
+  
 
   await test.step('Then I should see a “deceased” patient tag in the patient banner', async () => {
     await markPatientDeceasedPage.verifyDeceasedTag();
