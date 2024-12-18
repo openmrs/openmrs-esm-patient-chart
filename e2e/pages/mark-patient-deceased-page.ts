@@ -9,7 +9,10 @@ export class MarkPatientDeceasedPage {
   readonly dateOfDeathInput = () => this.page.getByPlaceholder(/dd\/mm\/yyyy/i);
   readonly causeOfDeathRadio = (cause: string) => this.page.getByRole('radio', { name: cause });
   readonly saveAndCloseButton = () => this.page.getByRole('button', { name: /save and close/i });
-  readonly deceasedTag = () => this.page.getByText(/deceased/i);
+
+  // Use a more specific selector for the deceased tag
+  readonly deceasedTag = () =>
+    this.page.locator('[data-extension-id="deceased-patient-tag"] span', { hasText: 'Deceased' });
 
   async goToPatientChart(patientUuid: string) {
     await this.page.goto(`/openmrs/spa/patient/${patientUuid}/chart/Patient%20Summary`);
@@ -30,6 +33,8 @@ export class MarkPatientDeceasedPage {
   }
 
   async verifyDeceasedTag() {
-    await expect(this.deceasedTag()).toBeVisible({ timeout: 70000 });
+    // Explicitly wait for the deceased tag with a refined selector
+    const deceasedTagLocator = this.deceasedTag();
+    await expect(deceasedTagLocator).toBeVisible({ timeout: 70000 });
   }
 }
