@@ -225,3 +225,8 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
 );
+
+export const encounterListTableTabs = getAsyncLifecycle(
+  () => import('./encounter-list/components/encounter-list-tabs.component'),
+  { featureName: 'encounter-list-table-tabs', moduleName },
+);
