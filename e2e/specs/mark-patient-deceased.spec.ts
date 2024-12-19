@@ -41,12 +41,12 @@ await test.step('When I enter the "Date of death" to today’s date', async () =
   await page.keyboard.press('Enter'); 
 });
 
-await test.step('When I set the "Cause of death" to Neoplasm', async () => {
+await test.step('And the "Cause of death" to Neoplasm', async () => {
   await page.locator('text=Neoplasm').waitFor({ state: 'visible' });
   await page.locator('text=Neoplasm').click();
 });
 
-await test.step('And I click "Save and close"', async () => {
+await test.step('And  click "Save and close"', async () => {
   await saveAndCloseButton().click();
 });
 
