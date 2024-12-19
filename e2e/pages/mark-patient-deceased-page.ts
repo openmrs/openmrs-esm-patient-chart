@@ -7,5 +7,4 @@ export class MarkPatientDeceasedPage {
     await this.page.goto('/openmrs/spa/patient/' + patientUuid + '/chart/Patient%20Summary');
   }
 
-
 }
