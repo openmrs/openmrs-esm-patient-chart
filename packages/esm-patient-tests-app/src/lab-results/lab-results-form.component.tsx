@@ -162,7 +162,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       encounter: order.encounter.uuid,
       patient: order.patient.uuid,
       concept: order.concept.uuid,
-      orderer: order.orderer.uuid,
+      orderer: { uuid: order.orderer.uuid },
     };
     const resultsStatusPayload = {
       fulfillerStatus: 'COMPLETED',

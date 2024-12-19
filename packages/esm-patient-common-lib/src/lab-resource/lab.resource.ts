@@ -79,7 +79,7 @@ export interface OrderDiscontinuationPayload {
   encounter: string;
   patient: string;
   concept: string;
-  orderer: string;
+  orderer: { uuid: string };
 }
 
 export function useOrderConceptByUuid(uuid: string) {

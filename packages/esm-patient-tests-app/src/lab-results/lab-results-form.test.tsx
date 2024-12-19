@@ -393,7 +393,7 @@ describe('LabResultsForm', () => {
         careSetting: 'care-setting-uuid',
         concept: 'concept-uuid',
         encounter: 'encounter-uuid',
-        orderer: mockOrder.orderer,
+        orderer: { uuid: mockOrder.orderer.uuid },
         patient: 'patient-uuid',
         previousOrder: 'order-uuid',
         type: 'testorder',
