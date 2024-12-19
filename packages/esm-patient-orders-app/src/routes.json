@@ -28,14 +28,6 @@
       "order": 0
     },
     {
-      "name": "lab-result",
-      "component": "labResult",
-      "slot": "completed-lab-order-results-slot",
-      "meta": {
-        "fullWidth": false
-      }
-    },
-    {
       "name": "patient-orders-summary-dashboard",
       "component": "ordersDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -68,13 +60,6 @@
       "title": "orderCancellation",
       "component": "patientOrdersFormWorkspace",
       "type": "order",
-      "canHide": false
-    },
-    {
-      "name": "test-results-form-workspace",
-      "title": "enterTestResults",
-      "component": "testResultsFormWorkspace",
-      "type": "lab-results",
       "canHide": false
     },
     {

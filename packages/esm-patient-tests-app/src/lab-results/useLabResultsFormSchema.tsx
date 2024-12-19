@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type LabOrderConcept, useOrderConceptByUuid } from './lab-results.resource';
+import { type LabOrderConcept, useOrderConceptByUuid } from '@openmrs/esm-patient-common-lib';
 
 type SchemaRecord = Record<string, z.ZodType>;
 

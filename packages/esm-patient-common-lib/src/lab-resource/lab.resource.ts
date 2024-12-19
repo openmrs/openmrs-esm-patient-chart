@@ -1,8 +1,7 @@
 import { openmrsFetch, restBaseUrl, type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import { type OrderAction, type Order } from '@openmrs/esm-patient-common-lib';
 import useSWR from 'swr';
 import { type Encounter, type Observation } from '../types/encounter';
-import { type OrderDiscontinuationPayload } from '../types/order';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -70,6 +69,17 @@ export interface Mapping {
   conceptReferenceTerm: OpenmrsResource;
   conceptMapType: OpenmrsResource;
   resourceVersion: string;
+}
+
+export interface OrderDiscontinuationPayload {
+  previousOrder: string;
+  type: string;
+  action: OrderAction;
+  careSetting: string;
+  encounter: string;
+  patient: string;
+  concept: string;
+  orderer: string;
 }
 
 export function useOrderConceptByUuid(uuid: string) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { NumberInput, Select, SelectItem, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller, type FieldErrors } from 'react-hook-form';
-import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
+import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from '@openmrs/esm-patient-common-lib';
 import styles from './lab-results-form.scss';
 
 interface ResultFormFieldProps {
