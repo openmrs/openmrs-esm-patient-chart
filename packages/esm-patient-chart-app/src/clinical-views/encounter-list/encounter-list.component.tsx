@@ -6,12 +6,11 @@ import { EncounterListDataTable } from './table.component';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchEncounterForm } from '../utils/helpers';
-import { deleteEncounter } from '../encounter-list.resource';
+import { deleteEncounter } from '../utils/encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
 
 import styles from './encounter-list.scss';
-import { type TableRow, type Encounter, type Mode, type ColumnValue } from '../types';
-import { type FormattedColumn } from '../utils/encounter-list-config-builder';
+import { type TableRow, type Encounter, type Mode, type ColumnValue, type FormattedColumn } from '../types';
 
 export interface EncounterListColumn {
   key: string;
