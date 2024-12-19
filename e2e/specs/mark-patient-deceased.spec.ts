@@ -13,7 +13,6 @@ test('Mark a patient as deceased', async ({ page }) => {
   const markPatientDeceasedPage = new MarkPatientDeceasedPage(page);
   const todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
   const causeOfDeath = 'Neoplasm';
-  
   const actionsButton = () => page.getByRole('button', { name: /actions/i });
   const markDeceasedMenuItem = () => page.getByRole('menuitem', { name: /mark patient deceased/i });
   const deathDetailsForm = () => page.locator('form');
