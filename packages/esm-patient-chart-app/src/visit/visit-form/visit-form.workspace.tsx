@@ -1,3 +1,12 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ButtonSet,
@@ -12,17 +21,17 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  type AssignedExtension,
   Extension,
   ExtensionSlot,
   formatDatetime,
-  type NewVisitPayload,
   saveVisit,
   showSnackbar,
   toDateObjectStrict,
   toOmrsIsoString,
+  type AssignedExtension,
+  type NewVisitPayload,
+  type Visit,
   updateVisit,
   useConfig,
   useConnectivity,
@@ -31,7 +40,6 @@ import {
   usePatient,
   useSession,
   useVisit,
-  type Visit,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -40,24 +48,11 @@ import {
   time12HourFormatRegex,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import { type ChartConfig } from '../../config-schema';
-
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeField from './visit-date-time.component';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
@@ -67,9 +62,12 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
-
-dayjs.extend(isSameOrBefore);
 
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   /**
@@ -121,6 +119,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
+
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
     [visitToEdit?.uuid, showVisitEndDateTimeFields],
@@ -157,7 +156,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           (value) => {
             const today = dayjs();
             const startDate = dayjs(value);
-            return displayVisitStopDateTimeFields ? true : startDate.isSameOrBefore(today, 'day');
+
+            return startDate.isSameOrBefore(today, 'day');
           },
           t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
             firstEncounterDatetime: formatDatetime(new Date()),
