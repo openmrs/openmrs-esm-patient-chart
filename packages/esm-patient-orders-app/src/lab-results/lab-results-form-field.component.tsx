@@ -15,13 +15,34 @@ interface ResultFormFieldProps {
 const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue, errors }) => {
   const { t } = useTranslation();
 
-  const printValueRange = (concept: LabOrderConcept) => {
-    if (concept?.datatype?.display === 'Numeric') {
-      const maxVal = Math.max(concept?.hiAbsolute, concept?.hiCritical, concept?.hiNormal);
-      const minVal = Math.min(concept?.lowAbsolute, concept?.lowCritical, concept?.lowNormal);
-      return ` (${minVal ?? 0} - ${maxVal > 0 ? maxVal : '--'} ${concept?.units ?? ''})`;
+  // TODO: Reference ranges should be dynamically adjusted based on patient demographics:
+  // - Age-specific ranges (e.g., pediatric vs adult values)
+  // - Gender-specific ranges where applicable
+  const formatLabRange = (concept: LabOrderConcept) => {
+    const {
+      datatype: { hl7Abbreviation },
+    } = concept ?? {};
+    if (hl7Abbreviation !== 'NM') return '';
+
+    const { hiAbsolute, lowAbsolute, units } = concept;
+    const displayUnit = units ? ` ${units}` : '';
+
+    const hasLowerLimit = lowAbsolute !== null && lowAbsolute !== undefined;
+    const hasUpperLimit = hiAbsolute !== null && hiAbsolute !== undefined;
+
+    if (hasLowerLimit && hasUpperLimit) {
+      return ` (${lowAbsolute} - ${hiAbsolute}) ${displayUnit}`;
     }
-    return '';
+
+    if (hasUpperLimit) {
+      return ` (<= ${hiAbsolute}) ${displayUnit}`;
+    }
+
+    if (hasLowerLimit) {
+      return ` (>= ${lowAbsolute}) ${displayUnit}`;
+    }
+
+    return ` (${displayUnit})`;
   };
 
   const getSavedMemberValue = (conceptUuid: string, dataType: string) => {
@@ -63,7 +84,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               hideSteppers
               id={concept.uuid}
               key={concept.uuid}
-              label={concept?.display + printValueRange(concept)}
+              label={concept?.display + formatLabRange(concept)}
               onChange={(event) => field.onChange(parseFloat(event.target.value))}
               value={field.value || ''}
               invalidText={errors[concept.uuid]?.message}
@@ -133,7 +154,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     hideSteppers
                     id={`number-${member.uuid}`}
                     key={member.uuid}
-                    label={member?.display + printValueRange(member)}
+                    label={member?.display + formatLabRange(member)}
                     onChange={(event) => field.onChange(parseFloat(event.target.value))}
                     value={field.value || ''}
                     invalidText={errors[member.uuid]?.message}
