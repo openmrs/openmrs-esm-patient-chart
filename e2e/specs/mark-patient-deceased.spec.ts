@@ -25,6 +25,7 @@ test('Mark a patient as deceased', async ({ page }) => {
 
   // Given that I have a patient and I am on the Patient’s chart page
   await test.step('Given that I have a patient and I am on the Patient’s chart page', async () => {
+    // Use the goTo method instead of getPatientChartPath
     await markPatientDeceasedPage.goTo(patient.uuid);
   });
 
@@ -62,6 +63,7 @@ test('Mark a patient as deceased', async ({ page }) => {
     const deceasedTagLocator = page.locator(
       '[data-extension-id="deceased-patient-tag"] span[title="Deceased"]'
     );
+
     await expect(deceasedTagLocator).toBeVisible({ timeout: 70000 });
   });
 });
