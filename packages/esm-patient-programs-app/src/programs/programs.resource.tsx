@@ -83,6 +83,16 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   });
 }
 
+export function deleteProgramEnrollment(programEnrollmentUuid: string, abortController) {
+  return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}
+
 export const usePrograms = (patientUuid: string) => {
   const {
     data: enrollments,
