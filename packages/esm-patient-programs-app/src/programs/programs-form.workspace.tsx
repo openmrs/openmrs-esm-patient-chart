@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -18,7 +16,15 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -189,18 +195,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
+        <OpenmrsDatePicker
           aria-label="enrollment date"
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={onChange}
           value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          labelText={t('dateEnrolled', 'Date enrolled')}
+        />
       )}
     />
   );
@@ -210,19 +212,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="completionDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
+        <OpenmrsDatePicker
           aria-label="completion date"
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
           minDate={new Date(watch('enrollmentDate')).toISOString()}
           maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
+          onChange={onChange}
           value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          labelText={t('dateCompleted', 'Date completed')}
+        />
       )}
     />
   );

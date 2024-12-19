@@ -11,8 +11,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -38,6 +36,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -455,19 +454,12 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <ResponsiveWrapper>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
+                  <OpenmrsDatePicker
                     maxDate={new Date().toISOString()}
                     value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
-                      id="visitDateTimePicker"
-                      labelText={t('visitDate', 'Visit date')}
-                      placeholder="dd/mm/yyyy"
-                    />
-                  </DatePicker>
+                    onChange={(date) => onChange(date)}
+                    labelText={t('visitDate', 'Visit date')}
+                  />
                 </ResponsiveWrapper>
               )}
             />

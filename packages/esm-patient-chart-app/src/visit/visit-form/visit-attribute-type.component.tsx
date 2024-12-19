@@ -1,8 +1,6 @@
 import React, { useEffect, useId, useMemo } from 'react';
 import {
   Checkbox,
-  DatePicker,
-  DatePickerInput,
   NumberInput,
   Select,
   SelectItem,
@@ -14,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerRenderProps, useFormContext } from 'react-hook-form';
-import { useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import { type VisitFormData } from './visit-form.resource';
@@ -204,21 +202,13 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         );
       case 'org.openmrs.customdatatype.datatype.DateDatatype':
         return (
-          <DatePicker
+          <OpenmrsDatePicker
             {...fieldProps}
-            dateFormat="d/m/Y"
-            datePickerType="single"
-            onChange={([date]) => onChange(dayjs(date).format('YYYY-MM-DD'))}
-          >
-            <DatePickerInput
-              id="date-picker-default-id"
-              placeholder="dd/mm/yyyy"
-              labelText={labelText}
-              type="text"
-              invalid={!!errors.visitAttributes?.[uuid]}
-              invalidText={errors.visitAttributes?.[uuid]?.message}
-            />
-          </DatePicker>
+            onChange={(date) => onChange(dayjs(date).format('YYYY-MM-DD'))}
+            labelText={labelText}
+            invalid={!!errors.visitAttributes?.[uuid]}
+            invalidText={errors.visitAttributes?.[uuid]?.message}
+          />
         );
       default:
         return (
