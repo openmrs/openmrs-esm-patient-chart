@@ -25,8 +25,7 @@ test('Mark a patient as deceased', async ({ page }) => {
 
   // Given that I have a patient and I am on the Patient’s chart page
   await test.step('Given that I have a patient and I am on the Patient’s chart page', async () => {
-    const patientChartPath = markPatientDeceasedPage.getPatientChartPath(patient.uuid);
-    await page.goto(patientChartPath);
+    await markPatientDeceasedPage.goTo(patient.uuid);
   });
 
   // When I click on the "Actions" button and select "Mark patient deceased"
@@ -42,7 +41,7 @@ test('Mark a patient as deceased', async ({ page }) => {
     await expect(page.getByRole('radio', { name: causeOfDeath })).toBeVisible();
   });
 
-  // When I add all the death details and save
+  // When I enter the "Date of death" to today’s date and the "Cause of death" to Neoplasm and click "Save and close"
   await test.step('When I enter the "Date of death" to today’s date and the "Cause of death" to Neoplasm and click "Save and close"', async () => {
     // Fill the date input
     await dateOfDeathInput().fill(todayDate);
@@ -63,7 +62,6 @@ test('Mark a patient as deceased', async ({ page }) => {
     const deceasedTagLocator = page.locator(
       '[data-extension-id="deceased-patient-tag"] span[title="Deceased"]'
     );
-    
     await expect(deceasedTagLocator).toBeVisible({ timeout: 70000 });
   });
 });
