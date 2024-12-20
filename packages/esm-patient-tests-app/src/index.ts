@@ -42,6 +42,12 @@ export const testResultsDashboardLink =
     options,
   );
 
+// t('enterTestResults', 'Enter test results')
+export const testResultsFormWorkspace = getAsyncLifecycle(
+  () => import('./lab-results/lab-results-form.component'),
+  options,
+);
+
 export const labOrderPanel = getAsyncLifecycle(
   () => import('./test-orders/lab-order-basket-panel/lab-order-basket-panel.extension'),
   options,
@@ -60,3 +66,5 @@ export const timelineResultsModal = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const labResult = getAsyncLifecycle(() => import('./lab-results/lab-result.component'), options);
