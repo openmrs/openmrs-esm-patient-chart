@@ -591,7 +591,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       mutateInfiniteVisits,
-
       patientUuid,
       t,
       validateVisitStartStopDatetime,
