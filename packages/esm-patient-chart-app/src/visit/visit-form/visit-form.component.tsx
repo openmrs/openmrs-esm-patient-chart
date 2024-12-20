@@ -243,6 +243,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     reset,
   } = methods;
 
+  // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
@@ -591,7 +592,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       mutateCurrentVisit,
       mutateVisits,
       mutateInfiniteVisits,
-
       patientUuid,
       t,
       validateVisitStartStopDatetime,
@@ -732,6 +732,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                       {contentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
                     </>
                   ) : (
+                    // Defaults to showing all possible visit types if recommended visits are not enabled
                     <BaseVisitType visitTypes={allVisitTypes} />
                   )}
                 </div>

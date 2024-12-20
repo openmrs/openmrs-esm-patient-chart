@@ -1,4 +1,4 @@
-import { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
+import type { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
 
 export const mockPanelData = {
   isLoading: false,
