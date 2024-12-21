@@ -51,7 +51,7 @@ await test.step('And I click "Save and close"', async () => {
     const deceasedTagLocator = page.locator(
       '[data-extension-id="deceased-patient-tag"] span[title="Deceased"]'
     );
-    await expect(deceasedTagLocator).toBeVisible({ timeout: 10000 });
+    await expect(deceasedTagLocator).toBeVisible();
   });
 });
 
