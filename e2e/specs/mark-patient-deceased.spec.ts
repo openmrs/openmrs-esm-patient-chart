@@ -46,7 +46,7 @@ await test.step('And the "Cause of death" to Neoplasm', async () => {
 });
 
 await test.step('And I click "Save and close"', async () => {
-  await saveAndCloseButton().click();
+  await page.getByRole('button', { name: /save and close/i }).click();
 });
 
   await test.step('Then I should see a “deceased” patient tag in the patient banner', async () => {
