@@ -42,7 +42,6 @@ await test.step('When I enter the "Date of death" to today’s date', async () =
 });
 
 await test.step('And the "Cause of death" to Neoplasm', async () => {
-  await page.locator('text=Neoplasm').waitFor({ state: 'visible' });
   await page.locator('text=Neoplasm').click();
 });
 
