@@ -18,8 +18,6 @@ test('Mark a patient as deceased', async ({ page }) => {
   const deathDetailsForm = () => page.locator('form');
   const dateOfDeathInput = () => page.getByPlaceholder(/dd\/mm\/yyyy/i);
   const saveAndCloseButton = () => page.getByRole('button', { name: /save and close/i });
-  const deceasedTag = () =>
-    page.locator('[data-extension-id="deceased-patient-tag"] span', { hasText: 'Deceased' });
 
   await test.step('Given that I have a patient and I am on the Patient’s chart page', async () => {
     await markPatientDeceasedPage.goTo(patient.uuid);
@@ -53,7 +51,7 @@ await test.step('And I click "Save and close"', async () => {
     const deceasedTagLocator = page.locator(
       '[data-extension-id="deceased-patient-tag"] span[title="Deceased"]'
     );
-    await expect(deceasedTagLocator).toBeVisible({ timeout: 70000 });
+    await expect(deceasedTagLocator).toBeVisible({ timeout: 10000 });
   });
 });
 
