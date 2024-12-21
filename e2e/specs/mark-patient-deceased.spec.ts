@@ -45,7 +45,7 @@ await test.step('And the "Cause of death" to Neoplasm', async () => {
   await page.locator('text=Neoplasm').click();
 });
 
-await test.step('And  click "Save and close"', async () => {
+await test.step('And I click "Save and close"', async () => {
   await saveAndCloseButton().click();
 });
 
