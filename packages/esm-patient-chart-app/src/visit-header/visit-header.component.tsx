@@ -118,7 +118,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 };
 
 function launchStartVisitForm() {
-  launchPatientWorkspace('start-visit-workspace-form', {openedFrom: "patient-chart-start-visit"});
+  launchPatientWorkspace('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit' });
 }
 
 const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {

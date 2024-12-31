@@ -43,7 +43,7 @@
   "male": "ذكر",
   "medicationDurationAndUnit": "لمدة {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "مدة غير محددة",
-  "Medications": "Medications",
+  "Medications": "الأدوية",
   "modify": "تعديل",
   "none": "لا شيء",
   "noResultsForDrugSearch": "لا توجد نتائج لـ \"{{searchTerm}}\"",
