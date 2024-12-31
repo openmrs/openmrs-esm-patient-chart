@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
-import { MarkPatientDeceasedPage } from '../pages';
+import { MarkPatientDeceasedPage } from '../pages/mark-patient-deceased-page';
 
 let patient: Patient;
 
@@ -12,29 +12,43 @@ test.beforeEach(async ({ api }) => {
 test('Mark a patient as deceased', async ({ page }) => {
   const markPatientDeceasedPage = new MarkPatientDeceasedPage(page);
   const todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-  const causeOfDeath = 'Neoplasm/cancer';
+  const causeOfDeath = 'Neoplasm';
+  const actionsButton = () => page.getByRole('button', { name: /actions/i });
+  const markDeceasedMenuItem = () => page.getByRole('menuitem', { name: /mark patient deceased/i });
+  const deathDetailsForm = () => page.locator('form');
+  const dateOfDeathInput = () => page.getByPlaceholder(/dd\/mm\/yyyy/i);
 
-  await test.step('When I go to the Patient’s chart page', async () => {
-    await markPatientDeceasedPage.goToPatientChart(patient.uuid);
+  await test.step('Given that I have a patient and I am on the Patients chart page', async () => {
+    await markPatientDeceasedPage.goTo(patient.uuid);
   });
 
-  await test.step('And I select "Mark patient deceased" from the Actions menu', async () => {
-    await markPatientDeceasedPage.openMarkDeceasedForm();
+  await test.step('When I click on the "Actions" button and select "Mark patient deceased"', async () => {
+    await actionsButton().click();
+    await markDeceasedMenuItem().click();
   });
 
-  await test.step('Then I should see a form to enter death details', async () => {
-    await expect(markPatientDeceasedPage.deathDetailsForm()).toBeVisible();
-    await expect(markPatientDeceasedPage.dateOfDeathInput()).toBeVisible();
-    await expect(markPatientDeceasedPage.causeOfDeathRadio(causeOfDeath)).toBeVisible();
+  await test.step('Then I should see a form to enter the patients death details', async () => {
+    await expect(deathDetailsForm()).toBeVisible();
+    await expect(dateOfDeathInput()).toBeVisible();
+    await expect(page.getByRole('radio', { name: causeOfDeath })).toBeVisible();
   });
 
-  await test.step('When I fill out the death details and save', async () => {
-    await markPatientDeceasedPage.fillDeathDetails(todayDate, causeOfDeath);
-    await markPatientDeceasedPage.saveAndClose();
+  await test.step('When I enter the "Date of death" to today’s date', async () => {
+    await dateOfDeathInput().fill(todayDate);
+    await page.keyboard.press('Enter');
   });
 
-  await test.step('Then I should see a “deceased” tag in the patient banner', async () => {
-    await markPatientDeceasedPage.verifyDeceasedTag();
+  await test.step('And the "Cause of death" to Neoplasm', async () => {
+    await page.locator('text=Neoplasm').click();
+  });
+
+  await test.step('And I click "Save and close"', async () => {
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a “deceased” patient tag in the patient banner', async () => {
+    const deceasedTagLocator = page.locator('[data-extension-id="deceased-patient-tag"] span[title="Deceased"]');
+    await expect(deceasedTagLocator).toBeVisible();
   });
 });
 
