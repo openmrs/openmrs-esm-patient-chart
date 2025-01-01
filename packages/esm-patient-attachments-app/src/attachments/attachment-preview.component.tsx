@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { type Attachment, CloseIcon, useLayoutType } from '@openmrs/esm-framework';
 import styles from './attachment-preview.scss';
+import Linkify from 'linkify-react';
 
 interface AttachmentPreviewProps {
   attachmentToPreview: Attachment;
@@ -69,7 +70,11 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
       <div className={styles.rightPanel}>
         <h4 className={styles.title}>{attachmentToPreview.filename}</h4>
         {attachmentToPreview?.description ? (
-          <p className={styles.imageDescription}>{attachmentToPreview.description}</p>
+          <p className={styles.imageDescription}>
+            <Linkify as="p" options={{ target: '_blank' }}>
+              {attachmentToPreview.description}
+            </Linkify>
+          </p>
         ) : null}
       </div>
     </div>
