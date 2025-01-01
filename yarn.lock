@@ -5993,6 +5993,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jest-cli: "npm:^29.7.0"
     jest-environment-jsdom: "npm:^29.7.0"
+    linkify-react: "npm:^4.2.0"
     lint-staged: "npm:^14.0.1"
     lodash: "npm:^4.17.21"
     openmrs: "npm:next"
@@ -19215,6 +19216,16 @@ __metadata:
   version: 2.0.3
   resolution: "lines-and-columns@npm:2.0.3"
   checksum: 10/b5bb0d6ee2f82ae834ceddc9251af2060c30db476673e9c817c34c00bed58e0c5d90a6866b64afe7bdcb2c5eb1b418a5b1ee631d2592dc8ff381540901fa4da6
+  languageName: node
+  linkType: hard
+
+"linkify-react@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "linkify-react@npm:4.2.0"
+  peerDependencies:
+    linkifyjs: ^4.0.0
+    react: ">= 15.0.0"
+  checksum: 10/d2e73abaf9ac2eff84f1dfd1bd0546748fa22225d80a40e76610ecfbe49097cc473118bf012c7b20df4966ed2f30c3eccfeb360c396f1c6b1e27906f92f00fbd
   languageName: node
   linkType: hard
 
