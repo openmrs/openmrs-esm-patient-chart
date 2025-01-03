@@ -1,7 +1,7 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "chartView": "Visualização do prontuário",
+  "dateAndTime": "Data e hora",
+  "displaying": "Exibindo",
+  "encounterType": "Tipo de encontro",
+  "tableView": "Visualização em tabela"
 }

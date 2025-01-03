@@ -2,7 +2,7 @@
   "add": "添加",
   "cancel": "取消",
   "doseNumber": "接种系列中的剂量编号",
-  "doseNumberWithinSeries": "Dose number within series",
+  "doseNumberWithinSeries": "接种系列中的剂量编号",
   "edit": "编辑",
   "error": "错误",
   "errorSaving": "保存疫苗接种时出现错误",
