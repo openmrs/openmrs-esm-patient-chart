@@ -34,6 +34,14 @@
       "component": "labOrderPanel",
       "slot": "order-basket-slot",
       "order": 2
+    },
+    {
+      "name": "lab-result",
+      "component": "labResult",
+      "slot": "completed-lab-order-results-slot",
+      "meta": {
+        "fullWidth": false
+      }
     }
   ],
   "modals": [
@@ -52,6 +60,13 @@
       "type": "order",
       "component": "addLabOrderWorkspace",
       "title": "addLabOrderWorkspaceTitle"
+    },
+    {
+      "name": "test-results-form-workspace",
+      "title": "enterTestResults",
+      "component": "testResultsFormWorkspace",
+      "type": "lab-results",
+      "canHide": false
     }
   ]
 }

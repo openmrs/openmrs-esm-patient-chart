@@ -37,6 +37,7 @@ import {
   type Order,
   type OrderBasketItem,
   type OrderType,
+  TestOrder,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
@@ -58,7 +59,6 @@ import {
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
-import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
 import GeneralOrderTable from './general-order-table.component';
 
