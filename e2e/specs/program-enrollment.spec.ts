@@ -63,6 +63,7 @@ test('Add and edit a program enrollment', async ({ page }) => {
   });
 
   await test.step('When I click on the `Edit` button of the created program', async () => {
+    await programsPage.overflowButton().click();
     await programsPage.editProgramButton().click();
   });
 
