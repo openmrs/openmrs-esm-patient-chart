@@ -25,41 +25,50 @@ export interface DashboardExtensionProps {
   title: string;
   basePath: string;
   moduleName?: string;
+  iconName?: string;
 }
 
-export const DashboardExtension = ({
+const MenuIcons = {
+  'Patient Summary': ReportIcon,
+  'Vitals & Biometrics': ActivityIcon,
+  Medications: MedicationIcon,
+  Orders: ShoppingCartIcon,
+  Results: ChartAverageIcon,
+  Visits: CalendarHeatMapIcon,
+  Allergies: WarningIcon,
+  Conditions: ListCheckedIcon,
+  Immunizations: SyringeIcon,
+  Attachments: DocumentAttachmentIcon,
+  Programs: ProgramsIcon,
+  Appointments: EventScheduleIcon,
+} as const;
+
+export type MenuTitle = keyof typeof MenuIcons;
+
+const DashboardExtension = ({
   path,
   title,
   basePath,
   moduleName = '@openmrs/esm-patient-chart-app',
+  iconName,
 }: DashboardExtensionProps) => {
   const { t } = useTranslation(moduleName);
   const location = useLocation();
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
-  type MenuTitle = keyof typeof MenuIcons;
+  const renderIcon = () => {
+    if (iconName) {
+      const IconComponent = MenuIcons[title as MenuTitle];
+      return IconComponent ? <IconComponent className={styles.icon} /> : null;
+    }
 
-  const MenuIcons = {
-    'Patient Summary': ReportIcon,
-    'Vitals & Biometrics': ActivityIcon,
-    Medications: MedicationIcon,
-    Orders: ShoppingCartIcon,
-    Results: ChartAverageIcon,
-    Visits: CalendarHeatMapIcon,
-    Allergies: WarningIcon,
-    Conditions: ListCheckedIcon,
-    Immunizations: SyringeIcon,
-    Attachments: DocumentAttachmentIcon,
-    Programs: ProgramsIcon,
-    Appointments: EventScheduleIcon,
-  } as const;
+    if (title in MenuIcons) {
+      const IconComponent = MenuIcons[title as MenuTitle];
+      return <IconComponent className={styles.icon} />;
+    }
 
-  const menuIcon = (title: MenuTitle) => {
-    const Icon = MenuIcons[title];
-    return Icon ? <Icon className={styles.icon} /> : null;
+    return null;
   };
-
-  const renderIcon = menuIcon(title as MenuTitle);
 
   return (
     <div key={path}>
@@ -68,10 +77,12 @@ export const DashboardExtension = ({
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
         <span className={styles.menu}>
-          {renderIcon}
+          {renderIcon()}
           <span>{t(title)}</span>
         </span>
       </ConfigurableLink>
     </div>
   );
 };
+
+export default DashboardExtension;
