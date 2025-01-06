@@ -33,6 +33,7 @@ interface DiagnosisItem {
   diagnosis: string;
   rank: number;
   type: string;
+  voided?: boolean;
 }
 
 interface VisitSummaryProps {
@@ -74,14 +75,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       // Check if there is a diagnosis associated with this encounter
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
-          enc.diagnoses.forEach((diagnosis: Diagnosis) => {
-            // Putting all the diagnoses in a single array.
-            diagnoses.push({
-              diagnosis: diagnosis.display,
-              type: diagnosis.rank === 1 ? 'red' : 'blue',
-              rank: diagnosis.rank,
+          enc.diagnoses
+            .filter((diagnosis) => !diagnosis.voided)
+            .forEach((diagnosis: Diagnosis) => {
+              // Putting all the diagnoses in a single array.
+              diagnoses.push({
+                diagnosis: diagnosis.display,
+                type: diagnosis.rank === 1 ? 'red' : 'blue',
+                rank: diagnosis.rank,
+                voided: diagnosis.voided,
+              });
             });
-          });
         }
       }
 
