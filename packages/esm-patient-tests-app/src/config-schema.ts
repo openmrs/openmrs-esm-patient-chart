@@ -47,11 +47,11 @@ export const configSchema = {
       _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
-  showLabReferenceNumberField: {
+  showReferenceField: {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'Whether to display the Lab Reference number field in the Lab Order form. This field maps to the accesion_number property in the Order data model',
+      'Whether to display the Reference number field in the Order form. This field maps to the accesion_number property in the Order data model',
   },
   additionalTestOrderTypes: {
     _type: Type.Array,
@@ -130,7 +130,7 @@ export interface ConfigObject {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
   };
-  showLabReferenceNumberField: boolean;
+  showReferenceField: boolean;
   additionalTestOrderTypes: Array<{
     label?: string;
     orderTypeUuid: string;

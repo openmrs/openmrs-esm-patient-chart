@@ -62,11 +62,11 @@ export function LabOrderForm({
   const labOrderFormSchema = useMemo(
     () =>
       z.object({
-        instructions: z.string().optional(),
+        instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
           message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
         }),
-        accessionNumber: z.string().nullable(),
+        accessionNumber: z.string().nullish(),
         testType: z.object(
           { label: z.string(), conceptUuid: z.string() },
           {
@@ -187,7 +187,7 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          {config.showLabReferenceNumberField ? (
+          {config.showReferenceField ? (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
                 <InputWrapper>

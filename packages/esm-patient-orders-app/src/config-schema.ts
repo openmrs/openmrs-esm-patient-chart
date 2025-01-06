@@ -12,6 +12,12 @@ export const configSchema = {
       'Determines whether or not to display a Print button in the Orders details table. If set to true, a Print button gets shown in both the orders table headers. When clicked, this button enables the user to print out the contents of the table',
     _default: false,
   },
+  showReferenceField: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether to display the Reference number field in the Order form. This field maps to the accesion_number property in the Order',
+  },
   orderTypes: {
     _type: Type.Array,
     _default: [],
@@ -54,4 +60,5 @@ export interface ConfigObject {
   orderEncounterType: string;
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
+  showReferenceField: boolean;
 }

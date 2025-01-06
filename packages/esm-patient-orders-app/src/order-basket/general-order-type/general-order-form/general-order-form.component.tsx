@@ -48,6 +48,7 @@ export function OrderForm({
   orderableConceptSets,
 }: OrderFormProps) {
   const { t } = useTranslation();
+  const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
@@ -58,11 +59,11 @@ export function OrderForm({
   const OrderFormSchema = useMemo(
     () =>
       z.object({
-        instructions: z.string().optional(),
+        instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
           message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
         }),
-        accessionNumber: z.string().optional(),
+        accessionNumber: z.string().nullish(),
         concept: z.object(
           { display: z.string(), uuid: z.string() },
           {
@@ -156,31 +157,33 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="accessionNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      invalid={!!errors.accessionNumber}
-                      invalidText={errors.accessionNumber?.message}
-                      labelText={t('referenceNumber', 'Reference number', {
-                        orderType: orderType?.display,
-                      })}
-                      maxLength={150}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      size={responsiveSize}
-                      value={value}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
+          {config.showReferenceField && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="accessionNumber"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        id="labReferenceNumberInput"
+                        invalid={!!errors.accessionNumber}
+                        invalidText={errors.accessionNumber?.message}
+                        labelText={t('referenceNumber', 'Reference number', {
+                          orderType: orderType?.display,
+                        })}
+                        maxLength={150}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        size={responsiveSize}
+                        value={value}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
