@@ -8,6 +8,7 @@ import {
   type LabOrderConcept,
   updateOrderResult,
   type Datatype,
+  useCompletedLabResults,
 } from './lab-results.resource';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
@@ -16,6 +17,7 @@ import { type Encounter } from '../types/encounter';
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
+const mockUseCompletedLabResults = jest.mocked(useCompletedLabResults);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
@@ -23,6 +25,11 @@ jest.mock('./lab-results.resource', () => ({
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
+  useCompletedLabResults: jest.fn(),
+  isCoded: (concept) => concept?.datatype?.display === 'Coded',
+  isText: (concept) => concept?.datatype?.display === 'Text',
+  isNumeric: (concept) => concept?.datatype?.display === 'Numeric',
+  isPanel: (concept) => concept?.setMembers?.length > 0,
 }));
 
 const mockOrder = {
@@ -78,6 +85,12 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseCompletedLabResults.mockReturnValue({
+      completeLabResult: null,
+      isLoading: false,
+      error: null,
       mutate: jest.fn(),
     });
   });
@@ -608,5 +621,27 @@ describe('LabResultsForm', () => {
       },
       expect.anything(),
     );
+  });
+
+  test('should handle empty form submission', async () => {
+    const user = userEvent.setup();
+    render(<LabResultsForm {...testProps} />);
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.click(saveButton);
+
+    expect(screen.getByText('Please fill at least one field.')).toBeInTheDocument();
+    expect(updateOrderResult).not.toHaveBeenCalled();
+  });
+
+  test('should disable save button when form has validation errors', async () => {
+    const user = userEvent.setup();
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await user.type(input, '150');
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    expect(saveButton).toBeDisabled();
   });
 });

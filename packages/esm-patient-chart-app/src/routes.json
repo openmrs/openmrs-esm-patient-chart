@@ -24,6 +24,12 @@
       "offline": true
     },
     {
+      "name": "encounter-list",
+      "component": "encounterListTableTabs",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "start-visit-button",
       "component": "startVisitActionButton",
       "slot": "patient-actions-slot",
@@ -122,6 +128,7 @@
     },
     {
       "name": "start-visit-workspace-form",
+      "slot": "start-visit-workspace-form-slot",
       "component": "startVisitForm",
       "meta": {
         "title": "Start a visit"

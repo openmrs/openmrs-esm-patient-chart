@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
-import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { DrugOrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type DrugOrderBasketItem } from '../types';
 
@@ -122,7 +122,7 @@ export function prepMedicationOrderPostData(
   order: DrugOrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
-): OrderPost {
+): DrugOrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',

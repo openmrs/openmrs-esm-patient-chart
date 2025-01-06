@@ -1,4 +1,4 @@
-import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import type { OrderBasketItem, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
 export interface FhirResponse<T> {
   total: number;
@@ -81,7 +81,7 @@ export interface Concept {
     display: string;
   }>;
   answers: [];
-  setMembers: [];
+  setMembers: Array<Concept>;
   hiNormal: number;
   hiAbsolute: number;
   hiCritical: number;
@@ -182,4 +182,13 @@ export interface GroupedObservation {
   date: string;
   flatName: string;
   entries: MappedObservation[];
+}
+
+export interface TestOrderBasketItem extends OrderBasketItem {
+  testType: {
+    label: string;
+    conceptUuid: string;
+  };
+  orderReason?: string;
+  specimenSource?: string;
 }

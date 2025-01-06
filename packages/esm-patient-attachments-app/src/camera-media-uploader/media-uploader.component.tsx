@@ -3,6 +3,7 @@ import { FileUploaderDropContainer, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { readFileAsString } from '../utils';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './media-uploader.scss';
 
@@ -14,7 +15,8 @@ interface ErrorNotification {
 const MediaUploaderComponent = () => {
   const { t } = useTranslation();
   const { maxFileSize } = useConfig();
-  const { setFilesToUpload, allowedExtensions, multipleFiles } = useContext(CameraMediaUploaderContext);
+  const { setFilesToUpload, multipleFiles } = useContext(CameraMediaUploaderContext);
+  const { allowedFileExtensions } = useAllowedFileExtensions();
   const [errorNotification, setErrorNotification] = useState<ErrorNotification>(null);
 
   const upload = useCallback(
@@ -28,8 +30,8 @@ const MediaUploaderComponent = () => {
               'exceeds the size limit of',
             )} ${maxFileSize} MB.`,
           });
-        } else if (!isFileExtensionAllowed(file.name, allowedExtensions)) {
-          const lastExtension = allowedExtensions.pop();
+        } else if (!isFileExtensionAllowed(file.name, allowedFileExtensions)) {
+          const lastExtension = allowedFileExtensions.pop();
 
           setErrorNotification({
             title: t('unsupportedFileType', 'Unsupported file type'),
@@ -39,7 +41,7 @@ const MediaUploaderComponent = () => {
               {
                 fileName: file.name,
                 lastExtension: lastExtension,
-                supportedExtensions: allowedExtensions.join(', '),
+                supportedExtensions: allowedFileExtensions.join(', '),
               },
             ),
           });
@@ -62,16 +64,16 @@ const MediaUploaderComponent = () => {
         }
       });
     },
-    [setFilesToUpload, maxFileSize, t, allowedExtensions],
+    [setFilesToUpload, maxFileSize, t, allowedFileExtensions],
   );
 
-  const isFileExtensionAllowed = (fileName: string, allowedExtensions: string[]): boolean => {
-    if (!allowedExtensions) {
+  const isFileExtensionAllowed = (fileName: string, allowedFileExtensions: string[]): boolean => {
+    if (!allowedFileExtensions) {
       return true;
     }
 
     const fileExtension = fileName.split('.').pop();
-    return allowedExtensions?.includes(fileExtension.toLowerCase());
+    return allowedFileExtensions?.includes(fileExtension.toLowerCase());
   };
 
   return (
@@ -93,13 +95,13 @@ const MediaUploaderComponent = () => {
         })}
         .{' '}
         {t('supportedFiletypes', 'Supported files are {{supportedFiles}}', {
-          supportedFiles: allowedExtensions?.join(', '),
+          supportedFiles: allowedFileExtensions?.join(', '),
         })}
         .
       </p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={allowedExtensions?.map((ext) => '.' + ext) || ['*']}
+          accept={allowedFileExtensions?.map((ext) => '.' + ext) || ['*']}
           labelText={t('fileSizeInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple={multipleFiles}
