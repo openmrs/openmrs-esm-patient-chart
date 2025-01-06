@@ -60,12 +60,21 @@ export interface DrugOrderFormProps {
   promptBeforeClosing: (testFcn: () => boolean) => void;
 }
 
-const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: TFunction) => {
+const createMedicationOrderFormSchema = (
+  requireOutpatientQuantity: boolean,
+  requireIndicationInDrugForm: boolean,
+  t: TFunction,
+) => {
   const comboSchema = {
     default: z.boolean().optional(),
     value: z.string(),
     valueCoded: z.string(),
   };
+
+  const indicationFieldSchema = z.string({
+    required_error: t('indicationErrorMessage', 'Indication is required'),
+    invalid_type_error: t('indicationErrorMessage', 'Indication is required'),
+  });
 
   const baseSchemaFields = {
     freeTextDosage: z.string().refine((value) => !!value, {
@@ -91,9 +100,7 @@ const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: 
     asNeededCondition: z.string().nullable(),
     duration: z.number().nullable(),
     durationUnit: z.object({ ...comboSchema }).nullable(),
-    indication: z.string().refine((value) => value !== '', {
-      message: t('indicationErrorMessage', 'Indication is required'),
-    }),
+    indication: requireIndicationInDrugForm ? indicationFieldSchema : indicationFieldSchema.nullish(),
     startDate: z.date(),
     frequency: z.object(
       { ...comboSchema },
@@ -230,8 +237,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, [initialOrderBasketItem?.startDate]);
 
   const medicationOrderFormSchema = useMemo(
-    () => createMedicationOrderFormSchema(requireOutpatientQuantity, t),
-    [requireOutpatientQuantity, t],
+    () => createMedicationOrderFormSchema(requireOutpatientQuantity, config.requireIndicationInDrugForm, t),
+    [requireOutpatientQuantity, config.requireIndicationInDrugForm, t],
   );
 
   const {
