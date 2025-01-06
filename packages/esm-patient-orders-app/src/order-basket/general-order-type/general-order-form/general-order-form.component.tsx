@@ -8,7 +8,7 @@ import {
   useOrderType,
   priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
@@ -25,7 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import styles from './general-order-form.scss';
 import type { ConfigObject } from '../../../config-schema';
 import { ordersEqual, prepOrderPostData } from '../resources';
@@ -61,22 +60,18 @@ export function OrderForm({
       z.object({
         instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+          message: t('orderPriorityRequired', 'Priority is required'),
         }),
         accessionNumber: z.string().nullish(),
         concept: z.object(
           { display: z.string(), uuid: z.string() },
           {
-            required_error: translateFrom(moduleName, 'addOrderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: translateFrom(
-              moduleName,
-              'addOrderableConceptRequired',
-              'Orderable concept is required',
-            ),
+            required_error: t('orderableConceptRequired', 'Orderable concept is required'),
+            invalid_type_error: t('addOrderableConceptRequired', 'Orderable concept is required'),
           },
         ),
       }),
-    [],
+    [t],
   );
 
   const {

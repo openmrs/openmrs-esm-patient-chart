@@ -1,11 +1,22 @@
-import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
+import { translateFrom } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
-  priorityOptions,
   type OrderUrgency,
   type OrderPost,
   type OrderableConcept,
+  type PriorityOption,
 } from '@openmrs/esm-patient-common-lib';
+import { type TOptions } from 'i18next';
+import { moduleName } from '../../constants';
+
+const t = (key: string, fallback?: string, options?: Omit<TOptions, 'ns' | 'defaultValue'>) =>
+  translateFrom(moduleName, key, fallback, options);
+
+export const priorityOptions: PriorityOption[] = [
+  { value: 'ROUTINE', label: t('routine', 'Routine') },
+  { value: 'STAT', label: t('stat', 'Stat') },
+  { value: 'ON_SCHEDULED_DATE', label: t('onScheduledDate', 'On scheduled date') },
+];
 
 export function createEmptyOrder(concept: OrderableConcept, orderer: string): OrderBasketItem {
   return {

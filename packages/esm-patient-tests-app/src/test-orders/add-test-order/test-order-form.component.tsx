@@ -6,7 +6,7 @@ import {
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
@@ -25,7 +25,6 @@ import { ordersEqual, priorityOptions } from './test-order';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './test-order-form.scss';
 import type { TestOrderBasketItem } from '../../types';
@@ -64,32 +63,25 @@ export function LabOrderForm({
       z.object({
         instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+          message: t('addLabOrderPriorityRequired', 'Priority is required'),
         }),
         accessionNumber: z.string().nullish(),
         testType: z.object(
           { label: z.string(), conceptUuid: z.string() },
           {
-            required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-            invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+            required_error: t('addLabOrderLabTestTypeRequired', 'Test type is required'),
+            invalid_type_error: t('addLabOrderLabReferenceRequired', 'Test type is required'),
           },
         ),
         orderReason: orderReasonRequired
           ? z
               .string({
-                required_error: translateFrom(
-                  moduleName,
-                  'addLabOrderLabOrderReasonRequired',
-                  'Order reason is required',
-                ),
+                required_error: t('addLabOrderLabOrderReasonRequired', 'Order reason is required'),
               })
-              .refine(
-                (value) => !!value,
-                translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-              )
+              .refine((value) => !!value, t('addLabOrderLabOrderReasonRequired', 'Order reason is required'))
           : z.string().optional(),
       }),
-    [orderReasonRequired],
+    [orderReasonRequired, t],
   );
 
   const {
