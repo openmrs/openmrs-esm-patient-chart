@@ -8,16 +8,19 @@ import {
   useOrderType,
   priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
   Column,
-  ComboBox,
+  DatePicker,
+  DatePickerInput,
   Form,
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
@@ -25,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import styles from './general-order-form.scss';
 import type { ConfigObject } from '../../../config-schema';
 import { ordersEqual, prepOrderPostData } from '../resources';
@@ -47,7 +51,7 @@ export function OrderForm({
   orderableConceptSets,
 }: OrderFormProps) {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const config = useConfig();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
@@ -57,20 +61,35 @@ export function OrderForm({
 
   const OrderFormSchema = useMemo(
     () =>
-      z.object({
-        instructions: z.string().nullish(),
-        urgency: z.string().refine((value) => value !== '', {
-          message: t('orderPriorityRequired', 'Priority is required'),
+      z
+        .object({
+          instructions: z.string().nullish(),
+          urgency: z.string().refine((value) => value !== '', {
+            message: t('addOrderPriorityRequired', 'Priority is required'),
+          }),
+          accessionNumber: z.string().nullish(),
+          concept: z.object(
+            { display: z.string(), uuid: z.string() },
+            {
+              required_error: t('addOrderableConceptRequired', 'Orderable concept is required'),
+              invalid_type_error: translateFrom(
+                moduleName,
+                'addOrderableConceptRequired',
+                'Orderable concept is required',
+              ),
+            },
+          ),
+          scheduledDate: z
+            .date()
+            .min(new Date(), {
+              message: t('scheduledDateMustBeInFuture', 'Scheduled date must be in future'),
+            })
+            .nullish(),
+        })
+        .refine((values) => (values.urgency === 'ON_SCHEDULED_DATE' ? Boolean(values.scheduledDate) : true), {
+          message: t('scheduledDateRequired', 'Scheduled date is required'),
+          path: ['scheduledDate'],
         }),
-        accessionNumber: z.string().nullish(),
-        concept: z.object(
-          { display: z.string(), uuid: z.string() },
-          {
-            required_error: t('orderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: t('addOrderableConceptRequired', 'Orderable concept is required'),
-          },
-        ),
-      }),
     [t],
   );
 
@@ -78,6 +97,7 @@ export function OrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    watch,
   } = useForm<OrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(OrderFormSchema),
@@ -86,9 +106,7 @@ export function OrderForm({
     },
   });
 
-  const filterItemsByName = useCallback((menu) => {
-    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  }, []);
+  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
 
   const handleFormSubmission = useCallback(
     (data: OrderBasketItem) => {
@@ -186,23 +204,54 @@ export function OrderForm({
                   name="urgency"
                   control={control}
                   render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                    <Select
                       id="priorityInput"
                       invalid={!!errors.urgency}
                       invalidText={errors.urgency?.message}
-                      items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
+                      onChange={onChange}
                       size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} text={option.label} value={option.value} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>
             </Column>
           </Grid>
+          {isScheduledDateRequired && (
+            <Grid className={styles.gridRow}>
+              <Column lg={8} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduledDate"
+                    control={control}
+                    render={({ field: { onBlur, onChange, value } }) => (
+                      <DatePicker
+                        id="scheduledDate"
+                        name="scheduledDate"
+                        datePickerType="single"
+                        onChange={([date]) => onChange(date)}
+                        onBlur={onBlur}
+                        value={value}
+                      >
+                        <DatePickerInput
+                          labelText={t('scheduledDate', 'Scheduled date')}
+                          placeholder="mm/dd/yyyy"
+                          min={new Date()}
+                          invalid={!!errors?.scheduledDate?.message}
+                          invalidText={errors?.scheduledDate?.message}
+                        />
+                      </DatePicker>
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>

@@ -13,12 +13,16 @@ import {
   ButtonSet,
   Column,
   ComboBox,
+  DatePicker,
+  DatePickerInput,
   Form,
   Grid,
   InlineNotification,
   Layer,
   TextArea,
   TextInput,
+  Select,
+  SelectItem,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ordersEqual, priorityOptions } from './test-order';
@@ -60,27 +64,38 @@ export function LabOrderForm({
 
   const labOrderFormSchema = useMemo(
     () =>
-      z.object({
-        instructions: z.string().nullish(),
-        urgency: z.string().refine((value) => value !== '', {
-          message: t('addLabOrderPriorityRequired', 'Priority is required'),
+      z
+        .object({
+          instructions: z.string().nullish(),
+          urgency: z.string().refine((value) => value !== '', {
+            message: t('addLabOrderPriorityRequired', 'Priority is required'),
+          }),
+          accessionNumber: z.string().nullish(),
+          testType: z.object(
+            { label: z.string(), conceptUuid: z.string() },
+            {
+              required_error: t('addLabOrderLabTestTypeRequired', 'Test type is required'),
+              invalid_type_error: t('addLabOrderLabReferenceRequired', 'Test type is required'),
+            },
+          ),
+          orderReason: orderReasonRequired
+            ? z
+                .string({
+                  required_error: t('addLabOrderLabOrderReasonRequired', 'Order reason is required'),
+                })
+                .refine((value) => !!value, t('addLabOrderLabOrderReasonRequired', 'Order reason is required'))
+            : z.string().optional(),
+          scheduledDate: z
+            .date()
+            .min(new Date(), {
+              message: t('scheduledDateMustBeInFuture', 'Scheduled date must be in future'),
+            })
+            .nullish(),
+        })
+        .refine((values) => (values.urgency === 'ON_SCHEDULED_DATE' ? Boolean(values.scheduledDate) : true), {
+          message: t('scheduledDateRequired', 'Scheduled date is required'),
+          path: ['scheduledDate'],
         }),
-        accessionNumber: z.string().nullish(),
-        testType: z.object(
-          { label: z.string(), conceptUuid: z.string() },
-          {
-            required_error: t('addLabOrderLabTestTypeRequired', 'Test type is required'),
-            invalid_type_error: t('addLabOrderLabReferenceRequired', 'Test type is required'),
-          },
-        ),
-        orderReason: orderReasonRequired
-          ? z
-              .string({
-                required_error: t('addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-              })
-              .refine((value) => !!value, t('addLabOrderLabOrderReasonRequired', 'Order reason is required'))
-          : z.string().optional(),
-      }),
     [orderReasonRequired, t],
   );
 
@@ -88,6 +103,7 @@ export function LabOrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    watch,
   } = useForm<TestOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
@@ -96,6 +112,8 @@ export function LabOrderForm({
       ...initialOrder,
     },
   });
+
+  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
 
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
@@ -213,23 +231,55 @@ export function LabOrderForm({
                   name="urgency"
                   control={control}
                   render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                    <Select
                       id="priorityInput"
                       invalid={!!errors.urgency}
                       invalidText={errors.urgency?.message}
-                      items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
+                      onChange={onChange}
+                      value={value}
                       size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value} text={option.label} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>
             </Column>
           </Grid>
+          {isScheduledDateRequired && (
+            <Grid className={styles.gridRow}>
+              <Column lg={8} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduledDate"
+                    control={control}
+                    render={({ field: { onBlur, onChange, value } }) => (
+                      <DatePicker
+                        id="scheduledDate"
+                        name="scheduledDate"
+                        datePickerType="single"
+                        onChange={([date]) => onChange(date)}
+                        onBlur={onBlur}
+                        value={value}
+                      >
+                        <DatePickerInput
+                          labelText={t('scheduledDate', 'Scheduled date')}
+                          placeholder="mm/dd/yyyy"
+                          min={new Date()}
+                          invalid={!!errors?.scheduledDate?.message}
+                          invalidText={errors?.scheduledDate?.message}
+                        />
+                      </DatePicker>
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           {orderReasons.length > 0 && (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
