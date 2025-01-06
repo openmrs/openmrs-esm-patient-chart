@@ -4,16 +4,16 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .desktopTile {
-  border-left: layout.$spacing-02 solid colors.$cyan-20;
+  border-left: layout.$spacing-02 solid colors.$purple-70;
   background-color: $ui-02;
-  border-top: 1px solid colors.$cyan-20;
+  border-top: 1px solid colors.$purple-20;
   border-right: none;
   padding: 0;
 }
 
 .tabletTile {
   @extend .desktopTile;
-  border-top: 1px solid #3778c1;
+  border-top: 1px solid #612ebd;
 }
 
 .collapsedTile {
