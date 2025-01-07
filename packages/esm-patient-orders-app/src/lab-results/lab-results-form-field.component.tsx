@@ -19,30 +19,23 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
   // - Age-specific ranges (e.g., pediatric vs adult values)
   // - Gender-specific ranges where applicable
   const formatLabRange = (concept: LabOrderConcept) => {
-    const {
-      datatype: { hl7Abbreviation },
-    } = concept ?? {};
+    const hl7Abbreviation = concept?.datatype?.hl7Abbreviation;
     if (hl7Abbreviation !== 'NM') return '';
 
     const { hiAbsolute, lowAbsolute, units } = concept;
     const displayUnit = units ? ` ${units}` : '';
 
-    const hasLowerLimit = lowAbsolute !== null && lowAbsolute !== undefined;
-    const hasUpperLimit = hiAbsolute !== null && hiAbsolute !== undefined;
+    const hasLowerLimit = lowAbsolute != null;
+    const hasUpperLimit = hiAbsolute != null;
 
     if (hasLowerLimit && hasUpperLimit) {
-      return ` (${lowAbsolute} - ${hiAbsolute}) ${displayUnit}`;
+      return ` (${lowAbsolute} - ${hiAbsolute} ${displayUnit})`;
+    } else if (hasUpperLimit) {
+      return ` (<= ${hiAbsolute} ${displayUnit})`;
+    } else if (hasLowerLimit) {
+      return ` (>= ${lowAbsolute} ${displayUnit})`;
     }
-
-    if (hasUpperLimit) {
-      return ` (<= ${hiAbsolute}) ${displayUnit}`;
-    }
-
-    if (hasLowerLimit) {
-      return ` (>= ${lowAbsolute}) ${displayUnit}`;
-    }
-
-    return ` (${displayUnit})`;
+    return units ? ` (${displayUnit})` : '';
   };
 
   const getSavedMemberValue = (conceptUuid: string, dataType: string) => {
@@ -63,7 +56,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               className={styles.textInput}
               id={concept.uuid}
               key={concept.uuid}
-              labelText={concept?.display ?? ''}
+              labelText={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
               type="text"
               invalidText={errors[concept.uuid]?.message}
               invalid={!!errors[concept.uuid]}
@@ -84,7 +77,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               hideSteppers
               id={concept.uuid}
               key={concept.uuid}
-              label={concept?.display + formatLabRange(concept)}
+              label={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
               onChange={(event) => field.onChange(parseFloat(event.target.value))}
               value={field.value || ''}
               invalidText={errors[concept.uuid]?.message}
@@ -105,7 +98,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               defaultValue={defaultValue?.value?.uuid}
               id={`select-${concept.uuid}`}
               key={concept.uuid}
-              labelText={concept?.display}
+              labelText={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
               invalidText={errors[concept.uuid]?.message}
               invalid={!!errors[concept.uuid]}
             >
@@ -134,7 +127,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     id={`text-${member.uuid}`}
                     className={styles.textInput}
                     key={member.uuid}
-                    labelText={member?.display ?? ''}
+                    labelText={`${member?.display ? member.display + ' ' : ''}${formatLabRange(member)}`}
                     type="text"
                     invalidText={errors[member.uuid]?.message}
                     invalid={!!errors[member.uuid]}
@@ -154,7 +147,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     hideSteppers
                     id={`number-${member.uuid}`}
                     key={member.uuid}
-                    label={member?.display + formatLabRange(member)}
+                    label={`${member?.display ? member.display + ' ' : ''}${formatLabRange(member)}`}
                     onChange={(event) => field.onChange(parseFloat(event.target.value))}
                     value={field.value || ''}
                     invalidText={errors[member.uuid]?.message}
@@ -174,7 +167,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                     defaultValue={getSavedMemberValue(member.uuid, member.datatype.display)}
                     id={`select-${member.uuid}`}
                     key={member.uuid}
-                    labelText={member?.display}
+                    labelText={`${member?.display ? member.display + ' ' : ''}${formatLabRange(member)}`}
                     type="text"
                     invalidText={errors[member.uuid]?.message}
                     invalid={!!errors[member.uuid]}

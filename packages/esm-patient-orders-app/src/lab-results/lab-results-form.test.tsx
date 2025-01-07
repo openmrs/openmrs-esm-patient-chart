@@ -99,7 +99,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100) mg/dL`);
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '150');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -152,7 +152,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100) mg/dL`);
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '50.5');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -168,7 +168,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100) mg/dL`);
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '-50');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -183,7 +183,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText('Test Concept (0 - 100) mg/dL');
+    const input = await screen.findByLabelText('Test Concept (0 - 100 mg/dL)');
     await user.type(input, '0');
 
     await waitFor(() => {
@@ -276,7 +276,7 @@ describe('LabResultsForm', () => {
       />,
     );
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100) mg/dL`);
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '50');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -338,11 +338,11 @@ describe('LabResultsForm', () => {
     render(<LabResultsForm {...testProps} />);
 
     // Normal input range
-    const setMember1Input = screen.getByLabelText('Set Member (50 - 150) mg/dL');
+    const setMember1Input = screen.getByLabelText('Set Member (50 - 150 mg/dL)');
     await user.type(setMember1Input, '50');
     expect(screen.queryByText('Set Member must be between 50 and 150')).not.toBeInTheDocument();
 
-    const setMember2Input = screen.getByLabelText('Set Member 2 (5 - 30) mg/dL');
+    const setMember2Input = screen.getByLabelText('Set Member 2 (5 - 30 mg/dL)');
     await user.type(setMember2Input, '10');
     expect(screen.queryByText('Set Member must be between 5 and 30')).not.toBeInTheDocument();
 
@@ -459,7 +459,7 @@ describe('LabResultsForm', () => {
     });
 
     render(<LabResultsForm {...testProps} />);
-    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100) mg/dL');
+    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100 mg/dL)');
     await user.type(concept1Input, '100');
 
     const submitButton = screen.getByRole('button', { name: 'Save and close' });
@@ -563,10 +563,10 @@ describe('LabResultsForm', () => {
     });
 
     render(<LabResultsForm {...testProps} />);
-    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100) mg/dL');
+    const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100 mg/dL)');
     await user.type(concept1Input, '100');
 
-    const concept2Input = await screen.findByLabelText('Set Member 2 (0 - 80) mmol/L');
+    const concept2Input = await screen.findByLabelText('Set Member 2 (0 - 80 mmol/L)');
     await user.type(concept2Input, '60');
 
     const submitButton = screen.getByRole('button', { name: 'Save and close' });
@@ -644,7 +644,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100) mg/dL`);
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '150');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
