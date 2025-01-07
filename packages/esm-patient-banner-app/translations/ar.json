@@ -1,11 +1,14 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "العنوان سطر 1",
   "address2": "العنوان سطر 2",
   "city": "المدينة",
   "cityVillage": "المدينة",
   "country": "الدولة",
   "countyDistrict": "المنطقة",
+  "deceased": "Deceased",
   "district": "المنطقة",
+  "from_lower": "from",
   "implementationLogo": "شعار التنفيذ",
   "patientAge": "العمر",
   "patientDateOfBirthWithSeparator": "تاريخ الميلاد",
@@ -14,6 +17,7 @@
   "patientNameWithSeparator": "اسم المريض",
   "postalCode": "الرمز البريدي",
   "printIdentifierSticker": "ملصق تعريف المريض",
+  "started": "Started",
   "state": "الولاية",
   "stateProvince": "الولاية",
   "telephoneNumberWithSeparator": "رقم الهاتف"
