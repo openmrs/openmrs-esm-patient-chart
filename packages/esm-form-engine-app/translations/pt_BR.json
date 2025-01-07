@@ -1,15 +1,15 @@
 {
-  "cancel": "Cancel",
-  "closeThisPanel": "Close this panel",
-  "collapseAll": "Collapse all",
-  "deleteQuestion": "Delete question",
-  "deleteQuestionConfirmation": "Are you sure you want to delete this question?",
-  "deleteQuestionExplainerText": "This action cannot be undone.",
-  "errorTitle": "There was an error with this form",
-  "expandAll": "Expand all",
-  "loading": "Loading",
-  "or": "or",
-  "thisList": "this list",
-  "toggleCollapseOrExpand": "Toggle collapse or expand",
-  "tryAgainMessage": "Try opening another form from"
+  "cancel": "Cancelar",
+  "closeThisPanel": "Fechar esse painel",
+  "collapseAll": "Esconder tudo",
+  "deleteQuestion": "Apagar pergunta",
+  "deleteQuestionConfirmation": "Tem certeza de que deseja esta pergunta?",
+  "deleteQuestionExplainerText": "Esta ação não pode ser desfeita.",
+  "errorTitle": "Houve um erro com esse formulário",
+  "expandAll": "Mostrar tudo",
+  "loading": "Carregando",
+  "or": "ou",
+  "thisList": "esta lista",
+  "toggleCollapseOrExpand": "Alternar entre mostrar e ocultar",
+  "tryAgainMessage": "Tente abrir outro formulário"
 }
