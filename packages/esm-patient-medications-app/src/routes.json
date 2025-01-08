@@ -43,7 +43,8 @@
       "name": "add-drug-order",
       "title": "addDrugOrderWorkspaceTitle",
       "component": "addDrugOrderWorkspace",
-      "type": "order"
+      "type": "order",
+      "groups": ["ward-patient"]
     }
   ]
 }
