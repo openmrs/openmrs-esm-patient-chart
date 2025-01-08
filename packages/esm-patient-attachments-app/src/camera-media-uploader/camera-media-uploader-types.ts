@@ -17,3 +17,7 @@ export interface CameraMediaUploaderContextType {
   setError?: React.Dispatch<React.SetStateAction<Error>>;
   allowedExtensions?: Array<string> | undefined;
 }
+
+export interface FileAttachment extends UploadedFile {
+  capturedFromWebcam?: boolean;
+}

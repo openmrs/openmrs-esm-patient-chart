@@ -1,10 +1,10 @@
 import React, { type SyntheticEvent, useCallback, useState, useContext } from 'react';
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, TextArea, TextInput } from '@carbon/react';
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
+import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
-import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, TextArea, TextInput } from '@carbon/react';
-import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
 import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
