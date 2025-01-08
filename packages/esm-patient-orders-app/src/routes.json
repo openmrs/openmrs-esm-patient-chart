@@ -66,8 +66,7 @@
       "title": "orderBasketWorkspaceTitle",
       "component": "orderBasketWorkspace",
       "type": "order",
-      "canHide": true,
-      "groups": ["ward-patient"]
+      "canHide": true
     },
     {
       "name": "patient-orders-form-workspace",
