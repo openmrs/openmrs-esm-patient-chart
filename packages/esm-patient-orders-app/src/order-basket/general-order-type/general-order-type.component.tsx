@@ -112,7 +112,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     >
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
-          <MaybePictogram pictogram={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          <MaybePictogram pictogram={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 16} />
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
