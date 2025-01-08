@@ -1,0 +1,15 @@
+{
+  "cancel": "Cancelar",
+  "closeThisPanel": "Fechar esse painel",
+  "collapseAll": "Esconder tudo",
+  "deleteQuestion": "Apagar pergunta",
+  "deleteQuestionConfirmation": "Tem certeza de que deseja esta pergunta?",
+  "deleteQuestionExplainerText": "Esta ação não pode ser desfeita.",
+  "errorTitle": "Houve um erro com esse formulário",
+  "expandAll": "Mostrar tudo",
+  "loading": "Carregando",
+  "or": "ou",
+  "thisList": "esta lista",
+  "toggleCollapseOrExpand": "Alternar entre mostrar e ocultar",
+  "tryAgainMessage": "Tente abrir outro formulário"
+}

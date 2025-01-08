@@ -93,18 +93,58 @@ function OrderActionLabel({ orderBasketItem }: { orderBasketItem: TestOrderBaske
   const { t } = useTranslation();
 
   if (orderBasketItem.isOrderIncomplete) {
-    return <span className={styles.orderActionIncompleteLabel}>{t('orderActionIncomplete', 'Incomplete')}</span>;
+    return (
+      <span
+        className={styles.orderActionIncompleteLabel}
+        role="status"
+        aria-atomic
+        aria-label={t('orderActionIncomplete', 'Incomplete')}
+      >
+        {t('orderActionIncomplete', 'Incomplete')}
+      </span>
+    );
   }
 
   switch (orderBasketItem.action) {
     case 'NEW':
-      return <span className={styles.orderActionNewLabel}>{t('orderActionNew', 'New')}</span>;
+      return (
+        <span className={styles.orderActionNewLabel} role="status" aria-atomic aria-label={t('orderActionNew', 'New')}>
+          {t('orderActionNew', 'New')}
+        </span>
+      );
     case 'RENEW':
-      return <span className={styles.orderActionRenewLabel}>{t('orderActionRenew', 'Renew')}</span>;
+      return (
+        <span
+          className={styles.orderActionRenewLabel}
+          role="status"
+          aria-atomic
+          aria-label={t('orderActionRenew', 'Renew')}
+        >
+          {t('orderActionRenew', 'Renew')}
+        </span>
+      );
     case 'REVISE':
-      return <span className={styles.orderActionRevisedLabel}>{t('orderActionRevise', 'Modify')}</span>;
+      return (
+        <span
+          className={styles.orderActionReviseLabel}
+          role="status"
+          aria-atomic
+          aria-label={t('orderActionRevise', 'Modify')}
+        >
+          {t('orderActionRevise', 'Modify')}
+        </span>
+      );
     case 'DISCONTINUE':
-      return <span className={styles.orderActionDiscontinueLabel}>{t('orderActionDiscontinue', 'Discontinue')}</span>;
+      return (
+        <span
+          className={styles.orderActionDiscontinueLabel}
+          role="status"
+          aria-atomic
+          aria-label={t('orderActionDiscontinue', 'Discontinue')}
+        >
+          {t('orderActionDiscontinue', 'Discontinue')}
+        </span>
+      );
     default:
       return <></>;
   }

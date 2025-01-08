@@ -1,11 +1,14 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "Địa chỉ 1",
   "address2": "Địa chỉ 2",
   "city": "Thành phố",
   "cityVillage": "thành phố",
   "country": "Đất nước",
   "countyDistrict": "Huyện",
+  "deceased": "Deceased",
   "district": "Huyện",
+  "from_lower": "from",
   "implementationLogo": "Logo triển khai",
   "patientAge": "Tuổi\"",
   "patientDateOfBirthWithSeparator": "Ngày sinh:",
@@ -14,6 +17,7 @@
   "patientNameWithSeparator": "Tên bệnh nhân:",
   "postalCode": "Mã bưu chính",
   "printIdentifierSticker": "In nhãn dán nhận dạng",
+  "started": "Started",
   "state": "State",
   "stateProvince": "State",
   "telephoneNumberWithSeparator": "Số điện thoại:"

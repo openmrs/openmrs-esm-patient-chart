@@ -1,5 +1,5 @@
 {
-  "activeFirst": "Active first",
+  "activeFirst": "激活第一个",
   "alphabetically": "A - Z",
   "clearSearch": "清除搜索",
   "closeFlagsBar": "关闭标示栏",
@@ -23,7 +23,7 @@
   "matchesForSearchTerm_one": "{{count}} 个标示",
   "matchesForSearchTerm_other": "{{count}} 个标示",
   "noFlagsFound": "抱歉，找不到与您搜索匹配的标示。",
-  "retiredFirst": "Retired first",
+  "retiredFirst": "退役第一个",
   "saveAndClose": "保存并关闭",
   "searchForAFlag": "搜索一个标示"
 }
