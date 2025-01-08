@@ -114,6 +114,9 @@ export function OrderForm({
         ...initialOrder,
         ...data,
       };
+      if (finalizedOrder.urgency !== 'ON_SCHEDULED_DATE') {
+        finalizedOrder.scheduledDate = null;
+      }
       finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];

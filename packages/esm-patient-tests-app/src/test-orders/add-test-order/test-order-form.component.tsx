@@ -131,6 +131,9 @@ export function LabOrderForm({
         ...initialOrder,
         ...data,
       };
+      if (finalizedOrder.urgency !== 'ON_SCHEDULED_DATE') {
+        finalizedOrder.scheduledDate = null;
+      }
       finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];
@@ -176,16 +179,6 @@ export function LabOrderForm({
 
   return (
     <>
-      {/* {errorLoadingTestTypes && (
-        <InlineNotification
-          className={styles.inlineNotification}
-          kind="error"
-          lowContrast
-          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
-        />
-      )} */}
-
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -230,14 +223,12 @@ export function LabOrderForm({
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
+                  render={({ field, fieldState }) => (
                     <Select
+                      {...field}
                       id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      value={value}
+                      invalid={!!fieldState.error}
+                      invalidText={fieldState.error?.message}
                       size={responsiveSize}
                       labelText={t('priority', 'Priority')}
                     >

@@ -87,6 +87,7 @@ export function buildLabOrder(order: Order, action?: OrderAction) {
     concept: order.concept,
     orderType: order.orderType.uuid,
     specimenSource: null,
+    scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : undefined,
   };
 }
 
@@ -106,5 +107,6 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     concept: order.concept,
     orderNumber: order.orderNumber,
     orderType: order.orderType.uuid,
+    scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : undefined,
   };
 }

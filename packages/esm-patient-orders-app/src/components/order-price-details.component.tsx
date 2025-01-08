@@ -15,7 +15,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   const { data: priceData, isLoading, error } = useOrderPrice(orderItemUuid);
 
   const amount = useMemo(() => {
-    if (!priceData || priceData.entry.length === 0) {
+    if (!priceData?.entry || priceData.entry.length === 0) {
       return null;
     }
     return priceData.entry[0].resource.propertyGroup[0]?.priceComponent[0]?.amount;
