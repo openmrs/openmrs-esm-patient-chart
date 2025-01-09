@@ -1,12 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import dayjs from 'dayjs';
 import {
   type FetchResponse,
   showSnackbar,
   useLocations,
   useConfig,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -29,6 +31,25 @@ const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 const testProps = {
   closeWorkspace: mockCloseWorkspace,

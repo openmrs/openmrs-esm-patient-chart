@@ -142,6 +142,9 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                     <OpenmrsDatePicker
                       className={styles.datePicker}
                       id="deceasedDate"
+                      isInvalid={!!errors?.deathDate}
+                      invalidText={errors?.deathDate?.message}
+                      labelText={t('dateOfDeath', 'Date of death')}
                       maxDate={new Date().toISOString()}
                       onChange={(date) => onChange(date)}
                       value={value}

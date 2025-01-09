@@ -1,11 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { esmPatientChartSchema, type ChartConfig } from '../config-schema';
 import { mockPatient } from 'tools';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
+import dayjs from 'dayjs';
 
 const originalLocation = window.location;
 delete window.location;
@@ -16,11 +17,38 @@ const mockUseCausesOfDeath = jest.mocked(useCausesOfDeath);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockCloseWorkspace = jest.fn();
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 jest.mock('../data.resource.ts', () => ({
   markPatientDeceased: jest.fn().mockResolvedValue({}),
   useCausesOfDeath: jest.fn(),
 }));
+
+jest.mock('@openmrs/esm-framework', () => {
+  const actual = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...actual,
+    OpenmrsDatePicker: jest.fn(),
+  };
+});
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 describe('MarkPatientDeceasedForm', () => {
   const freeTextFieldConceptUuid = '1234e218-6c8a-4ca3-8edb-9f6d9c8c8c7f';
@@ -35,26 +63,10 @@ describe('MarkPatientDeceasedForm', () => {
   };
 
   const codedCausesOfDeath = [
-    {
-      display: 'Traumatic injury',
-      uuid: '8b64f45e-1d5f-4894-b77c-4e1d840e2c99',
-      name: 'Traumatic injury',
-    },
-    {
-      display: 'Neoplasm/cancer',
-      uuid: 'c4e8d03c-f09b-48d1-8d93-7d84d463f865',
-      name: 'Neoplasm/cancer',
-    },
-    {
-      display: 'Infectious disease',
-      uuid: 'b7c1c30f-5b9e-4a3d-b943-7f4b3f740e6c',
-      name: 'Infectious disease',
-    },
-    {
-      display: 'Other',
-      uuid: freeTextFieldConceptUuid,
-      name: 'Other',
-    },
+    { display: 'Traumatic injury', uuid: '8b64f45e-1d5f-4894-b77c-4e1d840e2c99', name: 'Traumatic injury' },
+    { display: 'Neoplasm/cancer', uuid: 'c4e8d03c-f09b-48d1-8d93-7d84d463f865', name: 'Neoplasm/cancer' },
+    { display: 'Infectious disease', uuid: 'b7c1c30f-5b9e-4a3d-b943-7f4b3f740e6c', name: 'Infectious disease' },
+    { display: 'Other', uuid: freeTextFieldConceptUuid, name: 'Other' },
   ];
 
   beforeEach(() => {
@@ -83,7 +95,7 @@ describe('MarkPatientDeceasedForm', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/cause of death/i)).toBeInTheDocument();
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date/i }));
+    expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
     codedCausesOfDeath.forEach((codedCauseOfDeath) => {
       expect(screen.getByRole('radio', { name: codedCauseOfDeath.display })).toBeInTheDocument();
     });

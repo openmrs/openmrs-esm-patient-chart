@@ -8,6 +8,7 @@ import {
   useLocations,
   useVisitTypes,
   type Visit,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -168,6 +169,26 @@ jest.mock('./visit-form.resource', () => {
     updateVisitAttribute: jest.fn(),
     deleteVisitAttribute: jest.fn(),
   };
+});
+
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
 });
 
 mockSaveVisit.mockResolvedValue({
