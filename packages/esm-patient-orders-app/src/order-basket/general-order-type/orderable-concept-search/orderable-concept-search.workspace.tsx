@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -43,14 +43,23 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  setTitle,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const { patientUuid } = usePatientChartStore();
   const { orderTypes } = useConfig<ConfigObject>();
-
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  const { orderType } = useOrderType(orderTypeUuid);
+
+  useEffect(() => {
+    if (orderType) {
+      setTitle(
+        t('addTestOrderTitle', 'Add {{orderTypeName}}', { orderTypeName: orderType.display.toLocaleLowerCase() }),
+      );
+    }
+  }, [orderType, setTitle, t]);
 
   const orderableConceptSets = useMemo(
     () => orderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets,
