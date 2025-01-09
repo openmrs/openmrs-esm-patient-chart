@@ -24,7 +24,6 @@ import patientChartPageComponent from './root.component';
 import patientDetailsTileComponent from './patient-details-tile/patient-details-tile.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
-import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
 
@@ -159,8 +158,8 @@ export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
   moduleName,
 });
 
-// t('startAVisit', 'Start a visit')
-export const startVisitForm = getSyncLifecycle(startVisitFormComponent, {
+// t('startVisitWorkspaceTitle', 'Start a visit')
+export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit-form/visit-form.workspace'), {
   featureName: 'start-visit-form',
   moduleName,
 });

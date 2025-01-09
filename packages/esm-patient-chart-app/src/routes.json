@@ -127,16 +127,6 @@
       }
     },
     {
-      "name": "start-visit-workspace-form",
-      "slot": "start-visit-workspace-form-slot",
-      "component": "startVisitForm",
-      "meta": {
-        "title": "startAVisit"
-      },
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
@@ -248,6 +238,12 @@
       "component": "markPatientDeceasedForm",
       "title": "Mark patient deceased",
       "type": "form"
+    },
+    {
+      "name": "start-visit-workspace-form",
+      "component": "startVisitWorkspace",
+      "title": "startVisitWorkspaceTitle",
+      "type": "start-visit"
     }
   ]
 }
