@@ -1,4 +1,5 @@
 import {
+  type FetchResponse,
   getDefaultsFromConfigSchema,
   saveVisit,
   showSnackbar,
@@ -7,7 +8,6 @@ import {
   useLocations,
   usePatient,
   useVisitTypes,
-  type FetchResponse,
   type Visit,
 } from '@openmrs/esm-framework';
 import { render, screen } from '@testing-library/react';
@@ -16,10 +16,10 @@ import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks_
 import dayjs from 'dayjs';
 import React from 'react';
 import { mockPatient } from 'tools';
-import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
+import { type ChartConfig, esmPatientChartSchema } from '../../config-schema';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
-import StartVisitForm from './visit-form.component';
+import StartVisitForm from './visit-form.workspace';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
