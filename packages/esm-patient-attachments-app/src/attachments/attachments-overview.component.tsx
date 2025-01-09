@@ -8,14 +8,14 @@ import {
   deleteAttachmentPermanently,
   showModal,
   showSnackbar,
+  type Attachment,
+  type UploadedFile,
   useAttachments,
   useLayoutType,
   UserHasAccess,
-  type Attachment,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
-import { type FileAttachment } from '../camera-media-uploader/camera-media-uploader-types';
 import AttachmentPreview from './attachment-preview.component';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
@@ -98,7 +98,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
 
   const showAddAttachmentModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: FileAttachment) => {
+      saveFile: (file: UploadedFile) => {
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
           file.fileName = `${file.fileName}.png`;
         }

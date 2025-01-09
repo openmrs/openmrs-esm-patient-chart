@@ -108,7 +108,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     onSaveFile?.({
       ...uploadedFile,
       fileName: `${sanitizedFileName}${fileExtension}`,
-      fileDescription,
+      fileDescription: fileDescription ?? '',
     });
   };
 
