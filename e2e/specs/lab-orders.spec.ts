@@ -42,7 +42,7 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('Then I should see the lab order form launch in the workspace', async () => {
-      await expect(page.getByText(/add lab order/i)).toBeVisible();
+      await expect(page.getByText(/add test order/i)).toBeVisible();
     });
 
     await test.step('When I fill in the fields in the form for the Blood urea nitrogen test and submit the form', async () => {
