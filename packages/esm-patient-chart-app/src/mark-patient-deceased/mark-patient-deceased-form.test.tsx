@@ -24,14 +24,6 @@ jest.mock('../data.resource.ts', () => ({
   useCausesOfDeath: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => {
-  const actual = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...actual,
-    OpenmrsDatePicker: jest.fn(),
-  };
-});
-
 mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
   return (
     <>
