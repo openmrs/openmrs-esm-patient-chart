@@ -6,6 +6,7 @@
   "addOrderableConceptRequired": "Orderable concept is required",
   "addOrderPriorityRequired": "Priority is required",
   "addResults": "Add results",
+  "addTestOrderTitle": "Add {{orderTypeName}}",
   "allOrders": "All orders",
   "backToOrderBasket": "Back to order basket",
   "cancel": "Cancel",

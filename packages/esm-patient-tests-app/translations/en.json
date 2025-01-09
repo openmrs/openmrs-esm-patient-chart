@@ -5,6 +5,7 @@
   "addLabOrderLabReferenceRequired": "Test type is required",
   "addLabOrderLabTestTypeRequired": "Test type is required",
   "addLabOrderPriorityRequired": "Priority is required",
+  "addTestOrderTitle": "Add {{orderTypeName}}",
   "back": "Back",
   "backToOrderBasket": "Back to order basket",
   "backToTimeline": "Back to timeline",
