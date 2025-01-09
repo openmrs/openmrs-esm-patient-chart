@@ -159,7 +159,7 @@ export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
   moduleName,
 });
 
-// t('startVisit', 'Start visit')
+// t('startAVisit', 'Start a visit')
 export const startVisitForm = getSyncLifecycle(startVisitFormComponent, {
   featureName: 'start-visit-form',
   moduleName,

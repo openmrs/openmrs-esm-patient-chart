@@ -131,7 +131,7 @@
       "slot": "start-visit-workspace-form-slot",
       "component": "startVisitForm",
       "meta": {
-        "title": "startVisit"
+        "title": "startAVisit"
       },
       "online": true,
       "offline": true
