@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, showSnackbar, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
@@ -37,6 +37,34 @@ jest.mock('./conditions.resource', () => ({
   useConditionsSearch: jest.fn(),
 }));
 
+jest.mock('@openmrs/esm-framework', () => {
+  const actualFramework = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...actualFramework,
+    OpenmrsDatePicker: jest.fn(),
+  };
+});
+
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
+
 mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
 mockUseConditionsSearch.mockReturnValue({
   searchResults: [],
@@ -67,7 +95,6 @@ describe('Conditions form', () => {
     expect(cancelButton).toBeEnabled();
     expect(submitButton).toBeInTheDocument();
   });
-
   it('closes the form and the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
     renderConditionsForm();
