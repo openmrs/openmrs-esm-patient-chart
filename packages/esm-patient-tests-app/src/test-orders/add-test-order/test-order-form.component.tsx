@@ -108,7 +108,6 @@ export function LabOrderForm({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
-      accessionNumber: null,
       ...initialOrder,
     },
   });
@@ -256,11 +255,11 @@ export function LabOrderForm({
                         onChange={([date]) => onChange(date)}
                         onBlur={onBlur}
                         value={value}
+                        min={new Date()}
                       >
                         <DatePickerInput
                           labelText={t('scheduledDate', 'Scheduled date')}
                           placeholder="mm/dd/yyyy"
-                          min={new Date()}
                           invalid={!!errors?.scheduledDate?.message}
                           invalidText={errors?.scheduledDate?.message}
                         />

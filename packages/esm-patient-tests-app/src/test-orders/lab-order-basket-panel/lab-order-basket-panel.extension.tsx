@@ -9,7 +9,7 @@ import {
   ChevronUpIcon,
   useLayoutType,
   useConfig,
-  MaybePictogram,
+  MaybeIcon,
 } from '@openmrs/esm-framework';
 import {
   launchPatientWorkspace,
@@ -144,7 +144,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
     >
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
-          <MaybePictogram pictogram={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>

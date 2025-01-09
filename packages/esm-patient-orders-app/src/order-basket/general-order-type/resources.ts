@@ -52,6 +52,7 @@ export function prepOrderPostData(
       // orderReason: order.orderReason,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -66,6 +67,7 @@ export function prepOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -79,6 +81,7 @@ export function prepOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);

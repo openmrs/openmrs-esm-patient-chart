@@ -6,7 +6,6 @@ import {
   launchPatientWorkspace,
   useOrderBasket,
   useOrderType,
-  priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import {
@@ -31,7 +30,7 @@ import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import styles from './general-order-form.scss';
 import type { ConfigObject } from '../../../config-schema';
-import { ordersEqual, prepOrderPostData } from '../resources';
+import { ordersEqual, prepOrderPostData, priorityOptions } from '../resources';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
@@ -215,6 +214,7 @@ export function OrderForm({
                       onChange={onChange}
                       size={responsiveSize}
                       labelText={t('priority', 'Priority')}
+                      value={value}
                     >
                       {priorityOptions.map((option) => (
                         <SelectItem key={option.value} text={option.label} value={option.value} />
