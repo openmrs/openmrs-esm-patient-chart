@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody, InlineNotification } from '@carbon/react';
+import { InlineNotification, ModalBody, ModalHeader, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { type FetchResponse, type UploadedFile } from '@openmrs/esm-framework';
 import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraComponent from './camera.component';
@@ -33,10 +33,10 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   saveFile,
   title,
 }) => {
+  const { allowedFileExtensions } = useAllowedFileExtensions();
   const [error, setError] = useState<Error>(null);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
   const [uploadFilesToServer, setUploadFilesToServer] = useState(false);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
 
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
@@ -46,6 +46,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
         fileType: 'image',
         fileDescription: '',
         status: 'uploading',
+        capturedFromWebcam: true,
       },
     ]);
   }, []);
@@ -100,10 +101,9 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 
 const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) => {
   const { t } = useTranslation();
-  const [view, setView] = useState('upload');
-
   const { cameraOnly, closeModal, error } = useContext(CameraMediaUploaderContext);
   const mediaStream = useRef<MediaStream | undefined>();
+  const [view, setView] = useState('upload');
 
   const stopCameraStream = useCallback(() => {
     mediaStream.current?.getTracks().forEach((t) => t.stop());
