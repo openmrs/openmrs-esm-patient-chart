@@ -2,6 +2,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .editStatusBtn {
+  white-space: nowrap;
   margin-left: layout.$spacing-04;
   border: none;
 }
