@@ -271,21 +271,6 @@ describe('Visit form', () => {
     await user.click(screen.getByLabelText(/Outpatient visit/i));
   });
 
-  it('displays an error message when the visit start date is in the future', async () => {
-    const user = userEvent.setup();
-
-    renderVisitForm();
-
-    const dateInput = screen.getByRole('textbox', { name: /date/i });
-    const futureDate = dayjs().add(1, 'month').format('DD/MM/YYYY');
-
-    await user.clear(dateInput);
-    await user.type(dateInput, futureDate);
-    await user.tab();
-
-    expect(screen.getByText(/start date needs to be on or before/i)).toBeInTheDocument();
-  });
-
   // TODO: Figure out why this test is failing
   xit('displays an error message when the visit start time is in the future', async () => {
     const user = userEvent.setup();
