@@ -94,8 +94,6 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                     <TimePickerSelect
                       aria-label={t('timeFormat ', 'Time Format')}
                       id={`${timeFormatFieldName}Input`}
-                      invalid={Boolean(errors[timeFormatFieldName])}
-                      invalidText={errors[timeFormatFieldName]?.message}
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value}
                     >

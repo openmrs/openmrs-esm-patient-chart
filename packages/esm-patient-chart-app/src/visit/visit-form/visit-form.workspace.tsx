@@ -253,13 +253,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
+    const now = Date.now();
+
     if (!visitToEdit?.encounters?.length) {
-      return [null, null];
+      return [now, null];
     }
 
     const allEncounterDatetimes = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
       Date.parse(encounterDatetime),
     );
+
     const maxVisitStartDatetime = Math.min(...allEncounterDatetimes);
     const minVisitStopDatetime = Math.max(...allEncounterDatetimes);
     return [maxVisitStartDatetime, minVisitStopDatetime];
