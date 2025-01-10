@@ -436,6 +436,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStartDate).date(),
               hours,
               minutes,
+              dayjs(visitStartDate).second(),
+              dayjs(visitStartDate).millisecond(),
             ),
           ),
         ),
@@ -459,6 +461,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStopDate).date(),
               visitStopHours,
               visitStopMinutes,
+              dayjs(visitStopDate).second(),
+              dayjs(visitStopDate).millisecond(),
             ),
           ),
         );
