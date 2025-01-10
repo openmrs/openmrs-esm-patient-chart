@@ -257,11 +257,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       return [null, null];
     }
 
-    const allEncountersDateTime = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
+    const allEncounterDatetimes = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
       Date.parse(encounterDatetime),
     );
-    const maxVisitStartDatetime = Math.min(...allEncountersDateTime);
-    const minVisitStopDatetime = Math.max(...allEncountersDateTime);
+    const maxVisitStartDatetime = Math.min(...allEncounterDatetimes);
+    const minVisitStopDatetime = Math.max(...allEncounterDatetimes);
     return [maxVisitStartDatetime, minVisitStopDatetime];
   }, [visitToEdit]);
 
