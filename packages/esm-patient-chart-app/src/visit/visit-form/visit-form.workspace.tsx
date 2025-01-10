@@ -53,6 +53,7 @@ import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
@@ -62,7 +63,6 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
@@ -76,7 +76,6 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
    * affect how / if they should be rendered.
    */
   openedFrom: string;
-
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
@@ -116,9 +115,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     blockSavingForm: boolean;
   }>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
-  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
-
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
+  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
   const displayVisitStopDateTimeFields = useMemo(
     () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
@@ -193,7 +191,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       .refine((data) => validateStartTime(data), {
         message: t('futureStartTime', 'Visit start time cannot be in the future'),
         path: ['visitStartTime'],
-      });
+      })
+      .refine((data) => !(displayVisitStopDateTimeFields && data.visitStopDate && !data.visitStopTime), {
+        message: t('visitStopTimeRequired', 'Visit stop time is required'),
+        path: ['visitStopTime'],
+      })
+      .refine(
+        (data) =>
+          !(displayVisitStopDateTimeFields && data.visitStopDate && data.visitStopTime && !data.visitStopTimeFormat),
+        {
+          message: t('visitStopTimeFormatRequired', 'Visit stop time format is required'),
+          path: ['visitStopTimeFormat'],
+        },
+      );
   }, [config.visitAttributeTypes, visitToEdit?.stopDatetime, t, displayVisitStopDateTimeFields]);
 
   const defaultValues = useMemo(() => {
@@ -203,7 +213,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     let defaultValues: Partial<VisitFormData> = {
       visitStartDate,
       visitStartTime: dayjs(visitStartDate).format('hh:mm'),
-      visitStartTimeFormat: visitStartDate.getHours() >= 12 ? 'PM' : 'AM',
+      visitStartTimeFormat: new Date(visitStartDate).getHours() >= 12 ? 'PM' : 'AM',
       visitType: visitToEdit?.visitType?.uuid ?? emrConfiguration?.atFacilityVisitType?.uuid,
       visitLocation: visitToEdit?.location ?? defaultVisitLocation ?? {},
       visitAttributes:
@@ -659,17 +669,19 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             )}
 
             {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
-            <section>
-              <div className={styles.sectionTitle}></div>
-              <div className={styles.sectionField}>
-                <VisitFormExtensionSlot
-                  name="visit-form-top-slot"
-                  patientUuid={patientUuid}
-                  visitFormOpenedFrom={openedFrom}
-                  setVisitFormCallbacks={setVisitFormCallbacks}
-                />
-              </div>
-            </section>
+            {config.showUpcomingAppointments && (
+              <section>
+                <div className={styles.sectionTitle}></div>
+                <div className={styles.sectionField}>
+                  <VisitFormExtensionSlot
+                    name="visit-form-top-slot"
+                    patientUuid={patientUuid}
+                    visitFormOpenedFrom={openedFrom}
+                    setVisitFormCallbacks={setVisitFormCallbacks}
+                  />
+                </div>
+              </section>
+            )}
 
             {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
             <LocationSelector control={control} />
@@ -739,22 +751,22 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     <BaseVisitType visitTypes={allVisitTypes} />
                   )}
                 </div>
-              </section>
-            )}
 
-            {errors?.visitType && (
-              <section>
-                <div className={styles.sectionTitle}></div>
-                <div className={styles.sectionField}>
-                  <InlineNotification
-                    role="alert"
-                    style={{ margin: '0', minWidth: '100%' }}
-                    kind="error"
-                    lowContrast={true}
-                    title={t('missingVisitType', 'Missing visit type')}
-                    subtitle={t('selectVisitType', 'Please select a Visit Type')}
-                  />
-                </div>
+                {errors?.visitType && (
+                  <section>
+                    <div className={styles.sectionTitle}></div>
+                    <div className={styles.sectionField}>
+                      <InlineNotification
+                        role="alert"
+                        style={{ margin: '0', minWidth: '100%' }}
+                        kind="error"
+                        lowContrast={true}
+                        title={t('missingVisitType', 'Missing visit type')}
+                        subtitle={t('selectVisitType', 'Please select a Visit Type')}
+                      />
+                    </div>
+                  </section>
+                )}
               </section>
             )}
 

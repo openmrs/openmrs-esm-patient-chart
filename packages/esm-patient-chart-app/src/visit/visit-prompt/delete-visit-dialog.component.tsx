@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Visit, formatDatetime } from '@openmrs/esm-framework';
-import styles from './start-visit-dialog.scss';
+import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
+import { type Visit } from '@openmrs/esm-framework';
 import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
+import styles from './start-visit-dialog.scss';
 
 interface DeleteVisitDialogProps {
   closeModal: () => void;
@@ -19,26 +19,18 @@ const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patie
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('visit', 'Visit')}
-        title={t('deleteVisitDialogHeader', 'Are you sure you want to delete this visit?')}
+        label={t('deletePastVisit', 'Delete past visit')}
+        title={t('deletePastVisitDialogHeader', 'Are you sure you want to delete this past visit?')}
       />
       <ModalBody>
         <p className={styles.body}>
           {t(
-            'confirmDeletingVisitTextWithStartAndEndDate',
-            'Are you sure you want to delete {{visit}} which started {{visitStartDate}} and ended {{visitEndDate}}?',
+            'confirmDeletePastVisitText',
+            'Clicking confirm will delete this {{visit}} and all of its associated encounters.',
             {
               visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-              visitStartDate: formatDatetime(new Date(visit?.startDatetime), {
-                mode: 'standard',
-              }),
-              visitEndDate: formatDatetime(new Date(visit?.stopDatetime), {
-                mode: 'standard',
-              }),
             },
           )}
-          <br />
-          {t('deletingVisitWillDeleteEncounters', 'Deleting this visit will delete all associated encounters.')}
         </p>
       </ModalBody>
       <ModalFooter>
