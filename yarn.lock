@@ -5891,6 +5891,8 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
+    linkify-react: "npm:^4.2.0"
+    linkifyjs: "npm:^4.2.0"
     lodash-es: "npm:^4.17.21"
     react-grid-gallery: "npm:^0.5.6"
     react-html5-camera-photo: "npm:^1.5.11"
@@ -19215,6 +19217,23 @@ __metadata:
   version: 2.0.3
   resolution: "lines-and-columns@npm:2.0.3"
   checksum: 10/b5bb0d6ee2f82ae834ceddc9251af2060c30db476673e9c817c34c00bed58e0c5d90a6866b64afe7bdcb2c5eb1b418a5b1ee631d2592dc8ff381540901fa4da6
+  languageName: node
+  linkType: hard
+
+"linkify-react@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "linkify-react@npm:4.2.0"
+  peerDependencies:
+    linkifyjs: ^4.0.0
+    react: ">= 15.0.0"
+  checksum: 10/d2e73abaf9ac2eff84f1dfd1bd0546748fa22225d80a40e76610ecfbe49097cc473118bf012c7b20df4966ed2f30c3eccfeb360c396f1c6b1e27906f92f00fbd
+  languageName: node
+  linkType: hard
+
+"linkifyjs@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "linkifyjs@npm:4.2.0"
+  checksum: 10/fdd72a2615d6ef288f7036937fb38c933368dd8732d3665e2e44ce855b3e3b42ba9f67a28c622172155b47264cb8b41681bfb93a1e74eee7b29bbe4f04087696
   languageName: node
   linkType: hard
 
