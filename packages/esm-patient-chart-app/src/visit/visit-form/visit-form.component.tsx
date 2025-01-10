@@ -145,8 +145,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     // Validates that the start time is not in the future
     const validateStartTime = (data: z.infer<typeof visitFormSchema>) => {
       const [visitStartHours, visitStartMinutes] = convertTime12to24(data.visitStartTime, data.visitStartTimeFormat);
-      const visitStartDatetime = new Date(data.visitStartDate).setHours(visitStartHours, visitStartMinutes);
-      return new Date(visitStartDatetime) <= new Date();
+      const visitStartDatetime = new Date(data.visitStartDate);
+      visitStartDatetime.setHours(visitStartHours, visitStartMinutes, 0, 0);
+      return visitStartDatetime <= new Date();
     };
 
     const hadPreviousStopDateTime = Boolean(visitToEdit?.stopDatetime);
