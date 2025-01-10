@@ -41,6 +41,12 @@ export const configSchema = {
       },
     },
   },
+  showReferenceNumberField: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether to display the Reference number field in the Order form. This field maps to the accesion_number property in the Order data model',
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -54,4 +60,5 @@ export interface ConfigObject {
   orderEncounterType: string;
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
+  showReferenceNumberField: boolean;
 }
