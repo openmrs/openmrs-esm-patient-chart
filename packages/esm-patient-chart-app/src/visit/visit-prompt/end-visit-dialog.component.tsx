@@ -16,29 +16,13 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
-  const calculateStopDatetime = (): Date => {
-    const MinVisitdurMs = 1000;
-
-    if (!currentVisit?.startDatetime) {
-      throw new Error('Invalid visit: missing start datetime');
-    }
-
-    const startTime = new Date(currentVisit.startDatetime);
-    let stopTime = new Date();
-
-    if (stopTime.getTime() <= startTime.getTime()) {
-      stopTime = new Date(startTime.getTime() + MinVisitdurMs);
-    }
-    return stopTime;
-  };
-
   const handleEndVisit = () => {
     if (currentVisitIsRetrospective) {
       setCurrentVisit(null, null);
       closeModal();
     } else {
       const endVisitPayload = {
-        stopDatetime: calculateStopDatetime(),
+        stopDatetime: new Date(),
       };
 
       const abortController = new AbortController();
