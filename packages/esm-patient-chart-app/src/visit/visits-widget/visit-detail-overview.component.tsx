@@ -80,7 +80,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                 ))}
               </>
             ) : (
-              <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
+              <div className={styles.emptyStateContainer}>
+                <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
+              </div>
             )}
           </TabPanel>
           {showAllEncountersTab && (
@@ -97,7 +99,12 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                   patientUuid={patientUuid}
                 />
               ) : (
-                <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
+                <div className={styles.emptyStateContainer}>
+                  <EmptyState
+                    displayText={t('encounters__lower', 'encounters')}
+                    headerTitle={t('encounters', 'Encounters')}
+                  />
+                </div>
               )}
             </TabPanel>
           )}

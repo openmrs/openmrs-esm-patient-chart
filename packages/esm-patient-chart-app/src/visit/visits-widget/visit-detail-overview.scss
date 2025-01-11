@@ -105,9 +105,9 @@
   }
 }
 
-.encounterEmptyState {
+.emptyStateContainer {
   text-align: center;
-  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
+  margin: layout.$spacing-05 0;
 }
 
 .observation {
