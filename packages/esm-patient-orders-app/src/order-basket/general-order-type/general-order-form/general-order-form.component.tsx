@@ -1,14 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import {
-  type OrderBasketItem,
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-  priorityOptions,
-} from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, ExtensionSlot } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   ButtonSet,
@@ -21,11 +16,15 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
+import {
+  launchPatientWorkspace,
+  priorityOptions,
+  type DefaultPatientWorkspaceProps,
+  type OrderBasketItem,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, useSession, ExtensionSlot } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import styles from './general-order-form.scss';
 
@@ -59,22 +58,18 @@ export function OrderForm({
       z.object({
         instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+          message: t('priorityRequired', 'Priority is required'),
         }),
         accessionNumber: z.string().nullish(),
         concept: z.object(
           { display: z.string(), uuid: z.string() },
           {
-            required_error: translateFrom(moduleName, 'addOrderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: translateFrom(
-              moduleName,
-              'addOrderableConceptRequired',
-              'Orderable concept is required',
-            ),
+            required_error: t('orderableConceptRequired', 'Orderable concept is required'),
+            invalid_type_error: t('orderableConceptRequired', 'Orderable concept is required'),
           },
         ),
       }),
-    [],
+    [t],
   );
 
   const {
