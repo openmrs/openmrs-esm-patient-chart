@@ -660,7 +660,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               <div className={styles.sectionTitle}></div>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
-                  name="visit-form-top-slot"
+                  name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
                   visitFormCallbacksRef={visitFormCallbacksRef}
