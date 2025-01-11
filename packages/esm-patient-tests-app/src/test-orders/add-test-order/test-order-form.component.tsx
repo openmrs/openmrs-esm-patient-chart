@@ -27,8 +27,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
+import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
-import type { TestOrderBasketItem } from '../../types';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;

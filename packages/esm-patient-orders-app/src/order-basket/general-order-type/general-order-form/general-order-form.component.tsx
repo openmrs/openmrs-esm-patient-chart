@@ -8,7 +8,7 @@ import {
   useOrderType,
   priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { translateFrom, useLayoutType, useSession, ExtensionSlot } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
@@ -26,9 +26,8 @@ import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
-import styles from './general-order-form.scss';
-import type { ConfigObject } from '../../../config-schema';
 import { ordersEqual, prepOrderPostData } from '../resources';
+import styles from './general-order-form.scss';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
