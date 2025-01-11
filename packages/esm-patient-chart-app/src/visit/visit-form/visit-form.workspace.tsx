@@ -671,7 +671,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
             {config.showUpcomingAppointments && (
               <section>
-                <div className={styles.sectionTitle}></div>
+                <h1 className={styles.sectionTitle}></h1>
                 <div className={styles.sectionField}>
                   <VisitFormExtensionSlot
                     name="visit-form-top-slot"
@@ -690,7 +690,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           to true. */}
             {config.showRecommendedVisitTypeTab && (
               <section>
-                <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
+                <h1 className={styles.sectionTitle}>{t('program', 'Program')}</h1>
                 <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles.sectionField}>
                   <Controller
                     name="programType"
@@ -722,7 +722,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             {/* Lists available visit types if no atFacilityVisitType enabled. The content switcher only gets shown when recommended visit types are enabled */}
             {!emrConfiguration?.atFacilityVisitType && (
               <section>
-                <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
+                <h1 className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</h1>
                 <div className={styles.sectionField}>
                   {config.showRecommendedVisitTypeTab ? (
                     <>
@@ -754,7 +754,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
                 {errors?.visitType && (
                   <section>
-                    <div className={styles.sectionTitle}></div>
+                    <h1 className={styles.sectionTitle}></h1>
                     <div className={styles.sectionField}>
                       <InlineNotification
                         role="alert"
@@ -774,7 +774,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
-              <div className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</div>
+              <h1 className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</h1>
               <div className={styles.sectionField}>
                 <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
               </div>
@@ -783,7 +783,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
                 or when the form is opened from the queues app */}
             <section>
-              <div className={styles.sectionTitle}></div>
+              <h1 className={styles.sectionTitle}></h1>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
                   name="visit-form-bottom-slot"

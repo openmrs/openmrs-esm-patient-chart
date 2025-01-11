@@ -42,7 +42,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
 
   return (
     <section>
-      <div className={styles.sectionTitle}>{visitDatetimeLabel}</div>
+      <h1 className={styles.sectionTitle}>{visitDatetimeLabel}</h1>
       <div className={classNames(styles.dateTimeSection, styles.sectionField)}>
         <Controller
           name={dateFieldName}
@@ -85,7 +85,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                   labelText={t('time', 'Time')}
                   onBlur={onBlur}
                   onChange={(event) => onChange(event.target.value as amPm)}
-                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                  pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
                   value={value}
                 >
                   <Controller
