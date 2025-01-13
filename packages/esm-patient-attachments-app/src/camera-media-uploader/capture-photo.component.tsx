@@ -55,7 +55,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
       <div className={styles.editButtonContainer}>
         <Button
           className={styles.editButton}
-          kind="ghost"
+          kind="secondary"
           onClick={showCam}
           renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon {...props} />}
           size={responsiveSize}
