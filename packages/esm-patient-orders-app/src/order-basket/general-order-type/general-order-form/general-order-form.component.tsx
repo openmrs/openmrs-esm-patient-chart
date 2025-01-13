@@ -24,9 +24,10 @@ import {
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession, ExtensionSlot } from '@openmrs/esm-framework';
+import { useLayoutType, useSession, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import styles from './general-order-form.scss';
+import { type ConfigObject } from '../../../config-schema';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
