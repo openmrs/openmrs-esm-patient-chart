@@ -1,3 +1,4 @@
+export * from './encounter';
 export * from './test-results';
 
 export interface DashboardLinkConfig {

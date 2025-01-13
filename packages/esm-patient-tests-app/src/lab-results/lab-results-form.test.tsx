@@ -5,22 +5,22 @@ import {
   useOrderConceptByUuid,
   useLabEncounter,
   useObservation,
+  type Encounter,
   type LabOrderConcept,
+  type Order,
   updateOrderResult,
   type Datatype,
   useCompletedLabResults,
-} from './lab-results.resource';
+} from '@openmrs/esm-patient-common-lib';
 import LabResultsForm from './lab-results-form.component';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import { type Encounter } from '../types/encounter';
 
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 const mockUseCompletedLabResults = jest.mocked(useCompletedLabResults);
 
-jest.mock('./lab-results.resource', () => ({
-  ...jest.requireActual('./lab-results.resource'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderConceptByUuid: jest.fn(),
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),
@@ -393,7 +393,7 @@ describe('LabResultsForm', () => {
         careSetting: 'care-setting-uuid',
         concept: 'concept-uuid',
         encounter: 'encounter-uuid',
-        orderer: mockOrder.orderer,
+        orderer: { uuid: mockOrder.orderer.uuid },
         patient: 'patient-uuid',
         previousOrder: 'order-uuid',
         type: 'testorder',

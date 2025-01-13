@@ -1,7 +1,6 @@
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +13,14 @@ import {
   isNumeric,
   isPanel,
   isText,
+  type DefaultPatientWorkspaceProps,
+  type Order,
+  type OrderAction,
   updateObservation,
   updateOrderResult,
   useCompletedLabResults,
   useOrderConceptByUuid,
-} from './lab-results.resource';
+} from '@openmrs/esm-patient-common-lib';
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
@@ -155,12 +157,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
-      action: 'DISCONTINUE',
+      action: 'DISCONTINUE' as OrderAction,
       careSetting: order.careSetting.uuid,
       encounter: order.encounter.uuid,
       patient: order.patient.uuid,
       concept: order.concept.uuid,
-      orderer: order.orderer,
+      orderer: { uuid: order.orderer.uuid },
     };
     const resultsStatusPayload = {
       fulfillerStatus: 'COMPLETED',
