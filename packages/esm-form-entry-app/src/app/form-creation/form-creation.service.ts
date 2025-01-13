@@ -85,6 +85,8 @@ export class FormCreationService {
 
     if (patientIdentifiers) {
       this.patientIdentifierAdapter.populateForm(form, patientIdentifiers);
+      // set the patient identifiers in the form valueProcessingInfo
+      form.valueProcessingInfo.patientIdentifiers = patientIdentifiers;
     }
     if (encounter) {
       const encounterUuid = encounter.uuid;
