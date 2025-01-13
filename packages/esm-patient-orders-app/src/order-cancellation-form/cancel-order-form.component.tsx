@@ -112,10 +112,10 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
                 <div className={styles.row}>
                   <OpenmrsDatePicker
                     id="cancellationDate"
-                    minDate={dayjs().startOf('day').toDate()}
+                    minDate={dayjs().startOf('day')}
                     value={value}
                     onChange={(date) => onChange(date)}
-                    label={t('cancellationDate', 'Cancellation date')}
+                    labelText={t('cancellationDate', 'Cancellation date')}
                     invalid={!!errors['cancellationDate']}
                     invalidText={errors['cancellationDate']?.message}
                   />
