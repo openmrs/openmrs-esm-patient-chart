@@ -144,7 +144,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                       id="deceasedDate"
                       isInvalid={!!errors?.deathDate}
                       invalidText={errors?.deathDate?.message}
-                      labelText={t('dateOfDeath', 'Date of death')}
+                      labelText={t('date', 'Date')}
                       maxDate={new Date().toISOString()}
                       onChange={(date) => onChange(date)}
                       value={value}

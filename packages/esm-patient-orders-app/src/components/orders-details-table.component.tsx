@@ -360,21 +360,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         <OpenmrsDatePicker
           id="startDatePickerInput"
           data-testid="startDatePickerInput"
-          labelText="Start Date"
+          labelText=""
           value={''}
           onChange={(date: Date) => {
             handleDateFilterChange([date, date]);
           }}
         />
 
-        <OpenmrsDatePicker
-          id="endDatePickerInput"
-          data-testid="endDatePickerInput"
-          labelText="End Date"
-          onChange={(date: Date) => {
-            handleDateFilterChange([date, date]);
-          }}
-        />
+        <OpenmrsDatePicker id="endDatePickerInput" data-testid="endDatePickerInput" labelText="" />
       </div>
 
       {(() => {
