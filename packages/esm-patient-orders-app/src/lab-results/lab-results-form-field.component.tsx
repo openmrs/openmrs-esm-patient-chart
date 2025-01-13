@@ -3,12 +3,13 @@ import { NumberInput, Select, SelectItem, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller, type FieldErrors } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
+import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
-  control: Control<any, any>;
-  defaultValue: any;
+  control: Control<Record<string, unknown>>;
+  defaultValue: Observation;
   errors: FieldErrors;
 }
 
@@ -20,7 +21,9 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
   // - Gender-specific ranges where applicable
   const formatLabRange = (concept: LabOrderConcept) => {
     const hl7Abbreviation = concept?.datatype?.hl7Abbreviation;
-    if (hl7Abbreviation !== 'NM') return '';
+    if (hl7Abbreviation !== 'NM') {
+      return '';
+    }
 
     const { hiAbsolute, lowAbsolute, units } = concept;
     const displayUnit = units ? ` ${units}` : '';
