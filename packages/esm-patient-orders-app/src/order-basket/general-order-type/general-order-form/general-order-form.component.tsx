@@ -1,14 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import {
-  type OrderBasketItem,
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-  priorityOptions,
-} from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   ButtonSet,
@@ -21,14 +16,18 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
-import styles from './general-order-form.scss';
-import type { ConfigObject } from '../../../config-schema';
+import {
+  launchPatientWorkspace,
+  priorityOptions,
+  type DefaultPatientWorkspaceProps,
+  type OrderBasketItem,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, useSession, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
+import styles from './general-order-form.scss';
+import { type ConfigObject } from '../../../config-schema';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
@@ -54,28 +53,25 @@ export function OrderForm({
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const { orderType } = useOrderType(orderTypeUuid);
+  const config = useConfig<ConfigObject>();
 
   const OrderFormSchema = useMemo(
     () =>
       z.object({
-        instructions: z.string().optional(),
+        instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+          message: t('priorityRequired', 'Priority is required'),
         }),
-        accessionNumber: z.string().optional(),
+        accessionNumber: z.string().nullish(),
         concept: z.object(
           { display: z.string(), uuid: z.string() },
           {
-            required_error: translateFrom(moduleName, 'addOrderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: translateFrom(
-              moduleName,
-              'addOrderableConceptRequired',
-              'Orderable concept is required',
-            ),
+            required_error: t('orderableConceptRequired', 'Orderable concept is required'),
+            invalid_type_error: t('orderableConceptRequired', 'Orderable concept is required'),
           },
         ),
       }),
-    [],
+    [t],
   );
 
   const {
@@ -156,31 +152,33 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="accessionNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      invalid={!!errors.accessionNumber}
-                      invalidText={errors.accessionNumber?.message}
-                      labelText={t('referenceNumber', 'Reference number', {
-                        orderType: orderType?.display,
-                      })}
-                      maxLength={150}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      size={responsiveSize}
-                      value={value}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
+          {config.showReferenceNumberField && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="accessionNumber"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        id="labReferenceNumberInput"
+                        invalid={!!errors.accessionNumber}
+                        invalidText={errors.accessionNumber?.message}
+                        labelText={t('referenceNumber', 'Reference number', {
+                          orderType: orderType?.display,
+                        })}
+                        maxLength={150}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        size={responsiveSize}
+                        value={value}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>

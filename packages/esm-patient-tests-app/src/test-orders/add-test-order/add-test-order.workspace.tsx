@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,7 @@ import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   launchPatientWorkspace,
+  useOrderType,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderForm } from './test-order-form.component';
@@ -39,6 +40,7 @@ export default function AddLabOrderWorkspace({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  setTitle,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -46,6 +48,17 @@ export default function AddLabOrderWorkspace({
   const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
+  const { orderType } = useOrderType(orderTypeUuid);
+
+  useEffect(() => {
+    if (orderType) {
+      setTitle(
+        t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
+          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+        }),
+      );
+    }
+  }, [orderType, t, setTitle]);
 
   const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
