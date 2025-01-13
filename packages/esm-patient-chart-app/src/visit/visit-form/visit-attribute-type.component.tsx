@@ -205,6 +205,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
           <OpenmrsDatePicker
             {...fieldProps}
             onChange={(date) => onChange(dayjs(date).format('YYYY-MM-DD'))}
+            id="date-picker-default-id"
             labelText={labelText}
             invalid={!!errors.visitAttributes?.[uuid]}
             invalidText={errors.visitAttributes?.[uuid]?.message}
