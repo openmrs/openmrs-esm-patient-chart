@@ -234,9 +234,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       value={value}
                       onChange={(date) => onChange(date)}
                       style={{ paddingBottom: '1rem', width: '100%' }}
+                      labelText={t('vaccinationDate', 'Vaccination date')}
                       invalid={!!errors['vaccinationDate']}
                       invalidText={errors['vaccinationDate']?.message}
-                      labelText={t('vaccinationDate', 'Vaccination date')}
                     />
                   )}
                 />

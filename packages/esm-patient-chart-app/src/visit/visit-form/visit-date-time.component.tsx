@@ -51,7 +51,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             <ResponsiveWrapper>
               <OpenmrsDatePicker
                 className={styles.datePicker}
-                id={dateFieldName}
+                id={`${dateFieldName}Input`}
                 maxDate={maxDateObj}
                 minDate={minDateObj}
                 onChange={onChange}

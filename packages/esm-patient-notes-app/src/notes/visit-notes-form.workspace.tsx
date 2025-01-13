@@ -458,6 +458,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                     maxDate={new Date().toISOString()}
                     value={value}
                     onChange={(date) => onChange(date)}
+                    id="visitDateTimePicker"
                     labelText={t('visitDate', 'Visit date')}
                   />
                 </ResponsiveWrapper>
