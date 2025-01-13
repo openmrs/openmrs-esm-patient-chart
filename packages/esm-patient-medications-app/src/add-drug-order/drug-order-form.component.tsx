@@ -612,6 +612,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                           onChange={(newStartDate) => onChange(newStartDate)}
                           onBlur={onBlur}
                           ref={ref}
+                          id="startDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'lg' : 'sm'}
                         />
                       )}
                     />

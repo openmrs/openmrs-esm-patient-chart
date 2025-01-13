@@ -126,6 +126,7 @@ function PrintModal({
               onChange={setSelectedFromDate}
               value={selectedFromDate}
               labelText={t('startDate', 'Start date')}
+              style={{ width: '100%' }}
             />
             <OpenmrsDatePicker
               className={styles.datePicker}
@@ -134,6 +135,7 @@ function PrintModal({
               onChange={setSelectedToDate}
               value={selectedToDate}
               labelText={t('endDate', 'End date')}
+              style={{ width: '100%' }}
             />
           </div>
         </ResponsiveWrapper>
