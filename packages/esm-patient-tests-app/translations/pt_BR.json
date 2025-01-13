@@ -2,6 +2,7 @@
   "add": "Adicionar",
   "additionalInstructions": "Instruções adicionais",
   "addLabOrderWorkspaceTitle": "Adicionar pedido de laboratório",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "back": "Voltar",
   "backToOrderBasket": "Voltar para a cesta de pedidos",
   "backToTimeline": "Voltar à linha do tempo",

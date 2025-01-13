@@ -3,6 +3,7 @@
   "activeVisitRequired": "É necessário ter uma visita ativa para fazer pedidos",
   "add": "Adicionar",
   "additionalInstructions": "Instruções adicionais",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "addResults": "Adicionar resultados",
   "allOrders": "Todos os pedidos",
   "backToOrderBasket": "Voltar ao carrinho de pedidos",

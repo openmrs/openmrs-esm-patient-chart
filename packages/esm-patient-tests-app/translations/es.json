@@ -2,6 +2,7 @@
   "add": "Agregar",
   "additionalInstructions": "Instrucciones adicionales",
   "addLabOrderWorkspaceTitle": "Agregar orden de laboratorio",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "back": "Atrás",
   "backToOrderBasket": "Regresar a la canasta de órdenes",
   "backToTimeline": "Regresar al calendario",
