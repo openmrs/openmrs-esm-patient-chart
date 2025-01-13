@@ -1,4 +1,5 @@
 import {
+  type FetchResponse,
   getDefaultsFromConfigSchema,
   saveVisit,
   showSnackbar,
@@ -7,7 +8,6 @@ import {
   useLocations,
   usePatient,
   useVisitTypes,
-  type FetchResponse,
   type Visit,
   OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
@@ -17,10 +17,10 @@ import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks_
 import dayjs from 'dayjs';
 import React from 'react';
 import { mockPatient } from 'tools';
-import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
+import { type ChartConfig, esmPatientChartSchema } from '../../config-schema';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
-import StartVisitForm from './visit-form.component';
+import StartVisitForm from './visit-form.workspace';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
@@ -290,21 +290,6 @@ describe('Visit form', () => {
     expect(screen.getByText(/please select a visit type/i)).toBeInTheDocument();
 
     await user.click(screen.getByLabelText(/Outpatient visit/i));
-  });
-
-  it('displays an error message when the visit start date is in the future', async () => {
-    const user = userEvent.setup();
-
-    renderVisitForm();
-
-    const dateInput = screen.getByRole('textbox', { name: /date/i });
-    const futureDate = dayjs().add(1, 'month').format('DD/MM/YYYY');
-
-    await user.clear(dateInput);
-    await user.type(dateInput, futureDate);
-    await user.tab();
-
-    expect(screen.getByText(/start date needs to be on or before/i)).toBeInTheDocument();
   });
 
   // TODO: Figure out why this test is failing

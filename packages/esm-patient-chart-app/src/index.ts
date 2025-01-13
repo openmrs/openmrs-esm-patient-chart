@@ -11,8 +11,8 @@ import { esmPatientChartSchema } from './config-schema';
 import genericDashboardComponent, { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import genericNavGroupComponent, { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 import { moduleName } from './constants';
-import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
-import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
+import { encountersDashboardMeta, summaryDashboardMeta } from './dashboard.meta';
 import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
 import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
@@ -24,7 +24,6 @@ import patientChartPageComponent from './root.component';
 import patientDetailsTileComponent from './patient-details-tile/patient-details-tile.component';
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
-import startVisitFormComponent from './visit/visit-form/visit-form.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
 
@@ -159,7 +158,8 @@ export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
   moduleName,
 });
 
-export const startVisitForm = getSyncLifecycle(startVisitFormComponent, {
+// t('startVisitWorkspaceTitle', 'Start a visit')
+export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit-form/visit-form.workspace'), {
   featureName: 'start-visit-form',
   moduleName,
 });
