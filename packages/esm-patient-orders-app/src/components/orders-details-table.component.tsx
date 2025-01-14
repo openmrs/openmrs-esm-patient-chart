@@ -74,7 +74,6 @@ interface OrderBasketItemActionsProps {
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
   responsiveSize: string;
-  setOrderItems: (orderType: string, items: Array<MutableOrderBasketItem>) => void;
 }
 
 interface OrderHeaderProps {
@@ -113,7 +112,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
-  const { setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   const [selectedFromDate, setSelectedFromDate] = useState(null);
@@ -514,7 +512,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                                 openOrderBasket={launchOrderBasket}
                                                 openOrderForm={() => openOrderForm(matchingOrder)}
                                                 orderItem={matchingOrder}
-                                                setOrderItems={setOrders}
                                                 responsiveSize={responsiveSize}
                                               />
                                             ) : (
@@ -602,14 +599,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
 
 function OrderBasketItemActions({
   orderItem,
-  setOrderItems,
   openOrderBasket,
   openOrderForm,
   responsiveSize,
 }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-  const { orders: items } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
-  const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
+  const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
   const handleModifyClick = useCallback(() => {
     if (orderItem.type === 'drugorder') {
@@ -617,7 +613,7 @@ function OrderBasketItemActions({
         .then((res) => {
           const medicationOrder = res.data;
           const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
-          setOrderItems(medicationsOrderBasket, [...items, medicationItem]);
+          setOrders([...orders, medicationItem]);
           openOrderForm({ order: medicationItem });
         })
         .catch((e) => {
@@ -625,14 +621,14 @@ function OrderBasketItemActions({
         });
     } else if (orderItem.type === 'testorder') {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
+      setOrders([...orders, labItem]);
       openOrderForm({ order: labItem });
     } else if (orderItem.type === 'order') {
       const order = buildGeneralOrder(orderItem, 'REVISE');
-      setOrderItems(orderItem.orderType.uuid, [...items, order]);
+      setOrders([...orders, order]);
       openOrderForm({ order });
     }
-  }, [orderItem, openOrderForm, items, setOrderItems]);
+  }, [orderItem, openOrderForm, orders, setOrders]);
 
   const handleAddResultsClick = useCallback(() => {
     launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
@@ -642,19 +638,19 @@ function OrderBasketItemActions({
     if (orderItem.type === 'drugorder') {
       getDrugOrderByUuid(orderItem.uuid).then((res) => {
         let medicationOrder = res.data;
-        setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
+        setOrders([...orders, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
     } else if (orderItem.type === 'testorder') {
       const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
-      setOrderItems(orderItem.orderType.uuid, [...items, labItem]);
+      setOrders([...orders, labItem]);
       openOrderBasket();
     } else {
       const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
-      setOrderItems(orderItem.orderType.uuid, [...items, order]);
+      setOrders([...orders, order]);
       openOrderBasket();
     }
-  }, [orderItem, setOrderItems, items, openOrderBasket]);
+  }, [orderItem, setOrders, orders, openOrderBasket]);
 
   return (
     <Layer className={styles.layer}>
