@@ -4,7 +4,7 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
 import { FilterContext, FilterProvider } from '../filter';
@@ -109,7 +109,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
-            <p>{t('view', 'View')}: </p>
+            <RefreshDataButton isTablet={isTablet} t={t} />
+            <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
             <ContentSwitcher
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
@@ -152,15 +153,15 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
 
   return (
     <div className={styles.resultsContainer}>
-      <div ref={headerRef} className={styles.headerSentinel} />
+      <div className={styles.headerSentinel} ref={headerRef} />
       <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
           <h4>{t('tests', 'Tests')}</h4>
           <Button
             className={styles.button}
             kind="ghost"
-            size={isTablet ? 'md' : 'sm'}
             onClick={resetTree} // TODO: Undo selections fix
+            size={isTablet ? 'md' : 'sm'}
           >
             <span>{t('reset', 'Reset')}</span>
           </Button>
@@ -170,16 +171,19 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
               totalResultsCount ? `(${totalResultsCount})` : ''
             }`}</h4>
-            <p className={styles.viewOptionsSubHeading}>{t('view', 'View')}: </p>
-            <ContentSwitcher
-              className={styles.viewOptionsSwitcher}
-              onChange={({ name }: { name: viewOpts }) => setView(name)}
-              selectedIndex={isExpanded ? 1 : 0}
-              size={responsiveSize}
-            >
-              <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
-              <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
-            </ContentSwitcher>
+            <div className={styles.buttonsContainer}>
+              <RefreshDataButton isTablet={isTablet} t={t} />
+              <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
+              <ContentSwitcher
+                className={styles.viewOptionsSwitcher}
+                onChange={({ name }: { name: viewOpts }) => setView(name)}
+                selectedIndex={isExpanded ? 1 : 0}
+                size={responsiveSize}
+              >
+                <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
+                <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
+              </ContentSwitcher>
+            </div>
           </div>
         </div>
       </div>
@@ -196,5 +200,19 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     </div>
   );
 };
+
+function RefreshDataButton({ isTablet, t }: RefreshDataButtonProps) {
+  return (
+    <Button
+      className={styles.button}
+      kind="ghost"
+      onClick={() => window.location.reload()}
+      renderIcon={RenewIcon}
+      size={isTablet ? 'md' : 'sm'}
+    >
+      <span>{t('refreshData', 'Refresh data')}</span>
+    </Button>
+  );
+}
 
 export default RoutedResultsViewer;
