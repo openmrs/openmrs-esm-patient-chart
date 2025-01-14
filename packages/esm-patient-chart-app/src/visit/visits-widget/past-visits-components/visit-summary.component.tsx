@@ -3,30 +3,29 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
 import {
-  type AssignedExtension,
   Extension,
   ExtensionSlot,
   formatTime,
   parseDate,
+  useAssignedExtensions,
   useConfig,
-  useConnectedExtensions,
   useLayoutType,
   type Visit,
 } from '@openmrs/esm-framework';
+import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import {
+  mapEncounters,
   type Diagnosis,
   type Encounter,
-  mapEncounters,
   type Note,
   type Observation,
   type Order,
   type OrderItem,
 } from '../visit.resource';
-import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import VisitsTable from './visits-table/visits-table.component';
 import styles from './visit-summary.scss';
 
 interface DiagnosisItem {
@@ -46,8 +45,8 @@ const visitSummaryPanelSlot = 'visit-summary-panels';
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
+  const extensions = useAssignedExtensions(visitSummaryPanelSlot);
   const layout = useLayoutType();
-  const extensions = useConnectedExtensions(visitSummaryPanelSlot) as AssignedExtension[];
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -57,9 +56,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     // Notes Tab
     const notes: Array<Note> = [];
 
-    // Iterating through every Encounter
     visit?.encounters?.forEach((enc: Encounter) => {
-      // Orders of every encounter put in a single array.
       if (enc.hasOwnProperty('orders')) {
         medications.push(
           ...enc.orders.map((order: Order) => ({
@@ -113,7 +110,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   }, [config.notesConceptUuids, visit?.encounters]);
 
   const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
-    const encounterIds = visit?.encounters.map((e) => `Encounter/${e.uuid}`);
+    const encounterIds = visit?.encounters?.map((e) => `Encounter/${e.uuid}`);
     return ([entry]) => {
       return encounterIds.includes(entry.encounter?.reference);
     };
