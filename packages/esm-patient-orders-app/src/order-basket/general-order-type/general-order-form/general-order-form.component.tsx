@@ -24,9 +24,10 @@ import {
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession, ExtensionSlot } from '@openmrs/esm-framework';
+import { useLayoutType, useSession, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import styles from './general-order-form.scss';
+import { type ConfigObject } from '../../../config-schema';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
@@ -52,6 +53,7 @@ export function OrderForm({
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const { orderType } = useOrderType(orderTypeUuid);
+  const config = useConfig<ConfigObject>();
 
   const OrderFormSchema = useMemo(
     () =>
@@ -150,31 +152,33 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="accessionNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      invalid={!!errors.accessionNumber}
-                      invalidText={errors.accessionNumber?.message}
-                      labelText={t('referenceNumber', 'Reference number', {
-                        orderType: orderType?.display,
-                      })}
-                      maxLength={150}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      size={responsiveSize}
-                      value={value}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
+          {config.showReferenceNumberField && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="accessionNumber"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        id="labReferenceNumberInput"
+                        invalid={!!errors.accessionNumber}
+                        invalidText={errors.accessionNumber?.message}
+                        labelText={t('referenceNumber', 'Reference number', {
+                          orderType: orderType?.display,
+                        })}
+                        maxLength={150}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        size={responsiveSize}
+                        value={value}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
