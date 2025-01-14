@@ -70,7 +70,6 @@ interface OrderDetailsProps {
 }
 
 interface OrderBasketItemActionsProps {
-  items: Array<MutableOrderBasketItem>;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
@@ -114,7 +113,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>();
+  const { setOrders } = useOrderBasket<MutableOrderBasketItem>();
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   const [selectedFromDate, setSelectedFromDate] = useState(null);
@@ -512,7 +511,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
                                           <TableCell className="cds--table-column-menu">
                                             {isOmrsOrder(matchingOrder) ? (
                                               <OrderBasketItemActions
-                                                items={orders}
                                                 openOrderBasket={launchOrderBasket}
                                                 openOrderForm={() => openOrderForm(matchingOrder)}
                                                 orderItem={matchingOrder}
@@ -604,13 +602,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
 
 function OrderBasketItemActions({
   orderItem,
-  items,
   setOrderItems,
   openOrderBasket,
   openOrderForm,
   responsiveSize,
 }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
+  const { orders: items } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
   const alreadyInBasket = items.some((x) => x.uuid === orderItem.uuid);
 
   const handleModifyClick = useCallback(() => {
