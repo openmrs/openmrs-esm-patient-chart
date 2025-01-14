@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
 import styles from './tile.scss';
@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { type EncounterTileColumn, type EncounterTileProps } from '../types';
 import { useLastEncounter } from '../hooks';
 
-export const EncounterTile = React.memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
+export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
   const columnsByEncounterType = useMemo(() => groupColumnsByEncounterType(columns), [columns]);
   const isTablet = useLayoutType() === 'tablet';
 
@@ -18,11 +18,11 @@ export const EncounterTile = React.memo(({ patientUuid, columns, headerTitle }: 
           <h4 className={styles.title}>{headerTitle}</h4>
         </div>
         <Column className={styles.columnContainer}>
-          {Object.entries(columnsByEncounterType).map(([encounterUuid, columns]) => (
+          {Object.entries(columnsByEncounterType).map(([encounterTypeUuid, columns]) => (
             <EncounterData
-              key={encounterUuid}
+              key={encounterTypeUuid}
               patientUuid={patientUuid}
-              encounterType={encounterUuid}
+              encounterType={encounterTypeUuid}
               columns={columns}
             />
           ))}

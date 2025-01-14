@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
 import { navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { EncounterListDataTable } from './table.component';
-import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../utils/encounter-list.resource';

@@ -1,6 +1,6 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { type Encounter } from '../types';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -9,17 +9,19 @@ const encounterRepresentation =
   'names:(uuid,conceptNameType,name,display))),form:(uuid,name))';
 
 export function useLastEncounter(patientUuid: string, encounterType: string) {
-  const query = `encounterType=${encounterType}&patient=${patientUuid}&limit=1&order=desc&startIndex=0`;
+  const query = `encounterType=${encounterType}&patient=${patientUuid}`;
   const endpointUrl =
-    patientUuid && encounterType ? `/ws/rest/v1/encounter?${query}&v=${encounterRepresentation}` : null;
+    patientUuid && encounterType
+      ? `/ws/rest/v1/encounter?${query}&v=${encounterRepresentation}&limit=1&order=desc&startIndex=0`
+      : null;
 
-  const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: { results: Array<Encounter> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Encounter> } }, Error>(
     endpointUrl,
     openmrsFetch,
   );
 
   return {
-    lastEncounter: data ? data?.data.results?.length > 0 && data?.data.results[0] : null,
+    lastEncounter: data?.data.results?.length > 0 ? data?.data.results[0] : null,
     error,
     isLoading,
     isValidating,

@@ -225,7 +225,7 @@ export interface FormattedColumn {
 export interface EncounterTileColumn {
   key: string;
   header: string;
-  encounterUuid: string;
+  encounterTypeUuid: string;
   concept: string;
   title?: string;
   getObsValue: (encounter: Encounter) => string;

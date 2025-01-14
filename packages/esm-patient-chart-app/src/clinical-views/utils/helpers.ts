@@ -175,10 +175,10 @@ export function getObsFromEncounter(
 
 export const groupColumnsByEncounterType = (columns: EncounterTileColumn[]): Record<string, EncounterTileColumn[]> => {
   return columns.reduce((acc: Record<string, EncounterTileColumn[]>, column) => {
-    if (!acc[column.encounterUuid]) {
-      acc[column.encounterUuid] = [];
+    if (!acc[column.encounterTypeUuid]) {
+      acc[column.encounterTypeUuid] = [];
     }
-    acc[column.encounterUuid].push(column);
+    acc[column.encounterTypeUuid].push(column);
     return acc;
   }, {});
 };
