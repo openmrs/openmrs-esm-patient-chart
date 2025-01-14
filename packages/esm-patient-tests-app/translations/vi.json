@@ -2,6 +2,7 @@
   "add": "Thêm",
   "additionalInstructions": "Hướng dẫn bổ sung",
   "addLabOrderWorkspaceTitle": "Thêm lệnh phòng thí nghiệm",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "back": "Back",
   "backToOrderBasket": "Quay lại giỏ hàng",
   "backToTimeline": "Quay lại timeline",

@@ -2,6 +2,7 @@
   "add": "Add",
   "additionalInstructions": "הוראות נוספות",
   "addLabOrderWorkspaceTitle": "Add lab order",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "back": "חזרה",
   "backToOrderBasket": "חזור לסל ההזמנות",
   "backToTimeline": "חזור לציר הזמן",

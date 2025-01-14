@@ -2,6 +2,7 @@
   "add": "Hinzufügen",
   "additionalInstructions": "Zusätzliche Anweisungen",
   "addLabOrderWorkspaceTitle": "Laborauftrag hinzufügen",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "back": "Back",
   "backToOrderBasket": "Zurück zum Warenkorb",
   "backToTimeline": "Zurück zur Zeitleiste",

@@ -3,6 +3,7 @@
   "activeVisitRequired": "需要一个活动就诊才能下达遗嘱",
   "add": "添加",
   "additionalInstructions": "附加说明",
+  "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "addResults": "添加结果",
   "allOrders": "所有医嘱",
   "backToOrderBasket": "返回医嘱篮",
