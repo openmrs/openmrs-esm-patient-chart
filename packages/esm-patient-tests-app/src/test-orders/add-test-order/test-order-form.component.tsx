@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
+  type OrderUrgency,
   priorityOptions,
   useOrderBasket,
   useOrderType,
@@ -22,7 +23,7 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
@@ -97,6 +98,7 @@ export function LabOrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    setValue,
     watch,
   } = useForm<TestOrderBasketItem>({
     mode: 'all',
@@ -126,9 +128,6 @@ export function LabOrderForm({
         ...data,
       };
       finalizedOrder.orderer = session.currentProvider.uuid;
-      if (finalizedOrder.urgency !== 'ON_SCHEDULED_DATE') {
-        finalizedOrder.scheduledDate = null;
-      }
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -163,6 +162,16 @@ export function LabOrderForm({
     if (errors) {
       setShowErrorNotification(true);
     }
+  };
+
+  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
+    return (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as OrderUrgency;
+      if (value !== 'ON_SCHEDULED_DATE') {
+        setValue('scheduledDate', null);
+      }
+      fieldOnChange(e);
+    };
   };
 
   useEffect(() => {
@@ -220,6 +229,7 @@ export function LabOrderForm({
                   <Select
                     id="priorityInput"
                     {...field}
+                    onChange={handleUpdateUrgency(field.onChange)}
                     invalid={Boolean(fieldState?.error?.message)}
                     invalidText={fieldState?.error?.message}
                     labelText={t('priority', 'Priority')}

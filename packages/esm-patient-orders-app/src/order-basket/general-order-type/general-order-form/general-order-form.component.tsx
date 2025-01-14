@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type OrderBasketItem,
@@ -7,6 +7,7 @@ import {
   useOrderBasket,
   useOrderType,
   priorityOptions,
+  type OrderUrgency,
 } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, useSession, useConfig, ExtensionSlot, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import {
@@ -23,7 +24,7 @@ import {
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ordersEqual, prepOrderPostData } from '../resources';
@@ -84,6 +85,7 @@ export function OrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    setValue,
     watch,
   } = useForm<OrderBasketItem>({
     mode: 'all',
@@ -106,9 +108,6 @@ export function OrderForm({
         ...data,
       };
       finalizedOrder.orderer = session.currentProvider.uuid;
-      if (finalizedOrder.urgency !== 'ON_SCHEDULED_DATE') {
-        finalizedOrder.scheduledDate = null;
-      }
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -143,6 +142,16 @@ export function OrderForm({
     if (errors) {
       setShowErrorNotification(true);
     }
+  };
+
+  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
+    return (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as OrderUrgency;
+      if (value !== 'ON_SCHEDULED_DATE') {
+        setValue('scheduledDate', null);
+      }
+      fieldOnChange(e);
+    };
   };
 
   useEffect(() => {
@@ -201,6 +210,7 @@ export function OrderForm({
                     <Select
                       id="priorityInput"
                       {...field}
+                      onChange={handleUpdateUrgency(field.onChange)}
                       invalid={Boolean(fieldState?.error)}
                       invalidText={fieldState?.error?.message}
                       labelText={t('priority', 'Priority')}
