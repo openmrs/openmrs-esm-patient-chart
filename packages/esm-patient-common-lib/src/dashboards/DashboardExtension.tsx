@@ -3,14 +3,15 @@ import classNames from 'classnames';
 import last from 'lodash-es/last';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { ConfigurableLink } from '@openmrs/esm-framework';
-import { IconRenderer } from './MenuIcons';
+import { ConfigurableLink, MaybeIcon } from '@openmrs/esm-framework';
+import { setupIcons } from '@openmrs/esm-styleguide/src/icons/icon-registration';
 import styles from './dashboard-extension.scss';
 
 export interface DashboardExtensionProps {
   path: string;
   title: string;
   basePath: string;
+  icon: string;
   moduleName?: string;
 }
 
@@ -18,6 +19,7 @@ export const DashboardExtension = ({
   path,
   title,
   basePath,
+  icon,
   moduleName = '@openmrs/esm-patient-chart-app',
 }: DashboardExtensionProps) => {
   const { t } = useTranslation(moduleName);
@@ -31,7 +33,7 @@ export const DashboardExtension = ({
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
         <span className={styles.menu}>
-          <IconRenderer title={title as any} />
+          <MaybeIcon icon={icon} className={styles.icon} />
           <span>{t(title)}</span>
         </span>
       </ConfigurableLink>
