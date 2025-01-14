@@ -17,7 +17,7 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { z } from 'zod';
+import { date, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Control, Controller, useForm, type UseFormSetValue, type UseFormGetValues } from 'react-hook-form';
 import {
@@ -27,6 +27,7 @@ import {
   useConfig,
   useLayoutType,
   ResponsiveWrapper,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
@@ -55,6 +56,15 @@ const allergyFormSchema = z.object({
   nonCodedAllergicReaction: z.string().optional(),
   severityOfWorstReaction: z.string(),
   comment: z.string().optional(),
+  onsetDate: z.date().refine(
+    (date) => {
+      const currentDate = new Date(date);
+      return currentDate <= new Date();
+    },
+    {
+      message: 'Date cannot be in the future',
+    },
+  ),
 });
 
 type AllergyFormData = {
@@ -64,6 +74,7 @@ type AllergyFormData = {
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
   comment: string;
+  onsetDate: Date;
 };
 
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
@@ -133,6 +144,7 @@ function AllergyForm(props: AllergyFormProps) {
       nonCodedAllergicReaction: '',
       severityOfWorstReaction: null,
       comment: '',
+      onsetDate: new Date(),
     };
     if (formContext === 'editing') {
       defaultAllergy.allergen = allergens?.find((a) => allergy?.display === a?.display);
@@ -150,7 +162,7 @@ function AllergyForm(props: AllergyFormProps) {
     watch,
     getValues,
     setValue,
-    formState: { isDirty },
+    formState: { errors, isDirty },
   } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema),
@@ -190,6 +202,7 @@ function AllergyForm(props: AllergyFormProps) {
         nonCodedAllergicReaction,
         allergicReactions,
         severityOfWorstReaction,
+        onsetDate,
       } = data;
 
       const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
@@ -404,13 +417,33 @@ function AllergyForm(props: AllergyFormProps) {
           <div>
             <ResponsiveWrapper>
               <Controller
+                name="onsetDate"
+                control={control}
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <OpenmrsDatePicker
+                    id="onsetDate"
+                    label={t('DateofOnset', 'Date of Onset ')}
+                    onChange={(selectedDate) => {
+                      return onChange(selectedDate);
+                    }}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                )}
+              />
+            </ResponsiveWrapper>
+          </div>
+
+          <div>
+            <ResponsiveWrapper>
+              <Controller
                 name="comment"
                 control={control}
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
                     invalidText={t('invalidComment', 'Invalid comment, try again')}
-                    labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
+                    labelText={t('comments', 'comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                     onBlur={onBlur}
