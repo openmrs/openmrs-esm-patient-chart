@@ -5,6 +5,7 @@ import {
   launchPatientWorkspace,
   useOrderBasket,
   useOrderType,
+  priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
@@ -17,11 +18,13 @@ import {
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { ordersEqual, priorityOptions } from './test-order';
+import { ordersEqual } from './test-order';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -158,16 +161,6 @@ export function LabOrderForm({
 
   return (
     <>
-      {/* {errorLoadingTestTypes && (
-        <InlineNotification
-          className={styles.inlineNotification}
-          kind="error"
-          lowContrast
-          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
-        />
-      )} */}
-
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -212,19 +205,18 @@ export function LabOrderForm({
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                  render={({ field, fieldState }) => (
+                    <Select
                       id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      items={priorityOptions}
-                      onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
-                      size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      {...field}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value} text={option.label} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>

@@ -8,11 +8,12 @@ import {
   Button,
   ButtonSet,
   Column,
-  ComboBox,
   Form,
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
@@ -44,7 +45,6 @@ export function OrderForm({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   orderTypeUuid,
-  orderableConceptSets,
 }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -185,19 +185,18 @@ export function OrderForm({
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                  render={({ field, fieldState }) => (
+                    <Select
                       id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      items={priorityOptions}
-                      onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
-                      size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      {...field}
+                      invalid={Boolean(fieldState?.error)}
+                      invalidText={fieldState?.error?.message}
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} text={option.label} value={option.value} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>
