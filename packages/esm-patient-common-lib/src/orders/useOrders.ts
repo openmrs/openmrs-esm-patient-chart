@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, translateFrom } from '@openmrs/esm-framework';
 import type { PatientOrderFetchResponse, PriorityOption } from './types';
 
 export type Status = 'ACTIVE' | 'any';
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
+const patientChartAppModuleName = '@openmrs/esm-patient-chart-app';
 
 export const drugCustomRepresentation =
   'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
@@ -62,6 +63,7 @@ export function getDrugOrderByUuid(orderUuid: string) {
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
 export const priorityOptions: PriorityOption[] = [
-  { value: 'ROUTINE', label: 'Routine' },
-  { value: 'STAT', label: 'Stat' },
+  { value: 'ROUTINE', label: translateFrom(patientChartAppModuleName, 'Routine') },
+  { value: 'STAT', label: translateFrom(patientChartAppModuleName, 'Stat') },
+  { value: 'ON_SCHEDULED_DATE', label: translateFrom(patientChartAppModuleName, 'On scheduled date') },
 ];

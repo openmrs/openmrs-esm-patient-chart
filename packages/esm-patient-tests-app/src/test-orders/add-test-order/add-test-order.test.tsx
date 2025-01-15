@@ -151,8 +151,7 @@ describe('AddLabOrder', () => {
     const priority = screen.getByRole('combobox', { name: 'Priority' });
     expect(priority).toBeInTheDocument();
     await user.click(priority);
-    await user.clear(priority);
-    await user.click(screen.getByRole('option', { name: /stat/i }));
+    await user.selectOptions(priority, 'STAT');
 
     const additionalInstructions = screen.getByRole('textbox', { name: 'Additional instructions' });
     expect(additionalInstructions).toBeInTheDocument();

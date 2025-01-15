@@ -5,8 +5,9 @@ import {
   launchPatientWorkspace,
   useOrderBasket,
   useOrderType,
+  priorityOptions,
 } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
@@ -17,18 +18,19 @@ import {
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { ordersEqual, priorityOptions } from './test-order';
+import { ordersEqual } from './test-order';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
+import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
-import type { TestOrderBasketItem } from '../../types';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;
@@ -62,34 +64,27 @@ export function LabOrderForm({
   const labOrderFormSchema = useMemo(
     () =>
       z.object({
-        instructions: z.string().optional(),
+        instructions: z.string().nullish(),
         urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+          message: t('priorityRequired', 'Priority is required'),
         }),
-        accessionNumber: z.string().nullable(),
+        accessionNumber: z.string().nullish(),
         testType: z.object(
           { label: z.string(), conceptUuid: z.string() },
           {
-            required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-            invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
+            required_error: t('testTypeRequired', 'Test type is required'),
+            invalid_type_error: t('testTypeRequired', 'Test type is required'),
           },
         ),
         orderReason: orderReasonRequired
           ? z
               .string({
-                required_error: translateFrom(
-                  moduleName,
-                  'addLabOrderLabOrderReasonRequired',
-                  'Order reason is required',
-                ),
+                required_error: t('orderReasonRequired', 'Order reason is required'),
               })
-              .refine(
-                (value) => !!value,
-                translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-              )
+              .refine((value) => !!value, t('orderReasonRequired', 'Order reason is required'))
           : z.string().optional(),
       }),
-    [orderReasonRequired],
+    [orderReasonRequired, t],
   );
 
   const {
@@ -166,16 +161,6 @@ export function LabOrderForm({
 
   return (
     <>
-      {/* {errorLoadingTestTypes && (
-        <InlineNotification
-          className={styles.inlineNotification}
-          kind="error"
-          lowContrast
-          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
-        />
-      )} */}
-
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -187,7 +172,7 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          {config.showLabReferenceNumberField ? (
+          {config.showReferenceNumberField ? (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
                 <InputWrapper>
@@ -220,19 +205,18 @@ export function LabOrderForm({
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                  render={({ field, fieldState }) => (
+                    <Select
                       id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      items={priorityOptions}
-                      onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
-                      size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      {...field}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value} text={option.label} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>

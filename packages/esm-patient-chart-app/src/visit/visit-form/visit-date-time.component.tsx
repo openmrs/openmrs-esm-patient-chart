@@ -42,7 +42,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
 
   return (
     <section>
-      <div className={styles.sectionTitle}>{visitDatetimeLabel}</div>
+      <h1 className={styles.sectionTitle}>{visitDatetimeLabel}</h1>
       <div className={classNames(styles.dateTimeSection, styles.sectionField)}>
         <Controller
           name={dateFieldName}
@@ -76,35 +76,42 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             name={timeFieldName}
             control={control}
             render={({ field: { onBlur, onChange, value } }) => (
-              <TimePicker
-                id={timeFieldName}
-                invalid={Boolean(errors[timeFieldName])}
-                invalidText={errors[timeFieldName]?.message}
-                labelText={t('time', 'Time')}
-                onBlur={onBlur}
-                onChange={(event) => onChange(event.target.value as amPm)}
-                pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                style={{ marginLeft: '0.125rem', flex: 'none' }}
-                value={value}
-              >
-                <Controller
-                  name={timeFormatFieldName}
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <TimePickerSelect
-                      aria-label={t('timeFormat ', 'Time Format')}
-                      id={`${timeFormatFieldName}Input`}
-                      invalid={Boolean(errors[timeFormatFieldName])}
-                      invalidText={errors[timeFormatFieldName]?.message}
-                      onChange={(event) => onChange(event.target.value as amPm)}
-                      value={value}
-                    >
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
-                    </TimePickerSelect>
-                  )}
-                />
-              </TimePicker>
+              <div className={styles.timePickerContainer}>
+                <TimePicker
+                  className={styles.timePicker}
+                  id={timeFieldName}
+                  invalid={Boolean(errors[timeFieldName])}
+                  invalidText={errors[timeFieldName]?.message}
+                  labelText={t('time', 'Time')}
+                  onBlur={onBlur}
+                  onChange={(event) => onChange(event.target.value as amPm)}
+                  pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
+                  value={value}
+                >
+                  <Controller
+                    name={timeFormatFieldName}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <TimePickerSelect
+                        aria-label={t('timeFormat ', 'Time Format')}
+                        className={classNames({
+                          [styles.timePickerSelectError]: errors[timeFormatFieldName],
+                        })}
+                        id={`${timeFormatFieldName}Input`}
+                        onChange={(event) => onChange(event.target.value as amPm)}
+                        value={value}
+                      >
+                        <SelectItem value="" text="" />
+                        <SelectItem value="AM" text="AM" />
+                        <SelectItem value="PM" text="PM" />
+                      </TimePickerSelect>
+                    )}
+                  />
+                </TimePicker>
+                {errors[timeFormatFieldName] && (
+                  <div className={styles.timerPickerError}>{errors[timeFormatFieldName]?.message}</div>
+                )}
+              </div>
             )}
           />
         </ResponsiveWrapper>

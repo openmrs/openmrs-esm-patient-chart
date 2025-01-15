@@ -1,13 +1,13 @@
-import { type Visit, showActionableNotification, showSnackbar, useVisit } from '@openmrs/esm-framework';
-import { deleteVisit, restoreVisit, useVisits } from '../visits-widget/visit.resource';
-import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { type Visit, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { deleteVisit, restoreVisit, useVisits } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
+  const { t } = useTranslation();
   const { mutateVisits } = useVisits(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
-  const { t } = useTranslation();
 
   const restoreDeletedVisit = () => {
     restoreVisit(visit?.uuid)
@@ -42,9 +42,9 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
       .then(() => {
         mutateVisits();
         mutateCurrentVisit();
-        // TODO: Needs to be replaced with Actionable Snackbar when Actionable
+
         if (!isCurrentVisitDeleted) {
-          showActionableNotification({
+          showSnackbar({
             title: t('visitDeleted', '{{visit}} deleted', {
               visit: visit?.visitType?.display ?? t('visit', 'Visit'),
             }),
