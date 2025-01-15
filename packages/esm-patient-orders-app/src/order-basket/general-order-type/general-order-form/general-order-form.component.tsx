@@ -1,9 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import {
+  type OrderBasketItem,
+  type DefaultPatientWorkspaceProps,
+  launchPatientWorkspace,
+  useOrderBasket,
+  useOrderType,
+  priorityOptions,
+  type OrderUrgency,
+} from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, useSession, useConfig, ExtensionSlot, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
@@ -17,15 +23,10 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import {
-  launchPatientWorkspace,
-  priorityOptions,
-  type DefaultPatientWorkspaceProps,
-  type OrderBasketItem,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import styles from './general-order-form.scss';
 import { type ConfigObject } from '../../../config-schema';
@@ -57,20 +58,26 @@ export function OrderForm({
 
   const OrderFormSchema = useMemo(
     () =>
-      z.object({
-        instructions: z.string().nullish(),
-        urgency: z.string().refine((value) => value !== '', {
-          message: t('priorityRequired', 'Priority is required'),
+      z
+        .object({
+          instructions: z.string().nullish(),
+          urgency: z.string().refine((value) => value !== '', {
+            message: t('priorityRequired', 'Priority is required'),
+          }),
+          accessionNumber: z.string().nullish(),
+          concept: z.object(
+            { display: z.string(), uuid: z.string() },
+            {
+              required_error: t('orderableConceptRequired', 'Orderable concept is required'),
+              invalid_type_error: t('orderableConceptRequired', 'Orderable concept is required'),
+            },
+          ),
+          scheduledDate: z.date().nullish(),
+        })
+        .refine((data) => data.urgency !== 'ON_SCHEDULED_DATE' || data.scheduledDate, {
+          message: t('scheduledDateRequired', 'Scheduled date is required'),
+          path: ['scheduledDate'],
         }),
-        accessionNumber: z.string().nullish(),
-        concept: z.object(
-          { display: z.string(), uuid: z.string() },
-          {
-            required_error: t('orderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: t('orderableConceptRequired', 'Orderable concept is required'),
-          },
-        ),
-      }),
     [t],
   );
 
@@ -78,6 +85,8 @@ export function OrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    setValue,
+    watch,
   } = useForm<OrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(OrderFormSchema),
@@ -85,6 +94,8 @@ export function OrderForm({
       ...initialOrder,
     },
   });
+
+  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
 
   const filterItemsByName = useCallback((menu) => {
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
@@ -131,6 +142,16 @@ export function OrderForm({
     if (errors) {
       setShowErrorNotification(true);
     }
+  };
+
+  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
+    return (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as OrderUrgency;
+      if (value !== 'ON_SCHEDULED_DATE') {
+        setValue('scheduledDate', null);
+      }
+      fieldOnChange(e);
+    };
   };
 
   useEffect(() => {
@@ -189,6 +210,7 @@ export function OrderForm({
                     <Select
                       id="priorityInput"
                       {...field}
+                      onChange={handleUpdateUrgency(field.onChange)}
                       invalid={Boolean(fieldState?.error)}
                       invalidText={fieldState?.error?.message}
                       labelText={t('priority', 'Priority')}
@@ -202,6 +224,29 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
+          {isScheduledDateRequired && (
+            <Grid className={styles.gridRow}>
+              <Column lg={8} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduledDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <OpenmrsDatePicker
+                        labelText={t('scheduledDate', 'Scheduled date')}
+                        id="scheduledDate"
+                        {...field}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                        minDate={new Date()}
+                        size={responsiveSize}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
