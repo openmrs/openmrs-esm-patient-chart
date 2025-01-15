@@ -72,6 +72,8 @@
   "returnToOrderBasket": "Quay lại giỏ hàng",
   "returnToTimeline": "Quay lại timeline",
   "saveOrder": "Lưu đơn hàng",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Tìm kiếm",
   "searchAgain": "Tìm kiếm lại",
   "searchByTestName": "Tìm kiếm theo tên bài kiểm tra",

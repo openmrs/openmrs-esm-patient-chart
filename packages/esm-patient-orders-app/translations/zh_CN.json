@@ -93,6 +93,8 @@
   "saveLabResults": "保存检验结果",
   "saveOrder": "保存医嘱",
   "saving": "保存中",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "searchAgain": "重新搜索",
   "searchFieldOrder": "搜索 {{orderType}} 医嘱",
   "searchOrderables": "搜索可医嘱对象",
