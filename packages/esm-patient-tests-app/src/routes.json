@@ -51,8 +51,7 @@
       "name": "add-lab-order",
       "type": "order",
       "component": "addLabOrderWorkspace",
-      "title": "addLabOrderWorkspaceTitle",
-      "groups": ["ward-patient"]
+      "title": "addLabOrderWorkspaceTitle"
     }
   ]
 }
