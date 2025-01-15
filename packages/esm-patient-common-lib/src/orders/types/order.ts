@@ -70,6 +70,7 @@ export interface OrderBasketItem {
   previousOrder?: string;
   orderType?: string;
   orderNumber?: string;
+  scheduledDate?: Date;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
@@ -96,6 +97,7 @@ export interface OrderPost {
   instructions?: string;
   accessionNumber?: string;
   orderType?: string;
+  scheduledDate?: string;
 }
 
 export interface DrugOrderPost extends OrderPost {

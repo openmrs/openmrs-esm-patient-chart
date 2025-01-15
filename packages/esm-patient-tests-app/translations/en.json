@@ -72,6 +72,8 @@
   "returnToOrderBasket": "Return to order basket",
   "returnToTimeline": "Return to timeline",
   "saveOrder": "Save order",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Search",
   "searchAgain": "search again",
   "searchByTestName": "Search by test name",
