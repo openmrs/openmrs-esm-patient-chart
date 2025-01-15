@@ -89,7 +89,7 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/MUAC\s*-\s*/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/MUAC\s*23\s*cm/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/these vitals are out of date/i)).toBeInTheDocument();
   });
 
