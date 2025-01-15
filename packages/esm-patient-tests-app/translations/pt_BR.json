@@ -72,6 +72,8 @@
   "returnToOrderBasket": "Retornar à cesta de pedidos",
   "returnToTimeline": "Retornar à linha do tempo",
   "saveOrder": "Salvar pedido",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Pesquisar",
   "searchAgain": "pesquisar novamente",
   "searchByTestName": "Pesquisar por nome de teste",

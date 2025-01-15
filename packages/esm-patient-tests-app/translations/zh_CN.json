@@ -72,6 +72,8 @@
   "returnToOrderBasket": "返回医嘱篮",
   "returnToTimeline": "返回时间线",
   "saveOrder": "保存医嘱",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "搜索",
   "searchAgain": "重新搜索",
   "searchByTestName": "搜索检验名称",
