@@ -43,8 +43,6 @@ interface ResponsiveWrapperProps {
   isTablet: boolean;
 }
 
-const datePickerFormat = 'd/m/Y';
-
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
