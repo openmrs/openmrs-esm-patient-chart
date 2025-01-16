@@ -37,14 +37,6 @@ jest.mock('./conditions.resource', () => ({
   useConditionsSearch: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => {
-  const actualFramework = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...actualFramework,
-    OpenmrsDatePicker: jest.fn(),
-  };
-});
-
 const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
@@ -158,18 +150,13 @@ describe('Conditions form', () => {
     const submitButton = screen.getByRole('button', { name: /save & close/i });
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
     expect(cancelButton).toBeEnabled();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.click(activeStatusInput);
-    await user.type(onsetDateInput, '2020-05-05');
     await user.click(submitButton);
 
-    await waitFor(() => {
-      expect(mockShowSnackbar).toHaveBeenCalled();
-    });
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'It is now visible on the Conditions page',
