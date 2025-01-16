@@ -44,15 +44,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    OpenmrsDatePicker: jest.fn(),
-  };
-});
-
 mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
   return (
     <>
