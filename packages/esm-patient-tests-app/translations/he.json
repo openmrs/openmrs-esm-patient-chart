@@ -72,6 +72,8 @@
   "returnToOrderBasket": "חזרה לסל ההזמנות",
   "returnToTimeline": "חזור לציר הזמן",
   "saveOrder": "שמור הזמנה",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Search",
   "searchAgain": "search again",
   "searchByTestName": "Search by test name",

@@ -72,6 +72,8 @@
   "returnToOrderBasket": "Zum Warenkorb zurückkehren",
   "returnToTimeline": "Zur Zeitleiste zurückkehren",
   "saveOrder": "Auftrag speichern",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Suchen",
   "searchAgain": "erneut suchen",
   "searchByTestName": "Nach Testname suchen",

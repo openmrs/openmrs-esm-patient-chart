@@ -58,6 +58,7 @@ export default function DrugOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-drug-order'),
+      closeWorkspaceGroup: false,
     });
   };
 
@@ -65,6 +66,7 @@ export default function DrugOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
+      closeWorkspaceGroup: false,
     });
   };
 

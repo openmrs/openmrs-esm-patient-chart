@@ -72,6 +72,8 @@
   "returnToOrderBasket": "Regresar a la canasta de órdenes",
   "returnToTimeline": "Volver al calendario",
   "saveOrder": "Guardar orden",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "search": "Buscar",
   "searchAgain": "buscar nuevamente",
   "searchByTestName": "Buscar por nombre de la prueba",

@@ -93,6 +93,8 @@
   "saveLabResults": "Guardar resultados de laboratorio",
   "saveOrder": "Save order",
   "saving": "Guardando",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "searchAgain": "search again",
   "searchFieldOrder": "Search for {{orderType}} order",
   "searchOrderables": "Search orderables",

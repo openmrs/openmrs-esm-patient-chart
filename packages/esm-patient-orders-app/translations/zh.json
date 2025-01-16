@@ -93,6 +93,8 @@
   "saveLabResults": "保存检验结果",
   "saveOrder": "Save order",
   "saving": "保存中",
+  "scheduledDate": "Scheduled date",
+  "scheduledDateRequired": "Scheduled date is required",
   "searchAgain": "search again",
   "searchFieldOrder": "Search for {{orderType}} order",
   "searchOrderables": "Search orderables",
