@@ -53,6 +53,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
               null,
               config,
             );
+
             if (primaryConceptType !== '--') {
               summaryValue = primaryConceptType;
             } else {
