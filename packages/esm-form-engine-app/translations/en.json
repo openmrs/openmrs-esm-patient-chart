@@ -9,8 +9,8 @@
   "clearFile": "Clear file",
   "close": "Close",
   "closeCamera": "Close camera",
-  "closeThisPanel": "Close this panel",
   "closesNotification": "Closes notification",
+  "closeThisPanel": "Close this panel",
   "collapseAll": "Collapse all",
   "deleteQuestion": "Delete question",
   "deleteQuestionConfirmation": "Are you sure you want to delete this question?",
@@ -45,7 +45,7 @@
   "tryAgainMessage": "Try opening another form from",
   "unspecified": "Unspecified",
   "upload": "Upload",
-  "uploadImage": "Upload image",
   "uploadedPhoto": "Uploaded photo",
+  "uploadImage": "Upload image",
   "valuesOutOfBound": "Some of the values are out of bounds"
 }

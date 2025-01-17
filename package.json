@@ -7,7 +7,6 @@
   ],
   "scripts": {
     "start": "openmrs develop --sources packages/esm-patient-chart-app/",
-    "start2": "openmrs develop --sources packages/esm-form-engine-app/ --backend http://lime-mosul-dev.madiro.org",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag next",
     "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@next",
@@ -83,8 +82,7 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3",
-    "@openmrs/esm-form-engine-lib": "portal:/Users/piru/Projects/openmrs-esm-form-engine-lib"
+    "sass": "^1.54.3"
   },
   "packageManager": "yarn@4.5.0"
 }
