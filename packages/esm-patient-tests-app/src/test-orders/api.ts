@@ -4,7 +4,14 @@ import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import type { OrderPost, PatientOrderFetchResponse, TestOrderPost } from '@openmrs/esm-patient-common-lib';
 import type { TestOrderBasketItem } from '../types';
-import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
+  toOmrsIsoString,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -95,6 +102,7 @@ export function prepTestOrderPostData(
       orderReason: order.orderReason,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -110,6 +118,7 @@ export function prepTestOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -124,6 +133,7 @@ export function prepTestOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);

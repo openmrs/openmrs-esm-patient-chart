@@ -1,4 +1,10 @@
-import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  type OpenmrsResource,
+  restBaseUrl,
+  toOmrsIsoString,
+} from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
   priorityOptions,
@@ -41,6 +47,7 @@ export function prepOrderPostData(
       // orderReason: order.orderReason,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -55,6 +62,7 @@ export function prepOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -68,6 +76,7 @@ export function prepOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);
