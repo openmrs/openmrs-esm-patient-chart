@@ -1,11 +1,11 @@
 import React, { memo, useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
-import styles from './tile.scss';
-import { groupColumnsByEncounterType } from '../utils/helpers';
 import { useTranslation } from 'react-i18next';
-import { type EncounterTileColumn, type EncounterTileProps } from '../types';
+import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
+import { groupColumnsByEncounterType } from '../utils/helpers';
 import { useLastEncounter } from '../hooks';
+import type { EncounterTileColumn, EncounterTileProps } from '../types';
+import styles from './tile.scss';
 
 export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
   const columnsByEncounterType = useMemo(() => groupColumnsByEncounterType(columns), [columns]);

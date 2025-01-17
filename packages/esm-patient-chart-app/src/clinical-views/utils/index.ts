@@ -1,11 +1,5 @@
 import { getConceptFromMappings, getObsFromEncounter } from './helpers';
-import {
-  type Encounter,
-  type ColumnDefinition,
-  type ConfigConcepts,
-  type EncounterTileColumn,
-  type MenuCardProps,
-} from '../types';
+import type { Encounter, ColumnDefinition, ConfigConcepts, EncounterTileColumn, MenuCardProps } from '../types';
 import dayjs from 'dayjs';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
@@ -23,18 +17,23 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
       let obsValue;
       if (column.conceptMappings) {
         const concept = getConceptFromMappings(encounter, column.conceptMappings);
-        obsValue = getObsFromEncounter(
-          encounter,
-          concept,
-          column.isDate,
-          column.isTrueFalseConcept,
-          column.type,
-          column.fallbackConcepts,
-          column.summaryConcept?.secondaryConcept,
-          config,
-        );
+        obsValue = getObsFromEncounter({
+          encounter: encounter,
+          obsConcept: concept,
+          isDate: column.isDate,
+          isTrueFalseConcept: column.isTrueFalseConcept,
+          type: column.type,
+          fallbackConcepts: column.fallbackConcepts,
+          secondaryConcept: column.summaryConcept?.secondaryConcept,
+          config: config,
+        });
       } else {
-        obsValue = getObsFromEncounter(encounter, column.concept, column.isDate, null, null, null, null, config);
+        obsValue = getObsFromEncounter({
+          encounter: encounter,
+          obsConcept: column.concept,
+          isDate: column.isDate,
+          config: config,
+        });
       }
       return typeof obsValue === 'string' ? obsValue : obsValue?.name?.name ?? '--';
     },
@@ -43,42 +42,28 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
           let summaryValue;
 
           if (column.summaryConcept?.secondaryConcept) {
-            const primaryConceptType = getObsFromEncounter(
-              encounter,
-              column.summaryConcept.primaryConcept,
-              null,
-              null,
-              null,
-              null,
-              null,
-              config,
-            );
+            const primaryConceptType = getObsFromEncounter({
+              encounter: encounter,
+              obsConcept: column.summaryConcept.primaryConcept,
+              config: config,
+            });
 
             if (primaryConceptType !== '--') {
               summaryValue = primaryConceptType;
             } else {
-              summaryValue = getObsFromEncounter(
-                encounter,
-                null,
-                null,
-                null,
-                null,
-                null,
-                column.summaryConcept.secondaryConcept,
-                config,
-              );
+              summaryValue = getObsFromEncounter({
+                encounter: encounter,
+                obsConcept: column.summaryConcept.secondaryConcept,
+                config: config,
+              });
             }
           } else if (column.summaryConcept?.hasCalculatedDate) {
-            const primaryDate = getObsFromEncounter(
-              encounter,
-              column.summaryConcept.primaryConcept,
-              column.summaryConcept.isDate,
-              null,
-              null,
-              null,
-              null,
+            const primaryDate = getObsFromEncounter({
+              encounter: encounter,
+              obsConcept: column.summaryConcept.primaryConcept,
+              isDate: column.summaryConcept.isDate,
               config,
-            );
+            });
 
             if (typeof primaryDate === 'string' && primaryDate !== '--') {
               summaryValue = calculateDateDifferenceInDate(primaryDate);
@@ -86,16 +71,12 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
               summaryValue = '--';
             }
           } else {
-            summaryValue = getObsFromEncounter(
-              encounter,
-              column.summaryConcept?.primaryConcept,
-              column.summaryConcept?.isDate,
-              null,
-              null,
-              null,
-              null,
-              config,
-            );
+            summaryValue = getObsFromEncounter({
+              encounter: encounter,
+              obsConcept: column.summaryConcept?.primaryConcept,
+              isDate: column.summaryConcept?.isDate,
+              config: config,
+            });
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';
         }

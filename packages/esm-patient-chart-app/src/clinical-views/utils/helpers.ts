@@ -1,12 +1,13 @@
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { age, formatDate, parseDate, type Visit } from '@openmrs/esm-framework';
-import {
-  type ConfigConcepts,
-  type Encounter,
-  type EncounterPropertyType,
-  type EncounterTileColumn,
-  type Form,
-  type Observation,
+import type {
+  ConfigConcepts,
+  Encounter,
+  EncounterPropertyType,
+  EncounterTileColumn,
+  Form,
+  GetObsFromEncounterParams,
+  Observation,
 } from '../types';
 
 type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
@@ -53,7 +54,7 @@ export function findObs(encounter: Encounter, obsConcept: string): Observation {
 
 export function getObsFromEncounters(encounters: Encounter, obsConcept: string, config: ConfigConcepts) {
   const filteredEnc = encounters?.find((enc) => enc.obs.find((obs) => obs.concept.uuid === obsConcept));
-  return getObsFromEncounter(filteredEnc, obsConcept, false, false, null, null, null, config);
+  return getObsFromEncounter({ encounter: filteredEnc, obsConcept: obsConcept, config: config });
 }
 
 export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings) {
@@ -69,7 +70,7 @@ export function resolveValueUsingMappings(encounter: Encounter, concept: string,
 export function getConditionalConceptValue(
   encounter: Encounter,
   conditionalConceptMappings,
-  isDate: Boolean,
+  isDate: boolean,
   config: ConfigConcepts,
 ) {
   const { trueConcept, nonTrueConcept, dependantConcept, conditionalConcept } = conditionalConceptMappings;
@@ -77,7 +78,13 @@ export function getConditionalConceptValue(
   const dependantUuid =
     typeof dependantValue === 'object' && 'uuid' in dependantValue ? dependantValue.uuid : undefined;
   const finalConcept = dependantUuid === conditionalConcept ? trueConcept : nonTrueConcept;
-  return getObsFromEncounter(encounter, finalConcept, isDate, false, null, null, null, config);
+  return getObsFromEncounter({
+    encounter: encounter,
+    obsConcept: finalConcept,
+    isDate: isDate,
+    isTrueFalseConcept: false,
+    config: config,
+  });
 }
 
 export function getConceptFromMappings(encounter: Encounter, concepts: Array<string>) {
@@ -93,7 +100,7 @@ export function getConceptFromMappings(encounter: Encounter, concepts: Array<str
 export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: Array<string>, config: ConfigConcepts) {
   let observations = [];
   obsConcepts.map((concept) => {
-    const obs = getObsFromEncounter(encounter, concept, null, null, null, null, null, config);
+    const obs = getObsFromEncounter({ encounter: encounter, obsConcept: concept, config: config });
     if (obs !== '--') {
       observations.push(obs);
     }
@@ -115,16 +122,16 @@ export function getMultipleObsFromEncounter(encounter: Encounter, obsConcepts: A
  * @param t - Optional translation function.
  * @returns The value of the observation, formatted appropriately, or '--' if not found or applicable.
  */
-export function getObsFromEncounter(
-  encounter: Encounter,
-  obsConcept: string,
-  isDate?: Boolean,
-  isTrueFalseConcept?: Boolean,
-  type?: EncounterPropertyType,
-  fallbackConcepts?: Array<string>,
-  secondaryConcept?: string,
-  config?: ConfigConcepts,
-) {
+export function getObsFromEncounter({
+  encounter,
+  obsConcept,
+  isDate = false,
+  isTrueFalseConcept = false,
+  type,
+  fallbackConcepts = [],
+  secondaryConcept,
+  config,
+}: GetObsFromEncounterParams) {
   let obs = findObs(encounter, obsConcept);
   if (!encounter || !obsConcept) {
     return '--';
@@ -158,7 +165,7 @@ export function getObsFromEncounter(
     return '--';
   }
 
-  // format obs date or datetime appropriately
+  // format format obs date or datetime based on the obs value's type
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
       return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
@@ -167,7 +174,7 @@ export function getObsFromEncounter(
     }
   }
 
-  if (typeof obs.value === 'object' && obs.value?.names) {
+  if (typeof obs.value === 'object' && obs.value?.name) {
     return obs.value?.name?.display;
   }
   return obs.value;

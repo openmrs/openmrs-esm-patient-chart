@@ -296,3 +296,14 @@ export enum EncounterPropertyType {
   visitType = 'visitType',
   ageAtEncounter = 'ageAtEncounter',
 }
+
+export interface GetObsFromEncounterParams {
+  encounter: Encounter;
+  obsConcept: string;
+  isDate?: boolean;
+  isTrueFalseConcept?: boolean;
+  type?: EncounterPropertyType;
+  fallbackConcepts?: Array<string>;
+  secondaryConcept?: string;
+  config?: ConfigConcepts;
+}

@@ -10,7 +10,7 @@ import { deleteEncounter } from '../utils/encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
 
 import styles from './encounter-list.scss';
-import { type TableRow, type Encounter, type Mode, type ColumnValue, type FormattedColumn } from '../types';
+import type { TableRow, Encounter, Mode, ColumnValue, FormattedColumn } from '../types';
 
 export interface EncounterListColumn {
   key: string;
