@@ -1,16 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
-import { navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { AddIcon, navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { EncounterListDataTable } from './table.component';
-import { Add } from '@carbon/react/icons';
 import { launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../utils/encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
-
-import styles from './encounter-list.scss';
 import type { TableRow, Encounter, Mode, ColumnValue, FormattedColumn } from '../types';
+import styles from './encounter-list.scss';
+
 
 export interface EncounterListColumn {
   key: string;
@@ -242,7 +241,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       return (
         <Button
           kind="ghost"
-          renderIcon={Add}
+          renderIcon={AddIcon}
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
