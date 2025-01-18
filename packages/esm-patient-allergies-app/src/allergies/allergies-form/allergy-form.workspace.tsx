@@ -42,30 +42,32 @@ import {
 import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
 import { AllergenType } from '../../types';
 import styles from './allergy-form.scss';
+import { type TFunction } from 'i18next';
 
-const allergyFormSchema = z.object({
-  allergen: z
-    .object({
-      uuid: z.string(),
-      display: z.string(),
-      type: z.string(),
-    })
-    .required(),
-  nonCodedAllergen: z.string().optional(),
-  allergicReactions: z.array(z.string().optional()),
-  nonCodedAllergicReaction: z.string().optional(),
-  severityOfWorstReaction: z.string(),
-  comment: z.string().optional(),
-  onsetDate: z.date().refine(
-    (date) => {
-      const currentDate = new Date(date);
-      return currentDate <= new Date();
-    },
-    {
-      message: 'Date cannot be in the future',
-    },
-  ),
-});
+const allergyFormSchema = (t: TFunction) =>
+  z.object({
+    allergen: z
+      .object({
+        uuid: z.string(),
+        display: z.string(),
+        type: z.string(),
+      })
+      .required(),
+    nonCodedAllergen: z.string().optional(),
+    allergicReactions: z.array(z.string().optional()),
+    nonCodedAllergicReaction: z.string().optional(),
+    severityOfWorstReaction: z.string(),
+    comment: z.string().optional(),
+    onsetDate: z.date().refine(
+      (date) => {
+        const currentDate = new Date(date);
+        return currentDate <= new Date();
+      },
+      {
+        message: t('dateCannotBeInFuture', 'Date cannot be in the future'),
+      },
+    ),
+  });
 
 type AllergyFormData = {
   allergen: Allergen;
@@ -181,7 +183,7 @@ function AllergyForm(props: AllergyFormProps) {
     formState: { errors, isDirty },
   } = useForm<AllergyFormData>({
     mode: 'all',
-    resolver: zodResolver(allergyFormSchema),
+    resolver: zodResolver(allergyFormSchema(t)),
     values: getDefaultAllergy(allergy, formContext),
   });
 
@@ -442,7 +444,8 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
-                    invalidText={t('invalidComment', 'Invalid comment, try again')}
+                    invalidText={errors.comment?.message}
+                    invalid={Boolean(errors?.comment)}
                     labelText={t('comments', 'comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
