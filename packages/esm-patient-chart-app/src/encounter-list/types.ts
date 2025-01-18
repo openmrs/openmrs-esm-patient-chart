@@ -31,7 +31,6 @@ export interface Observation {
         uuid: string;
         name: {
           name: string;
-          display?: string;
         };
         names?: Array<{ uuid: string; name: string; conceptNameType: string }>;
       }
@@ -142,7 +141,7 @@ export interface ColumnDefinition {
   conditionalActionOptions?: Array<ConditionalActionProps>;
   isDate?: boolean;
   isTrueFalseConcept?: boolean;
-  type?: EncounterPropertyType;
+  type?: string;
   isLink?: boolean;
   useMultipleObs?: boolean;
   valueMappings?: Record<string, string>;
@@ -151,9 +150,6 @@ export interface ColumnDefinition {
   isConditionalConcept?: boolean;
   conditionalConceptMappings?: Record<string, string>;
   conditionalEncounterMappings?: Record<string, ConditionalEncounterMapping>;
-  encounterType: string;
-  hasSummary?: boolean;
-  summaryConcept?: SummaryConcept;
 }
 
 export interface ConditionalEncounterMapping {
@@ -212,98 +208,4 @@ export interface ConfigConcepts {
   trueConceptUuid: string;
   falseConceptUuid: string;
   otherConceptUuid: string;
-}
-
-export interface FormattedColumn {
-  key: string;
-  header: string;
-  getValue: (encounter: Encounter) => ColumnValue;
-  link?: { getUrl: (encounter: Encounter) => string; handleNavigate?: (encounter: Encounter) => void };
-  concept?: string;
-}
-
-export interface EncounterTileColumn {
-  key: string;
-  header: string;
-  encounterTypeUuid: string;
-  concept: string;
-  title?: string;
-  getObsValue: (encounter: Encounter) => string;
-  getSummaryObsValue?: (encounter: Encounter) => string;
-  encounter?: Encounter;
-  hasSummary?: Boolean;
-}
-export interface EncounterTileProps {
-  patientUuid: string;
-  columns: Array<EncounterTileColumn>;
-  headerTitle: string;
-}
-
-export interface MenuCardProps {
-  tileHeader: string;
-  columns: Array<ColumnDefinition>;
-}
-
-interface SummaryConcept {
-  primaryConcept: string;
-  secondaryConcept?: string;
-  isDate?: boolean;
-  hasCalculatedDate?: boolean;
-}
-
-export interface FormattedCardColumn {
-  key: string;
-  header: string;
-  concept: string;
-  encounterUuid: string;
-  title?: string;
-  getObsValue: (encounter: Encounter) => string;
-  getSummaryObsValue?: (encounter: Encounter) => string;
-  hasSummary: boolean;
-}
-
-export interface ConfigConcepts {
-  trueConceptUuid: string;
-  falseConceptUuid: string;
-  otherConceptUuid: string;
-}
-
-export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
-  encounterType: { uuid: string; name: string };
-  patient: {
-    uuid: string;
-    display: string;
-    age: number;
-    birthDate: string;
-  };
-  location: {
-    uuid: string;
-    display: string;
-    name: string;
-  };
-  encounterProviders?: Array<{ encounterRole: string; provider: { uuid: string; name: string } }>;
-  obs: Array<Observation>;
-  form?: {
-    uuid: string;
-  };
-  visit?: string;
-}
-
-export enum EncounterPropertyType {
-  location = 'location',
-  provider = 'provider',
-  visitType = 'visitType',
-  ageAtEncounter = 'ageAtEncounter',
-}
-
-export interface GetObsFromEncounterParams {
-  encounter: Encounter;
-  obsConcept: string;
-  isDate?: boolean;
-  isTrueFalseConcept?: boolean;
-  type?: EncounterPropertyType;
-  fallbackConcepts?: Array<string>;
-  secondaryConcept?: string;
-  config?: ConfigConcepts;
 }

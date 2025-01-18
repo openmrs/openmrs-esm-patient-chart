@@ -1,15 +1,17 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
-import { AddIcon, navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 import { EncounterListDataTable } from './table.component';
+import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { launchEncounterForm } from '../utils/helpers';
-import { deleteEncounter } from '../utils/encounter-list.resource';
+import { deleteEncounter } from '../encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
-import type { TableRow, Encounter, Mode, ColumnValue, FormattedColumn } from '../types';
-import styles from './encounter-list.scss';
 
+import styles from './encounter-list.scss';
+import { type TableRow, type Encounter, type Mode, type ColumnValue } from '../types';
+import { type FormattedColumn } from '../utils/encounter-list-config-builder';
 
 export interface EncounterListColumn {
   key: string;
@@ -241,7 +243,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       return (
         <Button
           kind="ghost"
-          renderIcon={AddIcon}
+          renderIcon={Add}
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
