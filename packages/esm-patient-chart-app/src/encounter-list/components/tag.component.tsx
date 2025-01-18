@@ -9,7 +9,7 @@ export const renderTag = (
   statusColorMappings: Record<string, string>,
   config: ConfigConcepts,
 ) => {
-  const columnStatus = getObsFromEncounter({ encounter: encounter, obsConcept: concept, config: config });
+  const columnStatus = getObsFromEncounter(encounter, concept, false, false, undefined, undefined, undefined, config);
   const columnStatusObs = findObs(encounter, concept);
 
   if (columnStatus == '--') {

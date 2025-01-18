@@ -37,12 +37,6 @@
       "offline": true
     },
     {
-      "name": "clinical-views-summary",
-      "component": "clinicalViewsSummary",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "stop-visit-button",
       "component": "stopVisitActionButton",
       "slot": "patient-actions-slot",
