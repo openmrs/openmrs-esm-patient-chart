@@ -118,7 +118,7 @@ export function LabOrderForm({
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const filterItemsByName = useCallback((menu) => {
-    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+    return menu?.item?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
 
   const handleFormSubmission = useCallback(
