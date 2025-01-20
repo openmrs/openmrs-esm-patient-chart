@@ -102,6 +102,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
         launchPatientWorkspace('add-lab-order', {
           orderTypeUuid: orderTypeUuid,
         }),
+      closeWorkspaceGroup: false,
     });
   }, [orderTypeUuid]);
 
@@ -114,6 +115,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
             order,
             orderTypeUuid: orderTypeUuid,
           }),
+        closeWorkspaceGroup: false,
       });
     },
     [orderTypeUuid],

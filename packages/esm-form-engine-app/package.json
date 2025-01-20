@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "license": "MPL-2.0",
   "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",

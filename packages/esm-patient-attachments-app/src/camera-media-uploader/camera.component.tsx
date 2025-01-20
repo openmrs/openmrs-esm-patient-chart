@@ -11,18 +11,9 @@ interface CameraComponentProps {
 const CameraComponent: React.FC<CameraComponentProps> = ({ mediaStream, stopCameraStream }) => {
   const { handleTakePhoto, setError } = useContext(CameraMediaUploaderContext);
 
-  useEffect(() => {
-    return () => {
-      stopCameraStream();
-    };
-  }, [stopCameraStream]);
+  useEffect(() => stopCameraStream(), [stopCameraStream]);
 
-  const setMediaStream = useCallback(
-    (ms: MediaStream) => {
-      mediaStream.current = ms;
-    },
-    [mediaStream],
-  );
+  const setMediaStream = useCallback((ms: MediaStream) => (mediaStream.current = ms), [mediaStream]);
   return (
     <Camera
       isDisplayStartCameraError={false}
