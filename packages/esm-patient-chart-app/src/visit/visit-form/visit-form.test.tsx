@@ -19,7 +19,7 @@ import { mockPatient } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
-import StartVisitForm from './visit-form.component';
+import StartVisitForm from './visit-form.workspace';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
