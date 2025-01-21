@@ -1,0 +1,211 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+@media (min-width: 1200px) {
+  :global(.-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
+    max-width: 150rem;
+  }
+}
+
+:global(.omrs-breakpoint-gt-small-desktop .-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
+  max-width: 150rem;
+}
+
+.resultsContainer {
+  padding: 0;
+  width: 100%;
+  position: relative;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  background-color: $ui-01;
+
+  :global(.cds--data-table td, .cds--data-table th) {
+    vertical-align: top;
+  }
+
+  :global(.cds--data-table--md td) {
+    padding-top: 0.1rem;
+  }
+}
+
+.flex {
+  display: flex;
+  flex: 1;
+}
+
+.resultsHeaderTablet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resultsHeader {
+  padding: layout.$spacing-03 0;
+  z-index: 10;
+  background-color: $openmrs-background-grey;
+  position: sticky;
+  top: layout.$spacing-09;
+  display: flex;
+  transition: border-bottom 0.2s ease-in-out;
+}
+
+.resultsHeaderScrolled {
+  border-bottom: 1px solid colors.$gray-20;
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+
+.headerSentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  visibility: hidden;
+}
+
+.leftHeaderSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.viewOptsContentSwitcherContainer {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.viewOptionsText {
+  justify-self: start;
+}
+
+.contentSwitcherLabel {
+  white-space: nowrap;
+  @include type.type-style('body-01');
+}
+
+.viewOptionsSwitcher {
+  justify-self: end;
+}
+
+.leftSection {
+  width: 350px;
+  margin-right: layout.$spacing-05;
+}
+
+.rightSection,
+.rightSectionHeader {
+  width: 70%;
+
+  &.fullView {
+    width: 100%;
+  }
+}
+
+.rightSection :global(.cds--skeleton) {
+  width: 100%;
+}
+
+.leftHeaderActions {
+  display: flex;
+  min-width: layout.$spacing-08;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.leftHeaderActions > :global(.cds--content-switcher),
+.viewOptsContentSwitcherContainer :global(.cds--content-switcher) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: max-content;
+  justify-content: flex-start;
+  height: 32px;
+}
+
+.trendlineOverlayHeader {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+
+  .trendlineOverlayHeaderTitle {
+    @include type.type-style('heading-compact-02');
+    margin-right: layout.$spacing-02;
+  }
+
+  .trendlineOverlayHeaderReferenceRange {
+    @include type.type-style('helper-text-01');
+  }
+}
+
+.filterSetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: layout.$spacing-03;
+  background-color: $openmrs-background-grey;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+
+  .filterSetActions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
+
+.floatingTreeButton {
+  position: fixed;
+  bottom: layout.$spacing-11;
+  right: layout.$spacing-05;
+  z-index: 99;
+
+  button {
+    background-color: $brand-01 !important;
+    padding: layout.$spacing-05;
+    border-radius: 50%;
+  }
+
+  svg {
+    fill: $ui-01 !important;
+  }
+}
+
+.panelViewTimeline {
+  margin-bottom: layout.$spacing-07;
+}
+
+.border {
+  border: 1px solid $ui-03;
+  border-bottom: none;
+}
+
+.groupPanelsTables {
+  > div + div {
+    margin-top: layout.$spacing-05;
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.button {
+  align-items: center;
+  margin-right: layout.$spacing-03;
+
+  svg {
+    fill: colors.$blue-60 !important;
+  }
+}

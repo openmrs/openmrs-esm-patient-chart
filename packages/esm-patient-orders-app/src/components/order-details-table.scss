@@ -1,11 +1,14 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
-  border-bottom: none;
+
+  > .desktop {
+    border-top: none !important;
+  }
 }
 
 .row {
@@ -14,40 +17,183 @@
   }
 
   p {
-    padding: spacing.$spacing-02 0;
+    padding: layout.$spacing-02 0;
   }
 }
 
 .tooltip {
-  margin: 0rem -0.5rem -0.625rem;
+  margin: 0 (-(layout.$spacing-03)) -0.625rem;
 }
 
 .menuItem {
   max-width: none;
 }
 
+.dropdownContainer {
+  min-width: max-content;
+
+  :global(.cds--dropdown__wrapper--inline) {
+    grid-gap: 0 0.5rem;
+  }
+}
+
 .buttons {
   justify-content: flex-end;
 }
 
-.singleLineText {
+.priorityPill {
+  @include type.type-style('label-01');
+  background-color: colors.$gray-20;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-01;
+  text-align: center;
+
+  &[data-urgency='routine'] {
+    background-color: colors.$green-20;
+  }
+
+  &[data-urgency='urgent'] {
+    background-color: colors.$red-20;
+  }
+}
+
+.statusPill {
+  @include type.type-style('label-01');
+  background-color: colors.$gray-20;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-01;
+  padding-inline: layout.$spacing-03;
+  text-align: center;
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &[data-status='received'] {
+    background-color: colors.$blue-20;
+  }
+
+  &[data-status='in progress'] {
+    background-color: colors.$cyan-20;
+  }
+
+  &[data-status='on hold'] {
+    background-color: colors.$teal-20;
+  }
+
+  &[data-status='exception'] {
+    background-color: colors.$magenta-20;
+  }
+
+  &[data-status='completed'] {
+    background-color: colors.$green-20;
+  }
+
+  &[data-status='discontinued'],
+  &[data-status='declined'] {
+    background-color: colors.$red-20;
+  }
 }
 
 .tile {
   text-align: center;
-  border-bottom: 1px solid $ui-03;
+  border-bottom: 1px solid vars.$ui-03;
 
   .message {
-    @include type.type-style("heading-compact-01");
-    color: $text-02;
+    @include type.type-style('heading-compact-01');
+    color: vars.$text-02;
   }
 }
 
 .table {
-  td:after {
-    display: none;
+  td {
+    &::after {
+      display: none;
+    }
   }
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.layer {
+  height: 100%;
+}
+
+.unknownOrderTypeText {
+  @include type.type-style('body-compact-01');
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}
+
+.toolBarContent {
+  background-color: colors.$gray-10;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-70;
+  padding: layout.$spacing-11 0;
+}
+
+.emptyStateTile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helperText {
+  @include type.type-style('helper-text-02');
+}
+
+.button {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
+.printButton {
+  margin-left: 1.25rem;
+  @extend .button;
+}
+
+.addButton {
+  @extend .button;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    width: fit-content;
+    padding: 0 !important;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
+.rangeLabel {
+  @extend .helperText;
+  margin-right: layout.$spacing-02;
 }

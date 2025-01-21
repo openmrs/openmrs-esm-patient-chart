@@ -1,16 +1,22 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptMetadata, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
-defineConfigSchema('@openmrs/esm-patient-vitals-app', configSchema);
-const mockedUseConfig = jest.mocked(useConfig);
-const mockedUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const testProps = {
+  patientUuid: mockPatient.id,
+  pageSize: 5,
+  pageUrl: '',
+  urlLabel: '',
+};
+
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
@@ -42,21 +48,18 @@ jest.mock('../common', () => {
   };
 });
 
-describe('VitalsOverview', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
-      mockVitalsConfig,
-    });
-    jest.clearAllMocks();
-  });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  mockVitalsConfig,
+} as ConfigObject);
 
+describe('VitalsOverview', () => {
   it('renders an empty state view if vitals data is unavailable', async () => {
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     await screen.findByRole('heading', { name: /vitals/i });
@@ -74,15 +77,15 @@ describe('VitalsOverview', () => {
       },
     } as unknown as Error;
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       error: mockError,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.findByRole('heading', { name: /vitals/i }));
+    await screen.findByRole('heading', { name: /vitals/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
@@ -95,11 +98,11 @@ describe('VitalsOverview', () => {
   it("renders a tabular overview of the patient's vital signs", async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
     expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
@@ -141,11 +144,11 @@ describe('VitalsOverview', () => {
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
-    mockedUseVitalsAndBiometrics.mockReturnValue({
+    mockUseVitalsAndBiometrics.mockReturnValue({
       data: formattedVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    renderVitalsOverview();
+    renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -165,14 +168,3 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
   });
 });
-
-function renderVitalsOverview() {
-  const testProps = {
-    patientUuid: mockPatient.id,
-    pageSize: 5,
-    pageUrl: '',
-    urlLabel: '',
-  };
-
-  renderWithSwr(<VitalsOverview {...testProps} />);
-}

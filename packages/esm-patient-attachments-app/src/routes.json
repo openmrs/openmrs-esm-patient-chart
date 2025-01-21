@@ -15,8 +15,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-attachments-dashboard-slot",
-        "path": "Attachments",
-        "columns": 1
+        "path": "Attachments"
       },
       "order": 9
     },
@@ -24,7 +23,9 @@
       "name": "capture-photo-widget",
       "component": "capturePhotoWidget",
       "slot": "capture-patient-photo-slot"
-    },
+    }
+  ],
+  "modals": [
     {
       "name": "capture-photo-modal",
       "component": "capturePhotoModal"

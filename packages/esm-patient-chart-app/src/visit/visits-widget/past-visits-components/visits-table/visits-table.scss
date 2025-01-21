@@ -1,10 +1,15 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-@import "../../../../root.scss";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05 0;
+}
 
 .tableContainer {
   padding: 0;
+  border: 1px solid $ui-03;
+  border-bottom: none;
 
   :global(.cds--data-table-header) {
     padding: 0;
@@ -21,13 +26,24 @@
   }
 }
 
+.paginationContainer {
+  > div {
+    border: 1px solid $ui-03 !important;
+    border-top: none !important;
+  }
+}
+
 .filterContainer {
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
+  }
+
+  label {
+    margin-right: layout.$spacing-05 !important;
   }
 }
 
@@ -62,13 +78,13 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: layout.$spacing-11 0;
 }
 
 .tile {

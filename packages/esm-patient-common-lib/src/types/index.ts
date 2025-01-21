@@ -1,10 +1,4 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
-
 export * from './test-results';
-
-export interface DashbardConfig {
-  columns: number;
-}
 
 export interface DashboardLinkConfig {
   path: string;
@@ -14,7 +8,6 @@ export interface DashboardLinkConfig {
 
 export interface DashboardConfig extends DashboardLinkConfig {
   slot: string;
-  config: DashbardConfig;
 }
 
 export interface PatientProgram {
@@ -53,4 +46,12 @@ export interface DisplayMetadata {
   display: string;
   links: Links;
   uuid: string;
+}
+
+export interface HtmlFormEntryForm {
+  formUuid: string;
+  formName: string;
+  formUiResource: string;
+  formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
+  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
 }

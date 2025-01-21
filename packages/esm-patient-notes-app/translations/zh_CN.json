@@ -20,6 +20,7 @@
   "noVisitNoteToDisplay": "没有可显示的就诊记录",
   "primaryDiagnosis": "主要诊断",
   "primaryDiagnosisInputPlaceholder": "选择一个主要诊断",
+  "primaryDiagnosisRequired": "选择至少一个主要诊断",
   "saveAndClose": "保存并关闭",
   "saving": "保存中",
   "searchForPrimaryDiagnosis": "搜索主要诊断",

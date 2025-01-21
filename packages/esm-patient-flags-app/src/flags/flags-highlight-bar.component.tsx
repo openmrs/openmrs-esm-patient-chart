@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { InlineLoading, Tag } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
+import { ArrowRightIcon } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useCurrentPath, usePatientFlags } from './hooks/usePatientFlags';
 import Flags from './flags.component';
@@ -51,7 +51,7 @@ const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) =>
                   count: riskFlags.length,
                 })}
               </span>
-              {!showHighlightBar && <ArrowRight className={styles.arrow} size={16} />}
+              {!showHighlightBar && <ArrowRightIcon className={styles.arrow} size={16} />}
             </Tag>
           </div>
           {showHighlightBar && (

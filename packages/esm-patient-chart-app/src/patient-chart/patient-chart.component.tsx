@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
-  ActionMenu,
   ExtensionSlot,
   WorkspaceContainer,
-  WorkspaceWindow,
   setCurrentVisit,
   setLeftNav,
   unsetLeftNav,
@@ -17,13 +15,16 @@ import { type LayoutMode } from './chart-review/dashboard-view.component';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
+import VisitHeader from '../visit-header/visit-header.component';
+import SideMenuPanel from '../side-nav/side-menu.component';
+import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
-  const { workspaceWindowState, active } = useWorkspaces();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
+  const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
 
   // We are responsible for creating a new offline visit while in offline mode.
@@ -41,6 +42,17 @@ const PatientChart: React.FC = () => {
     };
   }, [patientUuid]);
 
+  useEffect(() => {
+    getPatientChartStore().setState({
+      patientUuid,
+    });
+    return () => {
+      getPatientChartStore().setState({
+        patientUuid: null,
+      });
+    };
+  }, [patientUuid]);
+
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
   useEffect(() => {
     setLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
@@ -49,6 +61,8 @@ const PatientChart: React.FC = () => {
 
   return (
     <>
+      <VisitHeader patient={patient} />
+      <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <>
           <div

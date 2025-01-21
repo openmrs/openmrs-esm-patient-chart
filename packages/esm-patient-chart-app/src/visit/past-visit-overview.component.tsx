@@ -12,9 +12,8 @@ import {
   TableCell,
   type DataTableHeader,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { setCurrentVisit } from '@openmrs/esm-framework';
+import { EditIcon, setCurrentVisit } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
@@ -23,7 +22,7 @@ const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
 
-  const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
+  const { data: pastVisits, error, isLoading } = usePastVisits(patientUuid);
 
   const headerData: Array<typeof DataTableHeader> = useMemo(
     () => [
@@ -59,8 +58,8 @@ const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
-  if (isError) {
-    return <ErrorState error={isError} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />;
   }
   if (pastVisits?.length) {
     return (
@@ -85,14 +84,14 @@ const PastVisitOverview: React.FC<DefaultPatientWorkspaceProps> = ({ patientUuid
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, rowIndex) => (
+                  {rows.map((row) => (
                     <TableRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <Button
-                          renderIcon={Edit}
+                          renderIcon={EditIcon}
                           hasIconOnly
                           kind="ghost"
                           iconDescription={t('editThisVisit', 'Edit this visit')}

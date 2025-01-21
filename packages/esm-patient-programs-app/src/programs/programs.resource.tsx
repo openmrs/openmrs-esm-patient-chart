@@ -1,13 +1,12 @@
 import useSWR from 'swr';
-import { map as rxjsMap } from 'rxjs/operators';
-import { openmrsFetch, openmrsObservableFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type PatientProgram, type Program, type ProgramsFetchResponse } from '../types';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type ProgramWorkflowState, type PatientProgram, type Program, type ProgramsFetchResponse } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 
-export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
+export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
 
 export function useEnrollments(patientUuid: string) {
   const enrollmentsUrl = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
@@ -25,7 +24,7 @@ export function useEnrollments(patientUuid: string) {
 
   return {
     data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     activeEnrollments,
@@ -48,29 +47,23 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
 
   return {
     data: availablePrograms,
-    isError: error,
+    error,
     isLoading,
     eligiblePrograms,
   };
-}
-
-export function getPatientProgramByUuid(programUuid: string) {
-  return openmrsObservableFetch<PatientProgram>(`${restBaseUrl}/programenrollment/${programUuid}`).pipe(
-    rxjsMap(({ data }) => data),
-  );
 }
 
 export function createProgramEnrollment(payload, abortController) {
   if (!payload) {
     return null;
   }
-  const { program, patient, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`${restBaseUrl}/programenrollment`, {
+  const { program, patient, dateEnrolled, dateCompleted, location, states } = payload;
+  return openmrsFetch(`${restBaseUrl}/programenrollment`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: { program, patient, dateEnrolled, dateCompleted, location },
+    body: { program, patient, dateEnrolled, dateCompleted, location, states },
     signal: abortController.signal,
   });
 }
@@ -79,13 +72,13 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   if (!payload && !payload.program) {
     return null;
   }
-  const { program, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
+  const { dateEnrolled, dateCompleted, location, states } = payload;
+  return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: { dateEnrolled, dateCompleted, location },
+    body: { dateEnrolled, dateCompleted, location, states },
     signal: abortController.signal,
   });
 }
@@ -93,14 +86,14 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
 export const usePrograms = (patientUuid: string) => {
   const {
     data: enrollments,
-    isError: enrollError,
+    error: enrollError,
     isLoading: enrolLoading,
     isValidating,
     activeEnrollments,
   } = useEnrollments(patientUuid);
   const { data: availablePrograms, eligiblePrograms } = useAvailablePrograms(enrollments);
 
-  const status = { isLoading: enrolLoading, isError: enrollError };
+  const status = { isLoading: enrolLoading, error: enrollError };
   return {
     enrollments,
     ...status,
@@ -109,4 +102,15 @@ export const usePrograms = (patientUuid: string) => {
     availablePrograms,
     eligiblePrograms,
   };
+};
+
+export const findLastState = (states: ProgramWorkflowState[]): ProgramWorkflowState => {
+  const activeStates = states.filter((state) => !state.voided);
+  const ongoingState = activeStates.find((state) => !state.endDate);
+
+  if (ongoingState) {
+    return ongoingState;
+  }
+
+  return activeStates.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
 };

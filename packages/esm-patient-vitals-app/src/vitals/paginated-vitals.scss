@@ -1,72 +1,69 @@
 @use '@carbon/colors';
-@use '@carbon/type';
 @use '@carbon/layout';
+@use '@carbon/type';
 
 .table {
   td {
     white-space: nowrap;
-    padding: layout.$spacing-02;
-    > span {
-      width: 100%;
-      height: 100%;
-      display: inline-block;
-    }
+    border-top: 1px solid colors.$gray-20;
+    border-bottom: none !important;
   }
 }
 
-.criticallyLow, .criticallyHigh, .low, .high {
+.criticallyLow,
+.criticallyHigh,
+.low,
+.high {
   td:nth-child(2) {
-    @include type.type-style("heading-compact-01");
+    @include type.type-style('heading-compact-01');
   }
 }
 
-.criticallyHigh > span, .criticallyLow > span {
-  border: 2px solid colors.$red-60 !important;
-  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
-} 
-
-.high > span, .low > span {
-  border: 1.5px solid colors.$black-100 !important;
-  padding: layout.$spacing-02 layout.$spacing-02 layout.$spacing-02 layout.$spacing-05;
+.criticallyHigh,
+.criticallyLow {
+  border-top: 1px solid colors.$red-20-hover !important;
+  background-color: colors.$red-20 !important;
 }
 
-.normal > span {
-  padding-left: layout.$spacing-05;
+.high,
+.low {
+  border-top: 1px solid colors.$orange-20 !important;
+  background-color: colors.$orange-10 !important;
 }
 
 .criticallyLow {
   td:nth-child(2)::after {
-    content: " ↓↓";
+    content: ' ↓↓';
   }
 }
 
 .criticallyHigh {
   td:nth-child(2)::after {
-    content: " ↑↑";
+    content: ' ↑↑';
   }
 }
 
 .low {
   td:nth-child(2)::after {
-    content: " ↓";
+    content: ' ↓';
   }
 }
 
 .high {
   td:nth-child(2)::after {
-    content: " ↑";
+    content: ' ↑';
   }
 }
 
 .off-scale-low {
   td:nth-child(2)::after {
-    content: " ↓↓↓";
+    content: ' ↓↓↓';
   }
 }
 
 .off-scale-high {
   td:nth-child(2)::after {
-    content: " ↑↑↑";
+    content: ' ↑↑↑';
   }
 }
 
@@ -77,20 +74,21 @@
 .high,
 .low {
   @include type.type-style('heading-compact-01');
+  color: colors.$gray-100 !important;
 }
 
-.criticallyLow > span::after {
-  content: " ↓↓";
+.criticallyLow::after {
+  content: ' ↓↓';
 }
 
-.criticallyHigh > span::after {
-  content: " ↑↑";
+.criticallyHigh::after {
+  content: ' ↑↑';
 }
 
-.low > span::after {
-  content: " ↓";
+.low::after {
+  content: ' ↓';
 }
 
-.high > span::after {
-  content: " ↑";
+.high::after {
+  content: ' ↑';
 }

@@ -2,6 +2,7 @@ import { type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
+import { invalidateCachedVitalsAndBiometrics } from './common';
 
 /**
  * Launches the for entry workspace with the custom form
@@ -14,6 +15,7 @@ export function launchFormEntry(formUuid: string, encounterUuid?: string, formNa
   launchPatientWorkspace('patient-form-entry-workspace', {
     workspaceTitle: formName,
     formInfo: { formUuid, encounterUuid },
+    mutateForm: invalidateCachedVitalsAndBiometrics,
   });
 }
 

@@ -1,9 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { dashboardPath, spaRoot, basePath } from './constants';
 import PatientChart from './patient-chart/patient-chart.component';
-import SideMenu from './side-nav/side-menu.component';
-import VisitHeader from './visit-header/visit-header.component';
 import styles from './root.scss';
 
 export default function Root() {
@@ -11,8 +9,6 @@ export default function Root() {
     <>
       <div className={styles.patientChartWrapper}>
         <BrowserRouter basename={spaRoot}>
-          <VisitHeader />
-          <SideMenu />
           <Routes>
             <Route path={basePath} element={<PatientChart />} />
             <Route path={dashboardPath} element={<PatientChart />} />
@@ -33,4 +29,7 @@ export default function Root() {
  * t('error', 'Error')
  * t('seeAll', 'See all')
  * t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
+ * t('Routine')
+ * t('Stat')
+ * t('On scheduled date')
  */

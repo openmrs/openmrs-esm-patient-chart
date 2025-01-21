@@ -1,0 +1,94 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@import '~@carbon/charts/styles.css';
+
+.container {
+  :global(.cds--cc--area path.area) {
+    stroke: none;
+    fill: colors.$green-20;
+  }
+}
+
+.ui-shell-header-modal-bar-default {
+  height: layout.$spacing-09;
+  object-fit: contain;
+  background-color: colors.$teal-70;
+  color: white;
+  padding-top: layout.$spacing-05;
+  padding-left: 0.938rem;
+  display: flex;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  flex-grow: 1;
+}
+
+.title {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-right: layout.$spacing-02;
+}
+
+.reference-range {
+  @include type.type-style('helper-text-01');
+  //  color: $text-05; // WIP
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid $ui-03;
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    display: flex;
+
+    svg {
+      order: 1;
+      margin-right: layout.$spacing-03;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.inlineLoader {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: layout.$spacing-05;
+}
+
+.background {
+  width: 100%;
+  padding: 2.375rem 5.688rem 2.188rem layout.$spacing-05;
+  background: white;
+}
+
+.range-tabs :global(.cds--tabs--scrollable__nav-link) {
+  width: 7rem;
+}
+
+.tabPanel {
+  :global(.cds--tab--list) {
+    width: 100%;
+  }
+}

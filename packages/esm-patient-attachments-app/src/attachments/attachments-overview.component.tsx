@@ -1,17 +1,18 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, Loading } from '@carbon/react';
-import { Add, List, Thumbnail_2 } from '@carbon/react/icons';
+import { List, Thumbnail_2 } from '@carbon/react/icons';
 import {
+  AddIcon,
   createAttachment,
   deleteAttachmentPermanently,
   showModal,
   showSnackbar,
+  type Attachment,
+  type UploadedFile,
   useAttachments,
   useLayoutType,
   UserHasAccess,
-  type Attachment,
-  type UploadedFile,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
@@ -39,7 +40,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
   const { allowedFileExtensions } = useAllowedFileExtensions();
 
-  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
+  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment | null>(null);
   const [hasUploadError, setHasUploadError] = useState(false);
   const [view, setView] = useState<ViewType>('grid');
 
@@ -97,7 +98,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
 
   const showAddAttachmentModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
+      saveFile: (file: UploadedFile) => {
+        if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+          file.fileName = `${file.fileName}.png`;
+        }
+        return createAttachment(patientUuid, file);
+      },
       allowedExtensions: allowedFileExtensions,
       closeModal: () => close(),
       onCompletion: () => mutate(),
@@ -153,7 +159,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
                 </IconSwitch>
               </ContentSwitcher>
               <div className={styles.divider} />
-              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showAddAttachmentModal}>
+              <Button
+                kind="ghost"
+                renderIcon={AddIcon}
+                iconDescription="Add attachment"
+                onClick={showAddAttachmentModal}
+              >
                 {t('add', 'Add')}
               </Button>
             </div>

@@ -13,6 +13,8 @@
   "checkForValidity": "តម្លៃមួយចំនួនដែលបានបញ្ចូលមិនត្រឹមត្រូវទេ",
   "date": "កាលបរិច្ឆេទ",
   "dateAndTime": "កាលបរិច្ឆេទ និងម៉ោង",
+  "daysOldVitals_one": "<0>These vitals are <1>{{count}} day old</1></0>",
+  "daysOldVitals_other": "<0>These vitals are <1>{{count}} days old</1></0>",
   "diastolic": "ដឺដ្យាស្តូលីក",
   "discard": "បោះបង់",
   "error": "មានបញ្ហាបច្ចេកទេស",
@@ -26,7 +28,8 @@
   "noDataRecorded": "មិនមានទិន្នន័យត្រូវបានកត់ត្រាសម្រាប់អ្នកជំងឺនេះទេ",
   "notes": "កំណត់សម្គាល់",
   "other": "ផ្សេងៗ",
-  "overdue": "ហួសពេលកំណត់",
+  "outOfDateVitals": "<0>These vitals are <1>out of date</1></0>",
+  "overOneWeekOldVitals": "<0>These vitals are <1>over one week old</1></0>",
   "oxygenSaturation": "Oxygen saturation",
   "pleaseFillField": "សូមបំពេញយ៉ាងហោចណាស់នៅក្នុងប្រអប់មួយ",
   "print": "បោះពុម្ព",
@@ -54,7 +57,7 @@
   "vitalsAndBiometricsRecorded": "សញ្ញាជីវិត និងជីវមាត្រត្រូវបានរក្សាទុក",
   "vitalsAndBiometricsSaveError": "កំហុសក្នុងការរក្សាទុកសញ្ញាជីវិត និងជីវមាត្រ",
   "vitalsHistory": "ប្រវត្តិសញ្ញាជីវិត",
-  "vitalSignDisplayed": "សញ្ញាជីវិតត្រូវបានបង្ហាញ",
+  "vitalSignDisplayed": "Vital sign displayed",
   "vitalSigns": "សញ្ញាជីវិត",
   "weight": "ទម្ងន់"
 }

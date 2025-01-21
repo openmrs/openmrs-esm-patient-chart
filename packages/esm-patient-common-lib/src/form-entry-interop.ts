@@ -1,6 +1,8 @@
-import { navigate } from '@openmrs/esm-framework';
-import isEmpty from 'lodash-es/isEmpty';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+
+export const clinicalFormsWorkspace = 'clinical-forms-workspace';
+export const formEntryWorkspace = 'patient-form-entry-workspace';
+export const htmlFormEntryWorkspace = 'patient-html-form-entry-workspace';
 
 interface HtmlFormEntryForm {
   formUuid: string;
@@ -21,10 +23,16 @@ export function launchFormEntryOrHtmlForms(
   visitStartDatetime?: string,
   visitStopDatetime?: string,
   mutateForms?: () => void,
+  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  formEntryWorkspaceName = formEntryWorkspace,
+  htmlFormEntryWorkspaceName = htmlFormEntryWorkspace,
 ) {
   if (visitUuid) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlForm)) {
+
+    if (htmlForm) {
+      launchHtmlFormEntry(patientUuid, formName, encounterUuid, visitUuid, htmlForm, htmlFormEntryWorkspaceName);
+    } else {
       launchFormEntry(
         formUuid,
         patientUuid,
@@ -34,18 +42,11 @@ export function launchFormEntryOrHtmlForms(
         visitTypeUuid,
         visitStartDatetime,
         visitStopDatetime,
+        htmlForm,
         mutateForms,
+        clinicalFormsWorkspaceName,
+        formEntryWorkspaceName,
       );
-    } else {
-      if (encounterUuid) {
-        navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formEditUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-        });
-      } else {
-        navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
-        });
-      }
     }
   } else {
     launchStartVisitPrompt();
@@ -61,10 +62,16 @@ export function launchFormEntry(
   visitTypeUuid?: string,
   visitStartDatetime?: string,
   visitStopDatetime?: string,
+  htmlForm?: HtmlFormEntryForm,
   mutateForm?: () => void,
+  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  formEntryWorkspaceName = formEntryWorkspace,
 ) {
-  launchPatientWorkspace('patient-form-entry-workspace', {
+  launchPatientWorkspace(formEntryWorkspaceName, {
     workspaceTitle: formName,
+    clinicalFormsWorkspaceName,
+    formEntryWorkspaceName,
+    patientUuid,
     mutateForm,
     formInfo: {
       encounterUuid,
@@ -74,6 +81,26 @@ export function launchFormEntry(
       visitUuid: visitUuid,
       visitStartDatetime,
       visitStopDatetime,
+      htmlForm,
+    },
+  });
+}
+
+export function launchHtmlFormEntry(
+  patientUuid: string,
+  formName: string,
+  encounterUuid: string,
+  visitUuid: string,
+  htmlForm: HtmlFormEntryForm,
+  workspaceName = htmlFormEntryWorkspace,
+) {
+  launchPatientWorkspace(workspaceName, {
+    workspaceTitle: formName,
+    patientUuid,
+    formInfo: {
+      encounterUuid,
+      visitUuid,
+      htmlForm,
     },
   });
 }

@@ -1,4 +1,6 @@
-@import "../root.scss";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .attachmentTable > .cds--data-table-header {
   display: none;
@@ -11,4 +13,16 @@
 
 .menuItem {
   max-width: none;
+}
+
+.emptyState {
+  text-align: center;
+  background-color: white;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }

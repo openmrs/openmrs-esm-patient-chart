@@ -6,6 +6,3 @@ export const customEncounterRepresentation = `custom:(uuid,encounterDatetime,enc
 
 export const formEncounterUrl = `${restBaseUrl}/form?v=custom:${customFormRepresentation}`;
 export const formEncounterUrlPoc = `${restBaseUrl}/form?v=custom:${customFormRepresentation}&q=poc`;
-
-export const clinicalFormsWorkspace = 'clinical-forms-workspace';
-export const formEntryWorkspace = 'patient-form-entry-workspace';

@@ -1,0 +1,88 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/_vars' as *;
+
+.stickerContainer {
+  padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.documentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid $brand-01;
+  margin-bottom: layout.$spacing-05;
+}
+
+.row {
+  margin: layout.$spacing-03 0 0;
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+}
+
+.gridRow {
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  div {
+    margin-left: 0px;
+    margin-bottom: 5px;
+  }
+}
+
+.patientName {
+  font-size: layout.$spacing-06;
+  font-weight: bolder;
+  margin-bottom: 5px;
+}
+
+.button {
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: layout.$spacing-03 0;
+  margin-top: layout.$spacing-03;
+}
+
+.loader {
+  :global(.cds--inline-loading__text) {
+    @include type.type-style('body-01');
+  }
+}
+
+.strong {
+  @include type.type-style('heading-04');
+  font-weight: 700;
+  margin-inline-end: layout.$spacing-03;
+}
+
+.patientDetail {
+  @include type.type-style('heading-03');
+}
+
+.implementationLogo {
+  width: 40%;
+}
+
+@media print {
+  html,
+  body {
+    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  .stickerContainer {
+    transform: scale(var(--print-scale));
+    transform-origin: left top;
+  }
+}

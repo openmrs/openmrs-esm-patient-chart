@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/spacing';
-@import "../root";
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   display: flex;
@@ -9,39 +9,48 @@
 }
 
 .orderBasketContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .orderBasketContainer :global(.cds--btn-set .cds--btn) {
   max-width: 50%;
-  height: 4rem;
+  height: layout.$spacing-10;
 }
 
 .orderBasketSlot {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: layout.$spacing-07;
 }
 
 .orderBasketSlotTablet {
-  gap: 1rem;
+  gap: layout.$spacing-05;
 }
 
 .buttonSet {
-  padding: 0rem;
+  padding: 0;
 }
 
-.bottomButton {
-  height: 4rem;
+.actionButton {
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset;
+  }
 }
 
-.inlineNotification, .actionNotification {
+.inlineNotification,
+.actionNotification {
   max-width: unset !important;
-  margin-bottom: spacing.$spacing-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 /* Tablet */
@@ -51,7 +60,11 @@
   }
 
   .buttonSet {
-    padding: 1.5rem 1rem;
+    padding: layout.$spacing-06 layout.$spacing-05;
     background-color: $ui-02;
   }
+}
+
+.orderPanel {
+  margin: layout.$spacing-07 0;
 }

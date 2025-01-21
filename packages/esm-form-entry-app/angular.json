@@ -28,13 +28,13 @@
           "options": {
             "allowedCommonJsDependencies": [
               "core-js",
+              "dayjs",
               "dompurify",
               "html2canvas",
               "lodash",
               "moment",
               "raf",
-              "rgbcolor",
-              "zone.js"
+              "rgbcolor"
             ],
             "preserveSymlinks": true,
             "outputPath": "dist",

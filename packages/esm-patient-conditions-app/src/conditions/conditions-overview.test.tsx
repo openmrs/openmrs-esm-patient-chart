@@ -1,39 +1,31 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-
+import { type FetchResponse, getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-};
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-const mockedUseConfig = useConfig as jest.Mock;
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  launchPatientWorkspace: jest.fn(),
+}));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  conditionPageSize: 5,
 });
 
-describe('ConditionsOverview: ', () => {
-  beforeEach(() => {
-    mockedOpenmrsFetch.mockClear();
-    mockedUseConfig.mockReturnValue({ conditionPageSize: 5 });
-  });
-
+describe('ConditionsOverview', () => {
   it('renders an empty state view if conditions data is unavailable', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -53,9 +45,9 @@ describe('ConditionsOverview: ', () => {
       },
     };
 
-    mockedOpenmrsFetch.mockRejectedValueOnce(error);
+    mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -68,9 +60,9 @@ describe('ConditionsOverview: ', () => {
   it("renders an overview of the patient's conditions when present", async () => {
     const user = userEvent.setup();
 
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: mockFhirConditionsResponse } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -100,9 +92,9 @@ describe('ConditionsOverview: ', () => {
   it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
     const user = userEvent.setup();
 
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: [] } as FetchResponse);
 
-    renderConditionsOverview();
+    renderWithSwr(<ConditionsOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
@@ -114,7 +106,3 @@ describe('ConditionsOverview: ', () => {
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
   });
 });
-
-function renderConditionsOverview() {
-  renderWithSwr(<ConditionsOverview {...testProps} />);
-}

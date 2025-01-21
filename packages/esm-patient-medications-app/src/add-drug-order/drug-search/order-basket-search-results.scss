@@ -1,27 +1,11 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "../../root";
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 /** For OrderBasketSearchResults */
-
 .container {
-  margin: spacing.$spacing-03 spacing.$spacing-05 0;
-}
-
-.divider {
-  border: 0;
-  border-top: 1px solid $color-gray-30;
-  width: 66%;
-}
-
-.desktopDivider {
-  margin: spacing.$spacing-07 auto spacing.$spacing-05;
-  padding-bottom: 8rem;
-}
-
-.tabletDivider {
-  margin: spacing.$spacing-08 auto 0;
-  padding-bottom: spacing.$spacing-08;
+  margin: layout.$spacing-03 layout.$spacing-05 0;
 }
 
 .searchResultsCount {
@@ -32,38 +16,42 @@
 .orderBasketSearchResultsHeader {
   display: flex;
   justify-content: space-between;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   align-items: center;
 }
 
 /** For DrugSearchResultItem */
-
 .searchResultTile {
   padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid $grey-2;
+
   &:not(:last-of-type) {
-    margin-bottom: spacing.$spacing-03;
+    margin-bottom: layout.$spacing-03;
   }
 }
 
 .tabletSearchResultTile {
   &:not(:last-of-type) {
-    margin-bottom: spacing.$spacing-04;
+    margin-bottom: layout.$spacing-04;
   }
 }
 
 .searchResultTileContent {
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: layout.$spacing-03 layout.$spacing-05;
 }
 
 .searchResultActions {
   border-top: 1px solid $grey-2;
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
+
+  svg {
+    fill: currentColor !important;
+  }
 }
 
 .errorLabel {
@@ -72,14 +60,14 @@
 }
 
 .searchResultSkeletonWrapper {
-  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
-  
+  margin: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03;
+
   :global(.cds--skeleton__text) {
     margin: 0;
   }
 
   .searchResultCntSkeleton {
-    margin-right: spacing.$spacing-07;
+    margin-right: layout.$spacing-07;
   }
 
   .skeletonTile {
@@ -89,11 +77,11 @@
 }
 
 .emptyState {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: spacing.$spacing-07;
+  padding: layout.$spacing-07;
   border: 1px solid $ui-03;
   text-align: center;
   background-color: $ui-01;
@@ -110,16 +98,33 @@
 }
 
 .resultsContainer::-webkit-scrollbar {
-  width: spacing.$spacing-03;
+  width: layout.$spacing-03;
 }
 
 .resultsContainer::-webkit-scrollbar-thumb {
-  border-radius: spacing.$spacing-02;
+  border-radius: layout.$spacing-02;
 }
 
 .drugAlreadyPrescribed {
-  margin: 0 spacing.$spacing-03 spacing.$spacing-03 0;
+  margin: 0 layout.$spacing-03 layout.$spacing-03 0;
   text-align: right;
   @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.productiveHeading01 {
+  @include type.type-style('heading-compact-01');
+  margin-bottom: layout.$spacing-03;
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.text02 {
   color: $text-02;
 }

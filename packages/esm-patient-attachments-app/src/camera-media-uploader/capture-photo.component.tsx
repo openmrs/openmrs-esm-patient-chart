@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { type ComponentProps, useCallback, useState } from 'react';
+import classNames from 'classnames';
 import { Button } from '@carbon/react';
-import { Camera } from '@carbon/react/icons';
-import { showModal, toOmrsIsoString, type UploadedFile } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { EditIcon, showModal, toOmrsIsoString, useLayoutType, type UploadedFile } from '@openmrs/esm-framework';
 import styles from './capture-photo.scss';
 
 export interface CapturePhotoProps {
@@ -12,6 +12,8 @@ export interface CapturePhotoProps {
 
 const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhoto }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
   const [dataUri, setDataUri] = useState(null);
 
   const showCam = useCallback(() => {
@@ -23,31 +25,45 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
           close();
         });
       },
+      cameraOnly: false,
       collectDescription: false,
       closeModal: () => {
         close();
       },
-      cameraOnly: false,
+      title: t('addAnImage', 'Add image'),
     });
-  }, [onCapturePhoto]);
+  }, [onCapturePhoto, t]);
 
-  const showPlaceholderIcon = !dataUri && !initialState;
+  const showEmptyState = !dataUri && !initialState;
 
   return (
-    <div className={styles.container}>
-      <button type="button" onClick={showCam} className={styles.buttonCssReset}>
-        {showPlaceholderIcon ? (
-          <div className={styles.placeholderIconContainer}>
-            <Camera size="20" />
-          </div>
+    <>
+      <div className={styles.imageContainer}>
+        {showEmptyState ? (
+          <span className={styles.emptyState}>{t('noImageToDisplay', 'No image to display')}</span>
         ) : (
-          <img src={dataUri || initialState} alt="Preview" className={styles.preview} />
+          <img
+            alt={t('imagePreview', 'Image preview')}
+            className={classNames({
+              [styles.imagePreview]: !showEmptyState,
+              [styles.altImagePreview]: showEmptyState,
+            })}
+            src={dataUri || initialState}
+          />
         )}
-      </button>
-      <Button kind="ghost" onClick={showCam} className={styles.actionButton}>
-        {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
-      </Button>
-    </div>
+      </div>
+      <div className={styles.editButtonContainer}>
+        <Button
+          className={styles.editButton}
+          kind="secondary"
+          onClick={showCam}
+          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon {...props} />}
+          size={responsiveSize}
+        >
+          <span>{t('edit', 'Edit')}</span>
+        </Button>
+      </div>
+    </>
   );
 };
 

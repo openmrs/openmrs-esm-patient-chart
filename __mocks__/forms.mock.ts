@@ -55,6 +55,6 @@ export const mockForms = [
         },
       },
     ],
-    lastCompleted: new Date('2022-04-08T06:21:48.000Z'),
+    lastCompletedDate: new Date('2022-04-08T06:21:48.000Z'),
   },
 ];

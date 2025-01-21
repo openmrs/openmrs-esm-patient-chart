@@ -1,6 +1,8 @@
+import { openmrsFetch, restBaseUrl, type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import useSWR from 'swr';
-import { type OpenmrsResource, openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { type Encounter } from '../types/encounter';
+import { type Encounter, type Observation } from '../types/encounter';
+import { type OrderDiscontinuationPayload } from '../types/order';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -8,10 +10,11 @@ const labEncounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),' +
   'value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name))))';
 const labConceptRepresentation =
-  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,' +
-  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+  'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
+  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
+type NullableNumber = number | null | undefined;
 export interface LabOrderConcept {
   uuid: string;
   display: string;
@@ -24,12 +27,13 @@ export interface LabOrderConcept {
   mappings?: Array<Mapping>;
   answers?: Array<OpenmrsResource>;
   setMembers?: Array<LabOrderConcept>;
-  hiNormal?: number;
-  hiAbsolute?: number;
-  hiCritical?: number;
-  lowNormal?: number;
-  lowAbsolute?: number;
-  lowCritical?: number;
+  hiNormal?: NullableNumber;
+  hiAbsolute?: NullableNumber;
+  hiCritical?: NullableNumber;
+  lowNormal?: NullableNumber;
+  lowAbsolute?: NullableNumber;
+  lowCritical?: NullableNumber;
+  allowDecimal?: boolean | null;
   units?: string;
 }
 
@@ -95,63 +99,83 @@ export function useLabEncounter(encounterUuid: string) {
   return {
     encounter: data?.data,
     isLoading,
-    isError: error,
+    error: error,
     isValidating,
     mutate,
   };
 }
 
-export function fetchObservation(obsUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`).then(({ data }) => {
-    if (data) {
-      return data;
-    }
-    return null;
-  });
+export function useObservation(obsUuid: string) {
+  const url = `${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(
+    obsUuid ? url : null,
+    openmrsFetch,
+  );
+  return {
+    data: data?.data,
+    isLoading,
+    error,
+    isValidating,
+    mutate,
+  };
 }
 
-const addObservation = async (encounterUuid: string, obsPayload: any, abortController: any) => {
-  const saveResultObs = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+export function useCompletedLabResults(order: Order) {
+  const {
+    encounter,
+    isLoading: isLoadingEncounter,
+    mutate: mutateLabOrders,
+    error: encounterError,
+  } = useLabEncounter(order.encounter.uuid);
+  const {
+    data: observation,
+    isLoading: isLoadingObs,
+    error: isErrorObs,
+    mutate: mutateObs,
+  } = useObservation(encounter?.obs.find((obs) => obs?.concept?.uuid === order?.concept?.uuid)?.uuid ?? '');
+
+  return {
+    isLoading: isLoadingEncounter || isLoadingObs,
+    completeLabResult: observation,
+    mutate: () => {
+      mutateLabOrders();
+      mutateObs();
     },
-    signal: abortController.signal,
-    body: obsPayload,
-  });
-
-  return saveResultObs.status;
-};
-
-const editObservation = async (obsUuid: string, obsPayload: any, abortController: any) => {
-  const editResultObs = await openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: obsPayload,
-  });
-
-  return editResultObs.status;
-};
+    error: isErrorObs ?? encounterError,
+  };
+}
 
 // TODO: the calls to update order and observations for results should be transactional to allow for rollback
 export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
-  obsUuid: string,
   obsPayload: any,
   fulfillerPayload: any,
+  orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
-  const saveObs = obsUuid
-    ? editObservation(obsUuid, obsPayload, abortController)
-    : addObservation(encounterUuid, obsPayload, abortController);
+  const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: obsPayload,
+  });
 
-  saveObs.then((obsStatus) => {
-    if (obsStatus === 200 || obsStatus === 201) {
-      return openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
+  if (saveEncounter.ok) {
+    const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortController.signal,
+      body: orderPayload,
+    });
+
+    if (updateOrderCall.status === 201) {
+      const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +183,91 @@ export async function updateOrderResult(
         signal: abortController.signal,
         body: fulfillerPayload,
       });
+      return fulfillOrder;
     }
-    throw new Error('Saving of test results failed');
+  }
+  throw new Error('Failed to update order');
+}
+
+export function createObservationPayload(
+  concept: LabOrderConcept,
+  order: Order,
+  values: Record<string, unknown>,
+  status: string,
+) {
+  if (concept.set && concept.setMembers.length > 0) {
+    const groupMembers = concept.setMembers
+      .map((member) => createGroupMember(member, order, values, status))
+      .filter((member) => member !== null && member.value !== null && member.value !== undefined);
+
+    if (groupMembers.length === 0) {
+      return { obs: [] };
+    }
+
+    return { obs: [createObservation(order, groupMembers, null, status)] };
+  } else {
+    const value = getValue(concept, values);
+    if (value === null || value === undefined) {
+      return { obs: [] };
+    }
+    return { obs: [createObservation(order, null, value, status)] };
+  }
+}
+
+export function updateObservation(observationUuid: string, payload: Record<string, any>) {
+  return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
   });
 }
+
+function createGroupMember(member: LabOrderConcept, order: Order, values: Record<string, unknown>, status: string) {
+  const value = getValue(member, values);
+  if (value === null || value === undefined) {
+    return null;
+  }
+  return {
+    concept: { uuid: member.uuid },
+    value: value,
+    status: status,
+    order: { uuid: order.uuid },
+  };
+}
+
+function createObservation(order: Order, groupMembers = null, value = null, status: string) {
+  return {
+    concept: { uuid: order.concept.uuid },
+    status: status,
+    order: { uuid: order.uuid },
+    ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
+    ...(value !== null && value !== undefined && { value }),
+  };
+}
+
+function getValue(concept: LabOrderConcept, values: Record<string, unknown>) {
+  const { datatype, uuid } = concept;
+  const value = values[uuid];
+
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  // hl7Abbreviation is NM for Numeric and ST for Text
+  if (['NM', 'ST'].includes(datatype.hl7Abbreviation)) {
+    return value;
+  }
+  // hl7Abbreviation is CWE for Coded with exceptions datatype
+  if (datatype.hl7Abbreviation === 'CWE') {
+    return { uuid: value };
+  }
+
+  return null;
+}
+
+export const isCoded = (concept: LabOrderConcept) => concept.datatype?.display === 'Coded';
+export const isNumeric = (concept: LabOrderConcept) => concept.datatype?.display === 'Numeric';
+export const isPanel = (concept: LabOrderConcept) => concept.setMembers?.length > 0;
+export const isText = (concept: LabOrderConcept) => concept.datatype?.display === 'Text';

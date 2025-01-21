@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
-import { type ChartConfig } from '../config-schema';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../config-schema';
 
 interface VisitAttributeTagsProps {
   patientUuid: string;
@@ -28,7 +28,7 @@ const getAttributeValue = (attributeType, value) => {
 
 const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const { visitAttributeTypes } = useConfig() as ChartConfig;
+  const { visitAttributeTypes } = useConfig<ChartConfig>();
 
   return (
     <>
@@ -37,7 +37,11 @@ const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) 
           (attribute) =>
             visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
         )
-        .map((attribute) => <Tag type="gray">{getAttributeValue(attribute?.attributeType, attribute?.value)}</Tag>)}
+        .map((attribute) => (
+          <Tag key={attribute?.attributeType?.uuid} type="gray">
+            {getAttributeValue(attribute?.attributeType, attribute?.value)}
+          </Tag>
+        ))}
     </>
   );
 };

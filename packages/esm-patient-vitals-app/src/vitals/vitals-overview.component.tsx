@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
-import { Add, ChartLineSmooth, Table, Printer } from '@carbon/react/icons';
+import { Add, Analytics, Table, Printer } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import {
   age,
@@ -16,11 +16,11 @@ import {
 import type { ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
+import type { VitalsTableHeader, VitalsTableRow } from './types';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
-import type { VitalsTableHeader, VitalsTableRow } from './types';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -198,7 +198,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                       <Table size={16} />
                     </IconSwitch>
                     <IconSwitch name="chartView" text="Chart view">
-                      <ChartLineSmooth size={16} />
+                      <Analytics size={16} />
                     </IconSwitch>
                   </ContentSwitcher>
                   <>

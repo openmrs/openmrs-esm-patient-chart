@@ -12,12 +12,12 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 - [Conditions](packages/esm-patient-conditions-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
-- [Labs](packages/esm-patient-labs-app/README.md)
 - [Medications](packages/esm-patient-medications-app/README.md)
 - [Notes](packages/esm-patient-notes-app/README.md)
 - [Patient banner](packages/esm-patient-banner-app/README.md)
 - [Patient chart](packages/esm-patient-chart-app/README.md)
 - [Programs](packages/esm-patient-programs-app/README.md)
+- [Tests](packages/esm-patient-tests-app/README.md)
 - [Vitals](packages/esm-patient-vitals-app/README.md)
 
 In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
@@ -107,7 +107,7 @@ To run end-to-end tests, run:
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) to learn more about End-to-End tests in this project.
+Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 

@@ -1,31 +1,50 @@
-.container {
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: layout.$spacing-04;
+  color: colors.$cool-gray-70;
+  width: 7.5rem;
+  height: 7.5rem;
+  border: 1px solid colors.$cool-gray-80;
+}
+
+.imagePreview {
+  object-fit: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.altImagePreview {
+  @extend .imagePreview;
+  padding: layout.$spacing-07;
+  height: auto;
+}
+
+.emptyState {
+  padding: layout.$spacing-07;
+}
+
+.editButtonContainer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 7.5rem;
+  background-color: colors.$cool-gray-80;
 }
 
-.buttonCssReset {
-	max-width: 4rem;
-	padding: 0;
-	margin: 0;
-	border: none;
-	background: none;
-	cursor: pointer;
-}
-
-.placeholderIconContainer {
-	width: 4rem;
-	height: 4rem;
-	background-color: #D8D8D8;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.actionButton {
-  flex: 1;
-  margin-left: 1rem;
-}
-
-.preview {
+.editButton {
+  color: colors.$white-0;
+  display: flex;
+  justify-content: space-between;
   width: 100%;
+
+  &:hover {
+    color: colors.$white-0;
+  }
 }

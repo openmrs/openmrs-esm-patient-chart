@@ -1,17 +1,15 @@
-@import '../../root.scss';
-
 .radioButtonWrapper {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	flex-direction: row;
-	min-height: 18rem;
-	width: 30rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-direction: row;
+  min-height: 18rem;
+  width: 30rem;
 }
 
-.radioButtonWrapper  div {
-	width: 14rem;
-	display: flex;
-	height: spacing.$spacing-07;
-	margin: 0rem;
+.radioButtonWrapper div {
+  width: 14rem;
+  display: flex;
+  height: layout.$spacing-07;
+  margin: 0;
 }

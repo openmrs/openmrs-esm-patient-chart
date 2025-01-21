@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { AddIcon, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -26,7 +25,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
   const { currentVisit } = useVisit(patientUuid);
   const displayText = t('visitNotes', 'Visit notes');
   const headerTitle = t('visitNotes', 'Visit notes');
-  const { visitNotes, isError, isLoading, isValidating } = useVisitNotes(patientUuid);
+  const { visitNotes, error, isLoading, isValidating } = useVisitNotes(patientUuid);
   const layout = useLayoutType();
   const isDesktop = layout === 'large-desktop' || layout === 'small-desktop';
 
@@ -41,8 +40,8 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   }
-  if (isError) {
-    return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
   }
   if (!visitNotes?.length) {
     return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
@@ -54,7 +53,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
         <span>{isValidating ? <InlineLoading /> : null}</span>
         <Button
           kind="ghost"
-          renderIcon={(props) => <Add size={16} {...props} />}
+          renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
           iconDescription="Add visit note"
           onClick={launchVisitNoteForm}
         >

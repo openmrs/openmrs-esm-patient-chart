@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-conditions-app",
-  "version": "8.0.1",
+  "version": "9.1.0",
   "license": "MPL-2.0",
   "description": "Patient conditions microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-conditions-app.js",
@@ -17,7 +17,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/**/*.hook.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -38,12 +38,12 @@
   },
   "dependencies": {
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^8.0.1",
+    "@openmrs/esm-patient-common-lib": "^9.1.0",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "8.x",
+    "@openmrs/esm-framework": "6.x",
+    "@openmrs/esm-patient-common-lib": "9.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",
@@ -53,6 +53,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.88.2"
+    "webpack": "^5.94.0"
   }
 }

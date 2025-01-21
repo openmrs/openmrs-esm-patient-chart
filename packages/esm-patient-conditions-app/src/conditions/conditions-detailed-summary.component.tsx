@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,8 +16,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { useConditions, type ConditionTableHeader, useConditionsSorting } from './conditions.resource';
@@ -32,7 +31,7 @@ function ConditionsDetailedSummary({ patient }) {
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { conditions, error, isLoading, isValidating } = useConditions(patient.id);
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -101,7 +100,7 @@ function ConditionsDetailedSummary({ patient }) {
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -123,7 +122,7 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add conditions"
               onClick={launchConditionsForm}
             >
@@ -143,7 +142,7 @@ function ConditionsDetailedSummary({ patient }) {
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <>
               <TableContainer>
-                <Table aria-label="conditions summary" {...getTableProps()}>
+                <Table {...getTableProps()} aria-label="conditions summary" className={styles.table}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

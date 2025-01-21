@@ -1,7 +1,7 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import "~@openmrs/esm-styleguide/src/vars";
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetCard {
   border: 1px solid $ui-03;
@@ -9,9 +9,9 @@
 
 .divider {
   width: 1px;
-  height: spacing.$spacing-05;
+  height: layout.$spacing-05;
   color: colors.$gray-20;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .rightMostFlexContainer {
@@ -26,24 +26,24 @@
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
   }
 
   :global(.cds--dropdown--inline .cds--list-box__menu) {
-    min-width: 10rem;
+    min-width: layout.$spacing-13;
   }
 }
 
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: layout.$spacing-11 0;
 }
 
 .tile {
@@ -60,4 +60,14 @@
 .helper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.tableContainer {
+  flex: 1;
+}
+
+.table {
+  td {
+    border-bottom: none !important;
+  }
 }

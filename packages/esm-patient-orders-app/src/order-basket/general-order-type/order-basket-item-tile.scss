@@ -1,0 +1,81 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.clickableTileDesktop {
+  padding: layout.$spacing-03 layout.$spacing-04;
+  border-bottom: 1px solid $ui-03;
+}
+
+.clickableTileTablet {
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
+}
+
+.orderBasketItemTile {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.label {
+  display: inline-block;
+  @include type.type-style('label-01');
+  margin-bottom: layout.$spacing-03;
+}
+
+.orderActionNewLabel {
+  @extend .label;
+  background-color: colors.$green-10-hover;
+  padding: 0 layout.$spacing-02;
+}
+
+.orderActionIncompleteLabel {
+  @extend .orderActionNewLabel;
+  background-color: colors.$red-60;
+  color: white;
+}
+
+.orderActionRenewLabel {
+  @extend .orderActionNewLabel;
+}
+
+.orderActionReviseLabel {
+  @extend .orderActionNewLabel;
+}
+
+.orderActionDiscontinueLabel {
+  @extend .orderActionNewLabel;
+  background-color: colors.$gray-20;
+}
+
+.orderErrorText {
+  color: $danger;
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  @include type.type-style('heading-compact-01');
+  color: black;
+}
+
+.removeButton {
+  svg {
+    fill: $danger !important;
+  }
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.clipTextWithEllipsis {
+  font-size: layout.$spacing-05;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

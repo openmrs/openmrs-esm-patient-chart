@@ -1,20 +1,47 @@
 export const mockPatientFlags = [
   {
-    uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
-    flag: { display: 'Needs Follow Up' },
+    auditInfo: { dateCreated: '2024-03-01T00:00:00.000Z' },
+    flag: { display: 'Needs Follow Up', uuid: '98ca6c08f-66d9-4a18-a233-4f658b1755bf' },
     message: 'Patient needs to be followed up',
-    tags: [{ display: 'flag tag - risk' }, { display: 'flag type - Social' }],
+    patient: {
+      uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
+      display: 'John Doe',
+    },
+    tags: [
+      { display: 'flag tag - risk', uuid: 'some-uuid' },
+      { display: 'flag type - Social', uuid: 'some-other-uuid' },
+    ],
+    uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
+    voided: false,
   },
   {
-    uuid: '5fs6c08f-66d9-4a18-a233-5f658b1755bf',
-    flag: { display: 'Unknown Diagnosis' },
+    auditInfo: { dateCreated: '2024-03-01T00:00:00.000Z' },
+    flag: { display: 'Unknown Diagnosis', uuid: 'a4a4c08f-66d9-4a18-a233-5f658b1755bf' },
     message: 'Diagnosis for the patient is unknown',
-    tags: [{ display: 'flag tag - info' }, { display: 'flag type - Clinical' }],
+    patient: {
+      uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
+      display: 'John Doe',
+    },
+    tags: [
+      { display: 'flag tag - info', uuid: 'another-uuid' },
+      { display: 'flag type - Clinical', uuid: 'yet-another-uuid' },
+    ],
+    uuid: '5fs6c08f-66d9-4a18-a233-5f658b1755bf',
+    voided: false,
   },
   {
-    uuid: '4da4c08f-66d9-4a18-a233-5f658b1755bf',
-    flag: { display: 'Future Appointment' },
+    auditInfo: { dateCreated: '2024-03-01T00:00:00.000Z' },
+    flag: { display: 'Future Appointment', uuid: 'cc6c08f-66d9-4a18-a233-5f658b1755bf' },
     message: 'Patient has a future appointment scheduled',
-    tags: [{ display: 'flag tag - info' }, { display: 'flag type - Clinical' }],
+    patient: {
+      uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
+      display: 'John Doe',
+    },
+    tags: [
+      { display: 'flag tag - info', uuid: 'one-more-uuid' },
+      { display: 'flag type - Clinical', uuid: 'yet-one-more-uuid' },
+    ],
+    uuid: '4da4c08f-66d9-4a18-a233-5f658b1755bf',
+    voided: false,
   },
 ];

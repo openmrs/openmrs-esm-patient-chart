@@ -1,20 +1,11 @@
-import React, { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useMatch } from 'react-router-dom';
-import {
-  Extension,
-  type ExtensionData,
-  ExtensionSlot,
-  getExtensionNameFromId,
-  useExtensionSlotMeta,
-} from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { Extension, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-
-function getColumnsLayoutStyle(dashboard: DashboardConfig) {
-  const numberOfColumns = dashboard.columns ?? 2;
-  return '1fr '.repeat(numberOfColumns).trimEnd();
-}
 
 /**
  * The layout mode dictates the width occuppied by the chart dashboard widgets.
@@ -29,9 +20,9 @@ export interface DashboardConfig {
   slot: string;
   title: string | (() => string | Promise<string>);
   path: string;
-  columns: number;
   hideDashboardTitle?: boolean;
   layoutMode?: LayoutMode;
+  moduleName: string;
 }
 
 interface DashboardViewProps {
@@ -42,10 +33,10 @@ interface DashboardViewProps {
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
   const widgetMetas = useExtensionSlotMeta(dashboard.slot);
+  const { t } = useTranslation(dashboard.moduleName);
   const {
     params: { view },
   } = useMatch(dashboardPath);
-  const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = useMemo(
     () => ({
@@ -56,14 +47,6 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       launchStartVisitPrompt,
     }),
     [patient, patientUuid, view],
-  );
-
-  const wrapItem = useCallback(
-    (slot: ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 1 } = widgetMetas[getExtensionNameFromId(extension.extensionId)];
-      return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
-    },
-    [widgetMetas],
   );
 
   const [resolvedTitle, setResolvedTitle] = useState<string | undefined>();
@@ -81,15 +64,19 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   return (
     <>
       <ExtensionSlot state={state} name="top-of-all-patient-dashboards-slot" />
-      {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{resolvedTitle}</h1>}
-      <ExtensionSlot
-        key={dashboard.slot}
-        name={dashboard.slot}
-        className={styles.dashboard}
-        style={{ gridTemplateColumns }}
-      >
-        <Extension state={state}>{wrapItem}</Extension>
-      </ExtensionSlot>
+      {!dashboard.hideDashboardTitle && resolvedTitle && <h1 className={styles.dashboardTitle}>{t(resolvedTitle)}</h1>}
+      <div className={styles.dashboardContainer}>
+        <ExtensionSlot key={dashboard.slot} name={dashboard.slot} className={styles.dashboard}>
+          {(extension) => {
+            const { fullWidth = false } = widgetMetas[extension.id] || {};
+            return (
+              <div className={classNames(styles.extension, fullWidth && styles.fullWidth)}>
+                <Extension state={state} className={styles.extensionWrapper} />
+              </div>
+            );
+          }}
+        </ExtensionSlot>
+      </div>
     </>
   );
 }

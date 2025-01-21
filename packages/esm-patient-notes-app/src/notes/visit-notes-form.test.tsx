@@ -1,8 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { of } from 'rxjs/internal/observable/of';
-import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -11,35 +10,29 @@ import {
   mockFetchProviderByUuidResponse,
   mockSessionDataResponse,
 } from '__mocks__';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.workspace';
 
-const testProps = {
+const defaultProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
+  setTitle: jest.fn(),
 };
 
-const mockFetchDiagnosisConceptsByName = fetchDiagnosisConceptsByName as jest.Mock;
-const mockSaveVisitNote = saveVisitNote as jest.Mock;
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = useConfig as jest.Mock;
-const mockUseSession = useSession as jest.Mock;
+function renderVisitNotesForm(props = {}) {
+  render(<VisitNotesForm {...defaultProps} {...props} />);
+}
+
+const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
+const mockSaveVisitNote = jest.mocked(saveVisitNote);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    createErrorHandler: jest.fn(),
-    showSnackbar: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ConfigMock),
-    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
-  };
-});
 
 jest.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: jest.fn(),
@@ -58,41 +51,48 @@ jest.mock('./visit-notes.resource', () => ({
   })),
 }));
 
+mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  ...ConfigMock,
+});
+
 test('renders the visit notes form with all the relevant fields and values', () => {
   mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
 
   renderVisitNotesForm();
 
-  expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
-  expect(screen.getByRole('searchbox', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
-  expect(screen.getByRole('searchbox', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
-  expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /visit date/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
 });
 
-test.only('typing in the diagnosis search input triggers a search', async () => {
+test('typing in the diagnosis search input triggers a search', async () => {
+  const user = userEvent.setup();
+
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
   expect(screen.getByText('Diabetes Mellitus, Type II')).toBeInTheDocument();
 
   // clicking on a search result displays the selected diagnosis as a tag
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
   const diabetesMellitusTag = screen.getByTitle(/^Diabetes Mellitus$/i);
   expect(diabetesMellitusTag).toBeInTheDocument();
 
   const closeTagButton = screen.getByRole('button', { name: /clear filter/i });
   // Clicking the close button on the tag removes the selected diagnosis
-  await userEvent.click(closeTagButton);
+  await user.click(closeTagButton);
   // no selected diagnoses left
   expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
 });
@@ -110,25 +110,29 @@ test('renders an error message when no matching diagnoses are found', async () =
 });
 
 test('closes the form and the workspace when the cancel button is clicked', async () => {
+  const user = userEvent.setup();
+
   renderVisitNotesForm();
 
   const cancelButton = screen.getByRole('button', { name: /Discard/i });
-  await userEvent.click(cancelButton);
+  await user.click(cancelButton);
 
-  expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+  expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
 });
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
+  const user = userEvent.setup();
+
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
         encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
-        provider: undefined,
+        provider: mockSessionDataResponse.data.currentProvider.uuid,
       },
     ]),
     encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
     form: ConfigMock.visitNoteConfig.formConceptUuid,
-    location: undefined,
+    location: mockSessionDataResponse.data.sessionLocation.uuid,
     obs: expect.arrayContaining([
       {
         concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -136,34 +140,42 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
       },
     ]),
     patient: mockPatient.id,
+    encounterDatetime: undefined,
   };
 
-  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' });
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as ReturnType<
+    typeof saveVisitNote
+  >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
+
+  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(clinicalNote);
-  await userEvent.type(clinicalNote, 'Sample clinical note');
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
 
-  const submitButton = screen.getByRole('button', { name: /Save and close/i });
-
-  await userEvent.click(submitButton);
+  await user.click(submitButton);
 
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {
+  const user = userEvent.setup();
+
   const error = {
     message: 'Internal Server Error',
     response: {
@@ -177,32 +189,26 @@ test('renders an error snackbar if there was a problem recording a condition', a
 
   renderVisitNotesForm();
 
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
-  await userEvent.type(searchBox, 'Diabetes Mellitus');
+  await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = screen.getByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
-  await userEvent.click(targetSearchResult);
+  await user.click(targetSearchResult);
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(clinicalNote);
-  await userEvent.type(clinicalNote, 'Sample clinical note');
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
 
-  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
 
-  await userEvent.click(submitButton);
-
-  expect(mockedShowSnackbar).toHaveBeenCalledWith({
+  expect(mockShowSnackbar).toHaveBeenCalledWith({
     isLowContrast: false,
     kind: 'error',
     subtitle: 'Internal Server Error',
     title: 'Error saving visit note',
   });
 });
-
-function renderVisitNotesForm() {
-  mockUseConfig.mockReturnValue(ConfigMock);
-  mockUseSession.mockReturnValue(mockSessionDataResponse);
-  render(<VisitNotesForm {...testProps} />);
-}

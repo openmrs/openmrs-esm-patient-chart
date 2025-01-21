@@ -21,7 +21,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 it('renders an empty state view if conditions data is unavailable', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
-  renderConditionsDetailedSummary();
+  renderWithSwr(<ConditionsDetailedSummary patient={mockPatient} />);
 
   await waitForLoadingToFinish();
 
@@ -43,7 +43,7 @@ it('renders an error state view if there is a problem fetching conditions data',
 
   mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-  renderConditionsDetailedSummary();
+  renderWithSwr(<ConditionsDetailedSummary patient={mockPatient} />);
 
   await waitForLoadingToFinish();
 
@@ -59,7 +59,7 @@ it('renders an error state view if there is a problem fetching conditions data',
 
 it("renders a detailed summary of the patient's conditions when present", async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
-  renderConditionsDetailedSummary();
+  renderWithSwr(<ConditionsDetailedSummary patient={mockPatient} />);
 
   await waitForLoadingToFinish();
 
@@ -83,7 +83,7 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
 
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
-  renderConditionsDetailedSummary();
+  renderWithSwr(<ConditionsDetailedSummary patient={mockPatient} />);
 
   await waitForLoadingToFinish();
 
@@ -94,9 +94,3 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
   expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
   expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
 });
-
-function renderConditionsDetailedSummary() {
-  const testProps = { patient: mockPatient };
-
-  renderWithSwr(<ConditionsDetailedSummary {...testProps} />);
-}

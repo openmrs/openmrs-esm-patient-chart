@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
-import { Add, ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, closeWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import type { DrugOrderBasketItem } from '../types';
@@ -59,6 +58,7 @@ export default function DrugOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-drug-order'),
+      closeWorkspaceGroup: false,
     });
   };
 
@@ -66,6 +66,7 @@ export default function DrugOrderBasketPanelExtension() {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
+      closeWorkspaceGroup: false,
     });
   };
 
@@ -93,8 +94,9 @@ export default function DrugOrderBasketPanelExtension() {
         </div>
         <div className={styles.buttonContainer}>
           <Button
+            className={styles.addButton}
             kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
+            renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add medication"
             onClick={openDrugSearch}
             size={isTablet ? 'md' : 'sm'}
@@ -105,8 +107,8 @@ export default function DrugOrderBasketPanelExtension() {
             className={styles.chevron}
             hasIconOnly
             kind="ghost"
-            renderIcon={(props) =>
-              isExpanded ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+            renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
+              isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
             iconDescription="View"
             disabled={orders.length === 0}

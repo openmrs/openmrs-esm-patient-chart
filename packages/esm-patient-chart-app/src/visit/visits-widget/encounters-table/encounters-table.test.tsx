@@ -5,25 +5,21 @@ import { renderWithSwr } from 'tools';
 import { mockEncounters2 } from '__mocks__';
 import EncountersTable from './encounters-table.component';
 
-const testProps = {
+const defaultProps = {
   showAllEncounters: true,
   encounters: mockEncounters2,
 };
 
 describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', () => {
-    testProps.encounters = [];
-
-    renderEncountersTable();
+    renderEncountersTable({ encounters: [] });
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
-    testProps.encounters = mockEncounters2;
-
-    renderEncountersTable();
+    renderEncountersTable({ encounters: mockEncounters2 });
 
     expect(screen.getByRole('table')).toBeInTheDocument();
   });
@@ -46,6 +42,6 @@ describe('EncounterList', () => {
   });
 });
 
-function renderEncountersTable() {
-  renderWithSwr(<EncountersTable {...testProps} />);
+function renderEncountersTable(props = {}) {
+  renderWithSwr(<EncountersTable {...defaultProps} {...props} />);
 }

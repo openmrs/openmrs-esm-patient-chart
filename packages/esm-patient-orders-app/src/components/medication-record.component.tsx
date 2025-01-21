@@ -1,11 +1,10 @@
 import React from 'react';
 import capitalize from 'lodash-es/capitalize';
-import { formatDate } from '@openmrs/esm-framework';
+import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { formatDate, UserIcon } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './medication-record.scss';
-import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { User } from '@carbon/react/icons';
 
 interface MedicationRecordProps {
   medication: Order;
@@ -76,7 +75,7 @@ function InfoTooltip({ orderer }: { orderer: string }) {
   return (
     <Toggletip align="top-left">
       <ToggletipButton label={t('ordererInformation', 'Orderer information')}>
-        <User size={16} />
+        <UserIcon size={16} />
       </ToggletipButton>
       <ToggletipContent>
         <p>{orderer}</p>

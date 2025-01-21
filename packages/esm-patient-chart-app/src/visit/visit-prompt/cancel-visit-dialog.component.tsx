@@ -4,8 +4,8 @@ import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@car
 import { useVisit } from '@openmrs/esm-framework';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
-import styles from './cancel-visit-dialog.scss';
 import { useDeleteVisit } from '../hooks/useDeleteVisit.hook';
+import styles from './cancel-visit-dialog.scss';
 
 interface CancelVisitDialogProps {
   patientUuid: string;

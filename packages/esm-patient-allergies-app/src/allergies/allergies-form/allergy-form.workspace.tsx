@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -72,8 +72,7 @@ interface AllergyFormProps extends DefaultPatientWorkspaceProps {
 }
 
 function AllergyForm(props: AllergyFormProps) {
-  const { closeWorkspace, patientUuid, allergy, formContext, promptBeforeClosing, closeWorkspaceWithSavedChanges } =
-    props;
+  const { closeWorkspace, patientUuid, allergy, formContext, promptBeforeClosing } = props;
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
@@ -333,7 +332,7 @@ function AllergyForm(props: AllergyFormProps) {
             </ResponsiveWrapper>
           )}
           <div>
-            <div className={isTablet ? styles.checkboxContainer : undefined}>
+            <div className={classNames({ [styles.checkboxContainer]: isTablet })}>
               {isLoading ? (
                 <InlineLoading description={`${t('loading', 'Loading')} ...`} />
               ) : (

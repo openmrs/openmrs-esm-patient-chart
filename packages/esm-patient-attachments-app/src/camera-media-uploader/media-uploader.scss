@@ -1,11 +1,12 @@
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
 
 .errorContainer {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
 }
 
 .uploadFile {
-  color: $ui-02;
+  color: vars.$ui-02;
   width: 100%;
   height: 406px;
 

@@ -13,6 +13,8 @@
   "checkForValidity": "חלק מהערכים שהוזנו אינם תקפים",
   "date": "תאריך",
   "dateAndTime": "תאריך ושעה",
+  "daysOldVitals_one": "<0>המדדים החיוניים האלה הם בני <1>יום</1></0>",
+  "daysOldVitals_other": "<0>המדדים החיוניים האלה הם בני <1>{{count}} ימים</1></0>",
   "diastolic": "דיאסטולי",
   "discard": "בטל",
   "error": "שגיאה",
@@ -26,7 +28,8 @@
   "noDataRecorded": "לא נרשמו נתונים עבור מטופל זה",
   "notes": "הערות",
   "other": "אחר",
-  "overdue": "מאחר",
+  "outOfDateVitals": "<0>המדדים החיוניים האלה  <1>פגי תוקף</1></0>",
+  "overOneWeekOldVitals": "<0>המדדים החיוניים האלה הם בני <1>למעלה משבוע</1></0>",
   "oxygenSaturation": "Oxygen saturation",
   "pleaseFillField": "מלא לפחות שדה אחד",
   "print": "הדפסה",
@@ -54,7 +57,7 @@
   "vitalsAndBiometricsRecorded": "מדדים חיוניים וביומטרים נשמרו",
   "vitalsAndBiometricsSaveError": "שגיאה בשמירת מדדים חיוניים וביומטרים",
   "vitalsHistory": "היסטוריה של חיוניים",
-  "vitalSignDisplayed": "מדד חיוני מוצג",
+  "vitalSignDisplayed": "Vital sign displayed",
   "vitalSigns": "מדדים חיוניים",
   "weight": "משקל"
 }

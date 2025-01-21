@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .editStatusBtn {
-  margin-left: spacing.$spacing-04;
+  white-space: nowrap;
+  margin-left: layout.$spacing-04;
   border: none;
 }
 

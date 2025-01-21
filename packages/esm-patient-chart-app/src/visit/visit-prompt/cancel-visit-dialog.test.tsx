@@ -8,32 +8,17 @@ import { type MappedVisitQueueEntry, useVisitQueueEntry } from '../queue-entry/q
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import CancelVisitDialog from './cancel-visit-dialog.component';
 
-const mockedCloseModal = jest.fn();
-const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockedRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockedUseVisit = jest.mocked(useVisit) as jest.Mock;
-const mockedUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
+const mockCloseModal = jest.fn();
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockRemoveQueuedPatient = jest.mocked(removeQueuedPatient);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseVisit = jest.mocked(useVisit);
+const mockUseVisitQueueEntry = jest.mocked(useVisitQueueEntry);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useVisit: jest.fn(),
-    openmrsFetch: jest.fn(),
-    restBaseUrl: '/ws/rest/v1',
-  };
-});
-
-jest.mock('../queue-entry/queue.resource', () => {
-  const originalModule = jest.requireActual('../queue-entry/queue.resource');
-
-  return {
-    ...originalModule,
-    useVisitQueueEntry: jest.fn(),
-  };
-});
+jest.mock('../queue-entry/queue.resource', () => ({
+  ...jest.requireActual('../queue-entry/queue.resource'),
+  useVisitQueueEntry: jest.fn(),
+}));
 
 jest.mock('../hooks/useServiceQueue', () => {
   const originalModule = jest.requireActual('../hooks/useServiceQueue');
@@ -45,27 +30,37 @@ jest.mock('../hooks/useServiceQueue', () => {
 });
 
 describe('Cancel visit', () => {
+  beforeEach(() => {
+    mockUseVisit.mockReturnValue({
+      activeVisit: mockCurrentVisit,
+      currentVisit: mockCurrentVisit,
+      currentVisitIsRetrospective: false,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+  });
+
   it('cancels the active visit and voids its associated encounters', async () => {
     const user = userEvent.setup();
-
-    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
 
     const response: Partial<FetchResponse> = {
       statusText: 'ok',
       status: 200,
     };
 
-    mockedOpenmrsFetch.mockResolvedValue(response as FetchResponse);
-    mockedUseVisitQueueEntry.mockReturnValueOnce({
+    mockOpenmrsFetch.mockResolvedValue(response as FetchResponse);
+    mockUseVisitQueueEntry.mockReturnValueOnce({
       queueEntry: mockVisitQueueEntries,
       isLoading: false,
-      isError: undefined,
+      error: undefined,
       isValidating: false,
       mutate: jest.fn(),
     });
-    mockedRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
+    mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -82,11 +77,10 @@ describe('Cancel visit', () => {
 
     await user.click(cancelVisitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
       method: 'DELETE',
     });
-
-    expect(mockedShowSnackbar).toHaveBeenCalledWith(
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'success',
         title: 'Visit cancelled',
@@ -103,19 +97,18 @@ describe('Cancel visit', () => {
       status: 200,
     };
 
-    mockedUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
-    mockedOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
-    mockedUseVisitQueueEntry.mockReturnValueOnce({
+    mockOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
+    mockUseVisitQueueEntry.mockReturnValueOnce({
       queueEntry: {} as MappedVisitQueueEntry,
       isLoading: false,
-      isError: undefined,
+      error: undefined,
       isValidating: false,
       mutate: jest.fn(),
     });
 
-    mockedRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
+    mockRemoveQueuedPatient.mockResolvedValue(response as FetchResponse);
 
-    renderCancelVisitDialog();
+    render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const cancelVisitButton = screen.getByRole('button', { name: /cancel visit$/i });
@@ -128,18 +121,13 @@ describe('Cancel visit', () => {
 
     await user.click(cancelVisitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/visit/${mockCurrentVisit.uuid}`, {
       method: 'DELETE',
     });
-
-    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'An error occured when deleting visit',
       kind: 'error',
       title: 'Error cancelling active visit',
     });
   });
 });
-
-function renderCancelVisitDialog() {
-  render(<CancelVisitDialog closeModal={mockedCloseModal} patientUuid={mockPatient.id} />);
-}

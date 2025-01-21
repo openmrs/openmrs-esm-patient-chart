@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from '@carbon/react';
-import { UserHasAccess, type Visit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { EditIcon, UserHasAccess, type Visit, useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { Edit } from '@carbon/react/icons';
 
 interface EditVisitDetailsActionItemProps {
   patientUuid: string;
@@ -19,12 +18,13 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
     launchPatientWorkspace('start-visit-workspace-form', {
       workspaceTitle: t('editVisitDetails', 'Edit visit details'),
       visitToEdit: visit,
+      openedFrom: 'patient-chart-edit-visit',
     });
   };
 
   return (
     <UserHasAccess privilege="Edit Visits">
-      <Button onClick={editVisitDetails} kind="ghost" renderIcon={Edit} size={isTablet ? 'lg' : 'sm'}>
+      <Button onClick={editVisitDetails} kind="ghost" renderIcon={EditIcon} size={isTablet ? 'lg' : 'sm'}>
         {t('editVisitDetails', 'Edit visit details')}
       </Button>
     </UserHasAccess>

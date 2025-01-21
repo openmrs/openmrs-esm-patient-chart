@@ -1,0 +1,21 @@
+{
+  "backToPatientLists": "Voltar às listas de utentes",
+  "checkFilters": "Verifique os filtros acima",
+  "createdOn": "Criado em",
+  "identifier": "Identificador",
+  "listName": "Nome da Lista",
+  "listType": "Tipo de lista",
+  "name": "Nome",
+  "noMatchingListsFound": "Nenhuma lista correspondente para visualizar",
+  "noMatchingPatients": "Nenhum utente correspondente para visualizar",
+  "noPatientListsToDisplay": "Nenhuma lista de utentes para visualizar",
+  "noPatientsInList": "Não tem nenhum utente nesta lista",
+  "numberOfPatients": "Nr. de utentes",
+  "patientListDetailWorkspaceTitle": "Detalhes da Lista de Utentes",
+  "patientLists": "Lista de utentes",
+  "patientListsWorkspaceTitle": "Lista de Utentes",
+  "patients": "utentes",
+  "searchThisList": "Pesquisar esta lista",
+  "sex": "Sexo",
+  "startDate": "Data inicial"
+}

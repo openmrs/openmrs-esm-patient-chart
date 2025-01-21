@@ -1,0 +1,15 @@
+{
+  "cancel": "Hủy",
+  "closeThisPanel": "Đóng bảng điều khiển này",
+  "collapseAll": "Thu gọn tất cả",
+  "deleteQuestion": "Xóa câu hỏi",
+  "deleteQuestionConfirmation": "Bạn có chắc chắn muốn xóa câu hỏi này không?",
+  "deleteQuestionExplainerText": "Không thể hoàn tác hành động này.",
+  "errorTitle": "Có lỗi với mẫu này",
+  "expandAll": "Mở rộng tất cả",
+  "loading": "Đang tải",
+  "or": "hoặc",
+  "thisList": "danh sách này",
+  "toggleCollapseOrExpand": "Chuyển đổi thu gọn hoặc mở rộng",
+  "tryAgainMessage": "Hãy thử mở một biểu mẫu khác từ"
+}

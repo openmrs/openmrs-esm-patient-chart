@@ -1,0 +1,75 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tablet {
+  background-color: $ui-02;
+}
+
+.desktop {
+  background-color: $ui-01;
+
+  .paginationContainer div {
+    background-color: $ui-01;
+  }
+}
+
+.visitTypeOverviewWrapper {
+  margin: layout.$spacing-03 0;
+  border: 0.0625rem solid $grey-2;
+
+  &:has(.skeleton) {
+    border-bottom: none !important;
+  }
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+  position: relative;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) span * {
+  display: none;
+}
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: layout.$spacing-03;
+  min-height: layout.$spacing-10;
+  width: 100%;
+  @include type.type-style('body-compact-01');
+}
+
+.radioButton {
+  padding: layout.$spacing-02 layout.$spacing-05;
+  margin: layout.$spacing-03 0;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

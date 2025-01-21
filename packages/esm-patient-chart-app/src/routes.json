@@ -1,5 +1,15 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "optionalBackendDependencies": {
+    "emrapi": {
+      "version": "^2.0.0",
+      "feature": {
+        "flagName": "emrapi-module",
+        "label": "EMR API Module",
+        "description": "This module, if installed, provides core EMR business logic."
+      }
+    }
+  },
   "extensions": [
     {
       "name": "charts-summary-dashboard",
@@ -8,9 +18,14 @@
       "order": 0,
       "meta": {
         "slot": "patient-chart-summary-dashboard-slot",
-        "columns": 4,
         "path": "Patient Summary"
       },
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "encounter-list",
+      "component": "encounterListTableTabs",
       "online": true,
       "offline": true
     },
@@ -72,13 +87,6 @@
       "offline": true
     },
     {
-      "name": "print-identifier-sticker-button",
-      "slot": "patient-actions-slot",
-      "component": "printIdentifierStickerActionButton",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "add-past-visit-button",
       "slot": "patient-search-actions-slot",
       "component": "addPastVisitPatientSearchActionButton",
@@ -92,7 +100,6 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "columns": 1,
         "path": "Visits"
       },
       "order": 5,
@@ -120,15 +127,6 @@
       }
     },
     {
-      "name": "start-visit-workspace-form",
-      "component": "startVisitForm",
-      "meta": {
-        "title": "Start a visit"
-      },
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
@@ -149,36 +147,6 @@
       "offline": true
     },
     {
-      "name": "cancel-visit-dialog",
-      "component": "cancelVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "start-visit-dialog",
-      "component": "startVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "delete-visit-dialog",
-      "component": "deleteVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "modify-visit-date-dialog",
-      "component": "modifyVisitDateDialog",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "end-visit-dialog",
-      "component": "endVisitDialog",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "start-visit-button-patient-search",
       "slot": "start-visit-button-slot",
       "component": "startVisitPatientSearchActionButton",
@@ -193,19 +161,13 @@
       "offline": true
     },
     {
-      "name": "delete-encounter-modal",
-      "component": "deleteEncounterModal",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "current-visit-summary",
       "component": "currentVisitSummary",
-      "meta": {
-        "columnSpan": 4
-      },
       "online": true,
-      "offline": true
+      "offline": true,
+      "meta": {
+        "fullWidth": true
+      }
     },
     {
       "name": "edit-visit-action-button",
@@ -234,8 +196,32 @@
   ],
   "modals": [
     {
+      "name": "cancel-visit-dialog",
+      "component": "cancelVisitModal"
+    },
+    {
+      "name": "delete-encounter-modal",
+      "component": "deleteEncounterModal"
+    },
+    {
+      "name": "delete-visit-dialog",
+      "component": "deleteVisitModal"
+    },
+    {
+      "name": "end-visit-dialog",
+      "component": "endVisitModal"
+    },
+    {
       "name": "mark-patient-alive-modal",
       "component": "markPatientAliveModal"
+    },
+    {
+      "name": "modify-visit-date-dialog",
+      "component": "modifyVisitDateModal"
+    },
+    {
+      "name": "start-visit-dialog",
+      "component": "startVisitModal"
     }
   ],
   "pages": [
@@ -252,6 +238,12 @@
       "component": "markPatientDeceasedForm",
       "title": "Mark patient deceased",
       "type": "form"
+    },
+    {
+      "name": "start-visit-workspace-form",
+      "component": "startVisitWorkspace",
+      "title": "startVisitWorkspaceTitle",
+      "type": "start-visit"
     }
   ]
 }

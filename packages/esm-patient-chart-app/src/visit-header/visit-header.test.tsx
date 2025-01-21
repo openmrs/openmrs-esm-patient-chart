@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  age,
   getHistory,
   goBackInHistory,
   navigate,
@@ -9,63 +10,55 @@ import {
   useAssignedExtensions,
   useLayoutType,
   useOnClickOutside,
-  usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { getByTextWithMarkup, mockPatient, mockPatientWithLongName } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
 import VisitHeader from './visit-header.component';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
-const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
-const mockUsePatient = usePatient as jest.Mock;
-const mockUseVisit = useVisit as jest.Mock;
-const mockUseLayoutType = useLayoutType as jest.Mock;
-const mockShowModal = showModal as jest.Mock;
-const mockGetHistory = getHistory as jest.Mock;
-const mockGoBackInHistory = goBackInHistory as jest.Mock;
+const mockAge = jest.mocked(age);
+const mockUseAssignedExtensions = jest.mocked(useAssignedExtensions);
+const mockUseVisit = jest.mocked(useVisit);
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockShowModal = jest.mocked(showModal);
+const mockGetHistory = jest.mocked(getHistory);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    age: jest.fn().mockReturnValue('20'),
-    getHistory: jest.fn(() => []),
-    goBackInHistory: jest.fn(),
-    LeftNavMenu: jest.fn().mockImplementation(() => <div>Left Nav Menu</div>),
-    translateFrom: (module, key, defaultValue, options) => defaultValue,
-    useAssignedExtensions: jest.fn(),
-    useOnClickOutside: jest.fn(),
-  };
-});
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  launchPatientWorkspace: jest.fn(),
+}));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
-
-describe('Visit Header', () => {
+describe('Visit header', () => {
   beforeEach(() => {
-    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
-    mockGoBackInHistory.mockClear();
+    mockAge.mockReturnValue('20');
+    mockGetHistory.mockReturnValue([]);
+    mockUseAssignedExtensions.mockReturnValue([
+      {
+        id: 'someId',
+        moduleName: '@openmrs/esm-test-module',
+        name: 'patient-chart-visit-header',
+        meta: {},
+        config: null,
+      },
+    ]);
   });
 
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
-    mockUsePatient.mockReturnValue({
-      patient: mockPatient,
-      isLoading: false,
+    mockUseVisit.mockReturnValue({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
       error: null,
-      patientUuid: mockPatient.id,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
     });
-    mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
     mockUseLayoutType.mockReturnValue('tablet');
 
-    render(<VisitHeader />);
+    render(<VisitHeader patient={mockPatient} />);
 
     const headerBanner = screen.getByRole('banner', { name: /OpenMRS/i });
     expect(headerBanner).toBeInTheDocument();
@@ -91,20 +84,24 @@ describe('Visit Header', () => {
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      openedFrom: 'patient-chart-start-visit',
+    });
   });
 
   test('should display a truncated name when the patient name is very long', async () => {
-    mockUsePatient.mockReturnValue({
-      patient: mockPatientWithLongName,
-      isLoading: false,
+    mockUseVisit.mockReturnValue({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
       error: null,
-      patientUuid: mockPatient.id,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
     });
-    mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
-    mockUseLayoutType.mockReturnValue('desktop');
+    mockUseLayoutType.mockReturnValue('small-desktop');
 
-    render(<VisitHeader />);
+    render(<VisitHeader patient={mockPatientWithLongName} />);
 
     const longNameText = screen.getByText(/^Some very long given name...$/i);
     expect(longNameText).toBeInTheDocument();
@@ -113,16 +110,18 @@ describe('Visit Header', () => {
 
   it('should be able to show configurable stop visit button and modal to stop current visit', async () => {
     const user = userEvent.setup();
-    mockUsePatient.mockReturnValue({
-      patient: mockPatientWithLongName,
-      isLoading: false,
+    mockUseVisit.mockReturnValue({
+      activeVisit: mockCurrentVisit,
+      currentVisit: mockCurrentVisit,
+      currentVisitIsRetrospective: false,
       error: null,
-      patientUuid: mockPatient.id,
+      isLoading: false,
+      isValidating: null,
+      mutate: jest.fn(),
     });
-    mockUseVisit.mockReturnValue({ isValidating: false, currentVisit: mockCurrentVisit });
-    mockUseLayoutType.mockReturnValue('desktop');
+    mockUseLayoutType.mockReturnValue('small-desktop');
 
-    render(<VisitHeader />);
+    render(<VisitHeader patient={mockPatientWithLongName} />);
 
     // Should be able to end a visit
     const endVisitButton = screen.getByRole('button', { name: /End visit/i });
@@ -145,7 +144,7 @@ describe('Visit Header', () => {
       `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart`,
       `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart/labs`,
     ]);
-    render(<VisitHeader />);
+    render(<VisitHeader patient={mockPatient} />);
     const closeButton = screen.getByRole('button', { name: 'Close' });
     await user.click(closeButton);
     expect(goBackInHistory).toHaveBeenCalledWith({ toUrl: 'https://o3.openmrs.org/openmrs/spa/patient/1234/chart' });
@@ -153,7 +152,7 @@ describe('Visit Header', () => {
 
   test('close button should navigate to home if no such URL exists in history', async () => {
     const user = userEvent.setup();
-    render(<VisitHeader />);
+    render(<VisitHeader patient={mockPatient} />);
     mockGetHistory.mockReturnValue([
       `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart`,
       `https://o3.openmrs.org/openmrs/spa/patient/${mockPatient.id}/chart/labs`,

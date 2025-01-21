@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,8 +16,8 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import {
+  AddIcon,
   formatDate,
   parseDate,
   isDesktop as isDesktopLayout,
@@ -66,7 +66,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const isDesktop = isDesktopLayout(layout);
   const isTablet = !isDesktop;
 
-  const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
+  const { conditions, error, isLoading, isValidating } = useConditions(patientUuid);
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
@@ -137,7 +137,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -159,7 +159,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Add conditions"
               onClick={launchConditionsForm}
             >
@@ -179,8 +179,8 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
-              <TableContainer>
-                <Table {...getTableProps()}>
+              <TableContainer className={styles.tableContainer}>
+                <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
@@ -204,7 +204,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu condition={row} />
+                          <ConditionsActionMenu condition={row} patientUuid={patientUuid} />
                         </TableCell>
                       </TableRow>
                     ))}

@@ -1,11 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import classNames from 'classnames';
+import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { Button, ButtonSet, Form, InlineLoading, Stack } from '@carbon/react';
+import { mutate } from 'swr';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import { useOrderConceptByUuid, updateOrderResult, fetchObservation, useLabEncounter } from './lab-results.resource';
-import ResultFormField from './result-form-field.component';
+import {
+  createObservationPayload,
+  isCoded,
+  isNumeric,
+  isPanel,
+  isText,
+  updateObservation,
+  updateOrderResult,
+  useCompletedLabResults,
+  useOrderConceptByUuid,
+} from './lab-results.resource';
+import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
@@ -13,46 +27,62 @@ export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
-  order,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  order,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
-  const [obsUuid, setObsUuid] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [initialValues, setInitialValues] = useState(null);
-  const [isLoadingInitialValues, setIsLoadingInitialValues] = useState(false);
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
-  const { encounter, isLoading: isLoadingEncounter, mutate } = useLabEncounter(order.encounter.uuid);
+  const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
+  const schema = useLabResultsFormSchema(order.concept.uuid);
+  const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+
+  const mutateOrderData = useCallback(() => {
+    mutate(
+      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
+      undefined,
+      { revalidate: true },
+    );
+  }, [order.patient.uuid]);
 
   const {
     control,
-    register,
-    formState: { errors, isDirty },
-    getValues,
+    formState: { errors, isDirty, isSubmitting },
+    setValue,
     handleSubmit,
-  } = useForm<{ testResult: any }>({
+  } = useForm<{ testResult: Record<string, unknown> }>({
     defaultValues: {},
+    resolver: zodResolver(schema),
+    mode: 'all',
   });
 
-  if (!isLoadingEncounter && encounter?.obs.length > 0 && !isEditing) {
-    setObsUuid(encounter.obs.find((obs) => obs.order?.uuid === order.uuid).uuid);
-    setIsEditing(true);
-  }
-
-  if (isEditing && !obsUuid) {
-    setIsLoadingInitialValues(true);
-    fetchObservation(obsUuid).then((data) => {
-      if (data) {
-        setInitialValues(data);
+  useEffect(() => {
+    if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+      if (isCoded(concept) && completeLabResult?.value?.uuid) {
+        setValue(concept.uuid as any, completeLabResult?.value?.uuid);
+      } else if (isNumeric(concept) && completeLabResult?.value) {
+        setValue(concept.uuid as any, parseFloat(completeLabResult?.value as any));
+      } else if (isText(concept) && completeLabResult?.value) {
+        setValue(concept.uuid as any, completeLabResult?.value);
+      } else if (isPanel(concept)) {
+        concept.setMembers.forEach((member) => {
+          const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
+          let value: any;
+          if (isCoded(member)) {
+            value = obs?.value?.uuid;
+          } else if (isNumeric(member)) {
+            value = obs?.value ? parseFloat(obs?.value as any) : undefined;
+          } else if (isText(member)) {
+            value = obs?.value;
+          }
+          if (value) setValue(member.uuid as any, value);
+        });
       }
-      setIsLoadingInitialValues(false);
-    });
-  }
+    }
+  }, [concept, completeLabResult, order, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -71,126 +101,139 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }
 
-  const saveLabResults = (data, e) => {
-    setIsSubmitting(true);
-    e.preventDefault();
-    // assign result to test order
-    const documentedValues = getValues();
-    let obsValue = [];
-
-    if (concept.set && concept.setMembers.length > 0) {
-      let groupMembers = [];
-      concept.setMembers.forEach((member) => {
-        let value;
-        if (member.datatype.display === 'Numeric' || member.datatype.display === 'Text') {
-          value = getValues()[`${member.uuid}`];
-        } else if (member.datatype.display === 'Coded') {
-          value = {
-            uuid: getValues()[`${member.uuid}`],
-          };
-        }
-        const groupMember = {
-          concept: { uuid: member.uuid },
-          value: value,
-          status: 'FINAL',
-          order: { uuid: order.uuid },
-        };
-        groupMembers.push(groupMember);
-      });
-
-      obsValue.push({
-        concept: { uuid: order.concept.uuid },
-        status: 'FINAL',
-        order: { uuid: order.uuid },
-        groupMembers: groupMembers,
-      });
-    } else if (!concept.set && concept.setMembers.length === 0) {
-      let value;
-      if (concept.datatype.display === 'Numeric' || concept.datatype.display === 'Text') {
-        value = getValues()[`${concept.uuid}`];
-      } else if (concept.datatype.display === 'Coded') {
-        value = {
-          uuid: getValues()[`${concept.uuid}`],
-        };
-      }
-
-      obsValue.push({
-        concept: { uuid: order.concept.uuid },
-        status: 'FINAL',
-        order: { uuid: order.uuid },
-        value: value,
-      });
+  const saveLabResults = async (formValues: Record<string, unknown>) => {
+    const isEmptyForm = Object.values(formValues).every(
+      (value) => value === '' || value === null || value === undefined,
+    );
+    if (isEmptyForm) {
+      setShowEmptyFormErrorNotification(true);
+      return;
     }
 
-    const obsPayload = { obs: obsValue };
+    const showNotification = (kind: 'error' | 'success', message: string) => {
+      showSnackbar({
+        title:
+          kind === 'success'
+            ? t('saveLabResults', 'Save lab results')
+            : t('errorSavingLabResults', 'Error saving lab results'),
+        kind: kind,
+        subtitle: message,
+      });
+    };
 
+    // Handle update operation for completed lab order results
+    if (order.fulfillerStatus === 'COMPLETED') {
+      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+        return updateObservation(obs?.uuid, { value });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+        if (curr.status === 'rejected') {
+          return [...prev, Object.keys(formValues).at(index)];
+        }
+        return prev;
+      }, []);
+
+      if (failedObsconceptUuids.length) {
+        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+      } else {
+        closeWorkspaceWithSavedChanges();
+        showNotification(
+          'success',
+          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+            orderNumber: order?.orderNumber,
+          }),
+        );
+      }
+      mutateResults();
+      return setShowEmptyFormErrorNotification(false);
+    }
+
+    // Handle Creation logic
+
+    // Set the observation status to 'FINAL' as we're not capturing it in the form
+    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+    const orderDiscontinuationPayload = {
+      previousOrder: order.uuid,
+      type: 'testorder',
+      action: 'DISCONTINUE',
+      careSetting: order.careSetting.uuid,
+      encounter: order.encounter.uuid,
+      patient: order.patient.uuid,
+      concept: order.concept.uuid,
+      orderer: order.orderer,
+    };
     const resultsStatusPayload = {
       fulfillerStatus: 'COMPLETED',
       fulfillerComment: 'Test Results Entered',
     };
 
-    updateOrderResult(
-      order.uuid,
-      order.encounter.uuid,
-      obsUuid,
-      obsPayload,
-      resultsStatusPayload,
-      abortController,
-    ).then(
-      () => {
-        setIsSubmitting(false);
-        closeWorkspaceWithSavedChanges();
-        mutate();
-
-        showSnackbar({
-          title: t('saveLabResults', 'Save lab results'),
-          kind: 'success',
-          subtitle: t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-            orderNumber: order?.orderNumber,
-          }),
-        });
-      },
-      (err) => {
-        setIsSubmitting(false);
-        showSnackbar({
-          title: t('errorSavingLabResults', 'Error saving lab results'),
-          kind: 'error',
-          subtitle: err?.message,
-        });
-      },
-    );
+    try {
+      await updateOrderResult(
+        order.uuid,
+        order.encounter.uuid,
+        obsPayload,
+        resultsStatusPayload,
+        orderDiscontinuationPayload,
+        abortController,
+      );
+      closeWorkspaceWithSavedChanges();
+      mutateResults();
+      mutateOrderData();
+      showNotification(
+        'success',
+        t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+          orderNumber: order?.orderNumber,
+        }),
+      );
+    } catch (err) {
+      showNotification('error', err?.message);
+    } finally {
+      setShowEmptyFormErrorNotification(false);
+    }
   };
 
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
       <div className={styles.grid}>
         {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
         {concept && (
-          <Stack gap={2}>
-            {!isLoadingInitialValues ? (
+          <Stack gap={5}>
+            {!isLoading ? (
               <ResultFormField
-                defaultValue={initialValues}
-                register={register}
+                defaultValue={completeLabResult}
                 concept={concept}
-                control={control}
+                control={control as unknown as Control<Record<string, unknown>>}
                 errors={errors}
               />
             ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading Initial Values') + '...'} />
+              <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
           </Stack>
         )}
+        {showEmptyFormErrorNotification && (
+          <InlineNotification
+            className={styles.emptyFormError}
+            lowContrast
+            title={t('error', 'Error')}
+            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+          />
+        )}
       </div>
-
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet
+        className={classNames({
+          [styles.tablet]: isTablet,
+          [styles.desktop]: !isTablet,
+        })}
+      >
         <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button
           className={styles.button}
           kind="primary"
-          onClick={handleSubmit(saveLabResults)}
-          disabled={isSubmitting}
+          disabled={isSubmitting || Object.keys(errors).length > 0}
           type="submit"
         >
           {isSubmitting ? (

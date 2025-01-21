@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -16,17 +16,18 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
 import {
+  AddIcon,
+  type ConfigObject,
+  EditIcon,
   formatDate,
   formatDatetime,
   useConfig,
-  type ConfigObject,
   useLayoutType,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePrograms } from './programs.resource';
+import { findLastState, usePrograms } from './programs.resource';
 import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
@@ -35,22 +36,22 @@ interface ProgramsDetailedSummaryProps {
 
 interface ProgramEditButtonProps {
   programEnrollmentId: string;
+  t: TFunction;
 }
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { hideAddProgramButton, showProgramStatusField } = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
-  const { hideAddProgramButton } = useConfig<ConfigObject>();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms } =
-    usePrograms(patientUuid);
+  const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
-    () => [
+  const tableHeaders: Array<typeof DataTableHeader> = useMemo(() => {
+    const headers = [
       {
         key: 'display',
         header: t('activePrograms', 'Active programs'),
@@ -67,28 +68,47 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
-    ],
-    [t],
-  );
+    ];
+    if (showProgramStatusField) {
+      headers.push({
+        key: 'state',
+        header: t('programStatus', 'Program status'),
+      });
+    }
+    return headers;
+  }, [t, showProgramStatusField]);
 
-  const tableRows = useMemo(() => {
-    return enrollments?.map((program) => {
-      return {
-        id: program.uuid,
-        display: program.display,
-        location: program.location?.display ?? '--',
-        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
-        status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
-          : t('active', 'Active'),
-      };
-    });
-  }, [enrollments, t]);
+  const tableRows = useMemo(
+    () =>
+      enrollments?.map((program) => {
+        const state = program ? findLastState(program.states) : null;
+        return {
+          id: program.uuid,
+          display: program.display,
+          location: program.location?.display ?? '--',
+          dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
+          status: program.dateCompleted
+            ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
+            : t('active', 'Active'),
+          state: state ? state.state.concept.display : '--',
+        };
+      }),
+    [enrollments, t],
+  );
 
   const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
+  const isEnrolledInAllPrograms = useMemo(() => {
+    if (!availablePrograms?.length || !enrollments?.length) {
+      return false;
+    }
+
+    const activeEnrollments = enrollments.filter((enrollment) => !enrollment.dateCompleted);
+    return activeEnrollments.length === availablePrograms.length;
+  }, [availablePrograms, enrollments]);
+
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
   if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -96,25 +116,24 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {hideAddProgramButton ? null : (
             <Button
+              disabled={isEnrolledInAllPrograms}
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription="Add programs"
+              renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
+              iconDescription={t('addPrograms', 'Add programs')}
               onClick={launchProgramsForm}
-              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
             >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
-        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+        {isEnrolledInAllPrograms && (
           <InlineNotification
-            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-            kind={'info'}
+            style={{ minWidth: '100%', margin: '0', padding: '0' }}
             lowContrast
             subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
             title={t('fullyEnrolled', 'Enrolled in all programs')}
           />
-        ) : null}
+        )}
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
@@ -142,7 +161,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} />
+                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} t={t} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -157,10 +176,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 
-function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
+function ProgramEditButton({ programEnrollmentId, t }: ProgramEditButtonProps) {
   const isTablet = useLayoutType() === 'tablet';
-  const { t } = useTranslation();
-  const launchEditProgramsForm = React.useCallback(
+  const launchEditProgramsForm = useCallback(
     () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
     [programEnrollmentId],
   );
@@ -169,7 +187,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
     <Button
       aria-label="edit program"
       kind="ghost"
-      renderIcon={(props) => <Edit size={16} {...props} />}
+      renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
       iconDescription={t('editProgram', 'Edit Program')}
       onClick={launchEditProgramsForm}
       hasIconOnly
