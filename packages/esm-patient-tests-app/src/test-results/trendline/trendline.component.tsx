@@ -117,6 +117,11 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   const dataset = chartTitle;
 
+  const formatObsDatetime = (obsDatetime: string) => {
+    const isoFormattedString = obsDatetime.replace(' ', 'T').replace('.0', '.000').concat('Z');
+    return isoFormattedString;
+  };
+
   obs.forEach((obs, idx) => {
     const range =
       hiNormal && lowNormal
@@ -127,7 +132,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         : {};
 
     data.push({
-      date: new Date(Date.parse(obs.obsDatetime)),
+      date: new Date(formatObsDatetime(obs.obsDatetime)),
       value: parseFloat(obs.value),
       group: chartTitle,
       ...range,
@@ -135,7 +140,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     tableData.push({
       id: `${idx}`,
-      dateTime: obs.obsDatetime,
+      dateTime: formatObsDatetime(obs.obsDatetime),
       value: {
         value: parseFloat(obs.value),
         interpretation: obs.interpretation,
