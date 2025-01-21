@@ -144,6 +144,7 @@ describe('AllergyForm', () => {
         codedAllergen: { uuid: allergen.uuid },
       },
       comment,
+      onsetDate: '',
       reactions: [{ reaction: { uuid: reaction.uuid } }],
       severity: { uuid: mockConcepts.moderateReactionUuid },
     };
@@ -201,6 +202,7 @@ describe('AllergyForm', () => {
         nonCodedAllergen: customAllergen,
       },
       comment,
+      onsetDate: '',
       reactions: [{ reaction: { uuid: reaction.uuid } }],
       severity: { uuid: mockConcepts.moderateReactionUuid },
     };
@@ -298,6 +300,7 @@ describe('AllergyForm', () => {
         codedAllergen: { uuid: allergen.uuid },
       },
       comment,
+      onsetDate: '',
       reactions: [
         { reaction: { uuid: reaction.uuid } },
         { reaction: { uuid: mockAllergicReactions[2].uuid } },
