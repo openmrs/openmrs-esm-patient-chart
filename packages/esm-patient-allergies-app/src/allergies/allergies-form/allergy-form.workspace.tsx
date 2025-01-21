@@ -16,6 +16,7 @@ import {
   Stack,
   TextArea,
   TextInput,
+  DatePicker,
 } from '@carbon/react';
 import { date, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -184,7 +185,7 @@ function AllergyForm(props: AllergyFormProps) {
   } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema(t)),
-    values: getDefaultAllergy(allergy, formContext),
+    defaultValues: getDefaultAllergy(allergy, formContext),
   });
 
   useEffect(() => {
@@ -222,7 +223,6 @@ function AllergyForm(props: AllergyFormProps) {
         severityOfWorstReaction,
         onsetDate,
       } = data;
-
       const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
 
       let patientAllergy: NewAllergy = {
@@ -241,6 +241,7 @@ function AllergyForm(props: AllergyFormProps) {
           uuid: severityOfWorstReaction,
         },
         comment,
+        onsetDate: onsetDate.toISOString(),
         reactions: selectedAllergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
@@ -424,12 +425,13 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <OpenmrsDatePicker
                     id="onsetDate"
-                    label={t('DateofOnset', 'Date of Onset ')}
-                    onChange={(selectedDate) => {
-                      return onChange(selectedDate);
+                    labelText={t('DateofOnset', 'Date of Onset')}
+                    onChange={(date) => {
+                      onChange(date);
                     }}
                     onBlur={onBlur}
                     value={value}
+                    maxDate={new Date()}
                   />
                 )}
               />
@@ -444,8 +446,6 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
-                    invalidText={errors.comment?.message}
-                    invalid={Boolean(errors?.comment)}
                     labelText={t('comments', 'comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
