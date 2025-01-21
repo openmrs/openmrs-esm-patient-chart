@@ -140,7 +140,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     tableData.push({
       id: `${idx}`,
-      dateTime: formatObsDatetime(obs.obsDatetime),
+      dateTime: obs.obsDatetime,
       value: {
         value: parseFloat(obs.value),
         interpretation: obs.interpretation,
