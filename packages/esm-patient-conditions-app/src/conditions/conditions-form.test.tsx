@@ -157,10 +157,14 @@ describe('Conditions form', () => {
     await user.click(activeStatusInput);
     await user.click(submitButton);
 
-    expect(mockShowSnackbar).toHaveBeenCalledWith({
-      kind: 'success',
-      subtitle: 'It is now visible on the Conditions page',
-      title: 'Condition saved',
+    jest.clearAllMocks();
+
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        kind: 'success',
+        subtitle: 'It is now visible on the Conditions page',
+        title: 'Condition saved',
+      });
     });
   });
 
