@@ -21,6 +21,7 @@ export interface NewAllergy {
     uuid: string;
   };
   comment?: string;
+  onsetDate: string;
   reactions: Array<{
     reaction: {
       uuid: string;

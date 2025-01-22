@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -17,7 +17,7 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { date, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Control, Controller, useForm, type UseFormSetValue, type UseFormGetValues } from 'react-hook-form';
 import {
@@ -43,29 +43,28 @@ import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
 import { AllergenType } from '../../types';
 import styles from './allergy-form.scss';
 
-const allergyFormSchema = z.object({
-  allergen: z
-    .object({
-      uuid: z.string(),
-      display: z.string(),
-      type: z.string(),
-    })
-    .required(),
-  nonCodedAllergen: z.string().optional(),
-  allergicReactions: z.array(z.string().optional()),
-  nonCodedAllergicReaction: z.string().optional(),
-  severityOfWorstReaction: z.string(),
-  comment: z.string().optional(),
-  onsetDate: z.date().refine(
-    (date) => {
-      const currentDate = new Date(date);
-      return currentDate <= new Date();
-    },
-    {
-      message: 'Date cannot be in the future',
-    },
-  ),
-});
+const allergyFormSchema = (t: TFunction) =>
+  z.object({
+    allergen: z
+      .object({
+        uuid: z.string(),
+        display: z.string(),
+        type: z.string(),
+      })
+      .required(),
+    nonCodedAllergen: z.string().optional(),
+    allergicReactions: z.array(z.string().optional()),
+    nonCodedAllergicReaction: z.string().optional(),
+    severityOfWorstReaction: z.string(),
+    comment: z.string().optional(),
+    onsetDate: z.date().refine(
+      (date) => {
+        const currentDate = new Date(date);
+        return currentDate <= new Date();
+      },
+      t('onsetDateCannotBeFuture', 'Onset date cannot be in the future'),
+    ),
+  });
 
 type AllergyFormData = {
   allergen: Allergen;
@@ -160,13 +159,12 @@ function AllergyForm(props: AllergyFormProps) {
     control,
     handleSubmit,
     watch,
-    getValues,
     setValue,
     formState: { errors, isDirty },
   } = useForm<AllergyFormData>({
     mode: 'all',
-    resolver: zodResolver(allergyFormSchema),
-    values: getDefaultAllergy(allergy, formContext),
+    resolver: zodResolver(allergyFormSchema(t)),
+    defaultValues: getDefaultAllergy(allergy, formContext),
   });
 
   useEffect(() => {
@@ -223,6 +221,7 @@ function AllergyForm(props: AllergyFormProps) {
           uuid: severityOfWorstReaction,
         },
         comment,
+        onsetDate: onsetDate.toISOString(),
         reactions: selectedAllergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
@@ -422,12 +421,11 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <OpenmrsDatePicker
                     id="onsetDate"
-                    label={t('DateofOnset', 'Date of Onset ')}
-                    onChange={(selectedDate) => {
-                      return onChange(selectedDate);
-                    }}
+                    labelText={t('DateofOnset', 'Date of Onset')}
+                    onChange={(selectedDate) => onChange(selectedDate)}
                     onBlur={onBlur}
                     value={value}
+                    maxDate={new Date()}
                   />
                 )}
               />
@@ -442,7 +440,6 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
-                    invalidText={t('invalidComment', 'Invalid comment, try again')}
                     labelText={t('comments', 'comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
