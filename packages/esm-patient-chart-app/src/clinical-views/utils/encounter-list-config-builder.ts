@@ -15,7 +15,7 @@ import {
   type NamedColumn,
   type ConfigConcepts,
 } from '../types';
-import { renderTag } from '../components/tag.component';
+import { renderTag } from '../encounter-list/tag.component';
 
 export interface FormattedColumn {
   key: string;
@@ -49,16 +49,16 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition, config: 
     return getMappedConceptValue(encounter, column, config);
   }
 
-  return getObsFromEncounter(
-    encounter,
-    column.concept,
-    column.isDate,
-    column.isTrueFalseConcept,
-    column.type,
-    column.fallbackConcepts,
-    column.secondaryConcept,
-    config,
-  );
+  return getObsFromEncounter({
+    encounter: encounter,
+    obsConcept: column.concept,
+    isDate: column.isDate,
+    isTrueFalseConcept: column.isTrueFalseConcept,
+    type: column.type,
+    fallbackConcepts: column.fallbackConcepts,
+    secondaryConcept: column.secondaryConcept,
+    config: config,
+  });
 };
 
 const createActionObject = (encounter: Encounter, action: ActionProps | ConditionalActionProps) => ({
@@ -81,16 +81,11 @@ const getActions = (encounter: Encounter, column: ColumnDefinition, config: Conf
 };
 
 const createConditionalAction = (encounter: Encounter, action: ConditionalActionProps, config: ConfigConcepts) => {
-  const dependantObsValue = getObsFromEncounter(
-    encounter,
-    action.dependantConcept,
-    false,
-    false,
-    undefined,
-    undefined,
-    undefined,
-    config,
-  );
+  const dependantObsValue = getObsFromEncounter({
+    encounter: encounter,
+    obsConcept: action.dependantConcept,
+    config: config,
+  });
   if (dependantObsValue === action.dependsOn) {
     return createActionObject(encounter, action);
   }
@@ -105,16 +100,16 @@ const createConditionalAction = (encounter: Encounter, action: ConditionalAction
 
 const getMappedConceptValue = (encounter: Encounter, column: ColumnDefinition, config: ConfigConcepts): NamedColumn => {
   const concept = getConceptFromMappings(encounter, column.conceptMappings);
-  return getObsFromEncounter(
-    encounter,
-    concept,
-    column.isDate,
-    column.isTrueFalseConcept,
-    column.type,
-    column.fallbackConcepts,
-    column.secondaryConcept,
-    config,
-  );
+  return getObsFromEncounter({
+    encounter: encounter,
+    obsConcept: concept,
+    isDate: column.isDate,
+    isTrueFalseConcept: column.isTrueFalseConcept,
+    type: column.type,
+    fallbackConcepts: column.fallbackConcepts,
+    secondaryConcept: column.secondaryConcept,
+    config: config,
+  });
 };
 
 export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>, config: ConfigConcepts) => {
