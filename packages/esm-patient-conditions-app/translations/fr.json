@@ -1,7 +1,7 @@
 {
-  "active": "Actif",
+  "active": "Active",
   "add": "Ajouter",
-  "cancel": "Annuller",
+  "cancel": "Annuler",
   "checkFilters": "Vérifiez les filtres ci-dessus",
   "clinicalStatus": "Etat Clinique",
   "clinicalStatusRequired": "un état clinique est requis",
