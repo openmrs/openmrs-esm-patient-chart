@@ -29,4 +29,7 @@ export default function Root() {
  * t('error', 'Error')
  * t('seeAll', 'See all')
  * t('paginationItemsCount', `{{pageItemsCount}} / {{count}} items`, { count: totalItems, pageItemsCount });
+ * t('Routine')
+ * t('Stat')
+ * t('On scheduled date')
  */

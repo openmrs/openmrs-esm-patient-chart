@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
+  type OrderUrgency,
+  priorityOptions,
   useOrderBasket,
   useOrderType,
 } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, translateFrom, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { prepTestOrderPostData, useOrderReasons } from '../api';
+import { ExtensionSlot, OpenmrsDatePicker, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
@@ -17,18 +18,20 @@ import {
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { ordersEqual, priorityOptions } from './test-order';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { prepTestOrderPostData, useOrderReasons } from '../api';
+import { ordersEqual } from './test-order';
 import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
+import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
-import type { TestOrderBasketItem } from '../../types';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;
@@ -61,41 +64,42 @@ export function LabOrderForm({
 
   const labOrderFormSchema = useMemo(
     () =>
-      z.object({
-        instructions: z.string().optional(),
-        urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+      z
+        .object({
+          instructions: z.string().nullish(),
+          urgency: z.string().refine((value) => value !== '', {
+            message: t('priorityRequired', 'Priority is required'),
+          }),
+          accessionNumber: z.string().nullish(),
+          testType: z.object(
+            { label: z.string(), conceptUuid: z.string() },
+            {
+              required_error: t('testTypeRequired', 'Test type is required'),
+              invalid_type_error: t('testTypeRequired', 'Test type is required'),
+            },
+          ),
+          orderReason: orderReasonRequired
+            ? z
+                .string({
+                  required_error: t('orderReasonRequired', 'Order reason is required'),
+                })
+                .refine((value) => !!value, t('orderReasonRequired', 'Order reason is required'))
+            : z.string().optional(),
+          scheduledDate: z.date({}).nullish(),
+        })
+        .refine((data) => data.urgency !== 'ON_SCHEDULED_DATE' || Boolean(data.scheduledDate), {
+          message: t('scheduledDateRequired', 'Scheduled date is required'),
+          path: ['scheduledDate'],
         }),
-        accessionNumber: z.string().nullable(),
-        testType: z.object(
-          { label: z.string(), conceptUuid: z.string() },
-          {
-            required_error: translateFrom(moduleName, 'addLabOrderLabTestTypeRequired', 'Test type is required'),
-            invalid_type_error: translateFrom(moduleName, 'addLabOrderLabReferenceRequired', 'Test type is required'),
-          },
-        ),
-        orderReason: orderReasonRequired
-          ? z
-              .string({
-                required_error: translateFrom(
-                  moduleName,
-                  'addLabOrderLabOrderReasonRequired',
-                  'Order reason is required',
-                ),
-              })
-              .refine(
-                (value) => !!value,
-                translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
-              )
-          : z.string().optional(),
-      }),
-    [orderReasonRequired],
+    [orderReasonRequired, t],
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    setValue,
+    watch,
   } = useForm<TestOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
@@ -105,6 +109,8 @@ export function LabOrderForm({
     },
   });
 
+  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
+
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
@@ -112,7 +118,12 @@ export function LabOrderForm({
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const filterItemsByName = useCallback((menu) => {
-    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+    const inputValue = menu?.inputValue?.toLowerCase();
+    const itemDisplay = menu?.item?.display?.toLowerCase();
+    if (!inputValue) {
+      return true;
+    }
+    return itemDisplay?.includes(inputValue);
   }, []);
 
   const handleFormSubmission = useCallback(
@@ -140,6 +151,7 @@ export function LabOrderForm({
 
       closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        closeWorkspaceGroup: false,
       });
     },
     [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
@@ -149,6 +161,7 @@ export function LabOrderForm({
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      closeWorkspaceGroup: false,
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
@@ -158,6 +171,16 @@ export function LabOrderForm({
     }
   };
 
+  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
+    return (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as OrderUrgency;
+      if (value !== 'ON_SCHEDULED_DATE') {
+        setValue('scheduledDate', null);
+      }
+      fieldOnChange(e);
+    };
+  };
+
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
@@ -165,120 +188,33 @@ export function LabOrderForm({
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   return (
-    <>
-      {/* {errorLoadingTestTypes && (
-        <InlineNotification
-          className={styles.inlineNotification}
-          kind="error"
-          lowContrast
-          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-          title={t('errorLoadingTestTypes', 'Error occured when loading test types')}
-        />
-      )} */}
-
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
-        <div className={styles.form}>
-          <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
-                <p className={styles.testType}>{initialOrder?.testType?.label}</p>
-              </InputWrapper>
-            </Column>
-          </Grid>
-          {config.showLabReferenceNumberField ? (
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={8} sm={4}>
-                <InputWrapper>
-                  <Controller
-                    name="accessionNumber"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        id="labReferenceNumberInput"
-                        invalid={!!errors.accessionNumber}
-                        invalidText={errors.accessionNumber?.message}
-                        labelText={t('referenceNumber', 'Reference number', {
-                          orderType: orderType?.display,
-                        })}
-                        maxLength={150}
-                        onBlur={onBlur}
-                        onChange={onChange}
-                        size={responsiveSize}
-                        value={value}
-                      />
-                    )}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          ) : null}
-          <Grid className={styles.gridRow}>
-            <Column lg={8} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="urgency"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
-                      id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      items={priorityOptions}
-                      onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
-                      size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          {orderReasons.length > 0 && (
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={8} sm={4}>
-                <InputWrapper>
-                  <Controller
-                    name="orderReason"
-                    control={control}
-                    render={({ field: { onBlur, onChange } }) => (
-                      <ComboBox
-                        id="orderReasonInput"
-                        invalid={!!errors.orderReason}
-                        invalidText={errors.orderReason?.message}
-                        items={orderReasons}
-                        itemToString={(item) => item?.display}
-                        onBlur={onBlur}
-                        onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
-                        selectedItem={''}
-                        shouldFilterItem={filterItemsByName}
-                        size={responsiveSize}
-                        titleText={t('orderReason', 'Order reason')}
-                      />
-                    )}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          )}
+    <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+      <div className={styles.form}>
+        <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
+        <Grid className={styles.gridRow}>
+          <Column lg={16} md={8} sm={4}>
+            <InputWrapper>
+              <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
+              <p className={styles.testType}>{initialOrder?.testType?.label}</p>
+            </InputWrapper>
+          </Column>
+        </Grid>
+        {config.showReferenceNumberField ? (
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <Controller
-                  name="instructions"
+                  name="accessionNumber"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="additionalInstructionsInput"
-                      invalid={!!errors.instructions}
-                      invalidText={errors.instructions?.message}
-                      labelText={t('additionalInstructions', 'Additional instructions')}
-                      maxCount={500}
+                    <TextInput
+                      id="labReferenceNumberInput"
+                      invalid={!!errors.accessionNumber}
+                      invalidText={errors.accessionNumber?.message}
+                      labelText={t('referenceNumber', 'Reference number', {
+                        orderType: orderType?.display,
+                      })}
+                      maxLength={150}
                       onBlur={onBlur}
                       onChange={onChange}
                       size={responsiveSize}
@@ -289,31 +225,129 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-        </div>
-        <div>
-          {showErrorNotification && (
-            <Column className={styles.errorContainer}>
-              <InlineNotification
-                lowContrast
-                onClose={() => setShowErrorNotification(false)}
-                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-                title={t('error', 'Error')}
+        ) : null}
+        <Grid className={styles.gridRow}>
+          <Column lg={8} md={8} sm={4}>
+            <InputWrapper>
+              <Controller
+                name="urgency"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Select
+                    id="priorityInput"
+                    {...field}
+                    onChange={handleUpdateUrgency(field.onChange)}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
+                    labelText={t('priority', 'Priority')}
+                  >
+                    {priorityOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value} text={option.label} />
+                    ))}
+                  </Select>
+                )}
               />
+            </InputWrapper>
+          </Column>
+        </Grid>
+        {isScheduledDateRequired && (
+          <Grid className={styles.gridRow}>
+            <Column lg={8} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="scheduledDate"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <OpenmrsDatePicker
+                      labelText={t('scheduledDate', 'Scheduled date')}
+                      id="scheduledDate"
+                      {...field}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                      minDate={new Date()}
+                      size={responsiveSize}
+                    />
+                  )}
+                />
+              </InputWrapper>
             </Column>
-          )}
-          <ButtonSet
-            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-          >
-            <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
-              {t('discard', 'Discard')}
-            </Button>
-            <Button className={styles.button} kind="primary" size="xl" type="submit">
-              {t('saveOrder', 'Save order')}
-            </Button>
-          </ButtonSet>
-        </div>
-      </Form>
-    </>
+          </Grid>
+        )}
+        {orderReasons.length > 0 && (
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="orderReason"
+                  control={control}
+                  render={({ field: { onBlur, onChange } }) => (
+                    <ComboBox
+                      id="orderReasonInput"
+                      invalid={!!errors.orderReason}
+                      invalidText={errors.orderReason?.message}
+                      items={orderReasons}
+                      itemToString={(item) => item?.display}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
+                      selectedItem={''}
+                      shouldFilterItem={filterItemsByName}
+                      size={responsiveSize}
+                      titleText={t('orderReason', 'Order reason')}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+        )}
+        <Grid className={styles.gridRow}>
+          <Column lg={16} md={8} sm={4}>
+            <InputWrapper>
+              <Controller
+                name="instructions"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextArea
+                    enableCounter
+                    id="additionalInstructionsInput"
+                    invalid={!!errors.instructions}
+                    invalidText={errors.instructions?.message}
+                    labelText={t('additionalInstructions', 'Additional instructions')}
+                    maxCount={500}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    size={responsiveSize}
+                    value={value}
+                  />
+                )}
+              />
+            </InputWrapper>
+          </Column>
+        </Grid>
+      </div>
+      <div>
+        {showErrorNotification && (
+          <Column className={styles.errorContainer}>
+            <InlineNotification
+              lowContrast
+              onClose={() => setShowErrorNotification(false)}
+              subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
+              title={t('error', 'Error')}
+            />
+          </Column>
+        )}
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
+          <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} kind="primary" size="xl" type="submit">
+            {t('saveOrder', 'Save order')}
+          </Button>
+        </ButtonSet>
+      </div>
+    </Form>
   );
 }
 

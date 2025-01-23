@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   type OrderBasketItem,
@@ -7,28 +7,29 @@ import {
   useOrderBasket,
   useOrderType,
   priorityOptions,
+  type OrderUrgency,
 } from '@openmrs/esm-patient-common-lib';
-import { translateFrom, useLayoutType, useSession, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
+import { useLayoutType, useSession, useConfig, ExtensionSlot, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
   Column,
-  ComboBox,
   Form,
   Grid,
   InlineNotification,
   Layer,
+  Select,
+  SelectItem,
   TextArea,
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
-import styles from './general-order-form.scss';
-import type { ConfigObject } from '../../../config-schema';
 import { ordersEqual, prepOrderPostData } from '../resources';
+import styles from './general-order-form.scss';
+import { type ConfigObject } from '../../../config-schema';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
@@ -45,7 +46,6 @@ export function OrderForm({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   orderTypeUuid,
-  orderableConceptSets,
 }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -54,34 +54,39 @@ export function OrderForm({
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const { orderType } = useOrderType(orderTypeUuid);
+  const config = useConfig<ConfigObject>();
 
   const OrderFormSchema = useMemo(
     () =>
-      z.object({
-        instructions: z.string().optional(),
-        urgency: z.string().refine((value) => value !== '', {
-          message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
+      z
+        .object({
+          instructions: z.string().nullish(),
+          urgency: z.string().refine((value) => value !== '', {
+            message: t('priorityRequired', 'Priority is required'),
+          }),
+          accessionNumber: z.string().nullish(),
+          concept: z.object(
+            { display: z.string(), uuid: z.string() },
+            {
+              required_error: t('orderableConceptRequired', 'Orderable concept is required'),
+              invalid_type_error: t('orderableConceptRequired', 'Orderable concept is required'),
+            },
+          ),
+          scheduledDate: z.date().nullish(),
+        })
+        .refine((data) => data.urgency !== 'ON_SCHEDULED_DATE' || data.scheduledDate, {
+          message: t('scheduledDateRequired', 'Scheduled date is required'),
+          path: ['scheduledDate'],
         }),
-        accessionNumber: z.string().optional(),
-        concept: z.object(
-          { display: z.string(), uuid: z.string() },
-          {
-            required_error: translateFrom(moduleName, 'addOrderableConceptRequired', 'Orderable concept is required'),
-            invalid_type_error: translateFrom(
-              moduleName,
-              'addOrderableConceptRequired',
-              'Orderable concept is required',
-            ),
-          },
-        ),
-      }),
-    [],
+    [t],
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
+    setValue,
+    watch,
   } = useForm<OrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(OrderFormSchema),
@@ -89,6 +94,8 @@ export function OrderForm({
       ...initialOrder,
     },
   });
+
+  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
 
   const filterItemsByName = useCallback((menu) => {
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
@@ -119,6 +126,7 @@ export function OrderForm({
 
       closeWorkspaceWithSavedChanges({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        closeWorkspaceGroup: false,
       });
     },
     [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
@@ -128,6 +136,7 @@ export function OrderForm({
     setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
     closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      closeWorkspaceGroup: false,
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
@@ -135,6 +144,16 @@ export function OrderForm({
     if (errors) {
       setShowErrorNotification(true);
     }
+  };
+
+  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
+    return (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as OrderUrgency;
+      if (value !== 'ON_SCHEDULED_DATE') {
+        setValue('scheduledDate', null);
+      }
+      fieldOnChange(e);
+    };
   };
 
   useEffect(() => {
@@ -156,55 +175,80 @@ export function OrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="accessionNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      invalid={!!errors.accessionNumber}
-                      invalidText={errors.accessionNumber?.message}
-                      labelText={t('referenceNumber', 'Reference number', {
-                        orderType: orderType?.display,
-                      })}
-                      maxLength={150}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      size={responsiveSize}
-                      value={value}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
+          {config.showReferenceNumberField && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="accessionNumber"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        id="labReferenceNumberInput"
+                        invalid={!!errors.accessionNumber}
+                        invalidText={errors.accessionNumber?.message}
+                        labelText={t('referenceNumber', 'Reference number', {
+                          orderType: orderType?.display,
+                        })}
+                        maxLength={150}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        size={responsiveSize}
+                        value={value}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
                 <Controller
                   name="urgency"
                   control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <ComboBox
+                  render={({ field, fieldState }) => (
+                    <Select
                       id="priorityInput"
-                      invalid={!!errors.urgency}
-                      invalidText={errors.urgency?.message}
-                      items={priorityOptions}
-                      onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
-                      shouldFilterItem={filterItemsByName}
-                      size={responsiveSize}
-                      titleText={t('priority', 'Priority')}
-                    />
+                      {...field}
+                      onChange={handleUpdateUrgency(field.onChange)}
+                      invalid={Boolean(fieldState?.error)}
+                      invalidText={fieldState?.error?.message}
+                      labelText={t('priority', 'Priority')}
+                    >
+                      {priorityOptions.map((option) => (
+                        <SelectItem key={option.value} text={option.label} value={option.value} />
+                      ))}
+                    </Select>
                   )}
                 />
               </InputWrapper>
             </Column>
           </Grid>
+          {isScheduledDateRequired && (
+            <Grid className={styles.gridRow}>
+              <Column lg={8} md={8} sm={4}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduledDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <OpenmrsDatePicker
+                        labelText={t('scheduledDate', 'Scheduled date')}
+                        id="scheduledDate"
+                        {...field}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                        minDate={new Date()}
+                        size={responsiveSize}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              </Column>
+            </Grid>
+          )}
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>

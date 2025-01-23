@@ -187,6 +187,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      closeWorkspaceGroup: false,
     });
   }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace]);
 
