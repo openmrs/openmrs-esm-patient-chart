@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "Lỗi đánh dấu bệnh nhân còn sống",
   "errorMarkingPatientDeceased": "Lỗi đánh dấu bệnh nhân đã chết",
   "errorOccuredDeletingVisit": "Đã xảy ra lỗi khi xóa lượt khám",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "Không thể cập nhật thuộc tính {{attributeName}}",
   "errorUpdatingVisitDetails": "Lỗi cập nhật chi tiết lượt khám",
   "errorWhenRestoringVisit": "Đã xảy ra lỗi khi khôi phục {{visit}}",
