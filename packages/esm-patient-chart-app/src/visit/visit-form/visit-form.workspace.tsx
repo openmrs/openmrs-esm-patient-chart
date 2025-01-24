@@ -51,7 +51,7 @@ import {
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
+import { invalidateUseVisits, useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
@@ -107,7 +107,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutateVisits } = useVisits(patientUuid);
   const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const allVisitTypes = useConditionalVisitTypes();
 
@@ -558,7 +557,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           })
           .finally(() => {
             mutateCurrentVisit();
-            mutateVisits();
+            invalidateUseVisits(patientUuid);
             mutateInfiniteVisits();
           });
       } else {
@@ -602,7 +601,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       handleVisitAttributes,
       isOnline,
       mutateCurrentVisit,
-      mutateVisits,
       mutateInfiniteVisits,
       visitFormCallbacks,
       patientUuid,
