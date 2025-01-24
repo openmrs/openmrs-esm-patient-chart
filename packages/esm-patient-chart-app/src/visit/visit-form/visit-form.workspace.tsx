@@ -106,7 +106,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutateVisits } = useVisits(patientUuid);
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const allVisitTypes = useConditionalVisitTypes();
 
@@ -556,8 +556,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
+            mutateCurrentVisit();
             invalidateUseVisits(patientUuid);
-            mutateVisits();
             mutateInfiniteVisits();
           });
       } else {
@@ -568,7 +568,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            invalidateUseVisits(patientUuid);
+            mutateCurrentVisit();
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -600,7 +600,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       extraVisitInfo,
       handleVisitAttributes,
       isOnline,
-      mutateVisits,
+      mutateCurrentVisit,
       mutateInfiniteVisits,
       visitFormCallbacks,
       patientUuid,

@@ -63,7 +63,7 @@ export function useVisits(patientUuid: string) {
     isLoading,
     isValidating,
     mutate: localMutate,
-  } = useSWR(['visits', patientUuid], () =>
+  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () =>
     openmrsFetch(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`),
   );
 
