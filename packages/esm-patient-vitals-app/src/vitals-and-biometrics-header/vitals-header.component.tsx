@@ -206,6 +206,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
               unitSymbol={latestVitals?.bmi && config.biometrics['bmiUnit']}
               value={latestVitals?.bmi ?? '--'}
             />
+            {latestVitals?.muac && (
+              <VitalsHeaderItem
+                unitName={t('muac', 'MUAC')}
+                unitSymbol={
+                  (latestVitals?.muac && conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid)) ?? ''
+                }
+                value={latestVitals?.muac ?? '--'}
+              />
+            )}
           </div>
         </div>
       </div>
