@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "Error al marcar al paciente como vivo",
   "errorMarkingPatientDeceased": "Error al marcar al paciente como fallecido",
   "errorOccuredDeletingVisit": "Ocurrió un error al eliminar la consulta",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "No se pudo eliminar el atributo {{attributeName}}",
   "errorUpdatingVisitDetails": "Error al actualizar los detalles de la consulta",
   "errorWhenRestoringVisit": "Ocurrió un error al restaurar {{visit}}",
