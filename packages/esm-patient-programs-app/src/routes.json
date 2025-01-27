@@ -36,6 +36,12 @@
       "title": "programEnrollmentWorkspaceTitle",
       "component": "programsFormWorkspace"
     }
+  ],
+  "modals": [
+    {
+      "name": "program-delete-confirmation-modal",
+      "component": "deleteProgramConfirmationModal"
+    }
   ]
 }
 
