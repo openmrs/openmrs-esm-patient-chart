@@ -9,8 +9,10 @@ import { ProviderResourceService } from '../openmrs-api/provider-resource.servic
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
+import { DiagnosisResourceService } from '../openmrs-api/diagnosis.service';
 import type {
   Concept,
+  DiagnosisConfig,
   FormSchema,
   Identifier,
   Location,
@@ -27,6 +29,7 @@ export class FormDataSourceService {
     private locationResourceService: LocationResourceService,
     private conceptResourceService: ConceptResourceService,
     private localStorageService: LocalStorageService,
+    private diagnosisResourceService: DiagnosisResourceService,
   ) {}
 
   public getDataSources(formSchema: FormSchema) {
@@ -294,18 +297,8 @@ export class FormDataSourceService {
         ),
       );
   }
-  public findDiagnoses(searchText) {
-    const allowedConceptClasses = ['8d4918b0-c2cc-11de-8d13-0010c6dffd0f'];
-
-    return this.conceptResourceService
-      .searchConcept(searchText)
-      .pipe(
-        map((concepts) =>
-          concepts
-            .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
-            .map(this.mapConcept),
-        ),
-      );
+  public findDiagnoses(searchText, config?: DiagnosisConfig) {
+    return this.diagnosisResourceService.findDiagnoses(searchText, config);
   }
 
   public mapConcept(concept?: Concept) {
