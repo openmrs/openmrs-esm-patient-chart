@@ -68,7 +68,7 @@ describe('ProgramsOverview', () => {
     expect(screen.getByRole('columnheader', { name: /active programs/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /date enrolled/i })).toBeInTheDocument();
 
-    const addButton = screen.getByRole('button', { name: /Add/ });
+    const addButton = screen.getByRole('button', { name: /add/i });
     const previousPageButton = screen.getByRole('button', { name: /previous page/i });
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 
