@@ -2,8 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom 
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import immunizationsOverviewComponent from './immunizations/immunizations-overview.component';
-import immunizationsDetailedSummaryComponent from './immunizations/immunizations-detailed-summary.component';
 
 const moduleName = '@openmrs/esm-patient-immunizations-app';
 
@@ -18,9 +16,15 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const immunizationsOverview = getSyncLifecycle(immunizationsOverviewComponent, options);
+export const immunizationsOverview = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-overview.component'),
+  options,
+);
 
-export const immunizationsDetailedSummary = getSyncLifecycle(immunizationsDetailedSummaryComponent, options);
+export const immunizationsDetailedSummary = getAsyncLifecycle(
+  () => import('./immunizations/immunizations-detailed-summary.component'),
+  options,
+);
 
 export const immunizationsDashboardLink =
   // t('Immunizations', 'Immunizations')

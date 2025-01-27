@@ -2,7 +2,6 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { attachmentsConfigSchema } from './attachments-config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import attachmentsOverviewComponent from './attachments/attachments-overview.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -12,7 +11,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, attachmentsConfigSchema);
 }
 
-export const attachmentsOverview = getSyncLifecycle(attachmentsOverviewComponent, {
+export const attachmentsOverview = getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
   featureName: 'patient-attachments',
   moduleName,
 });

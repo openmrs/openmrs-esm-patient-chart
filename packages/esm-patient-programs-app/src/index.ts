@@ -1,9 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import programsOverviewComponent from './programs/programs-overview.component';
-import programsDetailedSummaryComponent from './programs/programs-detailed-summary.component';
 
 const moduleName = '@openmrs/esm-patient-programs-app';
 
@@ -18,9 +16,12 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const programsOverview = getSyncLifecycle(programsOverviewComponent, options);
+export const programsOverview = getAsyncLifecycle(() => import('./programs/programs-overview.component'), options);
 
-export const programsDetailedSummary = getSyncLifecycle(programsDetailedSummaryComponent, options);
+export const programsDetailedSummary = getAsyncLifecycle(
+  () => import('./programs/programs-detailed-summary.component'),
+  options,
+);
 
 export const programsDashboardLink =
   // t('Programs', 'Programs')

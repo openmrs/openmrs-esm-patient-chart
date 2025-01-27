@@ -1,15 +1,11 @@
 import {
   defineConfigSchema,
   getAsyncLifecycle,
-  getSyncLifecycle,
   messageOmrsServiceWorker,
   registerFeatureFlag,
   restBaseUrl,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
-import patientBannerComponent from './banner/patient-banner.component';
-import visitTagComponent from './banner-tags/visit-tag.extension';
 
 const moduleName = '@openmrs/esm-patient-banner-app';
 
@@ -34,11 +30,14 @@ export function startupApp() {
   );
 }
 
-export const visitTag = getSyncLifecycle(visitTagComponent, options);
+export const visitTag = getAsyncLifecycle(() => import('./banner-tags/visit-tag.extension'), options);
 
-export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, options);
+export const deceasedPatientTag = getAsyncLifecycle(
+  () => import('./banner-tags/deceased-patient-tag.extension'),
+  options,
+);
 
-export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
+export const patientBanner = getAsyncLifecycle(() => import('./banner/patient-banner.component'), options);
 
 export const printIdentifierStickerModal = getAsyncLifecycle(
   () => import('./print-identifier-sticker/print-identifier-sticker.modal'),

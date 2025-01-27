@@ -8,12 +8,7 @@ import {
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import biometricsDetailedSummaryComponent from './biometrics/biometrics-main.component';
-import biometricsOverviewComponent from './biometrics/biometrics-overview.component';
 import dashboardMeta from './dashboard.meta';
-import vitalsHeaderComponent from './vitals-and-biometrics-header/vitals-header.component';
-import vitalsMainComponent from './vitals/vitals-main.component';
-import vitalsSummaryComponent from './vitals/vitals-summary.component';
 
 const moduleName = '@openmrs/esm-patient-vitals-app';
 
@@ -38,15 +33,24 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const vitalsSummary = getSyncLifecycle(vitalsSummaryComponent, options);
+export const vitalsSummary = getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options);
 
-export const vitalsMain = getSyncLifecycle(vitalsMainComponent, options);
+export const vitalsMain = getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options);
 
-export const vitalsHeader = getSyncLifecycle(vitalsHeaderComponent, options);
+export const vitalsHeader = getAsyncLifecycle(
+  () => import('./vitals-and-biometrics-header/vitals-header.component'),
+  options,
+);
 
-export const biometricsOverview = getSyncLifecycle(biometricsOverviewComponent, options);
+export const biometricsOverview = getAsyncLifecycle(
+  () => import('./biometrics/biometrics-overview.component'),
+  options,
+);
 
-export const biometricsDetailedSummary = getSyncLifecycle(biometricsDetailedSummaryComponent, options);
+export const biometricsDetailedSummary = getAsyncLifecycle(
+  () => import('./biometrics/biometrics-main.component'),
+  options,
+);
 
 export const vitalsAndBiometricsDashboardLink =
   // t('Vitals & Biometrics', 'Vitals & Biometrics')

@@ -1,7 +1,5 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-
-import patientListsActionButtonComponent from './action-button/patient-lists-action-button.extension';
 
 const moduleName = '@openmrs/esm-patient-lists-app';
 const options = {
@@ -15,7 +13,10 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const patientListsActionMenu = getSyncLifecycle(patientListsActionButtonComponent, options);
+export const patientListsActionMenu = getAsyncLifecycle(
+  () => import('./action-button/patient-lists-action-button.extension'),
+  options,
+);
 
 // t('patientListsWorkspaceTitle', 'Patient Lists')
 export const patientListsWorkspace = getAsyncLifecycle(() => import('./workspaces/patient-lists.workspace'), options);

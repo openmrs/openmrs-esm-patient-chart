@@ -1,9 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
-import OrdersSummary from './orders-summary/orders-summary.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -33,7 +31,10 @@ export const testResultsFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);
+export const orderBasketActionMenu = getAsyncLifecycle(
+  () => import('./order-basket-action-button/order-basket-action-button.extension'),
+  options,
+);
 
 export const orderPriceDetailsExtension = getAsyncLifecycle(
   () => import('./components/order-price-details.component'),
@@ -54,7 +55,7 @@ export const ordersDashboardLink =
     options,
   );
 
-export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);
+export const ordersDashboard = getAsyncLifecycle(() => import('./orders-summary/orders-summary.component'), options);
 export const labResult = getAsyncLifecycle(() => import('./lab-results/lab-result.component'), options);
 
 // t('searchOrderables','Search orderables')

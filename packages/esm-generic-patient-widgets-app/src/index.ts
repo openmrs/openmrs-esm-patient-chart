@@ -1,6 +1,5 @@
-import { defineExtensionConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineExtensionConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import obsSwitchableComponent from './obs-switchable/obs-switchable.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -11,8 +10,8 @@ const options = {
   moduleName,
 };
 
-export const switchableObs = getSyncLifecycle(obsSwitchableComponent, options);
-
 export function startupApp() {
   defineExtensionConfigSchema(moduleName, configSchema);
 }
+
+export const switchableObs = getAsyncLifecycle(() => import('./obs-switchable/obs-switchable.component'), options);
