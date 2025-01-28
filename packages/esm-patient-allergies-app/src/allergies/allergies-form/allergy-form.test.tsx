@@ -81,8 +81,8 @@ describe('AllergyForm', () => {
     expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /severe/i })).toBeInTheDocument();
 
-    expect(screen.getByText(/date of onset and comments/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Date of onset and comments/i)).toBeInTheDocument();
+    expect(screen.getByText(/comments/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/comments/i)).toBeInTheDocument();
   });
 
   it('enable the save button when all required fields are filled', async () => {
@@ -133,7 +133,7 @@ describe('AllergyForm', () => {
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
+    await user.type(screen.getByLabelText(/comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
@@ -144,7 +144,6 @@ describe('AllergyForm', () => {
         codedAllergen: { uuid: allergen.uuid },
       },
       comment,
-      onsetDate: '',
       reactions: [{ reaction: { uuid: reaction.uuid } }],
       severity: { uuid: mockConcepts.moderateReactionUuid },
     };
@@ -191,7 +190,7 @@ describe('AllergyForm', () => {
     await user.type(customAllergenInput, customAllergen);
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
+    await user.type(screen.getByLabelText(/comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
@@ -202,7 +201,6 @@ describe('AllergyForm', () => {
         nonCodedAllergen: customAllergen,
       },
       comment,
-      onsetDate: '',
       reactions: [{ reaction: { uuid: reaction.uuid } }],
       severity: { uuid: mockConcepts.moderateReactionUuid },
     };
@@ -225,7 +223,7 @@ describe('AllergyForm', () => {
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
+    await user.type(screen.getByLabelText(/comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
@@ -260,7 +258,7 @@ describe('AllergyForm', () => {
     await user.click(screen.getByText(allergen.display));
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/Date of onset and comments/i), comment);
+    await user.type(screen.getByLabelText(/comments/i), comment);
     await user.click(screen.getByRole('button', { name: /save and close/i }));
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
@@ -278,7 +276,7 @@ describe('AllergyForm', () => {
     renderAllergyForm({ allergy: mockAllergy, formContext: 'editing' });
 
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-    const commentInput = screen.getByLabelText(/Date of onset and comments/i);
+    const commentInput = screen.getByLabelText(/comments/i);
 
     const allergen = mockAllergens[2];
     const reaction = mockAllergicReactions[0];
@@ -300,7 +298,6 @@ describe('AllergyForm', () => {
         codedAllergen: { uuid: allergen.uuid },
       },
       comment,
-      onsetDate: '',
       reactions: [
         { reaction: { uuid: reaction.uuid } },
         { reaction: { uuid: mockAllergicReactions[2].uuid } },
