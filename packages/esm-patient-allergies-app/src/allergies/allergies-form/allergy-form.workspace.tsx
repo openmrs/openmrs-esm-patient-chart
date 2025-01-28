@@ -57,13 +57,6 @@ const allergyFormSchema = (t: TFunction) =>
     nonCodedAllergicReaction: z.string().optional(),
     severityOfWorstReaction: z.string(),
     comment: z.string().optional(),
-    onsetDate: z.date().refine(
-      (date) => {
-        const currentDate = new Date(date);
-        return currentDate <= new Date();
-      },
-      t('onsetDateCannotBeFuture', 'Onset date cannot be in the future'),
-    ),
   });
 
 type AllergyFormData = {
@@ -73,7 +66,6 @@ type AllergyFormData = {
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
   comment: string;
-  onsetDate: Date;
 };
 
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
@@ -159,7 +151,6 @@ function AllergyForm(props: AllergyFormProps) {
       nonCodedAllergicReaction: '',
       severityOfWorstReaction: null,
       comment: '',
-      onsetDate: new Date(),
     };
     if (formContext === 'editing') {
       defaultAllergy.allergen = allergens?.find((a) => allergy?.display === a?.display);
@@ -216,7 +207,6 @@ function AllergyForm(props: AllergyFormProps) {
         nonCodedAllergicReaction,
         allergicReactions,
         severityOfWorstReaction,
-        onsetDate,
       } = data;
 
       const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
@@ -237,7 +227,6 @@ function AllergyForm(props: AllergyFormProps) {
           uuid: severityOfWorstReaction,
         },
         comment,
-        onsetDate: onsetDate.toISOString(),
         reactions: selectedAllergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
@@ -412,24 +401,6 @@ function AllergyForm(props: AllergyFormProps) {
                 )}
               />
             </FormGroup>
-          </div>
-          <div>
-            <ResponsiveWrapper>
-              <Controller
-                name="onsetDate"
-                control={control}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <OpenmrsDatePicker
-                    id="onsetDate"
-                    labelText={t('DateofOnset', 'Date of Onset')}
-                    onChange={(selectedDate) => onChange(selectedDate)}
-                    onBlur={onBlur}
-                    value={value}
-                    maxDate={new Date()}
-                  />
-                )}
-              />
-            </ResponsiveWrapper>
           </div>
 
           <div>
