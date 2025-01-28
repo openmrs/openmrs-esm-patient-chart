@@ -87,12 +87,28 @@ function AllergyForm(props: AllergyFormProps) {
   const { concepts } = useConfig();
   const isTablet = useLayoutType() === 'tablet';
 
-  const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
-  const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { mildReactionUuid, severeReactionUuid, moderateReactionUuid, otherConceptUuid } = useMemo(
     () => concepts,
     [concepts],
   );
+  const severityLevels = [
+    {
+      uuid: mildReactionUuid,
+      key: 'mild',
+      display: t('mild', 'Mild'),
+    },
+    {
+      uuid: moderateReactionUuid,
+      key: 'moderate',
+      display: t('moderate', 'Moderate'),
+    },
+    {
+      uuid: severeReactionUuid,
+      key: 'severe',
+      display: t('severe', 'Severe'),
+    },
+  ];
+  const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { allergicReactions, isLoading } = useAllergicReactions();
   const { allergens } = useAllergens();
   const [isDisabled, setIsDisabled] = useState(true);
@@ -389,24 +405,8 @@ function AllergyForm(props: AllergyFormProps) {
                     valueSelected={value}
                     onBlur={onBlur}
                   >
-                    {severityLevels.map((severity, index) => (
-                      <RadioButton
-                        id={severity.toLowerCase() + 'Severity'}
-                        key={`severity-${index}`}
-                        labelText={severity}
-                        value={(() => {
-                          switch (severity.toLowerCase()) {
-                            case 'mild':
-                              return mildReactionUuid;
-                            case 'moderate':
-                              return moderateReactionUuid;
-                            case 'severe':
-                              return severeReactionUuid;
-                            default:
-                              return '';
-                          }
-                        })()}
-                      />
+                    {severityLevels.map(({ key, display, uuid }) => (
+                      <RadioButton id={key} key={key} labelText={display} value={uuid} />
                     ))}
                   </RadioButtonGroup>
                 )}
