@@ -393,7 +393,7 @@ function AllergyForm(props: AllergyFormProps) {
                     valueSelected={value}
                     onBlur={onBlur}
                   >
-                    {severityLevels.map(({ key, display, uuid }, index) => (
+                    {severityLevels.map(({ key, display, uuid }) => (
                       <RadioButton id={key} key={key} labelText={display} value={uuid} />
                     ))}
                   </RadioButtonGroup>
