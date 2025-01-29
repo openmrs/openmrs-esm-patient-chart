@@ -1,5 +1,5 @@
 {
-  "active": "Active",
+  "active": "Actif",
   "add": "Ajouter",
   "cancel": "Annuler",
   "checkFilters": "Vérifiez les filtres ci-dessus",
@@ -29,7 +29,7 @@
   "noConditionsToDisplay": "Aucune pathologie à afficher",
   "noResultsFor": "Pas de résultat pour",
   "onsetDate": "Date de d'apparition",
-  "recordCondition": "Enregistrer une pathologie",
+  "recordCondition": "Ajouter une pathologie",
   "required": "Requis",
   "saveAndClose": "Enregistrer et fermer",
   "saving": "Enregistrement",
