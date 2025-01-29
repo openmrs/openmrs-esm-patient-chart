@@ -3,5 +3,6 @@ export const dashboardMeta = {
   columns: 1,
   path: 'Results',
   title: 'Results',
+  icon: 'omrs-icon-chart-average',
   hideDashboardTitle: true,
 };

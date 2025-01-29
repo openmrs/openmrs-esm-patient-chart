@@ -1,0 +1,10 @@
+@use '@carbon/layout';
+
+.menu {
+  display: flex;
+  align-items: start;
+}
+
+.icon {
+  margin-right: layout.$spacing-03;
+}
