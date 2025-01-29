@@ -54,7 +54,7 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t('errorTitle', 'There was an error with this form');
  * t('expandAll', 'Expand all');
  * t('fieldErrorDescriptionTitle', 'Validation Errors');
- * t('fileUploadDescription', '');
+ * t('fileUploadDescription', 'Upload one of the following file types: {{fileTypes}}');
  * t('fileUploadDescriptionAny', 'Upload any file type');
  * t('invalidWorkspaceName', 'Invalid workspace name.');
  * t('invalidWorkspaceNameSubtitle', 'Please provide a valid workspace name.');
