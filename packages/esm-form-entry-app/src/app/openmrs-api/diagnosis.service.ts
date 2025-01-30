@@ -7,6 +7,8 @@ import { Concept, DiagnosisResult } from '../types';
 import { DiagnosisConfig } from '../types';
 import { ConceptResourceService } from './concept-resource.service';
 
+type ConceptReferenceTerm = Concept['mappings'][number]['conceptReferenceTerm'];
+
 const DIAGNOSIS_CONCEPT_CLASS_UUID = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
 const CONCEPT_RESPONSE_CUSTOM_REPRESENTATION =
   'custom:(uuid,display,name,conceptClass:(uuid,display),set,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code,name,conceptSource:full)))';
@@ -55,26 +57,32 @@ export class DiagnosisResourceService {
     );
   }
 
-  private mapDiagnosis(concept: Concept, config?: DiagnosisConfig): DiagnosisResult | undefined {
-    if (!concept) return undefined;
+  private mapDiagnosis(concept, config) {
+    if (!concept?.uuid) {
+      return undefined;
+    }
 
-    const sourceUuid = config?.conceptSourceUuid;
-    const baseLabel = concept.name?.display || 'Unnamed Concept';
-    const sourceDisplay = this.getSourceDisplay(concept, sourceUuid);
+    const baseLabel = concept.name?.display ?? 'Unnamed Concept';
+
+    // Get reference term if source UUID is provided
+    const referenceTerm = config?.conceptSourceUuid
+      ? this.getSourceDisplay(concept, config.conceptSourceUuid)
+      : undefined;
+
+    const label = referenceTerm ? `${referenceTerm.code} - ${referenceTerm.name ?? baseLabel}` : baseLabel;
 
     return {
       value: concept.uuid,
-      label: sourceDisplay ? `${baseLabel} (${sourceDisplay})` : baseLabel,
+      label: label.trim(),
     };
   }
 
-  private getSourceDisplay(concept: Concept, sourceUuid?: string): string | undefined {
-    if (!sourceUuid) return undefined;
+  private getSourceDisplay(concept, sourceUuid): ConceptReferenceTerm | undefined {
+    if (!sourceUuid || !concept.mappings?.length) {
+      return undefined;
+    }
 
-    const relevantMapping = concept.mappings?.find(
-      (mapping) => mapping?.conceptReferenceTerm?.conceptSource?.uuid === sourceUuid,
-    );
-
-    return relevantMapping?.conceptReferenceTerm?.conceptSource?.display;
+    return concept.mappings.find((mapping) => mapping?.conceptReferenceTerm?.conceptSource?.uuid === sourceUuid)
+      ?.conceptReferenceTerm;
   }
 }
