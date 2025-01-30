@@ -10,6 +10,9 @@ interface RetrospectiveVisitLabelProps {
 
 const RetrospectiveVisitLabel: React.FC<RetrospectiveVisitLabelProps> = ({ currentVisit }) => {
   const { t } = useTranslation();
+  if (!currentVisit) {
+    return <></>;
+  }
   return (
     <Toggletip align="bottom">
       <ToggletipButton label={t('retrospectiveEntry', 'Retrospective Entry')}>

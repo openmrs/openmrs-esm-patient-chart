@@ -36,6 +36,7 @@ import {
   showSnackbar,
   type UploadedFile,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
@@ -123,6 +124,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
+
+  const isRdeEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
 
@@ -438,11 +441,14 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
+
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
         </Row>
       )}
+
       <Stack className={styles.formContainer} gap={2}>
         {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
         <Row className={styles.row}>

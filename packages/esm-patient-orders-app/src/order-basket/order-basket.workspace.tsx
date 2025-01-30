@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useFeatureFlag,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -26,11 +34,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
   const session = useSession();
-  const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
-    activeVisitRequired,
+    visitRequired,
     isLoading: isLoadingEncounterUuid,
     encounterUuid,
     error: errorFetchingEncounterUuid,
@@ -62,7 +70,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         await postOrdersOnNewEncounter(
           patientUuid,
           config?.orderEncounterType,
-          activeVisitRequired ? activeVisit : null,
+          visitRequired ? currentVisit : null,
           session?.sessionLocation?.uuid,
           abortController,
         );
@@ -92,8 +100,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
-    activeVisit,
-    activeVisitRequired,
+    currentVisit,
+    visitRequired,
     clearOrders,
     closeWorkspaceWithSavedChanges,
     config,
@@ -110,8 +118,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     closeWorkspace({ onWorkspaceClose: clearOrders });
   }, [clearOrders, closeWorkspace]);
 
+  const isRdeEnabled = useFeatureFlag('rde');
+
   return (
     <>
+      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
@@ -165,7 +176,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 isSavingOrders ||
                 !orders?.length ||
                 isLoadingEncounterUuid ||
-                (activeVisitRequired && !activeVisit) ||
+                (visitRequired && !currentVisit) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
               }
             >
@@ -178,13 +189,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           </ButtonSet>
         </div>
       </div>
-      {activeVisitRequired && !activeVisit && (
+      {visitRequired && !currentVisit && (
         <ActionableNotification
           kind="error"
           actionButtonLabel={t('startVisit', 'Start visit')}
           onActionButtonClick={openStartVisitDialog}
           title={t('startAVisitToRecordOrders', 'Start a visit to order')}
-          subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+          subtitle={t('visitRequired', 'A visit is required to make orders')}
           lowContrast={true}
           inline
           className={styles.actionNotification}

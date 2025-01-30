@@ -123,7 +123,7 @@ function launchStartVisitForm() {
 
 const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
   const { t } = useTranslation();
-  const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(patient?.id);
+  const { currentVisit, isLoading } = useVisit(patient?.id);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { logo } = useConfig();
@@ -131,6 +131,7 @@ const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
   const isTablet = useLayoutType() === 'tablet';
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
+  const currentVisitIsRetrospective = Boolean(currentVisit && currentVisit.stopDatetime);
 
   const toggleSideMenu = useCallback(
     (state?: boolean) => setIsSideMenuExpanded((prevState) => (state !== undefined ? state : !prevState)),
