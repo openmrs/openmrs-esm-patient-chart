@@ -26,8 +26,9 @@
   container-type: inline-size;
 }
 
-// Using 1100px here to account for the widget loading area, this ensures it collapses when the
-// workspace opens and lacks sufficient space.
+// When the dashboard's width is less than or equal to 68.25rem (1100px),
+// the layout should switch to a single column. This adjustment ensures
+// proper rendering when the workspace area is opened.
 @container dashboard (width <= 68.25rem) {
   .dashboard {
     grid-template-columns: 1fr;
