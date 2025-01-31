@@ -438,7 +438,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       } = data;
 
       const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
-
+      const currentSeconds = new Date().getSeconds();
       let payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
@@ -449,7 +449,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStartDate).date(),
               hours,
               minutes,
-              dayjs(visitStartDate).second(),
+              currentSeconds,
             ),
           ),
         ),
