@@ -5,6 +5,7 @@ export * from './test-results';
 export interface DashboardLinkConfig {
   path: string;
   title: string;
+  icon: string;
   moduleName: string;
 }
 
