@@ -31,11 +31,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   max-width: 80rem;
 }
 
-.widthContained:has([data-extension-slot-name='patient-chart-test-results-dashboard-slot']),
-.widthContained:has([data-extension-slot-name='patient-chart-encounters-dashboard-slot']) {
-  max-width: 150rem;
-}
-
 .chartContainer {
   flex: 1;
   display: flex;
