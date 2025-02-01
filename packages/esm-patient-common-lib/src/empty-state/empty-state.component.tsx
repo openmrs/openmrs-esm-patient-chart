@@ -25,6 +25,9 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         <p className={styles.content}>
           {t('emptyStateText', 'There are no {{displayText}} to display for this patient', {
             displayText: props.displayText.toLowerCase(),
+            interpolation: {
+              escapeValue: false,
+            },
           })}
         </p>
         <p className={styles.action}>
