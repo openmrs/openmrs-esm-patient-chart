@@ -15,8 +15,13 @@ export const ProgramsActionMenu = ({ patientUuid, programEnrollmentId }: Program
   const isTablet = useLayoutType() === 'tablet';
 
   const launchEditProgramsForm = useCallback(
-    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
-    [programEnrollmentId],
+    () =>
+      launchPatientWorkspace('programs-form-workspace', {
+        workspaceTitle: t('editProgramEnrollment', 'Edit program enrollment'),
+        programEnrollmentId,
+        formContext: 'editing',
+      }),
+    [programEnrollmentId, t],
   );
 
   const launchDeleteProgramDialog = useCallback(() => {
