@@ -14,6 +14,7 @@ import {
   Select,
   SelectItem,
   Stack,
+  TimePicker,
 } from '@carbon/react';
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -57,8 +58,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const { showProgramStatusField } = useConfig();
+  const { showProgramStatusField, allowCompletionTime } = useConfig();
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
@@ -90,16 +90,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     control,
     handleSubmit,
     watch,
-    formState: { isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
     mode: 'all',
     resolver: zodResolver(programsFormSchema),
     defaultValues: {
       selectedProgram: currentEnrollment?.program.uuid ?? '',
-      enrollmentDate: currentEnrollment?.dateEnrolled
-        ? dayjs(currentEnrollment.dateEnrolled).toDate()
-        : dayjs().startOf('day').toDate(),
-      completionDate: currentEnrollment?.dateCompleted ? dayjs(currentEnrollment.dateCompleted).toDate() : null,
+      enrollmentDate: currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
+      completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
       enrollmentLocation: getLocationUuid() ?? '',
       selectedProgramStatus: currentState?.state.uuid ?? '',
     },
@@ -115,21 +113,37 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     async (data: ProgramsFormData) => {
       const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
 
+      const formattedEnrollmentDate = dayjs(enrollmentDate).startOf('day').format();
+      const formattedCompletionDate = completionDate ? dayjs(completionDate).startOf('day').format() : null;
+
+      let formattedCompletionDateWithTime = formattedCompletionDate;
+      if (formattedCompletionDate && dayjs(formattedCompletionDate).isSame(dayjs(), 'day')) {
+        formattedCompletionDateWithTime = dayjs(formattedCompletionDate)
+          .set('hour', new Date().getHours())
+          .set('minute', new Date().getMinutes())
+          .set('second', new Date().getSeconds())
+          .format();
+      } else if (formattedCompletionDate && dayjs(formattedCompletionDate).isBefore(dayjs(), 'day')) {
+        formattedCompletionDateWithTime = dayjs(formattedCompletionDate)
+          .set('hour', 23)
+          .set('minute', 59)
+          .set('second', 59)
+          .format();
+      }
+
       const payload = {
         patient: patientUuid,
         program: selectedProgram,
-        dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
-        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
+        dateEnrolled: formattedEnrollmentDate,
+        dateCompleted: formattedCompletionDateWithTime,
         location: enrollmentLocation,
         states:
-          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
+          !!selectedProgramStatus && selectedProgramStatus !== currentState?.state.uuid
             ? [{ state: { uuid: selectedProgramStatus } }]
             : [],
       };
 
       try {
-        setIsSubmittingForm(true);
-
         const abortController = new AbortController();
 
         if (currentEnrollment) {
@@ -157,8 +171,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           subtitle: error instanceof Error ? error.message : 'An unknown error occurred',
         });
       }
-
-      setIsSubmittingForm(false);
     },
     [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
@@ -167,12 +179,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgram"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label="program name"
             id="program"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgram}
+            invalidText={errors?.selectedProgram?.message}
             labelText={t('programName', 'Program name')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -185,7 +198,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                 </SelectItem>
               ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -203,7 +215,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date ? dayjs(date).toDate() : null)}
+          onChange={([date]) => onChange(date)}
           value={value}
         >
           <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
@@ -217,19 +229,35 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="completionDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="completion date"
-          id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+        <>
+          <DatePicker
+            aria-label="completion date"
+            id="completionDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            minDate={new Date(watch('enrollmentDate')).toISOString()}
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => onChange(date)}
+            value={value}
+          >
+            <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
+          </DatePicker>
+          {allowCompletionTime && (
+            <TimePicker
+              id="completionTime"
+              value={value ? dayjs(value).format('HH:mm') : ''}
+              onChange={(time) =>
+                onChange(
+                  time
+                    ? dayjs(value).set('hour', time.split(':')[0]).set('minute', time.split(':')[1]).toISOString()
+                    : '',
+                )
+              }
+              labelText={t('selectTime', 'Select time')}
+            />
+          )}
+        </>
       )}
     />
   );
@@ -269,12 +297,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="selectedProgramStatus"
       control={control}
-      render={({ fieldState, field: { onChange, value } }) => (
+      render={({ field: { onChange, value } }) => (
         <>
           <Select
             aria-label={t('programStatus', 'Program status')}
             id="programStatus"
-            invalid={!!fieldState?.error}
+            invalid={!!errors?.selectedProgramStatus}
+            invalidText={errors?.selectedProgramStatus?.message}
             labelText={t('programStatus', 'Program status')}
             onChange={(event) => onChange(event.target.value)}
             value={value}
@@ -286,7 +315,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
               </SelectItem>
             ))}
           </Select>
-          <p className={styles.errorMessage}>{fieldState?.error?.message}</p>
         </>
       )}
     />
@@ -345,8 +373,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
-          {isSubmittingForm ? (
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
             <span>{t('saveAndClose', 'Save and close')}</span>
