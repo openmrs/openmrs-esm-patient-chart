@@ -183,7 +183,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       closeWorkspaceWithSavedChanges();
       mutateOrderData();
       mutateResults();
-      mutateLabOrders();
+      mutateLabOrders?.();
       showNotification(
         'success',
         t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
