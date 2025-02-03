@@ -24,12 +24,17 @@ export function readFileAsString(file: File) {
   });
 }
 
-export function createGalleryEntry(data: AttachmentResponse): Attachment {
+export interface AttachmentTableData extends Attachment {
+  dateTimeValue: string;
+}
+
+export function createGalleryEntry(data: AttachmentResponse): AttachmentTableData {
   return {
     id: data.uuid,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
-    filename: data.filename,
+    filename: data.filename.replace(/\.[^\\/.]+$/, ''),
     description: data.comment,
+    dateTimeValue: data.dateTime,
     dateTime: formatDate(new Date(data.dateTime), {
       mode: 'wide',
     }),

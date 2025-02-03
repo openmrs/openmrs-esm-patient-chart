@@ -88,7 +88,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const { currentVisit } = useVisit(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -98,7 +97,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { isDirty },
+    formState: { isDirty, isSubmitting },
   } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
     resolver: zodResolver(VitalsAndBiometricFormSchema),
@@ -181,7 +180,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         .every(([key, value]) => isValueWithinReferenceRange(conceptMetadata, config.concepts[`${key}Uuid`], value));
 
       if (allFieldsAreValid) {
-        setIsSubmitting(true);
         setShowErrorMessage(false);
         const abortController = new AbortController();
 
@@ -209,8 +207,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               });
             }
           })
-          .catch((err) => {
-            setIsSubmitting(false);
+          .catch(() => {
             createErrorHandler();
             showSnackbar({
               title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),

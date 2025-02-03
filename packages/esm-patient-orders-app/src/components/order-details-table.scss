@@ -31,6 +31,10 @@
 
 .dropdownContainer {
   min-width: max-content;
+
+  :global(.cds--dropdown__wrapper--inline) {
+    grid-gap: 0 0.5rem;
+  }
 }
 
 .buttons {
@@ -156,4 +160,40 @@
 
 .helperText {
   @include type.type-style('helper-text-02');
+}
+
+.button {
+  svg {
+    fill: currentColor !important;
+  }
+}
+
+.printButton {
+  margin-left: 1.25rem;
+  @extend .button;
+}
+
+.addButton {
+  @extend .button;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    width: fit-content;
+    padding: 0 !important;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
+.rangeLabel {
+  @extend .helperText;
+  margin-right: layout.$spacing-02;
 }

@@ -5,9 +5,9 @@ import duration from 'dayjs/plugin/duration';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 dayjs.extend(duration);
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
-import { ArrowRight, Time } from '@carbon/react/icons';
+import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig, useWorkspaces } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import {
@@ -24,9 +24,14 @@ import styles from './vitals-header.scss';
 
 interface VitalsHeaderProps {
   patientUuid: string;
+
+  /**
+   * This is useful for extensions slots using the Vitals Header
+   */
+  hideLinks?: boolean;
 }
 
-const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
+const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = false }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
@@ -37,13 +42,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { workspaces } = useWorkspaces();
 
-  const isWorkspaceOpen = useCallback(() => {
-    return Boolean(workspaces?.length);
-  }, [workspaces]);
+  const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
 
   const launchVitalsAndBiometricsForm = useCallback(
-    (e: Event) => {
-      e.stopPropagation();
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       launchForm(currentVisit, config);
     },
     [config, currentVisit],
@@ -61,20 +64,34 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
     const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
     const now = dayjs();
     const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
-    let overdueVitalsTagContent = '';
 
-    switch (true) {
-      case vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount <= 7:
-        overdueVitalsTagContent = t('daysOldVitals', 'These vitals are {{count}} days old', {
-          count: vitalsOverdueDayCount,
-        });
-        break;
-      case vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14:
-        overdueVitalsTagContent = t('overOneWeekOldVitals', 'These vitals are over one week old');
-        break;
-      default:
-        overdueVitalsTagContent = t('outOfDateVitals', 'These vitals are out of date');
-        break;
+    let overdueVitalsTagContent: React.ReactNode = null;
+
+    if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
+          <span>
+            {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
+            These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
+          </span>
+        </Trans>
+      );
+    } else if (vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="overOneWeekOldVitals">
+          <span>
+            These vitals are <strong>over one week old</strong>
+          </span>
+        </Trans>
+      );
+    } else {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="outOfDateVitals">
+          <span>
+            These vitals are <strong>out of date</strong>
+          </span>
+        </Trans>
+      );
     }
 
     return (
@@ -86,37 +103,38 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
             {vitalsOverdue ? (
-              <Tag type="red">
-                <span className={styles.overdueIndicator}>
-                  <Time />
-                  {`${t('overdue', 'Overdue')}: ${overdueVitalsTagContent}`}
-                </span>
+              <Tag className={styles.tag} type="red">
+                <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
               </Tag>
             ) : null}
-            <ConfigurableLink
-              className={styles.link}
-              to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
-            >
-              {t('vitalsHistory', 'Vitals history')}
-            </ConfigurableLink>
+            {!hideLinks && (
+              <ConfigurableLink
+                className={styles.link}
+                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
+              >
+                {t('vitalsHistory', 'Vitals history')}
+              </ConfigurableLink>
+            )}
           </div>
           {isValidating ? (
             <div className={styles.backgroundDataFetchingIndicator}>
               <span>{isValidating ? <InlineLoading /> : null}</span>
             </div>
           ) : null}
-          <div className={styles.buttonContainer}>
-            <Button
-              className={styles.recordVitalsButton}
-              data-openmrs-role="Record Vitals"
-              kind="ghost"
-              onClick={launchVitalsAndBiometricsForm}
-              size="sm"
-            >
-              {t('recordVitals', 'Record vitals')}
-              <ArrowRight size={16} className={styles.recordVitalsIconButton} />
-            </Button>
-          </div>
+          {!hideLinks && (
+            <div className={styles.buttonContainer}>
+              <Button
+                className={styles.recordVitalsButton}
+                data-openmrs-role="Record Vitals"
+                kind="ghost"
+                onClick={launchVitalsAndBiometricsForm}
+                size="sm"
+              >
+                {t('recordVitals', 'Record vitals')}
+                <ArrowRight size={16} className={styles.recordVitalsIconButton} />
+              </Button>
+            </div>
+          )}
         </div>
         <div
           className={classNames(styles.rowContainer, {
@@ -166,7 +184,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
             />
             <VitalsHeaderItem
               interpretation={assessValue(
-                latestVitals.temperature,
+                latestVitals?.temperature,
                 getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
               )}
               unitName={t('temperatureAbbreviated', 'Temp')}
@@ -188,6 +206,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
               unitSymbol={latestVitals?.bmi && config.biometrics['bmiUnit']}
               value={latestVitals?.bmi ?? '--'}
             />
+            {latestVitals?.muac && (
+              <VitalsHeaderItem
+                unitName={t('muac', 'MUAC')}
+                unitSymbol={
+                  (latestVitals?.muac && conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid)) ?? ''
+                }
+                value={latestVitals?.muac ?? '--'}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -201,10 +228,12 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid }) => {
         <span className={styles.bodyText}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
       </div>
 
-      <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
-        {t('recordVitals', 'Record vitals')}
-        <ArrowRight size={16} className={styles.recordVitalsIconButton} />
-      </Button>
+      {!hideLinks && (
+        <Button className={styles.recordVitalsButton} kind="ghost" onClick={launchVitalsAndBiometricsForm} size="sm">
+          {t('recordVitals', 'Record vitals')}
+          <ArrowRight size={16} className={styles.recordVitalsIconButton} />
+        </Button>
+      )}
     </div>
   );
 };

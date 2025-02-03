@@ -50,7 +50,7 @@
   "nextYear": "Année suivante",
   "patientIdentifierDuplication": "Duplication de l'identifiant du patient",
   "patientIdentifierDuplicationDescription": "L'identifiant fourni est déjà associé à un patient existant. Veuillez vérifier l'identifiant et réessayer.",
-  "orderNumber": "Numéro de commande",
+  "orderNumber": "Référence",
   "previous": "Précédent",
   "previous21Years": "21 dernières années",
   "previousMonth": "Mois précédent",

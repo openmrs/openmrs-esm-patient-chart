@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
-import { launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useOrderBasket, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
   closeWorkspace,
@@ -114,8 +114,8 @@ export default function OrderBasketSearchResults({
 const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
-  const patient = usePatient();
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patient.patientUuid, 'ACTIVE');
+  const { patientUuid } = usePatientChartStore();
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
     [orders, drug],

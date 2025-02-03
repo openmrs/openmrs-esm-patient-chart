@@ -35,7 +35,9 @@ describe('StartVisit', () => {
 
     await user.click(startNewVisitButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+      openedFrom: 'patient-chart-start-visit',
+    });
   });
 
   test('should launch edit past visit form', async () => {

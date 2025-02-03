@@ -8,11 +8,11 @@ import {
   deleteAttachmentPermanently,
   showModal,
   showSnackbar,
+  type Attachment,
+  type UploadedFile,
   useAttachments,
   useLayoutType,
   UserHasAccess,
-  type Attachment,
-  type UploadedFile,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
@@ -40,7 +40,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
   const { allowedFileExtensions } = useAllowedFileExtensions();
 
-  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
+  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment | null>(null);
   const [hasUploadError, setHasUploadError] = useState(false);
   const [view, setView] = useState<ViewType>('grid');
 
@@ -98,7 +98,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
 
   const showAddAttachmentModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
+      saveFile: (file: UploadedFile) => {
+        if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+          file.fileName = `${file.fileName}.png`;
+        }
+        return createAttachment(patientUuid, file);
+      },
       allowedExtensions: allowedFileExtensions,
       closeModal: () => close(),
       onCompletion: () => mutate(),

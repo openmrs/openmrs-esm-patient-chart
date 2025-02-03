@@ -35,6 +35,7 @@ export default function AddDrugOrderWorkspace({
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      closeWorkspaceGroup: false,
     });
   }, [closeWorkspace]);
 

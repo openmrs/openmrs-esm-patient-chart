@@ -1,14 +1,24 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "អាសយដ្ឋានជួរទី១",
   "address2": "អសយដ្ឋានជួរទី 2",
   "city": "ទីក្រុង",
   "cityVillage": "ទីក្រុង",
   "country": "ប្រទេស",
   "countyDistrict": "ស្រុក/ខ័ណ្ឌ",
+  "deceased": "Deceased",
   "district": "ស្រុក/ខ័ណ្ឌ",
-  "dob": "DOB",
+  "from_lower": "from",
+  "implementationLogo": "Implementation logo",
+  "patientAge": "Age:",
+  "patientDateOfBirthWithSeparator": "Date of birth:",
+  "patientGenderWithSeparator": "Gender:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "Patient name:",
   "postalCode": "លេខកូដតំបន់",
+  "printIdentifierSticker": "Print identifier sticker",
+  "started": "Started",
   "state": "រដ្ឋ",
-  "stateProvince": "រដ្ឋ"
+  "stateProvince": "រដ្ឋ",
+  "telephoneNumberWithSeparator": "Telephone number:"
 }

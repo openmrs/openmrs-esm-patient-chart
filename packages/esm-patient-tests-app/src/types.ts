@@ -1,4 +1,4 @@
-import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import type { OrderBasketItem, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
 export interface FhirResponse<T> {
   total: number;
@@ -81,7 +81,7 @@ export interface Concept {
     display: string;
   }>;
   answers: [];
-  setMembers: [];
+  setMembers: Array<Concept>;
   hiNormal: number;
   hiAbsolute: number;
   hiCritical: number;
@@ -137,3 +137,58 @@ export interface ObservationSet {
 }
 
 export type viewOpts = 'individual-test' | 'over-time' | 'full';
+
+export type Observation = {
+  obsDatetime: string;
+  value: string;
+  interpretation: OBSERVATION_INTERPRETATION;
+};
+
+export type TestResult = {
+  obs: Observation[];
+  datatype: string;
+  lowAbsolute: number;
+  display: string;
+  conceptUuid: string;
+  lowNormal: number;
+  units: string;
+  lowCritical: number;
+  hiNormal: number;
+  flatName: string;
+  hasData: boolean;
+  range: string;
+};
+
+export type MappedObservation = {
+  datatype: string;
+  lowAbsolute: number;
+  display: string;
+  conceptUuid: string;
+  lowNormal: number;
+  units: string;
+  lowCritical: number;
+  hiNormal: number;
+  flatName: string;
+  hasData: boolean;
+  range: string;
+  obsDatetime: string;
+  value: string;
+  interpretation: OBSERVATION_INTERPRETATION;
+  key: string;
+};
+
+export interface GroupedObservation {
+  key: string;
+  date: string;
+  flatName: string;
+  entries: MappedObservation[];
+}
+
+export interface TestOrderBasketItem extends OrderBasketItem {
+  testType: {
+    label: string;
+    conceptUuid: string;
+  };
+  orderReason?: string;
+  specimenSource?: string;
+}

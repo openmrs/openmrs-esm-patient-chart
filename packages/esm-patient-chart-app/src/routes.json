@@ -1,5 +1,15 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "optionalBackendDependencies": {
+    "emrapi": {
+      "version": "^2.0.0",
+      "feature": {
+        "flagName": "emrapi-module",
+        "label": "EMR API Module",
+        "description": "This module, if installed, provides core EMR business logic."
+      }
+    }
+  },
   "extensions": [
     {
       "name": "charts-summary-dashboard",
@@ -14,9 +24,21 @@
       "offline": true
     },
     {
+      "name": "encounter-list",
+      "component": "encounterListTableTabs",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "start-visit-button",
       "component": "startVisitActionButton",
       "slot": "patient-actions-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "clinical-views-summary",
+      "component": "clinicalViewsSummary",
       "online": true,
       "offline": true
     },
@@ -109,15 +131,6 @@
         "title": "Edit or load a past visit",
         "view": "visits"
       }
-    },
-    {
-      "name": "start-visit-workspace-form",
-      "component": "startVisitForm",
-      "meta": {
-        "title": "Start a visit"
-      },
-      "online": true,
-      "offline": true
     },
     {
       "name": "patient-details-tile",
@@ -231,6 +244,12 @@
       "component": "markPatientDeceasedForm",
       "title": "Mark patient deceased",
       "type": "form"
+    },
+    {
+      "name": "start-visit-workspace-form",
+      "component": "startVisitWorkspace",
+      "title": "startVisitWorkspaceTitle",
+      "type": "start-visit"
     }
   ]
 }

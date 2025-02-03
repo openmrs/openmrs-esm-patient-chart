@@ -1,4 +1,4 @@
-import { type DrugOrderBasketItem, type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
+import { type Order, type OrderAction, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
@@ -23,7 +23,7 @@ export function compare<T>(x?: T, y?: T) {
 /**
  * Builds medication order object from the given order object
  */
-export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOrderBasketItem {
+export function buildMedicationOrder(order: Order, action?: OrderAction) {
   return {
     display: order.drug?.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
@@ -84,8 +84,29 @@ export function buildLabOrder(order: Order, action?: OrderAction) {
       conceptUuid: order.concept.uuid,
     },
     orderNumber: order.orderNumber,
-    concept: order.concept.uuid,
+    concept: order.concept,
     orderType: order.orderType.uuid,
     specimenSource: null,
+    scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
+  };
+}
+
+/**
+ * Builds general order object from the given order object
+ */
+export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBasketItem {
+  return {
+    action: action,
+    display: order.display,
+    previousOrder: action !== 'NEW' ? order.uuid : null,
+    orderer: order.orderer.uuid,
+    careSetting: order.careSetting.uuid,
+    instructions: order.instructions,
+    urgency: order.urgency,
+    accessionNumber: order.accessionNumber,
+    concept: order.concept,
+    orderNumber: order.orderNumber,
+    orderType: order.orderType.uuid,
+    scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
   };
 }

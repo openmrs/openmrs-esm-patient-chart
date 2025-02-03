@@ -88,6 +88,6 @@ test('Add and delete a visit note', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
 });

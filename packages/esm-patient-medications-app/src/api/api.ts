@@ -1,29 +1,42 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
-import { type ConfigObject } from '../config-schema';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type OrderPost, type PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
-import { type DrugOrderBasketItem } from '../types';
 import useSWRImmutable from 'swr/immutable';
+import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import type { DrugOrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
+import { type DrugOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
+
+const customRepresentation =
+  'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
+  'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
+  'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+  'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
+  'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
+  'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+
+/**
+ * Sorts orders by date activated in descending order.
+ *
+ * @param orders The orders to sort.
+ * @returns The sorted orders.
+ */
+function sortOrdersByDateActivated(orders: any[]) {
+  return orders?.sort(
+    (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
+  );
+}
 
 /**
  * SWR-based data fetcher for patient orders.
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
- * @param status Allows fetching either all orders or only active orders.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
-  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
-  const customRepresentation =
-    'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
-    'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
-    'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
-    'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
-    'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
-    'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
+export function usePatientOrders(patientUuid: string) {
+  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
+
+  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -35,15 +48,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
     [patientUuid],
   );
 
-  const drugOrders = useMemo(
-    () =>
-      data?.data?.results
-        ? data.data.results
-            .filter((order) => order.orderType.display === 'Drug Order')
-            ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
-        : null,
-    [data],
-  );
+  const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
 
   return {
     data: data ? drugOrders : null,
@@ -54,11 +59,70 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') 
   };
 }
 
+/**
+ * Hook to get active patient orders.
+ *
+ * @param patientUuid The UUID of the patient whose active orders should be fetched.
+ */
+export function useActivePatientOrders(patientUuid: string) {
+  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
+  const ordersUrl = useMemo(
+    () =>
+      patientUuid
+        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&excludeCanceledAndExpired=true&v=${customRepresentation}`
+        : null,
+    [patientUuid, drugOrderTypeUUID],
+  );
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
+    ordersUrl,
+    openmrsFetch,
+  );
+
+  const activeOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
+
+  return {
+    data: activeOrders,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+}
+
+/**
+ * Hook to get past patient orders.
+ *
+ * @param patientUuid The UUID of the patient whose past orders should be fetched.
+ */
+export function usePastPatientOrders(patientUuid: string) {
+  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
+  const { data: activeOrders } = useActivePatientOrders(patientUuid);
+
+  const pastOrders = useMemo(() => {
+    if (!allOrders || !activeOrders) {
+      return [];
+    }
+
+    const filteredDrugOrders = allOrders.filter(
+      (order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid),
+    );
+    return sortOrdersByDateActivated(filteredDrugOrders);
+  }, [allOrders, activeOrders]);
+
+  return {
+    data: pastOrders,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+}
+
 export function prepMedicationOrderPostData(
   order: DrugOrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
-): OrderPost {
+): DrugOrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',

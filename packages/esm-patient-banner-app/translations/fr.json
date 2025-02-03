@@ -1,14 +1,24 @@
 {
+  "activeVisit": "Visite en cours",
   "address1": "Ligne d'adresse 1",
   "address2": "Ligne d'adresse 2",
   "city": "Ville",
   "cityVillage": "ville",
   "country": "Pays",
   "countyDistrict": "District",
+  "deceased": "Décédé",
   "district": "District",
-  "dob": "Date de naissance",
+  "from_lower": "du",
+  "implementationLogo": "Logo d'implementation",
+  "patientAge": "Age :",
+  "patientDateOfBirthWithSeparator": "Date de naissance :",
+  "patientGenderWithSeparator": "Genre :",
   "patientIdentifierSticker": "Autocollant d'identification du patient",
+  "patientNameWithSeparator": "Nom du patient :",
   "postalCode": "Code postal",
+  "printIdentifierSticker": "Imprimer l'autocollant d'identification",
+  "started": "Démarré",
   "state": "État",
-  "stateProvince": "État"
+  "stateProvince": "État",
+  "telephoneNumberWithSeparator": "Numéro de téléphone :"
 }

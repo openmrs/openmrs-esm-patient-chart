@@ -1,8 +1,9 @@
+/* eslint-disable playwright/no-nested-step */
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { generateRandomPatient, type Patient, startVisit, endVisit, deletePatient } from '../commands';
 import { test } from '../core';
-import { ResultsViewerPage, VisitsPage } from '../pages';
+import { ChartPage, ResultsViewerPage, VisitsPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
@@ -13,6 +14,7 @@ test.beforeEach(async ({ api }) => {
 });
 
 test('Record and edit test results', async ({ page }) => {
+  const chartPage = new ChartPage(page);
   const resultsViewerPage = new ResultsViewerPage(page);
   const visitsPage = new VisitsPage(page);
   const form = page.locator('[data-extension-slot-name="form-widget-slot"]');
@@ -209,12 +211,12 @@ test('Record and edit test results', async ({ page }) => {
     },
   ];
 
-  await test.step('When I visit the results viewer page', async () => {
-    await resultsViewerPage.goTo(patient.uuid);
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Clinical forms` button on the siderail', async () => {
-    await page.getByLabel(/clinical forms/i).click();
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByLabel(/clinical forms/i, { exact: true }).click();
   });
 
   await test.step('Then I should see the clinical forms workspace', async () => {
@@ -226,11 +228,15 @@ test('Record and edit test results', async ({ page }) => {
     await expect(page.getByRole('cell', { name: /laboratory test results/i })).toBeVisible();
   });
 
-  await test.step('When I launch the `Laboratory Test Results` form', async () => {
+  await test.step('When I click the `Laboratory Test Results` link to launch the form', async () => {
     await page.getByText(/laboratory test results/i).click();
   });
 
-  await test.step('And I fill the "Complete Blood Count" section', async () => {
+  await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
+    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+  });
+
+  await test.step('When I fill the "Complete Blood Count" section', async () => {
     for (const { label, value } of completeBloodCountData) {
       await test.step(label, async () => {
         await form.getByLabel(label, { exact: true }).fill(value);
@@ -276,6 +282,7 @@ test('Record and edit test results', async ({ page }) => {
         });
       }
     });
+
     for (const { resultsPageReference, value } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
@@ -364,6 +371,6 @@ test('Record and edit test results', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
 });

@@ -3,12 +3,36 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies": {
+    "fhirproxy": "^1.0.0-SNAPSHOT",
+    "stockmanagement": "^2.0.2-SNAPSHOT",
+    "billing": "^1.2.0-SNAPSHOT"
+  },
   "extensions": [
+    {
+      "name": "order-price-details",
+      "component": "orderPriceDetailsExtension",
+      "slot": "order-item-additional-info-slot",
+      "order": 0
+    },
+    {
+      "name": "order-stock-details",
+      "component": "orderStockDetailsExtension",
+      "slot": "order-item-additional-info-slot",
+      "order": 1
+    },
     {
       "name": "order-basket-action-menu",
       "component": "orderBasketActionMenu",
-      "slot": "action-menu-patient-chart-items-slot",
-      "order": 0
+      "slot": "action-menu-patient-chart-items-slot"
+    },
+    {
+      "name": "lab-result",
+      "component": "labResult",
+      "slot": "completed-lab-order-results-slot",
+      "meta": {
+        "fullWidth": false
+      }
     },
     {
       "name": "patient-orders-summary-dashboard",
@@ -51,6 +75,12 @@
       "component": "testResultsFormWorkspace",
       "type": "lab-results",
       "canHide": false
+    },
+    {
+      "name": "orderable-concept-workspace",
+      "title": "searchOrderables",
+      "component": "orderableConceptSearch",
+      "type": "order"
     }
   ]
 }

@@ -14,17 +14,15 @@ import {
   TableRow,
 } from '@carbon/react';
 import { ArrowRightIcon, showModal, useLayoutType, isDesktop, formatDate } from '@openmrs/esm-framework';
-import { getPatientUuidFromUrl, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { type RowData } from '../filter/filter-types';
+import { getPatientUuidFromStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import styles from './individual-results-table.scss';
+import { type GroupedObservation } from '../../types';
 
 interface IndividualResultsTableProps {
   isLoading: boolean;
-  parent: {
-    display: string;
-  };
-  subRows: Array<RowData>;
+  subRows: GroupedObservation;
   index: number;
+  title: string;
 }
 
 const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
@@ -53,12 +51,13 @@ const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
   }
 };
 
-const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, parent, subRows, index }) => {
+const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, subRows, index, title }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const headerTitle = t(parent.display);
+  const headerTitle = t(title);
 
   const launchResultsDialog = useCallback(
     (title: string, testUuid: string) => {
@@ -85,9 +84,10 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
 
   const tableRows = useMemo(
     () =>
-      subRows.map((row, i) => {
-        const { units = '', range = '', obs: values } = row;
-        const isString = isNaN(parseFloat(values?.[0]?.value));
+      subRows?.entries.length &&
+      subRows.entries.map((row, i) => {
+        const { units = '', range = '' } = row;
+        const isString = isNaN(parseFloat(row.value));
 
         return {
           ...row,
@@ -107,8 +107,8 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
             </span>
           ),
           value: {
-            value: `${row.obs[0]?.value ?? ''} ${row.units ?? ''}`,
-            interpretation: row.obs[0]?.interpretation,
+            value: `${row.value} ${row.units ?? ''}`,
+            interpretation: row?.interpretation,
           },
           referenceRange: `${range || '--'} ${units || '--'}`,
         };
@@ -118,7 +118,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
 
-  if (subRows?.length) {
+  if (subRows.entries?.length) {
     return (
       <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -126,11 +126,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
             <div className={styles.cardTitle}>
               <h4 className={styles.resultType}>{headerTitle}</h4>
               <div className={styles.displayFlex}>
-                <span className={styles.date}>
-                  {subRows[0]?.obs[0]?.obsDatetime
-                    ? formatDate(new Date(subRows[0]?.obs[0]?.obsDatetime), { mode: 'standard' })
-                    : ''}
-                </span>
+                <span className={styles.date}>{formatDate(new Date(subRows.date), { mode: 'standard' })}</span>
                 <Button
                   className={styles.viewTimeline}
                   iconDescription="view timeline"
@@ -143,7 +139,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
                 </Button>
               </div>
             </div>
-            <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
+            <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

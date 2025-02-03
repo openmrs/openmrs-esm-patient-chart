@@ -337,13 +337,6 @@ export const mockFhirConditionsResponse = {
 export const searchedCondition = [
   {
     display: 'Headache',
-    concept: {
-      uuid: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      display: 'Headache',
-    },
-    conceptName: {
-      uuid: '38867BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-      display: 'Headache',
-    },
+    uuid: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
 ];

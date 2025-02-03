@@ -40,13 +40,45 @@ export const configSchema = {
     },
     labOrderableConcepts: {
       _type: Type.Array,
-      _description:
-        'UUIDs of concepts that represent orderable lab tests or lab sets. If an empty array `[]` is provided, every concept with class `Test` will be considered orderable.',
+      _description: 'UUIDs of concepts that represent orderable lab tests or lab sets.',
       _elements: {
         _type: Type.UUID,
       },
       _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
+  },
+  showReferenceNumberField: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether to display the Reference number field in the Test Order form. This field maps to the accesion_number property in the Order data model',
+  },
+  additionalTestOrderTypes: {
+    _type: Type.Array,
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
+    _elements: {
+      _type: Type.Object,
+      orderTypeUuid: {
+        _type: Type.UUID,
+        _description: 'UUID for the new order type',
+      },
+      label: {
+        _type: Type.String,
+        _description:
+          'The custom label to be shown for the order type. The label will be translated using the label as the key itself.',
+      },
+      orderableConceptSets: {
+        _type: Type.UUID,
+        _description:
+          'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderableConceptClasses` will be considered orderable.',
+      },
+      icon: {
+        _type: Type.String,
+        _description: 'Icon to be shown for the order type. Icons are from the OpenMRS icon library.',
+        _default: '',
+      },
+    },
+    _default: [],
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
@@ -88,15 +120,22 @@ export interface LabTestReason {
 
 export interface OrderReason {
   labTestUuid: string;
-  required: boolean;
   orderReasons: Array<string>;
+  required: boolean;
 }
 
 export interface ConfigObject {
-  resultsViewerConcepts: Array<ObsTreeEntry>;
+  labTestsWithOrderReasons: Array<OrderReason>;
   orders: {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;
   };
-  labTestsWithOrderReasons: Array<OrderReason>;
+  showReferenceNumberField: boolean;
+  additionalTestOrderTypes: Array<{
+    label?: string;
+    orderTypeUuid: string;
+    orderableConceptSets: Array<string>;
+    icon?: string;
+  }>;
+  resultsViewerConcepts: Array<ObsTreeEntry>;
 }

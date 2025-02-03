@@ -15,13 +15,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
+  Tooltip,
 } from '@carbon/react';
 import {
   CardHeader,
-  type Order,
-  useOrderBasket,
-  useLaunchWorkspaceRequiringVisit,
+  compare,
   PatientChartPagination,
+  type Order,
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -42,7 +45,7 @@ import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 
-export interface ActiveMedicationsProps {
+export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
@@ -53,7 +56,7 @@ export interface ActiveMedicationsProps {
   patient: fhir.Patient;
 }
 
-const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
+const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   isValidating,
   title,
   medications,
@@ -102,6 +105,13 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
               <strong>{capitalize(medication.drug?.display)}</strong>{' '}
               {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
               {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
+              {medication.dateStopped && (
+                <Tooltip align="right" label={<>{formatDate(new Date(medication.dateStopped))}</>}>
+                  <Tag type="gray" className={styles.tag}>
+                    {t('discontinued', 'Discontinued')}
+                  </Tag>
+                </Tooltip>
+              )}
             </p>
             <p className={styles.bodyLong01}>
               <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
@@ -128,26 +138,18 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
             </p>
           </div>
           <p className={styles.bodyLong01}>
-            {medication.orderReasonNonCoded ? (
+            {medication.orderReasonNonCoded && (
               <span>
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            ) : null}
-            {medication.quantity ? (
+            )}
+            {medication.quantity && (
               <span>
                 <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                 {medication.quantity} {medication?.quantityUnits?.display}
               </span>
-            ) : null}
-            {medication.dateStopped ? (
-              <span>
-                <span className={styles.label01}>
-                  &mdash; {t('discontinuedDate', 'Discontinued date').toUpperCase()}
-                </span>
-                {formatDate(new Date(medication.dateStopped))}
-              </span>
-            ) : null}
+            )}
           </p>
         </div>
       ),
@@ -550,26 +552,6 @@ function OrderBasketItemActions({
       )}
     </OverflowMenu>
   );
-}
-
-/**
- * Enables a comparison of arbitrary values with support for undefined/null.
- * Requires the `<` and `>` operators to return something reasonable for the provided values.
- */
-function compare<T>(x?: T, y?: T) {
-  if (x == undefined && y == undefined) {
-    return 0;
-  } else if (x == undefined) {
-    return -1;
-  } else if (y == undefined) {
-    return 1;
-  } else if (x < y) {
-    return -1;
-  } else if (x > y) {
-    return 1;
-  } else {
-    return 0;
-  }
 }
 
 export default MedicationsDetailsTable;

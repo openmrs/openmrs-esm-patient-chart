@@ -70,13 +70,15 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
 
   if (!root.subSets) return;
 
-  const filterParent = root.subSets.map((node) => {
+  const filterParent = root.subSets.map((node, key) => {
     return (
-      <FilterNode
-        root={node}
-        level={0}
-        open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
-      />
+      <div key={key}>
+        <FilterNode
+          root={node}
+          level={0}
+          open={expandAll === undefined ? config.resultsViewerConcepts[itemNumber].defaultOpen : expandAll}
+        />
+      </div>
     );
   });
 
@@ -87,7 +89,7 @@ const FilterNodeParent = ({ root, itemNumber }: filterNodeParentProps) => {
         <Button
           className={styles.button}
           kind="ghost"
-          size="sm"
+          size={tablet ? 'md' : 'sm'}
           onClick={() => setExpandAll((prevValue) => !prevValue)}
         >
           <span>{t(!expandAll ? `Expand all` : `Collapse all`)}</span>
@@ -112,7 +114,7 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
             id={root?.flatName}
             checked={root.hasData && allChildrenChecked}
             indeterminate={indeterminate}
-            labelText={`${root?.display} (${parents?.[root?.flatName]?.length ?? 0})`}
+            labelText={root?.display}
             onChange={() => updateParent(root.flatName)}
             disabled={!root.hasData}
           />

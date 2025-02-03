@@ -14,7 +14,13 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   const { currentVisit } = useVisit(patient?.id);
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
-  const handleLaunchModal = useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
+  const handleLaunchModal = useCallback(
+    () =>
+      launchPatientWorkspace('start-visit-workspace-form', {
+        openedFrom: 'patient-chart-start-visit',
+      }),
+    [],
+  );
 
   return (
     !currentVisit &&

@@ -1,14 +1,24 @@
 {
+  "activeVisit": "Active Visit",
   "address1": "כתובת רשומה 1",
   "address2": "כתובת רשומה 2",
   "city": "עיר",
   "cityVillage": "עיר",
   "country": "מדינה",
   "countyDistrict": "מחוז",
+  "deceased": "Deceased",
   "district": "מחוז",
-  "dob": "DOB",
+  "from_lower": "from",
+  "implementationLogo": "לוגו הטמעה",
+  "patientAge": "גיל:",
+  "patientDateOfBirthWithSeparator": "תאריך לידה:",
+  "patientGenderWithSeparator": "מגדר:",
   "patientIdentifierSticker": "Patient identifier sticker",
+  "patientNameWithSeparator": "שם המטופל/ת:",
   "postalCode": "מיקוד",
+  "printIdentifierSticker": "הדפסת מדבקת זיהוי",
+  "started": "Started",
   "state": "מדינה",
-  "stateProvince": "מדינה"
+  "stateProvince": "מדינה",
+  "telephoneNumberWithSeparator": "מספר טלפון:"
 }

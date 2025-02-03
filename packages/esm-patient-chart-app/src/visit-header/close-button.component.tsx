@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { HeaderGlobalAction } from '@carbon/react';
-import { getHistory, goBackInHistory, navigate, CloseFilledIcon } from '@openmrs/esm-framework';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getHistory, goBackInHistory, navigate, CloseFilledIcon } from '@openmrs/esm-framework';
 import styles from './close-button.scss';
 
 export function CloseButton({ patientUuid }: { patientUuid: string }) {
@@ -29,8 +28,8 @@ export function CloseButton({ patientUuid }: { patientUuid: string }) {
 
   return (
     <HeaderGlobalAction
-      className={styles.headerGlobalBarCloseButton}
       aria-label={t('close', 'Close')}
+      className={styles.headerGlobalBarCloseButton}
       onClick={onClosePatientChart}
     >
       <CloseFilledIcon size={20} />

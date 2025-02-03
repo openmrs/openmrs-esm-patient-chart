@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
@@ -7,7 +8,7 @@ import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish
 import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { useVitalsAndBiometrics } from '../common';
+import { invalidateCachedVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -88,7 +89,8 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
-    expect(screen.getByText(/overdue: these vitals are out of date/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/MUAC\s*23\s*cm/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/these vitals are out of date/i)).toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button is clicked', async () => {
@@ -104,6 +106,27 @@ describe('VitalsHeader', () => {
 
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+  });
+
+  it('displays correct overdue tag for vitals 5 days old', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    // TODO: Fix pluralization so that the string reads "5 days old"
+    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
@@ -166,6 +189,47 @@ describe('VitalsHeader', () => {
         formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
       },
       workspaceTitle: 'Triage',
+      mutateForm: invalidateCachedVitalsAndBiometrics,
     });
+  });
+
+  it('should show links in vitals header by default', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('link', { name: /vitals history/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^record vitals$/i })).toBeInTheDocument();
+  });
+
+  it('should show not links in vitals header when hideLinks is true', async () => {
+    const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: fiveDaysAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+    renderWithSwr(<VitalsHeader {...{ ...testProps, hideLinks: true }} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
   });
 });
