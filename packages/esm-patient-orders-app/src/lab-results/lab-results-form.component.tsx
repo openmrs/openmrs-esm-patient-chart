@@ -21,7 +21,6 @@ import {
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
-import { cache } from 'swr/_internal';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
