@@ -33,7 +33,7 @@ export const DashboardExtension = ({
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
         <span className={styles.menu}>
-          <MaybeIcon icon={icon} className={styles.icon} />
+          <MaybeIcon icon={icon} className={styles.icon} size={16} />
           <span>{t(title)}</span>
         </span>
       </ConfigurableLink>
