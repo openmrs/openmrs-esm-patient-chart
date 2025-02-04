@@ -46,12 +46,10 @@ const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
           {medication.dosingInstructions && <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>}
         </p>
         <p className={styles.bodyLong01}>
-          {medication.orderReasonNonCoded ? (
-            <span>
-              <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-              {medication.orderReasonNonCoded}
-            </span>
-          ) : null}
+          <span>
+            <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+            {medication.orderReasonNonCoded ?? t('none', 'None')}
+          </span>
           {medication.quantity ? (
             <span>
               <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
