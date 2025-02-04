@@ -92,7 +92,6 @@ describe('ProgramsDetailedSummary', () => {
     await user.click(screen.getByText('Edit'));
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
-      formContext: 'editing',
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
       workspaceTitle: 'Edit program enrollment',
     });

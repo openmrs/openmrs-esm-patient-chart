@@ -52,7 +52,6 @@ describe('ProgramActionsMenu', () => {
     await user.click(screen.getByText('Edit'));
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
-      formContext: 'editing',
       programEnrollmentId: testProps.programEnrollmentId,
       workspaceTitle: 'Edit program enrollment',
     });

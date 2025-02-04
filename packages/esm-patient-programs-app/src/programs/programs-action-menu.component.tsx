@@ -19,7 +19,6 @@ export const ProgramsActionMenu = ({ patientUuid, programEnrollmentId }: Program
       launchPatientWorkspace('programs-form-workspace', {
         workspaceTitle: t('editProgramEnrollment', 'Edit program enrollment'),
         programEnrollmentId,
-        formContext: 'editing',
       }),
     [programEnrollmentId, t],
   );
