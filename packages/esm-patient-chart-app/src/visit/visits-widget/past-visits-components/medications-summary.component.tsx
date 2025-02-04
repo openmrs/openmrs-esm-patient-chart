@@ -65,12 +65,10 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     )}
                   </p>
                   <p className={styles.bodyLong01}>
-                    {medication?.order?.orderReasonNonCoded ? (
-                      <span>
-                        <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-                        {medication?.order?.orderReasonNonCoded}
-                      </span>
-                    ) : null}
+                    <span>
+                      <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+                      {medication?.order?.orderReasonNonCoded ?? t('none', 'None')}
+                    </span>
                     {medication?.order?.quantity ? (
                       <span>
                         <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
