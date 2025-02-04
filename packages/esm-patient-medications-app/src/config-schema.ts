@@ -36,6 +36,11 @@ export const configSchema = {
       'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
     _default: 300,
   },
+  isIndicationFieldOptional: {
+    _type: Type.Boolean,
+    _description: 'Whether to make the indication field optional in the drug order form',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
@@ -47,4 +52,5 @@ export interface ConfigObject {
   showPrintButton: boolean;
   maxDispenseDurationInDays: number;
   debounceDelayInMs: number;
+  isIndicationFieldOptional: boolean;
 }
