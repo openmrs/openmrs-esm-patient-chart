@@ -44,6 +44,7 @@
   "medications": "Medications",
   "modifyOrder": "Modify order",
   "noMatchingOrdersToDisplay": "No matching orders to display",
+  "none": "None",
   "noResultsForTestTypeSearch": "No results to display for \"{{searchTerm}}\"",
   "normalRange": "Normal range",
   "onDate": "on",
