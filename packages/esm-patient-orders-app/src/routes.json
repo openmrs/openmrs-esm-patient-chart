@@ -24,7 +24,10 @@
     {
       "name": "order-basket-action-menu",
       "component": "orderBasketActionMenu",
-      "slot": "action-menu-patient-chart-items-slot"
+      "slots": [
+        "action-menu-patient-chart-items-slot", 
+        "action-menu-ward-patient-items-slot"
+      ]
     },
     {
       "name": "lab-result",
