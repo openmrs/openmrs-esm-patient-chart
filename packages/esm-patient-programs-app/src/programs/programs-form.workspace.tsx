@@ -17,7 +17,6 @@ import {
   SelectItem,
   Stack,
   TimePicker,
-  TimePickerSelect,
 } from '@carbon/react';
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -141,16 +140,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
       let formattedCompletionDateWithTime = formattedCompletionDate;
       if (formattedCompletionDate && dayjs(formattedCompletionDate).isSame(dayjs(), 'day')) {
-        formattedCompletionDateWithTime = dayjs(formattedCompletionDate)
-          .set('hour', new Date().getHours())
-          .set('minute', new Date().getMinutes())
-          .set('second', new Date().getSeconds())
-          .format();
+        formattedCompletionDateWithTime = dayjs().utc().format();
       } else if (formattedCompletionDate && dayjs(formattedCompletionDate).isBefore(dayjs(), 'day')) {
         formattedCompletionDateWithTime = dayjs(formattedCompletionDate)
           .set('hour', 23)
           .set('minute', 59)
           .set('second', 59)
+          .utc(true)
           .format();
       }
 
@@ -238,14 +234,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         name="enrollmentDate"
         control={control}
         render={({ field: { onChange, value } }) => {
-          const date = value ? new Date(value) : null;
-          const dateValue = date ? date.toISOString().split('T')[0] : '';
-          const timeValue = date ? date.toTimeString().slice(0, 5) : '';
+          const date = value ? new Date(value) : new Date();
+          const dateValue = date.toISOString().split('T')[0];
+          const timeValue = date.toTimeString().slice(0, 5);
+          const isTimePickerDisabled = false;
 
           const handleDateChange = ([selectedDate]) => {
             if (selectedDate) {
               const combinedDate = new Date(selectedDate);
-              if (timeValue) {
+
+              if (isTimePickerDisabled) {
+                combinedDate.setHours(0, 0, 0, 0);
+              } else {
                 const [hours, minutes] = timeValue.split(':').map(Number);
                 combinedDate.setHours(hours, minutes);
               }
@@ -256,7 +256,9 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           const handleTimeChange = (event) => {
             const time = event.target.value;
             if (dateValue) {
-              const combinedDate = new Date(`${dateValue}T${time}:00`);
+              const [hours, minutes] = time.split(':').map(Number);
+              const combinedDate = new Date(dateValue);
+              combinedDate.setHours(hours, minutes);
               onChange(combinedDate.toISOString());
             }
           };
@@ -276,25 +278,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                 <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
               </DatePicker>
 
-              <TimePicker
-                id="enrollmentTime"
-                labelText={t('timeEnrolled', 'Time enrolled')}
-                onChange={handleTimeChange}
-                value={timeValue}
-                placeholder="HH:mm"
-                pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
-                format="24hr"
-              >
-                <TimePickerSelect
-                  aria-label={t('timeFormat', 'Time Format')}
-                  id="enrollmentTimeFormat"
+              {!isTimePickerDisabled && (
+                <TimePicker
+                  id="enrollmentTime"
+                  labelText={t('timeEnrolled', 'Time enrolled')}
                   onChange={handleTimeChange}
-                  value={timeValue.includes('AM') ? 'AM' : timeValue.includes('PM') ? 'PM' : ''}
-                >
-                  <SelectItem value="AM" text="AM" />
-                  <SelectItem value="PM" text="PM" />
-                </TimePickerSelect>
-              </TimePicker>
+                  value={timeValue}
+                  placeholder="HH:mm"
+                  pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                  format="24hr"
+                />
+              )}
             </>
           );
         }}

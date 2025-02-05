@@ -41,6 +41,9 @@
   "saveAndClose": "Save and close",
   "saving": "Saving",
   "seeAll": "See all",
+  "selectTime": "Select time",
   "state": "State",
-  "status": "Status"
+  "status": "Status",
+  "timeEnrolled": "Time enrolled",
+  "timeFormat": "Time Format"
 }
