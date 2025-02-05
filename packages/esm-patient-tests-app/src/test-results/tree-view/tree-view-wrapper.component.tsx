@@ -24,12 +24,12 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
 
   if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
-
+  const MemoizedFilterProvider = React.memo(FilterProvider);
   if (roots?.length) {
     return (
-      <FilterProvider roots={!isLoading ? roots : []}>
+      <MemoizedFilterProvider roots={!isLoading ? roots : []}>
         <TreeView {...props} isLoading={isLoading} />
-      </FilterProvider>
+      </MemoizedFilterProvider>
     );
   }
 
