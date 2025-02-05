@@ -24,6 +24,7 @@ import styles from './lab-results-form.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
+  mutateLabOrders?: () => void;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
@@ -31,6 +32,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   closeWorkspaceWithSavedChanges,
   order,
   promptBeforeClosing,
+  mutateLabOrders,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -179,8 +181,9 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         abortController,
       );
       closeWorkspaceWithSavedChanges();
-      mutateResults();
       mutateOrderData();
+      mutateResults();
+      mutateLabOrders?.();
       showNotification(
         'success',
         t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
