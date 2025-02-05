@@ -106,7 +106,8 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "path": "Visits"
+        "path": "Visits",
+        "layoutMode": "anchored"
       },
       "order": 5,
       "online": true,
