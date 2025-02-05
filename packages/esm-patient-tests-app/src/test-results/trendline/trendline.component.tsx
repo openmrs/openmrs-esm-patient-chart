@@ -2,7 +2,7 @@ import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEf
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, ConfigurableLink, formatDate, formatDatetime } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
@@ -117,6 +117,11 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   const dataset = chartTitle;
 
+  const formatObsDatetime = (obsDatetime: string) => {
+    const isoFormattedString = obsDatetime.replace(' ', 'T').replace('.0', '.000').concat('Z');
+    return isoFormattedString;
+  };
+
   obs.forEach((obs, idx) => {
     const range =
       hiNormal && lowNormal
@@ -127,7 +132,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         : {};
 
     data.push({
-      date: new Date(Date.parse(obs.obsDatetime)),
+      date: new Date(formatObsDatetime(obs.obsDatetime)),
       value: parseFloat(obs.value),
       group: chartTitle,
       ...range,
@@ -184,7 +189,7 @@ const Trendline: React.FC<TrendlineProps> = ({
       tooltip: {
         customHTML: ([{ date, value }]) =>
           `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
-          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
+          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDatetime(date)}</span></div>`,
       },
     }),
     [bottomAxisTitle, leftAxisTitle, range, chartTitle],
