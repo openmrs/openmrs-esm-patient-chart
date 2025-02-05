@@ -104,10 +104,7 @@ test('Add and edit an immunization', async ({ page }) => {
 
   await test.step('Then I attempt to click the Collapse All Rows button in the table header if visible', async () => {
     const collapseButton = page.getByRole('button', { name: /collapse all rows/i });
-    if (!(await collapseButton.isVisible())) {
-      return;
-    }
-    await collapseButton.click();
+    if (await collapseButton.isVisible()) await collapseButton.click();
   });
 
   await test.step('And I should see the updated immunization in the list', async () => {
@@ -118,10 +115,7 @@ test('Add and edit an immunization', async ({ page }) => {
 
   await test.step('When I attempt to click the expand All rows in the table header with the updated recorded immunization if visible', async () => {
     const expandButton = page.getByRole('button', { name: /expand all rows/i });
-    if (!(await expandButton.isVisible())) {
-      return;
-    }
-    await expandButton.click();
+    if (await expandButton.isVisible()) await expandButton.click();
   });
 
   await test.step('Then I should see the immunization updated Dose number saved row in the table as `2`', async () => {
