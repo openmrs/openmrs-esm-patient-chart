@@ -67,7 +67,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                   <p className={styles.bodyLong01}>
                     <span>
                       <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-                      {medication?.order?.orderReasonNonCoded ?? t('none', 'None')}
+                      {medication?.order?.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')}
                     </span>
                     {medication?.order?.quantity ? (
                       <span>
