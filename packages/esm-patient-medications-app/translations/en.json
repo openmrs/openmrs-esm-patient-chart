@@ -45,7 +45,7 @@
   "medicationIndefiniteDuration": "Indefinite duration",
   "Medications": "Medications",
   "modify": "Modify",
-  "none": "None",
+  "noIndicationProvided": "No indication provided",
   "noResultsForDrugSearch": "No results to display for \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Number of refills is required",
   "onDate": "on",
