@@ -289,7 +289,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       validSubmission = false;
       setError('visitStartDate', {
         message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
+          firstEncounterDatetime: formatDatetime(new Date(maxVisitStartDatetime)),
         }),
       });
     }
@@ -314,7 +314,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             'visitStopDateMustBeAfterMostRecentEncounter',
             'Stop date needs to be on or after {{lastEncounterDatetime}}',
             {
-              lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
+              lastEncounterDatetime: formatDatetime(new Date(minVisitStopDatetime)),
             },
           ),
         });
