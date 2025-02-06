@@ -23,11 +23,13 @@ interface FilePreviewProps {
   title?: string;
   // TODO: Constrain the file type to a more specific type that only allows image and pdf
   uploadedFile: UploadedFile;
+  closeModal: () => void;
 }
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onCompletion }) => {
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
 
   const { clearData, closeModal, collectDescription, filesToUpload, setFilesToUpload } =
     useContext(CameraMediaUploaderContext);
@@ -47,22 +49,54 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onComp
     },
     [moveToNextFile, setFilesToUpload, currentFile],
   );
+  const handleClose = useCallback(() => {
+    setShowWarningDialog(true);
+  }, []);
 
   return (
-    <div className={styles.filePreviewContainer}>
-      <ModalHeader closeModal={closeModal} className={styles.modalHeader}>
-        {title || t('addAttachment_title', 'Add Attachment')}{' '}
-        {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
-      </ModalHeader>
-      <FilePreview
-        title={title}
-        key={filesToUpload[currentFile - 1]?.fileName}
-        clearData={clearData}
-        collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
-        moveToNextFile={moveToNextFile}
-        onSaveFile={handleSave}
-        uploadedFile={filesToUpload[currentFile - 1]}
-      />
+    <div>
+      {showWarningDialog ? (
+        <div>
+          <ModalHeader closeModal={closeModal} title={t('unsavedAttachment', 'Unsaved attachment')} />
+          <ModalBody>
+            <p className={styles.bodyShort02}>
+              {t('unsavedAttachmentMessage', 'You have an unsaved attachment. Are you sure you want to discard it?')}.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button kind="secondary" onClick={() => setShowWarningDialog(false)}>
+              {t('keepAttachment', 'Keep Attachment')}
+            </Button>
+            <Button
+              kind="danger"
+              onClick={() => {
+                closeModal();
+                clearData?.();
+                setShowWarningDialog(false);
+              }}
+            >
+              {t('discard', 'Discard')}
+            </Button>
+          </ModalFooter>
+        </div>
+      ) : (
+        <div className={styles.filePreviewContainer}>
+          <ModalHeader closeModal={handleClose} className={styles.modalHeader}>
+            {title || t('addAttachment_title', 'Add Attachment')}{' '}
+            {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
+          </ModalHeader>
+          <FilePreview
+            title={title}
+            key={filesToUpload[currentFile - 1]?.fileName}
+            clearData={clearData}
+            collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
+            moveToNextFile={moveToNextFile}
+            onSaveFile={handleSave}
+            uploadedFile={filesToUpload[currentFile - 1]}
+            closeModal={handleClose}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -73,6 +107,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   collectDescription,
   onSaveFile,
   clearData,
+  closeModal,
 }) => {
   const { t } = useTranslation();
   const { allowedFileExtensions } = useAllowedFileExtensions();
@@ -122,9 +157,9 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   const handleCancelUpload = useCallback(
     (event: SyntheticEvent) => {
       event.preventDefault();
-      clearData?.();
+      closeModal();
     },
-    [clearData],
+    [closeModal],
   );
 
   return (
