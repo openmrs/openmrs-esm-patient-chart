@@ -41,21 +41,23 @@ import {
 import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
 import { AllergenType } from '../../types';
 import styles from './allergy-form.scss';
+import { type TFunction } from 'i18next';
 
-const allergyFormSchema = z.object({
-  allergen: z
-    .object({
-      uuid: z.string(),
-      display: z.string(),
-      type: z.string(),
-    })
-    .required(),
-  nonCodedAllergen: z.string().optional(),
-  allergicReactions: z.array(z.string().optional()),
-  nonCodedAllergicReaction: z.string().optional(),
-  severityOfWorstReaction: z.string(),
-  comment: z.string().optional(),
-});
+const allergyFormSchema = (t: TFunction) =>
+  z.object({
+    allergen: z
+      .object({
+        uuid: z.string(),
+        display: z.string(),
+        type: z.string(),
+      })
+      .required(),
+    nonCodedAllergen: z.string().optional(),
+    allergicReactions: z.array(z.string().optional()),
+    nonCodedAllergicReaction: z.string().optional(),
+    severityOfWorstReaction: z.string(),
+    comment: z.string().optional(),
+  });
 
 type AllergyFormData = {
   allergen: Allergen;
@@ -166,11 +168,11 @@ function AllergyForm(props: AllergyFormProps) {
     watch,
     getValues,
     setValue,
-    formState: { isDirty },
+    formState: { errors, isDirty },
   } = useForm<AllergyFormData>({
     mode: 'all',
-    resolver: zodResolver(allergyFormSchema),
-    values: getDefaultAllergy(allergy, formContext),
+    resolver: zodResolver(allergyFormSchema(t)),
+    defaultValues: getDefaultAllergy(allergy, formContext),
   });
 
   useEffect(() => {
@@ -207,7 +209,6 @@ function AllergyForm(props: AllergyFormProps) {
         allergicReactions,
         severityOfWorstReaction,
       } = data;
-
       const selectedAllergicReactions = allergicReactions.filter((value) => value !== '');
 
       let patientAllergy: NewAllergy = {
@@ -401,6 +402,7 @@ function AllergyForm(props: AllergyFormProps) {
               />
             </FormGroup>
           </div>
+
           <div>
             <ResponsiveWrapper>
               <Controller
@@ -409,8 +411,7 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
-                    invalidText={t('invalidComment', 'Invalid comment, try again')}
-                    labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
+                    labelText={t('comments', 'comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                     onBlur={onBlur}
