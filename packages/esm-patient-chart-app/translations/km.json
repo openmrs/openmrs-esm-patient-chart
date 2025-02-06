@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "Error marking patient alive",
   "errorMarkingPatientDeceased": "Error marking patient deceased",
   "errorOccuredDeletingVisit": "មានបញ្ហាបច្ចេកទេសនៅពេលលុបការពិនិត្យជំងឺ",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "Could not update {{attributeName}} attribute",
   "errorUpdatingVisitDetails": "មានបញ្ហាបច្ចេកទេសក្នុងការធ្វើបច្ចុប្បន្នភាពព័ត៌មានលម្អិតនៃការពិនិត្យជំងឺ",
   "errorWhenRestoringVisit": "មានបញ្ហាបច្ចេកទេសនៅពេលទាញមកវិញនូវ{{visit}}",

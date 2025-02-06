@@ -9,16 +9,16 @@
   "deceased": "Décédé",
   "district": "District",
   "from_lower": "du",
-  "implementationLogo": "Logo de mise en œuvre",
-  "patientAge": "Age:",
-  "patientDateOfBirthWithSeparator": "Date de Naissance:",
-  "patientGenderWithSeparator": "Genre:",
+  "implementationLogo": "Logo d'implementation",
+  "patientAge": "Age :",
+  "patientDateOfBirthWithSeparator": "Date de naissance :",
+  "patientGenderWithSeparator": "Genre :",
   "patientIdentifierSticker": "Autocollant d'identification du patient",
-  "patientNameWithSeparator": "Nom du Patient:",
+  "patientNameWithSeparator": "Nom du patient :",
   "postalCode": "Code postal",
   "printIdentifierSticker": "Imprimer l'autocollant d'identification",
   "started": "Démarré",
   "state": "État",
   "stateProvince": "État",
-  "telephoneNumberWithSeparator": "Numéro de téléphone:"
+  "telephoneNumberWithSeparator": "Numéro de téléphone :"
 }

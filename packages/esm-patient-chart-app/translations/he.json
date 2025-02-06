@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "Error marking patient alive",
   "errorMarkingPatientDeceased": "Error marking patient deceased",
   "errorOccuredDeletingVisit": "אירעה שגיאה בעת מחיקת הביקור",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "Could not update {{attributeName}} attribute",
   "errorUpdatingVisitDetails": "שגיאה בעדכון פרטי הביקור",
   "errorWhenRestoringVisit": "שגיאה בשחזור {{visit}}",

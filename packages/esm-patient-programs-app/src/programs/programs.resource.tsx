@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type ProgramWorkflowState, type PatientProgram, type Program, type ProgramsFetchResponse } from '../types';
+import type { ProgramWorkflowState, PatientProgram, Program, ProgramsFetchResponse } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
@@ -79,6 +79,17 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
       'Content-Type': 'application/json',
     },
     body: { dateEnrolled, dateCompleted, location, states },
+    signal: abortController.signal,
+  });
+}
+
+export function deleteProgramEnrollment(programEnrollmentUuid: string) {
+  const abortController = new AbortController();
+  return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     signal: abortController.signal,
   });
 }

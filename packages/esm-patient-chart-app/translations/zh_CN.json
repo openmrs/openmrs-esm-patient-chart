@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "标记患者生存时出错",
   "errorMarkingPatientDeceased": "标记患者已故时出错",
   "errorOccuredDeletingVisit": "删除就诊时发生错误",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "无法更新 {{attributeName}} 属性",
   "errorUpdatingVisitDetails": "更新就诊详情时出现错误",
   "errorWhenRestoringVisit": "在恢复 {{visit}} 时发生错误",

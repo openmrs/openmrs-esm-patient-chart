@@ -6025,6 +6025,7 @@ export const formattedVitals = [
     diastolic: 89,
     systolic: 121,
     bmi: null,
+    muac: 23,
     bloodPressureRenderInterpretation: 'normal',
   },
   {

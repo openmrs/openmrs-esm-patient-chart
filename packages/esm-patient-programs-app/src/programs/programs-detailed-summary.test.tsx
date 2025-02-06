@@ -77,8 +77,10 @@ describe('ProgramsDetailedSummary', () => {
     expect(row).toBeInTheDocument();
     expect(within(row).getByRole('cell', { name: /16-Jan-2020/i })).toBeInTheDocument();
     expect(within(row).getByRole('cell', { name: /active$/i })).toBeInTheDocument();
-    const editButton = within(row).getByRole('button', { name: /Edit Program$/i });
-    expect(editButton).toBeInTheDocument();
+    const actionMenuButton = within(row).getByRole('button', { name: /options$/i });
+    expect(actionMenuButton).toBeInTheDocument();
+
+    await user.click(actionMenuButton);
 
     // Clicking "Add" launches the programs form in a workspace
     expect(addButton).toBeEnabled();
@@ -86,11 +88,12 @@ describe('ProgramsDetailedSummary', () => {
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
-    // Clicking the edit button launches the edit form in a workspace
-    await user.click(editButton);
+    await user.click(actionMenuButton);
+    await user.click(screen.getByText('Edit'));
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
+      workspaceTitle: 'Edit program enrollment',
     });
   });
 
@@ -110,9 +113,7 @@ describe('ProgramsDetailedSummary', () => {
     expect(screen.getByText(/there are no more programs left to enroll this patient in/i)).toBeInTheDocument();
   });
 
-  it('renders the programs status field', async () => {
-    const user = userEvent.setup();
-
+  it('conditionally renders the programs status field', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
 
     mockUseConfig.mockReturnValue({
