@@ -38,7 +38,7 @@ export const configSchema = {
   },
   isIndicationFieldOptional: {
     _type: Type.Boolean,
-    _description: 'Whether to require an indication when placing a medication order'
+    _description: 'Whether to require an indication when placing a medication order',
     _default: false,
   },
 };
