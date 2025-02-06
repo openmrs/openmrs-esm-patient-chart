@@ -599,7 +599,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       render={({ field: { onBlur, value, onChange, ref } }) => (
                         <DatePicker
                           datePickerType="single"
-                          maxDate={new Date().toISOString()}
                           value={value}
                           onChange={([newStartDate]) => onChange(newStartDate)}
                           onBlur={onBlur}
