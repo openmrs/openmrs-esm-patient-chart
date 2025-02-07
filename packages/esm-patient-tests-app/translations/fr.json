@@ -2,7 +2,7 @@
   "add": "Ajouter",
   "additionalInstructions": "Instructions supplémentaires",
   "addLabOrderWorkspaceTitle": "Prescrire des analyses",
-  "addOrderableForOrderType": "Ajouter {{orderTypeDisplay}}",
+  "addOrderableForOrderType": "{{orderTypeDisplay}}",
   "back": "Retour",
   "backToOrderBasket": "Retour à l'ordonnance",
   "backToTimeline": "Retour à la chronologie",
