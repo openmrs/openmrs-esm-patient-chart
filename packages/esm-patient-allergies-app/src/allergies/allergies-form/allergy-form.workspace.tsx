@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -41,7 +41,6 @@ import {
 import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
 import { AllergenType } from '../../types';
 import styles from './allergy-form.scss';
-import { type TFunction } from 'i18next';
 
 const allergyFormSchema = (t: TFunction) =>
   z.object({
