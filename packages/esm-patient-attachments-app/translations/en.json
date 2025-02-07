@@ -19,7 +19,6 @@
   "deleteAttachmentConfirmationText": "Are you sure you want to delete this {{attachmentType}}? This action can't be undone.",
   "deleteImage": "Delete image",
   "deletePdf": "Delete PDF",
-  "discard": "Discard",
   "edit": "Edit",
   "enterAttachmentDescription": "Enter attachment description",
   "enterAttachmentName": "Enter attachment name",

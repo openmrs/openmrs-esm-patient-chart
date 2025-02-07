@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
-import { type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
+import { getCoreTranslation, type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './file-review.scss';
 
@@ -28,30 +28,31 @@ interface FilePreviewProps {
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onCompletion }) => {
   const { t } = useTranslation();
-  const [currentFile, setCurrentFile] = useState(1);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
 
   const { clearData, closeModal, collectDescription, filesToUpload, setFilesToUpload } =
     useContext(CameraMediaUploaderContext);
 
   const moveToNextFile = useCallback(() => {
-    if (currentFile < filesToUpload.length) {
-      setCurrentFile(currentFile + 1);
+    if (currentFileIndex < filesToUpload.length - 1) {
+      setCurrentFileIndex(currentFileIndex + 1);
     } else {
       onCompletion();
     }
-  }, [setCurrentFile, currentFile, filesToUpload, onCompletion]);
+  }, [setCurrentFileIndex, currentFileIndex, filesToUpload, onCompletion]);
 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
-      setFilesToUpload((filesToUpload) => filesToUpload.map((file, i) => (i === currentFile - 1 ? updatedFile : file)));
+      setFilesToUpload((filesToUpload) =>
+        filesToUpload.map((file, i) => (i === currentFileIndex ? updatedFile : file)),
+      );
       moveToNextFile();
     },
-    [moveToNextFile, setFilesToUpload, currentFile],
+    [moveToNextFile, setFilesToUpload, currentFileIndex],
   );
-  const handleClose = useCallback(() => {
-    setShowWarningDialog(true);
-  }, []);
+
+  const handleClose = useCallback(() => setShowWarningDialog(true), []);
 
   return (
     <div>
@@ -75,7 +76,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onComp
                 setShowWarningDialog(false);
               }}
             >
-              {t('discard', 'Discard')}
+              {getCoreTranslation('discard')}
             </Button>
           </ModalFooter>
         </div>
@@ -83,17 +84,17 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onComp
         <div className={styles.filePreviewContainer}>
           <ModalHeader closeModal={handleClose} className={styles.modalHeader}>
             {title || t('addAttachment_title', 'Add Attachment')}{' '}
-            {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
+            {filesToUpload.length > 1 && `(${currentFileIndex + 1} of ${filesToUpload.length})`}
           </ModalHeader>
           <FilePreview
-            title={title}
-            key={filesToUpload[currentFile - 1]?.fileName}
             clearData={clearData}
-            collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
+            closeModal={handleClose}
+            collectDescription={filesToUpload[currentFileIndex].fileType === 'image' && collectDescription}
+            key={`${filesToUpload[currentFileIndex]?.fileName}-${currentFileIndex}`}
             moveToNextFile={moveToNextFile}
             onSaveFile={handleSave}
-            uploadedFile={filesToUpload[currentFile - 1]}
-            closeModal={handleClose}
+            title={title}
+            uploadedFile={filesToUpload[currentFileIndex]}
           />
         </div>
       )}
@@ -220,7 +221,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       <ModalFooter>
         <UserHasAccess privilege="Create Attachment">
           <Button kind="secondary" onClick={handleCancelUpload} size="lg">
-            {t('cancel', 'Cancel')}
+            {getCoreTranslation('cancel')}
           </Button>
           <Button type="submit" size="lg">
             {title || t('addAttachment', 'Add attachment')}
