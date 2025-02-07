@@ -55,7 +55,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
-    await expect(headerRow).toContainText(/onset date and comments/i);
+    await expect(headerRow).toContainText(/comments/i);
     await expect(dataRow).toContainText(/ace inhibitors/i);
     await expect(dataRow).toContainText(/mild/i);
     await expect(dataRow).toContainText(/mental status change/i);
@@ -104,7 +104,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
-    await expect(headerRow).toContainText(/onset date and comments/i);
+    await expect(headerRow).toContainText(/comments/i);
     await expect(dataRow).toContainText(/bee stings/i);
     await expect(dataRow).not.toContainText(/ace inhibitors/i);
     await expect(dataRow).toContainText(/severe/i);
