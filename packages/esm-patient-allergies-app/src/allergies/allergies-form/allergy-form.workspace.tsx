@@ -411,7 +411,7 @@ function AllergyForm(props: AllergyFormProps) {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
                     id="comments"
-                    labelText={t('comments', 'comments')}
+                    labelText={t('comments', 'Comments')}
                     onChange={onChange}
                     placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                     onBlur={onBlur}
