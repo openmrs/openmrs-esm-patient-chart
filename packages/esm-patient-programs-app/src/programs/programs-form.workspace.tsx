@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -16,7 +16,6 @@ import {
   Select,
   SelectItem,
   Stack,
-  TimePicker,
 } from '@carbon/react';
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -44,7 +43,6 @@ const createProgramsFormSchema = (t: TFunction) =>
     completionDate: z.date().nullable(),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
-    enrollmentDateTime: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -62,7 +60,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
-  const { showProgramStatusField, allowCompletionTime } = useConfig<ConfigObject>();
+  const { showProgramStatusField } = useConfig<ConfigObject>();
   const inEditMode = Boolean(programEnrollmentId);
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
@@ -94,6 +92,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const {
     control,
     handleSubmit,
+    setValue,
     watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
@@ -116,50 +115,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
-      const {
-        selectedProgram,
-        enrollmentDate,
-        enrollmentDateTime,
-        completionDate,
-        enrollmentLocation,
-        selectedProgramStatus,
-      } = data;
-
-      let formattedEnrollmentDate = dayjs(enrollmentDate).startOf('day').format();
-
-      if (!dayjs(enrollmentDate).isSame(dayjs(), 'day')) {
-        formattedEnrollmentDate = dayjs(enrollmentDate).endOf('day').utc(true).format();
-      } else if (enrollmentDateTime) {
-        const formattedEnrollmentDateTime = dayjs(enrollmentDateTime).format('HH:mm:ss');
-        formattedEnrollmentDate = dayjs(`${dayjs(enrollmentDate).format('YYYY-MM-DD')} ${formattedEnrollmentDateTime}`)
-          .utc(true)
-          .format();
-      }
-
-      const formattedCompletionDate = completionDate ? dayjs(completionDate).startOf('day').format() : null;
-
-      let formattedCompletionDateWithTime = formattedCompletionDate;
-      if (formattedCompletionDate && dayjs(formattedCompletionDate).isSame(dayjs(), 'day')) {
-        formattedCompletionDateWithTime = dayjs().utc().format();
-      } else if (formattedCompletionDate && dayjs(formattedCompletionDate).isBefore(dayjs(), 'day')) {
-        formattedCompletionDateWithTime = dayjs(formattedCompletionDate)
-          .set('hour', 23)
-          .set('minute', 59)
-          .set('second', 59)
-          .utc(true)
-          .format();
-      }
+      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
 
       const payload = {
         patient: patientUuid,
         program: selectedProgram,
-        dateEnrolled: formattedEnrollmentDate,
-        dateCompleted: dayjs(formattedCompletionDateWithTime).isSame(dayjs(), 'day')
-          ? dayjs().utc().format()
-          : dayjs(formattedCompletionDateWithTime).endOf('day').utc(true).format(),
+        dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
+        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
         location: enrollmentLocation,
         states:
-          !!selectedProgramStatus && selectedProgramStatus !== currentState?.state.uuid
+          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
             ? [{ state: { uuid: selectedProgramStatus } }]
             : [],
       };
@@ -228,80 +193,70 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     />
   );
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
+  );
+  const [selectedTime, setSelectedTime] = useState<string>(
+    new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+  );
+
+  const handleDateChange = ([date]: Date[]) => {
+    setSelectedDate(date);
+    updateDateTime(date, selectedTime);
+  };
+
+  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const time = event.target.value;
+    setSelectedTime(time);
+    updateDateTime(selectedDate, time);
+  };
+
+  const updateDateTime = (date: Date | null, time: string) => {
+    if (date) {
+      const [hours, minutes] = time.split(':').map(Number);
+      const updatedDateTime = new Date(date);
+      updatedDateTime.setHours(hours);
+      updatedDateTime.setMinutes(minutes);
+      control.setValue('enrollmentDate', updatedDateTime);
+    }
+  };
+
   const enrollmentDate = (
-    <div className="flex items-center space-x-4">
-      <Controller
-        name="enrollmentDate"
-        control={control}
-        render={({ field: { onChange, value } }) => {
-          const date = value ? new Date(value) : new Date();
-          const dateValue = date.toISOString().split('T')[0];
-          const timeValue = date.toTimeString().slice(0, 5);
-          const isTimePickerDisabled = false;
-
-          const handleDateChange = ([selectedDate]) => {
-            if (selectedDate) {
-              const combinedDate = new Date(selectedDate);
-
-              if (isTimePickerDisabled) {
-                combinedDate.setHours(0, 0, 0, 0);
-              } else {
-                const [hours, minutes] = timeValue.split(':').map(Number);
-                combinedDate.setHours(hours, minutes);
-              }
-              onChange(combinedDate.toISOString());
-            }
-          };
-
-          const handleTimeChange = (event) => {
-            const time = event.target.value;
-            if (dateValue) {
-              const [hours, minutes] = time.split(':').map(Number);
-              const combinedDate = new Date(dateValue);
-              combinedDate.setHours(hours, minutes);
-              onChange(combinedDate.toISOString());
-            }
-          };
-
-          return (
-            <>
-              <DatePicker
-                aria-label="enrollment date"
-                id="enrollmentDate"
-                datePickerType="single"
-                dateFormat="d/m/Y"
-                maxDate={new Date().toISOString()}
-                placeholder="dd/mm/yyyy"
-                onChange={handleDateChange}
-                value={dateValue}
-              >
-                <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-              </DatePicker>
-
-              {!isTimePickerDisabled && (
-                <TimePicker
-                  id="enrollmentTime"
-                  labelText={t('timeEnrolled', 'Time enrolled')}
-                  onChange={handleTimeChange}
-                  value={timeValue}
-                  placeholder="HH:mm"
-                  pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-                  format="24hr"
-                />
-              )}
-            </>
-          );
-        }}
-      />
-    </div>
+    <DatePicker
+      aria-label="enrollment date"
+      id="enrollmentDate"
+      datePickerType="single"
+      dateFormat="d/m/Y"
+      maxDate={new Date().toISOString()}
+      placeholder="dd/mm/yyyy"
+      onChange={handleDateChange}
+      value={selectedDate}
+    >
+      <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
+    </DatePicker>
   );
 
   const completionDate = (
     <Controller
       name="completionDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <>
+      render={({ field: { onChange, value } }) => {
+        const handleChange = ([date]) => {
+          if (!date) return;
+
+          const selectedDate = new Date(date);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          if (selectedDate.toDateString() === today.toDateString()) {
+            onChange(new Date());
+          } else {
+            selectedDate.setUTCHours(23, 59, 59, 999);
+            onChange(selectedDate);
+          }
+        };
+
+        return (
           <DatePicker
             aria-label="completion date"
             id="completionDate"
@@ -310,27 +265,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             minDate={new Date(watch('enrollmentDate')).toISOString()}
             maxDate={new Date().toISOString()}
             placeholder="dd/mm/yyyy"
-            onChange={([date]) => onChange(date)}
+            onChange={handleChange}
             value={value}
           >
             <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
           </DatePicker>
-          {allowCompletionTime && (
-            <TimePicker
-              id="completionTime"
-              value={value ? dayjs(value).format('HH:mm') : ''}
-              onChange={(time) =>
-                onChange(
-                  time
-                    ? dayjs(value).set('hour', time.split(':')[0]).set('minute', time.split(':')[1]).toISOString()
-                    : '',
-                )
-              }
-              labelText={t('selectTime', 'Select time')}
-            />
-          )}
-        </>
-      )}
+        );
+      }}
     />
   );
 
