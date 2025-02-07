@@ -60,12 +60,12 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ title, onComp
           <ModalHeader closeModal={closeModal} title={t('unsavedAttachment', 'Unsaved attachment')} />
           <ModalBody>
             <p className={styles.bodyShort02}>
-              {t('unsavedAttachmentMessage', 'You have an unsaved attachment. Are you sure you want to discard it?')}.
+              {t('unsavedAttachmentMessage', 'You have an unsaved attachment. Are you sure you want to discard it?')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button kind="secondary" onClick={() => setShowWarningDialog(false)}>
-              {t('keepAttachment', 'Keep Attachment')}
+              {t('keepAttachment', 'Keep attachment')}
             </Button>
             <Button
               kind="danger"
