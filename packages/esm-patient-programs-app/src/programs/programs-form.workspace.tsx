@@ -217,7 +217,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       const updatedDateTime = new Date(date);
       updatedDateTime.setHours(hours);
       updatedDateTime.setMinutes(minutes);
-      control.setValue('enrollmentDate', updatedDateTime);
+      setValue('enrollmentDate', updatedDateTime);
     }
   };
 
