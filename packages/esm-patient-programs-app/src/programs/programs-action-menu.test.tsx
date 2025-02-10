@@ -53,6 +53,7 @@ describe('ProgramActionsMenu', () => {
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: testProps.programEnrollmentId,
+      workspaceTitle: 'Edit program enrollment',
     });
   });
 

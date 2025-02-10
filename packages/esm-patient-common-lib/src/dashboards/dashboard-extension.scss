@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 
 .menu {
@@ -6,5 +7,6 @@
 }
 
 .icon {
-  margin-right: layout.$spacing-03;
+  margin-right: layout.$spacing-06;
+  fill: colors.$gray-70;
 }
