@@ -63,7 +63,7 @@ export interface DrugOrderFormProps {
 function useCreateMedicationOrderFormSchema() {
   const { t } = useTranslation();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
-  const { isIndicationFieldOptional } = useConfig<ConfigObject>();
+  const { requireIndication } = useConfig<ConfigObject>();
 
   const schema = useMemo(() => {
     const comboSchema = {
@@ -96,7 +96,7 @@ function useCreateMedicationOrderFormSchema() {
       asNeededCondition: z.string().nullable(),
       duration: z.number().nullable(),
       durationUnit: z.object({ ...comboSchema }).nullable(),
-      indication: !isIndicationFieldOptional
+      indication: requireIndication
         ? z.string().refine((value) => value !== '', {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
@@ -173,7 +173,7 @@ function useCreateMedicationOrderFormSchema() {
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-  }, [isIndicationFieldOptional, requireOutpatientQuantity, t]);
+  }, [requireIndication, requireOutpatientQuantity, t]);
 
   return schema;
 }
