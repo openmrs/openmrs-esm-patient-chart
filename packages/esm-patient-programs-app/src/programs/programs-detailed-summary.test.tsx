@@ -93,6 +93,7 @@ describe('ProgramsDetailedSummary', () => {
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
+      workspaceTitle: 'Edit program enrollment',
     });
   });
 
