@@ -152,7 +152,7 @@ test('Record and edit test results', async ({ page }) => {
     {
       label: 'Total Protein (g/dL)',
       resultsPageReference: 'Total Protein',
-      value: '7.0',
+      value: '7',
       updatedValue: '8',
     },
     {
