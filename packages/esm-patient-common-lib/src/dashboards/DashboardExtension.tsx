@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import last from 'lodash-es/last';
+import { last } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { ConfigurableLink, MaybeIcon } from '@openmrs/esm-framework';
-import { setupIcons } from '@openmrs/esm-styleguide/src/icons/icon-registration';
 import styles from './dashboard-extension.scss';
 
 export interface DashboardExtensionProps {
@@ -24,6 +23,7 @@ export const DashboardExtension = ({
 }: DashboardExtensionProps) => {
   const { t } = useTranslation(moduleName);
   const location = useLocation();
+
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
   return (
@@ -33,7 +33,7 @@ export const DashboardExtension = ({
         to={`${basePath}/${encodeURIComponent(path)}`}
       >
         <span className={styles.menu}>
-          <MaybeIcon icon={icon} className={styles.icon} />
+          <MaybeIcon icon={icon} className={styles.icon} size={16} />
           <span>{t(title)}</span>
         </span>
       </ConfigurableLink>
