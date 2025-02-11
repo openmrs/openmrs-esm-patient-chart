@@ -13,16 +13,25 @@ const EmptyFormModal: React.FC<EmptyFormModalProps> = ({ onConfirm, onCancel }) 
 
   return (
     <React.Fragment>
-      <ModalHeader closeModal={onCancel} title={t('emptyForm', 'Empty Form')} className={styles.customModal} />
+      <ModalHeader
+        closeModal={onCancel}
+        title={t('incompleteForm', 'Incomplete form')}
+        className={styles.customModal}
+      />
       <ModalBody>
-        <p>{t('emptyFormConfirmation', 'All fields are Empty. Are you sure you want to submit the form?')}</p>
+        <p>
+          {t(
+            'emptyFormIndication',
+            'The form contains empty fields or no data has been entered. Please complete the necessary information before proceeding.',
+          )}
+        </p>
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={onCancel}>
-          {t('cancel', 'Cancel')}
+          {t('continueEditing', 'Continue editing')}
         </Button>
         <Button kind="danger" onClick={onConfirm}>
-          {t('confirm', 'Confirm')}
+          {t('discardForm', 'Discard form')}
         </Button>
       </ModalFooter>
     </React.Fragment>
