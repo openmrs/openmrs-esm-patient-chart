@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from 'tools';
-import { mockEncounters } from '__mocks__';
+import { mockMappedEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
-  visits: mockEncounters,
+  visits: mockMappedEncounters,
 };
 
 const mockShowModal = jest.mocked(showModal);
@@ -29,7 +29,7 @@ describe('EncounterList', () => {
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderVisitsTable({ visits: mockMappedEncounters });
 
     await screen.findByRole('table');
 
@@ -81,7 +81,7 @@ describe('Delete Encounter', () => {
 
     mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderVisitsTable({ visits: mockMappedEncounters });
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
