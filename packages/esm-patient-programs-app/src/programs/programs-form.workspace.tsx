@@ -229,7 +229,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     if (date) {
       const dateWithMidnightTime = new Date(date);
       dateWithMidnightTime.setHours(0, 0, 0, 0);
-      setSelectedDate(dateWithMidnightTime);
+      setValue('enrollmentDate', dateWithMidnightTime);
     }
   };
 
@@ -329,8 +329,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => onChange(date)}
           value={value}
