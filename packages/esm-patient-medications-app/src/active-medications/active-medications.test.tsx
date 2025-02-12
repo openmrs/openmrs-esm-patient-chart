@@ -91,8 +91,8 @@ describe('ActiveMedications', () => {
     const expectedTableRows = [
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
       /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet 14-Aug-2023 DOSE 2 tablet — oral — twice daily — indefinite duration INDICATION No good 0/,
-      /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for {{duration}} weeks — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
-      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for {{duration}} days INDICATION Heart — QUANTITY 30 Tablet/,
+      /14-Aug-2023 Admin User Sulfacetamide 0.1 — 10% DOSE 1 application — for 1 weeks — REFILLS 1 — apply it INDICATION Pain — QUANTITY 8 Application/,
+      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for 30 days INDICATION Heart — QUANTITY 30 Tablet/,
     ];
 
     expectedTableRows.forEach((row) =>
