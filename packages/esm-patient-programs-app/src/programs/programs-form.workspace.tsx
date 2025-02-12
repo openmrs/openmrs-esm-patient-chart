@@ -196,12 +196,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       control={control}
       render={({ field: { onChange, value } }) => (
         <OpenmrsDatePicker
-          aria-label="enrollment date"
+          aria-label={t('dateEnrolled', 'Date enrolled')}
           id="enrollmentDate"
           maxDate={new Date().toISOString()}
           onChange={onChange}
           value={value}
           labelText={t('dateEnrolled', 'Date enrolled')}
+          aria-required="true"
         />
       )}
     />
@@ -213,13 +214,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       control={control}
       render={({ field: { onChange, value } }) => (
         <OpenmrsDatePicker
-          aria-label="completion date"
+          aria-label={t('dateCompleted', 'Date completed')}
           id="completionDate"
           minDate={new Date(watch('enrollmentDate')).toISOString()}
           maxDate={new Date().toISOString()}
           onChange={onChange}
           value={value}
           labelText={t('dateCompleted', 'Date completed')}
+          aria-required="true"
         />
       )}
     />
