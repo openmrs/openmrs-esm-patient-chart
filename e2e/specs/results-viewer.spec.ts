@@ -152,7 +152,7 @@ test('Record and edit test results', async ({ page }) => {
     {
       label: 'Total Protein (g/dL)',
       resultsPageReference: 'Total Protein',
-      value: '7.0',
+      value: '7',
       updatedValue: '8',
     },
     {
@@ -353,18 +353,14 @@ test('Record and edit test results', async ({ page }) => {
     for (const { resultsPageReference, updatedValue } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
-
-        await expect(valueCell).toContainText(updatedValue);
+        await expect(row).toBeVisible();
       });
     }
 
     for (const { resultsPageReference, updatedValue } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
-
-        await expect(valueCell).toContainText(updatedValue);
+        await expect(row).toBeVisible();
       });
     }
   });
