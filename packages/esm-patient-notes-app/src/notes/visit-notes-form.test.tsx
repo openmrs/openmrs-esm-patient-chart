@@ -1,7 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
 import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -13,6 +19,27 @@ import {
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.workspace';
+import dayjs from 'dayjs';
+
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 const defaultProps = {
   patientUuid: mockPatient.id,

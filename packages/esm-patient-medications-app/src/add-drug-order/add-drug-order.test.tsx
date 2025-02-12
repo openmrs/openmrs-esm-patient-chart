@@ -10,10 +10,11 @@ import {
   mockPatientDrugOrdersApiData,
   mockSessionDataResponse,
 } from '__mocks__';
-import { closeWorkspace, useSession } from '@openmrs/esm-framework';
+import { closeWorkspace, useSession, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
+import dayjs from 'dayjs';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockLaunchPatientWorkspace = jest.fn();
@@ -21,6 +22,7 @@ const mockUseSession = jest.mocked(useSession);
 const mockUseDrugSearch = jest.mocked(useDrugSearch);
 const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
 const usePatientOrdersMock = jest.fn();
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -53,6 +55,24 @@ jest.mock('../api/api', () => ({
     .fn()
     .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
 }));
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 describe('AddDrugOrderWorkspace drug search', () => {
   beforeEach(() => {

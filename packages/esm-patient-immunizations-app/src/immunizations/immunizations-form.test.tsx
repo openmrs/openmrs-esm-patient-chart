@@ -10,6 +10,7 @@ import {
   useConfig,
   useSession,
   useVisit,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { type ImmunizationWidgetConfigObject } from '../types/fhir-immunization-domain';
@@ -30,6 +31,25 @@ const mockUseVisit = jest.mocked(useVisit);
 const mockMutate = jest.fn();
 const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
 const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 jest.mock('../hooks/useImmunizationsConceptSet', () => ({
   useImmunizationsConceptSet: jest.fn(() => ({
