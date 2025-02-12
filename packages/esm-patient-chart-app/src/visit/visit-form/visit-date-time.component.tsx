@@ -59,6 +59,9 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 labelText={t('date', 'Date')}
                 invalid={Boolean(errors[dateFieldName])}
                 invalidText={errors[dateFieldName]?.message}
+                aria-labelledby={`${dateFieldName}Label`}
+                aria-describedby={errors[dateFieldName] ? `${dateFieldName}Error` : undefined}
+                aria-invalid={Boolean(errors[dateFieldName]) ? 'true' : 'false'}
               />
             </ResponsiveWrapper>
           )}

@@ -375,6 +375,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       value={value}
                       onChange={(date) => onChange(date)}
                       labelText={t('expirationDate', 'Expiration date')}
+                      aria-label={t('expirationDate', 'Expiration date')}
+                      aria-required="true"
+                      aria-describedby="vaccinationExpirationHelper"
                     />
                   </div>
                 )}

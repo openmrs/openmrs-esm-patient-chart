@@ -120,6 +120,8 @@ function PrintModal({ patientUuid, closeDialog }) {
               onChange={setSelectedFromDate}
               value={selectedFromDate}
               labelText={t('startDate', 'Start date')}
+              aria-required="true"
+              data-testid="start-date-picker"
             />
             <OpenmrsDatePicker
               className={styles.datePicker}
@@ -128,6 +130,8 @@ function PrintModal({ patientUuid, closeDialog }) {
               onChange={setSelectedToDate}
               value={selectedToDate}
               labelText={t('endDate', 'End date')}
+              aria-required="true"
+              data-testid="end-date-picker"
             />
           </div>
         </ResponsiveWrapper>

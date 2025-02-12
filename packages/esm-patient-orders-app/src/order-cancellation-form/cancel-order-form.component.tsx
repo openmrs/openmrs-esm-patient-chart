@@ -116,8 +116,9 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
                     value={value}
                     onChange={(date) => onChange(date)}
                     labelText={t('cancellationDate', 'Cancellation date')}
-                    invalid={!!errors['cancellationDate']}
-                    invalidText={errors['cancellationDate']?.message}
+                    aria-label={t('cancellationDate', 'Cancellation date')}
+                    aria-invalid={!!errors['cancellationDate']}
+                    aria-describedby={errors['cancellationDate'] ? 'cancellationDate-error' : undefined}
                   />
                 </div>
               )}

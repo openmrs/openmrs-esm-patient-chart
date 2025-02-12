@@ -460,6 +460,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                     onChange={(date) => onChange(date)}
                     id="visitDateTimePicker"
                     labelText={t('visitDate', 'Visit date')}
+                    aria-label={t('visitDate', 'Visit date')}
+                    aria-describedby="visitDateHelpText"
                   />
                 </ResponsiveWrapper>
               )}
