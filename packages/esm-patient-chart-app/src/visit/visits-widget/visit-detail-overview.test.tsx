@@ -6,6 +6,7 @@ import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { visitOverviewDetailMockData } from '__mocks__';
 import VisitDetailOverview from './visit-detail-overview.component';
+import { useInfiniteVisits } from './visit.resource';
 
 const mockGetConfig = getConfig as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -16,9 +17,28 @@ mockUseConfig.mockReturnValue({
   numberOfVisitsToLoad: 5,
 });
 
+jest.mock('./visit.resource', () => {
+  const requireActual = jest.requireActual('./visit.resource');
+  return {
+    ...requireActual,
+    useInfiniteVisits: jest.fn(),
+  };
+});
+const mockedUseInfiniteVisits = jest.mocked(useInfiniteVisits);
+
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+    mockedUseInfiniteVisits.mockReturnValueOnce({
+      visits: [],
+      error: null,
+      hasMore: false,
+      isLoading: false,
+      isValidating: false,
+      loadMore: jest.fn(),
+      mutate: jest.fn(),
+      nextUri: null,
+      totalCount: 0,
+    });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
@@ -31,15 +51,23 @@ describe('VisitDetailOverview', () => {
   });
 
   it('renders an error state view if there was a problem fetching encounter data', async () => {
-    const error = {
-      message: 'Unauthorized',
-      response: {
-        status: 401,
-        statusText: 'Unauthorized',
+    mockedUseInfiniteVisits.mockReturnValueOnce({
+      visits: [],
+      error: {
+        message: 'Unauthorized',
+        response: {
+          status: 401,
+          statusText: 'Unauthorized',
+        },
       },
-    };
-
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+      hasMore: false,
+      isLoading: false,
+      isValidating: false,
+      loadMore: jest.fn(),
+      mutate: jest.fn(),
+      nextUri: null,
+      totalCount: 0,
+    });
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
@@ -53,8 +81,17 @@ describe('VisitDetailOverview', () => {
 
   it(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
     const user = userEvent.setup();
-
-    mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
+    mockedUseInfiniteVisits.mockReturnValue({
+      visits: visitOverviewDetailMockData.data.results,
+      error: null,
+      hasMore: false,
+      isLoading: false,
+      isValidating: false,
+      loadMore: jest.fn(),
+      mutate: jest.fn(),
+      nextUri: null,
+      totalCount: visitOverviewDetailMockData.data.results.length,
+    });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
@@ -90,7 +127,17 @@ describe('VisitDetailOverview', () => {
   });
 
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
+    mockedUseInfiniteVisits.mockReturnValue({
+      visits: visitOverviewDetailMockData.data.results,
+      error: null,
+      hasMore: false,
+      isLoading: false,
+      isValidating: false,
+      loadMore: jest.fn(),
+      mutate: jest.fn(),
+      nextUri: null,
+      totalCount: visitOverviewDetailMockData.data.results.length,
+    });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
