@@ -248,9 +248,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       setValue('enrollmentDate', updatedDateTime);
     }
   };
-
   const enrollmentDate = (
-    <div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
       <DatePicker
         aria-label="enrollment date"
         id="enrollmentDate"
@@ -289,9 +288,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                 <TimePicker
                   id="enrollmentTimePicker"
                   labelText={t('timeEnrolled', 'Time enrolled')}
-                  onChange={(event) => onChange(event.target.value)}
+                  onChange={(event) => {
+                    handleTimeChange(event);
+                    onChange(event.target.value);
+                  }}
                   pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                  style={{ marginLeft: '0.125rem', flex: 'none' }}
                   value={value}
                   onBlur={onBlur}
                 >
