@@ -57,6 +57,21 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     });
   }, []);
 
+  const handleEmptyFormSubmission = useCallback(() => {
+    return new Promise<void>((resolve, reject) => {
+      const dispose = showModal('form-engine-empty-form-confirm-modal', {
+        onCancel() {
+          dispose();
+          reject();
+        },
+        onConfirm() {
+          dispose();
+          resolve();
+        },
+      });
+    });
+  }, []);
+
   const handleMarkFormAsDirty = useCallback(
     (isDirty: boolean) => promptBeforeClosing(() => isDirty),
     [promptBeforeClosing],
@@ -86,6 +101,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           formJson={schema}
           handleClose={handleCloseForm}
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
+          handleEmptyFormSubmission={handleEmptyFormSubmission}
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
           formSessionIntent={formSessionIntent}
