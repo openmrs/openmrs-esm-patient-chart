@@ -282,6 +282,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   onBlur={onBlur}
                   value={value}
                   labelText={t('onsetDate', 'Onset date')}
+                  aria-label={t('onsetDate', 'Onset date')}
+                  aria-required="true"
+                  aria-describedby="onsetDateHelper"
                 />
               </ResponsiveWrapper>
             )}
@@ -324,6 +327,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       onBlur={onBlur}
                       value={value}
                       labelText={t('endDate', 'End date')}
+                      aria-label={t('endDate', 'End date')}
+                      aria-required="true"
+                      aria-describedby="endDateDescription"
                     />
                   </ResponsiveWrapper>
                 </>

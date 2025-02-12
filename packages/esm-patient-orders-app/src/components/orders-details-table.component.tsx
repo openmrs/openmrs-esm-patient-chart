@@ -363,15 +363,19 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
         <OpenmrsDatePicker
           id="startDatePickerInput"
-          data-testid="startDatePickerInput"
-          labelText=""
+          aria-labelledby="dateRangeLabel startDatePickerLabel"
+          aria-label={t('startDate', 'Start Date')}
           value={''}
           onChange={(date: Date) => {
             handleDateFilterChange([date, date]);
           }}
         />
 
-        <OpenmrsDatePicker id="endDatePickerInput" data-testid="endDatePickerInput" labelText="" />
+        <OpenmrsDatePicker
+          id="endDatePickerInput"
+          aria-labelledby="dateRangeLabel endDatePickerLabel"
+          aria-label={t('endDate', 'End Date')}
+        />
       </div>
 
       {(() => {
