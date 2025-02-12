@@ -605,6 +605,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                           id="startDatePicker"
                           labelText={t('startDate', 'Start date')}
                           size={isTablet ? 'lg' : 'sm'}
+                          aria-labelledby="startDatePickerLabel"
+                          aria-describedby="startDatePickerDescription"
                         />
                       )}
                     />
