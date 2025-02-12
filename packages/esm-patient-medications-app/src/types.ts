@@ -1,27 +1,26 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
 import type { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
-  drug: Drug;
-  unit: DosingUnit;
-  commonMedicationName: string;
-  dosage: number;
-  frequency: MedicationFrequency;
-  route: MedicationRoute;
-  quantityUnits: QuantityUnit;
-  patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
-  startDate: Date | string;
-  durationUnit: DurationUnit;
+  commonMedicationName: string;
+  dateActivated: Date | string;
+  dosage: number;
+  drug: Drug;
   duration: number | null;
-  pillsDispensed: number;
-  numRefills: number;
+  durationUnit: DurationUnit;
+  freeTextDosage: string;
+  frequency: MedicationFrequency;
   indication: string;
   isFreeTextDosage: boolean;
-  freeTextDosage: string;
+  numRefills: number;
+  patientInstructions: string;
+  pillsDispensed: number;
   previousOrder?: string;
+  quantityUnits: QuantityUnit;
+  route: MedicationRoute;
   template?: OrderTemplate;
+  unit: DosingUnit;
 }
 
 export interface DrugOrderTemplate {
@@ -38,15 +37,15 @@ export interface OrderTemplate {
 }
 
 export interface DosingInstructions {
-  dose: Array<MedicationDosage>;
-  units: Array<DosingUnit>;
-  route: Array<MedicationRoute>;
-  frequency: Array<MedicationFrequency>;
-  instructions?: Array<MedicationInstructions>;
-  durationUnits?: Array<DurationUnit>;
-  quantityUnits?: Array<QuantityUnit>;
   asNeeded?: boolean;
   asNeededCondition?: string;
+  dose: Array<MedicationDosage>;
+  durationUnits?: Array<DurationUnit>;
+  frequency: Array<MedicationFrequency>;
+  instructions?: Array<MedicationInstructions>;
+  quantityUnits?: Array<QuantityUnit>;
+  route: Array<MedicationRoute>;
+  units: Array<DosingUnit>;
 }
 
 export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
@@ -66,11 +65,11 @@ export type QuantityUnit = CommonMedicationValueCoded;
 export type DurationUnit = CommonMedicationValueCoded;
 
 interface CommonMedicationProps {
-  value: string;
+  value?: string;
   default?: boolean;
 }
 
 export interface CommonMedicationValueCoded extends CommonMedicationProps {
-  valueCoded: string;
+  valueCoded?: string;
   names?: string[];
 }

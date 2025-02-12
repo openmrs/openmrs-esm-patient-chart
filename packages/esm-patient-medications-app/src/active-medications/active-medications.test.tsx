@@ -83,7 +83,7 @@ describe('ActiveMedications', () => {
     const table = screen.getByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/start date/, /details/];
+    const expectedColumnHeaders = [/activation date/, /details/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });

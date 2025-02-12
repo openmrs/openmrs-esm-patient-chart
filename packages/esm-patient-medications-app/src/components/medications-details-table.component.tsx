@@ -81,8 +81,8 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
 
   const tableHeaders = [
     {
-      key: 'startDate',
-      header: t('startDate', 'Start date'),
+      key: 'activationDate',
+      header: t('activationDate', 'Activation date'),
       isSortable: true,
       isVisible: true,
     },
@@ -154,10 +154,10 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
         </div>
       ),
     },
-    startDate: {
+    activationDate: {
       sortKey: dayjs(medication.dateActivated).toDate(),
       content: (
-        <div className={styles.startDateColumn}>
+        <div className={styles.activationDateColumn}>
           <span>{formatDate(new Date(medication.dateActivated))}</span>
           {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
@@ -365,51 +365,52 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+
   const handleDiscontinueClick = useCallback(() => {
     setItems([
       ...items,
       {
-        uuid: medication.uuid,
-        display: medication.drug?.display,
-        previousOrder: null,
         action: 'DISCONTINUE',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
-        startDate: medication.dateActivated,
+        careSetting: medication.careSetting.uuid,
+        commonMedicationName: medication.drug?.display,
+        dateActivated: medication.dateActivated,
+        display: medication.drug?.display,
+        dosage: medication.dose,
+        drug: medication.drug,
         duration: medication.duration,
         durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
           value: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
         },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
+        freeTextDosage:
+          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+        frequency: {
+          value: medication.frequency?.display,
+          valueCoded: medication.frequency?.uuid,
+        },
         indication: medication.orderReasonNonCoded,
+        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+        numRefills: medication.numRefills,
         orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
+        patientInstructions:
+          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+        pillsDispensed: medication.quantity,
+        previousOrder: null,
         quantityUnits: {
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
         },
+        route: {
+          value: medication.route?.display,
+          valueCoded: medication.route?.uuid,
+        },
+        unit: {
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
+        },
+        uuid: medication.uuid,
       },
     ]);
     openOrderBasket();
@@ -417,47 +418,47 @@ function OrderBasketItemActions({
 
   const handleModifyClick = useCallback(() => {
     const newItem: DrugOrderBasketItem = {
-      uuid: medication.uuid,
-      display: medication.drug?.display,
-      previousOrder: medication.uuid,
-      startDate: new Date(),
       action: 'REVISE',
-      drug: medication.drug,
-      dosage: medication.dose,
-      unit: {
-        value: medication.doseUnits?.display,
-        valueCoded: medication.doseUnits?.uuid,
-      },
-      frequency: {
-        valueCoded: medication.frequency?.uuid,
-        value: medication.frequency?.display,
-      },
-      route: {
-        valueCoded: medication.route?.uuid,
-        value: medication.route?.display,
-      },
-      commonMedicationName: medication.drug?.display,
-      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-      freeTextDosage:
-        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-      patientInstructions:
-        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
       asNeeded: medication.asNeeded,
       asNeededCondition: medication.asNeededCondition,
+      careSetting: medication.careSetting?.uuid,
+      commonMedicationName: medication.drug?.display,
+      dateActivated: medication?.dateActivated,
+      display: medication.drug?.display,
+      dosage: medication.dose,
+      drug: medication.drug,
       duration: medication.duration,
       durationUnit: {
-        valueCoded: medication.durationUnits?.uuid,
         value: medication.durationUnits?.display,
+        valueCoded: medication.durationUnits?.uuid,
       },
-      pillsDispensed: medication.quantity,
-      numRefills: medication.numRefills,
+      freeTextDosage:
+        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      frequency: {
+        value: medication.frequency?.display,
+        valueCoded: medication.frequency?.uuid,
+      },
       indication: medication.orderReasonNonCoded,
+      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+      numRefills: medication.numRefills,
       orderer: medication.orderer?.uuid,
-      careSetting: medication.careSetting?.uuid,
+      patientInstructions:
+        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+      pillsDispensed: medication.quantity,
+      previousOrder: medication.uuid,
       quantityUnits: {
         value: medication.quantityUnits?.display,
         valueCoded: medication.quantityUnits?.uuid,
       },
+      route: {
+        value: medication.route?.display,
+        valueCoded: medication.route?.uuid,
+      },
+      unit: {
+        value: medication.doseUnits?.display,
+        valueCoded: medication.doseUnits?.uuid,
+      },
+      uuid: medication.uuid,
     };
     setItems([...items, newItem]);
     openDrugOrderForm({ order: newItem });
@@ -467,47 +468,47 @@ function OrderBasketItemActions({
     setItems([
       ...items,
       {
-        uuid: medication.uuid,
-        display: medication.drug?.display,
-        previousOrder: null,
-        startDate: new Date(),
         action: 'RENEW',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
+        careSetting: medication.careSetting?.uuid,
+        commonMedicationName: medication.drug?.display,
+        dateActivated: new Date(),
+        display: medication.drug?.display,
+        dosage: medication.dose,
+        drug: medication.drug,
         duration: medication.duration,
         durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
           value: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
         },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
+        frequency: {
+          value: medication.frequency?.display,
+          valueCoded: medication.frequency?.uuid,
+        },
+        freeTextDosage:
+          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         indication: medication.orderReasonNonCoded,
+        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+        numRefills: medication.numRefills,
         orderer: medication.orderer?.uuid,
-        careSetting: medication.careSetting?.uuid,
+        patientInstructions:
+          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
+        pillsDispensed: medication.quantity,
+        previousOrder: null,
         quantityUnits: {
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
         },
+        route: {
+          value: medication.route?.display,
+          valueCoded: medication.route?.uuid,
+        },
+        unit: {
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
+        },
+        uuid: medication.uuid,
       },
     ]);
     openOrderBasket();
@@ -515,39 +516,39 @@ function OrderBasketItemActions({
 
   return (
     <OverflowMenu
-      aria-label="Actions menu"
-      selectorPrimaryFocus={'#modify'}
-      flipped
-      size={isTablet ? 'lg' : 'md'}
       align="left"
+      aria-label="Actions menu"
+      flipped
+      selectorPrimaryFocus="#modify"
+      size={isTablet ? 'lg' : 'md'}
     >
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}
+          disabled={alreadyInBasket}
           id="modify"
           itemText={t('modify', 'Modify')}
           onClick={handleModifyClick}
-          disabled={alreadyInBasket}
         />
       )}
       {showReorderButton && (
         <OverflowMenuItem
           className={styles.menuItem}
+          disabled={alreadyInBasket}
           id="reorder"
           itemText={t('reorder', 'Reorder')}
           onClick={handleReorderClick}
-          disabled={alreadyInBasket}
         />
       )}
       {showDiscontinueButton && (
         <OverflowMenuItem
           className={styles.menuItem}
+          disabled={alreadyInBasket}
+          hasDivider
           id="discontinue"
+          isDelete
           itemText={t('discontinue', 'Discontinue')}
           onClick={handleDiscontinueClick}
-          disabled={alreadyInBasket}
-          isDelete={true}
-          hasDivider
         />
       )}
     </OverflowMenu>

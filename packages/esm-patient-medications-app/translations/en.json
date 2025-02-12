@@ -1,4 +1,5 @@
 {
+  "activationDate": "Activation date",
   "activeMedicationsDisplayText": "Active medications",
   "activeMedicationsHeaderTitle": "active medications",
   "activeMedicationsTableTitle": "Active Medications",
@@ -85,7 +86,6 @@
   "selectQuantityUnitsErrorMessage": "Quantity unit is required",
   "selectRouteErrorMessage": "Route is required",
   "selectUnitErrorMessage": "Dose unit is required",
-  "startDate": "Start date",
   "takeAsNeeded": "Take as needed",
   "tryReopeningTheForm": "Please try launching the form again",
   "trySearchingAgain": "Please try searching again",
