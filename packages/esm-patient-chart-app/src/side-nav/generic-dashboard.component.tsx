@@ -19,11 +19,17 @@ export const genericDashboardConfigSchema = {
     _default: '',
     _type: Type.String,
   },
+  icon: {
+    _description: 'The icons for the navigation menu',
+    _default: '',
+    _type: Type.String,
+  },
 };
 
 export interface GenericDashboardConfig {
   path: string;
   title: string;
+  icon: string;
   /** This gets used by the patient chart when it renders the dashboard itself. */
   slot: string;
 }
@@ -40,6 +46,7 @@ export default function GenericDashboard({ basePath }: GenericDashboardProps) {
         path={config.path}
         title={config.title}
         basePath={basePath}
+        icon={config.icon}
         moduleName="@openmrs/esm-patient-chart-app"
       />
     </BrowserRouter>
