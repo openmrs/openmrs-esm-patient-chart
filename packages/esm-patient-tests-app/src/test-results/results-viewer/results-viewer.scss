@@ -3,16 +3,6 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-@media (min-width: 1200px) {
-  :global(.-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
-    max-width: 150rem;
-  }
-}
-
-:global(.omrs-breakpoint-gt-small-desktop .-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
-  max-width: 150rem;
-}
-
 .resultsContainer {
   padding: 0;
   width: 100%;
