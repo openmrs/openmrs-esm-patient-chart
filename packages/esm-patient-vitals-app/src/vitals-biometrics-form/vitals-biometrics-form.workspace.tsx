@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -43,35 +42,13 @@ import {
 } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
+import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
 
-const VitalsAndBiometricFormSchema = z
-  .object({
-    systolicBloodPressure: z.number(),
-    diastolicBloodPressure: z.number(),
-    respiratoryRate: z.number(),
-    oxygenSaturation: z.number(),
-    pulse: z.number(),
-    temperature: z.number(),
-    generalPatientNote: z.string(),
-    weight: z.number(),
-    height: z.number(),
-    midUpperArmCircumference: z.number(),
-    computedBodyMassIndex: z.number(),
-  })
-  .partial()
-  .refine(
-    (fields) => {
-      return Object.values(fields).some((value) => Boolean(value));
-    },
-    {
-      message: 'Please fill at least one field',
-      path: ['oneFieldRequired'],
-    },
-  );
+interface VitalsAndBiometricsFormProps extends DefaultPatientWorkspaceProps {
+  formContext: 'creating' | 'editing';
+}
 
-export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
-
-const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
+const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
@@ -100,7 +77,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     formState: { isDirty, isSubmitting },
   } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
-    resolver: zodResolver(VitalsAndBiometricFormSchema),
+    resolver: zodResolver(VitalsAndBiometricsFormSchema),
   });
 
   useEffect(() => {
