@@ -47,21 +47,17 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         <Controller
           name={dateFieldName}
           control={control}
-          render={({ field: { onChange, value } }) => (
+          render={({ field, fieldState }) => (
             <ResponsiveWrapper>
               <OpenmrsDatePicker
+                {...field}
                 className={styles.datePicker}
                 id={`${dateFieldName}Input`}
                 maxDate={maxDateObj}
                 minDate={minDateObj}
-                onChange={onChange}
-                value={value ? dayjs(value).format('DD/MM/YYYY') : null}
                 labelText={t('date', 'Date')}
-                invalid={Boolean(errors[dateFieldName])}
-                invalidText={errors[dateFieldName]?.message}
-                aria-labelledby={`${dateFieldName}Label`}
-                aria-describedby={errors[dateFieldName] ? `${dateFieldName}Error` : undefined}
-                aria-invalid={Boolean(errors[dateFieldName]) ? 'true' : 'false'}
+                invalid={Boolean(fieldState?.error?.message)}
+                invalidText={fieldState?.error?.message}
               />
             </ResponsiveWrapper>
           )}

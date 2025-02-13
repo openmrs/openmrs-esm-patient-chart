@@ -273,18 +273,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           <Controller
             name="onsetDateTime"
             control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field, fieldState }) => (
               <ResponsiveWrapper>
                 <OpenmrsDatePicker
+                  {...field}
                   id="onsetDate"
-                  maxDate={dayjs().utc().format()}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  value={value}
+                  maxDate={new Date()}
                   labelText={t('onsetDate', 'Onset date')}
-                  aria-label={t('onsetDate', 'Onset date')}
-                  aria-required="true"
-                  aria-describedby="onsetDateHelper"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
                 />
               </ResponsiveWrapper>
             )}
@@ -316,20 +313,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             <Controller
               name="abatementDateTime"
               control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <>
                   <ResponsiveWrapper>
                     <OpenmrsDatePicker
+                      {...field}
                       id="endDate"
-                      minDate={new Date(watch('onsetDateTime')).toISOString()}
-                      maxDate={dayjs().utc().format()}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      value={value}
+                      minDate={new Date(watch('onsetDateTime'))}
+                      maxDate={new Date()}
                       labelText={t('endDate', 'End date')}
-                      aria-label={t('endDate', 'End date')}
-                      aria-required="true"
-                      aria-describedby="endDateDescription"
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
                     />
                   </ResponsiveWrapper>
                 </>

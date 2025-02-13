@@ -126,12 +126,10 @@ function PrintModal({ patientUuid, closeDialog }) {
             <OpenmrsDatePicker
               className={styles.datePicker}
               minDate={selectedFromDate}
-              maxDate={new Date().toISOString()}
+              maxDate={new Date()}
               onChange={setSelectedToDate}
               value={selectedToDate}
               labelText={t('endDate', 'End date')}
-              aria-required="true"
-              data-testid="end-date-picker"
             />
           </div>
         </ResponsiveWrapper>
