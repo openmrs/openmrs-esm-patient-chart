@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import {
   openmrsFetch,
@@ -31,11 +31,15 @@ export function useInfiniteVisits(patientUuid: string) {
     return url;
   };
 
-  const { data, error, isLoading, isValidating, mutate, size, setSize } = useSWRInfinite(
-    patientUuid ? getKey : null,
-    openmrsFetch,
-    { parallel: true },
-  );
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: localMutate,
+    size,
+    setSize,
+  } = useSWRInfinite(patientUuid ? getKey : null, openmrsFetch, { parallel: true });
 
   return {
     visits: data ? [].concat(data?.flatMap((page) => page?.data?.results)) : null,
@@ -43,7 +47,7 @@ export function useInfiniteVisits(patientUuid: string) {
     hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
     isLoading,
     isValidating,
-    mutateVisits: mutate,
+    mutateVisits: localMutate,
     setSize,
     size,
   };
@@ -53,17 +57,27 @@ export function useVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
-    openmrsFetch,
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: localMutate,
+  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () =>
+    openmrsFetch(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`),
   );
+
   return {
     visits: data ? data?.data?.results : null,
     error,
     isLoading,
     isValidating,
-    mutateVisits: mutate,
+    mutateVisits: localMutate,
   };
+}
+
+export function invalidateUseVisits(patientUuid: string) {
+  return mutate(['visits', patientUuid]);
 }
 
 export function useEncounters(patientUuid: string) {

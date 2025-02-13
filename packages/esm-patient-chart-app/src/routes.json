@@ -37,6 +37,12 @@
       "offline": true
     },
     {
+      "name": "clinical-views-summary",
+      "component": "clinicalViewsSummary",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "stop-visit-button",
       "component": "stopVisitActionButton",
       "slot": "patient-actions-slot",
@@ -100,7 +106,8 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "path": "Visits"
+        "path": "Visits",
+        "layoutMode": "anchored"
       },
       "order": 5,
       "online": true,

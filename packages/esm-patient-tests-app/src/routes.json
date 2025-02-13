@@ -12,7 +12,8 @@
       "meta": {
         "slot": "patient-chart-test-results-dashboard-slot",
         "path": "Results",
-        "hideDashboardTitle": true
+        "hideDashboardTitle": true,
+        "layoutMode": "anchored"
       },
       "order": 4
     },
