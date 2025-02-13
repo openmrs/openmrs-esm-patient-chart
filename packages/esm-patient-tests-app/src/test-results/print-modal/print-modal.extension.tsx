@@ -30,6 +30,7 @@ import {
   usePatient,
   useSession,
   ResponsiveWrapper,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import styles from './print-modal.scss';
@@ -117,35 +118,21 @@ function PrintModal({ patientUuid, closeDialog }) {
       <ModalBody className={styles.modalBody}>
         <ResponsiveWrapper>
           <div className={styles.datePickerContainers}>
-            <DatePicker
+            <OpenmrsDatePicker
               className={styles.datePicker}
-              dateFormat={datePickerFormat}
-              datePickerType="single"
-              maxDate={new Date().toISOString()}
-              onChange={([date]) => setSelectedFromDate(date)}
+              maxDate={new Date()}
+              onChange={setSelectedFromDate}
               value={selectedFromDate}
-            >
-              <DatePickerInput
-                labelText={t('startDate', 'Start date')}
-                placeholder={datePickerPlaceHolder}
-                style={{ width: '100%' }}
-              />
-            </DatePicker>
-            <DatePicker
+              labelText={t('startDate', 'Start date')}
+            />
+            <OpenmrsDatePicker
               className={styles.datePicker}
-              dateFormat={datePickerFormat}
-              datePickerType="single"
               minDate={selectedFromDate}
-              maxDate={new Date().toISOString()}
-              onChange={([date]) => setSelectedToDate(date)}
+              maxDate={new Date()}
+              onChange={setSelectedToDate}
               value={selectedToDate}
-            >
-              <DatePickerInput
-                labelText={t('endDate', 'End date')}
-                placeholder={datePickerPlaceHolder}
-                style={{ width: '100%' }}
-              />
-            </DatePicker>
+              labelText={t('endDate', 'End date')}
+            />
           </div>
         </ResponsiveWrapper>
         <div className={styles.printContainer} ref={printContainerRef}>

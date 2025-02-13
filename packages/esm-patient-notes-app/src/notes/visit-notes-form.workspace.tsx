@@ -30,6 +30,7 @@ import {
   createAttachment,
   createErrorHandler,
   ExtensionSlot,
+  OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
@@ -453,21 +454,15 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             <Controller
               name="noteDate"
               control={control}
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <ResponsiveWrapper>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    maxDate={new Date().toISOString()}
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
-                      id="visitDateTimePicker"
-                      labelText={t('visitDate', 'Visit date')}
-                      placeholder="dd/mm/yyyy"
-                    />
-                  </DatePicker>
+                  <OpenmrsDatePicker
+                    {...field}
+                    maxDate={new Date()}
+                    labelText={t('visitDate', 'Visit date')}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
+                  />
                 </ResponsiveWrapper>
               )}
             />

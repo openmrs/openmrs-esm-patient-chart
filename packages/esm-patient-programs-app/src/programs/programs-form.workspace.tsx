@@ -20,7 +20,15 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -196,19 +204,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="enrollmentDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           aria-label="enrollment date"
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          maxDate={new Date()}
+          labelText={t('dateEnrolled', 'Date enrolled')}
+          invalid={!!fieldState?.error?.message}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );
@@ -217,20 +222,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="completionDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           aria-label="completion date"
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          labelText={t('dateCompleted', 'Date completed')}
+          minDate={new Date(watch('enrollmentDate'))}
+          maxDate={new Date()}
+          invalid={!!fieldState?.error?.message}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );

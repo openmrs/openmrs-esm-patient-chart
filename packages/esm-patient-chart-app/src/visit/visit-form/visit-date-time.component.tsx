@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ResponsiveWrapper } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { type VisitFormData } from './visit-form.resource';
 import styles from './visit-form.scss';
@@ -47,27 +47,18 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         <Controller
           name={dateFieldName}
           control={control}
-          render={({ field: { onChange, value } }) => (
+          render={({ field, fieldState }) => (
             <ResponsiveWrapper>
-              <DatePicker
+              <OpenmrsDatePicker
+                {...field}
                 className={styles.datePicker}
-                dateFormat="d/m/Y"
-                datePickerType="single"
                 id={dateFieldName}
                 maxDate={maxDateObj}
                 minDate={minDateObj}
-                onChange={([date]) => onChange(date)}
-                value={value ? dayjs(value).format('DD/MM/YYYY') : null}
-              >
-                <DatePickerInput
-                  id={`${dateFieldName}Input`}
-                  invalid={Boolean(errors[dateFieldName])}
-                  invalidText={errors[dateFieldName]?.message}
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
+                invalid={Boolean(fieldState?.error)}
+                invalidText={fieldState?.error?.message}
+                labelText={t('date', 'Date')}
+              />
             </ResponsiveWrapper>
           )}
         />

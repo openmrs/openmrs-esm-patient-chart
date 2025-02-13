@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
@@ -277,18 +277,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <ResponsiveWrapper>
-                <DatePicker
+                <OpenmrsDatePicker
                   id="onsetDate"
-                  datePickerType="single"
-                  dateFormat="d/m/Y"
-                  maxDate={dayjs().utc().format()}
-                  placeholder="dd/mm/yyyy"
-                  onChange={([date]) => onChange(date)}
+                  maxDate={new Date()}
+                  onChange={onChange}
                   onBlur={onBlur}
                   value={value}
-                >
-                  <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
-                </DatePicker>
+                  labelText={t('onsetDate', 'Onset date')}
+                />
               </ResponsiveWrapper>
             )}
           />
@@ -322,7 +318,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               render={({ field: { onBlur, onChange, value } }) => (
                 <>
                   <ResponsiveWrapper>
-                    <DatePicker
+                    <OpenmrsDatePicker
+                      id="endDate"
+                      minDate={new Date(watch('onsetDateTime')).toISOString()}
+                      maxDate={new Date()}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      labelText={t('endDate', 'End date')}
+                    />
+                    {/* <DatePicker
                       id="endDate"
                       datePickerType="single"
                       dateFormat="d/m/Y"
@@ -334,7 +339,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       value={value}
                     >
                       <DatePickerInput id="abatementDateTime" labelText={t('endDate', 'End date')} />
-                    </DatePicker>
+                    </DatePicker> */}
                   </ResponsiveWrapper>
                 </>
               )}
