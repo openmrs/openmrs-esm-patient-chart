@@ -108,17 +108,15 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
             <Controller
               name="cancellationDate"
               control={control}
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <div className={styles.row}>
                   <OpenmrsDatePicker
+                    {...field}
                     id="cancellationDate"
                     minDate={dayjs().startOf('day')}
-                    value={value}
-                    onChange={(date) => onChange(date)}
                     labelText={t('cancellationDate', 'Cancellation date')}
-                    aria-label={t('cancellationDate', 'Cancellation date')}
-                    aria-invalid={!!errors['cancellationDate']}
-                    aria-describedby={errors['cancellationDate'] ? 'cancellationDate-error' : undefined}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
                   />
                 </div>
               )}

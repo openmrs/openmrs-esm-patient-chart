@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import {
   Button,
+  DatePicker,
+  DatePickerInput,
   DataTable,
   DataTableSkeleton,
   Dropdown,
@@ -47,7 +49,6 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
-  OpenmrsDatePicker,
   PrinterIcon,
   useConfig,
   useLayoutType,
@@ -361,21 +362,27 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
           />
         </div>
         <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
-        <OpenmrsDatePicker
-          id="startDatePickerInput"
-          aria-labelledby="dateRangeLabel startDatePickerLabel"
-          aria-label={t('startDate', 'Start Date')}
+        <DatePicker
+          datePickerType="range"
+          dateFormat={'d/m/Y'}
           value={''}
-          onChange={(date: Date) => {
-            handleDateFilterChange([date, date]);
+          onChange={([startDate, endDate]) => {
+            handleDateFilterChange([startDate, endDate]);
           }}
-        />
-
-        <OpenmrsDatePicker
-          id="endDatePickerInput"
-          aria-labelledby="dateRangeLabel endDatePickerLabel"
-          aria-label={t('endDate', 'End Date')}
-        />
+        >
+          <DatePickerInput
+            id="startDatePickerInput"
+            data-testid="startDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
+          <DatePickerInput
+            id="endDatePickerInput"
+            data-testid="endDatePickerInput"
+            labelText=""
+            placeholder="dd/mm/yyyy"
+          />
+        </DatePicker>
       </div>
 
       {(() => {

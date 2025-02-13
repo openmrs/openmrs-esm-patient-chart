@@ -225,16 +225,15 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 <Controller
                   name="vaccinationDate"
                   control={control}
-                  render={({ field: { onChange, value } }) => (
+                  render={({ field, fieldState }) => (
                     <OpenmrsDatePicker
+                      {...field}
                       id="vaccinationDate"
-                      maxDate={new Date().toISOString()}
-                      value={value}
-                      onChange={(date) => onChange(date)}
+                      maxDate={new Date()}
                       style={{ paddingBottom: '1rem', width: '100%' }}
                       labelText={t('vaccinationDate', 'Vaccination date')}
-                      invalid={!!errors['vaccinationDate']}
-                      invalidText={errors['vaccinationDate']?.message}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
                     />
                   )}
                 />
@@ -366,18 +365,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <Controller
                 name="expirationDate"
                 control={control}
-                render={({ field: { onChange, value } }) => (
+                render={({ field, fieldState }) => (
                   <div className={styles.row}>
                     <OpenmrsDatePicker
+                      {...field}
                       id="vaccinationExpiration"
                       className="vaccinationExpiration"
-                      minDate={immunizationToEditMeta ? null : new Date().toISOString()}
-                      value={value}
-                      onChange={(date) => onChange(date)}
+                      minDate={immunizationToEditMeta ? null : new Date()}
                       labelText={t('expirationDate', 'Expiration date')}
-                      aria-label={t('expirationDate', 'Expiration date')}
-                      aria-required="true"
-                      aria-describedby="vaccinationExpirationHelper"
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
                     />
                   </div>
                 )}
