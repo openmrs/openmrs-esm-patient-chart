@@ -55,7 +55,7 @@ const allergyFormSchema = (t: TFunction) =>
     allergicReactions: z.array(z.string().optional()),
     nonCodedAllergicReaction: z.string().optional(),
     severityOfWorstReaction: z.string(),
-    comment: z.string().optional(),
+    comments: z.string().optional(),
   });
 
 type AllergyFormData = {
@@ -64,7 +64,7 @@ type AllergyFormData = {
   allergicReactions: string[];
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
-  comment: string;
+  comments: string;
 };
 
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
@@ -149,13 +149,13 @@ function AllergyForm(props: AllergyFormProps) {
       allergicReactions: [],
       nonCodedAllergicReaction: '',
       severityOfWorstReaction: null,
-      comment: '',
+      comments: '',
     };
     if (formContext === 'editing') {
       defaultAllergy.allergen = allergens?.find((a) => allergy?.display === a?.display);
       defaultAllergy.allergicReactions = getDefaultAllergicReactions();
       defaultAllergy.severityOfWorstReaction = getDefaultSeverityUUID(allergy?.reactionSeverity);
-      defaultAllergy.comment = allergy?.note !== '--' ? allergy?.note : '';
+      defaultAllergy.comments = allergy?.note !== '--' ? allergy?.note : '';
       setDefaultNonCodedAllergen(defaultAllergy);
       setDefaultNonCodedReactions(defaultAllergy);
     }
@@ -165,9 +165,8 @@ function AllergyForm(props: AllergyFormProps) {
     control,
     handleSubmit,
     watch,
-    getValues,
     setValue,
-    formState: { errors, isDirty },
+    formState: { isDirty },
   } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema(t)),
@@ -202,7 +201,7 @@ function AllergyForm(props: AllergyFormProps) {
     (data: AllergyFormData) => {
       const {
         allergen,
-        comment,
+        comments,
         nonCodedAllergen,
         nonCodedAllergicReaction,
         allergicReactions,
@@ -225,7 +224,7 @@ function AllergyForm(props: AllergyFormProps) {
         severity: {
           uuid: severityOfWorstReaction,
         },
-        comment,
+        comment: comments,
         reactions: selectedAllergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
@@ -405,7 +404,7 @@ function AllergyForm(props: AllergyFormProps) {
           <div>
             <ResponsiveWrapper>
               <Controller
-                name="comment"
+                name="comments"
                 control={control}
                 render={({ field: { onBlur, onChange, value } }) => (
                   <TextArea
