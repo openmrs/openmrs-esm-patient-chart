@@ -595,18 +595,15 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     <Controller
                       name="startDate"
                       control={control}
-                      render={({ field: { onBlur, value, onChange, ref } }) => (
+                      render={({ field, fieldState }) => (
                         <OpenmrsDatePicker
-                          maxDate={new Date().toISOString()}
-                          value={value}
-                          onChange={(newStartDate) => onChange(newStartDate)}
-                          onBlur={onBlur}
-                          ref={ref}
+                          {...field}
+                          maxDate={new Date()}
                           id="startDatePicker"
                           labelText={t('startDate', 'Start date')}
                           size={isTablet ? 'lg' : 'sm'}
-                          aria-labelledby="startDatePickerLabel"
-                          aria-describedby="startDatePickerDescription"
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
                         />
                       )}
                     />

@@ -452,16 +452,15 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             <Controller
               name="noteDate"
               control={control}
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <ResponsiveWrapper>
                   <OpenmrsDatePicker
-                    maxDate={new Date().toISOString()}
-                    value={value}
-                    onChange={(date) => onChange(date)}
+                    {...field}
+                    maxDate={new Date()}
                     id="visitDateTimePicker"
                     labelText={t('visitDate', 'Visit date')}
-                    aria-label={t('visitDate', 'Visit date')}
-                    aria-describedby="visitDateHelpText"
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
                   />
                 </ResponsiveWrapper>
               )}

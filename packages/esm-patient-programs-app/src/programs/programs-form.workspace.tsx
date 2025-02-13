@@ -194,15 +194,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="enrollmentDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
+      render={({ field, fieldState }) => (
         <OpenmrsDatePicker
-          aria-label={t('dateEnrolled', 'Date enrolled')}
+          {...field}
           id="enrollmentDate"
-          maxDate={new Date().toISOString()}
-          onChange={onChange}
-          value={value}
+          maxDate={new Date()}
           labelText={t('dateEnrolled', 'Date enrolled')}
-          aria-required="true"
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
         />
       )}
     />
@@ -212,16 +211,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="completionDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
+      render={({ field, fieldState }) => (
         <OpenmrsDatePicker
-          aria-label={t('dateCompleted', 'Date completed')}
+          {...field}
           id="completionDate"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          onChange={onChange}
-          value={value}
+          minDate={new Date(watch('enrollmentDate'))}
+          maxDate={new Date()}
           labelText={t('dateCompleted', 'Date completed')}
-          aria-required="true"
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
         />
       )}
     />

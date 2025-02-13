@@ -138,26 +138,18 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                 <Controller
                   name="deathDate"
                   control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <div role="textbox">
-                      <OpenmrsDatePicker
-                        className={styles.datePicker}
-                        id="deceasedDate"
-                        aria-invalid={!!errors?.deathDate}
-                        aria-describedby={errors?.deathDate ? 'deceasedDate-error' : undefined}
-                        aria-label={t('date', 'Date')}
-                        maxDate={new Date().toISOString()}
-                        onChange={(date) => onChange(date)}
-                        value={value}
-                      />
-                    </div>
+                  render={({ field, fieldState }) => (
+                    <OpenmrsDatePicker
+                      {...field}
+                      className={styles.datePicker}
+                      id="deceasedDate"
+                      labelText={t('date', 'Date')}
+                      maxDate={new Date()}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
                   )}
                 />
-                {errors?.deathDate && (
-                  <p id="deceasedDate-error" role="alert" className={styles.errorMessage}>
-                    {errors?.deathDate?.message}
-                  </p>
-                )}
               </ResponsiveWrapper>
             ) : (
               <DatePickerSkeleton />
