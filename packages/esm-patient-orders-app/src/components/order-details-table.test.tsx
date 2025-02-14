@@ -8,13 +8,11 @@ import {
   openmrsFetch,
   useConfig,
   useSession,
-  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
 import OrderDetailsTable from './orders-details-table.component';
-import dayjs from 'dayjs';
 
 const mockUsePatientOrders = usePatientOrders as jest.Mock;
 const mockUseOrderTypes = useOrderTypes as jest.Mock;
@@ -22,7 +20,6 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseReactToPrint = jest.mocked(useReactToPrint);
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(jest.fn());
@@ -41,24 +38,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useOrderTypes: jest.fn(),
     usePatient: jest.fn(),
   };
-});
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        aria-label={labelText.toString()}
-        id={id}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-        type="text"
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-      />
-    </>
-  );
 });
 
 describe('OrderDetailsTable', () => {

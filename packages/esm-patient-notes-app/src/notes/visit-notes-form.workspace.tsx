@@ -458,6 +458,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                     {...field}
                     maxDate={new Date()}
                     id="visitDateTimePicker"
+                    data-testid="visitDateTimePicker"
                     labelText={t('visitDate', 'Visit date')}
                     invalid={Boolean(fieldState?.error?.message)}
                     invalidText={fieldState?.error?.message}
