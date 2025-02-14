@@ -37,7 +37,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   // Since we have the separate date and time fields, the final validation needs to be done at the form
   // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
   // last second of the day. We want to just compare dates and not time.
-  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)).format('DD/MM/YYYY') : null;
+  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)) : null;
   const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)).format('DD/MM/YYYY') : null;
 
   return (
