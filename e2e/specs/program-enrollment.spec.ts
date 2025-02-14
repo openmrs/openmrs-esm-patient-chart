@@ -41,8 +41,14 @@ test('Add and edit a program enrollment', async ({ page }) => {
   });
 
   await test.step('And I set `05/07/2023` as the completion date', async () => {
-    await page.locator('#completionDateInput').fill('05/07/2023');
-    await page.locator('#completionDateInput').press('Tab');
+    const completionDateInput = page.getByTestId('completionDate');
+    const completionDateDayInput = completionDateInput.getByRole('spinbutton', { name: /day/i });
+    const completionDateMonthInput = completionDateInput.getByRole('spinbutton', { name: /month/i });
+    const completionDateYearInput = completionDateInput.getByRole('spinbutton', { name: /year/i });
+    await completionDateDayInput.fill('05');
+    await completionDateMonthInput.fill('07');
+    await completionDateYearInput.fill('2023');
+    await page.locator('#location').focus();
   });
 
   await test.step('And I select `Outpatient Clinic` as the enrollment location', async () => {
@@ -88,9 +94,14 @@ test('Add and edit a program enrollment', async ({ page }) => {
   });
 
   await test.step('And I change the completion date to `04/07/2023`', async () => {
-    await page.locator('#completionDateInput').clear();
-    await page.locator('#completionDateInput').fill('04/07/2023');
-    await page.locator('#completionDateInput').press('Tab');
+    const completionDateInput = page.getByTestId('completionDate');
+    const completionDateDayInput = completionDateInput.getByRole('spinbutton', { name: /day/i });
+    const completionDateMonthInput = completionDateInput.getByRole('spinbutton', { name: /month/i });
+    const completionDateYearInput = completionDateInput.getByRole('spinbutton', { name: /year/i });
+    await completionDateDayInput.fill('04');
+    await completionDateMonthInput.fill('07');
+    await completionDateYearInput.fill('2023');
+    await page.locator('#location').focus();
   });
 
   await test.step('And I change the enrollment location to `Community Outreach`', async () => {
