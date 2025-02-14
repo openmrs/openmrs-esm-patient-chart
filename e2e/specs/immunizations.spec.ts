@@ -31,9 +31,13 @@ test('Add an immunization', async ({ page }) => {
   });
 
   await test.step('When I set `08/03/2024` as the vaccination date', async () => {
-    await page.getByLabel(/vaccination date/i).clear();
-    await page.getByLabel(/vaccination date/i).fill('08/03/2024');
-    await page.getByLabel(/vaccination date/i).press('Tab');
+    const vaccinationDateInput = page.getByTestId('vaccinationDate');
+    const vaccinationDateDayInput = vaccinationDateInput.getByRole('spinbutton', { name: /day/i });
+    const vaccinationDateMonthInput = vaccinationDateInput.getByRole('spinbutton', { name: /month/i });
+    const vaccinationDateYearInput = vaccinationDateInput.getByRole('spinbutton', { name: /year/i });
+    await vaccinationDateDayInput.fill('08');
+    await vaccinationDateMonthInput.fill('03');
+    await vaccinationDateYearInput.fill('2024');
   });
 
   await test.step('And I set `Hepatitis B vaccination` as the immunization', async () => {
