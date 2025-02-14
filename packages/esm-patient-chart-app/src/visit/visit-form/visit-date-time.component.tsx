@@ -53,6 +53,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 {...field}
                 className={styles.datePicker}
                 id={`${dateFieldName}Input`}
+                data-testid={`${dateFieldName}Input`}
                 maxDate={maxDateObj}
                 minDate={minDateObj}
                 labelText={t('date', 'Date')}

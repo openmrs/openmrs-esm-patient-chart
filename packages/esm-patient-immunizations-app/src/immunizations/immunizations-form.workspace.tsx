@@ -229,6 +229,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                     <OpenmrsDatePicker
                       {...field}
                       id="vaccinationDate"
+                      data-testid="vaccinationDate"
                       maxDate={new Date()}
                       style={{ paddingBottom: '1rem', width: '100%' }}
                       labelText={t('vaccinationDate', 'Vaccination date')}
@@ -370,6 +371,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                     <OpenmrsDatePicker
                       {...field}
                       id="vaccinationExpiration"
+                      data-testid="vaccinationExpiration"
                       className="vaccinationExpiration"
                       minDate={immunizationToEditMeta ? null : new Date()}
                       labelText={t('expirationDate', 'Expiration date')}

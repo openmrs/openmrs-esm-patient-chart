@@ -143,6 +143,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                       {...field}
                       className={styles.datePicker}
                       id="deceasedDate"
+                      data-testid="deceasedDate"
                       labelText={t('date', 'Date')}
                       maxDate={new Date()}
                       invalid={Boolean(fieldState?.error?.message)}

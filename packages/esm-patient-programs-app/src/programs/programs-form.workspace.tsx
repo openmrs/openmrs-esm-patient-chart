@@ -206,6 +206,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         <OpenmrsDatePicker
           {...field}
           id="enrollmentDate"
+          data-testid="enrollmentDate"
           maxDate={new Date()}
           labelText={t('dateEnrolled', 'Date enrolled')}
           invalid={Boolean(fieldState?.error?.message)}
@@ -223,6 +224,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         <OpenmrsDatePicker
           {...field}
           id="completionDate"
+          data-testid="completionDate"
           minDate={new Date(watch('enrollmentDate'))}
           maxDate={new Date()}
           labelText={t('dateCompleted', 'Date completed')}

@@ -278,6 +278,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 <OpenmrsDatePicker
                   {...field}
                   id="onsetDate"
+                  data-testid="onsetDate"
                   maxDate={new Date()}
                   labelText={t('onsetDate', 'Onset date')}
                   invalid={Boolean(fieldState?.error?.message)}
@@ -319,6 +320,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     <OpenmrsDatePicker
                       {...field}
                       id="endDate"
+                      data-testid="endDate"
                       minDate={new Date(watch('onsetDateTime'))}
                       maxDate={new Date()}
                       labelText={t('endDate', 'End date')}
