@@ -42,7 +42,6 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await onsetDateDayInput.fill('10');
     await onsetDateMonthInput.fill('07');
     await onsetDateYearInput.fill('2023');
-    await page.getByRole('radio', { name: /active/i }).focus();
   });
 
   await test.step('And I set the clinical status to `Active`', async () => {
