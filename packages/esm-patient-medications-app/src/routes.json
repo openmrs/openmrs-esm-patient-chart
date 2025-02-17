@@ -41,7 +41,7 @@
   "workspaces": [
     {
       "name": "add-drug-order",
-      "title": "addDrugOrderWorkspaceTitle",
+      "title": "Add drug order",
       "component": "addDrugOrderWorkspace",
       "type": "order"
     }
