@@ -129,8 +129,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
+        dateActivated: expect.any(Date),
         isOrderIncomplete: true,
-        startDate: expect.any(Date),
       }),
     ]);
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
@@ -179,9 +179,9 @@ describe('AddDrugOrderWorkspace drug search', () => {
             undefined,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
-          startDate: expect.any(Date),
-          indication: 'Hypertension',
           careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
+          dateActivated: expect.any(Date),
+          indication: 'Hypertension',
           orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]),
@@ -192,11 +192,11 @@ describe('AddDrugOrderWorkspace drug search', () => {
 function renderAddDrugOrderWorkspace() {
   render(
     <AddDrugOrderWorkspace
-      order={undefined as any}
       closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
       closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-      promptBeforeClosing={() => false}
+      order={undefined as any}
       patientUuid={'mock-patient-uuid'}
+      promptBeforeClosing={() => false}
       setTitle={jest.fn()}
     />,
   );
