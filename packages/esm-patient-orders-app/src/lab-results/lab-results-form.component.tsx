@@ -24,6 +24,7 @@ import styles from './lab-results-form.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
+  invalidateLabOrders?: () => void;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
@@ -31,6 +32,11 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   closeWorkspaceWithSavedChanges,
   order,
   promptBeforeClosing,
+  /* Callback to refresh lab orders in the Laboratory app after results are saved.
+   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
+   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
+   */
+  invalidateLabOrders,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -178,9 +184,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         orderDiscontinuationPayload,
         abortController,
       );
+
       closeWorkspaceWithSavedChanges();
-      mutateResults();
       mutateOrderData();
+      mutateResults();
+      invalidateLabOrders?.();
+
       showNotification(
         'success',
         t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {

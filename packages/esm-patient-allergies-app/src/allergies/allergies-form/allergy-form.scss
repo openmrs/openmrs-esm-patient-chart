@@ -1,4 +1,5 @@
 @use '@carbon/layout';
+@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .header {
@@ -36,10 +37,6 @@
   }
 }
 
-.input {
-  margin: 0 layout.$spacing-05 layout.$spacing-05;
-}
-
 .checkboxContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -51,6 +48,14 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    @include type.type-style('body-01');
+  }
 }
 
 .desktopButtons {
@@ -66,6 +71,10 @@
 .actionButtons {
   position: sticky;
   bottom: 0;
+}
+
+.formContainer {
+  height: 100%;
 }
 
 .formContent {
