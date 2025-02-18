@@ -167,7 +167,17 @@ export class FormDataSourceService {
     );
   }
 
-  public findLocation(searchText) {
+  public findLocation(searchText: string, dataSourceOptions?) {
+    const locationTag = dataSourceOptions?.tag;
+    const searchTerm = searchText;
+
+    if (locationTag) {
+      return this.locationResourceService.fetchFhirLocationsByTagAndName(locationTag, searchTerm).pipe(
+        map((locations) => locations.map(this.mapLocation)),
+        take(10),
+      );
+    }
+
     return this.locationResourceService.searchLocation(searchText).pipe(
       map((locations) => locations.map(this.mapLocation)),
       take(10),

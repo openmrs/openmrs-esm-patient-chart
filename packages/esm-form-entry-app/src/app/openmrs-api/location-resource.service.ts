@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 import { WindowRef } from '../window-ref';
 import { Location, ListResult } from '../types';
+import capitalize from 'lodash/capitalize';
 
 @Injectable()
 export class LocationResourceService {
@@ -39,6 +40,30 @@ export class LocationResourceService {
     if (uuid) {
       return this.windowRef.openmrsRestBase + 'location/' + uuid + '?v=' + LocationResourceService.v;
     }
+  }
+
+  /**
+   * Fetches locations from FHIR server based on tag and optional name search
+   * @param tag - The location tag to filter by
+   * @param locationName - Optional name to search for (defaults to empty string)
+   * @returns Observable of locations with uuid and display name
+   */
+  public fetchFhirLocationsByTagAndName(
+    tag: string,
+    locationName: string = '',
+  ): Observable<Array<{ uuid: string; display: string }>> {
+    const fhirBaseUrl: string = this.windowRef.openmrsFhirBase;
+    const url: string = `${fhirBaseUrl}/Location?_summary=data&_count=50&_tag=${tag}&name%3Acontains=${locationName}`;
+
+    return this.http.get<{ entry?: Array<{ resource: { id: string; name: string } }> }>(url).pipe(
+      map(
+        (r) =>
+          r?.['entry']?.map(({ resource }) => ({
+            uuid: resource.id,
+            display: capitalize(resource.name),
+          })) ?? [],
+      ),
+    );
   }
 
   public getUrl(searchText?: string) {
