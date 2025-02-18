@@ -23,7 +23,7 @@ const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, val
   const unitId = `omrs-patient-chart-unit-${unitName}-${generatedId}`;
 
   const displayValue =
-    Boolean(value) ? t('notAvailable', 'Not available') : value;
+    Boolean(value) ? value : t('notAvailable', 'Not available');
 
   return (
     <section className={styles.container}>
