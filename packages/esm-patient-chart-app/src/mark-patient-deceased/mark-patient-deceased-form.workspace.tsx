@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   DatePickerSkeleton,
   Form,
   InlineLoading,
@@ -23,7 +21,14 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
 import { EmptyState, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, useLayoutType, showSnackbar, ResponsiveWrapper, useConfig } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  useLayoutType,
+  showSnackbar,
+  ResponsiveWrapper,
+  useConfig,
+  OpenmrsDatePicker,
+} from '@openmrs/esm-framework';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import { type ChartConfig } from '../config-schema';
 import styles from './mark-patient-deceased-form.scss';
@@ -133,26 +138,19 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
                 <Controller
                   name="deathDate"
                   control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <DatePicker
+                  render={({ field, fieldState }) => (
+                    <OpenmrsDatePicker
+                      {...field}
                       className={styles.datePicker}
-                      dateFormat="d/m/Y"
-                      datePickerType="single"
                       id="deceasedDate"
-                      maxDate={new Date().toISOString()}
-                      onChange={([date]) => onChange(date)}
-                      value={value}
-                    >
-                      <DatePickerInput
-                        id="deceasedDateInput"
-                        labelText={t('date', 'Date')}
-                        placeholder="dd/mm/yyyy"
-                        style={{ width: '100%' }}
-                      />
-                    </DatePicker>
+                      data-testid="deceasedDate"
+                      labelText={t('date', 'Date')}
+                      maxDate={new Date()}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
                   )}
                 />
-                {errors?.deathDate && <p className={styles.errorMessage}>{errors?.deathDate?.message}</p>}
               </ResponsiveWrapper>
             ) : (
               <DatePickerSkeleton />
