@@ -10,6 +10,8 @@ import {
 } from './filter-types';
 import reducer from './filter-reducer';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
+import { formatDatetime } from '@openmrs/esm-framework';
+import { format } from 'date-fns';
 
 const initialState: ReducerState = {
   checkboxes: {},
@@ -78,7 +80,14 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
     const allTimes = [
       ...new Set(
         Object.values(tests)
-          .map((test: ReducerState['tests']) => test?.obs?.map((entry) => entry.obsDatetime))
+          .map(
+            (test: ReducerState['tests']) =>
+              test?.obs?.map((entry) => {
+                const isoFormattedString = entry.obsDatetime.replace(' ', 'T').replace('.0', '.000').concat('Z');
+                const date = new Date(isoFormattedString);
+                return format(date, 'yyyy-MM-dd HH:mm:ss');
+              }),
+          )
           .flat(),
       ),
     ];
@@ -89,6 +98,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
       rows.push({ ...testData, entries: newEntries });
     });
     const panelName = 'timeline';
+
     return {
       data: { parsedTime: parseTime(allTimes), rowData: rows, panelName },
       loaded: true,
