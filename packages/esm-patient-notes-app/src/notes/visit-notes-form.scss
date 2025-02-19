@@ -100,6 +100,7 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
+  top: 80%;
 }
 
 .spinner {
@@ -112,7 +113,9 @@
 }
 
 .desktop {
-  padding: 0;
+  position: absolute;
+  top: 89%;
+
 }
 
 .headerGridRow {
