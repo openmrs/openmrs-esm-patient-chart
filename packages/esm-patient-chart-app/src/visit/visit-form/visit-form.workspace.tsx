@@ -463,7 +463,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStopDate).date(),
               visitStopHours,
               visitStopMinutes,
-              dayjs(visitStopDate).second(),
+              currentSeconds,
             ),
           ),
         );
