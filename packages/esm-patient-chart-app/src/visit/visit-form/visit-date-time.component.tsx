@@ -46,7 +46,6 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
     ],
   });
 
-  const hasStartTime = ['ongoing', 'past'].includes(visitStatus);
   const hasStopTime = 'past' == visitStatus;
   const selectedVisitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
   const selectedVisitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
@@ -62,14 +61,12 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
           ? t('visitStartDate', 'Visit start date')
           : t('visitStartAndEndDate', 'Visit start and end date')}
       </div>
-      {hasStartTime && (
-        <VisitDateTimeField
-          dateField={{ name: 'visitStartDate', label: t('startDate', 'Start date') }}
-          timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
-          timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
-          maxDate={Math.min(firstEncounterDateTime, selectedVisitStopDateTime?.getTime(), Date.now())}
-        />
-      )}
+      <VisitDateTimeField
+        dateField={{ name: 'visitStartDate', label: t('startDate', 'Start date') }}
+        timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
+        timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
+        maxDate={Math.min(firstEncounterDateTime, selectedVisitStopDateTime?.getTime(), Date.now())}
+      />
       {hasStopTime && (
         <VisitDateTimeField
           dateField={{ name: 'visitStopDate', label: t('endDate', 'End date') }}
@@ -83,7 +80,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
   );
 };
 
-interface DateTimeFieldProps {
+interface VisitDateTimeFieldProps {
   dateField: Field;
   timeField: Field;
   timeFormatField: Field;
@@ -102,7 +99,7 @@ interface Field {
  * used to input a Date.
  * It is used by the visit form for the start and end time inputs.
  */
-const VisitDateTimeField: React.FC<DateTimeFieldProps> = ({
+const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   dateField,
   timeField,
   timeFormatField,
@@ -187,8 +184,8 @@ const VisitDateTimeField: React.FC<DateTimeFieldProps> = ({
                       value={value}
                       disabled={disabled}
                     >
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
+                      <SelectItem value="AM" text={t('AM', 'AM')} />
+                      <SelectItem value="PM" text={t('PM', 'PM')} />
                     </TimePickerSelect>
                   )}
                 />
