@@ -158,9 +158,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           },
           t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
             firstEncounterDatetime: formatDatetime(new Date()),
-            interpolation: {
-              escapeValue: false,
-            },
           }),
         ),
         visitStartTime: z
@@ -292,10 +289,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       validSubmission = false;
       setError('visitStartDate', {
         message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
-          },
+          firstEncounterDatetime: formatDatetime(new Date(maxVisitStartDatetime)),
         }),
       });
     }
@@ -320,10 +314,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             'visitStopDateMustBeAfterMostRecentEncounter',
             'Stop date needs to be on or after {{lastEncounterDatetime}}',
             {
-              lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-              interpolation: {
-                escapeValue: false,
-              },
+              lastEncounterDatetime: formatDatetime(new Date(minVisitStopDatetime)),
             },
           ),
         });
@@ -437,7 +428,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       } = data;
 
       const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
-
+      const currentSeconds = new Date().getSeconds();
       let payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
@@ -448,6 +439,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStartDate).date(),
               hours,
               minutes,
+              currentSeconds,
             ),
           ),
         ),
@@ -471,6 +463,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStopDate).date(),
               visitStopHours,
               visitStopMinutes,
+              currentSeconds,
             ),
           ),
         );
