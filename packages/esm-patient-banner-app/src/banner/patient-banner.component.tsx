@@ -60,7 +60,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         <div className={styles.patientAvatar} role="img">
           <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
         </div>
-        <PatientBannerPatientInfo patient={patient} />
+        <PatientBannerPatientInfo patient={patient} renderedFrom="patient-chart" />
         <div className={styles.buttonCol}>
           <div className={styles.buttonRow}>
             {!hideActionsOverflow ? (
