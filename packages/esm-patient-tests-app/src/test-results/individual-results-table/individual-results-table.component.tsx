@@ -132,7 +132,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
                   iconDescription="view timeline"
                   kind="ghost"
                   renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-                  onClick={() => launchResultsDialog(headerTitle, subRows[0]?.conceptUuid)}
+                  onClick={() => launchResultsDialog(headerTitle, subRows?.entries[0]?.conceptUuid)}
                   size="sm"
                 >
                   {t('viewTimeline', 'View timeline')}
