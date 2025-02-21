@@ -100,7 +100,6 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
-  top: 80%;
 }
 
 .spinner {
@@ -113,8 +112,12 @@
 }
 
 .desktop {
-  position: absolute;
-  top: 89%;
+bottom: 0;
+padding:0;
+left: 0;
+width:100%;
+position:absolute;
+
 
 }
 
@@ -131,6 +134,10 @@
 
 .formContainer {
   margin: layout.$spacing-05;
+  flex: 1;
+  overflow-y: auto; 
+  padding-bottom: 5rem
+
 }
 
 .form {
@@ -138,6 +145,9 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  overflow-y: auto;
+  max-height:calc(100vh);
+
 }
 
 .grid {
