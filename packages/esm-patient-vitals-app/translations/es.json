@@ -26,6 +26,7 @@
   "male": "Masculino",
   "muac": "PB/MUAC",
   "noDataRecorded": "No se han registrado datos para este paciente",
+  "notAvailable": "Not available",
   "notes": "Notas",
   "other": "Otro",
   "outOfDateVitals": "<0>Estos signos vitales están <1>desactualizados</1></0>",
