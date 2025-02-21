@@ -51,7 +51,7 @@ import {
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
+import { invalidateUseVisits, useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
@@ -107,7 +107,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutateVisits } = useVisits(patientUuid);
   const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const allVisitTypes = useConditionalVisitTypes();
 
@@ -159,9 +158,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           },
           t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
             firstEncounterDatetime: formatDatetime(new Date()),
-            interpolation: {
-              escapeValue: false,
-            },
           }),
         ),
         visitStartTime: z
@@ -293,10 +289,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       validSubmission = false;
       setError('visitStartDate', {
         message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
-          },
+          firstEncounterDatetime: formatDatetime(new Date(maxVisitStartDatetime)),
         }),
       });
     }
@@ -321,10 +314,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             'visitStopDateMustBeAfterMostRecentEncounter',
             'Stop date needs to be on or after {{lastEncounterDatetime}}',
             {
-              lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-              interpolation: {
-                escapeValue: false,
-              },
+              lastEncounterDatetime: formatDatetime(new Date(minVisitStopDatetime)),
             },
           ),
         });
@@ -438,7 +428,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       } = data;
 
       const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
-
+      const currentSeconds = new Date().getSeconds();
       let payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
@@ -449,6 +439,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStartDate).date(),
               hours,
               minutes,
+              currentSeconds,
             ),
           ),
         ),
@@ -472,6 +463,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               dayjs(visitStopDate).date(),
               visitStopHours,
               visitStopMinutes,
+              currentSeconds,
             ),
           ),
         );
@@ -558,7 +550,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           })
           .finally(() => {
             mutateCurrentVisit();
-            mutateVisits();
+            invalidateUseVisits(patientUuid);
             mutateInfiniteVisits();
           });
       } else {
@@ -602,7 +594,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       handleVisitAttributes,
       isOnline,
       mutateCurrentVisit,
-      mutateVisits,
       mutateInfiniteVisits,
       visitFormCallbacks,
       patientUuid,

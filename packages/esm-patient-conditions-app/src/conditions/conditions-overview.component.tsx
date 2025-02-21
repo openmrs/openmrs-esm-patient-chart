@@ -123,7 +123,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         condition: condition.display,
         abatementDateTime: condition.abatementDateTime,
         onsetDateTimeRender: condition.onsetDateTime
-          ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+          ? formatDate(parseDate(condition.onsetDateTime), { mode: 'wide', time: 'for today' })
           : '--',
         status: condition.clinicalStatus,
       };

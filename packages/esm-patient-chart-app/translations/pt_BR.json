@@ -65,6 +65,8 @@
   "errorMarkingPatientAlive": "Erro ao marcar paciente vivo",
   "errorMarkingPatientDeceased": "Erro ao marcar o paciente como falecido",
   "errorOccuredDeletingVisit": "Ocorreu um erro ao excluir a visita",
+  "errorStartingVisit": "Error starting visit",
+  "errorStartingVisitDescription": "An error occurred while starting the visit",
   "errorUpdatingVisitAttribute": "Não foi possível atualizar o atributo {{attributeName}}",
   "errorUpdatingVisitDetails": "Erro ao atualizar os detalhes da visita",
   "errorWhenRestoringVisit": "Ocorreu um erro ao restaurar {{visit}}",
