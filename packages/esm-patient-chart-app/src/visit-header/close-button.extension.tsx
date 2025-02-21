@@ -3,9 +3,14 @@ import { HeaderGlobalAction } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getHistory, goBackInHistory, navigate, CloseFilledIcon } from '@openmrs/esm-framework';
 import styles from './close-button.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
-export function CloseButton({ patientUuid }: { patientUuid: string }) {
+/**
+ * This extension gets slotted into top-nav-actions-slot in the top nav
+ */
+function CloseButton() {
   const { t } = useTranslation();
+  const { patientUuid } = usePatientChartStore();
 
   const onClosePatientChart = useCallback(() => {
     const history = getHistory();
@@ -26,13 +31,19 @@ export function CloseButton({ patientUuid }: { patientUuid: string }) {
     }
   }, [patientUuid]);
 
-  return (
-    <HeaderGlobalAction
-      aria-label={t('close', 'Close')}
-      className={styles.headerGlobalBarCloseButton}
-      onClick={onClosePatientChart}
-    >
-      <CloseFilledIcon size={20} />
-    </HeaderGlobalAction>
-  );
+  if (patientUuid) {
+    return (
+      <HeaderGlobalAction
+        aria-label={t('closePatientChart', 'Close patient chart')}
+        className={styles.headerGlobalBarCloseButton}
+        onClick={onClosePatientChart}
+      >
+        <CloseFilledIcon size={20} />
+      </HeaderGlobalAction>
+    );
+  } else {
+    return <></>;
+  }
 }
+
+export default CloseButton;

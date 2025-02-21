@@ -64,16 +64,16 @@
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-actions-slot",
-      "component": "cancelVisitActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-search-actions-slot",
-      "component": "cancelVisitPatientSearchActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
@@ -81,22 +81,6 @@
       "name": "mark-patient-deceased-button",
       "slot": "patient-actions-slot",
       "component": "markPatientDeceasedActionButton",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "add-past-visit-button",
-      "slot": "patient-actions-slot",
-      "component": "addPastVisitActionButton",
-      "featureFlag": "rde",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "add-past-visit-button",
-      "slot": "patient-search-actions-slot",
-      "component": "addPastVisitPatientSearchActionButton",
-      "featureFlag": "rde",
       "online": true,
       "offline": true
     },
@@ -196,13 +180,17 @@
       "name": "visit-context-header",
       "slot": "visit-context-header-slot",
       "component": "visitContextHeader"
+    },
+    {
+      "name": "patient-chart-close-button",
+      "slot": "top-nav-actions-slot",
+      "component": "closeButton",
+      "online": true,
+      "offline": true,
+      "order": -1
     }
   ],
   "modals": [
-    {
-      "name": "cancel-visit-dialog",
-      "component": "cancelVisitModal"
-    },
     {
       "name": "delete-encounter-modal",
       "component": "deleteEncounterModal"

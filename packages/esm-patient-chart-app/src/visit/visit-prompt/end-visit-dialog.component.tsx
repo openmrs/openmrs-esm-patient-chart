@@ -1,9 +1,7 @@
+import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
-import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -11,32 +9,25 @@ interface EndVisitDialogProps {
   closeModal: () => void;
 }
 
+/**
+ * This modal shows up when user clicks on the "End visit" button in the action menu within the
+ * patient banner. It should only show when the patient has an active visit. See stop-visit.component.tsx
+ * for the button.
+ */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
-  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+  const { activeVisit, mutate } = useVisit(patientUuid);
 
   const handleEndVisit = () => {
-    if (currentVisitIsRetrospective) {
-      setCurrentVisit(null, null);
-      closeModal();
-    } else {
+    if (activeVisit) {
       const endVisitPayload = {
         stopDatetime: new Date(),
       };
 
       const abortController = new AbortController();
 
-      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
+      updateVisit(activeVisit.uuid, endVisitPayload, abortController)
         .then((response) => {
-          if (queueEntry) {
-            removeQueuedPatient(
-              queueEntry.queue.uuid,
-              queueEntry.queueEntryUuid,
-              abortController,
-              response?.data.stopDatetime,
-            );
-          }
           mutate();
           closeModal();
 
