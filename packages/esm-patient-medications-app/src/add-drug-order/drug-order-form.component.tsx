@@ -33,7 +33,6 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
-  usePatient,
 } from '@openmrs/esm-framework';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -355,15 +354,17 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patientUuid } = usePatientChartStore();
-  const { patient, isLoading: isLoadingPatientDetails } = usePatient(patientUuid);
+  const { patient } = usePatientChartStore();
   const patientName = patient ? getPatientName(patient) : '';
   const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
+    (node: HTMLElement) => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+
       observer.current = new IntersectionObserver(
         ([e]) => {
           setShowMedicationHeader(e.intersectionRatio < 1);
@@ -372,7 +373,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
           threshold: 1,
         },
       );
-      if (node) observer.current.observe(node);
+
+      if (node) {
+        observer.current.observe(node);
+      }
     },
     [setShowMedicationHeader],
   );
@@ -389,7 +393,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
           />
         </div>
       )}
-      {isTablet && !isLoadingPatientDetails && (
+      {isTablet && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
           <span className={classNames(styles.text02, styles.bodyShort01)}>

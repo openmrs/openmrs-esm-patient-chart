@@ -1,20 +1,17 @@
 import { useCallback } from 'react';
 import { type DefaultWorkspaceProps, launchWorkspace, navigateAndLaunchWorkspace } from '@openmrs/esm-framework';
-import { getPatientUuidFromStore, usePatientChartStore } from './store/patient-chart-store';
+import { usePatientChartStore } from './store/patient-chart-store';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';
 
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
+  patient: fhir.Patient;
   patientUuid: string;
 }
 
 export function launchPatientWorkspace(workspaceName: string, additionalProps?: object) {
-  const patientUuid = getPatientUuidFromStore();
-  launchWorkspace(workspaceName, {
-    patientUuid: patientUuid,
-    ...additionalProps,
-  });
+  launchWorkspace(workspaceName, additionalProps);
 }
 
 export function launchPatientChartWithWorkspaceOpen({
@@ -37,14 +34,14 @@ export function launchPatientChartWithWorkspaceOpen({
 }
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid } = usePatientChartStore();
+  const { patientUuid, patient } = usePatientChartStore();
   const { systemVisitEnabled } = useSystemVisitSetting();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const launchPatientWorkspaceCb = useCallback(
     (additionalProps?: T) => {
       if (!systemVisitEnabled || currentVisit) {
-        launchPatientWorkspace(workspaceName, additionalProps);
+        launchWorkspace(workspaceName, additionalProps);
       } else {
         launchStartVisitPrompt();
       }

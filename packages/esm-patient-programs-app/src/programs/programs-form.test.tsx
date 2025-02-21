@@ -34,6 +34,7 @@ const testProps = {
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: jest.fn(),
 };

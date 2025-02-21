@@ -5,9 +5,10 @@ import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
 
 export interface OrdersSummaryProps {
   patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid }) => {
+const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const ordersDisplayText = t('orders', 'Orders');
   const { showPrintButton } = useConfig<ConfigObject>();
@@ -16,6 +17,7 @@ const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid }) => {
     <div style={{ marginBottom: '1.5rem' }}>
       <OrderDetailsTable
         patientUuid={patientUuid}
+        patient={patient}
         showAddButton
         showPrintButton={showPrintButton}
         title={ordersDisplayText}

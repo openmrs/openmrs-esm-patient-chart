@@ -48,7 +48,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
-  const { patientUuid } = usePatientChartStore();
+  const { patientUuid, patient } = usePatientChartStore();
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { orderType } = useOrderType(orderTypeUuid);
@@ -111,6 +111,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
           patientUuid={patientUuid}
+          patient={patient}
           setTitle={() => {}}
         />
       ) : (
