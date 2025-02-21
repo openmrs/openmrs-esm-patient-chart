@@ -405,7 +405,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               kind="error"
               lowContrast
               className={styles.inlineNotification}
-              title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
+              title={t('errorFetchingOrderConfig', 'Error occurred when fetching Order config')}
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           )}
