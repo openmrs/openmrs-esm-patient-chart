@@ -8,9 +8,13 @@ interface StopVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
+/**
+ * This button shows up in the patient banner action menu, but only when the patient has an active visit.
+ * On click, it opens the modal in end-visit-dialog.component.tsx
+ */
 const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('end-visit-dialog', {
@@ -20,7 +24,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
   }, [patientUuid]);
 
   return (
-    currentVisit && (
+    activeVisit && (
       <OverflowMenuItem
         className={styles.menuitem}
         itemText={`${t('endVisit', 'End visit')}`}

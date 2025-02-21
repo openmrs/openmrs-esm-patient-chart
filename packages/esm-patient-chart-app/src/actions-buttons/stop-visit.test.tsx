@@ -9,34 +9,15 @@ import { mockPatient } from 'tools';
 const mockUseVisit = jest.mocked(useVisit);
 const mockShowModal = jest.mocked(showModal);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useVisit: jest.fn(),
-  showModal: jest.fn(),
-  useConfig: jest.fn(),
-}));
-
 describe('StopVisitOverflowMenuItem', () => {
-  it('should be able to stop current visit', async () => {
+  it('should be able to stop active visit', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit } as ReturnType<typeof useVisit>);
+    mockUseVisit.mockReturnValue({ activeVisit: mockCurrentVisit } as ReturnType<typeof useVisit>);
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const endVisitButton = screen.getByRole('menuitem', { name: /End Visit/i });
-    expect(endVisitButton).toBeInTheDocument();
-
-    await user.click(endVisitButton);
-    expect(mockShowModal).toHaveBeenCalledTimes(1);
-  });
-  it('should be able to show configured label in button to stop current visit', async () => {
-    const user = userEvent.setup();
-
-    mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit } as ReturnType<typeof useVisit>);
-
-    render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
-
-    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/ });
+    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
     await user.click(endVisitButton);
