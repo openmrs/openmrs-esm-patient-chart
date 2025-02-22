@@ -171,6 +171,16 @@ jest.mock('./visit-form.resource', () => {
   };
 });
 
+jest.mock('../visits-widget/visit.resource', () => {
+  const requireActual = jest.requireActual('../visits-widget/visit.resource');
+  return {
+    ...requireActual,
+    useInfiniteVisits: jest.fn(() => ({
+      mutate: jest.fn(),
+    })),
+  };
+});
+
 mockSaveVisit.mockResolvedValue({
   status: 201,
   data: {

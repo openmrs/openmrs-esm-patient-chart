@@ -42,7 +42,7 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
 }
 
 export function useOrderEncounter(patientUuid: string): {
-  activeVisitRequired: boolean;
+  visitRequired: boolean;
   isLoading: boolean;
   error: Error;
   encounterUuid: string;
@@ -63,7 +63,7 @@ export function useOrderEncounter(patientUuid: string): {
   const results = useMemo(() => {
     if (isLoadingSystemVisitSetting || errorFetchingSystemVisitSetting) {
       return {
-        activeVisitRequired: false,
+        visitRequired: false,
         isLoading: isLoadingSystemVisitSetting,
         error: errorFetchingSystemVisitSetting,
         encounterUuid: null,
@@ -72,14 +72,14 @@ export function useOrderEncounter(patientUuid: string): {
     }
     return systemVisitEnabled
       ? {
-          activeVisitRequired: true,
+          visitRequired: true,
           isLoading: visit?.isLoading,
           encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
           error: visit?.error,
           mutate: visit?.mutate,
         }
       : {
-          activeVisitRequired: false,
+          visitRequired: false,
           isLoading: todayEncounter?.isLoading,
           encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
           error: todayEncounter?.error,
