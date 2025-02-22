@@ -22,10 +22,6 @@ import RetrospectiveVisitLabel from './retrospective-visit-label.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 
-interface PatientInfoProps {
-  patient: fhir.Patient;
-}
-
 function getGender(gender: string) {
   switch (gender) {
     case 'male':
@@ -41,15 +37,29 @@ function getGender(gender: string) {
   }
 }
 
+const getTagType = (priority: MappedQueuePriority) => {
+  switch (priority) {
+    case 'emergency':
+      return 'red';
+    case 'not urgent':
+      return 'green';
+    default:
+      return 'gray';
+  }
+};
+
+interface PatientInfoProps {
+  patient: fhir.Patient;
+}
+
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
   const name = patient ? getPatientName(patient) : '';
-  const patientUuid = `${patient?.id}`;
   const patientNameIsTooLong = !isTablet && name.trim().length > 25;
-  const { currentVisit } = useVisit(patientUuid);
-  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+  const { currentVisit } = useVisit(patient.id);
+  const { queueEntry } = useVisitQueueEntry(patient.id, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
@@ -60,17 +70,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       return '';
     }
   }, [queueEntry, t]);
-
-  const getTagType = (priority: string) => {
-    switch (priority as MappedQueuePriority) {
-      case 'emergency':
-        return 'red';
-      case 'not urgent':
-        return 'green';
-      default:
-        return 'gray';
-    }
-  };
 
   return (
     <>
@@ -121,9 +120,9 @@ function launchStartVisitForm() {
   launchPatientWorkspace('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit' });
 }
 
-const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
+const VisitHeader: React.FC<{ patientUuid: string; patient: fhir.Patient }> = (state) => {
   const { t } = useTranslation();
-  const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(patient?.id);
+  const { currentVisit, currentVisitIsRetrospective, isLoading } = useVisit(state.patient?.id);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { logo } = useConfig();
@@ -144,7 +143,7 @@ const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
     });
   }, []);
 
-  const isDeceased = Boolean(patient?.deceasedDateTime);
+  const isDeceased = Boolean(state.patient?.deceasedDateTime);
 
   return (
     <Header aria-label="OpenMRS" className={styles.topNavHeader}>
@@ -174,12 +173,12 @@ const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
         </div>
       </ConfigurableLink>
       <div className={styles.navDivider} />
-      <div className={styles.patientDetails}>{patient && <PatientInfo patient={patient} />}</div>
+      <div className={styles.patientDetails}>{state.patient && <PatientInfo {...state} />}</div>
       {currentVisitIsRetrospective && <RetrospectiveVisitLabel currentVisit={currentVisit} />}
       <HeaderGlobalBar>
         {systemVisitEnabled && (
           <>
-            <ExtensionSlot name="visit-header-right-slot" />
+            <ExtensionSlot name="visit-header-right-slot" state={state} />
             {!isLoading && !currentVisit && !isDeceased && (
               <Button
                 className={styles.startVisitButton}
@@ -192,7 +191,7 @@ const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
             )}
             {!isLoading && !!currentVisit && (
               <Button
-                onClick={() => openModal(patient?.id)}
+                onClick={() => openModal(state.patient?.id)}
                 className={styles.startVisitButton}
                 aria-label={t('endVisit', 'End visit')}
               >
@@ -201,7 +200,7 @@ const VisitHeader: React.FC<{ patient: fhir.Patient }> = ({ patient }) => {
             )}
           </>
         )}
-        <CloseButton patientUuid={patient?.id} />
+        <CloseButton patientUuid={state.patient?.id} />
       </HeaderGlobalBar>
       <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
     </Header>

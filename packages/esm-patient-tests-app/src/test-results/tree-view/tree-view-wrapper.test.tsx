@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -9,7 +9,6 @@ import { useGetManyObstreeData } from '../grouped-timeline';
 import TreeViewWrapper from './tree-view-wrapper.component';
 import FilterContext from '../filter/filter-context';
 
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseGetManyObstreeData = jest.mocked(useGetManyObstreeData);
@@ -25,7 +24,8 @@ jest.mock('../grouped-timeline', () => ({
 }));
 
 const mockProps = {
-  patientUuid: 'test-patient-uuid',
+  patientUuid: mockPatient.id,
+  patient: mockPatient,
   basePath: '/test-base-path',
   testUuid: 'test-uuid',
   expanded: false,
@@ -60,13 +60,6 @@ const renderTreeViewWrapperWithMockContext = (contextValue = mockFilterContext) 
 describe('TreeViewWrapper', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('small-desktop');
-
-    mockUsePatient.mockReturnValue({
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-      isLoading: false,
-      error: null,
-    });
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),

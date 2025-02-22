@@ -5,7 +5,6 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import HtmlFormEntryWrapper from './html-form-entry-wrapper.component';
-import { usePatient } from '@openmrs/esm-framework';
 
 interface HtmlFormEntryComponentProps extends DefaultPatientWorkspaceProps {
   formInfo: FormEntryProps;
@@ -13,11 +12,11 @@ interface HtmlFormEntryComponentProps extends DefaultPatientWorkspaceProps {
 
 const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   patientUuid,
+  patient,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   formInfo,
 }) => {
-  const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { encounterUuid, visitUuid, htmlForm } = formInfo || {};
 

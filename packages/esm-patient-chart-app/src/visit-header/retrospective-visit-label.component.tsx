@@ -4,7 +4,7 @@ import { Toggletip, ToggletipButton, ToggletipContent, Tag } from '@carbon/react
 import { type Visit, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import styles from './retrospective-visit-label.scss';
 
-interface RetrospectiveVisitLabelProps {
+export interface RetrospectiveVisitLabelProps {
   currentVisit: Visit;
 }
 
@@ -32,5 +32,4 @@ const RetrospectiveVisitLabel: React.FC<RetrospectiveVisitLabelProps> = ({ curre
   );
 };
 
-export { RetrospectiveVisitLabelProps };
 export default RetrospectiveVisitLabel;

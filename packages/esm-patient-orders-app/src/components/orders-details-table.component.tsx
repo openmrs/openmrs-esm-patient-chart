@@ -53,7 +53,6 @@ import {
   useConfig,
   useLayoutType,
   usePagination,
-  usePatient,
 } from '@openmrs/esm-framework';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
@@ -64,6 +63,7 @@ import GeneralOrderTable from './general-order-table.component';
 
 interface OrderDetailsProps {
   patientUuid: string;
+  patient: fhir.Patient;
   showAddButton?: boolean;
   showPrintButton?: boolean;
   title?: string;
@@ -95,10 +95,13 @@ interface DataTableRow {
 
 type MutableOrderBasketItem = OrderBasketItem;
 
-const medicationsOrderBasket = 'medications';
-const labsOrderBasket = 'labs';
-
-const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddButton, showPrintButton, title }) => {
+const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
+  patientUuid,
+  patient,
+  showAddButton,
+  showPrintButton,
+  title,
+}) => {
   const { t } = useTranslation();
   const defaultPageSize = 10;
   const headerTitle = t('orders', 'Orders');
@@ -109,7 +112,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
   const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
   const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
   const contentToPrintRef = useRef(null);
-  const patient = usePatient(patientUuid);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
   const { data: orderTypes } = useOrderTypes();
@@ -263,16 +265,16 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
     };
 
     const identifiers =
-      patient?.patient?.identifier?.filter(
+      patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      name: patient?.patient ? getPatientName(patient?.patient) : '',
-      age: age(patient?.patient?.birthDate),
-      gender: getGender(patient?.patient?.gender),
-      location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      name: patient ? getPatientName(patient) : '',
+      age: age(patient?.birthDate),
+      gender: getGender(patient?.gender),
+      location: patient?.address?.[0].city,
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
