@@ -42,5 +42,7 @@
   "saving": "Saving",
   "seeAll": "See all",
   "state": "State",
-  "status": "Status"
+  "status": "Status",
+  "timeEnrolled": "Time enrolled",
+  "timeFormat": "Time Format"
 }
