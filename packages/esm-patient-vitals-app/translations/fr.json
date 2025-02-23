@@ -26,6 +26,7 @@
   "male": "Homme",
   "muac": "Périmètre brachial",
   "noDataRecorded": "Aucune information enregistrée pour ce patient",
+  "notAvailable": "Not available",
   "notes": "Notes",
   "other": "Autre",
   "outOfDateVitals": "Ces signes vitaux sont obsolètes",
