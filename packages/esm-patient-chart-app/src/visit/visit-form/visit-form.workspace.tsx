@@ -79,6 +79,7 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
+  handleDiscardVisit?: () => void;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
@@ -89,6 +90,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   showVisitEndDateTimeFields,
   visitToEdit,
   openedFrom,
+  handleDiscardVisit,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -792,7 +794,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             [styles.desktop]: !isTablet,
           })}
         >
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button
+            className={styles.button}
+            kind="secondary"
+            onClick={() => {
+              handleDiscardVisit?.();
+              closeWorkspace();
+            }}
+          >
             {t('discard', 'Discard')}
           </Button>
           <Button
