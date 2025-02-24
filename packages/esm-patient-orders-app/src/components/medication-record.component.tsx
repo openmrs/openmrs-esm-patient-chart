@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { formatDate, UserIcon } from '@openmrs/esm-framework';
@@ -12,61 +12,68 @@ interface MedicationRecordProps {
 
 const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
   const { t } = useTranslation();
+
+  const medicationDetails = useMemo(() => {
+    return [
+      { label: t('dose', 'Dose'), value: `${medication.dose} ${medication.doseUnits?.display?.toLowerCase()}` },
+      { label: t('route', 'Route'), value: medication.route?.display?.toLowerCase() },
+      { label: t('frequency', 'Frequency'), value: medication.frequency?.display?.toLowerCase() },
+      {
+        label: t('duration', 'Duration'),
+        value: medication.duration
+          ? t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+              duration: medication.duration,
+              durationUnit: medication.durationUnits?.display.toLowerCase(),
+            })
+          : t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase(),
+      },
+      medication.numRefills !== 0 && { label: t('refills', 'Refills'), value: medication.numRefills },
+      medication.dosingInstructions && {
+        label: t('instructions', 'Instructions'),
+        value: medication.dosingInstructions.toLowerCase(),
+      },
+      medication.orderReasonNonCoded && { label: t('indication', 'Indication'), value: medication.orderReasonNonCoded },
+      medication.quantity && {
+        label: t('quantity', 'Quantity'),
+        value: `${medication.quantity} ${medication.quantityUnits?.display}`,
+      },
+      medication.dateStopped && {
+        label: t('endDate', 'End date'),
+        value: formatDate(new Date(medication.dateStopped)),
+      },
+    ].filter(Boolean);
+  }, [medication, t]);
+
   return (
     <div className={styles.medicationContainer}>
       <div className={styles.startDateColumn}>
         <span>{formatDate(new Date(medication.dateActivated))}</span>
         <InfoTooltip orderer={medication.orderer?.display ?? '--'} />
       </div>
+
       <div className={styles.medicationRecord}>
         <p className={styles.bodyLong01}>
-          <strong>{capitalize(medication.drug?.display)}</strong>{' '}
-          {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
+          <strong>{capitalize(medication.drug?.display)}</strong>
+          {medication.drug?.strength && <>&mdash; {medication.drug.strength.toLowerCase()}</>}
           {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
         </p>
-        <p className={styles.bodyLong01}>
-          <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <span className={styles.dosage}>
-            {medication.dose} {medication.doseUnits?.display.toLowerCase()}
-          </span>{' '}
-          {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-          {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
-          {!medication.duration
-            ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-            : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
-                duration: medication.duration,
-                durationUnit: medication.durationUnits?.display.toLowerCase(),
-              })}{' '}
-          {medication.numRefills !== 0 && (
-            <span>
-              <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-              {medication.numRefills}
-            </span>
-          )}
-          {medication.dosingInstructions && <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>}
-        </p>
-        <p className={styles.bodyLong01}>
-          {medication.orderReasonNonCoded ? (
-            <span>
-              <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-              {medication.orderReasonNonCoded}
-            </span>
-          ) : null}
-          {medication.quantity ? (
-            <span>
-              <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-              {medication.quantity} {medication?.quantityUnits?.display}
-            </span>
-          ) : null}
-          {medication.dateStopped ? (
-            <span>
-              <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
-              {formatDate(new Date(medication.dateStopped))}
-            </span>
-          ) : null}
-        </p>
+
+        <MedicationDetails details={medicationDetails} />
       </div>
     </div>
+  );
+};
+
+const MedicationDetails: React.FC<{ details: { label: string; value: string | number }[] }> = ({ details }) => {
+  return (
+    <p className={styles.bodyLong01}>
+      {details.map(({ label, value }, index) => (
+        <span key={label}>
+          <span className={styles.label01}>{label.toUpperCase()}</span> — {value}
+          {index !== details.length - 1 && ' '}
+        </span>
+      ))}
+    </p>
   );
 };
 
