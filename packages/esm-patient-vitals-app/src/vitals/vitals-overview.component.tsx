@@ -21,6 +21,7 @@ import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
+import { useEncounterVitalsAndBiometrics } from '../common/data.resource';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -49,6 +50,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     launchVitalsAndBiometricsForm(currentVisit, config);
   }, [config, currentVisit]);
 
+  useEncounterVitalsAndBiometrics('771bbc44-8d45-4ac3-af6e-059814dd7cde');
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
@@ -138,10 +140,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
 
   const tableRows: Array<VitalsTableRow> = useMemo(
     () =>
-      vitals?.map((vitalSigns, index) => {
+      vitals?.map((vitalSigns) => {
         return {
           ...vitalSigns,
-          id: `${index}`,
           dateRender: formatDate(parseDate(vitalSigns.date.toString()), { mode: 'wide', time: true }),
           bloodPressureRender: `${vitalSigns.systolic ?? '--'} / ${vitalSigns.diastolic ?? '--'}`,
           pulseRender: vitalSigns.pulse ?? '--',
