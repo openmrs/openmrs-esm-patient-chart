@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import styles from './action-button.scss';
 import { launchWorkspace } from '@openmrs/esm-framework';
+import styles from './action-button.scss';
 
 interface MarkPatientDeceasedOverflowMenuItemProps {
   patientUuid?: string;
