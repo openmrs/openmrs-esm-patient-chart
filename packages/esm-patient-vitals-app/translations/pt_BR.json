@@ -26,6 +26,7 @@
   "male": "Masculino",
   "muac": "CMB",
   "noDataRecorded": "Nenhum dado foi registrado para esse paciente",
+  "notAvailable": "Not available",
   "notes": "Observações",
   "other": "Outros",
   "outOfDateVitals": "<0>Estes sinais vitais estão <1>desatualizados</1></0>",
