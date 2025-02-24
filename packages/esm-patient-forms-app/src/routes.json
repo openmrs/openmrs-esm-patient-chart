@@ -52,7 +52,7 @@
       "type": "clinical-form",
       "canMaximize": true,
       "canHide": true,
-      "width": "wider"
+      "width": "extra-wide"
     },
     {
       "name": "ward-patient-form-entry-workspace",
@@ -70,7 +70,7 @@
       "type": "clinical-form",
       "canMaximize": true,
       "canHide": false,
-      "width": "wider"
+      "width": "extra-wide"
     },
     {
       "name": "ward-patient-html-form-entry-workspace",
@@ -79,7 +79,7 @@
       "type": "ward-patient-clinical-form",
       "canMaximize": true,
       "canHide": false,
-      "width": "wider"
+      "width": "extra-wide"
     },
     {
       "name": "clinical-forms-workspace",
