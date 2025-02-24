@@ -20,6 +20,7 @@ import type {
   Questions,
 } from '../types';
 import { AppointmentService } from '../openmrs-api/appointment-resource.service';
+import { capitalize } from 'lodash';
 
 @Injectable()
 export class FormDataSourceService {
@@ -294,24 +295,61 @@ export class FormDataSourceService {
         ),
       );
   }
-  public findDiagnoses(searchText) {
+  public findDiagnoses(searchText?: string, dataSourceOptions: Record<string, any> = {}) {
+    const conceptSourceUuids: Array<string> = dataSourceOptions?.conceptSourceUuid;
     const allowedConceptClasses = ['8d4918b0-c2cc-11de-8d13-0010c6dffd0f'];
+    const customRepresentation = conceptSourceUuids
+      ? 'custom:(uuid,name:(uuid,display),conceptClass:(uuid,display),setMembers,mappings:(conceptReferenceTerm:(code,name,display,conceptSource:(uuid))))'
+      : null;
 
-    return this.conceptResourceService
-      .searchConcept(searchText)
-      .pipe(
-        map((concepts) =>
+    return this.conceptResourceService.searchConcept(searchText, false, customRepresentation).pipe(
+      map((concepts) => {
+        return (
           concepts
             .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
-            .map(this.mapConcept),
-        ),
-      );
+            .filter((concept) => this.filterConceptByConceptSourceUuid(concept, conceptSourceUuids))
+            .map((concept) => this.mapConceptWithMappings(concept, conceptSourceUuids))
+        );
+      }),
+    );
+  }
+
+  private filterConceptByConceptSourceUuid(concept, conceptSourceUuids: Array<string>) {
+    if (!conceptSourceUuids || conceptSourceUuids.length === 0) {
+      return true;
+    }
+    return concept.mappings.find((mapping) =>
+      conceptSourceUuids.includes(mapping.conceptReferenceTerm.conceptSource.uuid),
+    );
   }
 
   public findAppointmentServices(searchText: string) {
     return this.appointmentService
       .fetchAllAppointmentServices(searchText)
       .pipe(map((services) => services.map(this.mapService)));
+  }
+
+  public mapConceptWithMappings(concept: Concept, conceptSourceUuid: Array<string>) {
+    if (!conceptSourceUuid) {
+      return {
+        value: concept.uuid,
+        label: concept.name.display,
+      };
+    }
+
+    const conceptMappings = conceptSourceUuid
+      ? concept?.mappings?.filter((mapping) =>
+          conceptSourceUuid.includes(mapping.conceptReferenceTerm.conceptSource.uuid),
+        )
+      : null;
+
+    const referenceName = conceptMappings?.map((mapping) => mapping.conceptReferenceTerm.code).join(' , ');
+    const label = referenceName ? `${referenceName} - ${capitalize(concept.name.display)}` : concept.name.display;
+
+    return {
+      value: concept.uuid,
+      label: label,
+    };
   }
 
   public mapConcept(concept?: Concept) {

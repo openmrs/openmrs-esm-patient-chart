@@ -50,8 +50,13 @@
     "@ng-select/ng-select": "^11.2.0",
     "@ngx-translate/core": "^15.0.0",
     "@openmrs/ngx-file-uploader": "next",
+<<<<<<< HEAD
     "@openmrs/ngx-formentry": "next",
     "jspdf": "^3.0.1",
+=======
+    "@openmrs/ngx-formentry": "/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry",
+    "jspdf": "^2.5.1",
+>>>>>>> 15544a85 ((fix) : fix regression on diagnosis data source)
     "moment": "^2.29.4",
     "ngx-bootstrap": "^11.0.1",
     "ngx-webcam": "^0.4.1",

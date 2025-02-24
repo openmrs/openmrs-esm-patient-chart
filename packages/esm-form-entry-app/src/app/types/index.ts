@@ -260,6 +260,18 @@ export interface Concept {
   answers: Array<Concept>;
   setMembers: Array<Concept>;
   display: string;
+  mappings: Array<{
+    display: string;
+    conceptReferenceTerm: {
+      display: string;
+      conceptSource: {
+        uuid: string;
+        display: string;
+      };
+      name: string | null;
+      code: string;
+    };
+  }>;
 }
 
 export interface Visit {
