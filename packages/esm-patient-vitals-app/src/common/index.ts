@@ -2,8 +2,8 @@ export {
   invalidateCachedVitalsAndBiometrics,
   useVitalsAndBiometrics,
   useVitalsConceptMetadata,
-  updateVitalsAndBiometrics,
-  saveVitalsAndBiometrics,
+  createOrUpdateVitalsAndBiometrics,
+  useEncounterVitalsAndBiometrics,
   withUnit,
   type ConceptMetadata,
 } from './data.resource';
