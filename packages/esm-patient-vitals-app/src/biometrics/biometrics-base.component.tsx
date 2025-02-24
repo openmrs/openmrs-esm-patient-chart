@@ -75,7 +75,6 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
       biometrics?.map((biometricsData, index) => {
         return {
           ...biometricsData,
-          id: `${index}`,
           dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
           weightRender: biometricsData.weight ?? '--',
           heightRender: biometricsData.height ?? '--',
