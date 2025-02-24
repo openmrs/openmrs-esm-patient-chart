@@ -13,7 +13,7 @@ import { useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
 import OrderDetailsTable from './orders-details-table.component';
-import { mockPatient } from '../../../../tools/test-utils';
+import { mockPatient } from 'tools';
 
 const mockUsePatientOrders = usePatientOrders as jest.Mock;
 const mockUseOrderTypes = useOrderTypes as jest.Mock;

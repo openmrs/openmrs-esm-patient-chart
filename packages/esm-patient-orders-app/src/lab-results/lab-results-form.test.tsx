@@ -13,7 +13,7 @@ import {
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
-import { mockPatient } from '../../../../tools/test-utils';
+import { mockPatient } from 'tools';
 
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
