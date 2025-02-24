@@ -10,9 +10,10 @@ export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patientUuid: string;
 }
 
-export function launchPatientWorkspace(workspaceName: string, additionalProps?: object) {
-  launchWorkspace(workspaceName, additionalProps);
-}
+/**
+ * @deprecated Use `launchWorkspace()` instead
+ */
+export const launchPatientWorkspace = launchWorkspace;
 
 export function launchPatientChartWithWorkspaceOpen({
   patientUuid,
