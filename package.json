@@ -1,7 +1,7 @@
 {
   "name": "@openmrs/esm-patient-chart",
   "private": true,
-  "version": "9.0.0",
+  "version": "9.2.0",
   "workspaces": [
     "packages/*"
   ],
@@ -9,7 +9,7 @@
     "start": "openmrs develop --sources packages/esm-patient-chart-app/",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag next",
-    "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@next",
+    "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@latest",
     "release": "yarn workspaces foreach --all --topological version",
     "verify": "turbo run lint typescript test --color --concurrency=5",
     "postinstall": "husky install",
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@openmrs/esm-framework": "next",
-    "@playwright/test": "1.49.0",
+    "@playwright/test": "^1.50.1",
     "@swc/cli": "^0.1.62",
     "@swc/core": "^1.3.89",
     "@swc/jest": "^0.2.29",
@@ -72,7 +72,7 @@
     "sass": "^1.54.3",
     "swc-loader": "^0.2.3",
     "swr": "^2.2.4",
-    "turbo": "^2.2.3",
+    "turbo": "^2.4.2",
     "typescript": "^4.0.3",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.1"
@@ -84,5 +84,5 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@4.6.0"
 }

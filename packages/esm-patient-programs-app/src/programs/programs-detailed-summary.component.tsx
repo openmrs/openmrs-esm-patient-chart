@@ -1,6 +1,6 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -19,7 +19,6 @@ import {
 import {
   AddIcon,
   type ConfigObject,
-  EditIcon,
   formatDate,
   formatDatetime,
   useConfig,
@@ -28,15 +27,11 @@ import {
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { findLastState, usePrograms } from './programs.resource';
+import { ProgramsActionMenu } from './programs-action-menu.component';
 import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
   patientUuid: string;
-}
-
-interface ProgramEditButtonProps {
-  programEnrollmentId: string;
-  t: TFunction;
 }
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
@@ -107,8 +102,14 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     return activeEnrollments.length === availablePrograms.length;
   }, [availablePrograms, enrollments]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -135,7 +136,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           />
         )}
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <TableContainer>
               <Table aria-label="program enrollments" {...getTableProps()}>
                 <TableHead>
@@ -156,12 +157,12 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <ProgramEditButton programEnrollmentId={enrollments[i]?.uuid} t={t} />
+                        <ProgramsActionMenu patientUuid={patientUuid} programEnrollmentId={enrollments[i]?.uuid} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -175,26 +176,5 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
-
-function ProgramEditButton({ programEnrollmentId, t }: ProgramEditButtonProps) {
-  const isTablet = useLayoutType() === 'tablet';
-  const launchEditProgramsForm = useCallback(
-    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
-    [programEnrollmentId],
-  );
-
-  return (
-    <Button
-      aria-label="edit program"
-      kind="ghost"
-      renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
-      iconDescription={t('editProgram', 'Edit Program')}
-      onClick={launchEditProgramsForm}
-      hasIconOnly
-      tooltipPosition="left"
-      size={isTablet ? 'lg' : 'sm'}
-    />
-  );
-}
 
 export default ProgramsDetailedSummary;

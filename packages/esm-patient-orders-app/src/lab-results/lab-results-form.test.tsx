@@ -135,7 +135,9 @@ describe('LabResultsForm', () => {
     });
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    const input = screen.getByRole('spinbutton', {
+      name: /Test Concept/i,
+    });
     await user.type(input, '50.5');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -181,7 +183,7 @@ describe('LabResultsForm', () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    const input = await screen.findByLabelText('Test Concept (0 - 100 mg/dL)');
     await user.type(input, '0');
 
     await waitFor(() => {
@@ -212,7 +214,9 @@ describe('LabResultsForm', () => {
     });
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    const input = screen.getByRole('spinbutton', {
+      name: /Test Concept/i,
+    });
     await user.type(input, '150');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
@@ -246,7 +250,9 @@ describe('LabResultsForm', () => {
     });
     render(<LabResultsForm {...testProps} />);
 
-    const input = await screen.findByLabelText(`Test Concept (0 - -- mg/dL)`);
+    const input = screen.getByRole('spinbutton', {
+      name: /Test Concept/i,
+    });
     await user.type(input, '-50');
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });

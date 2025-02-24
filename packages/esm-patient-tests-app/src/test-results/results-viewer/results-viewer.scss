@@ -1,25 +1,7 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
-
-:global(.omrs-breakpoint-gt-small-desktop .-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
-  max-width: 150rem;
-}
-
-@media (min-width: 1200px) {
-  :global(.-esm-patient-chart__patient-chart__widthContained___Ow0JH) {
-    max-width: 150rem;
-  }
-}
-
-:global(.cds--data-table td, .cds--data-table th) {
-  vertical-align: top;
-}
-
-:global(.cds--data-table--md td) {
-  padding-top: 0.1rem;
-}
 
 .resultsContainer {
   padding: 0;
@@ -27,6 +9,14 @@
   position: relative;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   background-color: $ui-01;
+
+  :global(.cds--data-table td, .cds--data-table th) {
+    vertical-align: top;
+  }
+
+  :global(.cds--data-table--md td) {
+    padding-top: 0.1rem;
+  }
 }
 
 .flex {
@@ -83,9 +73,9 @@
   justify-self: start;
 }
 
-.viewOptionsSubHeading {
+.contentSwitcherLabel {
   white-space: nowrap;
-  align-self: center;
+  @include type.type-style('body-01');
 }
 
 .viewOptionsSwitcher {
@@ -184,21 +174,6 @@
   margin-bottom: layout.$spacing-07;
 }
 
-.button {
-  align-items: center;
-  margin-left: layout.$spacing-05;
-
-  svg {
-    order: 1;
-    margin-right: layout.$spacing-03;
-    margin-left: 0 !important;
-  }
-
-  span {
-    order: 2;
-  }
-}
-
 .border {
   border: 1px solid $ui-03;
   border-bottom: none;
@@ -207,5 +182,20 @@
 .groupPanelsTables {
   > div + div {
     margin-top: layout.$spacing-05;
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.button {
+  align-items: center;
+  margin-right: layout.$spacing-03;
+
+  svg {
+    fill: colors.$blue-60 !important;
   }
 }

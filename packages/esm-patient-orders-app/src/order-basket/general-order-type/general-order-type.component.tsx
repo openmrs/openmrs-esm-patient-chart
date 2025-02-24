@@ -75,6 +75,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
         launchPatientWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
         }),
+      closeWorkspaceGroup: false,
     });
   };
 
@@ -86,6 +87,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
           order,
           orderTypeUuid,
         }),
+      closeWorkspaceGroup: false,
     });
   };
 

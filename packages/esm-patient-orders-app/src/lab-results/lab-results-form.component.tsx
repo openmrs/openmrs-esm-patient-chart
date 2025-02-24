@@ -1,13 +1,12 @@
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import classNames from 'classnames';
+import { type Control, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
-import ResultFormField from './lab-results-form-field.component';
-import styles from './lab-results-form.scss';
 import {
   createObservationPayload,
   isCoded,
@@ -20,9 +19,12 @@ import {
   useOrderConceptByUuid,
 } from './lab-results.resource';
 import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import ResultFormField from './lab-results-form-field.component';
+import styles from './lab-results-form.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
+  invalidateLabOrders?: () => void;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
@@ -30,6 +32,11 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   closeWorkspaceWithSavedChanges,
   order,
   promptBeforeClosing,
+  /* Callback to refresh lab orders in the Laboratory app after results are saved.
+   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
+   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
+   */
+  invalidateLabOrders,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -37,7 +44,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const schema = useLabResultsFormSchema(order.concept.uuid);
-  const { completeLabResult, error, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+
   const mutateOrderData = useCallback(() => {
     mutate(
       (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
@@ -176,9 +184,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         orderDiscontinuationPayload,
         abortController,
       );
+
       closeWorkspaceWithSavedChanges();
-      mutateResults();
       mutateOrderData();
+      mutateResults();
+      invalidateLabOrders?.();
+
       showNotification(
         'success',
         t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
@@ -199,7 +210,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         {concept && (
           <Stack gap={5}>
             {!isLoading ? (
-              <ResultFormField defaultValue={completeLabResult} concept={concept} control={control} errors={errors} />
+              <ResultFormField
+                defaultValue={completeLabResult}
+                concept={concept}
+                control={control as unknown as Control<Record<string, unknown>>}
+                errors={errors}
+              />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
             )}
@@ -214,7 +230,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           />
         )}
       </div>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet
+        className={classNames({
+          [styles.tablet]: isTablet,
+          [styles.desktop]: !isTablet,
+        })}
+      >
         <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>

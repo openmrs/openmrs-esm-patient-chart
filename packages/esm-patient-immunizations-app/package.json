@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-immunizations-app",
-  "version": "9.0.0",
+  "version": "9.2.0",
   "license": "MPL-2.0",
   "description": "Patient immunizations microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-immunizations-app.js",
