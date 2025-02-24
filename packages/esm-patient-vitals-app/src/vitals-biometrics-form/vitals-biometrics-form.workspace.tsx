@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -37,42 +36,25 @@ import {
   getReferenceRangesForConcept,
   interpretBloodPressure,
   invalidateCachedVitalsAndBiometrics,
-  saveVitalsAndBiometrics as savePatientVitals,
   useVitalsConceptMetadata,
+  createOrUpdateVitalsAndBiometrics,
+  useEncounterVitalsAndBiometrics,
 } from '../common';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
+import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
+import { prepareObsForSubmission } from '../common/helpers';
 
-const VitalsAndBiometricFormSchema = z
-  .object({
-    systolicBloodPressure: z.number(),
-    diastolicBloodPressure: z.number(),
-    respiratoryRate: z.number(),
-    oxygenSaturation: z.number(),
-    pulse: z.number(),
-    temperature: z.number(),
-    generalPatientNote: z.string(),
-    weight: z.number(),
-    height: z.number(),
-    midUpperArmCircumference: z.number(),
-    computedBodyMassIndex: z.number(),
-  })
-  .partial()
-  .refine(
-    (fields) => {
-      return Object.values(fields).some((value) => Boolean(value));
-    },
-    {
-      message: 'Please fill at least one field',
-      path: ['oneFieldRequired'],
-    },
-  );
+interface VitalsAndBiometricsFormProps extends DefaultPatientWorkspaceProps {
+  formContext: 'creating' | 'editing';
+  editEncounterUuid?: string;
+}
 
-export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSchema>;
-
-const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
+const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   patientUuid,
   patient,
+  editEncounterUuid,
+  formContext = 'creating',
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -85,22 +67,45 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   const session = useSession();
   const { currentVisit } = useVisit(patientUuid);
-  const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
+  const {
+    data: conceptUnits,
+    conceptMetadata,
+    conceptRanges,
+    isLoading: isLoadingConceptMetadata,
+  } = useVitalsConceptMetadata();
+  const {
+    isLoading: isLoadingEncounter,
+    vitalsAndBiometrics: initialFieldValuesMap,
+    getRefinedInitialValues,
+    mutate: mutateEncounter,
+  } = useEncounterVitalsAndBiometrics(formContext === 'editing' ? editEncounterUuid : null);
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+
+  const isLoadingInitialvalues = useMemo(
+    () => (formContext === 'creating' ? false : isLoadingEncounter),
+    [formContext, isLoadingEncounter],
+  );
 
   const {
     control,
     handleSubmit,
     watch,
     setValue,
-    formState: { isDirty, isSubmitting },
+    formState: { isDirty, isSubmitting, dirtyFields },
+    reset,
   } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
-    resolver: zodResolver(VitalsAndBiometricFormSchema),
+    resolver: zodResolver(VitalsAndBiometricsFormSchema),
   });
+
+  useEffect(() => {
+    if (formContext === 'editing' && !isLoadingInitialvalues && initialFieldValuesMap) {
+      reset(getRefinedInitialValues());
+    }
+  }, [formContext, isLoadingInitialvalues, initialFieldValuesMap, getRefinedInitialValues, reset]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -182,35 +187,45 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       if (allFieldsAreValid) {
         setShowErrorMessage(false);
         const abortController = new AbortController();
-
-        savePatientVitals(
-          config.vitals.encounterTypeUuid,
-          config.vitals.formUuid,
-          config.concepts,
-          patientUuid,
+        const { newObs, toBeVoided } = prepareObsForSubmission(
           formData,
-          abortController,
+          dirtyFields,
+          formContext,
+          initialFieldValuesMap,
+          config.concepts,
+        );
+
+        createOrUpdateVitalsAndBiometrics(
+          patientUuid,
+          config.vitals.encounterTypeUuid,
+          editEncounterUuid,
           session?.sessionLocation?.uuid,
+          [...newObs, ...toBeVoided],
+          abortController,
         )
           .then((response) => {
-            if (response.status === 201) {
-              invalidateCachedVitalsAndBiometrics();
-              closeWorkspaceWithSavedChanges();
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-                subtitle: t(
-                  'vitalsAndBiometricsNowAvailable',
-                  'They are now visible on the Vitals and Biometrics page',
-                ),
-              });
+            if (mutateEncounter) {
+              mutateEncounter();
             }
+            invalidateCachedVitalsAndBiometrics();
+            closeWorkspaceWithSavedChanges();
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              title:
+                formContext === 'creating'
+                  ? t('vitalsAndBiometricsSaved', 'Vitals and Biometrics saved')
+                  : t('vitalsAndBiometricsUpdated', 'Vitals and Biometrics updated'),
+              subtitle: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
+            });
           })
           .catch(() => {
             createErrorHandler();
             showSnackbar({
-              title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+              title:
+                formContext === 'creating'
+                  ? t('vitalsAndBiometricsSaveError', 'Error saving Vitals and Biometrics')
+                  : t('vitalsAndBiometricsUpdateError', 'Error updating Vitals and Biometrics'),
               kind: 'error',
               isLowContrast: false,
               subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
@@ -224,13 +239,17 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       }
     },
     [
-      closeWorkspaceWithSavedChanges,
       conceptMetadata,
       config.concepts,
       config.vitals.encounterTypeUuid,
-      config.vitals.formUuid,
+      dirtyFields,
+      editEncounterUuid,
+      formContext,
+      initialFieldValuesMap,
       patientUuid,
       session?.sessionLocation?.uuid,
+      closeWorkspaceWithSavedChanges,
+      mutateEncounter,
       t,
     ],
   );
@@ -253,7 +272,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     );
   }
 
-  if (isLoading) {
+  if (isLoadingConceptMetadata || isLoadingInitialvalues) {
     return (
       <Form className={styles.form}>
         <div className={styles.grid}>
@@ -605,7 +624,7 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           className={styles.button}
           kind="primary"
           onClick={handleSubmit(savePatientVitalsAndBiometrics, onError)}
-          disabled={isSubmitting}
+          disabled={!isDirty || isSubmitting}
           type="submit"
         >
           {t('saveAndClose', 'Save and close')}

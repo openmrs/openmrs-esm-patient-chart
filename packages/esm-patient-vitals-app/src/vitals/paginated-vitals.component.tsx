@@ -13,6 +13,7 @@ import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import styles from './paginated-vitals.scss';
+import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
 
 interface PaginatedVitalsProps {
   isPrinting?: boolean;
@@ -108,6 +109,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
+                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -123,6 +125,9 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                         </StyledTableCell>
                       );
                     })}
+                    <TableCell className="cds--table-column-menu" id="actions">
+                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} formType="vitals" />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
