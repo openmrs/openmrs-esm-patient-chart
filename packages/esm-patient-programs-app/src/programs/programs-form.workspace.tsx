@@ -50,7 +50,22 @@ const createProgramsFormSchema = (t: TFunction) =>
   z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
-    completionDate: z.date().nullable(),
+    completionDate: z
+      .date()
+      .nullable()
+      .refine((date) => !date || date <= new Date(), {
+        message: t('completionDateFuture', 'Completion date cannot be in the future'),
+      })
+      .superRefine((date, ctx) => {
+        const enrollmentDate = (ctx.parent as any).enrollmentDate;
+        if (date && enrollmentDate && date < enrollmentDate) {
+          ctx.addIssue({
+            path: ['completionDate'],
+            message: t('completionDateBeforeEnrollment', 'Completion date cannot be before enrollment date'),
+            code: z.ZodIssueCode.custom,
+          });
+        }
+      }),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
     enrollmentTime: z.string(),
