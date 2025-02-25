@@ -1,15 +1,7 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
-import {
-  generateRandomPatient,
-  deletePatient,
-  type Patient,
-  startVisit,
-  endVisit,
-  getCurrentUserUuid,
-  restoreLanguage,
-} from '../commands';
+import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit, restoreLanguage } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
 import { HomePage } from '../pages/home-page';
 
@@ -369,13 +361,20 @@ test('Form labels should be translated to the system language', async ({ page })
 });
 
 test.afterEach(async ({ api, page }) => {
-  try {
-    const userUuid = await getCurrentUserUuid(api);
-    await restoreLanguage(api, userUuid);
-    await page.reload();
-  } catch (e) {
-    console.error('Failed to reset language to English:', e);
-  }
   await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
+
+  try {
+    const response = await api.get('/ws/rest/v1/session');
+    const data = await response.json();
+
+    if (data?.user?.uuid) {
+      await restoreLanguage(api, data.user.uuid);
+      await page.reload();
+    } else {
+      console.warn('Could not restore language: No active user session');
+    }
+  } catch (e) {
+    console.warn('Could not restore language:', e.message);
+  }
 });
