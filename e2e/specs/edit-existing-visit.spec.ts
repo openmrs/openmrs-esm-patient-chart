@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { deletePatient, generateRandomPatient, type Patient, startVisit } from '../commands';
+import { deletePatient, generateRandomPatient, getVisit, type Patient, startVisit } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
@@ -12,7 +12,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Edit an existing visit', async ({ page }) => {
+test('Edit an existing ongoing visit', async ({ page, api }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -26,7 +26,7 @@ test('Edit an existing visit', async ({ page }) => {
   });
 
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
-    await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
+    await expect(chartPage.page.getByText(/visit start date/i)).toBeVisible();
 
     const startDateInput = chartPage.page.locator('input#visitStartDateInput');
     const startTimeInput = chartPage.page.locator('input#visitStartTime');
@@ -73,6 +73,55 @@ test('Edit an existing visit', async ({ page }) => {
     await chartPage.page.getByLabel(/active visit/i).click();
     await expect(chartPage.page.getByRole('tooltip')).toContainText(/home visit/i);
     await expect(chartPage.page.getByRole('tooltip')).toContainText(/started: today/i);
+  });
+
+  await test.step('And the visit should not have ended', async () => {
+    const updatedVisit = await getVisit(api, visit.uuid);
+    expect(updatedVisit.stopDatetime).toBeNull();
+  });
+});
+
+test('Edit an existing ongoing visit to have an end time', async ({ page, api }) => {
+  const chartPage = new ChartPage(page);
+  const visitsPage = new VisitsPage(page);
+
+  await test.step('When I visit the Visits summary page', async () => {
+    await visitsPage.goTo(patient.uuid);
+    await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
+  });
+
+  await test.step('And I click on the `Edit visit details` button on an active visit', async () => {
+    await visitsPage.page.getByRole('button', { name: /edit visit details/i }).click();
+  });
+
+  await test.step('Then I should see the visit status `Ongoing` and `Ended` tabs', async () => {
+    await expect(visitsPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
+    await expect(visitsPage.page.getByRole('tab', { name: /ended/i })).toBeVisible();
+  });
+
+  await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
+    await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
+    await chartPage.page.getByRole('textbox', { name: /start date/i }).fill('01/01/2025');
+    await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');
+    await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
+
+    await chartPage.page.getByRole('textbox', { name: /end date/i }).fill('01/01/2025');
+    await chartPage.page.getByRole('textbox', { name: /end time/i }).fill('12:10');
+    await chartPage.page.getByLabel(/end time format/i).selectOption('AM');
+  });
+
+  await test.step('And when I submit the form', async () => {
+    await chartPage.page.getByRole('button', { name: /update visit/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
+    await expect(chartPage.page.getByText(/facility visit updated successfully/i)).toBeVisible();
+  });
+
+  await test.step('And the visit should have ended', async () => {
+    const updatedVisit = await getVisit(api, visit.uuid);
+    expect(updatedVisit.stopDatetime).not.toBeNull();
   });
 });
 
