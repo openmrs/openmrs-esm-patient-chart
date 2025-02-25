@@ -1,3 +1,6 @@
+import { OpenmrsResource, Visit } from '@openmrs/esm-framework';
+import { MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+
 export const mockVisitTypes = [
   {
     uuid: 'some-uuid1',
@@ -17,29 +20,24 @@ export const mockVisitTypesDataResponse = {
   },
 };
 
-export const mockVisits = {
-  data: {
-    results: [
-      {
-        uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
-        patient: {
-          uuid: '5a4e7a05-e275-4c14-acab-cb86f3e16353',
-          display: '102EWH - Test Patient Registration',
-        },
-        visitType: {
-          uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-          display: 'Facility Visit',
-        },
-        location: {
-          uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453',
-          display: 'Laboratory',
-        },
-        startDatetime: '2020-07-28T10:29:00.000+0000',
-        stopDatetime: '2020-07-29T10:29:00.000+0000',
-        encounters: [],
-      },
-    ],
+export const mockVisit: Visit = {
+  uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+  patient: {
+    uuid: '5a4e7a05-e275-4c14-acab-cb86f3e16353',
+    display: '102EWH - Test Patient Registration',
   },
+  visitType: {
+    uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+    display: 'Facility Visit',
+  },
+  location: {
+    uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453',
+    display: 'Laboratory',
+  },
+  startDatetime: '2020-07-28T10:29:00.000+0000',
+  stopDatetime: '2020-07-29T10:29:00.000+0000',
+  encounters: [],
+  attributes: [],
 };
 
 export const mockCurrentVisit = {
@@ -286,7 +284,7 @@ export const visitOverviewDetailMockDataNotEmpty = {
   },
 };
 
-export const mockEncounters = [
+export const mockMappedEncounters: MappedEncounter[] = [
   {
     id: '979d38e3-fb68-47cf-843f-2b0263690f49',
     datetime: '2022-01-18T16:25:27.000+0000',
@@ -358,92 +356,115 @@ export const mockEncounters = [
   },
 ];
 
-export const mockEncounters2 = [
-  {
-    uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
-    display: 'Consultation 09/23/2022',
-    encounterDatetime: '2022-09-23T13:11:06.000+0000',
-    patient: {
-      uuid: 'b835eff8-98c9-4988-887b-d93da7fbd542',
-      display: '100019A - George Roberts',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/patient/b835eff8-98c9-4988-887b-d93da7fbd542',
-          resourceAlias: 'patient',
-        },
-      ],
-    },
-    location: null,
-    form: {
-      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
-      display: 'Covid 19',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/form/9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
-          resourceAlias: 'form',
-        },
-      ],
-    },
-    encounterType: {
-      uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
-      display: 'Consultation',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/encountertype/dd528487-82a5-4082-9c72-ed246bd49591',
-          resourceAlias: 'encountertype',
-        },
-      ],
-    },
-    obs: [
-      {
-        uuid: '04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
-        display: 'Covid 19 Signs and Symptom Set: Fever, Congestion, Loss of taste',
-        links: [
-          {
-            rel: 'self',
-            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
-            resourceAlias: 'obs',
-          },
-        ],
-      },
-      {
-        uuid: '5ca0c815-2c47-4cda-8c46-1e118b593ea8',
-        display: 'Covid 19 Test Set: Positive, No, Respiratory PCR',
-        links: [
-          {
-            rel: 'self',
-            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/5ca0c815-2c47-4cda-8c46-1e118b593ea8',
-            resourceAlias: 'obs',
-          },
-        ],
-      },
-    ],
-    orders: [],
-    voided: false,
-    visit: null,
-    encounterProviders: [],
-    diagnoses: [],
+// This should be of type Encounter, but we don't have the Encounter type defined in core
+export const mockEncounter: OpenmrsResource = {
+  uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
+  display: 'Consultation 09/23/2022',
+  encounterDatetime: '2022-09-23T13:11:06.000+0000',
+  patient: {
+    uuid: 'b835eff8-98c9-4988-887b-d93da7fbd542',
+    display: '100019A - George Roberts',
     links: [
       {
         rel: 'self',
-        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
-        resourceAlias: 'encounter',
-      },
-      {
-        rel: 'full',
-        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1?v=full',
-        resourceAlias: 'encounter',
+        uri: 'http://backend:8080/openmrs/ws/rest/v1/patient/b835eff8-98c9-4988-887b-d93da7fbd542',
+        resourceAlias: 'patient',
       },
     ],
-    resourceVersion: '2.2',
   },
-];
+  location: null,
+  form: {
+    uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+    display: 'Covid 19',
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://backend:8080/openmrs/ws/rest/v1/form/9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+        resourceAlias: 'form',
+      },
+    ],
+  },
+  encounterType: {
+    uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
+    display: 'Consultation',
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://backend:8080/openmrs/ws/rest/v1/encountertype/dd528487-82a5-4082-9c72-ed246bd49591',
+        resourceAlias: 'encountertype',
+      },
+    ],
+  },
+  obs: [
+    {
+      uuid: '04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
+      display: 'Covid 19 Signs and Symptom Set: Fever, Congestion, Loss of taste',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
+          resourceAlias: 'obs',
+        },
+      ],
+    },
+    {
+      uuid: '5ca0c815-2c47-4cda-8c46-1e118b593ea8',
+      display: 'Covid 19 Test Set: Positive, No, Respiratory PCR',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/5ca0c815-2c47-4cda-8c46-1e118b593ea8',
+          resourceAlias: 'obs',
+        },
+      ],
+    },
+  ],
+  orders: [],
+  voided: false,
+  visit: null,
+  encounterProviders: [],
+  diagnoses: [],
+  links: [
+    {
+      rel: 'self',
+      uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
+      resourceAlias: 'encounter',
+    },
+    {
+      rel: 'full',
+      uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1?v=full',
+      resourceAlias: 'encounter',
+    },
+  ],
+  resourceVersion: '2.2',
+};
+
+export const mockEncounters = [mockEncounter];
+
+export const mockOngoingVisitWithEncounters: Visit = {
+  ...mockVisit,
+  startDatetime: '2022-01-01T10:00:00.000+0000',
+  stopDatetime: null,
+  encounters: [
+    {
+      ...mockEncounter,
+      encounterDatetime: '2022-01-01T11:00:00.000+0000',
+    },
+    {
+      ...mockEncounter,
+      encounterDatetime: '2022-01-01T11:30:00.000+0000',
+    },
+  ],
+};
+
+export const mockPastVisitWithEncounters: Visit = {
+  ...mockOngoingVisitWithEncounters,
+  startDatetime: '2022-01-01T10:00:00.000+0000',
+  stopDatetime: '2022-01-01T12:00:00.000+0000',
+};
 
 export const mockVisitWithAttributes = {
-  ...mockVisits.data.results[0],
+  ...mockVisit,
   attributes: [
     {
       attributeType: {
