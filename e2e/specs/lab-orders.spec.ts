@@ -104,7 +104,7 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('Then the order status should be changed to `Modify`', async () => {
-      await expect(page.getByRole('status', { name: /new/i })).not.toBeVisible();
+      await expect(page.getByRole('status', { name: /new/i })).toBeHidden();
       await expect(page.getByRole('status', { name: /modify/i })).toBeVisible();
     });
 
