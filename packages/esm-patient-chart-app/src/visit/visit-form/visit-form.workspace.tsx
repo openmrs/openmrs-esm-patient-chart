@@ -78,6 +78,7 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
+  handleBackToSearchList?: () => void;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
@@ -89,6 +90,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   showVisitEndDateTimeFields,
   visitToEdit,
   openedFrom,
+  handleBackToSearchList,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -602,6 +604,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     ],
   );
 
+  const handleDiscard = useCallback(() => {
+    if (openedFrom === 'patient-chart-start-visit' && handleBackToSearchList) {
+      handleBackToSearchList();
+    } else {
+      closeWorkspace();
+    }
+  }, [openedFrom, handleBackToSearchList, closeWorkspace]);
+
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
   const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
@@ -791,7 +801,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             [styles.desktop]: !isTablet,
           })}
         >
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
             {t('discard', 'Discard')}
           </Button>
           <Button
