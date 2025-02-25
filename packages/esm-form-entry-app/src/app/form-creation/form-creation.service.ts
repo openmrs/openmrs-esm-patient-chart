@@ -17,6 +17,7 @@ import { Session } from '@openmrs/esm-framework';
 import { create, isFunction } from 'lodash-es';
 import { AppointmentService } from '../openmrs-api/appointment-resource.service';
 import dayjs from 'dayjs';
+import { FormPrepopulationService } from '../services/pre-populate-question.service';
 
 /**
  * Data required for creating a {@link Form} instance.
@@ -78,6 +79,7 @@ export class FormCreationService {
     private readonly patientIdentifierAdapter: PatientIdentifierAdapter,
     private readonly appointmentService: AppointmentService,
     private readonly appointmentAdapter: AppointmentAdapter,
+    private readonly formPrepopulationService: FormPrepopulationService,
   ) {}
 
   /**
@@ -313,6 +315,9 @@ export class FormCreationService {
         encounterDate[0]?.control?.disable();
       }
     }
+
+    // Pre-filled questions
+    this.formPrepopulationService.prepopulateForm(form);
   }
 
   private setAppointmentQuestionDefaultValue(form: Form, createFormParams: CreateFormParams) {

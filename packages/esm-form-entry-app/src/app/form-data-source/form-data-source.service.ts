@@ -126,7 +126,7 @@ export class FormDataSourceService {
     };
   }
 
-  private extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
+  public extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
     for (const question of questions) {
       const useMostRecentValue = question.questionOptions?.useMostRecentValue ?? false;
       if (useMostRecentValue === 'true' || (typeof useMostRecentValue === 'boolean' && useMostRecentValue)) {
