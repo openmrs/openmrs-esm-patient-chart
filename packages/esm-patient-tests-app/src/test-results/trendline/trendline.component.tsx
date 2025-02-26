@@ -118,6 +118,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   const dataset = chartTitle;
 
   const formatObsDatetime = (obsDatetime: string) => {
+    // same here. if i have a date like 2025-01-22 05:28:00.0 but i want it to be correct ISO format like 2025-01-22T05:28:00.000Z
     const isoFormattedString = obsDatetime.replace(' ', 'T').replace('.0', '.000').concat('Z');
     return isoFormattedString;
   };

@@ -10,7 +10,6 @@ import {
 } from './filter-types';
 import reducer from './filter-reducer';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
-import { formatDatetime } from '@openmrs/esm-framework';
 import { format } from 'date-fns';
 
 const initialState: ReducerState = {
@@ -83,9 +82,12 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
           .map(
             (test: ReducerState['tests']) =>
               test?.obs?.map((entry) => {
+                // obsDatetime - 2025-01-22 05:28:00.0 - this is in UTC time
+                // isoFormattedString - 2025-01-22T05:28:00.000Z - UTC time but correctly formatted
+                // Question. how can i achieve the same without the manual string manipulation. ideally with dayjs or datefns
                 const isoFormattedString = entry.obsDatetime.replace(' ', 'T').replace('.0', '.000').concat('Z');
-                const date = new Date(isoFormattedString);
-                return format(date, 'yyyy-MM-dd HH:mm:ss');
+                const date = new Date(isoFormattedString); // this is essentially converting it to the users local time.
+                return format(date, 'yyyy-MM-dd HH:mm:ss'); // 2025-01-22 08:28:00.0  2025-01-22 02:28:00.0
               }),
           )
           .flat(),
