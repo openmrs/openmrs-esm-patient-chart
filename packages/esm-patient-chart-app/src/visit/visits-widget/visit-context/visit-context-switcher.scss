@@ -2,14 +2,6 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.visitstList {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  flex-direction: column;
-  min-height: 18rem;
-}
-
 .visitCardRowsContainer {
   max-height: 300px;
 }

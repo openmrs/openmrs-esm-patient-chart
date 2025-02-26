@@ -1,5 +1,11 @@
 @use '@carbon/layout';
 
+.visitContextInfoContainer {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
 .separator,
 .visitLocation {
   margin: layout.$spacing-02;

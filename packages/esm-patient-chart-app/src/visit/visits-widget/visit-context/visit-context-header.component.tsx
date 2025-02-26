@@ -37,7 +37,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   if (isLoading) {
     return (
       <div className={styles.visitContextHeader}>
-        <Loading small />;
+        <Loading small />
       </div>
     );
   }

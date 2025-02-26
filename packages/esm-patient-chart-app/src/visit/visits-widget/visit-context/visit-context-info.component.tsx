@@ -11,25 +11,27 @@ interface VisitContextInfoProps {
 const VisitContextInfo: React.FC<VisitContextInfoProps> = ({ visit }) => {
   const { t } = useTranslation();
 
-  if (visit) {
-    const isActive = !Boolean(visit.stopDatetime);
+  if (!visit) {
+    return null;
+  }
 
-    return (
-      <>
+  const isActive = !Boolean(visit.stopDatetime);
+
+  return (
+    <div className={styles.visitContextInfoContainer}>
+      <span>
         {isActive
           ? t('currentActiveVisit', 'Current active visit')
           : t('fromDateToDate', '{{fromDate}} - {{toDate}}', {
               fromDate: formatDate(parseDate(visit.startDatetime), { time: false }),
               toDate: formatDate(parseDate(visit.stopDatetime), { time: false }),
             })}
-        <span className={styles.separator}>&middot;</span>
-        <Building />
-        <span className={styles.visitLocation}>{visit.location.display}</span>
-      </>
-    );
-  } else {
-    return <></>;
-  }
+      </span>
+      <span className={styles.separator}>&middot;</span>
+      <Building />
+      <span className={styles.visitLocation}>{visit.location.display}</span>
+    </div>
+  );
 };
 
 export default VisitContextInfo;

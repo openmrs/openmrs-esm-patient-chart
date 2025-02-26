@@ -1,6 +1,6 @@
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, RadioButton } from '@carbon/react';
 import { ErrorState, type Visit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib/src';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
   const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const [selectedVisit, setSelectedVisit] = useState<string>(
-    selectedVisitPatientUuid == patientUuid ? manuallySetVisitUuid : null,
+    selectedVisitPatientUuid === patientUuid ? manuallySetVisitUuid : null,
   );
 
   const openStartVisitWorkspace = () => {
@@ -67,7 +67,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
         <Button
           disabled={selectedVisit == null || isLoading}
           onClick={() => {
-            setVisitContext(visits.find((v) => v.uuid == selectedVisit));
+            setVisitContext(visits.find((v) => v.uuid === selectedVisit));
             onAfterVisitSelected?.();
             closeModal();
           }}
