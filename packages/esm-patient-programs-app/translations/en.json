@@ -9,6 +9,7 @@
   "chooseProgram": "Choose a program",
   "chooseStatus": "Choose a program status",
   "completedOn": "Completed On",
+  "completionDateFuture": "Completion date cannot be in the future.",
   "configurePrograms": "Please configure programs to continue.",
   "dateCompleted": "Date completed",
   "dateEnrolled": "Date enrolled",

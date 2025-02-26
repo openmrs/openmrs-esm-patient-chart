@@ -350,7 +350,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           invalid={!!errors?.completionDate}
           invalidText={errors?.completionDate?.message}
         >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
+          <DatePickerInput
+            id="completionDate"
+            labelText={t('completionDate', 'Completion date')}
+            invalid={!!errors?.completionDate}
+            invalidText={errors?.completionDate?.message}
+          />
         </DatePicker>
       )}
     />
