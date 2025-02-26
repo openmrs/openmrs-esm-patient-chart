@@ -50,22 +50,22 @@ const createProgramsFormSchema = (t: TFunction) =>
   z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
-    completionDate: z
+    completionDate: z.coerce
       .date()
       .nullable()
-      .refine((date) => !date || date <= new Date(), {
-        message: t('completionDateFuture', 'Completion date cannot be in the future'),
-      })
-      .superRefine((date, ctx) => {
-        const enrollmentDate = (ctx.parent as any).enrollmentDate;
-        if (date && enrollmentDate && date < enrollmentDate) {
-          ctx.addIssue({
-            path: ['completionDate'],
-            message: t('completionDateBeforeEnrollment', 'Completion date cannot be before enrollment date'),
-            code: z.ZodIssueCode.custom,
-          });
-        }
-      }),
+      .refine(
+        (completionDate) => {
+          if (!completionDate) return true;
+
+          const today = dayjs().startOf('day');
+          const completionDay = dayjs(completionDate).startOf('day');
+
+          return !completionDay.isAfter(today, 'day');
+        },
+        {
+          message: t('completionDateFuture', 'Completion date cannot be in the future.'),
+        },
+      ),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
     enrollmentTime: z.string(),
@@ -120,7 +120,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     control,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
     mode: 'all',
@@ -348,6 +347,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           placeholder="dd/mm/yyyy"
           onChange={([date]) => onChange(date)}
           value={value}
+          invalid={!!errors?.completionDate}
+          invalidText={errors?.completionDate?.message}
         >
           <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
         </DatePicker>
