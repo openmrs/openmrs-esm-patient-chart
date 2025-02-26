@@ -3,11 +3,6 @@ import notesConfigSchema, { type VisitNoteConfigObject } from './notes/visit-not
 
 export const configSchema = {
   visitNoteConfig: notesConfigSchema,
-  numberOfVisitsToLoad: {
-    _type: Type.Number,
-    _description: 'The number of visits to load initially in the Visits Summary tab. Defaults to 5',
-    _default: 5,
-  },
   diagnosisConceptClass: {
     _type: Type.UUID,
     _description: 'The concept class to use for the diagnoses',
@@ -17,6 +12,5 @@ export const configSchema = {
 
 export interface ConfigObject {
   visitNoteConfig: VisitNoteConfigObject;
-  numberOfVisitsToLoad: number;
   diagnosisConceptClass: string;
 }

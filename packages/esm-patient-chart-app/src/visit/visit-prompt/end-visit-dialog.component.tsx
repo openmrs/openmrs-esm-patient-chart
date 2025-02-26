@@ -5,6 +5,7 @@ import { setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/e
 import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
 import styles from './end-visit-dialog.scss';
+import { useMutateVisits } from '@openmrs/esm-patient-common-lib/src';
 
 interface EndVisitDialogProps {
   patientUuid: string;
@@ -13,7 +14,8 @@ interface EndVisitDialogProps {
 
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
+  const { currentVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
+  const {mutateVisits} = useMutateVisits();
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const handleEndVisit = () => {
@@ -37,7 +39,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
               response?.data.stopDatetime,
             );
           }
-          mutate();
+          mutateVisits(patientUuid, currentVisit.uuid);
           closeModal();
 
           showSnackbar({

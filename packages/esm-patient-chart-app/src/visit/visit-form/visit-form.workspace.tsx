@@ -1,12 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-dayjs.extend(isSameOrBefore);
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ButtonSet,
@@ -21,6 +12,7 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Extension,
   ExtensionSlot,
@@ -29,9 +21,6 @@ import {
   showSnackbar,
   toDateObjectStrict,
   toOmrsIsoString,
-  type AssignedExtension,
-  type NewVisitPayload,
-  type Visit,
   updateVisit,
   useConfig,
   useConnectivity,
@@ -39,21 +28,34 @@ import {
   useLayoutType,
   usePatient,
   useSession,
-  useVisit,
+  type AssignedExtension,
+  type NewVisitPayload,
+  type Visit
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
   createOfflineVisitForPatient,
-  type DefaultPatientWorkspaceProps,
   time12HourFormatRegex,
   useActivePatientEnrollment,
+  useMutateVisits,
+  type DefaultPatientWorkspaceProps
 } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { invalidateUseVisits, useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeField from './visit-date-time.component';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
@@ -63,11 +65,8 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
+dayjs.extend(isSameOrBefore);
 
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   /**
@@ -106,8 +105,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const {mutateVisits} = useMutateVisits();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -549,9 +547,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
-            mutateCurrentVisit();
-            invalidateUseVisits(patientUuid);
-            mutateInfiniteVisits();
+            mutateVisits(patientUuid, visitToEdit?.uuid);
           });
       } else {
         createOfflineVisitForPatient(
@@ -561,7 +557,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            mutateCurrentVisit();
+            mutateVisits(patientUuid, visitToEdit?.uuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -593,8 +589,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       extraVisitInfo,
       handleVisitAttributes,
       isOnline,
-      mutateCurrentVisit,
-      mutateInfiniteVisits,
+      mutateVisits,
       visitFormCallbacks,
       patientUuid,
       t,

@@ -21,4 +21,6 @@ export * from './time-helper';
 export * from './types';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
+export * from './visits/useMutateVisit';
+export * from './visits/useInfiniteVisits';
 export * from './workspaces';

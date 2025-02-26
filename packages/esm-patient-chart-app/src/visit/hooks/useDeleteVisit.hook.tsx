@@ -1,12 +1,12 @@
+import { type Visit, showSnackbar } from '@openmrs/esm-framework';
+import { useMutateVisits } from '@openmrs/esm-patient-common-lib';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type Visit, showSnackbar, useVisit } from '@openmrs/esm-framework';
-import { deleteVisit, restoreVisit, useVisits } from '../visits-widget/visit.resource';
+import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const { mutateVisits } = useVisits(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const {mutateVisits} = useMutateVisits();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
 
   const restoreDeletedVisit = () => {
@@ -19,8 +19,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
           }),
           kind: 'success',
         });
-        mutateVisits();
-        mutateCurrentVisit();
+        mutateVisits(patientUuid, visit?.uuid);
         onVisitRestore?.();
       })
       .catch(() => {
@@ -40,8 +39,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
     deleteVisit(visit?.uuid)
       .then(() => {
-        mutateVisits();
-        mutateCurrentVisit();
+        mutateVisits(patientUuid, visit?.uuid);
 
         if (!isCurrentVisitDeleted) {
           showSnackbar({

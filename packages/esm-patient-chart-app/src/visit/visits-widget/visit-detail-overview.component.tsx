@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useInfiniteVisits } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
-import { mapEncounters, useInfiniteVisits } from './visit.resource';
+import { mapEncounters } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
@@ -15,8 +15,7 @@ interface VisitOverviewComponentProps {
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
-  const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
-    useInfiniteVisits(patientUuid);
+  const { visits, error, hasMore, isLoading, isValidating, setSize, size } = useInfiniteVisits(patientUuid);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
 
@@ -92,12 +91,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ) : error ? (
                 <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : visits?.length ? (
-                <VisitsTable
-                  mutateVisits={mutateVisits}
-                  visits={visitsWithEncounters}
-                  showAllEncounters
-                  patientUuid={patientUuid}
-                />
+                <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
               ) : (
                 <div className={styles.emptyStateContainer}>
                   <EmptyState

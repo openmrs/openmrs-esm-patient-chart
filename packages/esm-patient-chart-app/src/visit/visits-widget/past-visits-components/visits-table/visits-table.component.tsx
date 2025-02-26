@@ -42,6 +42,7 @@ import {
   EmptyState,
   PatientChartPagination,
   launchFormEntryOrHtmlForms,
+  useMutateVisits,
 } from '@openmrs/esm-patient-common-lib';
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
@@ -52,7 +53,6 @@ interface VisitTableProps {
   visits: Array<MappedEncounter>;
   showAllEncounters?: boolean;
   patientUuid: string;
-  mutateVisits?: () => void;
 }
 
 type FilterProps = {
@@ -63,11 +63,12 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid, mutateVisits }) => {
+const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
   const visitCount = 20;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
+  const { mutateVisits } = useMutateVisits();
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
 
@@ -135,7 +136,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   const handleEncounterTypeChange = useCallback(({ selectedItem }) => setFilter(selectedItem), []);
 
   const handleDeleteEncounter = useCallback(
-    (encounterUuid: string, encounterTypeName?: string) => {
+    (visitUuid: string, encounterUuid: string, encounterTypeName: string) => {
       const close = showModal('delete-encounter-modal', {
         close: () => close(),
         encounterTypeName: encounterTypeName || '',
@@ -143,7 +144,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              mutateVisits?.();
+              mutateVisits(patientUuid, visitUuid);
               showSnackbar({
                 isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
@@ -166,7 +167,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         },
       });
     },
-    [t, mutateVisits],
+    [t, mutateVisits, patientUuid],
   );
 
   const handleFilter = useCallback(
@@ -304,7 +305,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                       className={styles.menuItem}
                                       itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                       onClick={() =>
-                                        handleDeleteEncounter(selectedVisit.id, selectedVisit.form?.display)
+                                        handleDeleteEncounter(
+                                          selectedVisit.visitUuid,
+                                          selectedVisit.id,
+                                          selectedVisit.form?.display,
+                                        )
                                       }
                                       hasDivider
                                       isDelete
@@ -347,7 +352,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   <Button
                                     kind="danger--ghost"
                                     onClick={() =>
-                                      handleDeleteEncounter(selectedVisit?.id, selectedVisit?.form?.display)
+                                      handleDeleteEncounter(
+                                        selectedVisit.visitUuid,
+                                        selectedVisit?.id,
+                                        selectedVisit?.form?.display,
+                                      )
                                     }
                                     renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
                                       <TrashCanIcon size={16} {...props} />
