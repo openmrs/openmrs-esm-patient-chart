@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "start": "openmrs develop --sources packages/esm-form-entry-app packages/esm-patient-chart-app --backend http://hie.kenyahmis.org --config-url http://hie.kenyahmis.org/openmrs/spa/openmrs.config.json http://hie.kenyahmis.org/openmrs/spa/kenyaemr.config.json --port 8085",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag next",
     "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@latest",
