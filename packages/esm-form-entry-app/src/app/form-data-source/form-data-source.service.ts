@@ -128,6 +128,10 @@ export class FormDataSourceService {
 
   public extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
     for (const question of questions) {
+      const conceptsForExpressionEvaluation = question.questionOptions?.conceptsForExpressionEvaluation;
+      if (Array.isArray(conceptsForExpressionEvaluation)) {
+        conceptsForExpressionEvaluation.forEach((concept) => concepts.add(concept));
+      }
       const useMostRecentValue = question.questionOptions?.useMostRecentValue ?? false;
       if (useMostRecentValue === 'true' || (typeof useMostRecentValue === 'boolean' && useMostRecentValue)) {
         if (typeof question.concept === 'string') {
@@ -304,12 +308,10 @@ export class FormDataSourceService {
 
     return this.conceptResourceService.searchConcept(searchText, false, customRepresentation).pipe(
       map((concepts) => {
-        return (
-          concepts
-            .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
-            .filter((concept) => this.filterConceptByConceptSourceUuid(concept, conceptSourceUuids))
-            .map((concept) => this.mapConceptWithMappings(concept, conceptSourceUuids))
-        );
+        return concepts
+          .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
+          .filter((concept) => this.filterConceptByConceptSourceUuid(concept, conceptSourceUuids))
+          .map((concept) => this.mapConceptWithMappings(concept, conceptSourceUuids));
       }),
     );
   }

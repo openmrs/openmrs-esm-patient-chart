@@ -185,6 +185,7 @@ interface QuestionOptions {
   answers?: Array<QuestionOptionsAnswer>;
   useMostRecentValue: boolean | 'true';
   autoPopulateWithMostRecentValue: boolean;
+  conceptsForExpressionEvaluation?: Array<string>;
 }
 
 interface QuestionOptionsAnswer {

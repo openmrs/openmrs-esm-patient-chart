@@ -137,14 +137,13 @@ export class FormCreationService {
     this.dataSources.registerDataSource('personAttribute', dataSources.location);
     this.dataSources.registerDataSource('conceptAnswers', dataSources.conceptAnswers);
     this.dataSources.registerDataSource('diagnoses', dataSources.diagnoses);
-    this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
+    this.dataSources.registerDataSource('visitTypeUuid', { visitTypeUuid }, true);
     const patientObj = this.formDataSourceService.getPatientObject(patient);
     this.dataSources.registerDataSource('patient', patientObj, true);
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.session.sessionLocation);
-    // Appointment service types
     this.dataSources.registerDataSource('services', dataSources.services);
     this.dataSources.registerDataSource('appointmentSummaryService', this.appointmentService);
 
