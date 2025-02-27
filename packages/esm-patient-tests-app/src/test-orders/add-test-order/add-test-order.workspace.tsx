@@ -10,7 +10,6 @@ import {
   formatDate,
   parseDate,
   useLayoutType,
-  usePatient,
   useConfig,
 } from '@openmrs/esm-framework';
 import {
@@ -44,8 +43,7 @@ export default function AddLabOrderWorkspace({
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { patientUuid } = usePatientChartStore();
-  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
+  const { patientUuid, patient } = usePatientChartStore();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
@@ -84,7 +82,7 @@ export default function AddLabOrderWorkspace({
 
   return (
     <div className={styles.container}>
-      {isTablet && !isLoadingPatient && (
+      {isTablet && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
           <span className={classNames(styles.text02, styles.bodyShort01)}>
@@ -110,6 +108,7 @@ export default function AddLabOrderWorkspace({
         <LabOrderForm
           initialOrder={currentLabOrder}
           patientUuid={patientUuid}
+          patient={patient}
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           promptBeforeClosing={promptBeforeClosing}

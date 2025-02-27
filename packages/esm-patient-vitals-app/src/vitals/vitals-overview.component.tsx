@@ -1,17 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
-import { Add, Analytics, Table, Printer } from '@carbon/react/icons';
+import { Analytics, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import {
+  AddIcon,
+  PrinterIcon,
   age,
   getPatientName,
   formatDate,
   parseDate,
   useConfig,
   useLayoutType,
-  usePatient,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import { launchVitalsAndBiometricsForm } from '../utils';
@@ -24,12 +25,13 @@ import styles from './vitals-overview.scss';
 
 interface VitalsOverviewProps {
   patientUuid: string;
+  patient: fhir.Patient;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
 }
 
-const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const headerTitle = t('vitals', 'Vitals');
@@ -38,7 +40,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
   const isTablet = useLayoutType() === 'tablet';
   const [isPrinting, setIsPrinting] = useState(false);
   const contentToPrintRef = useRef(null);
-  const patient = usePatient(patientUuid);
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
@@ -66,16 +67,16 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     };
 
     const identifiers =
-      patient?.patient?.identifier?.filter(
+      patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      name: patient?.patient ? getPatientName(patient?.patient) : '',
-      age: age(patient?.patient?.birthDate),
-      gender: getGender(patient?.patient?.gender),
-      location: patient?.patient?.address?.[0].city,
-      identifiers: identifiers?.length ? identifiers.map(({ value, type }) => value) : [],
+      name: patient ? getPatientName(patient) : '',
+      age: age(patient?.birthDate),
+      gender: getGender(patient?.gender),
+      location: patient?.address?.[0].city,
+      identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
   }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
 
@@ -166,7 +167,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
     documentTitle: `OpenMRS - ${patientDetails.name} - ${headerTitle}`,
     onBeforeGetContent: () =>
       new Promise((resolve) => {
-        if (patient && patient.patient && headerTitle) {
+        if (patient && headerTitle) {
           onBeforeGetContentResolve.current = resolve;
           setIsPrinting(true);
         }
@@ -191,7 +192,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                 </div>
                 <div className={styles.vitalsHeaderActionItems}>
                   <ContentSwitcher
-                    onChange={(evt) => setChartView(evt.name === 'chartView')}
+                    onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
+                      setChartView(evt.name === 'chartView')
+                    }
                     size={isTablet ? 'md' : 'sm'}
                   >
                     <IconSwitch name="tableView" text="Table view">
@@ -206,7 +209,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                     {showPrintButton && (
                       <Button
                         kind="ghost"
-                        renderIcon={Printer}
+                        renderIcon={PrinterIcon}
                         iconDescription="Add vitals"
                         className={styles.printButton}
                         onClick={handlePrint}
@@ -216,7 +219,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, pageSize, 
                     )}
                     <Button
                       kind="ghost"
-                      renderIcon={Add}
+                      renderIcon={AddIcon}
                       iconDescription="Add vitals"
                       onClick={launchVitalsBiometricsForm}
                     >
