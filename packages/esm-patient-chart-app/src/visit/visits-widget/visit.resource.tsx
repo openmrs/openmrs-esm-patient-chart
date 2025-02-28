@@ -1,9 +1,11 @@
 import useSWR, { mutate } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import {
+  makeUrl,
   openmrsFetch,
   restBaseUrl,
   useConfig,
+  useOpenmrsPagination,
   type OpenmrsResource,
   type Privilege,
   type Visit,
@@ -53,9 +55,10 @@ export function useInfiniteVisits(patientUuid: string) {
   };
 }
 
+const customRepresentation =
+  'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+
 export function useVisits(patientUuid: string) {
-  const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
   const {
     data,
@@ -74,6 +77,11 @@ export function useVisits(patientUuid: string) {
     isValidating,
     mutateVisits: localMutate,
   };
+}
+
+export function useVisitsPagination(patientUuid: string, pageSize: number) {
+  const url = new URL(makeUrl(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`), window.location.toString())
+  return useOpenmrsPagination<Visit>(url, pageSize);
 }
 
 export function invalidateUseVisits(patientUuid: string) {
