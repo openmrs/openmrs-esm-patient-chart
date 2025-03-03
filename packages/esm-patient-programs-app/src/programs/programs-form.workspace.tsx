@@ -54,11 +54,20 @@ const createProgramsFormSchema = (t: TFunction) =>
       .date()
       .nullable()
       .refine(
-        (completionDate) => {
+        (completionDate, ctx) => {
           if (!completionDate) return true;
 
           const today = dayjs().startOf('day');
           const completionDay = dayjs(completionDate).startOf('day');
+          const enrollmentDate = ctx.parent.enrollmentDate ? dayjs(ctx.parent.enrollmentDate) : null;
+
+          if (enrollmentDate && completionDay.isBefore(enrollmentDate, 'day')) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('completionDateBeforeEnrollment', 'Completion date cannot be before the enrollment date.'),
+            });
+            return false;
+          }
 
           return !completionDay.isAfter(today, 'day');
         },
@@ -120,6 +129,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
     mode: 'all',
