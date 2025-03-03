@@ -5,7 +5,7 @@ import { formatDatetime, parseDate, useConfig, ExtensionSlot } from '@openmrs/es
 import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
 import { mapEncounters } from './visit.resource';
-import VisitsTable from './past-visits-components/visits-table';
+import EncountersTable from './past-visits-components/encounters-table/encounters-table.component';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
 
@@ -91,7 +91,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ) : error ? (
                 <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : visits?.length ? (
-                <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
+                <EncountersTable encounters={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
               ) : (
                 <div className={styles.emptyStateContainer}>
                   <EmptyState

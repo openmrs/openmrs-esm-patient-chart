@@ -30,7 +30,7 @@ import {
   useSession,
   type AssignedExtension,
   type NewVisitPayload,
-  type Visit
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -38,7 +38,7 @@ import {
   time12HourFormatRegex,
   useActivePatientEnrollment,
   useMutateVisits,
-  type DefaultPatientWorkspaceProps
+  type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -105,7 +105,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const {mutateVisits} = useMutateVisits();
+  const { mutateVisits } = useMutateVisits();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{

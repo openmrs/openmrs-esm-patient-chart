@@ -6,7 +6,7 @@ import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const {mutateVisits} = useMutateVisits();
+  const { mutateVisits } = useMutateVisits();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
 
   const restoreDeletedVisit = () => {

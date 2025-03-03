@@ -13,6 +13,7 @@ import {
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.workspace';
+import { useMutateVisits } from '@openmrs/esm-patient-common-lib/src';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
@@ -46,7 +47,16 @@ jest.mock('./visit-notes.resource', () => ({
   useVisitNotes: jest.fn().mockImplementation(() => ({
     mutateVisitNotes: jest.fn(),
   })),
+  savePatientDiagnosis: jest.fn().mockResolvedValue({}),
 }));
+
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  useMutateVisits: jest.fn().mockReturnValue({
+    mutateVisits: jest.fn(),
+  }),
+}));
+const mockUseMutatedVisits = jest.mocked(useMutateVisits);
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 mockUseConfig.mockReturnValue({
@@ -140,10 +150,15 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
     encounterDatetime: undefined,
   };
 
-  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as ReturnType<
-    typeof saveVisitNote
-  >);
+  mockSaveVisitNote.mockResolvedValueOnce({
+    status: 201,
+    data: { uuid: 'new-visit-note-encounter-uuid' },
+  } as unknown as ReturnType<typeof saveVisitNote>);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  const mockMutateVisits = jest.fn();
+  mockUseMutatedVisits.mockReturnValue({
+    mutateVisits: mockMutateVisits,
+  });
 
   renderVisitNotesForm();
 
@@ -168,6 +183,8 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
+  expect(mockMutateVisits).toHaveBeenCalledTimes(1);
+  expect(mockMutateVisits).toHaveBeenCalledWith(mockPatient.id);
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {

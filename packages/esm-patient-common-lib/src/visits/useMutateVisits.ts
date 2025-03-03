@@ -1,5 +1,5 @@
 import { restBaseUrl } from '@openmrs/esm-framework';
-import { useSWRConfig } from 'swr/_internal';
+import { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import { useInfiniteVisitsGetKey } from './useInfiniteVisits';
 

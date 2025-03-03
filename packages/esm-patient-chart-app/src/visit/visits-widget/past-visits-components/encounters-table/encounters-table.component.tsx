@@ -47,10 +47,10 @@ import {
 import { deleteEncounter } from './visits-table.resource';
 import { type MappedEncounter } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
-import styles from './visits-table.scss';
+import styles from './encounters-table.scss';
 
 interface VisitTableProps {
-  visits: Array<MappedEncounter>;
+  encounters: Array<MappedEncounter>;
   showAllEncounters?: boolean;
   patientUuid: string;
 }
@@ -63,8 +63,8 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
-  const visitCount = 20;
+const EncountersTable: React.FC<VisitTableProps> = ({ showAllEncounters, encounters, patientUuid }) => {
+  const pageSize = 20;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
@@ -78,23 +78,23 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     });
   });
 
-  const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
+  const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))].sort();
 
   const [filter, setFilter] = useState('');
 
   const filteredRows = useMemo(() => {
     if (!filter || filter == 'All') {
-      return visits;
+      return encounters;
     }
 
     if (filter) {
-      return visits?.filter((encounter) => encounter.encounterType === filter);
+      return encounters?.filter((encounter) => encounter.encounterType === filter);
     }
 
-    return visits;
-  }, [filter, visits]);
+    return encounters;
+  }, [filter, encounters]);
 
-  const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
+  const { results: paginatedEncounters, goTo, currentPage } = usePagination(filteredRows ?? [], pageSize);
 
   const tableHeaders = [
     {
@@ -126,12 +126,12 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   );
 
   const tableRows = useMemo(() => {
-    return paginatedVisits?.map((encounter) => ({
+    return paginatedEncounters?.map((encounter) => ({
       ...encounter,
       formName: encounter.form?.display ?? '--',
       datetime: formatDatetime(parseDate(encounter.datetime)),
     }));
-  }, [paginatedVisits]);
+  }, [paginatedEncounters]);
 
   const handleEncounterTypeChange = useCallback(({ selectedItem }) => setFilter(selectedItem), []);
 
@@ -185,7 +185,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     [],
   );
 
-  if (!visits?.length) {
+  if (!encounters?.length) {
     return (
       <div className={styles.container}>
         <EmptyState headerTitle={t('encounters', 'Encounters')} displayText={t('encounters__lower', 'encounters')} />
@@ -201,7 +201,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         rows={tableRows}
         overflowMenuOnHover={desktopLayout}
         size={desktopLayout ? 'sm' : 'lg'}
-        useZebraStyles={visits?.length > 1 ? true : false}
+        useZebraStyles={encounters?.length > 1 ? true : false}
       >
         {({
           rows,
@@ -255,7 +255,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                 </TableHead>
                 <TableBody>
                   {rows.map((row) => {
-                    const selectedVisit = visits.find((visit) => visit.id === row.id);
+                    const selectedEncounter = encounters.find((encounter) => encounter.id === row.id);
 
                     return (
                       <React.Fragment key={row.id}>
@@ -278,8 +278,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                     className={styles.menuItem}
                                     itemText={t('goToThisEncounter', 'Go to this encounter')}
                                   />
-                                  {userHasAccess(selectedVisit?.editPrivilege, session?.user) &&
-                                    selectedVisit?.form?.uuid && (
+                                  {userHasAccess(selectedEncounter?.editPrivilege, session?.user) &&
+                                    selectedEncounter?.form?.uuid && (
                                       <OverflowMenuItem
                                         className={styles.menuItem}
                                         itemText={t('editThisEncounter', 'Edit this encounter')}
@@ -288,27 +288,27 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                           launchFormEntryOrHtmlForms(
                                             htmlFormEntryFormsConfig,
                                             patientUuid,
-                                            selectedVisit?.form?.uuid,
-                                            selectedVisit?.visitUuid,
-                                            selectedVisit?.id,
-                                            selectedVisit?.form?.display,
-                                            selectedVisit?.visitTypeUuid,
-                                            selectedVisit?.visitStartDatetime,
-                                            selectedVisit?.visitStopDatetime,
+                                            selectedEncounter?.form?.uuid,
+                                            selectedEncounter?.visitUuid,
+                                            selectedEncounter?.id,
+                                            selectedEncounter?.form?.display,
+                                            selectedEncounter?.visitTypeUuid,
+                                            selectedEncounter?.visitStartDatetime,
+                                            selectedEncounter?.visitStopDatetime,
                                           );
                                         }}
                                       />
                                     )}
-                                  {userHasAccess(selectedVisit?.editPrivilege, session?.user) && (
+                                  {userHasAccess(selectedEncounter?.editPrivilege, session?.user) && (
                                     <OverflowMenuItem
                                       size={desktopLayout ? 'sm' : 'lg'}
                                       className={styles.menuItem}
                                       itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                       onClick={() =>
                                         handleDeleteEncounter(
-                                          selectedVisit.visitUuid,
-                                          selectedVisit.id,
-                                          selectedVisit.form?.display,
+                                          selectedEncounter.visitUuid,
+                                          selectedEncounter.id,
+                                          selectedEncounter.form?.display,
                                         )
                                       }
                                       hasDivider
@@ -323,23 +323,23 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              <EncounterObservations observations={selectedVisit?.obs} />
-                              {userHasAccess(selectedVisit?.editPrivilege, session?.user) && (
+                              <EncounterObservations observations={selectedEncounter?.obs} />
+                              {userHasAccess(selectedEncounter?.editPrivilege, session?.user) && (
                                 <>
-                                  {selectedVisit?.form?.uuid && (
+                                  {selectedEncounter?.form?.uuid && (
                                     <Button
                                       kind="ghost"
                                       onClick={() => {
                                         launchFormEntryOrHtmlForms(
                                           htmlFormEntryFormsConfig,
                                           patientUuid,
-                                          selectedVisit?.form?.uuid,
-                                          selectedVisit?.visitUuid,
-                                          selectedVisit?.id,
-                                          selectedVisit?.form?.display,
-                                          selectedVisit?.visitTypeUuid,
-                                          selectedVisit?.visitStartDatetime,
-                                          selectedVisit?.visitStopDatetime,
+                                          selectedEncounter?.form?.uuid,
+                                          selectedEncounter?.visitUuid,
+                                          selectedEncounter?.id,
+                                          selectedEncounter?.form?.display,
+                                          selectedEncounter?.visitTypeUuid,
+                                          selectedEncounter?.visitStartDatetime,
+                                          selectedEncounter?.visitStopDatetime,
                                         );
                                       }}
                                       renderIcon={(props: ComponentProps<typeof EditIcon>) => (
@@ -353,9 +353,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                     kind="danger--ghost"
                                     onClick={() =>
                                       handleDeleteEncounter(
-                                        selectedVisit.visitUuid,
-                                        selectedVisit?.id,
-                                        selectedVisit?.form?.display,
+                                        selectedEncounter.visitUuid,
+                                        selectedEncounter?.id,
+                                        selectedEncounter?.form?.display,
                                       )
                                     }
                                     renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
@@ -392,10 +392,10 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
             {showAllEncounters ? (
               <div className={styles.paginationContainer}>
                 <PatientChartPagination
-                  currentItems={paginatedVisits.length}
+                  currentItems={paginatedEncounters.length}
                   onPageNumberChange={({ page }) => goTo(page)}
                   pageNumber={currentPage}
-                  pageSize={visitCount}
+                  pageSize={pageSize}
                   totalItems={filteredRows.length}
                 />
               </div>
@@ -407,4 +407,4 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   );
 };
 
-export default VisitTable;
+export default EncountersTable;
