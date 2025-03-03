@@ -12,4 +12,20 @@ describe('VitalsHeaderItem', () => {
     expect(screen.getByText('°C')).toBeInTheDocument();
     expect(screen.getByText('36.5')).toBeInTheDocument();
   });
+
+  it('handles empty unit symbol gracefully', () => {
+    const propsWithEmptyUnit = { ...testProps, unitSymbol: '' };
+    render(<VitalsHeaderItem {...propsWithEmptyUnit} />);
+
+    expect(screen.getByText('Temp')).toBeInTheDocument();
+    expect(screen.getByText('36.5')).toBeInTheDocument();
+  });
+
+  it('handles undefined unit symbol gracefully', () => {
+    const propsWithUndefinedUnit = { ...testProps, unitSymbol: undefined };
+    render(<VitalsHeaderItem {...propsWithUndefinedUnit} />);
+
+    expect(screen.getByText('Temp')).toBeInTheDocument();
+    expect(screen.getByText('36.5')).toBeInTheDocument();
+  });
 });
