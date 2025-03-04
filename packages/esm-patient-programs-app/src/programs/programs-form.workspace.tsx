@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -16,11 +16,21 @@ import {
   Select,
   SelectItem,
   Stack,
+  TimePickerSelect,
+  TimePicker,
 } from '@carbon/react';
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  ResponsiveWrapper,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -40,9 +50,35 @@ const createProgramsFormSchema = (t: TFunction) =>
   z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
-    completionDate: z.date().nullable(),
+    completionDate: z.coerce
+      .date()
+      .nullable()
+      .refine(
+        (completionDate, ctx) => {
+          if (!completionDate) return true;
+
+          const today = dayjs().startOf('day');
+          const completionDay = dayjs(completionDate).startOf('day');
+          const enrollmentDate = ctx.parent.enrollmentDate ? dayjs(ctx.parent.enrollmentDate) : null;
+
+          if (enrollmentDate && completionDay.isBefore(enrollmentDate, 'day')) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('completionDateBeforeEnrollment', 'Completion date cannot be before the enrollment date.'),
+            });
+            return false;
+          }
+
+          return !completionDay.isAfter(today, 'day');
+        },
+        {
+          message: t('completionDateFuture', 'Completion date cannot be in the future.'),
+        },
+      ),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
+    enrollmentTime: z.string(),
+    enrollmentTimeFormat: z.string(),
   });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
@@ -92,6 +128,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const {
     control,
     handleSubmit,
+    setValue,
     watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
@@ -116,14 +153,26 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     async (data: ProgramsFormData) => {
       const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
 
+      let finalCompletionDate: string | null = null;
+      if (completionDate) {
+        const today = dayjs().startOf('day');
+        const completionDay = dayjs(completionDate).startOf('day');
+
+        if (completionDay.isSame(today, 'day')) {
+          finalCompletionDate = dayjs().utc().format();
+        } else {
+          finalCompletionDate = dayjs(completionDate).endOf('day').utc().format();
+        }
+      }
+
       const payload = {
         patient: patientUuid,
         program: selectedProgram,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
-        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
+        dateCompleted: finalCompletionDate,
         location: enrollmentLocation,
         states:
-          !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
+          !!selectedProgramStatus && selectedProgramStatus !== currentState?.state.uuid
             ? [{ state: { uuid: selectedProgramStatus } }]
             : [],
       };
@@ -192,25 +241,107 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     />
   );
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
+  );
+  const timepickerEnabled = true;
+  const [selectedTime, setSelectedTime] = useState<string>(
+    new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+  );
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      const dateWithMidnightTime = new Date(date);
+      dateWithMidnightTime.setHours(0, 0, 0, 0);
+      setValue('enrollmentDate', dateWithMidnightTime);
+    }
+  };
+
+  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const time = event.target.value;
+    setSelectedTime(time);
+    updateDateTime(selectedDate, time);
+  };
+
+  const updateDateTime = (date: Date | null, time: string) => {
+    if (date) {
+      const formattedTime = dayjs(time, 'h:mm A');
+      const updatedDateTime = new Date(date);
+      updatedDateTime.setHours(formattedTime.hour());
+      updatedDateTime.setMinutes(formattedTime.minute());
+      setValue('enrollmentDate', updatedDateTime);
+    }
+  };
   const enrollmentDate = (
-    <Controller
-      name="enrollmentDate"
-      control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="enrollment date"
-          id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+      <DatePicker
+        aria-label="enrollment date"
+        id="enrollmentDate"
+        datePickerType="single"
+        dateFormat="d/m/Y"
+        maxDate={new Date().toISOString()}
+        placeholder="dd/mm/yyyy"
+        onChange={handleDateChange}
+        value={selectedDate}
+      >
+        <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
+      </DatePicker>
+
+      {timepickerEnabled && (
+        <ResponsiveWrapper>
+          <Controller
+            name="enrollmentTime"
+            control={control}
+            render={({ field: { onBlur, onChange, value } }) => {
+              const getCurrentTime = () => {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const amPm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                return { time: `${hours}:${minutes}`, format: amPm };
+              };
+
+              if (!value) {
+                const { time, format } = getCurrentTime();
+                onChange(time);
+                setValue('enrollmentTimeFormat', format);
+              }
+
+              return (
+                <TimePicker
+                  id="enrollmentTimePicker"
+                  labelText={t('timeEnrolled', 'Time enrolled')}
+                  onChange={(event) => {
+                    handleTimeChange(event);
+                    onChange(event.target.value);
+                  }}
+                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                  value={value}
+                  onBlur={onBlur}
+                >
+                  <Controller
+                    name="enrollmentTimeFormat"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <TimePickerSelect
+                        id="enrollmentTimeFormatSelect"
+                        onChange={(event) => onChange(event.target.value)}
+                        value={value}
+                        aria-label={t('timeFormat', 'Time Format')}
+                      >
+                        <SelectItem value="AM" text="AM" />
+                        <SelectItem value="PM" text="PM" />
+                      </TimePickerSelect>
+                    )}
+                  />
+                </TimePicker>
+              );
+            }}
+          />
+        </ResponsiveWrapper>
       )}
-    />
+    </div>
   );
 
   const completionDate = (
@@ -223,13 +354,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => onChange(date)}
           value={value}
+          invalid={!!errors?.completionDate}
+          invalidText={errors?.completionDate?.message}
         >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
+          <DatePickerInput
+            id="completionDate"
+            labelText={t('completionDate', 'Completion date')}
+            invalid={!!errors?.completionDate}
+            invalidText={errors?.completionDate?.message}
+          />
         </DatePicker>
       )}
     />
