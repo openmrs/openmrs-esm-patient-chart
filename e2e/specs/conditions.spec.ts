@@ -119,7 +119,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted condition in the list', async () => {
-    await expect(conditionsPage.page.getByText(/mental status change/i)).not.toBeVisible();
+    await expect(conditionsPage.page.getByText(/mental status change/i)).toBeHidden();
     await expect(conditionsPage.page.getByText(/there are no conditions to display for this patient/i)).toBeVisible();
   });
 });
