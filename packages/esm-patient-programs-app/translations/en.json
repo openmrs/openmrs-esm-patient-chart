@@ -9,6 +9,7 @@
   "chooseProgram": "Choose a program",
   "chooseStatus": "Choose a program status",
   "completedOn": "Completed On",
+  "completionDateFuture": "Completion date cannot be in the future.",
   "configurePrograms": "Please configure programs to continue.",
   "dateCompleted": "Date completed",
   "dateEnrolled": "Date enrolled",
@@ -42,5 +43,7 @@
   "saving": "Saving",
   "seeAll": "See all",
   "state": "State",
-  "status": "Status"
+  "status": "Status",
+  "timeEnrolled": "Time enrolled",
+  "timeFormat": "Time Format"
 }
