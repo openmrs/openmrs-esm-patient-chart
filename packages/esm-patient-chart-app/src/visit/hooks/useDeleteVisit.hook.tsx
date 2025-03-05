@@ -6,7 +6,7 @@ import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const { mutateVisits } = useMutateVisits();
+  const { mutateVisits } = useMutateVisits(patientUuid);
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
 
   const restoreDeletedVisit = () => {
@@ -19,7 +19,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
           }),
           kind: 'success',
         });
-        mutateVisits(patientUuid, visit?.uuid);
+        mutateVisits(visit?.uuid);
         onVisitRestore?.();
       })
       .catch(() => {
@@ -39,7 +39,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
     deleteVisit(visit?.uuid)
       .then(() => {
-        mutateVisits(patientUuid, visit?.uuid);
+        mutateVisits(visit?.uuid);
 
         if (!isCurrentVisitDeleted) {
           showSnackbar({

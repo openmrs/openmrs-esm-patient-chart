@@ -184,7 +184,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
   expect(mockMutateVisits).toHaveBeenCalledTimes(1);
-  expect(mockMutateVisits).toHaveBeenCalledWith(mockPatient.id);
+  expect(mockMutateVisits).toHaveBeenCalledWith();
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {

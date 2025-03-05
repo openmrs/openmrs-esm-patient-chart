@@ -105,7 +105,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutateVisits } = useMutateVisits();
+  const { mutateVisits } = useMutateVisits(patientUuid);
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -547,7 +547,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
-            mutateVisits(patientUuid, visitToEdit?.uuid);
+            mutateVisits(visitToEdit?.uuid);
           });
       } else {
         createOfflineVisitForPatient(
@@ -557,7 +557,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            mutateVisits(patientUuid, visitToEdit?.uuid);
+            mutateVisits(visitToEdit?.uuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,

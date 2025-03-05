@@ -31,7 +31,11 @@ import {
   useSession,
   type UploadedFile,
 } from '@openmrs/esm-framework';
-import { useAllowedFileExtensions, useMutateVisits, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import {
+  useAllowedFileExtensions,
+  useMutateVisits,
+  type DefaultPatientWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
@@ -47,7 +51,7 @@ import {
   fetchDiagnosisConceptsByName,
   savePatientDiagnosis,
   saveVisitNote,
-  useVisitNotes
+  useVisitNotes,
 } from './visit-notes.resource';
 
 type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
@@ -170,7 +174,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useMutateVisits();
+  const { mutateVisits } = useMutateVisits(patientUuid);
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -390,10 +394,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         })
         .then(() => {
           mutateVisitNotes();
-          // TODO: we should explicitly specify the visit that the visit note encounter is for, 
+          // TODO: we should explicitly specify the visit that the visit note encounter is for,
           // and pass in the visitUuid here.
           // See https://openmrs.atlassian.net/browse/O3-4420
-          mutateVisits(patientUuid);
+          mutateVisits();
 
           if (images?.length) {
             mutateAttachments();

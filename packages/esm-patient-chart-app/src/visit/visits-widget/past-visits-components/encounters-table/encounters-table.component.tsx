@@ -68,7 +68,7 @@ const EncountersTable: React.FC<VisitTableProps> = ({ showAllEncounters, encount
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisits } = useMutateVisits();
+  const { mutateVisits } = useMutateVisits(patientUuid);
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
 
@@ -144,7 +144,7 @@ const EncountersTable: React.FC<VisitTableProps> = ({ showAllEncounters, encount
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              mutateVisits(patientUuid, visitUuid);
+              mutateVisits(visitUuid);
               showSnackbar({
                 isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
@@ -167,7 +167,7 @@ const EncountersTable: React.FC<VisitTableProps> = ({ showAllEncounters, encount
         },
       });
     },
-    [t, mutateVisits, patientUuid],
+    [t, mutateVisits],
   );
 
   const handleFilter = useCallback(

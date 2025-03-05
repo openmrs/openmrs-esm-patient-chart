@@ -2,7 +2,7 @@ import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWRInfinite from 'swr/infinite';
 
 export function useInfiniteVisits(patientUuid: string) {
-  const getKey = useInfiniteVisitsGetKey()(patientUuid);
+  const getKey = useInfiniteVisitsGetKey(patientUuid);
 
   const {
     data,
@@ -26,12 +26,12 @@ export function useInfiniteVisits(patientUuid: string) {
   };
 }
 
-export function useInfiniteVisitsGetKey() {
+export function useInfiniteVisitsGetKey(patientUuid: string) {
   const { numberOfVisitsToLoad } = useConfig({ externalModuleName: '@openmrs/esm-patient-chart-app' });
   const customRepresentation =
     'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
-  return (patientUuid: string) => {
+  return () => {
     const getKey = (pageIndex, previousPageData) => {
       const pageSize = numberOfVisitsToLoad;
 

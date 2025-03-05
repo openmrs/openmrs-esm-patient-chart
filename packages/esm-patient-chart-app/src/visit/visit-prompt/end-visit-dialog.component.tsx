@@ -15,7 +15,7 @@ interface EndVisitDialogProps {
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
-  const { mutateVisits } = useMutateVisits();
+  const { mutateVisits } = useMutateVisits(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const handleEndVisit = () => {
@@ -39,7 +39,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
               response?.data.stopDatetime,
             );
           }
-          mutateVisits(patientUuid, currentVisit.uuid);
+          mutateVisits(currentVisit.uuid);
           closeModal();
 
           showSnackbar({
