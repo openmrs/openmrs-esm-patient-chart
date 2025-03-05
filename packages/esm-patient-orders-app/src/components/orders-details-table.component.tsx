@@ -207,8 +207,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({ patientUuid, showAddBu
         dosage:
           order.type === 'drugorder' ? (
             <div className={styles.singleLineText}>{`${t('indication', 'Indication').toUpperCase()}
-            ${order.orderReasonNonCoded} ${'-'} ${t('quantity', 'Quantity').toUpperCase()} ${order.quantity} ${order
-              ?.quantityUnits?.display} `}</div>
+            ${order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')} ${'-'} ${t(
+              'quantity',
+              'Quantity',
+            ).toUpperCase()} ${order.quantity} ${order?.quantityUnits?.display} `}</div>
           ) : (
             '--'
           ),
