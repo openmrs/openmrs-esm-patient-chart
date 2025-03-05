@@ -37,7 +37,6 @@ import {
   useConnectivity,
   useFeatureFlag,
   useLayoutType,
-  usePatient,
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
@@ -83,7 +82,8 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
   closeWorkspace,
-  patientUuid: initialPatientUuid,
+  patient,
+  patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   showVisitEndDateTimeFields,
@@ -102,7 +102,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
   );
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
-  const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);

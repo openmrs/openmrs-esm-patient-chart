@@ -1,14 +1,13 @@
 import { createGlobalStore, useStore } from '@openmrs/esm-framework';
 
 export interface PatientChartStore {
-  patientUuid: string;
+  patientUuid?: string;
+  patient?: fhir.Patient;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
 
-const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {
-  patientUuid: '',
-});
+const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {});
 
 /**
  * This function returns the patient chart store.
@@ -28,6 +27,14 @@ export function usePatientChartStore() {
  * This function will get the patient UUID from either URL, or will look into the patient chart store.
  * @returns {string} patientUuid
  */
-export function getPatientUuidFromStore(): string {
-  return patientChartStore.getState()?.patientUuid;
+export function getPatientUuidFromStore(): string | undefined {
+  return patientChartStore.getState().patientUuid;
+}
+
+/**
+ * This function will get the current patient from the store
+ * @returns {string} patientUuid
+ */
+export function getPatientFromStore(): fhir.Patient | undefined {
+  return patientChartStore.getState().patient;
 }
