@@ -17,6 +17,7 @@ import { useMutateVisits } from '@openmrs/esm-patient-common-lib/src';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),

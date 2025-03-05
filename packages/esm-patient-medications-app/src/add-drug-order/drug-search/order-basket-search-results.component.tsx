@@ -10,7 +10,6 @@ import {
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
-  usePatient,
   UserHasAccess,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
