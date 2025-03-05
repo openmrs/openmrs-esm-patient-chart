@@ -275,8 +275,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                             value={value}
                             aria-label={t('timeFormat ', 'Time Format')}
                           >
-                            <SelectItem value="AM" text="AM" />
-                            <SelectItem value="PM" text="PM" />
+                            <SelectItem value="AM" text={t('AM', 'AM')} />
+                            <SelectItem value="PM" text={t('PM', 'PM')} />
                           </TimePickerSelect>
                         )}
                       />

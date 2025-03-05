@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity, usePatient } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useFeatureFlag, usePatient } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   type DefaultPatientWorkspaceProps,
@@ -85,8 +85,11 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
     }
   }, [state]);
 
+  const isRdeEnabled = useFeatureFlag('rde');
+
   return (
     <div>
+      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
       {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
     </div>
   );
