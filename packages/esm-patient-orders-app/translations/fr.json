@@ -43,6 +43,7 @@
   "medicationIndefiniteDuration": "Durée illimitée",
   "medications": "Traitements",
   "modifyOrder": "Modifier la prescription",
+  "noIndicationProvided": "No indication provided",
   "noMatchingOrdersToDisplay": "Aucune prescription à afficher",
   "noResultsForTestTypeSearch": "Aucun résultat pour \"{{searchTerm}}\"",
   "normalRange": "Plage normale",

@@ -43,6 +43,7 @@
   "medicationIndefiniteDuration": "无限期",
   "medications": "药物",
   "modifyOrder": "修改医嘱",
+  "noIndicationProvided": "No indication provided",
   "noMatchingOrdersToDisplay": "没有匹配的医嘱可显示",
   "noResultsForTestTypeSearch": "没有与“{{searchTerm}}”有关的结果可显示",
   "normalRange": "正常范围",

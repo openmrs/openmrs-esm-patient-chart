@@ -27,6 +27,7 @@ describe('MarkPatientDeceasedForm', () => {
 
   const defaultProps = {
     patientUuid: mockPatient.id,
+    patient: mockPatient,
     closeWorkspace: mockCloseWorkspace,
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),

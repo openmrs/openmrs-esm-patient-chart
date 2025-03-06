@@ -26,12 +26,6 @@ const PatientChart: React.FC = () => {
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
-
-  // We are responsible for creating a new offline visit while in offline mode.
-  // The patient chart widgets assume that this is handled by the chart itself.
-  // We are also the module that holds the offline visit type UUID config.
-  // The following hook takes care of the creation.
-
   // Keep state updated with the current patient. Anything used outside the patient
   // chart (e.g., the current visit is used by the Active Visit Tag used in the
   // patient search) must be updated in the callback, which is called when the patient
@@ -43,15 +37,11 @@ const PatientChart: React.FC = () => {
   }, [patientUuid]);
 
   useEffect(() => {
-    getPatientChartStore().setState({
-      patientUuid,
-    });
+    getPatientChartStore().setState({ ...state });
     return () => {
-      getPatientChartStore().setState({
-        patientUuid: null,
-      });
+      getPatientChartStore().setState({});
     };
-  }, [patientUuid]);
+  }, [state]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
   useEffect(() => {
@@ -61,7 +51,7 @@ const PatientChart: React.FC = () => {
 
   return (
     <>
-      <VisitHeader patient={patient} />
+      <VisitHeader patient={state.patient} patientUuid={state.patientUuid} />
       <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <>
@@ -84,7 +74,12 @@ const PatientChart: React.FC = () => {
                   <div
                     className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
                   >
-                    <ChartReview {...state} view={view} setDashboardLayoutMode={setLayoutMode} />
+                    <ChartReview
+                      patient={state.patient}
+                      patientUuid={state.patientUuid}
+                      view={view}
+                      setDashboardLayoutMode={setLayoutMode}
+                    />
                   </div>
                 </div>
               </>
@@ -92,7 +87,11 @@ const PatientChart: React.FC = () => {
           </div>
         </>
       </main>
-      <WorkspaceContainer showSiderailAndBottomNav contextKey={`patient/${patientUuid}`} />
+      <WorkspaceContainer
+        showSiderailAndBottomNav
+        contextKey={`patient/${patientUuid}`}
+        additionalWorkspaceProps={state}
+      />
     </>
   );
 };
