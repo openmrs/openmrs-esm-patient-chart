@@ -16,6 +16,7 @@ const defaultProps = {
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   promptBeforeClosing: jest.fn(),
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),

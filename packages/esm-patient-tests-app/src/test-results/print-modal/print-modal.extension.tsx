@@ -27,18 +27,26 @@ import {
   formatDate,
   useConfig,
   useLayoutType,
-  usePatient,
   useSession,
   ResponsiveWrapper,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import styles from './print-modal.scss';
 
-function PrintModal({ patientUuid, closeDialog }) {
+function PrintModal({
+  patientUuid,
+  patient,
+  closeDialog,
+}: {
+  patientUuid: string;
+  patient: fhir.Patient;
+  closeDialog: () => void;
+}) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { panels } = usePanelData();
+  const { panels } = usePanelData(patientUuid);
   const printContainerRef = useRef(null);
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
@@ -64,37 +72,35 @@ function PrintModal({ patientUuid, closeDialog }) {
     content: () => printContainerRef.current,
   });
 
-  const patient = usePatient(patientUuid);
-
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
         case 'male':
-          return t('male', 'Male');
+          return getCoreTranslation('male');
         case 'female':
-          return t('female', 'Female');
+          return getCoreTranslation('female');
         case 'other':
-          return t('other', 'Other');
+          return getCoreTranslation('other');
         case 'unknown':
-          return t('unknown', 'Unknown');
+          return getCoreTranslation('unknown');
         default:
           return gender;
       }
     };
 
     const identifiers =
-      patient?.patient?.identifier?.filter(
+      patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
-      name: patient?.patient ? getPatientName(patient?.patient) : '',
-      age: age(patient?.patient?.birthDate),
-      gender: getGender(patient?.patient?.gender),
-      location: patient?.patient?.address?.[0].city,
+      name: patient ? getPatientName(patient) : '',
+      age: age(patient?.birthDate),
+      gender: getGender(patient?.gender),
+      location: patient?.address?.[0].city,
       identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
-  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
+  }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
   const testResults = useMemo(() => {
     if (selectedFromDate && selectedToDate) {

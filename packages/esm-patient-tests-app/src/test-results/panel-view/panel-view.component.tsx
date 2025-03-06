@@ -34,7 +34,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const trendlineView = testUuid && type === 'trendline';
-  const { panels, isLoading, groupedObservations } = usePanelData();
+  const { panels, isLoading, groupedObservations } = usePanelData(patientUuid);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);

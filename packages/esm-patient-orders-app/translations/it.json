@@ -43,6 +43,7 @@
   "medicationIndefiniteDuration": "Durata indefinita",
   "medications": "Farmaci",
   "modifyOrder": "Modifica ordine",
+  "noIndicationProvided": "No indication provided",
   "noMatchingOrdersToDisplay": "Nessun ordine corrispondente da visualizzare",
   "noResultsForTestTypeSearch": "Nessun risultato da visualizzare per \"{{searchTerm}}\"",
   "normalRange": "Intervallo normale",

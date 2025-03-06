@@ -10,6 +10,7 @@ import VitalsOverview from './vitals-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   pageSize: 5,
   pageUrl: '',
   urlLabel: '',

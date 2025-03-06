@@ -16,6 +16,7 @@ import VisitNotesForm from './visit-notes-form.workspace';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
