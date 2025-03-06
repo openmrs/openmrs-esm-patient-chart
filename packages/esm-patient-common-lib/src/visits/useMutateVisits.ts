@@ -25,6 +25,7 @@ export function useMutateVisits(patientUuid: string) {
      */
     mutateVisits: (mutatedVisitUuid?: string) => {
       const mutatePromise = mutate((key) => {
+        console.warn(">>>", key, restBaseUrl, patientUuid, mutatedVisitUuid);
         return (
           typeof key === 'string' &&
           // is it a request for visits of the patient?

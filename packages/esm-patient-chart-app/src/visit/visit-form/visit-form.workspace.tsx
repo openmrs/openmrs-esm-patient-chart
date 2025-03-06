@@ -556,6 +556,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
+            console.warn(">>>", "mutating visit");
             mutateVisits(visitToEdit?.uuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
