@@ -6,7 +6,7 @@ import { showSnackbar } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
-  handleBackToSearchList: () => void;
+  handleBackToSearchList?: () => void;
 }
 
 const StartVisitButton = ({ patientUuid, handleBackToSearchList }: StartVisitButtonProps) => {
