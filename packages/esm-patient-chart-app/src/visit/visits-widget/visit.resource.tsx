@@ -1,18 +1,13 @@
-import { openmrsFetch, restBaseUrl, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { openmrsFetch, restBaseUrl, type OpenmrsResource, type Privilege, type Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
-  const {
-    data,
-    error,
-    isLoading,
-    isValidating,
-    mutate: localMutate,
-  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () =>
-    openmrsFetch(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`),
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    patientUuid ? `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}` : null,
+    openmrsFetch,
   );
 
   return {
@@ -20,7 +15,7 @@ export function useVisits(patientUuid: string) {
     error,
     isLoading,
     isValidating,
-    mutateVisits: localMutate,
+    mutateVisits: mutate,
   };
 }
 

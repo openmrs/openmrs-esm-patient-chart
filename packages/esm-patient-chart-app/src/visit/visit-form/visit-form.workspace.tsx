@@ -1,3 +1,11 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import {
   Button,
   ButtonSet,
@@ -12,7 +20,6 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Extension,
   ExtensionSlot,
@@ -39,22 +46,14 @@ import {
   useMutateVisits,
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { type ChartConfig } from '../../config-schema';
-import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeField from './visit-date-time.component';
+import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
+import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import {
   createVisitAttribute,
   deleteVisitAttribute,
@@ -64,6 +63,7 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
 dayjs.extend(isSameOrBefore);
 
