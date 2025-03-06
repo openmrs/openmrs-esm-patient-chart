@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DatePicker,
-  DatePickerInput,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -30,6 +28,7 @@ import {
   useSession,
   ResponsiveWrapper,
   getCoreTranslation,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import usePanelData from '../panel-view/usePanelData';
 import styles from './print-modal.scss';
@@ -58,8 +57,6 @@ function PrintModal({
     externalModuleName: '@openmrs/esm-patient-banner-app',
   });
   const headerTitle = t('testResults_title', 'Test Results');
-  const datePickerPlaceHolder = 'dd/mm/yyyy';
-  const datePickerFormat = 'd/m/Y';
 
   const tableHeaders = [
     { key: 'testType', header: 'Test Type' },
@@ -123,35 +120,23 @@ function PrintModal({
       <ModalBody className={styles.modalBody}>
         <ResponsiveWrapper>
           <div className={styles.datePickerContainers}>
-            <DatePicker
+            <OpenmrsDatePicker
               className={styles.datePicker}
-              dateFormat={datePickerFormat}
-              datePickerType="single"
               maxDate={new Date().toISOString()}
-              onChange={([date]) => setSelectedFromDate(date)}
+              onChange={setSelectedFromDate}
               value={selectedFromDate}
-            >
-              <DatePickerInput
-                labelText={t('startDate', 'Start date')}
-                placeholder={datePickerPlaceHolder}
-                style={{ width: '100%' }}
-              />
-            </DatePicker>
-            <DatePicker
+              labelText={t('startDate', 'Start date')}
+              aria-required="true"
+              data-testid="start-date-picker"
+            />
+            <OpenmrsDatePicker
               className={styles.datePicker}
-              dateFormat={datePickerFormat}
-              datePickerType="single"
               minDate={selectedFromDate}
-              maxDate={new Date().toISOString()}
-              onChange={([date]) => setSelectedToDate(date)}
+              maxDate={new Date()}
+              onChange={setSelectedToDate}
               value={selectedToDate}
-            >
-              <DatePickerInput
-                labelText={t('endDate', 'End date')}
-                placeholder={datePickerPlaceHolder}
-                style={{ width: '100%' }}
-              />
-            </DatePicker>
+              labelText={t('endDate', 'End date')}
+            />
           </div>
         </ResponsiveWrapper>
         <div className={styles.printContainer} ref={printContainerRef}>
