@@ -4,23 +4,23 @@ import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from 'tools';
 import { mockEncounters } from '__mocks__';
-import VisitsTable from './visits-table.component';
+import EncountersTable from './encounters-table.component';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
-  visits: mockEncounters,
+  encounters: mockEncounters,
 };
 
 const mockShowModal = jest.mocked(showModal);
 const mockGetConfig = getConfig as jest.Mock;
 const mockUserHasAccess = userHasAccess as jest.Mock;
 
-describe('EncounterList', () => {
+describe('EncountersTable', () => {
   it('renders an empty state when no encounters are available', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    renderVisitsTable({ visits: [] });
+    renderEncountersTable({ encounters: [] });
 
     await screen.findByTitle(/empty data illustration/i);
     expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe('EncounterList', () => {
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderEncountersTable({ encounters: mockEncounters });
 
     await screen.findByRole('table');
 
@@ -81,7 +81,7 @@ describe('Delete Encounter', () => {
 
     mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderEncountersTable({ encounters: mockEncounters });
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -103,6 +103,6 @@ describe('Delete Encounter', () => {
   });
 });
 
-function renderVisitsTable(props = {}) {
-  renderWithSwr(<VisitsTable {...defaultProps} {...props} />);
+function renderEncountersTable(props = {}) {
+  renderWithSwr(<EncountersTable {...defaultProps} {...props} />);
 }
