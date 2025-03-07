@@ -1,12 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import classnames from 'classnames';
-import dayjs from 'dayjs';
-import debounce from 'lodash-es/debounce';
-import { useTranslation, type TFunction } from 'react-i18next';
-import { mutate } from 'swr';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, type Control } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -23,32 +14,44 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createAttachment,
   createErrorHandler,
   ExtensionSlot,
+  OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
   showSnackbar,
-  type UploadedFile,
   useConfig,
   useLayoutType,
   useSession,
-  OpenmrsDatePicker,
+  type UploadedFile,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  useAllowedFileExtensions,
+  useMutateVisits,
+  type DefaultPatientWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
+import classnames from 'classnames';
+import dayjs from 'dayjs';
+import debounce from 'lodash-es/debounce';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, useForm, type Control } from 'react-hook-form';
+import { useTranslation, type TFunction } from 'react-i18next';
+import { mutate } from 'swr';
+import { z } from 'zod';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
+import styles from './visit-notes-form.scss';
 import {
   fetchDiagnosisConceptsByName,
   savePatientDiagnosis,
   saveVisitNote,
-  useInfiniteVisits,
   useVisitNotes,
 } from './visit-notes.resource';
-import styles from './visit-notes-form.scss';
 
 type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
   images?: UploadedFile[];
@@ -170,7 +173,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisits } = useMutateVisits(patientUuid);
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -390,6 +393,9 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         })
         .then(() => {
           mutateVisitNotes();
+          // TODO: we should explicitly specify the visit that the visit note encounter is for,
+          // and pass in the visitUuid here.
+          // See https://openmrs.atlassian.net/browse/O3-4420
           mutateVisits();
 
           if (images?.length) {

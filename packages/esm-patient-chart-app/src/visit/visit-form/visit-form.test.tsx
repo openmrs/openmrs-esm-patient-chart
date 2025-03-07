@@ -89,6 +89,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
     activePatientEnrollment: [],
     isLoading: false,
   }),
+  useInfiniteVisits: jest.fn(),
 }));
 
 jest.mock('../hooks/useVisitAttributeType', () => ({
