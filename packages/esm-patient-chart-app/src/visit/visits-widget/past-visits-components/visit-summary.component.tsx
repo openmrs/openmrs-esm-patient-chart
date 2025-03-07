@@ -76,6 +76,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             .filter((diagnosis: Diagnosis) => !diagnosis.voided)
             .map((diagnosis: Diagnosis) => ({
               diagnosis: diagnosis.display,
+              // TODO: make tag colors configurable
               type: diagnosis.rank === 1 ? 'red' : 'blue',
               rank: diagnosis.rank,
               voided: diagnosis.voided,

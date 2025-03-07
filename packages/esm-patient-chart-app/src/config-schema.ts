@@ -1,6 +1,7 @@
-import { Type } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type } from '@openmrs/esm-framework';
+import { visitTableConfigSchema, type VisitTablesConfig } from './visit-table-config-schema';
 
-export const esmPatientChartSchema = {
+export const esmPatientChartSchema: ConfigSchema = {
   defaultFacilityUrl: {
     _type: Type.String,
     _default: '',
@@ -133,6 +134,7 @@ export const esmPatientChartSchema = {
     _default: '/etl-latest/etl/patient/',
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
+  visitTables: visitTableConfigSchema,
   trueConceptUuid: {
     _type: Type.String,
     _description: 'Default concept uuid for true in forms',
@@ -176,6 +178,7 @@ export interface ChartConfig {
     uuid: string;
   }>;
   visitDiagnosisConceptUuid: string;
+  visitTables: VisitTablesConfig;
   trueConceptUuid: string;
   falseConceptUuid: string;
   otherConceptUuid: string;
