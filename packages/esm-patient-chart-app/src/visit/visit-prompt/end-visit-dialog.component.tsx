@@ -2,8 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { setCurrentVisit, showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import { removeQueuedPatient } from '../hooks/useServiceQueue';
+import { useInfiniteVisits } from '../visits-widget/visit.resource';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -15,6 +16,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   const { t } = useTranslation();
   const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
 
   const handleEndVisit = () => {
     if (currentVisitIsRetrospective) {
@@ -38,6 +40,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
             );
           }
           mutate();
+          mutateInfiniteVisits();
           closeModal();
 
           showSnackbar({

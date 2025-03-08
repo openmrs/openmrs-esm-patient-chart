@@ -57,15 +57,15 @@ export function useVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
+  const apiUrl = patientUuid ? `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}` : null;
+
   const {
     data,
     error,
     isLoading,
     isValidating,
     mutate: localMutate,
-  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () =>
-    openmrsFetch(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`),
-  );
+  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () => openmrsFetch(apiUrl));
 
   return {
     visits: data ? data?.data?.results : null,
