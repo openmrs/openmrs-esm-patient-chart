@@ -27,6 +27,7 @@ describe('MarkPatientDeceasedForm', () => {
 
   const defaultProps = {
     patientUuid: mockPatient.id,
+    patient: mockPatient,
     closeWorkspace: mockCloseWorkspace,
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
@@ -82,7 +83,7 @@ describe('MarkPatientDeceasedForm', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/cause of death/i)).toBeInTheDocument();
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date/i }));
+    expect(screen.getByTestId(/deceasedDate/i)).toBeInTheDocument();
     codedCausesOfDeath.forEach((codedCauseOfDeath) => {
       expect(screen.getByRole('radio', { name: codedCauseOfDeath.display })).toBeInTheDocument();
     });

@@ -21,6 +21,7 @@ const testProps = {
   closeWorkspace: () => {},
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   promptBeforeClosing: () => {},
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),

@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "Durata indefinita",
   "Medications": "Farmaci",
   "modify": "Modifica",
-  "none": "Nessuno",
   "noResultsForDrugSearch": "Nessun risultato da visualizzare per \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Il numero di ricariche è obbligatorio",
   "onDate": "il",
