@@ -49,8 +49,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               <ErrorState headerTitle={t('visits', 'visits')} error={error} />
             ) : visits?.length ? (
               <>
-                {visits.map((visit, i) => (
-                  <div className={styles.container} key={i}>
+                {visits.map((visit) => (
+                  <div className={styles.container} key={visit.uuid}>
                     <div className={styles.header}>
                       <div className={styles.visitInfo}>
                         <div>
