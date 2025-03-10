@@ -127,16 +127,6 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
               <h4 className={styles.resultType}>{headerTitle}</h4>
               <div className={styles.displayFlex}>
                 <span className={styles.date}>{formatDate(new Date(subRows.date), { mode: 'standard' })}</span>
-                <Button
-                  className={styles.viewTimeline}
-                  iconDescription="view timeline"
-                  kind="ghost"
-                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-                  onClick={() => launchResultsDialog(headerTitle, subRows?.entries[0]?.conceptUuid)}
-                  size="sm"
-                >
-                  {t('viewTimeline', 'View timeline')}
-                </Button>
               </div>
             </div>
             <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
