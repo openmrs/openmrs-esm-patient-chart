@@ -510,7 +510,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                   </Column>
                 </Grid>
                 <Grid className={styles.gridRow}>
-                  <Column lg={8} md={4} sm={4}>
+                  <Column lg={16} md={4} sm={4}>
                     <InputWrapper>
                       <ControlledFieldInput
                         control={control}
@@ -525,7 +525,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       />
                     </InputWrapper>
                   </Column>
-                  <Column lg={8} md={4} sm={4}>
+                  <Column lg={16} md={4} sm={4}>
                     <InputWrapper>
                       <ControlledFieldInput
                         control={control}
