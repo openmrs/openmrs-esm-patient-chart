@@ -19,6 +19,12 @@ export type VisitFormData = {
   visitAttributes: {
     [x: string]: string;
   };
+  pastVisitEndDate: Date;
+  pastVisitEndTime: string;
+  pastVisitEndTimeFormat: amPm;
+  pastVisitStartDate: Date;
+  pastVisitStartTime: string;
+  pastVisitStartTimeFormat: amPm;
 };
 
 export function useConditionalVisitTypes() {

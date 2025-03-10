@@ -1,0 +1,20 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.heading {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.endDatePickerContainer {
+  display: flex;
+  gap: layout.$spacing-05;
+}
+
+.startDatePickerContainer {
+  display: flex;
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}

@@ -82,6 +82,12 @@ export const esmPatientChartSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
   },
+  showMultipleVisitTypesSwitch: {
+    _type: Type.Boolean,
+    _description:
+      'Whether to show the visits switch for retrospective data entry i.e "New", "Ongoing", and "In the past"`',
+    _default: false,
+  },
   showServiceQueueFields: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display service queue fields`',
@@ -166,6 +172,7 @@ export interface ChartConfig {
   showAllEncountersTab: boolean;
   showExtraVisitAttributesSlot: boolean;
   showRecommendedVisitTypeTab: boolean;
+  showMultipleVisitTypesSwitch: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
   showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
   visitTypeResourceUrl: string;

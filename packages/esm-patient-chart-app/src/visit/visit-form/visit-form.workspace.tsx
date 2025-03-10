@@ -39,6 +39,7 @@ import {
   useLayoutType,
   useSession,
   useVisit,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
   convertTime12to24,
@@ -67,6 +68,7 @@ import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
+import { PastVisitDateTimeComponent } from './past-visit-date-time.component';
 
 interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
   /**
@@ -103,6 +105,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   );
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
+  // below state is for the visit type i.e "NEW" , "Ongoing" and "In the past" should not be confused with the "lab visit"
+  // "diabetes return visit" etc.
+  const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(0);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
@@ -163,6 +168,26 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           .string()
           .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
         visitStartTimeFormat: z.enum(['PM', 'AM']),
+        pastVisitStartDate: z.date().optional(),
+        pastVisitStartTime: z
+          .string()
+          .optional()
+          .refine((value) => {
+            if (value) {
+              return value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format');
+            }
+          }),
+        pastVisitStartTimeFormat: z.enum(['PM', 'AM']).optional(),
+        pastVisitEndDate: z.date().optional(),
+        pastVisitEndTime: z
+          .string()
+          .optional()
+          .refine((value) => {
+            if (value) {
+              return value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format');
+            }
+          }),
+        pastVisitEndTimeFormat: z.enum(['PM', 'AM']).optional(),
         visitStopDate: displayVisitStopDateTimeFields && hadPreviousStopDateTime ? z.date() : z.date().optional(),
         visitStopTime:
           displayVisitStopDateTimeFields && hadPreviousStopDateTime
@@ -424,27 +449,60 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         visitStopDate,
         visitStopTime,
         visitStopTimeFormat,
+        pastVisitEndDate,
+        pastVisitEndTime,
+        pastVisitEndTimeFormat,
+        pastVisitStartDate,
+        pastVisitStartTime,
+        pastVisitStartTimeFormat,
       } = data;
 
-      const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
+      const isRetrospectiveVisit = Boolean(pastVisitEndDate) && Boolean(pastVisitStartDate);
+
+      const [hours, minutes] = isRetrospectiveVisit
+        ? convertTime12to24(pastVisitStartTime, pastVisitStartTimeFormat)
+        : convertTime12to24(visitStartTime, visitStartTimeFormat);
+
       const currentSeconds = new Date().getSeconds();
-      let payload: NewVisitPayload = {
-        patient: patientUuid,
-        startDatetime: toDateObjectStrict(
+
+      const getDateObjectStrict = (date: Date) => {
+        return toDateObjectStrict(
           toOmrsIsoString(
-            new Date(
-              dayjs(visitStartDate).year(),
-              dayjs(visitStartDate).month(),
-              dayjs(visitStartDate).date(),
-              hours,
-              minutes,
-              currentSeconds,
-            ),
+            new Date(dayjs(date).year(), dayjs(date).month(), dayjs(date).date(), hours, minutes, currentSeconds),
+          ),
+        );
+      };
+
+      const startDateTime = isRetrospectiveVisit
+        ? getDateObjectStrict(pastVisitStartDate)
+        : getDateObjectStrict(visitStartDate);
+
+      const [endTimehours, endTimeMinutes] = convertTime12to24(pastVisitEndTime, pastVisitEndTimeFormat);
+
+      const endDateTime = toDateObjectStrict(
+        toOmrsIsoString(
+          new Date(
+            dayjs(pastVisitEndDate).year(),
+            dayjs(pastVisitEndDate).month(),
+            dayjs(pastVisitEndDate).date(),
+            endTimehours,
+            endTimeMinutes,
+            0,
           ),
         ),
+      );
+
+      let payload: NewVisitPayload = {
+        patient: patientUuid,
+        startDatetime: startDateTime,
         visitType: visitType,
         location: visitLocation?.uuid,
+        stopDatetime: endDateTime,
       };
+
+      if (!isRetrospectiveVisit) {
+        delete payload.stopDatetime;
+      }
 
       if (visitToEdit?.uuid) {
         // The request throws 400 (Bad request) error when the patient is passed in the update payload
@@ -484,29 +542,51 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController);
 
+        const getSnackbarSuccessText = (response: FetchResponse) => {
+          if (visitToEdit) {
+            return {
+              title: t('visitDetailsUpdated', 'Visit details updated'),
+              subtitle: t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
+                visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+              }),
+            };
+          }
+
+          if (isRetrospectiveVisit) {
+            return {
+              title: t('retrospectiveVisitCreated', 'Retrospective visit creates'),
+              subtitle: t('retrospectiveVisitStartedSuccessfully', 'Retrospective visit started successfully', {
+                visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+              }),
+            };
+          }
+
+          return {
+            title: t('visitStarted', 'Visit started'),
+            subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
+              visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+            }),
+          };
+        };
+
         visitRequest
           .then((response) => {
+            const { subtitle, title } = getSnackbarSuccessText(response);
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
-              subtitle: !visitToEdit
-                ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                  })
-                : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                  }),
-              title: !visitToEdit
-                ? t('visitStarted', 'Visit started')
-                : t('visitDetailsUpdated', 'Visit details updated'),
+              subtitle: subtitle,
+              title: title,
             });
             return response;
           })
           .catch((error) => {
             showSnackbar({
-              title: !visitToEdit
-                ? t('startVisitError', 'Error starting visit')
-                : t('errorUpdatingVisitDetails', 'Error updating visit details'),
+              title: visitToEdit
+                ? t('errorUpdatingVisitDetails', 'Error updating visit details')
+                : isRetrospectiveVisit
+                ? t('errorCreatingRetrospectiveVisit', 'Error creating retrospective visit')
+                : t('startVisitError', 'Error starting visit'),
               kind: 'error',
               isLowContrast: false,
               subtitle: error?.message,
@@ -640,13 +720,41 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             </Row>
           )}
           <Stack gap={1} className={styles.container}>
-            <VisitDateTimeField
-              dateFieldName="visitStartDate"
-              maxDate={maxVisitStartDatetime}
-              timeFieldName="visitStartTime"
-              timeFormatFieldName="visitStartTimeFormat"
-              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
-            />
+            {config.showMultipleVisitTypesSwitch && !visitToEdit ? (
+              <>
+                <ContentSwitcher
+                  selectedIndex={visitTypeContentSwitcherIndex}
+                  onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
+                  className={styles.multiSwitchContentSwitcher}
+                >
+                  <Switch name="new" text={t('new', 'New')} />
+                  <Switch name="on-going" text={t('on-going', 'On-going')} />
+                  <Switch name="in the past" text={t('in the past', 'In the past')} />
+                </ContentSwitcher>
+                {visitTypeContentSwitcherIndex === 0 && (
+                  <VisitDateTimeField
+                    dateFieldName="visitStartDate"
+                    maxDate={maxVisitStartDatetime}
+                    timeFieldName="visitStartTime"
+                    timeFormatFieldName="visitStartTimeFormat"
+                    visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
+                  />
+                )}
+                {/* on going visit: TODO: THERE ARE NO DESIGNS FOR THIS*/}
+                {visitTypeContentSwitcherIndex === 1 && <p>On going visit</p>}
+                {/* past visit */}
+                {visitTypeContentSwitcherIndex === 2 && <PastVisitDateTimeComponent />}
+              </>
+            ) : (
+              // default to show the default visit date time field if multiple visits switch is not enabled
+              <VisitDateTimeField
+                dateFieldName="visitStartDate"
+                maxDate={maxVisitStartDatetime}
+                timeFieldName="visitStartTime"
+                timeFormatFieldName="visitStartTimeFormat"
+                visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
+              />
+            )}
 
             {displayVisitStopDateTimeFields && (
               <VisitDateTimeField
