@@ -15,6 +15,7 @@ import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
+import { VisitBanner } from './visit-banner.component';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -113,6 +114,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   return (
     <>
       <div className={styles.container}>
+        <VisitBanner patientUuid={patientUuid} />
+
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
@@ -134,7 +137,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             ))}
         </div>
 
-        <div>
+        <div className={styles.basketFooter}>
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
