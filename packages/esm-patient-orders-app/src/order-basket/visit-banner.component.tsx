@@ -9,12 +9,13 @@ export const VisitBanner = ({ patientUuid }: { patientUuid: string }) => {
 
   const handleShowingVisitSelectorModal = () => {
     const dispose = showModal('visit-selector-modal', {
-      close: () => dispose(),
+      closeModal: () => dispose(),
     });
   };
 
   if (currentVisitIsRetrospective) {
     return (
+      // button cannot be a child of button
       <button className={styles.retroVisit} onClick={handleShowingVisitSelectorModal}>
         <p>Adding to:</p>
         <div className={styles.visitInfo}>
