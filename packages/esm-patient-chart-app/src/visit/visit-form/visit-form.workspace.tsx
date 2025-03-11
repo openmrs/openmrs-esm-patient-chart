@@ -51,7 +51,7 @@ import {
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { invalidateUseVisits, useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
+import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
