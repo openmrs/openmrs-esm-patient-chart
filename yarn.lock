@@ -6555,22 +6555,23 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-file-uploader@npm:next":
-  version: 0.0.16-pre.21
-  resolution: "@openmrs/ngx-file-uploader@npm:0.0.16-pre.21"
+  version: 18.0.1-pre.56
+  resolution: "@openmrs/ngx-file-uploader@npm:18.0.1-pre.56"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^16.2.12
-    "@angular/cdk": ^16.2.12
-    "@angular/common": ^16.2.12
-    "@angular/compiler": ^16.2.12
-    "@angular/core": ^16.2.12
-    "@angular/forms": ^16.2.12
-    "@angular/material": ^16.2.12
-    "@angular/platform-browser": ^16.2.12
-    "@angular/platform-browser-dynamic": ^16.2.12
-    "@angular/router": ^16.2.12
-  checksum: 10/777861a3fef3085699ca5a3df0a6dc27a467891540531c112bdcf20bd0a1b0b0bb74c99c603a4213f85c22f2e411cae3e3276ef24cfaaf8abf6b3e09957c4634
+    "@angular/animations": ^18.2.13
+    "@angular/cdk": ^18.2.14
+    "@angular/common": ^18.2.13
+    "@angular/compiler": ^18.2.13
+    "@angular/compiler-cli": ^18.2.13
+    "@angular/core": ^18.2.13
+    "@angular/forms": ^18.2.13
+    "@angular/material": ^18.2.14
+    "@angular/platform-browser": 18.2.13
+    "@angular/platform-browser-dynamic": 18.2.13
+    "@angular/router": ^18.2.13
+  checksum: 10/83bb5c7ff02854b8839bddaa63763df9d8645ff83fa2cfd61c84057c80e6957aa0298e50751b3a95937d0bd78589b6793fc639f35c219416362cdb95f48fb0c2
   languageName: node
   linkType: hard
 
