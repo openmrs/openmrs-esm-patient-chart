@@ -731,7 +731,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   <Switch name="on-going" text={t('on-going', 'On-going')} />
                   <Switch name="in the past" text={t('in the past', 'In the past')} />
                 </ContentSwitcher>
-                {visitTypeContentSwitcherIndex === 0 && (
+                {(visitTypeContentSwitcherIndex === 0 || visitTypeContentSwitcherIndex === 1) && (
                   <VisitDateTimeField
                     dateFieldName="visitStartDate"
                     maxDate={maxVisitStartDatetime}
@@ -740,8 +740,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                     visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
                   />
                 )}
-                {/* on going visit: TODO: THERE ARE NO DESIGNS FOR THIS*/}
-                {visitTypeContentSwitcherIndex === 1 && <p>On going visit</p>}
                 {/* past visit */}
                 {visitTypeContentSwitcherIndex === 2 && <PastVisitDateTimeComponent />}
               </>
