@@ -1,8 +1,7 @@
-import React, { type ComponentProps, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
   DataTable,
   DataTableSkeleton,
   Table,
@@ -13,10 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ArrowRightIcon, showModal, useLayoutType, isDesktop, formatDate } from '@openmrs/esm-framework';
+import { showModal, useLayoutType, formatDate } from '@openmrs/esm-framework';
 import { getPatientUuidFromStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import styles from './individual-results-table.scss';
 import { type GroupedObservation } from '../../types';
+import styles from './individual-results-table.scss';
 
 interface IndividualResultsTableProps {
   isLoading: boolean;
@@ -116,7 +115,9 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
     [index, subRows, launchResultsDialog],
   );
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
 
   if (subRows.entries?.length) {
     return (
