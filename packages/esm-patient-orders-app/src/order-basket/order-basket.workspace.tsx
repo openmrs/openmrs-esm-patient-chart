@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useDefineAppContext,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -16,6 +24,7 @@ import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 import { VisitBanner } from './visit-banner.component';
+import { type SelectedVisitContext } from '../types/visit';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -40,6 +49,15 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+
+  // used to hold the select visit
+  const [selectedVisitUuid, setSelectedVisitUuid] = useState<string | null>(null);
+
+  // Question: is there a preference for where this should be done?
+  useDefineAppContext<SelectedVisitContext>('selected-visit-uuid', {
+    selectedVisitUuid,
+    setSelectedVisitUuid,
+  });
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);

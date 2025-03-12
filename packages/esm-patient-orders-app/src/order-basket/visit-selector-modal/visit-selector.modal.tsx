@@ -21,16 +21,27 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-selector.scss';
 import { useVisits } from './visit-resource';
-import { ErrorState, launchWorkspace } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
 import { VisitRow } from './visit-row';
+import { type SelectedVisitContext } from '../../types/visit';
 
 export const VisitSelector = ({ closeModal, patientUuid }) => {
+  const { setSelectedVisitUuid } = useAppContext<SelectedVisitContext>('selected-visit-uuid') ?? {
+    // Fallback values used when the app context is undefined
+    setSelectedVisitUuid: () => {},
+  };
+
   const { t } = useTranslation();
   const { visits, isLoading, isValidating, error } = useVisits(patientUuid);
-  const [selectedVisitUuid, setSelectedVisitUuid] = useState<string | null>(null);
+  const [selectedVisitUuidLocal, setSelectedVisitUuidLocal] = useState<string | null>(null);
 
   const updateSelectedVisitUuid = (value: string) => {
-    setSelectedVisitUuid(value);
+    setSelectedVisitUuidLocal(value);
+  };
+
+  const handleContinue = () => {
+    setSelectedVisitUuid(selectedVisitUuidLocal);
+    closeModal();
   };
 
   // Question: what is the limit of visits we can fetch
@@ -81,7 +92,7 @@ export const VisitSelector = ({ closeModal, patientUuid }) => {
                     {visits.map((visit) => (
                       <VisitRow
                         visit={visit}
-                        selectedVisitUuid={selectedVisitUuid}
+                        selectedVisitUuid={selectedVisitUuidLocal}
                         updateSelectedVisitUuid={updateSelectedVisitUuid}
                       />
                     ))}
@@ -100,7 +111,9 @@ export const VisitSelector = ({ closeModal, patientUuid }) => {
           <Button kind="secondary" onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button disabled={!selectedVisitUuid}>{t('continue', 'Continue')}</Button>
+          <Button disabled={!selectedVisitUuidLocal} onClick={handleContinue}>
+            {t('continue', 'Continue')}
+          </Button>
         </ButtonSet>
       </ModalFooter>
     </React.Fragment>
