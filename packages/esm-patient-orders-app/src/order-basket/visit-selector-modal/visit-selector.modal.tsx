@@ -15,138 +15,92 @@ import {
   TableToolbar,
   TableToolbarSearch,
   TableToolbarContent,
+  DataTableSkeleton,
 } from '@carbon/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-selector.scss';
-// onChange={onInputChange}
+import { useVisits } from './visit-resource';
+import { ErrorState, launchWorkspace } from '@openmrs/esm-framework';
+import { VisitRow } from './visit-row';
 
-export const VisitSelector = ({ closeModal }) => {
+export const VisitSelector = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
+  const { visits, isLoading, isValidating, error } = useVisits(patientUuid);
+  const [selectedVisitUuid, setSelectedVisitUuid] = useState<string | null>(null);
+
+  const updateSelectedVisitUuid = (value: string) => {
+    setSelectedVisitUuid(value);
+  };
+
+  // Question: what is the limit of visits we can fetch
+  // Question: modal sizes.
 
   const handleCreateNewVisit = () => {
-    // TODO implement
+    closeModal();
+    launchWorkspace('start-visit-workspace-form', {
+      patientUuid,
+      openedFrom: 'patient-chart-start-visit',
+    });
   };
 
   return (
     <React.Fragment>
       <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')} subtitle={'shsh'} />
       <ModalBody>
-        <DataTable
-          headers={[
-            {
-              header: 'Name',
-              key: 'name',
-            },
-            {
-              header: 'Protocol',
-              key: 'protocol',
-            },
-            {
-              header: 'Port',
-              key: 'port',
-            },
-            {
-              header: 'Rule',
-              key: 'rule',
-            },
-            {
-              header: 'Attached groups',
-              key: 'attached_groups',
-            },
-            {
-              header: 'Status',
-              key: 'status',
-            },
-          ]}
-          rows={[
-            {
-              attached_groups: 'Kevin’s VM Groups',
-              id: 'a',
-              name: 'Load Balancer 3',
-              port: 3000,
-              protocol: 'HTTP',
-              rule: 'Round robin',
-            },
-            {
-              attached_groups: 'Maureen’s VM Groups',
-              id: 'b',
-              name: 'Load Balancer 1',
-              port: 443,
-              protocol: 'HTTP',
-              rule: 'Round robin',
-            },
-            {
-              attached_groups: 'Andrew’s VM Groups',
-              id: 'c',
-              name: 'Load Balancer 2',
-              port: 80,
-              protocol: 'HTTP',
-              rule: 'DNS delegation',
-            },
-            {
-              attached_groups: 'Marc’s VM Groups',
-              id: 'd',
-              name: 'Load Balancer 6',
-              port: 3000,
-              protocol: 'HTTP',
-              rule: 'Round robin',
-            },
-            {
-              attached_groups: 'Mel’s VM Groups',
-              id: 'e',
-              name: 'Load Balancer 4',
-              port: 443,
-              protocol: 'HTTP',
-              rule: 'Round robin',
-            },
-            {
-              attached_groups: 'Ronja’s VM Groups',
-              id: 'f',
-              name: 'Load Balancer 5',
-              port: 80,
-              protocol: 'HTTP',
-              rule: 'DNS delegation',
-            },
-          ]}
-          size="md"
-        >
-          {({ rows, getTableProps, getRowProps, getTableContainerProps, getToolbarProps, headers, getHeaderProps }) => (
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      key={header.key}
-                      {...getHeaderProps({
-                        header,
-                      })}
-                    >
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+        {isLoading || isValidating ? (
+          <DataTableSkeleton
+            aria-label="sample table"
+            showHeader={false}
+            showToolbar={false}
+            rowCount={2}
+            columnCount={2}
+          />
+        ) : error ? (
+          <ErrorState error={error} headerTitle={t('anErrorOccurred', 'An error occurred')} />
+        ) : (
+          <DataTable
+            headers={[
+              {
+                header: 'Display',
+                key: 'display',
+              },
+            ]}
+            rows={visits}
+            size="md"
+          >
+            {({ getTableProps, getTableContainerProps, getToolbarProps }) => (
+              <TableContainer {...getTableContainerProps()} className={styles.tableContainer}>
+                <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
+                  <TableToolbarContent>
+                    <TableToolbarSearch persistent />
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table {...getTableProps()}>
+                  <TableBody>
+                    {visits.map((visit) => (
+                      <VisitRow
+                        visit={visit}
+                        selectedVisitUuid={selectedVisitUuid}
+                        updateSelectedVisitUuid={updateSelectedVisitUuid}
+                      />
                     ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </DataTable>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        )}
         <Button kind="ghost" onClick={handleCreateNewVisit}>
           Create new visit...
         </Button>
       </ModalBody>
       <ModalFooter>
         <ButtonSet className={styles.buttonSet}>
-          <Button kind="secondary">{t('cancel', 'Cancel')}</Button>
-          <Button>{t('continue', 'Continue')}</Button>
+          <Button kind="secondary" onClick={closeModal}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button disabled={!selectedVisitUuid}>{t('continue', 'Continue')}</Button>
         </ButtonSet>
       </ModalFooter>
     </React.Fragment>

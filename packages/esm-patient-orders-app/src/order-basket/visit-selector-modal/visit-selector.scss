@@ -1,3 +1,16 @@
+@use '@carbon/colors';
+
 .buttonSet {
   width: 100%;
+}
+
+.tableContainer {
+  border: 1px solid colors.$gray-30;
+  max-height: 50vh;
+  overflow-y: auto;
+
+  > :first-child {
+    position: relative;
+    top: 0;
+  }
 }

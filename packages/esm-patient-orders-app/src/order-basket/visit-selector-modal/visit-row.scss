@@ -1,0 +1,56 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
+
+.retroVisit {
+  display: flex;
+  background-color: colors.$gray-10;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  p {
+    font-size: 12px;
+    color: colors.$gray-70;
+  }
+}
+
+.retroVisit:hover {
+  background-color: colors.$gray-20;
+}
+
+.activeVisit {
+  display: flex;
+  background-color: colors.$green-10;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+
+  p {
+    font-size: 12px;
+    color: colors.$gray-70;
+  }
+}
+
+.activeVisit:hover {
+  background-color: colors.$green-20;
+}
+
+.visitAttributes {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.visitHeading {
+  font-weight: 700;
+  text-align: left;
+}
