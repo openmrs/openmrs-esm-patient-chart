@@ -605,12 +605,12 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   );
 
   const handleDiscard = useCallback(() => {
-    if (openedFrom === 'patient-chart-start-visit' && handleBackToSearchList) {
+    if (handleBackToSearchList) {
       handleBackToSearchList();
     } else {
       closeWorkspace();
     }
-  }, [openedFrom, handleBackToSearchList, closeWorkspace]);
+  }, [handleBackToSearchList, closeWorkspace]);
 
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
