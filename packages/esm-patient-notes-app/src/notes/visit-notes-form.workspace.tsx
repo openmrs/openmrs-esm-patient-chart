@@ -170,7 +170,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -389,8 +390,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           }
         })
         .then(() => {
+          mutateInfiniteVisits();
           mutateVisitNotes();
-          mutateVisits();
 
           if (images?.length) {
             mutateAttachments();
@@ -424,8 +425,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       encounterTypeUuid,
       formConceptUuid,
       locationUuid,
+      mutateInfiniteVisits,
       mutateVisitNotes,
-      mutateVisits,
       patientUuid,
       providerUuid,
       selectedPrimaryDiagnoses.length,

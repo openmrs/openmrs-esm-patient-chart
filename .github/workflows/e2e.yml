@@ -15,7 +15,9 @@ env:
 
 jobs:
   run_e2e_tests:
+    name: Run E2E Tests
     runs-on: ubuntu-latest
+
     steps:
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
