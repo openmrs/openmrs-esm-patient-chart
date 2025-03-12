@@ -262,6 +262,17 @@ export interface Concept {
   answers: Array<Concept>;
   setMembers: Array<Concept>;
   display: string;
+  mappings: Array<{
+    uuid: string;
+    display: string;
+    conceptReferenceTerm: {
+      uuid: string;
+      display: string;
+      code: string;
+      name: string | null;
+      conceptSource: OpenmrsResource;
+    };
+  }>;
 }
 
 export interface Visit {
@@ -475,3 +486,12 @@ export type ErrorObject = {
     globalErrors?: FieldError;
   };
 };
+
+export interface DiagnosisConfig {
+  conceptSourceUuid?: string;
+}
+
+export interface DiagnosisResult {
+  value: string;
+  label: string;
+}
