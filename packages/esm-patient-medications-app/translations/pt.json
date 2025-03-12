@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "Duração indefinida",
   "Medications": "Medicamentos",
   "modify": "Modificar",
-  "none": "Nenhum",
   "noResultsForDrugSearch": "Não há resultados a mostrar para  \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Número de reabastecimento é obrigatório",
   "onDate": "no",

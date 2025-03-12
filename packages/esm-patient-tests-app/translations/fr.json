@@ -24,12 +24,10 @@
   "endDate": "Date de fin",
   "error": "Erreur",
   "errorFetchingTestTypes": "Erreur lors de la récupération des résultats pour « {{searchTerm}} »",
-  "female": "Femme",
   "goToDrugOrderForm": "Préscrire",
   "hideResultsTable": "Masquer le tableau des résultats",
   "individualTests": "Examens individuels",
   "labOrders": "Analyses",
-  "male": "Homme",
   "moreResultsAvailable": "Plus de résultats disponibles",
   "noPanelsFound": "Aucun panel d'analyses trouvé",
   "noResultsForTestTypeSearch": "Aucun résultat à afficher pour « {{searchTerm}} »",
@@ -46,7 +44,6 @@
   "ordered": "Commandé",
   "orderReason": "Raison de la prescription",
   "orderReasonRequired": "Order reason is required",
-  "other": "Autre",
   "overTime": "Au fil du temps",
   "panel": "Panels",
   "panels": "panels",
@@ -107,9 +104,7 @@
   "trendlineRangeSelectorMonths": "6 mois",
   "trySearchingAgain": "Veuillez essayer de rechercher à nouveau",
   "tryTo": "Essayez de",
-  "unknown": "Inconnu",
   "usingADifferentTerm": "en utilisant un terme différent",
   "value": "Valeur",
-  "view": "Vue",
-  "viewTimeline": "Voir la chronologie"
+  "view": "Vue"
 }

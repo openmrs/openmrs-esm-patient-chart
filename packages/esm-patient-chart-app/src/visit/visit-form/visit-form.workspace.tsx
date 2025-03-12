@@ -37,7 +37,6 @@ import {
   useConnectivity,
   useFeatureFlag,
   useLayoutType,
-  usePatient,
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
@@ -51,7 +50,7 @@ import {
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { invalidateUseVisits, useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
+import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
@@ -83,7 +82,8 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
   closeWorkspace,
-  patientUuid: initialPatientUuid,
+  patient,
+  patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   showVisitEndDateTimeFields,
@@ -102,7 +102,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
   );
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
-  const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);

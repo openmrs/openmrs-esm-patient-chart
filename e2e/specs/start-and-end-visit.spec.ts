@@ -22,7 +22,7 @@ test('Start and end a visit', async ({ page }) => {
 
   await test.step('Then I should see the `Start Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
-    await expect(chartPage.page.getByPlaceholder(/dd\/mm\/yyyy/i)).toBeVisible();
+    await expect(chartPage.page.getByTestId('visitStartDateInput')).toBeVisible();
     await expect(chartPage.page.getByPlaceholder(/hh\:mm/i)).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByText(/visit type/i)).toBeVisible();

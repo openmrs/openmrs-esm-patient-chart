@@ -13,6 +13,7 @@ import { useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
 import OrderDetailsTable from './orders-details-table.component';
+import { mockPatient } from 'tools';
 
 const mockUsePatientOrders = usePatientOrders as jest.Mock;
 const mockUseOrderTypes = useOrderTypes as jest.Mock;
@@ -264,5 +265,13 @@ describe('OrderDetailsTable', () => {
 });
 
 function renderOrderDetailsTable() {
-  render(<OrderDetailsTable patientUuid="mock-patient-uuid" showAddButton showPrintButton title="Patient Orders" />);
+  render(
+    <OrderDetailsTable
+      patientUuid={mockPatient.id}
+      patient={mockPatient}
+      showAddButton
+      showPrintButton
+      title="Patient Orders"
+    />,
+  );
 }
