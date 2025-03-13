@@ -1,11 +1,12 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
 
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100%;
+  gap: layout.$spacing-05;
 }
 
 .orderBasketContainer {
@@ -29,6 +30,10 @@
 
 .buttonSet {
   padding: 0;
+}
+
+.basketFooter {
+  margin-top: auto;
 }
 
 .actionButton {
@@ -67,4 +72,96 @@
 
 .orderPanel {
   margin: layout.$spacing-07 0;
+}
+
+.retroVisit {
+  display: flex;
+  background-color: colors.$gray-10;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+  border: none;
+  cursor: pointer;
+
+  p {
+    font-size: 12px;
+    color: colors.$gray-70;
+  }
+
+  > :nth-child(2) {
+    flex-grow: 1;
+  }
+}
+
+.activeVisit {
+  display: flex;
+  background-color: colors.$green-10;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+  border: none;
+  cursor: pointer;
+
+  p {
+    font-size: 12px;
+    color: colors.$gray-70;
+  }
+
+  > :nth-child(2) {
+    flex-grow: 1;
+  }
+}
+
+.activeVisit:hover {
+  background-color: colors.$green-20;
+  transition: background-color 0.3s ease;
+}
+
+.retroVisit:hover {
+  background-color: colors.$gray-20;
+  transition: background-color 0.3s ease;
+}
+
+.visitTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  button {
+    padding: 0;
+    min-height: 0;
+  }
+}
+
+.visitAttributes {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.visitHeading {
+  font-weight: 700;
+  text-align: left;
+}
+
+.addingToText {
+  line-height: 2.1;
+}
+
+.skeletonWrapper {
+  display: flex;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+
+  > :nth-child(2) {
+    flex-grow: 1;
+  }
+}
+
+.skeletonHeader {
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.skeletonDescription {
+  display: flex;
+  justify-content: space-between;
 }
