@@ -24,12 +24,10 @@
   "endDate": "Data de término",
   "error": "Erro",
   "errorFetchingTestTypes": "Erro ao buscar resultados para \"{{searchTerm}}\"",
-  "female": "Feminino",
   "goToDrugOrderForm": "Formulário de pedido",
   "hideResultsTable": "Ocultar tabela de resultados",
   "individualTests": "Testes individuais",
   "labOrders": "Pedidos de laboratório",
-  "male": "Masculino",
   "moreResultsAvailable": "Mais resultados disponíveis",
   "noPanelsFound": "Nenhum painel encontrado",
   "noResultsForTestTypeSearch": "Nenhum resultado a ser exibido para \"{{searchTerm}}\"",
@@ -46,7 +44,6 @@
   "ordered": "Pedido",
   "orderReason": "Motivo do pedido",
   "orderReasonRequired": "Order reason is required",
-  "other": "Outros",
   "overTime": "Ao longo do tempo",
   "panel": "Painel",
   "panels": "painéis",
@@ -107,9 +104,7 @@
   "trendlineRangeSelectorMonths": "6 meses",
   "trySearchingAgain": "Tente pesquisar novamente",
   "tryTo": "Tente",
-  "unknown": "Desconhecido",
   "usingADifferentTerm": "usando um termo diferente",
   "value": "Valor",
-  "view": "Exibir",
-  "viewTimeline": "Exibir linha do tempo"
+  "view": "Exibir"
 }

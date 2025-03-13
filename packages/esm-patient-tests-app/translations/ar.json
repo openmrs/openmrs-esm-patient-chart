@@ -24,12 +24,10 @@
   "endDate": "End date",
   "error": "خطأ",
   "errorFetchingTestTypes": "Error fetching results for \"{{searchTerm}}\"",
-  "female": "Female",
   "goToDrugOrderForm": "Order form",
   "hideResultsTable": "إخفاء جدول النتائج",
   "individualTests": "Individual tests",
   "labOrders": "Lab orders",
-  "male": "Male",
   "moreResultsAvailable": "المزيد من النتائج متاحة",
   "noPanelsFound": "No panels found",
   "noResultsForTestTypeSearch": "لا توجد نتائج لـ \"{{searchTerm}}\"",
@@ -46,7 +44,6 @@
   "ordered": "مُطلوب",
   "orderReason": "Order reason",
   "orderReasonRequired": "Order reason is required",
-  "other": "Other",
   "overTime": "Over time",
   "panel": "Panel",
   "panels": "panels",
@@ -107,9 +104,7 @@
   "trendlineRangeSelectorMonths": "6 أشهر",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
-  "unknown": "Unknown",
   "usingADifferentTerm": "using a different term",
   "value": "القيمة",
-  "view": "عرض",
-  "viewTimeline": "View timeline"
+  "view": "عرض"
 }

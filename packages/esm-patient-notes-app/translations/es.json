@@ -1,13 +1,13 @@
 {
-  "add": "Añadir",
-  "addImage": "Añadir imagen",
-  "addVisitNote": "Añadir una nota de visita",
-  "clinicalNoteLabel": "Escribir tus notas",
+  "add": "Agregar",
+  "addImage": "Agregar imagen",
+  "addVisitNote": "Agregar una nota de visita",
+  "clinicalNoteLabel": "Escribe tus notas",
   "clinicalNotePlaceholder": "Escribe cualquier nota adicional aquí",
   "date": "Fecha",
   "diagnoses": "Diagnósticos",
   "discard": "Descartar",
-  "emptyDiagnosisText": "No se ha seleccionado ningún diagnóstico. Introduzca un diagnóstico a continuación",
+  "emptyDiagnosisText": "No se ha seleccionado ningún diagnóstico. Ingrese un diagnóstico a continuación",
   "enterPrimaryDiagnoses": "Ingrese Diagnósticos Principales",
   "enterSecondaryDiagnoses": "Ingrese Diagnósticos Secundarios",
   "error": "Error",
@@ -26,7 +26,7 @@
   "searchForPrimaryDiagnosis": "Buscar un diagnóstico principal",
   "searchForSecondaryDiagnosis": "Buscar un diagnóstico secundario",
   "secondaryDiagnosis": "Diagnóstico secundario",
-  "secondaryDiagnosisInputPlaceholder": "Elegir un diagnóstico secundario",
+  "secondaryDiagnosisInputPlaceholder": "Elija un diagnóstico secundario",
   "seeAll": "Ver todo",
   "visitDate": "Fecha de visita",
   "visitNote": "Nota de visita",
@@ -34,5 +34,5 @@
   "visitNotes": "Notas de visita",
   "visitNoteSaved": "Nota de visita guardada",
   "visitNoteSaveError": "Error al guardar la nota de visita",
-  "visitNoteWorkspaceTitle": "Nota de la visita"
+  "visitNoteWorkspaceTitle": "Nota de la Visita"
 }

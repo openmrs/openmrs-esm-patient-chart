@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { deletePatient, generateRandomPatient, getVisit, type Patient, startVisit } from '../commands';
+import { deletePatient, generateRandomPatient, getVisit, type Patient, startVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
@@ -28,13 +28,24 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date/i)).toBeVisible();
 
-    const startDateInput = chartPage.page.locator('input#visitStartDateInput');
-    const startTimeInput = chartPage.page.locator('input#visitStartTime');
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
+    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
+    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
+
+    // await expect(chartPage.page.getByRole('textbox', { name: /start date/i })).toBeVisible();
+    // await expect(chartPage.page.getByRole('textbox', { name: /start time/i })).toBeVisible();
+    // await expect(chartPage.page.getByLabel(/start time format/i)).toBeVisible();
+
+    const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
 
     await expect(startDateInput).toBeVisible();
-    const dateValue = await startDateInput.inputValue();
-    expect(dateValue).not.toBe('');
-    expect(dateValue).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+    const startDateDayInputValue = await startDateDayInput.textContent();
+    expect(startDateDayInputValue).toBe(visitStartDatetime.format('DD'));
+    const startDateMonthInputValue = await startDateMonthInput.textContent();
+    expect(startDateMonthInputValue).toBe(visitStartDatetime.format('MM'));
+    const startDateYearInputValue = await startDateYearInput.textContent();
+    expect(startDateYearInputValue).toBe(visitStartDatetime.format('YYYY'));
 
     await expect(startTimeInput).toBeVisible();
     const timeValue = await startTimeInput.inputValue();
@@ -101,11 +112,20 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api })
 
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
     await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
-    await chartPage.page.getByRole('textbox', { name: /start date/i }).fill('01/01/2025');
+    
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
+    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
+    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
+    startDateDayInput.fill("01");
+    startDateMonthInput.fill("01");
+    startDateYearInput.fill("2025");
+
+    // await chartPage.page.getByRole('textbox', { name: /start date/i }).fill('01/01/2025');
     await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');
     await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
 
-    await chartPage.page.getByRole('textbox', { name: /end date/i }).fill('01/01/2025');
+    // await chartPage.page.getByRole('textbox', { name: /end date/i }).fill('01/01/2025');
     await chartPage.page.getByRole('textbox', { name: /end time/i }).fill('12:10');
     await chartPage.page.getByLabel(/end time format/i).selectOption('AM');
   });

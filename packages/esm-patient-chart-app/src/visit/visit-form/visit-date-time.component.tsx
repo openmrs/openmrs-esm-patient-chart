@@ -1,5 +1,5 @@
-import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
-import { ResponsiveWrapper } from '@openmrs/esm-framework';
+import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -123,34 +123,22 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
       <Controller
         name={dateField.name}
         control={control}
-        render={({ field: { onChange, value, onBlur } }) => {
-          return (
+        render={({ field, fieldState }) => (
             <ResponsiveWrapper>
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id={dateField.name}
-                maxDate={maxDateObj?.valueOf()}
-                minDate={minDateObj?.valueOf()}
-                onChange={([date]: [date: Date]) => {
-                  onChange(dayjs(date).format('YYYY-MM-DD'));
-                }}
-                value={dayjs(value as string).valueOf()}
-                onBlur={onBlur}
-              >
-                <DatePickerInput
-                  id={`${dateField.name}Input`}
-                  invalid={Boolean(errors[dateField.name])}
-                  invalidText={errors[dateField.name]?.message}
-                  labelText={dateField.label}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                  disabled={disabled}
-                />
-              </DatePicker>
+              <OpenmrsDatePicker
+                {...field}
+                value={field.value as Date}
+                className={styles.datePicker}
+                id={`${dateField.name}Input`}
+                data-testid={`${dateField.name}Input`}
+                maxDate={maxDateObj}
+                minDate={minDateObj}
+                labelText={dateField.label}
+                invalid={Boolean(fieldState?.error?.message)}
+                invalidText={fieldState?.error?.message}
+              />
             </ResponsiveWrapper>
-          );
-        }}
+          )}
       />
       <ResponsiveWrapper>
         <Controller

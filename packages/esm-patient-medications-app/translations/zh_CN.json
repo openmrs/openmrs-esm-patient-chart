@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "无限期",
   "Medications": "药物",
   "modify": "修改",
-  "none": "无",
   "noResultsForDrugSearch": "没有与“{{searchTerm}}”有关的结果可显示",
   "numRefillsErrorMessage": "需要重新填充的次数",
   "onDate": "on",

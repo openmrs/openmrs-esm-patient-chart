@@ -6,7 +6,6 @@ import {
   updateVisit,
   useConfig,
   useLocations,
-  usePatient,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -60,6 +59,7 @@ const mockSetTitle = jest.fn();
 const testProps = {
   openedFrom: 'test',
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
@@ -71,7 +71,6 @@ const mockUpdateVisit = jest.mocked(updateVisit);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
@@ -198,12 +197,6 @@ describe('Visit form', () => {
           displayInThePatientBanner: true,
         },
       ],
-    });
-    mockUsePatient.mockReturnValue({
-      error: null,
-      isLoading: false,
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
     });
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
     mockUseLocations.mockReturnValue(mockLocations);

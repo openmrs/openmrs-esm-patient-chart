@@ -23,11 +23,10 @@ import {
   useConnectivity,
   useFeatureFlag,
   useLayoutType,
-  usePatient,
   useVisit,
   type AssignedExtension,
   type NewVisitPayload,
-  type Visit,
+  type Visit
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
@@ -80,7 +79,8 @@ interface VisitFormProps extends DefaultPatientWorkspaceProps {
  */
 const VisitForm: React.FC<VisitFormProps> = ({
   closeWorkspace,
-  patientUuid: initialPatientUuid,
+  patient,
+  patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   visitToEdit,
@@ -92,7 +92,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
   const isOnline = useConnectivity();
   const config = useConfig<ChartConfig>();
   const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
-  const { patientUuid, patient } = usePatient(initialPatientUuid);
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
     config.showRecommendedVisitTypeTab ? 0 : 1,
   );

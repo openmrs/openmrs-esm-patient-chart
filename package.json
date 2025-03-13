@@ -1,7 +1,7 @@
 {
   "name": "@openmrs/esm-patient-chart",
   "private": true,
-  "version": "9.2.0",
+  "version": "9.2.2",
   "workspaces": [
     "packages/*"
   ],
@@ -82,7 +82,8 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "@openmrs/esm-api": "portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-api"
   },
   "packageManager": "yarn@4.6.0"
 }

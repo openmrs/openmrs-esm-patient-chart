@@ -23,10 +23,10 @@ export type VisitStatus = (typeof visitStatuses)[number];
 
 export type VisitFormData = {
   visitStatus: VisitStatus;
-  visitStartDate: string; // YYYY-MM-DD
+  visitStartDate: Date; // Date object that only contains info for year, month, day
   visitStartTime: string; // hh:mm (note that hh is from 01 to 12, NOT 00 to 23)
   visitStartTimeFormat: amPm;
-  visitStopDate: string; // YYYY-MM-DD
+  visitStopDate: Date; // Date object that only contains info for year, month, day
   visitStopTime: string; // hh:mm (note that hh is from 01 to 12, NOT 00 to 23)
   visitStopTimeFormat: amPm;
   programType: string;
@@ -139,10 +139,10 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
     const visitFormSchema = z
       .object({
         visitStatus: visitToEdit ? visitStatusEnum.exclude(['new']) : visitStatusEnum,
-        visitStartDate: z.string().date().optional(),
+        visitStartDate: z.date().optional(),
         visitStartTime: z.string().regex(time12HourFormatRegex).optional(),
         visitStartTimeFormat: z.enum(['PM', 'AM']).optional(),
-        visitStopDate: z.string().date().optional(),
+        visitStopDate: z.date().optional(),
         visitStopTime: z.string().regex(time12HourFormatRegex).optional(),
         visitStopTimeFormat: z.enum(['PM', 'AM']).optional(),
         programType: z.string().optional(),
@@ -244,7 +244,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
 // Note that the inputs are expected to be in local time.
 // Returns a non-null Date only is the inputs are valid
 export const convertToDate = (
-  dateString: string, // YYYY-MM-DD
+  dateString: Date, // Date object that only contains info for year, month, day
   time12h: string, // hh:mm, where hh is 01 to 12
   timeFormat: amPm, // AM / PM
 ): Date => {
@@ -260,7 +260,7 @@ export const convertToDate = (
 export const convertToDateTimeFields = (dateTime: dayjs.ConfigType) => {
   const dateTimeDayjs = dayjs(dateTime);
   return {
-    date: dateTimeDayjs.format('YYYY-MM-DD'),
+    date: dateTimeDayjs.startOf('day').toDate(),
     time: dateTimeDayjs.format('hh:mm'),
     timeFormat: dateTimeDayjs.format('A') as amPm,
   };
