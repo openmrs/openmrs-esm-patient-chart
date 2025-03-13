@@ -1,30 +1,46 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
-import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
+import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification, Form } from '@carbon/react';
 import {
   ExtensionSlot,
   showModal,
   showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
   useConfig,
   useDefineAppContext,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
 import {
+  convertTime12to24,
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   postOrders,
   postOrdersOnNewEncounter,
+  time12HourFormatRegex,
   useOrderBasket,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
+import { isWithinInterval } from 'date-fns';
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 import { VisitBanner } from './visit-banner.component';
 import { type SelectedVisitContext } from '../types/visit';
+import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useVisits } from './visit-selector-modal/visit-resource';
+import dayjs from 'dayjs';
+
+export interface RetrospectiveVisitFormData {
+  date: Date;
+  time: string;
+  timePickerFormat: string;
+}
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -49,15 +65,58 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+  const { visits } = useVisits(patientUuid);
 
   // used to hold the select visit
   const [selectedVisitUuid, setSelectedVisitUuid] = useState<string | null>(null);
 
-  // Question: is there a preference for where this should be done?
+  const selectedVisit = visits?.find((v) => v.uuid === selectedVisitUuid);
+  const selectedVisitIsRetrospective = selectedVisit?.stopDatetime !== null;
+
   useDefineAppContext<SelectedVisitContext>('selected-visit-uuid', {
     selectedVisitUuid,
     setSelectedVisitUuid,
   });
+
+  // Conditionally apply the schema based on selectedVisitIsRetrospective
+  const conditionalSchema = z.preprocess(
+    (data) => (selectedVisitIsRetrospective ? data : {}),
+    z
+      .object({
+        date: z.date(),
+        time: z.string(),
+        timePickerFormat: z.enum(['PM', 'AM']),
+      })
+      .refine(
+        ({ date, time, timePickerFormat }) => {
+          const [hours, minutes] = convertTime12to24(time, timePickerFormat);
+
+          const encounterTime = toDateObjectStrict(
+            toOmrsIsoString(new Date(dayjs(date).year(), dayjs(date).month(), dayjs(date).date(), hours, minutes, 0)),
+          );
+
+          const startDateTimeAsDateObject = new Date(selectedVisit.startDatetime);
+          const stopDateTimeAsDateObject = new Date(selectedVisit.stopDatetime);
+
+          const isValid = isWithinInterval(encounterTime, {
+            start: startDateTimeAsDateObject,
+            end: stopDateTimeAsDateObject,
+          });
+
+          return isValid;
+        },
+        t('dateOutOfRange', 'Date must be within the visit range'),
+      ),
+  );
+
+  const methods = useForm<RetrospectiveVisitFormData>({
+    mode: 'onBlur',
+    resolver: zodResolver(conditionalSchema),
+  });
+
+  const {
+    formState: { isValid },
+  } = methods;
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -130,8 +189,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   }, [clearOrders, closeWorkspace]);
 
   return (
-    <>
-      <div className={styles.container}>
+    <FormProvider {...methods}>
+      <Form className={styles.container} onSubmit={methods.handleSubmit(handleSave)}>
         <VisitBanner patientUuid={patientUuid} />
 
         <div className={styles.orderBasketContainer}>
@@ -175,20 +234,21 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             />
           ))}
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.actionButton} kind="secondary" onClick={handleCancel}>
+            <Button className={styles.actionButton} kind="secondary" onClick={handleCancel} type="button">
               {t('cancel', 'Cancel')}
             </Button>
             <Button
               className={styles.actionButton}
               kind="primary"
-              onClick={handleSave}
               disabled={
                 isSavingOrders ||
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (activeVisitRequired && !activeVisit) ||
-                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
+                !isValid
               }
+              type="submit"
             >
               {isSavingOrders ? (
                 <InlineLoading description={t('saving', 'Saving') + '...'} />
@@ -198,21 +258,22 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
             </Button>
           </ButtonSet>
         </div>
-      </div>
-      {activeVisitRequired && !activeVisit && (
-        <ActionableNotification
-          kind="error"
-          actionButtonLabel={t('startVisit', 'Start visit')}
-          onActionButtonClick={openStartVisitDialog}
-          title={t('startAVisitToRecordOrders', 'Start a visit to order')}
-          subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
-          lowContrast={true}
-          inline
-          className={styles.actionNotification}
-          hasFocus
-        />
-      )}
-    </>
+
+        {activeVisitRequired && !activeVisit && (
+          <ActionableNotification
+            kind="error"
+            actionButtonLabel={t('startVisit', 'Start visit')}
+            onActionButtonClick={openStartVisitDialog}
+            title={t('startAVisitToRecordOrders', 'Start a visit to order')}
+            subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+            lowContrast={true}
+            inline
+            className={styles.actionNotification}
+            hasFocus
+          />
+        )}
+      </Form>
+    </FormProvider>
   );
 };
 

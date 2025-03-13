@@ -124,7 +124,6 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: layout.$spacing-03;
 
   button {
     padding: 0;
@@ -140,8 +139,29 @@
 
 .visitHeading {
   font-weight: 700;
+  text-align: left;
 }
 
 .addingToText {
   line-height: 2.1;
+}
+
+.skeletonWrapper {
+  display: flex;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  gap: layout.$spacing-05;
+
+  > :nth-child(2) {
+    flex-grow: 1;
+  }
+}
+
+.skeletonHeader {
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.skeletonDescription {
+  display: flex;
+  justify-content: space-between;
 }
