@@ -38,7 +38,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
   // last second of the day. We want to just compare dates and not time.
   const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)) : null;
-  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)).format('DD/MM/YYYY') : null;
+  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)) : null;
 
   return (
     <section>
