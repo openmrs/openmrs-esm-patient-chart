@@ -63,7 +63,10 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   renderVisitNotesForm();
 
-  expect(screen.getByTestId('visitDateTimePicker')).toBeInTheDocument();
+  // TODO: use better selector
+  // expect(screen.getByTestId('visitDateTimePicker')).toBeInTheDocument();
+  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
+
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();

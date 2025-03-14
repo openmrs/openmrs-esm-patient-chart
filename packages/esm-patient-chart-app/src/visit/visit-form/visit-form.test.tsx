@@ -212,7 +212,10 @@ describe('Visit form', () => {
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
-    expect(screen.getByTestId('visitStartDateInput')).toBeInTheDocument();
+    // TODO: use better selector
+    // expect(screen.getByTestId('visitStartDateInput')).toBeInTheDocument();
+    expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
+
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
