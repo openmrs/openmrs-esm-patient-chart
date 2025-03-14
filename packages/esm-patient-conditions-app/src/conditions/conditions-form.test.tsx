@@ -52,14 +52,10 @@ describe('Conditions form', () => {
     renderConditionsForm();
 
     expect(screen.getByRole('group', { name: /condition/i })).toBeInTheDocument();
-    // TODO: use better selector
-    // expect(screen.getByTestId('onsetDate')).toBeInTheDocument();
-    expect(screen.getByLabelText('Onset date')).toBeInTheDocument();
-
+    expect(screen.getByLabelText(/onset date/i)).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /clinical status/i })).toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: /enter condition/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
-
     expect(screen.getByLabelText(/^active/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^active/i)).not.toBeChecked();
     expect(screen.getByLabelText(/inactive/i)).toBeInTheDocument();
@@ -138,9 +134,8 @@ describe('Conditions form', () => {
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
 
     // FIXME: make the date input work
-    // const onsetDateInput = screen.getByTestId('onsetDate');
     const onsetDateInput = screen.getByLabelText('Onset date');
-
+    expect(onsetDateInput).toBeInTheDocument();
     // const onsetDateDayInput = within(onsetDateInput).getByRole('spinbutton', { name: /day/i });
     // const onsetDateMonthInput = within(onsetDateInput).getByRole('spinbutton', { name: /month/i });
     // const onsetDateYearInput = within(onsetDateInput).getByRole('spinbutton', { name: /year/i });
@@ -181,7 +176,7 @@ describe('Conditions form', () => {
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     // FIXME: make the date input work
-    // const onsetDateInput = screen.getByTestId('onsetDate');
+    const onsetDateInput = screen.getByLabelText(/onset date/i);
     // const onsetDateDayInput = within(onsetDateInput).getByRole('spinbutton', { name: /day/i });
     // const onsetDateMonthInput = within(onsetDateInput).getByRole('spinbutton', { name: /month/i });
     // const onsetDateYearInput = within(onsetDateInput).getByRole('spinbutton', { name: /year/i });

@@ -253,7 +253,7 @@ describe('Immunizations Form', () => {
     render(<ImmunizationsForm {...testProps} />);
 
     // FIXME make the data input work
-    // const vaccinationDateField = screen.getByTestId('vaccinationDate');
+    const vaccinationDateField = screen.getByLabelText(/vaccination date/i);
     // const vaccinationDateDayInput = within(vaccinationDateField).getByRole('spinbutton', { name: /day/i });
     // const vaccinationDateMonthInput = within(vaccinationDateField).getByRole('spinbutton', { name: /month/i });
     // const vaccinationDateYearInput = within(vaccinationDateField).getByRole('spinbutton', { name: /year/i });

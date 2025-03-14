@@ -83,9 +83,6 @@ describe('MarkPatientDeceasedForm', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/cause of death/i)).toBeInTheDocument();
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
-
-    // TODO: use better selector
-    // expect(screen.getByTestId(/deceasedDate/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
 
     codedCausesOfDeath.forEach((codedCauseOfDeath) => {

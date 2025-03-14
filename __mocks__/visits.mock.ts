@@ -1,5 +1,5 @@
-import { Visit } from '@openmrs/esm-api';
-import { MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+import { type Visit } from '@openmrs/esm-api';
+import { type MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
 
 export const mockVisitTypes = [
   {

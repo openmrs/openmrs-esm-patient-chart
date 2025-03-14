@@ -81,7 +81,7 @@ describe('ProgramsForm', () => {
 
     const programNameInput = screen.getByRole('combobox', { name: /program name/i });
     // FIXME: Make the date input work
-    // const enrollmentDateInput = screen.getByTestId('enrollmentDate');
+    const enrollmentDateInput = screen.getByLabelText(/date enrolled/i);
     // const enrollmentDateDayInput = within(enrollmentDateInput).getByRole('spinbutton', { name: /day/i });
     // const enrollmentDateMonthInput = within(enrollmentDateInput).getByRole('spinbutton', { name: /month/i });
     // const enrollmentDateYearInput = within(enrollmentDateInput).getByRole('spinbutton', { name: /year/i });
@@ -129,7 +129,7 @@ describe('ProgramsForm', () => {
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
 
     // FIXME: make the date input work
-    // const completionDateInput = screen.getByTestId('completionDate');
+    const completionDateInput = screen.getByLabelText(/date completed/i);
     // const completionDateDayInput = within(completionDateInput).getByRole('spinbutton', { name: /day/i });
     // const completionDateMonthInput = within(completionDateInput).getByRole('spinbutton', { name: /month/i });
     // const completionDateYearInput = within(completionDateInput).getByRole('spinbutton', { name: /year/i });
