@@ -1,12 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
-import { type Observation } from '../visit.resource';
+import { type Obs, useConfig } from '@openmrs/esm-framework';
 import styles from './styles.scss';
 
 interface EncounterObservationsProps {
-  observations: Array<Observation>;
+  observations: Array<Obs>;
 }
 
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
