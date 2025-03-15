@@ -9,6 +9,7 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
+  useEmrConfiguration,
   useLocations,
   useVisitTypes,
   type Visit,
@@ -16,7 +17,6 @@ import {
 import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import { mockPatient } from 'tools';
 import { type ChartConfig, esmPatientChartSchema } from '../../config-schema';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.workspace';
 import {
@@ -141,10 +141,6 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
       },
     ],
   })),
-}));
-
-jest.mock('../hooks/useEmrConfiguration', () => ({
-  useEmrConfiguration: jest.fn(() => ({})),
 }));
 
 jest.mock('../hooks/useDefaultFacilityLocation', () => {
