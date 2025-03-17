@@ -3,6 +3,7 @@ import {
   restBaseUrl,
   useConfig,
   useConnectivity,
+  useEmrConfiguration,
   useFeatureFlag,
   useSession,
   useVisitTypes,
@@ -15,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 
 export const visitStatuses = ['new', 'ongoing', 'past'] as const;
@@ -87,7 +87,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
     sessionLocation,
     restrictByVisitLocationTag && isEmrApiModuleInstalled,
   );
-  const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
+  const { emrConfiguration } = useEmrConfiguration();
 
   return useMemo(() => {
     const now = new Date();
@@ -244,14 +244,15 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
 // Note that the inputs are expected to be in local time.
 // Returns a non-null Date only is the inputs are valid
 export const convertToDate = (
-  dateString: Date, // Date object that only contains info for year, month, day
+  date: Date, // Date object that only contains info for year, month, day
   time12h: string, // hh:mm, where hh is 01 to 12
   timeFormat: amPm, // AM / PM
 ): Date => {
-  if (!dateString || !time12h || !timeFormat) {
+  if (!date || !time12h || !timeFormat) {
     return null;
   }
-  const ret = dayjs(`${dateString} ${time12h} ${timeFormat}`, 'YYYY-MM-DD hh:mm A');
+  const dateStr = dayjs(date).format('YYYY-MM-DD');
+  const ret = dayjs(`${dateStr} ${time12h} ${timeFormat}`, 'YYYY-MM-DD hh:mm A');
   return ret.isValid() ? ret.toDate() : null;
 };
 

@@ -21,12 +21,14 @@ import {
   updateVisit,
   useConfig,
   useConnectivity,
+  useEmrConfiguration,
   useFeatureFlag,
   useLayoutType,
+  useSession,
   useVisit,
   type AssignedExtension,
   type NewVisitPayload,
-  type Visit
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
@@ -40,7 +42,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
+import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -88,10 +90,9 @@ const VisitForm: React.FC<VisitFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
   const isOnline = useConnectivity();
   const config = useConfig<ChartConfig>();
-  const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
+  const { emrConfiguration } = useEmrConfiguration();
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
     config.showRecommendedVisitTypeTab ? 0 : 1,
   );

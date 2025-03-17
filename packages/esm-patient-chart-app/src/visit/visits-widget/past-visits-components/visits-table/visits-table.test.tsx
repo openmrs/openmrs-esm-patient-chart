@@ -53,7 +53,6 @@ describe('EncounterList', () => {
     await user.click(filterDropdown);
     await user.click(screen.getByRole('option', { name: /Admission/i }));
 
-    // screen.logTestingPlaygroundURL();
     expect(screen.queryByRole('cell', { name: /visit note/i })).not.toBeInTheDocument();
     expect(screen.getByRole('cell', { name: /admission/i })).toBeInTheDocument();
 

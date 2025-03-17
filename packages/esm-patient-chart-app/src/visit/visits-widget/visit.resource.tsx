@@ -1,6 +1,7 @@
 import useSWR, { mutate } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import {
+  type Obs,
   openmrsFetch,
   restBaseUrl,
   useConfig,
@@ -189,11 +190,11 @@ export interface Encounter {
   encounterType: {
     uuid: string;
     display: string;
-    viewPrivilege: Privilege;
-    editPrivilege: Privilege;
+    viewPrivilege?: Privilege;
+    editPrivilege?: Privilege;
   };
-  obs: Array<Observation>;
-  orders: Array<Order>;
+  obs: Array<Obs>;
+  orders?: Array<Order>;
   form: OpenmrsResource;
   patient: OpenmrsResource;
 }
@@ -207,7 +208,7 @@ export interface EncounterProvider {
   };
   provider: {
     uuid: string;
-    person: {
+    person?: {
       uuid: string;
       display: string;
     };
@@ -294,7 +295,6 @@ export interface Diagnosis {
   diagnosis: {
     coded: {
       display: string;
-      links: Array<any>;
     };
   };
 }

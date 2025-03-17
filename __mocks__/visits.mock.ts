@@ -1,4 +1,4 @@
-import { OpenmrsResource, Visit } from '@openmrs/esm-framework';
+import { Encounter, Visit } from '@openmrs/esm-framework';
 import { MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
 
 export const mockVisitTypes = [
@@ -58,7 +58,7 @@ export const mockCurrentVisit = {
   },
 };
 
-export const visitOverviewDetailMockData = {
+export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -158,7 +158,7 @@ export const visitOverviewDetailMockData = {
   },
 };
 
-export const visitOverviewDetailMockDataNotEmpty = {
+export const visitOverviewDetailMockDataNotEmpty: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -284,7 +284,7 @@ export const visitOverviewDetailMockDataNotEmpty = {
   },
 };
 
-export const mockMappedEncounters: MappedEncounter[] = [
+export const mockMappedEncounters: Array<MappedEncounter> = [
   {
     id: '979d38e3-fb68-47cf-843f-2b0263690f49',
     datetime: '2022-01-18T16:25:27.000+0000',
@@ -357,7 +357,7 @@ export const mockMappedEncounters: MappedEncounter[] = [
 ];
 
 // This should be of type Encounter, but we don't have the Encounter type defined in core
-export const mockEncounter: OpenmrsResource = {
+export const mockEncounter: Encounter = {
   uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
   display: 'Consultation 09/23/2022',
   encounterDatetime: '2022-09-23T13:11:06.000+0000',
