@@ -143,7 +143,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            )}
+            )}{' '}
             {medication.orderReasonNonCoded && medication.quantity && <>&mdash;</>}
             {medication.quantity && (
               <span>
