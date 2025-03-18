@@ -256,8 +256,8 @@ export const convertToDate = (
   return ret.isValid() ? ret.toDate() : null;
 };
 
-// The inverse of `convertToDate`. Takes a Date and returns
-// the dateString, time12h and timeFormat
+// The inverse of `convertToDate`. Takes a Date-like value and returns
+// the date (with hour / minute / seconds truncated), time12h and timeFormat
 export const convertToDateTimeFields = (dateTime: dayjs.ConfigType) => {
   const dateTimeDayjs = dayjs(dateTime);
   return {

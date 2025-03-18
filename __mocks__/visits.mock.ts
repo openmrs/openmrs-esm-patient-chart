@@ -1,5 +1,5 @@
-import { Encounter, Visit } from '@openmrs/esm-framework';
-import { MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+import type { Encounter, Visit } from '@openmrs/esm-framework';
+import { type MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
 
 export const mockVisitTypes = [
   {
@@ -356,7 +356,6 @@ export const mockMappedEncounters: Array<MappedEncounter> = [
   },
 ];
 
-// This should be of type Encounter, but we don't have the Encounter type defined in core
 export const mockEncounter: Encounter = {
   uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
   display: 'Consultation 09/23/2022',
@@ -443,15 +442,18 @@ export const mockEncounters = [mockEncounter];
 
 export const mockOngoingVisitWithEncounters: Visit = {
   ...mockVisit,
+  uuid: '42e03650-0401-11f0-9a86-00155dc8b906',
   startDatetime: '2022-01-01T10:00:00.000+0000',
   stopDatetime: null,
   encounters: [
     {
       ...mockEncounter,
+      uuid: '0e0ebbc2-0401-11f0-b5f9-00155dc8b906',
       encounterDatetime: '2022-01-01T11:00:00.000+0000',
     },
     {
       ...mockEncounter,
+      uuid: '18283232-0401-11f0-b111-00155dc8b906',
       encounterDatetime: '2022-01-01T11:30:00.000+0000',
     },
   ],
@@ -459,12 +461,14 @@ export const mockOngoingVisitWithEncounters: Visit = {
 
 export const mockPastVisitWithEncounters: Visit = {
   ...mockOngoingVisitWithEncounters,
+  uuid: '2993cedc-0401-11f0-9b1f-00155dc8b906',
   startDatetime: '2022-01-01T10:00:00.000+0000',
   stopDatetime: '2022-01-01T12:00:00.000+0000',
 };
 
 export const mockVisitWithAttributes = {
   ...mockVisit,
+  uuid: '380d78c8-0401-11f0-ad28-00155dc8b906',
   attributes: [
     {
       attributeType: {
