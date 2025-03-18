@@ -78,7 +78,7 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted attachment in the list', async () => {
-    await expect(page.getByRole('button', { name: /brainScan/i })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /brainScan/i })).toBeHidden();
   });
 
   await test.step('And the attachments table should be empty', async () => {

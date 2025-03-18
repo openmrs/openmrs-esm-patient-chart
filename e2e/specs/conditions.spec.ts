@@ -104,8 +104,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
 
   await test.step('And I should see the updated condition in the list', async () => {
     await page.getByRole('combobox', { name: /show/i }).click();
-    await page.getByText(/all/i).click();
-
+    await page.getByRole('option').filter({ hasText: /all/i }).click();
     await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/11 — jul — 2023/i);
     await expect(dataRow).toContainText(/inactive/i);
