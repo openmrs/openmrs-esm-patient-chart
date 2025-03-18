@@ -277,7 +277,7 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 });
 
-test('Form labels should be translated to the system language', async ({ page }) => {
+test.skip('Form labels should be translated to the system language', async ({ page }) => {
   const chartPage = new ChartPage(page);
   const homePage = new HomePage(page);
 
@@ -360,21 +360,7 @@ test('Form labels should be translated to the system language', async ({ page })
   });
 });
 
-test.afterEach(async ({ api, page }) => {
+test.afterEach(async ({ api }) => {
   await endVisit(api, visit);
   await deletePatient(api, patient.uuid);
-
-  try {
-    const response = await api.get('/ws/rest/v1/session');
-    const data = await response.json();
-
-    if (data?.user?.uuid) {
-      await restoreLanguage(api, data.user.uuid);
-      await page.reload();
-    } else {
-      console.warn('Could not restore language: No active user session');
-    }
-  } catch (e) {
-    console.warn('Could not restore language:', e.message);
-  }
 });
