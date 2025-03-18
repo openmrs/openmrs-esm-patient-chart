@@ -92,7 +92,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('Then the order status should be changed to `New`', async () => {
-    await expect(orderBasket.getByText(/incomplete/i)).not.toBeVisible();
+    await expect(orderBasket.getByText(/incomplete/i)).toBeHidden();
     await expect(orderBasket.getByText(/new/i)).toBeVisible();
   });
 
@@ -183,7 +183,7 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('Then the order status should be changed to `Modify`', async () => {
-    await expect(orderBasket.getByText(/new/i)).not.toBeVisible();
+    await expect(orderBasket.getByText(/new/i)).toBeHidden();
     await expect(orderBasket.getByText(/modify/i)).toBeVisible();
   });
 

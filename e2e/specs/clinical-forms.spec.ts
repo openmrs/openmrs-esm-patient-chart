@@ -164,7 +164,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   });
 
   await test.step('And I should not see any error messages', async () => {
-    await expect(page.getByText('error')).not.toBeVisible();
+    await expect(page.getByText('error')).toBeHidden();
   });
 });
 
