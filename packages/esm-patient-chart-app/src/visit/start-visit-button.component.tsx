@@ -6,23 +6,22 @@ import { showSnackbar } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
-  handleBackToSearchList?: () => void;
-  setIsPatientSearchOpen?: (isOpen: boolean) => void;
+  handleReturnToSearchList?: () => void;
+  hidePatientSearch?: () => void;
 }
 
-const StartVisitButton = ({ patientUuid, handleBackToSearchList, setIsPatientSearchOpen }: StartVisitButtonProps) => {
+const StartVisitButton = ({ patientUuid, handleReturnToSearchList, hidePatientSearch }: StartVisitButtonProps) => {
   const { t } = useTranslation();
   const startVisitWorkspaceForm = 'start-visit-workspace-form';
 
   const handleStartVisit = useCallback(() => {
-    if (setIsPatientSearchOpen) {
-      setIsPatientSearchOpen(false);
-    }
+    hidePatientSearch?.();
+
     try {
       launchPatientWorkspace(startVisitWorkspaceForm, {
         patientUuid,
         openedFrom: 'patient-chart-start-visit',
-        handleBackToSearchList,
+        handleReturnToSearchList,
       });
     } catch (error) {
       console.error('Error launching visit form workspace:', error);
@@ -34,7 +33,7 @@ const StartVisitButton = ({ patientUuid, handleBackToSearchList, setIsPatientSea
         subtitle: error.message ?? t('errorStartingVisitDescription', 'An error occurred while starting the visit'),
       });
     }
-  }, [patientUuid, t, handleBackToSearchList, setIsPatientSearchOpen]);
+  }, [patientUuid, t, handleReturnToSearchList, hidePatientSearch]);
 
   return (
     <Button aria-label={t('startVisit', 'Start visit')} kind="primary" onClick={handleStartVisit}>

@@ -74,23 +74,23 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
    * This string is passed into various extensions within the form to
    * affect how / if they should be rendered.
    */
+  handleReturnToSearchList?: () => void;
   openedFrom: string;
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
-  handleBackToSearchList?: () => void;
 }
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
   closeWorkspace,
+  handleReturnToSearchList,
+  openedFrom,
   patient,
   patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   showVisitEndDateTimeFields,
   visitToEdit,
-  openedFrom,
-  handleBackToSearchList,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -605,12 +605,12 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   );
 
   const handleDiscard = useCallback(() => {
-    if (handleBackToSearchList) {
-      handleBackToSearchList();
+    if (handleReturnToSearchList) {
+      handleReturnToSearchList();
     } else {
       closeWorkspace();
     }
-  }, [handleBackToSearchList, closeWorkspace]);
+  }, [handleReturnToSearchList, closeWorkspace]);
 
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
