@@ -54,7 +54,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "workspace:*",
+    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.94.0"
   }
 }
