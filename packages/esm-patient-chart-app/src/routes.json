@@ -199,6 +199,14 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "patient-chart-close-button",
+      "slot": "top-nav-actions-slot",
+      "component": "closeButton",
+      "online": true,
+      "offline": true,
+      "order": -1
     }
   ],
   "modals": [

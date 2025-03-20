@@ -26,6 +26,7 @@ import startVisitActionButtonComponent from './actions-buttons/start-visit.compo
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
+import closeButtonComponent from './visit-header/close-button.extension';
 
 // This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -160,6 +161,11 @@ export const genericNavGroup = getSyncLifecycle(genericNavGroupComponent, {
 
 export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
   featureName: 'Dashboard',
+  moduleName,
+});
+
+export const closeButton = getSyncLifecycle(closeButtonComponent, {
+  featureName: 'close-button',
   moduleName,
 });
 

@@ -14,6 +14,7 @@
   "causeOfDeath_lower": "cause of death concepts configured in the system",
   "causeOfDeathIsRequired": "Please select the cause of death",
   "checkFilters": "Check the filters above",
+  "closePatientChart": "Close patient chart",
   "confirm": "Confirm",
   "confirmDeletePastVisitText": "Clicking confirm will delete this {{visit}} and all of its associated encounters.",
   "confirmModifyingVisitDateToAccomodateEncounter": "The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?",
