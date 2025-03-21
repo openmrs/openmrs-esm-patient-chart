@@ -35,6 +35,7 @@ import {
   updateVisit,
   useConfig,
   useConnectivity,
+  useEmrConfiguration,
   useFeatureFlag,
   useLayoutType,
   useSession,
@@ -50,7 +51,6 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
@@ -76,6 +76,7 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
    * This string is passed into various extensions within the form to
    * affect how / if they should be rendered.
    */
+  handleReturnToSearchList?: () => void;
   openedFrom: string;
   showPatientHeader?: boolean;
   showVisitEndDateTimeFields: boolean;
@@ -84,13 +85,14 @@ interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
 
 const StartVisitForm: React.FC<StartVisitFormProps> = ({
   closeWorkspace,
+  handleReturnToSearchList,
+  openedFrom,
   patient,
   patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   showVisitEndDateTimeFields,
   visitToEdit,
-  openedFrom,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -103,7 +105,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     sessionLocation,
     config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
   );
-  const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
+  const { emrConfiguration } = useEmrConfiguration();
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   // below state is for the visit type i.e "NEW" , "Ongoing" and "In the past" should not be confused with the "lab visit"
   // "diabetes return visit" etc.
@@ -682,6 +684,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     ],
   );
 
+  const handleDiscard = useCallback(() => {
+    if (handleReturnToSearchList) {
+      handleReturnToSearchList();
+    } else {
+      closeWorkspace();
+    }
+  }, [handleReturnToSearchList, closeWorkspace]);
+
   const visitStartDate = getValues('visitStartDate') ?? new Date();
   minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
   const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
@@ -897,7 +907,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             [styles.desktop]: !isTablet,
           })}
         >
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
             {t('discard', 'Discard')}
           </Button>
           <Button

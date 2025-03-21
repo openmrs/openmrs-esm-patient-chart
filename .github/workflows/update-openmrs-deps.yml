@@ -1,0 +1,50 @@
+on:
+  workflow_dispatch:
+  schedule:
+    # every hour
+    - cron: '30 */1 * * *'
+
+name: 'Check for OpenMRS Dependency Updates'
+
+jobs:
+  check-for-updates:
+    name: Check for updates to OpenMRS libraries
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    if: github.repository_owner == 'openmrs'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🟢 Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 💾 Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - name: 📦 Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --immutable
+      - name: ✅ Check for updates
+        run: node ./tools/update-openmrs-deps.mjs
+      - name: Create PR if necessary
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: '(chore) Update OpenMRS dependencies'
+          title: '(chore) Update OpenMRS dependencies'
+          body: |
+            Update OpenMRS dependencies
+          branch: 'chore/update-openmrs-deps'
+          author: 'OpenMRS Bot <infrastructure@openmrs.org>'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Automerge PR
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: gh pr merge --admin --squash --auto "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,3 +1,6 @@
+import { type Visit } from '@openmrs/esm-api';
+import { type MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+
 export const mockVisitTypes = [
   {
     uuid: 'some-uuid1',
@@ -60,7 +63,7 @@ export const mockCurrentVisit = {
   },
 };
 
-export const visitOverviewDetailMockData = {
+export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -160,7 +163,7 @@ export const visitOverviewDetailMockData = {
   },
 };
 
-export const visitOverviewDetailMockDataNotEmpty = {
+export const visitOverviewDetailMockDataNotEmpty: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -286,7 +289,7 @@ export const visitOverviewDetailMockDataNotEmpty = {
   },
 };
 
-export const mockEncounters = [
+export const mockEncounters: Array<MappedEncounter> = [
   {
     id: '979d38e3-fb68-47cf-843f-2b0263690f49',
     datetime: '2022-01-18T16:25:27.000+0000',

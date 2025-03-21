@@ -9,11 +9,12 @@ name: 'Scheduled Transifex Update'
 jobs:
   pull-translations-from-transifex:
     name: pull-translations-from-transifex
-
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
+    if: github.repository_owner == 'openmrs'
+
     steps:
       - uses: actions/checkout@v4
       - name: Push source file using transifex client

@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+// https://github.com/jsdom/jsdom/issues/1695
+window.HTMLElement.prototype.scrollIntoView = function () {};
+
 window.URL.createObjectURL = jest.fn();
 global.openmrsBase = '/openmrs';
 global.spaBase = '/spa';
