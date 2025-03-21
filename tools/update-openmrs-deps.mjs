@@ -16,6 +16,19 @@ try {
     windowsHide: true,
   });
 } catch (error) {
-  console.error(`Error while updating dependencies: ${error.message ?? error}`, error);
+  console.error(`Error while deduplicating dependencies: ${error.message ?? error}`, error);
+  process.exit(1);
+}
+
+try {
+  execSync(`yarn turbo verify`, {
+    stdio: 'ignore',
+    windowsHide: true,
+  });
+} catch (error) {
+  console.error(
+    `Error while running yarn verify: ${error.message ?? error}. Updates require manual intervention.`,
+    error,
+  );
   process.exit(1);
 }
