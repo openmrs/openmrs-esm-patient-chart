@@ -14,5 +14,5 @@ const options = {
 export const switchableObs = getSyncLifecycle(obsSwitchableComponent, options);
 
 export function startupApp() {
-  defineExtensionConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('obs-by-encounter-widget', configSchema);
 }
