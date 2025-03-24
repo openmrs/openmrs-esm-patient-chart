@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, useConfig, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
-import { mapEncounters, useInfiniteVisits } from './visit.resource';
+import { mapEncounters, useInfiniteVisits, useEncounters } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
@@ -17,8 +17,10 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const { t } = useTranslation();
   const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
     useInfiniteVisits(patientUuid);
+  const { encounters } = useEncounters(patientUuid);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
   const shouldLoadMore = size !== visits?.length;
+  const [visitSummarySize, setVisitSummarySize] = useState(size);
 
   const visitsWithEncounters = visits
     ?.filter((visit) => visit?.encounters?.length)
@@ -30,11 +32,25 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     <div className={styles.tabs}>
       <Tabs>
         <TabList aria-label="Visit detail tabs" className={styles.tabList}>
-          <Tab className={styles.tab} id="visit-summaries-tab">
+          <Tab
+            className={styles.tab}
+            id="visit-summaries-tab"
+            onClick={() => {
+              setSize(visitSummarySize);
+            }}
+          >
             {t('visitSummaries', 'Visit summaries')}
           </Tab>
-          {showAllEncountersTab ? (
-            <Tab className={styles.tab} id="all-encounters-tab">
+          {showAllEncountersTab && !isLoading ? (
+            <Tab
+              className={styles.tab}
+              id="all-encounters-tab"
+              onClick={() => {
+                setVisitSummarySize(size);
+                const newSize = Math.floor((encounters?.length + 19) / 20);
+                setSize(newSize);
+              }}
+            >
               {t('allEncounters', 'All encounters')}
             </Tab>
           ) : (
