@@ -1,34 +1,42 @@
 import { execSync } from 'node:child_process';
 
-/** @type {Buffer} */
-let output;
 try {
-  output = execSync("yarn outdated --format=json '@openmrs/*' 'openmrs'", {
-    stdio: ['ignore', 'pipe', 'pipe'],
+  execSync(`yarn up --fixed '@openmrs/*@next' 'openmrs@next'`, {
+    stdio: ['ignore', 'inherit', 'inherit'],
     windowsHide: true,
   });
 } catch (error) {
-  console.error(`Error while detecting outdated versions: ${error.message ?? error}`, error);
+  console.error(`Error while updating dependencies: ${error.message ?? error}`);
   process.exit(1);
 }
 
-const outdated = JSON.parse(output.toString('utf8'));
-const outdatedDeps = [];
-
-for (const outdatedDep of outdated) {
-  if (outdatedDep.name) {
-    outdatedDeps.push(outdatedDep.name);
-  }
+try {
+  execSync(`yarn dedupe`, {
+    stdio: ['ignore', 'inherit', 'inherit'],
+    windowsHide: true,
+  });
+} catch (error) {
+  console.error(`Error while deduplicating dependencies: ${error.message ?? error}`);
+  process.exit(1);
 }
 
-if (outdatedDeps.length > 0) {
-  try {
-    execSync(`yarn up --fixed ${outdatedDeps.map((dep) => `${dep}@next`).join(' ')}`, {
-      stdio: 'ignore',
-      windowsHide: true,
-    });
-  } catch (error) {
-    console.error(`Error while updating dependencies: ${error.message ?? error}`, error);
-    process.exit(1);
-  }
+try {
+  execSync(`git diff-index --quiet HEAD --`, {
+    stdio: 'ignore',
+    windowsHide: true,
+  });
+  process.exit(0);
+} catch (error) {
+  // git diff-index --quite HEAD --
+  // exits with status 1 if there are changes; we only need to run yarn verify if there are changes
+}
+
+try {
+  execSync(`yarn verify`, {
+    stdio: ['ignore', 'inherit', 'inherit'],
+    windowsHide: true,
+  });
+} catch (error) {
+  console.error(`Error while running yarn verify: ${error.message ?? error}. Updates require manual intervention.`);
+  process.exit(1);
 }

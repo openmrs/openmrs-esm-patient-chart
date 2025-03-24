@@ -71,6 +71,7 @@ interface VisitFormProps extends DefaultPatientWorkspaceProps {
    * This string is passed into various extensions within the form to
    * affect how / if they should be rendered.
    */
+  handleReturnToSearchList?: () => void;
   openedFrom: string;
   showPatientHeader?: boolean;
   visitToEdit?: Visit;
@@ -81,12 +82,13 @@ interface VisitFormProps extends DefaultPatientWorkspaceProps {
  */
 const VisitForm: React.FC<VisitFormProps> = ({
   closeWorkspace,
+  handleReturnToSearchList,
+  openedFrom,
   patient,
   patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
   visitToEdit,
-  openedFrom,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -370,6 +372,14 @@ const VisitForm: React.FC<VisitFormProps> = ({
     ],
   );
 
+  const handleDiscard = useCallback(() => {
+    if (handleReturnToSearchList) {
+      handleReturnToSearchList();
+    } else {
+      closeWorkspace();
+    }
+  }, [handleReturnToSearchList, closeWorkspace]);
+
   return (
     <FormProvider {...methods}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
@@ -565,7 +575,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
             [styles.desktop]: !isTablet,
           })}
         >
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
             {t('discard', 'Discard')}
           </Button>
           <Button

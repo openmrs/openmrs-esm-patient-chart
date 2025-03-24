@@ -1,6 +1,13 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { deletePatient, generateRandomPatient, getVisit, type Patient, startVisit, visitStartDatetime } from '../commands';
+import {
+  deletePatient,
+  generateRandomPatient,
+  getVisit,
+  type Patient,
+  startVisit,
+  visitStartDatetime,
+} from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
@@ -112,20 +119,10 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api })
 
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
     await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
-    
-    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
-    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
-    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
-    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
-    startDateDayInput.fill("01");
-    startDateMonthInput.fill("01");
-    startDateYearInput.fill("2025");
 
-    // await chartPage.page.getByRole('textbox', { name: /start date/i }).fill('01/01/2025');
     await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');
     await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
 
-    // await chartPage.page.getByRole('textbox', { name: /end date/i }).fill('01/01/2025');
     await chartPage.page.getByRole('textbox', { name: /end time/i }).fill('12:10');
     await chartPage.page.getByLabel(/end time format/i).selectOption('AM');
   });

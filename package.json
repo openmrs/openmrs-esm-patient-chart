@@ -82,8 +82,7 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3",
-    "@openmrs/esm-api": "portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-api"
+    "sass": "^1.54.3"
   },
   "packageManager": "yarn@4.6.0"
 }
