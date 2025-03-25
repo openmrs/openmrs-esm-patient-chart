@@ -13,7 +13,7 @@ import {
   UserHasAccess,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { prepMedicationOrderPostData, usePatientOrders } from '../../api/api';
+import { prepMedicationOrderPostData, useActivePatientOrders } from '../../api/api';
 import { ordersEqual } from './helpers';
 import {
   type DrugSearchResult,
@@ -114,7 +114,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const { patientUuid } = usePatientChartStore();
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = usePatientOrders(patientUuid);
+  const { data: activeOrders, isLoading: isLoadingActiveOrders } = useActivePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
     [orders, drug],
