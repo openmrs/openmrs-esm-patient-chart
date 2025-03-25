@@ -27,7 +27,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('When I select `ACE inhibitors` as the allergy', async () => {
-    await page.getByRole('combobox', { name: /select the allergen/i }).click();
+    await page.getByRole('combobox', { name: /choose an item/i }).click();
     await page.getByText(/ace inhibitors/i).click();
   });
 
