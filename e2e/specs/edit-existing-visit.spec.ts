@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { deletePatient, generateRandomPatient, type Patient, startVisit } from '../commands';
+import { deletePatient, generateRandomPatient, type Patient, startVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
@@ -28,13 +28,22 @@ test('Edit an existing visit', async ({ page }) => {
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
     await expect(chartPage.page.getByText(/visit start date and time/i)).toBeVisible();
 
-    const startDateInput = chartPage.page.locator('input#visitStartDateInput');
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
+    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
+    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
     const startTimeInput = chartPage.page.locator('input#visitStartTime');
 
     await expect(startDateInput).toBeVisible();
-    const dateValue = await startDateInput.inputValue();
-    expect(dateValue).not.toBe('');
-    expect(dateValue).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+    const startDateDayInputValue = await startDateDayInput.textContent();
+    expect(startDateDayInputValue).toBe(visitStartDatetime.format('DD'));
+    const startDateMonthInputValue = await startDateMonthInput.textContent();
+    expect(startDateMonthInputValue).toBe(visitStartDatetime.format('MM'));
+    const startDateYearInputValue = await startDateYearInput.textContent();
+    expect(startDateYearInputValue).toBe(visitStartDatetime.format('YYYY'));
+
+    // expect(dateValue).not.toBe('');
+    // expect(dateValue).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
 
     await expect(startTimeInput).toBeVisible();
     const timeValue = await startTimeInput.inputValue();

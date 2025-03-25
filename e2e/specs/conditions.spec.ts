@@ -35,8 +35,13 @@ test('Record, edit and delete a condition', async ({ page }) => {
   });
 
   await test.step('And I set `10/07/2023` as the onset date', async () => {
-    await page.getByLabel(/onset date/i).fill('10/07/2023');
-    await page.getByLabel(/onset date/i).press('Tab');
+    const onsetDateInput = page.getByTestId('onsetDate');
+    const onsetDateDayInput = onsetDateInput.getByRole('spinbutton', { name: /day/i });
+    const onsetDateMonthInput = onsetDateInput.getByRole('spinbutton', { name: /month/i });
+    const onsetDateYearInput = onsetDateInput.getByRole('spinbutton', { name: /year/i });
+    await onsetDateDayInput.fill('10');
+    await onsetDateMonthInput.fill('07');
+    await onsetDateYearInput.fill('2023');
   });
 
   await test.step('And I set the clinical status to `Active`', async () => {
@@ -80,9 +85,13 @@ test('Record, edit and delete a condition', async ({ page }) => {
   });
 
   await test.step('And I change the on onset date to `11/07/2023`', async () => {
-    await page.getByLabel(/onset date/i).clear();
-    await page.getByLabel(/onset date/i).fill('11/07/2023');
-    await page.getByLabel(/onset date/i).press('Tab');
+    const onsetDateInput = page.getByTestId('onsetDate');
+    const onsetDateDayInput = onsetDateInput.getByRole('spinbutton', { name: /day/i });
+    const onsetDateMonthInput = onsetDateInput.getByRole('spinbutton', { name: /month/i });
+    const onsetDateYearInput = onsetDateInput.getByRole('spinbutton', { name: /year/i });
+    await onsetDateDayInput.fill('11');
+    await onsetDateMonthInput.fill('07');
+    await onsetDateYearInput.fill('2023');
   });
 
   await test.step('And I click on the `Save & close` button', async () => {
@@ -95,8 +104,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
 
   await test.step('And I should see the updated condition in the list', async () => {
     await page.getByRole('combobox', { name: /show/i }).click();
-    await page.getByText(/all/i).click();
-
+    await page.getByRole('option').filter({ hasText: /all/i }).click();
     await expect(dataRow).toContainText(/mental status change/i);
     await expect(dataRow).toContainText(/11 — jul — 2023/i);
     await expect(dataRow).toContainText(/inactive/i);
@@ -119,7 +127,7 @@ test('Record, edit and delete a condition', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted condition in the list', async () => {
-    await expect(conditionsPage.page.getByText(/mental status change/i)).not.toBeVisible();
+    await expect(conditionsPage.page.getByText(/mental status change/i)).toBeHidden();
     await expect(conditionsPage.page.getByText(/there are no conditions to display for this patient/i)).toBeVisible();
   });
 });

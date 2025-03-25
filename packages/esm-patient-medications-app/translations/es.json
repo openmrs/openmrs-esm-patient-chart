@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "Duración indefinida",
   "Medications": "Medicamentos",
   "modify": "Modificar",
-  "none": "Ninguno",
   "noResultsForDrugSearch": "No hay resultados para \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "El número de renovaciones de la prescripción es obligatorio",
   "onDate": "en",

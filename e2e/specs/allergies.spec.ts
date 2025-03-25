@@ -27,7 +27,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('When I select `ACE inhibitors` as the allergy', async () => {
-    await page.getByPlaceholder(/select the allergen/i).click();
+    await page.getByRole('combobox', { name: /choose an item/i }).click();
     await page.getByText(/ace inhibitors/i).click();
   });
 
@@ -130,7 +130,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted allergy in the list', async () => {
-    await expect(page.getByText(/bee stings/i)).not.toBeVisible();
+    await expect(page.getByText(/bee stings/i)).toBeHidden();
   });
 
   await test.step('And the allergy table should be empty', async () => {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type FetchResponse, openmrsFetch, usePatient, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRInfinite from 'swr/infinite';
 import { extractMetaInformation, getConceptUuid } from './helper';
 import {
@@ -10,8 +10,7 @@ import {
   type ObsRecord,
 } from '../../types';
 
-export function useObservations() {
-  const { patientUuid } = usePatient();
+export function useObservations(patientUuid: string) {
   const getUrl = useCallback(
     (pageIndex: number, prevPageData: FetchResponse<FhirResponse<FHIRObservationResource>>) => {
       if (prevPageData && !prevPageData?.data?.link.some(({ relation }) => relation === 'next')) {
@@ -64,7 +63,7 @@ export function useObservations() {
 
 function useConcepts(conceptUuids: Array<string>) {
   const getUrl = useCallback(
-    (index) => {
+    (index: number) => {
       if (conceptUuids && index < conceptUuids.length) {
         return `${restBaseUrl}/concept/${conceptUuids[index]}?v=full`;
       }
@@ -93,8 +92,12 @@ function useConcepts(conceptUuids: Array<string>) {
   return results;
 }
 
-export default function usePanelData() {
-  const { observations: fhirObservations, conceptUuids, isLoading: isLoadingObservations } = useObservations();
+export default function usePanelData(patientUuid: string) {
+  const {
+    observations: fhirObservations,
+    conceptUuids,
+    isLoading: isLoadingObservations,
+  } = useObservations(patientUuid);
   const { concepts } = useConcepts(conceptUuids);
 
   const conceptData: Record<string, ConceptMeta> = useMemo(

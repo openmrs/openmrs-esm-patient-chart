@@ -6,7 +6,6 @@ import {
   launchWorkspace,
   useFeatureFlag,
   useLayoutType,
-  usePatient,
   useWorkspaces,
 } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
@@ -15,7 +14,6 @@ import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/sto
 import OrderBasketActionButton from './order-basket-action-button.extension';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseWorkspaces = useWorkspaces as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
 const MockActionMenuButton = jest.mocked(ActionMenuButton);
@@ -80,7 +78,6 @@ jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
   return { useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit() };
 });
 
-mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);

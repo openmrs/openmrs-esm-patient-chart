@@ -1,3 +1,7 @@
+import React from 'react';
+import dayjs from 'dayjs';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -5,19 +9,14 @@ import {
   showSnackbar,
   updateVisit,
   useConfig,
+  useEmrConfiguration,
   useLocations,
-  usePatient,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { mockLocations, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
-import dayjs from 'dayjs';
-import React from 'react';
 import { mockPatient } from 'tools';
 import { type ChartConfig, esmPatientChartSchema } from '../../config-schema';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import StartVisitForm from './visit-form.workspace';
 import {
@@ -58,6 +57,7 @@ const mockSetTitle = jest.fn();
 const testProps = {
   openedFrom: 'test',
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
@@ -70,7 +70,6 @@ const mockUpdateVisit = jest.mocked(updateVisit);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
@@ -144,10 +143,6 @@ jest.mock('../hooks/useVisitAttributeType', () => ({
   })),
 }));
 
-jest.mock('../hooks/useEmrConfiguration', () => ({
-  useEmrConfiguration: jest.fn(() => ({})),
-}));
-
 jest.mock('../hooks/useDefaultFacilityLocation', () => {
   const requireActual = jest.requireActual('../hooks/useDefaultFacilityLocation');
 
@@ -208,12 +203,6 @@ describe('Visit form', () => {
         },
       ],
     });
-    mockUsePatient.mockReturnValue({
-      error: null,
-      isLoading: false,
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-    });
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
     mockUseLocations.mockReturnValue(mockLocations);
     mockUseEmrConfiguration.mockReturnValue({
@@ -229,7 +218,7 @@ describe('Visit form', () => {
   it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
-    expect(screen.getByRole('textbox', { name: /Date/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();

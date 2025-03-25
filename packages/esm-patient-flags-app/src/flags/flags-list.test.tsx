@@ -28,6 +28,7 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       closeWorkspace={jest.fn()}
       closeWorkspaceWithSavedChanges={jest.fn()}
       patientUuid={mockPatient.id}
+      patient={mockPatient}
       promptBeforeClosing={jest.fn()}
       setTitle={jest.fn()}
     />,
