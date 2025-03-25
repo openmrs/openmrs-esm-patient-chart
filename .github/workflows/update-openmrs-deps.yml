@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   schedule:
     # every hour
-    - cron: '30 */1 * * *'
+    - cron: '30 * * * *'
 
 name: 'Check for OpenMRS Dependency Updates'
 
@@ -32,7 +32,7 @@ jobs:
         run: yarn install --immutable
       - name: ✅ Check for updates
         run: node ./tools/update-openmrs-deps.mjs
-      - name: Create PR if necessary
+      - name: ⬆️ Create PR if necessary
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
@@ -43,13 +43,13 @@ jobs:
           branch: 'chore/update-openmrs-deps'
           author: 'OpenMRS Bot <infrastructure@openmrs.org>'
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Auto approve PR
+      - name: ✅ Auto approve PR
         if: steps.cpr.outputs.pull-request-operation == 'created'
         run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Automerge PR
+          GH_TOKEN: ${{ secrets.OMRS_BOT_GH_TOKEN }}
+      - name: 🔀 Automerge PR
         if: steps.cpr.outputs.pull-request-operation == 'created'
-        run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
+        run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
