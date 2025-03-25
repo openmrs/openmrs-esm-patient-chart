@@ -22,6 +22,7 @@ import {
   useSession,
   ExtensionSlot,
   useVisit,
+  useAbortController,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -83,8 +84,9 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   const [muacColorCode, setMuacColorCode] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const abortController = useAbortController();
 
-  const isLoadingInitialvalues = useMemo(
+  const isLoadingInitialValues = useMemo(
     () => (formContext === 'creating' ? false : isLoadingEncounter),
     [formContext, isLoadingEncounter],
   );
@@ -102,17 +104,18 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   });
 
   useEffect(() => {
-    if (formContext === 'editing' && !isLoadingInitialvalues && initialFieldValuesMap) {
+    if (formContext === 'editing' && !isLoadingInitialValues && initialFieldValuesMap) {
       reset(getRefinedInitialValues());
     }
-  }, [formContext, isLoadingInitialvalues, initialFieldValuesMap, getRefinedInitialValues, reset]);
+  }, [formContext, isLoadingInitialValues, initialFieldValuesMap, getRefinedInitialValues, reset]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
-    ?.uuid;
+  const encounterUuid = currentVisit?.encounters?.find(
+    (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
+  )?.uuid;
 
   const midUpperArmCircumference = watch('midUpperArmCircumference');
   const systolicBloodPressure = watch('systolicBloodPressure');
@@ -185,7 +188,6 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
 
       if (allFieldsAreValid) {
         setShowErrorMessage(false);
-        const abortController = new AbortController();
         const { newObs, toBeVoided } = prepareObsForSubmission(
           formData,
           dirtyFields,
@@ -202,7 +204,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
           [...newObs, ...toBeVoided],
           abortController,
         )
-          .then((response) => {
+          .then(() => {
             if (mutateEncounter) {
               mutateEncounter();
             }
@@ -229,15 +231,13 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
               isLowContrast: false,
               subtitle: t('checkForValidity', 'Some of the values entered are invalid'),
             });
-          })
-          .finally(() => {
-            abortController.abort();
           });
       } else {
         setHasInvalidVitals(true);
       }
     },
     [
+      abortController,
       conceptMetadata,
       config.concepts,
       config.vitals.encounterTypeUuid,
@@ -271,7 +271,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
     );
   }
 
-  if (isLoadingConceptMetadata || isLoadingInitialvalues) {
+  if (isLoadingConceptMetadata || isLoadingInitialValues) {
     return (
       <Form className={styles.form}>
         <div className={styles.grid}>
