@@ -1,13 +1,18 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  showSnackbar,
+  useConfig,
+  getDefaultsFromConfigSchema,
+  useAbortController,
+} from '@openmrs/esm-framework';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
-import { MutatorCallback, MutatorOptions } from 'swr';
 
 const heightValue = 180;
 const muacValue = 23;
@@ -31,6 +36,7 @@ const testProps = {
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockCreateOrUpdateVitalsAndBiometrics = jest.mocked(createOrUpdateVitalsAndBiometrics);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseAbortController = jest.mocked(useAbortController);
 const mockUseEncounterVitalsAndBiometrics = jest.mocked(useEncounterVitalsAndBiometrics);
 
 jest.mock('../common', () => ({
@@ -57,6 +63,9 @@ mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
 });
+
+// TODO: Fix mock defined by the framework
+mockUseAbortController.mockReturnValue(new AbortController());
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({
@@ -302,7 +311,7 @@ describe('VitalsBiometricsForm', () => {
     const temperatureInput = screen.getByRole('spinbutton', { name: /temperature/i });
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
 
-    // the save button should be disabled untill the user makes a change
+    // the save button should be disabled until the user makes a change
     expect(saveButton).toBeDisabled();
     await user.clear(weightInput);
     await user.type(weightInput, '70');

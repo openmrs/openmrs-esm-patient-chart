@@ -1,3 +1,4 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from '../common';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
@@ -107,9 +108,16 @@ export function prepareObsForSubmission(
   formContext: 'creating' | 'editing',
   initialFieldValuesMap: VitalsAndBiometricsFieldValuesMap,
   fieldToConceptMap: Record<string, string>,
-) {
+): {
+  toBeVoided: Array<OpenmrsResource>;
+  newObs: Array<OpenmrsResource>;
+} {
   return Object.entries(formData).reduce(
     (obsForSubmission, [field, newValue]) => {
+      if (!fieldToConceptMap[`${field}Uuid`]) {
+        console.error(`Missing concept mapping for field: ${field}`);
+        return obsForSubmission;
+      }
       if (formContext === 'editing' && initialFieldValuesMap.has(field) && dirtyFields[field]) {
         // void old obs
         const { obs } = initialFieldValuesMap.get(field);

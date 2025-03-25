@@ -50,7 +50,7 @@ interface VitalsConceptMetadataResponse {
   setMembers: Array<ConceptMetadata>;
 }
 
-export type VitalsAndBiometricsFieldValuesMap = Map<string, { value: any; obs: OpenmrsResource }>;
+export type VitalsAndBiometricsFieldValuesMap = Map<string, { value: number | string; obs: OpenmrsResource }>;
 
 interface PartialEncounter extends OpenmrsResource {
   encounterType: OpenmrsResource;
@@ -124,8 +124,16 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   const conceptUuids = useMemo(() => {
     const biometricsKeys = ['heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
 
+    if (!concepts) {
+      return [];
+    }
+
     return Object.entries(concepts)
       .filter(([key, conceptUuid]) => {
+        if (!conceptUuid) {
+          console.warn(`Missing UUID for concept ${key}`);
+          return false;
+        }
         if (mode === 'both') {
           return true;
         }
@@ -286,7 +294,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
  */
 export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
   const { concepts } = useConfig<ConfigObject>();
-  const fieldNameSufix = 'Uuid';
+  const fieldNameSuffix = 'Uuid';
   const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}?v=${encounterRepresentation}` : null;
 
   const { data, isLoading, error, mutate } = useSWRImmutable<FetchResponse<PartialEncounter>, Error>(url, openmrsFetch);
@@ -297,7 +305,7 @@ export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
         let fieldName = Object.entries(concepts).find(([, value]) => value === obs.concept.uuid)?.[0];
 
         if (fieldName) {
-          fieldName = fieldName.endsWith(fieldNameSufix) ? fieldName.replace(fieldNameSufix, '') : fieldName;
+          fieldName = fieldName.endsWith(fieldNameSuffix) ? fieldName.replace(fieldNameSuffix, '') : fieldName;
           vitalsAndBiometrics.set(fieldName, {
             value: obs.value,
             obs,
@@ -310,7 +318,7 @@ export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
   }, [isLoading, data, concepts]);
 
   const getRefinedInitialValues = useCallback(() => {
-    const initialValues: Record<string, any> = {};
+    const initialValues: Record<string, string | number> = {};
     if (vitalsAndBiometrics) {
       vitalsAndBiometrics.forEach((value, key) => {
         initialValues[key] = value.value;
@@ -395,6 +403,12 @@ export function createOrUpdateVitalsAndBiometrics(
     },
     signal: abortController.signal,
     body: encounter,
+  });
+}
+
+export function deleteEncounter(encounterUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    method: 'DELETE',
   });
 }
 

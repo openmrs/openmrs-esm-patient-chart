@@ -24,14 +24,14 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, formType }: Vital
     });
   }, [encounterUuid, t]);
 
-  const handleLaunchDeleteVitalsAndBiometricsModal = () => {
+  const handleLaunchDeleteVitalsAndBiometricsModal = useCallback(() => {
     const dispose = showModal('vitals-biometrics-delete-confirmation-modal', {
       closeDeleteModal: () => dispose(),
       encounterUuid,
       formType,
       patientUuid,
     });
-  };
+  }, [encounterUuid, formType, patientUuid]);
 
   return (
     <Layer className={styles.layer}>
@@ -50,7 +50,7 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, formType }: Vital
         />
         <OverflowMenuItem
           className={styles.menuItem}
-          id="deleteViitalsAndBiometrics"
+          id="deleteVitalsAndBiometrics"
           itemText={t('delete', 'Delete')}
           onClick={handleLaunchDeleteVitalsAndBiometricsModal}
           isDelete
