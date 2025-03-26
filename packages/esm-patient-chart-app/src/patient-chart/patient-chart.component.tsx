@@ -17,6 +17,8 @@ import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
 import SideMenuPanel from '../side-nav/side-menu.component';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+// ✅ Import the placeholder GrowthChart component
+import GrowthChart from './growth-chart/GrowthChart';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -78,6 +80,10 @@ const PatientChart: React.FC = () => {
                       view={view}
                       setDashboardLayoutMode={setLayoutMode}
                     />
+                    {/* GSoC 2025 - Show GrowthChart placeholder at bottom of patient chart dashboard*/}
+                    <div style={{ marginTop: '2rem' }}>
+                      <GrowthChart />
+                    </div>
                   </div>
                 </div>
               </>
