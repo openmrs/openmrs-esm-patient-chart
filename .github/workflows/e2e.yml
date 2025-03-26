@@ -55,7 +55,6 @@ jobs:
 
       - name: 🎭 Install Playwright Browsers
         run: npx playwright install chromium firefox --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
