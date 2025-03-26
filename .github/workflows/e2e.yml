@@ -54,7 +54,7 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: 🎭 Install Playwright Browsers
-        run: npx playwright install chromium firefox --with-deps
+        run: npx playwright install --with-deps --no-shell
 
       - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
