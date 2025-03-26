@@ -5,7 +5,7 @@
   },
   "optionalBackendDependencies": {
     "fhirproxy": "^1.0.0-SNAPSHOT",
-    "stockmanagement": "^2.0.2-SNAPSHOT",
+    "stockmanagement": ">=1.4.0 || ^2.0.0-SNAPSHOT",
     "billing": "^1.2.0-SNAPSHOT"
   },
   "extensions": [
@@ -25,7 +25,7 @@
       "name": "order-basket-action-menu",
       "component": "orderBasketActionMenu",
       "slots": [
-        "action-menu-patient-chart-items-slot", 
+        "action-menu-patient-chart-items-slot",
         "action-menu-ward-patient-items-slot"
       ]
     },
