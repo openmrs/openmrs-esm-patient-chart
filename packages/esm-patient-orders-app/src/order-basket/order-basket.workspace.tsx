@@ -9,6 +9,7 @@ import {
   postOrders,
   postOrdersOnNewEncounter,
   useOrderBasket,
+  usePatientChartStore,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -17,11 +18,14 @@ import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
-  patientUuid,
+  patientUuid : patientUuidFromProps,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
+  const { patientUuid:patientUuidFromStore } = usePatientChartStore();
+  const patientUuid = patientUuidFromProps || patientUuidFromStore;
+
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
