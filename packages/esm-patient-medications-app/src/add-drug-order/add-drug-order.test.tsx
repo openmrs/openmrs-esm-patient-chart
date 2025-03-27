@@ -48,7 +48,7 @@ jest.mock('./drug-search/drug-search.resource', () => ({
 
 jest.mock('../api/api', () => ({
   ...jest.requireActual('../api/api'),
-  usePatientOrders: () => usePatientOrdersMock(),
+  useActivePatientOrders: () => usePatientOrdersMock(),
   useRequireOutpatientQuantity: jest
     .fn()
     .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
