@@ -118,11 +118,9 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     closeWorkspace({ onWorkspaceClose: clearOrders });
   }, [clearOrders, closeWorkspace]);
 
-  const isRdeEnabled = useFeatureFlag('rde');
-
   return (
     <>
-      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot

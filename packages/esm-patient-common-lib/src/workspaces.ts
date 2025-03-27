@@ -41,7 +41,7 @@ export function launchPatientChartWithWorkspaceOpen({
 }
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid, patient } = usePatientChartStore();
+  const { patientUuid } = usePatientChartStore();
   const { systemVisitEnabled } = useSystemVisitSetting();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isRdeEnabled = useFeatureFlag('rde');

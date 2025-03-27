@@ -124,8 +124,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
 
-  const isRdeEnabled = useFeatureFlag('rde');
-
   const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
 
   const customResolver = useCallback(
@@ -441,7 +439,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
       {isTablet && (
         <Row className={styles.headerGridRow}>

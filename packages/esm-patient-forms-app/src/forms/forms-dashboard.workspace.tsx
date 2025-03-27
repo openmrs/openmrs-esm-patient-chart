@@ -5,12 +5,11 @@ import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-l
 import { ExtensionSlot, useFeatureFlag } from '@openmrs/esm-framework';
 
 export default function FormsWorkspace(props: DefaultPatientWorkspaceProps) {
-  const isRdeEnabled = useFeatureFlag('rde');
   const { patientUuid } = props;
 
   return (
     <div className={styles.container}>
-      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       <FormsDashboard {...props} />
     </div>
   );

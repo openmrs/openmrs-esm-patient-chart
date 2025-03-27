@@ -85,11 +85,9 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
     }
   }, [state]);
 
-  const isRdeEnabled = useFeatureFlag('rde');
-
   return (
     <div>
-      {isRdeEnabled && <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />}
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
     </div>
   );

@@ -1,11 +1,12 @@
 import { Button, Loading } from '@carbon/react';
-import { showModal, useVisit } from '@openmrs/esm-framework';
+import { showModal, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-context-header.scss';
 import VisitContextInfo from './visit-context-info.component';
 import { useVisitContextStore } from './visit-context';
+import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib/src';
 
 interface VisitContextHeaderProps {
   patientUuid: string;
@@ -13,7 +14,11 @@ interface VisitContextHeaderProps {
 
 const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { currentVisit, isLoading } = useVisit(patientUuid);
+  const { systemVisitEnabled } = useSystemVisitSetting();
+  const isRdeEnabled = useFeatureFlag('rde');
+  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled;
+
+  const { currentVisit, isLoading } = useVisit(showVisitContextHeader ? patientUuid : null);
   const { manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
 
@@ -21,10 +26,10 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   // returns a currentVisit that isn't actually the one in the visit context.
   // TODO: move this into the useVisit hook
   useEffect(() => {
-    if (!isLoading && currentVisit.uuid != manuallySetVisitUuid) {
+    if (showVisitContextHeader && !isLoading && currentVisit.uuid != manuallySetVisitUuid) {
       setVisitContext(currentVisit);
     }
-  }, [currentVisit, isLoading, setVisitContext, manuallySetVisitUuid]);
+  }, [currentVisit, isLoading, setVisitContext, manuallySetVisitUuid, showVisitContextHeader]);
 
   const openVisitSwitcherModal = () => {
     const dispose = showModal('visit-context-switcher-modal', {
@@ -34,6 +39,9 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
     });
   };
 
+  if (!showVisitContextHeader) {
+    return <></>;
+  }
   if (isLoading) {
     return (
       <div className={styles.visitContextHeader}>
