@@ -94,13 +94,7 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
                       </p>
                       <p className={styles.itemLabel}>
                         {upperCase(t('gender', 'Gender'))}:
-                        {upperCase(
-                          firstOrder?.patient?.person?.gender === 'M'
-                            ? ' Male'
-                            : firstOrder?.patient?.person?.gender === 'F'
-                            ? ' Female'
-                            : '',
-                        )}
+                        {upperCase(firstOrder?.patient?.person?.gender === 'M' ? 'Male' : 'Female')}
                       </p>
                     </div>
 
