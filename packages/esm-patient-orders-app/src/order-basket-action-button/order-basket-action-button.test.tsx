@@ -1,14 +1,13 @@
 import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ActionMenuButton, launchWorkspace, useLayoutType, usePatient, useWorkspaces } from '@openmrs/esm-framework';
+import { ActionMenuButton, launchWorkspace, useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseWorkspaces = useWorkspaces as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
 const MockActionMenuButton = jest.mocked(ActionMenuButton);
@@ -73,7 +72,6 @@ jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
   return { useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit() };
 });
 
-mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
 describe('<OrderBasketActionButton/>', () => {

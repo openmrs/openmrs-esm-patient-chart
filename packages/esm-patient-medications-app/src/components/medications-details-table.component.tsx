@@ -143,11 +143,12 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                 <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
                 {medication.orderReasonNonCoded}
               </span>
-            )}
+            )}{' '}
+            {medication.orderReasonNonCoded && medication.quantity && <>&mdash;</>}
             {medication.quantity && (
               <span>
-                <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                {medication.quantity} {medication?.quantityUnits?.display}
+                <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span> {medication.quantity}{' '}
+                {medication?.quantityUnits?.display}
               </span>
             )}
           </p>

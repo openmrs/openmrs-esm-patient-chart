@@ -21,15 +21,15 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await medicationsPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Record active medications` link', async () => {
+  await test.step('And I click on the "Record active medications" link', async () => {
     await page.getByText(/record active medications/i).click();
   });
 
-  await test.step('And I search for `Aspirin` in the search bar', async () => {
+  await test.step('And I search for "Aspirin" in the search bar', async () => {
     await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
   });
 
-  await test.step('And I add `Aspirin 81mg` to the basket', async () => {
+  await test.step('And I add "Aspirin 81mg" to the basket', async () => {
     await page
       .getByRole('listitem')
       .filter({ hasText: /aspirin 81mg — 81mg — tablet/i })
@@ -37,11 +37,11 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
       .click();
   });
 
-  await test.step('Then I should see `Aspirin 81mg` under drug order', async () => {
+  await test.step('Then I should see "Aspirin 81mg" under drug order', async () => {
     await expect(page.getByText('Aspirin 81mg')).toBeVisible();
   });
 
-  await test.step('When I click on the created drug order', async () => {
+  await test.step('When I click on the newly created drug order', async () => {
     await page
       .getByRole('listitem')
       .filter({ hasText: /incomplete/i })
@@ -52,51 +52,50 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
     await expect(page.getByText(/order form/i)).toBeVisible();
   });
 
-  await test.step('When I set the dose to `1` tablet', async () => {
-    await form.getByLabel(/^dose$/i).clear();
-    await form.getByLabel(/^dose$/i).fill('1');
+  await test.step('When I set the dose to "1" tablet', async () => {
+    await page.getByLabel(/^dose$/i, { exact: true }).click();
+    await page.getByLabel(/^dose$/i, { exact: true }).fill('1');
   });
 
-  await test.step('And I set the route to `Oral`', async () => {
-    await form.getByPlaceholder(/route/i).click();
-    await form.getByText('Oral', { exact: true }).click();
+  await test.step('And I set the route to "Oral"', async () => {
+    await page.getByRole('combobox', { name: /route/i }).click();
+    await page.getByRole('option', { name: /oral/i }).click();
   });
 
-  await test.step('And I set the frequency to `Once daily`', async () => {
-    await form.getByPlaceholder(/frequency/i).click();
-    await form.getByText('Once daily', { exact: true }).click();
+  await test.step('And I set the frequency to "Once daily"', async () => {
+    await page.getByRole('combobox', { name: /frequency/i }).click();
+    await page.getByRole('option', { name: /once daily/i }).click();
   });
 
-  await test.step('And I set duration to `3` days', async () => {
-    await form.getByLabel(/^duration$/i).clear();
-    await form.getByLabel(/^duration$/i).fill('3');
+  await test.step('And I set duration to "3" days', async () => {
+    await page.getByText(/^duration$/i).clear();
+    await page.getByText(/^duration$/i).fill('3');
   });
 
   await test.step('And I set the quantity to dispense to 3', async () => {
-    await form.getByLabel(/^quantity to dispense$/i).clear();
-    await form.getByLabel(/^quantity to dispense$/i).fill('3');
+    await page.getByText(/^quantity to dispense$/i).clear();
+    await page.getByText(/^quantity to dispense$/i).fill('3');
   });
 
   await test.step('And I set the prescription refills to 1', async () => {
-    await form.getByLabel(/^prescription refills$/i).clear();
-    await form.getByLabel(/^prescription refills$/i).fill('1');
+    await page.getByText(/^prescription refills$/i).clear();
+    await page.getByText(/^prescription refills$/i).fill('1');
   });
 
-  await test.step('And I set the indication to `Headache`', async () => {
-    await form.getByLabel(/indication/i).clear();
-    await form.getByLabel(/indication/i).fill('Headache');
+  await test.step('And I set the indication to "Headache"', async () => {
+    await page.getByText(/indication/i).fill('Headache');
   });
 
   await test.step('And I click on the "Save Order" button', async () => {
-    await form.getByRole('button', { name: /save order/i }).click();
+    await page.getByRole('button', { name: /save order/i }).click();
   });
 
-  await test.step('Then the order status should be changed to `New`', async () => {
-    await expect(orderBasket.getByText(/incomplete/i)).not.toBeVisible();
+  await test.step('Then the order status should be changed to "New"', async () => {
+    await expect(orderBasket.getByText(/incomplete/i)).toBeHidden();
     await expect(orderBasket.getByText(/new/i)).toBeVisible();
   });
 
-  await test.step('When I click on the `Sign and close` button', async () => {
+  await test.step('When I click on the "Sign and close" button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
@@ -125,69 +124,50 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
       .click();
   });
 
-  await test.step('And I click on the `Modify` button', async () => {
+  await test.step('And I click on the "Modify" button', async () => {
     await page.getByRole('menuitem', { name: /modify/i }).click();
   });
 
-  await test.step('Then I should see the medication launch in the workspace in edit mode', async () => {
+  await test.step('Then I should see the medication order form launch in the workspace in edit mode', async () => {
     await expect(form.getByText('Aspirin 81mg (81mg)')).toBeVisible();
   });
 
-  await test.step('When I change the dose to `2` tablets', async () => {
-    await form.getByLabel(/^dose$/i).clear();
-    await form.getByLabel(/^dose$/i).fill('2');
+  await test.step('When I change the dose to "2" tablets', async () => {
+    await page.getByLabel(/^dose$/i).clear();
+    await page.getByLabel(/^dose$/i).fill('2');
   });
 
-  await test.step('And I change the duration to `5` days', async () => {
-    await form.getByLabel(/^duration$/i).clear();
-    await form.getByLabel(/^duration$/i).fill('5');
+  await test.step('And I change the duration to "5" days', async () => {
+    await page.getByText(/^duration$/i).clear();
+    await page.getByText(/^duration$/i).fill('5');
   });
 
-  await test.step('And I change the route to `Inhalation`', async () => {
-    await form.getByPlaceholder(/route/i).click();
-    await form.getByPlaceholder(/route/i).clear();
-    await form.getByPlaceholder(/route/i).fill('Inhalation');
-    await form.getByText('Inhalation', { exact: true }).click();
+  await test.step('And I change the route to "Inhalation"', async () => {
+    await page.getByRole('combobox', { name: /route/i }).click();
+    await page.getByRole('combobox', { name: /route/i }).clear();
+    await page.getByRole('option', { name: /inhalation/i }).click();
   });
 
-  await test.step('And I change the frequency to `Twice daily`', async () => {
-    await form.getByPlaceholder(/frequency/i).clear();
-    await form.getByText('Twice daily', { exact: true }).click();
+  await test.step('And I change the frequency to "Twice daily"', async () => {
+    await page.getByRole('combobox', { name: /frequency/i }).click();
+    await page.getByRole('combobox', { name: /frequency/i }).clear();
+    await page.getByRole('option', { name: /twice daily/i }).click();
   });
 
-  await test.step('And I set the frequency to `q12`', async () => {
-    await form.getByPlaceholder(/frequency/i).clear();
-    await form.getByPlaceholder(/frequency/i).fill('q12');
-    await form.getByText('Every twelve hours', { exact: true }).click();
+  await test.step('And I change the indication to "Hypertension"', async () => {
+    await form.getByText(/indication/i).fill('Hypertension');
   });
 
-  await test.step('And I set the frequency to `od`', async () => {
-    await form.getByPlaceholder(/frequency/i).clear();
-    await form.getByPlaceholder(/frequency/i).fill('od');
-    await form.getByText('Once daily', { exact: true }).click();
+  await test.step('And I click on the "Save Order" button', async () => {
+    await page.getByRole('button', { name: /save order/i }).click();
   });
 
-  await test.step('And I set the frequency to `bd`', async () => {
-    await form.getByPlaceholder(/frequency/i).clear();
-    await form.getByPlaceholder(/frequency/i).fill('bd');
-    await form.getByText('Twice daily', { exact: true }).click();
-  });
-
-  await test.step('And I change the indication to `Hypertension`', async () => {
-    await form.getByLabel(/indication/i).clear();
-    await form.getByLabel(/indication/i).fill('Hypertension');
-  });
-
-  await test.step('And I click on the `Save Order` button', async () => {
-    await form.getByRole('button', { name: /save order/i }).click();
-  });
-
-  await test.step('Then the order status should be changed to `Modify`', async () => {
-    await expect(orderBasket.getByText(/new/i)).not.toBeVisible();
+  await test.step('Then the order status should be changed to "Modify"', async () => {
+    await expect(orderBasket.getByText(/new/i)).toBeHidden();
     await expect(orderBasket.getByText(/modify/i)).toBeVisible();
   });
 
-  await test.step('When I click on the `Sign and close` button', async () => {
+  await test.step('When I click on the "Sign and close" button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 
@@ -221,15 +201,15 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
       .click();
   });
 
-  await test.step('And I click on the `Discontinue` button', async () => {
+  await test.step('And I click on the "Discontinue" button', async () => {
     await page.getByRole('menuitem', { name: /discontinue/i }).click();
   });
 
-  await test.step('Then the order status should be changed to `Discontinue`', async () => {
+  await test.step('Then the order status should be changed to "Discontinue"', async () => {
     await expect(orderBasket.getByText(/discontinue/i)).toBeVisible();
   });
 
-  await test.step('And I click on the `Sign and close` button', async () => {
+  await test.step('And I click on the "Sign and close" button', async () => {
     await page.getByRole('button', { name: /sign and close/i }).click();
   });
 

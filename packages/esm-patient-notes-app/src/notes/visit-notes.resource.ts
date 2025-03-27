@@ -65,12 +65,17 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 }
 
 export function useInfiniteVisits(patientUuid: string) {
-  const config = useConfig();
+  const { numberOfVisitsToLoad } = useConfig<{
+    numberOfVisitsToLoad: number;
+  }>({
+    externalModuleName: '@openmrs/esm-patient-chart-app',
+  });
+
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+    'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
   const getKey = (pageIndex, previousPageData) => {
-    const pageSize = config.numberOfVisitsToLoad;
+    const pageSize = numberOfVisitsToLoad;
 
     if (previousPageData && !previousPageData?.data?.links.some((link) => link.rel === 'next')) {
       return null;
@@ -85,19 +90,23 @@ export function useInfiniteVisits(patientUuid: string) {
     return url;
   };
 
-  const { data, error, isLoading, isValidating, mutate, size, setSize } = useSWRInfinite(
-    patientUuid ? getKey : null,
-    openmrsFetch,
-    { parallel: true },
-  );
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: localMutate,
+    size,
+    setSize,
+  } = useSWRInfinite(patientUuid ? getKey : null, openmrsFetch, { parallel: true });
 
   return {
-    visits: data ? [].concat(data?.flatMap((page) => page.data.results)) : null,
+    visits: data ? [].concat(data?.flatMap((page) => page?.data?.results)) : null,
     error,
     hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
     isLoading,
     isValidating,
-    mutateVisits: mutate,
+    mutateVisits: localMutate,
     setSize,
     size,
   };
