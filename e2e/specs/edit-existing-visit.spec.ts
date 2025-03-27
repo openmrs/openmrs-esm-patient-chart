@@ -66,6 +66,7 @@ test('Edit an existing visit', async ({ page }) => {
   await test.step('And when I change the visit details and submit the form', async () => {
     await chartPage.page.getByRole('button', { name: /clear selected item/i }).click();
     await chartPage.page.getByRole('combobox', { name: /select a location/i }).click();
+    await chartPage.page.getByRole('combobox', { name: /select a location/i }).clear();
     await chartPage.page.getByRole('option', { name: /inpatient ward/i }).click();
     await chartPage.page.getByText(/home visit/i).click();
     await expect(chartPage.page.getByLabel(/home visit/i)).toBeChecked();
