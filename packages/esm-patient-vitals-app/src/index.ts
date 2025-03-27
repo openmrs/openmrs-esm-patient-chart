@@ -67,6 +67,6 @@ export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(
 );
 
 export const vitalsAndBiometricsDeleteConfirmationModal = getAsyncLifecycle(
-  () => import('./components/delete-vitals-biometrics-modal/delete-vitals-biometrics-modal.component'),
+  () => import('./components/delete-vitals-biometrics-modal/delete-vitals-biometrics.modal'),
   options,
 );
