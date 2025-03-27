@@ -1,4 +1,5 @@
 export {
+  deleteEncounter,
   invalidateCachedVitalsAndBiometrics,
   useVitalsAndBiometrics,
   useVitalsConceptMetadata,

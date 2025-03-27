@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { deleteEncounter, invalidateCachedVitalsAndBiometrics } from '../../common/data.resource';
+import { deleteEncounter, invalidateCachedVitalsAndBiometrics } from '../../common';
 import { ModalHeader, ModalBody, ModalFooter, Button, InlineLoading } from '@carbon/react';
 
 interface DeleteVitalsAndBiometricsModalProps {
