@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useFeatureFlag } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   type DefaultPatientWorkspaceProps,
@@ -87,6 +87,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
 
   return (
     <div>
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
     </div>
   );

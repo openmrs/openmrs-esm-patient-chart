@@ -94,7 +94,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   }, [filter, visits]);
 
   const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
 
   const tableHeaders = [
     {
