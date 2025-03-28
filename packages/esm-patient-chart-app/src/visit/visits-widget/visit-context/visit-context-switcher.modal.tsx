@@ -51,7 +51,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
                   key={visit.uuid}
                   visit={visit}
                   setSelectedVisit={setSelectedVisit}
-                  isSelected={selectedVisit == visit.uuid}
+                  isSelected={selectedVisit === visit.uuid}
                 />
               );
             })}
@@ -92,7 +92,7 @@ interface VisitCardRowProps {
  * (not just the radio button and the label) is clickable
  */
 const VisitCardRow: React.FC<VisitCardRowProps> = ({ visit, setSelectedVisit: setSelected, isSelected }) => {
-  const isActive = !Boolean(visit.stopDatetime);
+  const isActive = !visit.stopDatetime;
 
   return (
     <div

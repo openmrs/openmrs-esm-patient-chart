@@ -15,7 +15,7 @@ const VisitContextInfo: React.FC<VisitContextInfoProps> = ({ visit }) => {
     return null;
   }
 
-  const isActive = !Boolean(visit.stopDatetime);
+  const isActive = !visit.stopDatetime;
 
   return (
     <div className={styles.visitContextInfoContainer}>

@@ -26,7 +26,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   // returns a currentVisit that isn't actually the one in the visit context.
   // TODO: move this into the useVisit hook
   useEffect(() => {
-    if (showVisitContextHeader && !isLoading && currentVisit.uuid != manuallySetVisitUuid) {
+    if (showVisitContextHeader && !isLoading && currentVisit.uuid !== manuallySetVisitUuid) {
       setVisitContext(currentVisit);
     }
   }, [currentVisit, isLoading, setVisitContext, manuallySetVisitUuid, showVisitContextHeader]);
