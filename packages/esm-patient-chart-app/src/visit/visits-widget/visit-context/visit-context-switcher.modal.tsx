@@ -21,6 +21,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   onAfterVisitSelected,
 }) => {
   const { t } = useTranslation();
+  // TODO: add pagination for the visits list.
   const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
   const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const [selectedVisit, setSelectedVisit] = useState<string>(
