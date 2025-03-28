@@ -1,14 +1,15 @@
-import React from 'react';
-import userEvent from '@testing-library/user-event';
+import { FetchResponse, getConfig, getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { openmrsFetch, getConfig, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
-import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
-import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import userEvent from '@testing-library/user-event';
 import { visitOverviewDetailMockData } from '__mocks__';
+import React from 'react';
+import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
+import { useInfiniteVisits, useVisitsPagination } from './visit.resource';
+import { MutatorCallback, MutatorOptions } from 'swr';
 
 const mockGetConfig = getConfig as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 
 mockUseConfig.mockReturnValue({
@@ -16,16 +17,65 @@ mockUseConfig.mockReturnValue({
   numberOfVisitsToLoad: 5,
 });
 
+const mockVisitPaginationData: ReturnType<typeof useVisitsPagination> = {
+  data: visitOverviewDetailMockData.data.results,
+  error: null,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  totalPages: 1,
+  totalCount: 1,
+  currentPage: 1,
+  currentPageSize: { current: 10 },
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: jest.fn(),
+  goToNext: jest.fn(),
+  goToPrevious: jest.fn(),
+};
+const mockUseInfiniteVisitsData: ReturnType<typeof useInfiniteVisits> = {
+  visits: visitOverviewDetailMockData.data.results,
+  error: null,
+  hasMore: false,
+  isLoading: false,
+  isValidating: false,
+  mutateVisits: jest.fn(),
+  setSize: jest.fn(),
+  size: 1,
+};
+jest.mock('./visit.resource', () => ({
+  ...jest.requireActual('./visit.resource'),
+  useVisitsPagination: jest.fn().mockImplementation(() => mockVisitPaginationData),
+  useInfiniteVisits: jest.fn().mockImplementation(() => mockUseInfiniteVisitsData),
+}));
+const mockuseVisitsPagination = jest.mocked(useVisitsPagination);
+const mockUseInfiniteVisits = jest.mocked(useInfiniteVisits);
+
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+    mockuseVisitsPagination.mockReturnValueOnce({
+      ...mockVisitPaginationData,
+      data: [],
+    });
+    mockUseInfiniteVisits.mockReturnValue({
+      ...mockUseInfiniteVisitsData,
+      visits: [],
+    });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /visits/i })).toBeInTheDocument();
+    // visits table view
+    expect(screen.getByRole('heading', { name: /past visits/i })).toBeInTheDocument();
+    expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
+
+    // visits summary view
+    await screen.getByRole('tab', { name: /summary cards/i }).click();
+    expect(screen.getByRole('heading', { name: /Past visits/i })).toBeInTheDocument();
     expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
   });
@@ -38,15 +88,31 @@ describe('VisitDetailOverview', () => {
         statusText: 'Unauthorized',
       },
     };
-
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockuseVisitsPagination.mockReturnValue({
+      ...mockVisitPaginationData,
+      data: null,
+      error,
+    });
+    mockUseInfiniteVisits.mockReturnValue({
+      ...mockUseInfiniteVisitsData,
+      visits: null,
+      error,
+    });
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
+    // visits table view
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /visits/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/visits/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/Error 401: Unauthorized/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
+
+    // visits summary view
+    await screen.getByRole('tab', { name: /summary cards/i }).click();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Past visits/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Error 401: Unauthorized/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
   });
@@ -54,24 +120,27 @@ describe('VisitDetailOverview', () => {
   it(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
+    mockuseVisitsPagination.mockReturnValue(mockVisitPaginationData);
+    mockUseInfiniteVisits.mockReturnValue(mockUseInfiniteVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
-    const allVisitsTab = screen.getByRole('tab', { name: /All encounters/i });
-    const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
+    const allEncountersTab = screen.getByRole('tab', { name: /All encounters/i });
+    const visitsTab = screen.getByRole('tab', { name: /visit/i });
 
-    expect(visitSummariesTab).toBeInTheDocument();
-    expect(allVisitsTab).toBeInTheDocument();
-    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
-    expect(allVisitsTab).toHaveAttribute('aria-selected', 'false');
+    expect(visitsTab).toBeInTheDocument();
+    expect(allEncountersTab).toBeInTheDocument();
+    expect(visitsTab).toHaveAttribute('aria-selected', 'true');
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
+    // visits summary view
+    await screen.getByRole('tab', { name: /summary cards/i }).click();
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
@@ -83,28 +152,32 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no medications to display for this patient/i)).toBeInTheDocument();
 
-    await user.click(allVisitsTab);
+    await user.click(allEncountersTab);
 
-    expect(allVisitsTab).toHaveAttribute('aria-selected', 'true');
-    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'true');
+    expect(visitsTab).toHaveAttribute('aria-selected', 'false');
   });
 
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
+    mockuseVisitsPagination.mockReturnValue(mockVisitPaginationData);
+    mockUseInfiniteVisits.mockReturnValue(mockUseInfiniteVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
 
     await waitForLoadingToFinish();
 
-    const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
+    const visitsTab = screen.getByRole('tab', { name: /visits/i });
 
-    expect(visitSummariesTab).toBeInTheDocument();
-    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
+    // visits summary view
+    await screen.getByRole('tab', { name: /summary cards/i }).click();
+
+    expect(visitsTab).toBeInTheDocument();
+    expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.queryByText('/All encounters/i')).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
