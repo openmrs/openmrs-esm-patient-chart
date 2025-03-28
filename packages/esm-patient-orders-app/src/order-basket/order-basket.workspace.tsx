@@ -193,7 +193,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           actionButtonLabel={t('startVisit', 'Start visit')}
           onActionButtonClick={openStartVisitDialog}
           title={t('startAVisitToRecordOrders', 'Start a visit to order')}
-          subtitle={t('visitRequired', 'A visit is required to make orders')}
+          subtitle={t('visitRequired', 'You must select a visit to make orders')}
           lowContrast={true}
           inline
           className={styles.actionNotification}

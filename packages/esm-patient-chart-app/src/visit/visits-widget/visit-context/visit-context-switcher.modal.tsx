@@ -66,7 +66,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
           {t('cancel', 'Cancel')}
         </Button>
         <Button
-          disabled={selectedVisit == null || isLoading}
+          disabled={selectedVisit === null || isLoading}
           onClick={() => {
             setVisitContext(visits.find((v) => v.uuid === selectedVisit));
             onAfterVisitSelected?.();

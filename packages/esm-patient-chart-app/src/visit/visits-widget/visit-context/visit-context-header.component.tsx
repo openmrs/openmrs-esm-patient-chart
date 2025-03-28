@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './visit-context-header.scss';
 import VisitContextInfo from './visit-context-info.component';
 import { useVisitContextStore } from './visit-context';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib/src';
+import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 interface VisitContextHeaderProps {
   patientUuid: string;
@@ -40,7 +40,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   };
 
   if (!showVisitContextHeader) {
-    return <></>;
+    return null;
   }
   if (isLoading) {
     return (
