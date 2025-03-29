@@ -10,28 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
+import upperCase from 'lodash/upperCase';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
-import styles from './test-order.scss';
+import { useLabEncounter, useOrderConceptByUuid } from '../../lab-results.resource';
+import styles from './print-preview.scss';
 
-interface TestOrderProps {
-  testOrder: Order;
+interface PrintableReportProps {
+  order: Order;
+  index: number;
 }
 
-const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
+const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
-  const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder?.concept?.uuid);
-  const { encounter, isLoading: isLoadingResult } = useLabEncounter(testOrder?.encounter?.uuid);
+
+  const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(order?.concept?.uuid);
+  const { encounter, isLoading: isLoadingResult } = useLabEncounter(order?.encounter?.uuid);
 
   const tableHeaders = useMemo(
     () => [
       {
         key: 'testType',
-        header: testOrder?.orderType?.display || t('test', 'Test'),
+        header: order?.orderType?.display || t('test', 'Test'),
       },
       {
         key: 'result',
@@ -42,7 +43,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         header: t('normalRange', 'Normal range'),
       },
     ],
-    [t, testOrder?.orderType?.display],
+    [t, order?.orderType?.display],
   );
 
   const testResultObs = useMemo(() => {
@@ -94,7 +95,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   }, [concept, encounter, isLoadingResult, testResultObs]);
 
   if (isLoadingTestConcepts || isLoadingResult) {
-    return <DataTableSkeleton role="progressbar" compact={isTablet} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (!concept) {
@@ -102,35 +103,44 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   }
 
   return (
-    <div className={styles.testOrder}>
-      <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label="test orders">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })} key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id} className={styles.testCell}>
-                        {cell.value}
-                      </TableCell>
+    <div className={styles.container}>
+      <div className={styles.mainContent}>
+        <p className={styles.testDoneHeader}>
+          {index + 1}. {upperCase(order.concept.display)}
+        </p>
+        <div className={styles.printResults}>
+          <DataTable rows={testRows} headers={tableHeaders} size="sm" useZebraStyles>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+              <TableContainer {...getTableContainerProps()}>
+                <Table {...getTableProps()} aria-label="test orders">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader key={header.key} {...getHeaderProps({ header })} className={styles.testCell}>
+                          {header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow {...getRowProps({ row })} key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id} className={styles.testCell}>
+                            {cell.value}
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default TestOrder;
+export default PrintableReport;
