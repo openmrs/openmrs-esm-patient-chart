@@ -1,15 +1,11 @@
 import React, { useMemo } from 'react';
-import { type ImmunizationSequenceDefinition } from '../../types/fhir-immunization-domain';
+import { type DoseInputProps } from '../../types/fhir-immunization-domain';
 import { useController, type Control } from 'react-hook-form';
 import { Dropdown, NumberInput } from '@carbon/react';
 import styles from './../immunizations-form.scss';
 import { useTranslation } from 'react-i18next';
 
-export const DoseInput: React.FC<{
-  vaccine: string;
-  sequences: ImmunizationSequenceDefinition[];
-  control: Control;
-}> = ({ vaccine, sequences, control }) => {
+export const DoseInput: React.FC<DoseInputProps> = ({ vaccine, sequences, control }) => {
   const { t } = useTranslation();
   const { field } = useController({ name: 'doseNumber', control });
 
