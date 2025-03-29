@@ -21,8 +21,9 @@ export type ObservationInterpretation = 'critically_low' | 'critically_high' | '
 export type MappedVitals = {
   code: string;
   interpretation: string;
-  recordedDate: Date;
+  recordedDate: string | Date;
   value: number;
+  encounterId: string;
 };
 
 export interface PatientVitalsAndBiometrics {
