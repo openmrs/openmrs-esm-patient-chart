@@ -1,7 +1,13 @@
 import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ActionMenuButton, launchWorkspace, useLayoutType, useWorkspaces } from '@openmrs/esm-framework';
+import {
+  ActionMenuButton,
+  launchWorkspace,
+  useFeatureFlag,
+  useLayoutType,
+  useWorkspaces,
+} from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -74,6 +80,8 @@ jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
 
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
+const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
+
 describe('<OrderBasketActionButton/>', () => {
   beforeAll(() => {
     orderBasketStore.setState({
@@ -108,6 +116,7 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should prompt user to start visit if no currentVisit found', async () => {
+    mockedUseFeatureFlag.mockReturnValue(false);
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
