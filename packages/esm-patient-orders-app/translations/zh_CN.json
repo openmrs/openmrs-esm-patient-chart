@@ -1,6 +1,5 @@
 {
   "actionsMenu": "动作菜单",
-  "activeVisitRequired": "需要一个活动就诊才能下达遗嘱",
   "add": "添加",
   "additionalInstructions": "附加说明",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
@@ -115,5 +114,6 @@
   "trySearchingAgain": "请尝试重新搜索",
   "tryTo": "尝试",
   "updated": "已更新",
-  "usingADifferentTerm": "使用不同的术语"
+  "usingADifferentTerm": "使用不同的术语",
+  "visitRequired": "A visit is required to make orders"
 }
