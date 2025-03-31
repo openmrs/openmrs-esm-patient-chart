@@ -46,18 +46,18 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
     ],
   });
 
-  const hasStopTime = 'past' == visitStatus;
+  const hasStopTime = 'past' === visitStatus;
   const selectedVisitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
   const selectedVisitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
-  if (visitStatus == 'new') {
+  if (visitStatus === 'new') {
     return <></>;
   }
 
   return (
     <section>
       <div className={styles.sectionTitle}>
-        {visitStatus == 'ongoing'
+        {visitStatus === 'ongoing'
           ? t('visitStartDate', 'Visit start date')
           : t('visitStartAndEndDate', 'Visit start and end date')}
       </div>
@@ -124,21 +124,21 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         name={dateField.name}
         control={control}
         render={({ field, fieldState }) => (
-            <ResponsiveWrapper>
-              <OpenmrsDatePicker
-                {...field}
-                value={field.value as Date}
-                className={styles.datePicker}
-                id={`${dateField.name}Input`}
-                data-testid={`${dateField.name}Input`}
-                maxDate={maxDateObj}
-                minDate={minDateObj}
-                labelText={dateField.label}
-                invalid={Boolean(fieldState?.error?.message)}
-                invalidText={fieldState?.error?.message}
-              />
-            </ResponsiveWrapper>
-          )}
+          <ResponsiveWrapper>
+            <OpenmrsDatePicker
+              {...field}
+              value={field.value as Date}
+              className={styles.datePicker}
+              id={`${dateField.name}Input`}
+              data-testid={`${dateField.name}Input`}
+              maxDate={maxDateObj}
+              minDate={minDateObj}
+              labelText={dateField.label}
+              invalid={Boolean(fieldState?.error?.message)}
+              invalidText={fieldState?.error?.message}
+            />
+          </ResponsiveWrapper>
+        )}
       />
       <ResponsiveWrapper>
         <Controller

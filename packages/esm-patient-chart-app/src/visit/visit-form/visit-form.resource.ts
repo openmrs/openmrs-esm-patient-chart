@@ -141,7 +141,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
     const stopDateTime = convertToDateTimeFields(visitToEdit?.stopDatetime ?? now);
 
     const visitStatus: VisitStatus =
-      visitToEdit == null ? 'new' : visitToEdit.stopDatetime == null ? 'ongoing' : 'past';
+      visitToEdit === null ? 'new' : visitToEdit.stopDatetime === null ? 'ongoing' : 'past';
 
     const defaultValues: Partial<VisitFormData> = {
       visitStatus,
@@ -205,8 +205,8 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
         const visitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
         const visitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
-        if (visitStatus == 'ongoing' || visitStatus == 'past') {
-          if (visitStartDateTime == null) {
+        if (visitStatus === 'ongoing' || visitStatus === 'past') {
+          if (visitStartDateTime === null) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('visitStartDateTimeRequired', 'Start date and time are required'),
@@ -236,8 +236,8 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
           }
         }
 
-        if (visitStatus == 'past') {
-          if (visitStopDateTime == null) {
+        if (visitStatus === 'past') {
+          if (visitStopDateTime === null) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endDateTimeRequired', 'End date and time are required'),

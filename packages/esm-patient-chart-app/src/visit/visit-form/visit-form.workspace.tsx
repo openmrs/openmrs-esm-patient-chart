@@ -235,7 +235,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
       const { handleCreateExtraVisitInfo, attributes: extraAttributes } = extraVisitInfo ?? {};
       const hasStartTime = ['ongoing', 'past'].includes(visitStatus);
-      const hasStopTime = 'past' == visitStatus;
+      const hasStopTime = 'past' === visitStatus;
       const startDatetime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
       const stopDatetime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
@@ -280,7 +280,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           .catch((error) => {
             const errorDescription =
               error instanceof OpenmrsFetchError
-                ? typeof error.responseBody == 'string'
+                ? typeof error.responseBody === 'string'
                   ? error.responseBody
                   : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
                 : error?.message;
