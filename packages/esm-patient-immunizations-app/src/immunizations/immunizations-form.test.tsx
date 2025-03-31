@@ -142,7 +142,7 @@ describe('Immunizations Form', () => {
       const field =
         type === 'sequence-coded'
           ? screen.queryByRole('combobox', { name: /Sequence/i })
-          : screen.queryByRole('spinbutton', { name: /Dose number within series/i });
+          : screen.queryByRole('combobox', { name: /Dose number within series/i });
       if (shouldExist) {
         expect(field).toBeInTheDocument();
       } else {
@@ -191,7 +191,7 @@ describe('Immunizations Form', () => {
     // fill up the form
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
     await selectOption(vaccineField, 'Hepatitis B vaccination');
-    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+    const doseField = screen.getByRole('combobox', { name: /Dose number within series/i });
     await user.type(doseField, formValues.doseNumber.toString());
     const manufacturer = screen.getByRole('textbox', { name: /Manufacturer/i });
     await user.type(manufacturer, formValues.manufacturer);
@@ -235,7 +235,7 @@ describe('Immunizations Form', () => {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       immunizationId: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
       vaccinationDate: new Date('2024-01-03T15:44:17'),
-      doseNumber: 24,
+      doseNumber: 2,
       expirationDate: new Date('2024-05-19T21:00:00'),
       lotNumber: 'A123456',
       manufacturer: 'Merck & Co., Inc.',
@@ -255,7 +255,7 @@ describe('Immunizations Form', () => {
     const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
-    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+    const doseField = screen.getByRole('combobox', { name: /Dose number within series/i });
     const lotField = screen.getByRole('textbox', { name: /Lot number/i });
     const manufacturerField = screen.getByRole('textbox', { name: /Manufacturer/i });
     const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
@@ -265,14 +265,13 @@ describe('Immunizations Form', () => {
     expect(vaccinationDateField).toHaveDisplayValue(/03\/01\/2024/i);
     expect(vaccinationTimeField).toHaveValue('03:44');
     expect(vaccineField.title).toBe('Bacillus Calmette–Guérin vaccine');
-    expect(doseField).toHaveValue(24);
+    expect(doseField).toHaveValue("2");
     expect(lotField).toHaveValue('A123456');
     expect(manufacturerField).toHaveValue('Merck & Co., Inc.');
     expect(expirationDateField).toHaveValue('19/05/2024');
 
     // edit the form
     await selectOption(vaccineField, 'Hepatitis B vaccination');
-    await user.clear(doseField);
     await user.type(doseField, '2');
     await user.click(saveButton);
 
