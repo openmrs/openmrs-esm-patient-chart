@@ -10,7 +10,7 @@ import {
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
-import { render, renderHook, screen } from '@testing-library/react';
+import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
 import dayjs from 'dayjs';
@@ -316,7 +316,7 @@ describe('Visit form', () => {
     renderVisitForm();
 
     await user.click(screen.getByRole('tab', { name: /ongoing/i }));
-    const dateInput = screen.queryByLabelText(/start date/i);
+    const dateInput = screen.getByRole('textbox', { name: /start date/i });
     const timeInput = screen.getByRole('textbox', { name: /start time/i });
     const amPmSelect = screen.getByRole('combobox', { name: /start time format/i });
     const saveButton = screen.getByRole('button', { name: /Start visit/i });
@@ -324,7 +324,8 @@ describe('Visit form', () => {
 
     expect(dateInput).toBeEnabled();
     await user.clear(dateInput);
-    await user.type(dateInput, futureTime.format('DD/MM/YYYY'));
+    await user.click(dateInput);
+    fireEvent.change(dateInput, { target: { value: futureTime.format('YYYY-MM-DD') } });
     await user.clear(timeInput);
     await user.type(timeInput, futureTime.format('hh:mm'));
     await user.selectOptions(amPmSelect, futureTime.format('A'));
@@ -341,7 +342,6 @@ describe('Visit form', () => {
     const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
     await user.click(locationPicker);
     await user.click(screen.getByText('Inpatient Ward'));
-
     await user.click(saveButton);
 
     expect(timeInput).toHaveValue(futureTime.format('hh:mm'));

@@ -276,7 +276,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           })
           .catch((error) => {
             const errorDescription =
-              error instanceof OpenmrsFetchError
+              typeof OpenmrsFetchError === 'object' && error instanceof OpenmrsFetchError
                 ? typeof error.responseBody === 'string'
                   ? error.responseBody
                   : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
