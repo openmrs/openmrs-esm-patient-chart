@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Extension,
   ExtensionSlot,
+  OpenmrsFetchError,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -54,6 +55,8 @@ import {
   convertToDate,
   createVisitAttribute,
   deleteVisitAttribute,
+  type ErrorObject,
+  extractErrorMessagesFromResponse,
   updateVisitAttribute,
   useConditionalVisitTypes,
   useVisitFormCallbacks,
@@ -275,13 +278,20 @@ const VisitForm: React.FC<VisitFormProps> = ({
             return response;
           })
           .catch((error) => {
+            const errorDescription =
+              error instanceof OpenmrsFetchError
+                ? typeof error.responseBody == 'string'
+                  ? error.responseBody
+                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+                : error?.message;
+
             showSnackbar({
               title: !visitToEdit
                 ? t('startVisitError', 'Error starting visit')
                 : t('errorUpdatingVisitDetails', 'Error updating visit details'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: error?.message,
+              subtitle: errorDescription,
             });
             return Promise.reject(error); // short-circuit promise chain
           })

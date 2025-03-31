@@ -40,6 +40,44 @@ export type VisitFormData = {
   };
 };
 
+// *****************
+// Copied from form-submission.service.ts
+// TODO: consolidate logic for parsing errors from REST API calls
+export type FieldError = {
+  [key: string]: Array<{ code: string; message: string }>;
+};
+
+export type ErrorObject = {
+  error: {
+    code: string;
+    message: string;
+    detail: string;
+    fieldErrors?: FieldError;
+    globalErrors?: FieldError;
+  };
+};
+
+export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+  const {
+    error: { fieldErrors, globalErrors, message, code },
+  } = errorObject ?? {};
+
+  if (fieldErrors) {
+    return Object.values(fieldErrors)
+      .flatMap((errors) => errors.map((error) => error.message))
+      .join('\n');
+  }
+
+  if (globalErrors) {
+    return Object.values(globalErrors)
+      .flatMap((errors) => errors.map((error) => error.message))
+      .join('\n');
+  }
+
+  return message ?? code ?? this.translateService.instant('unknownError');
+}
+// *****************
+
 export function useConditionalVisitTypes() {
   const isOnline = useConnectivity();
 
