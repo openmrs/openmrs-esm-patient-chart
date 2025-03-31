@@ -232,7 +232,7 @@ export const encounterListTableTabs = getAsyncLifecycle(
 
 export const visitContextSwitcherModal = getAsyncLifecycle(
   () => import('./visit/visits-widget/visit-context/visit-context-switcher.modal'),
-  { featureName: 'visit-context-switcher-modal', moduleName },
+  { featureName: 'visit-context-switcher', moduleName },
 );
 
 export const visitContextHeader = getAsyncLifecycle(
