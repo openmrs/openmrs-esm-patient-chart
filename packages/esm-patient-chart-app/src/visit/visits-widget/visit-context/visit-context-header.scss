@@ -1,0 +1,45 @@
+@use '@carbon/layout';
+
+.visitContextHeader {
+  display: grid;
+  column-gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  font-size: layout.$spacing-04;
+  grid-template-areas:
+    'addingTo    visitType    changeVisitButton'
+    'addingTo    visitInfo    visitInfo';
+  grid-template-columns: max-content 1fr min-content;
+}
+
+.activeVisit {
+  background-color: #defbe6;
+}
+
+.retroactiveVisit {
+  background-color: #f4f4f4;
+}
+
+.addingTo {
+  grid-area: addingTo;
+}
+
+.visitType {
+  font-size: 14px;
+  font-weight: 600;
+  grid-area: visitType;
+}
+
+.changeVisitButton {
+  grid-area: changeVisitButton;
+  :global(.cds--btn) {
+    min-height: 0;
+    padding: 0;
+  }
+}
+
+.visitInfo {
+  grid-area: visitInfo;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
