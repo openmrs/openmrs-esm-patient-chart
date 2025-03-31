@@ -40,10 +40,6 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
     const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
     const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
 
-    // await expect(chartPage.page.getByRole('textbox', { name: /start date/i })).toBeVisible();
-    // await expect(chartPage.page.getByRole('textbox', { name: /start time/i })).toBeVisible();
-    // await expect(chartPage.page.getByLabel(/start time format/i)).toBeVisible();
-
     const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
 
     await expect(startDateInput).toBeVisible();
