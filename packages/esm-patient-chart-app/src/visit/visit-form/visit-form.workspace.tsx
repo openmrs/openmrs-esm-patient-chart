@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -23,9 +24,7 @@ import {
   useConfig,
   useConnectivity,
   useEmrConfiguration,
-  useFeatureFlag,
   useLayoutType,
-  useSession,
   useVisit,
   type AssignedExtension,
   type NewVisitPayload,
@@ -39,11 +38,9 @@ import {
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
-import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
@@ -55,13 +52,13 @@ import {
   convertToDate,
   createVisitAttribute,
   deleteVisitAttribute,
-  type ErrorObject,
   extractErrorMessagesFromResponse,
   updateVisitAttribute,
   useConditionalVisitTypes,
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
   visitStatuses,
+  type ErrorObject,
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';

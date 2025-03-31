@@ -141,7 +141,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
     const stopDateTime = convertToDateTimeFields(visitToEdit?.stopDatetime ?? now);
 
     const visitStatus: VisitStatus =
-      visitToEdit === null ? 'new' : visitToEdit.stopDatetime === null ? 'ongoing' : 'past';
+      visitToEdit == null ? 'new' : visitToEdit.stopDatetime === null ? 'ongoing' : 'past';
 
     const defaultValues: Partial<VisitFormData> = {
       visitStatus,
