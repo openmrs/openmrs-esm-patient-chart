@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "无限期",
   "Medications": "Medications",
   "modify": "修改",
-  "none": "无",
   "noResultsForDrugSearch": "没有与“{{searchTerm}}”有关的结果可显示",
   "numRefillsErrorMessage": "Number of refills is required",
   "onDate": "on",

@@ -9,8 +9,6 @@ import {
 } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
-import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
 import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
@@ -105,7 +103,7 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
 // Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
 // hook is unmounted.
 let vitalsHooksCounter = 0;
-const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>();
+const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
 
 /**
  * Hook to get the vitals and / or biometrics for a patient
@@ -357,7 +355,7 @@ export function updateVitalsAndBiometrics(
 function createObsObject(
   vitals: VitalsBiometricsFormData,
   concepts: ConfigObject['concepts'],
-): Array<Omit<ObsRecord, 'effectiveDateTime' | 'conceptClass' | 'encounter'>> {
+): Array<{ concept: string; value: string | number }> {
   return Object.entries(vitals)
     .filter(([_, result]) => Boolean(result))
     .map(([name, result]) => {

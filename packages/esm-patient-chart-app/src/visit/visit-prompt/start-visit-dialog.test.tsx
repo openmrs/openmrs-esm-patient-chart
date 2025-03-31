@@ -27,7 +27,7 @@ describe('StartVisit', () => {
 
     expect(
       screen.getByText(
-        `You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.`,
+        `You can't add data to the patient chart without an active visit. Would you like to start a new visit?`,
       ),
     ).toBeInTheDocument();
 
@@ -38,24 +38,6 @@ describe('StartVisit', () => {
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
       openedFrom: 'patient-chart-start-visit',
     });
-  });
-
-  test('should launch edit past visit form', async () => {
-    const user = userEvent.setup();
-
-    renderStartVisitDialog({ visitType: 'past' });
-
-    expect(
-      screen.getByText(
-        `You can add a new past visit or update an old one. Choose from one of the options below to continue.`,
-      ),
-    ).toBeInTheDocument();
-
-    const editPastVisitButton = screen.getByRole('button', { name: /Edit past visit/i });
-
-    await user.click(editPastVisitButton);
-
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('past-visits-overview');
   });
 });
 

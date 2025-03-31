@@ -1,3 +1,6 @@
+import { type Visit } from '@openmrs/esm-api';
+import { type MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+
 export const mockVisitTypes = [
   {
     uuid: 'some-uuid1',
@@ -42,7 +45,7 @@ export const mockVisits = {
   },
 };
 
-export const mockCurrentVisit = {
+export const mockCurrentVisit: Visit = {
   uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
   encounters: [],
   patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -60,7 +63,23 @@ export const mockCurrentVisit = {
   },
 };
 
-export const visitOverviewDetailMockData = {
+// a visit that has ended
+export const mockVisit2: Visit = {
+  ...mockCurrentVisit,
+  uuid: 'a6906dfe-0bdc-11f0-9a36-00155d6fa44e',
+  startDatetime: new Date('2020-01-01T00:00:00.000+0000').toISOString(),
+  stopDatetime: new Date('2020-01-01T01:00:00.000+0000').toISOString(),
+};
+
+// a visit that has ended
+export const mockVisit3: Visit = {
+  ...mockCurrentVisit,
+  uuid: 'dd025938-0bdc-11f0-a3b8-00155d6fa44e',
+  startDatetime: new Date('2019-01-01T00:00:00.000+0000').toISOString(),
+  stopDatetime: new Date('2019-01-01T01:00:00.000+0000').toISOString(),
+};
+
+export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -160,7 +179,7 @@ export const visitOverviewDetailMockData = {
   },
 };
 
-export const visitOverviewDetailMockDataNotEmpty = {
+export const visitOverviewDetailMockDataNotEmpty: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -286,7 +305,7 @@ export const visitOverviewDetailMockDataNotEmpty = {
   },
 };
 
-export const mockEncounters = [
+export const mockEncounters: Array<MappedEncounter> = [
   {
     id: '979d38e3-fb68-47cf-843f-2b0263690f49',
     datetime: '2022-01-18T16:25:27.000+0000',

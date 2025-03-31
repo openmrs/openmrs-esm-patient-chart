@@ -16,6 +16,7 @@ const defaultProps = {
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   promptBeforeClosing: jest.fn(),
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),
@@ -51,11 +52,10 @@ describe('Conditions form', () => {
     renderConditionsForm();
 
     expect(screen.getByRole('group', { name: /condition/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /onset date/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/onset date/i)).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /clinical status/i })).toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: /enter condition/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
-
     expect(screen.getByLabelText(/^active/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^active/i)).not.toBeChecked();
     expect(screen.getByLabelText(/inactive/i)).toBeInTheDocument();
@@ -81,11 +81,12 @@ describe('Conditions form', () => {
     const user = userEvent.setup();
     renderConditionsForm();
 
+    // TODO: use better selector
     await user.click(screen.getByLabelText(/^active/i));
-    expect(screen.queryByLabelText(/end date/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('End date')).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText(/inactive/i));
-    expect(screen.getByLabelText(/end date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('End date')).toBeInTheDocument();
   });
 
   it('renders a list of matching conditions when the user types a query into the searchbox', async () => {
@@ -131,13 +132,19 @@ describe('Conditions form', () => {
     const submitButton = screen.getByRole('button', { name: /save & close/i });
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+
     const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
+    expect(onsetDateInput).toBeInTheDocument();
+
     expect(cancelButton).toBeEnabled();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.click(activeStatusInput);
-    await user.type(onsetDateInput, '2020-05-05');
+    await user.click(onsetDateInput);
+    await user.paste('2020-05-05');
+    expect(onsetDateInput).toHaveDisplayValue(/05\/05\/2020/i);
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -177,7 +184,8 @@ describe('Conditions form', () => {
     mockCreateCondition.mockRejectedValue(error);
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
-    await user.type(onsetDateInput, '2020-05-05');
+    await user.click(onsetDateInput);
+    await user.paste('2020-05-05');
     await user.click(activeStatusInput);
     expect(activeStatusInput).toBeChecked();
     expect(submitButton).toBeEnabled();

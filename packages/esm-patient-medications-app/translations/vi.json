@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "Indefinite duration",
   "Medications": "Medications",
   "modify": "Chỉnh sửa",
-  "none": "Không có",
   "noResultsForDrugSearch": "No results to display for \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Number of refills is required",
   "onDate": "on",

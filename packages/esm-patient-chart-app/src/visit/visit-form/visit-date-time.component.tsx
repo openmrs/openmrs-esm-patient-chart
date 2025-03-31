@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { DatePicker, DatePickerInput, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ResponsiveWrapper } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { type VisitFormData } from './visit-form.resource';
 import styles from './visit-form.scss';
@@ -37,8 +37,8 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   // Since we have the separate date and time fields, the final validation needs to be done at the form
   // submission, hence just using the min date with hours/ minutes/ seconds set to 0 and max date set to
   // last second of the day. We want to just compare dates and not time.
-  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)).format('DD/MM/YYYY') : null;
-  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)).format('DD/MM/YYYY') : null;
+  const minDateObj = minDate ? dayjs(new Date(minDate).setHours(0, 0, 0, 0)) : null;
+  const maxDateObj = maxDate ? dayjs(new Date(maxDate).setHours(23, 59, 59, 59)) : null;
 
   return (
     <section>
@@ -47,27 +47,19 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
         <Controller
           name={dateFieldName}
           control={control}
-          render={({ field: { onChange, value } }) => (
+          render={({ field, fieldState }) => (
             <ResponsiveWrapper>
-              <DatePicker
+              <OpenmrsDatePicker
+                {...field}
                 className={styles.datePicker}
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id={dateFieldName}
+                id={`${dateFieldName}Input`}
+                data-testid={`${dateFieldName}Input`}
                 maxDate={maxDateObj}
                 minDate={minDateObj}
-                onChange={([date]) => onChange(date)}
-                value={value ? dayjs(value).format('DD/MM/YYYY') : null}
-              >
-                <DatePickerInput
-                  id={`${dateFieldName}Input`}
-                  invalid={Boolean(errors[dateFieldName])}
-                  invalidText={errors[dateFieldName]?.message}
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
+                labelText={t('date', 'Date')}
+                invalid={Boolean(fieldState?.error?.message)}
+                invalidText={fieldState?.error?.message}
+              />
             </ResponsiveWrapper>
           )}
         />

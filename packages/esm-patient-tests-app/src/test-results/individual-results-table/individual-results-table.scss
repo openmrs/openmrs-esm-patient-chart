@@ -102,16 +102,6 @@ p {
   justify-content: flex-start;
 }
 
-.viewTimeline {
-  display: flex;
-  margin-left: auto;
-  margin-top: -(layout.$spacing-02);
-
-  svg {
-    fill: colors.$blue-60 !important;
-  }
-}
-
 .cardTitle {
   background-color: white;
   padding: 0.5rem;

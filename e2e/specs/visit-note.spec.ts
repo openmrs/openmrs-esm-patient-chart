@@ -33,9 +33,9 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
   });
 
-  await test.step('And I select `Infection by Ascaris Lumbricoides` as the secondary diagnosis', async () => {
-    await page.getByPlaceholder('Choose a secondary diagnosis').fill('Infection by Ascaris Lumbricoides');
-    await page.getByRole('menuitem', { name: /infection by ascaris lumbricoides/i }).click();
+  await test.step('And I select `GI upset` as the secondary diagnosis', async () => {
+    await page.getByPlaceholder('Choose a secondary diagnosis').fill('GI upset');
+    await page.getByRole('menuitem', { name: /gi upset/i }).click();
   });
 
   await test.step('And I add a visit note', async () => {
@@ -56,7 +56,7 @@ test('Add and delete a visit note', async ({ page }) => {
 
   await test.step('Then I should see the newly added visit note added to the list', async () => {
     await expect(page.getByText(/asthma/i)).toBeVisible();
-    await expect(page.getByText(/infection by ascaris lumbricoides/i)).toBeVisible();
+    await expect(page.getByText(/gi upset/i)).toBeVisible();
     await expect(page.getByText(/this is a note/i)).toBeVisible();
   });
 

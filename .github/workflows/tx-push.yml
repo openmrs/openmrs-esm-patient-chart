@@ -8,10 +8,10 @@ name: 'Update Transifex on Push'
 jobs:
   push-translations-to-transifex:
     name: push-translations-to-transifex
-
     runs-on: ubuntu-latest
     permissions:
       actions: read
+    if: github.repository_owner == 'openmrs'
 
     steps:
       - uses: actions/checkout@v4

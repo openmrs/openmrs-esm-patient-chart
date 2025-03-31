@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "مدة غير محددة",
   "Medications": "الأدوية",
   "modify": "تعديل",
-  "none": "لا شيء",
   "noResultsForDrugSearch": "لا توجد نتائج لـ \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Number of refills is required",
   "onDate": "في",

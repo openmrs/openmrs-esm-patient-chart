@@ -7,6 +7,7 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 const defaultProps = {
   patientUuid: '',
+  patient: undefined,
   promptBeforeClosing: jest.fn(),
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),

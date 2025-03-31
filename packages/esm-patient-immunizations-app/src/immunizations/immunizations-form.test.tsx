@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -69,6 +69,7 @@ jest.mock('./immunizations.resource', () => ({
 
 const testProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   promptBeforeClosing: mockPromptBeforeClosing,
@@ -119,7 +120,10 @@ describe('Immunizations Form', () => {
   it('should render ImmunizationsForm component', () => {
     render(<ImmunizationsForm {...testProps} />);
 
-    expect(screen.getByRole('textbox', { name: /Vaccination Date/i })).toBeInTheDocument();
+    // TODO: use better selector
+    // expect(screen.getByTestId('vaccinationDate')).toBeInTheDocument();
+    expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
+
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();
@@ -127,7 +131,10 @@ describe('Immunizations Form', () => {
     expect(screen.getByRole('combobox', { name: /Immunization/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Manufacturer/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Lot Number/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /Expiration Date/i })).toBeInTheDocument();
+
+    // TODO: use better selector
+    // expect(screen.getByTestId('vaccinationExpiration')).toBeInTheDocument();
+    expect(screen.getByLabelText(/expiration date/i)).toBeInTheDocument();
   });
 
   it('should render dose field appropriately', async () => {
@@ -245,17 +252,17 @@ describe('Immunizations Form', () => {
 
     render(<ImmunizationsForm {...testProps} />);
 
-    const vaccinationDateField = screen.getByRole('textbox', { name: /Vaccination Date/i });
+    const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
     const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
     const lotField = screen.getByRole('textbox', { name: /Lot number/i });
     const manufacturerField = screen.getByRole('textbox', { name: /Manufacturer/i });
-    const expirationDateField = screen.getByRole('textbox', { name: /Expiration Date/i });
+    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
     const saveButton = screen.getByRole('button', { name: /Save/i });
 
     // verify the form values
-    expect(vaccinationDateField).toHaveValue('03/01/2024');
+    expect(vaccinationDateField).toHaveDisplayValue(/03\/01\/2024/i);
     expect(vaccinationTimeField).toHaveValue('03:44');
     expect(vaccineField.title).toBe('Bacillus Calmette–Guérin vaccine');
     expect(doseField).toHaveValue(24);

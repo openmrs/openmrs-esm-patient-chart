@@ -22,7 +22,6 @@ import {
   useLayoutType,
   useSession,
   ExtensionSlot,
-  usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -73,6 +72,7 @@ export type VitalsBiometricsFormData = z.infer<typeof VitalsAndBiometricFormSche
 
 const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
+  patient,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -84,7 +84,6 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const useMuacColorStatus = config.vitals.useMuacColors;
 
   const session = useSession();
-  const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
   const { data: conceptUnits, conceptMetadata, conceptRanges, isLoading } = useVitalsConceptMetadata();
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
@@ -107,8 +106,9 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
-    ?.uuid;
+  const encounterUuid = currentVisit?.encounters?.find(
+    (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
+  )?.uuid;
 
   const midUpperArmCircumference = watch('midUpperArmCircumference');
   const systolicBloodPressure = watch('systolicBloodPressure');
@@ -121,12 +121,12 @@ const VitalsAndBiometricsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const height = watch('height');
 
   useEffect(() => {
-    const patientBirthDate = patient?.patient?.birthDate;
+    const patientBirthDate = patient?.birthDate;
     if (patientBirthDate && midUpperArmCircumference) {
       const patientAge = extractNumbers(age(patientBirthDate));
       getMuacColorCode(patientAge, midUpperArmCircumference, setMuacColorCode);
     }
-  }, [watch, patient.patient?.birthDate, midUpperArmCircumference]);
+  }, [watch, patient?.birthDate, midUpperArmCircumference]);
 
   useEffect(() => {
     if (height && weight) {
