@@ -10,6 +10,7 @@
 
 .orderBasketContainer {
   margin: layout.$spacing-05;
+  flex: 1;
 }
 
 .orderBasketContainer :global(.cds--btn-set .cds--btn) {

@@ -120,8 +120,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <>
-      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       <div className={styles.container}>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
