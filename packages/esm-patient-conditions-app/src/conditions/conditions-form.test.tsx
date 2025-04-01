@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
@@ -133,22 +133,18 @@ describe('Conditions form', () => {
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
 
-    // FIXME: make the date input work
-    const onsetDateInput = screen.getByLabelText('Onset date');
+    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
     expect(onsetDateInput).toBeInTheDocument();
-    // const onsetDateDayInput = within(onsetDateInput).getByRole('spinbutton', { name: /day/i });
-    // const onsetDateMonthInput = within(onsetDateInput).getByRole('spinbutton', { name: /month/i });
-    // const onsetDateYearInput = within(onsetDateInput).getByRole('spinbutton', { name: /year/i });
 
     expect(cancelButton).toBeEnabled();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.click(activeStatusInput);
-    // await user.type(onsetDateInput, '2020-05-05');
-    // await user.type(onsetDateDayInput, '05');
-    // await user.type(onsetDateMonthInput, '05');
-    // await user.type(onsetDateYearInput, '2020');
+    await user.click(onsetDateInput);
+    await user.paste('2020-05-05');
+    expect(onsetDateInput).toHaveDisplayValue(/05\/05\/2020/i);
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -175,11 +171,7 @@ describe('Conditions form', () => {
     const submitButton = screen.getByRole('button', { name: /save & close/i });
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    // FIXME: make the date input work
-    const onsetDateInput = screen.getByLabelText(/onset date/i);
-    // const onsetDateDayInput = within(onsetDateInput).getByRole('spinbutton', { name: /day/i });
-    // const onsetDateMonthInput = within(onsetDateInput).getByRole('spinbutton', { name: /month/i });
-    // const onsetDateYearInput = within(onsetDateInput).getByRole('spinbutton', { name: /year/i });
+    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
 
     const error = {
       message: 'Internal Server Error',
@@ -192,9 +184,8 @@ describe('Conditions form', () => {
     mockCreateCondition.mockRejectedValue(error);
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
-    // await user.type(onsetDateDayInput, '05');
-    // await user.type(onsetDateMonthInput, '05');
-    // await user.type(onsetDateYearInput, '2020');
+    await user.click(onsetDateInput);
+    await user.paste('2020-05-05');
     await user.click(activeStatusInput);
     expect(activeStatusInput).toBeChecked();
     expect(submitButton).toBeEnabled();
