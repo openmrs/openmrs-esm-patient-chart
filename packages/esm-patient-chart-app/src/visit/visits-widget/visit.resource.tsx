@@ -139,7 +139,7 @@ export interface Encounter {
     viewPrivilege?: Privilege;
     editPrivilege?: Privilege;
   };
-  obs: Array<Observation>;
+  obs: Array<Obs>;
   orders?: Array<Order>;
   form: OpenmrsResource;
   patient: OpenmrsResource;
@@ -159,33 +159,6 @@ export interface EncounterProvider {
       display: string;
     };
   };
-}
-
-export interface Observation {
-  uuid: string;
-  concept: {
-    uuid: string;
-    display: string;
-    conceptClass: {
-      uuid: string;
-      display: string;
-    };
-  };
-  display: string;
-  groupMembers: null | Array<{
-    uuid: string;
-    concept: {
-      uuid: string;
-      display: string;
-    };
-    value: {
-      uuid: string;
-      display: string;
-    };
-    display: string;
-  }>;
-  value: any;
-  obsDatetime?: string;
 }
 
 export interface Order {
