@@ -60,10 +60,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t(
-            'endVisitExplainerMessage',
-            'Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one.',
-          )}
+          {t('youCanAddAdditionalEncounters', 'You can add additional encounters to this visit in the visit summary.')}
         </p>
       </ModalBody>
       <ModalFooter>

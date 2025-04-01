@@ -53,7 +53,6 @@
   "endTime": "End time",
   "endTimeFormat": "End time format",
   "endVisit_title": "End Visit",
-  "endVisitExplainerMessage": "Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one.",
   "enterNonCodedCauseOfDeath": "Enter non-coded cause of death",
   "error": "Error",
   "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
@@ -173,5 +172,6 @@
   "visitType": "Visit type",
   "visitType_title": "Visit Type",
   "warning": "Warning",
-  "yes": "Yes"
+  "yes": "Yes",
+  "youCanAddAdditionalEncounters": "You can add additional encounters to this visit in the visit summary."
 }
