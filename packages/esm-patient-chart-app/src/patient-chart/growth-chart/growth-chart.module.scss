@@ -1,0 +1,31 @@
+/*
+ * Styles for GrowthChart component
+ * This module contains basic placeholder styles for upcoming feature.
+ */
+.wrapper {
+  border: 1px dashed teal;
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  margin: 3rem auto; // top-bottom spacing + center align
+  max-width: 960px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.icon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #666;
+}
