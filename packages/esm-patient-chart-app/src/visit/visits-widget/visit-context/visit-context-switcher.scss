@@ -1,0 +1,55 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.visitCardRowsContainer {
+  max-height: 300px;
+}
+
+.visitCardRow {
+  display: flex;
+  position: relative;
+  border: solid 1px #e0e0e0;
+  padding: layout.$spacing-03;
+
+  &.activeVisit {
+    background-color: #defbe6;
+    &:hover {
+      background-color: #b6f6c8;
+    }
+  }
+
+  &.retroactiveVisit {
+    background-color: #f4f4f4;
+    &:hover {
+      background-color: #e5e5e5;
+    }
+  }
+}
+
+.visitInfoContainer {
+  flex: 1;
+}
+
+.visitType {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.visitCardRowButton {
+  border: none;
+  padding: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: pointer;
+  }
+}
+
+.visitCardRowRadioButton {
+  display: flex;
+  align-items: center;
+}

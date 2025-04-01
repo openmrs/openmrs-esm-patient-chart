@@ -16,7 +16,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   const { t } = useTranslation();
   const { currentVisit, currentVisitIsRetrospective, mutate } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
 
   const handleEndVisit = () => {
     if (currentVisitIsRetrospective) {
