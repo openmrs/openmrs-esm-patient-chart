@@ -1,5 +1,6 @@
 {
   "add": "Add",
+  "AM": "AM",
   "cancel": "Cancel",
   "doseNumber": "Dose number within series",
   "doseNumberWithinSeries": "Dose number within series",
@@ -16,6 +17,7 @@
   "lotNumber": "Lot Number",
   "manufacturer": "Manufacturer",
   "pleaseSelect": "Please select",
+  "PM": "PM",
   "recentVaccination": "Recent vaccination",
   "save": "Save",
   "seeAll": "See all",
