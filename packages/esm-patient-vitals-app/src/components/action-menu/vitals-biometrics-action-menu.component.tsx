@@ -8,10 +8,9 @@ import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 
 interface VitalsAndBiometricsActionMenuProps {
   encounterUuid: string;
-  formType: 'vitals' | 'biometrics';
 }
 
-export const VitalsAndBiometricsActionMenu = ({ encounterUuid, formType }: VitalsAndBiometricsActionMenuProps) => {
+export const VitalsAndBiometricsActionMenu = ({ encounterUuid }: VitalsAndBiometricsActionMenuProps) => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromStore();
   const isTablet = useLayoutType() === 'tablet';
@@ -28,10 +27,9 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, formType }: Vital
     const dispose = showModal('vitals-biometrics-delete-confirmation-modal', {
       closeDeleteModal: () => dispose(),
       encounterUuid,
-      formType,
       patientUuid,
     });
-  }, [encounterUuid, formType, patientUuid]);
+  }, [encounterUuid, patientUuid]);
 
   return (
     <Layer className={styles.layer}>

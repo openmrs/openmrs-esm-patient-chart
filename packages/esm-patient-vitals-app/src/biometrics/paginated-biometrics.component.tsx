@@ -106,7 +106,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} formType="biometrics" />
+                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} />
                     </TableCell>
                   </TableRow>
                 ))}

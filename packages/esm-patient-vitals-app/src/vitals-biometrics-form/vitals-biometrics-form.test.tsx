@@ -1,13 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  type FetchResponse,
-  showSnackbar,
-  useConfig,
-  getDefaultsFromConfigSchema,
-  useAbortController,
-} from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
@@ -36,7 +30,6 @@ const testProps = {
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockCreateOrUpdateVitalsAndBiometrics = jest.mocked(createOrUpdateVitalsAndBiometrics);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseAbortController = jest.mocked(useAbortController);
 const mockUseEncounterVitalsAndBiometrics = jest.mocked(useEncounterVitalsAndBiometrics);
 
 jest.mock('../common', () => ({
@@ -63,9 +56,6 @@ mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
 });
-
-// TODO: Fix mock defined by the framework
-mockUseAbortController.mockReturnValue(new AbortController());
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({
@@ -260,7 +250,12 @@ describe('VitalsBiometricsForm', () => {
         { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 180 },
         { concept: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 23 },
       ]),
-      new AbortController(),
+      expect.objectContaining({
+        signal: {
+          aborted: false,
+        },
+        abort: expect.any(Function),
+      }),
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
@@ -340,7 +335,12 @@ describe('VitalsBiometricsForm', () => {
         { uuid: '123e4567-e89b-12d3-a456-426614174004', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174007', voided: true },
       ]),
-      new AbortController(),
+      expect.objectContaining({
+        signal: {
+          aborted: false,
+        },
+        abort: expect.any(Function),
+      }),
     );
 
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);

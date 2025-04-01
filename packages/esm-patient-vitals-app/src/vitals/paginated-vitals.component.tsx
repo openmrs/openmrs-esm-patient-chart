@@ -126,7 +126,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       );
                     })}
                     <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} formType="vitals" />
+                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} />
                     </TableCell>
                   </TableRow>
                 ))}

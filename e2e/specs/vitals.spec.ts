@@ -148,7 +148,7 @@ test('Add, edit and delete patient vitals', async ({ page }) => {
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(vitalsPage.page.getByText(/vitals deleted/i)).toBeVisible();
+    await expect(vitalsPage.page.getByText(/Vitals and biometrics deleted/i)).toBeVisible();
   });
 
   await test.step('And the vitals table should be empty', async () => {

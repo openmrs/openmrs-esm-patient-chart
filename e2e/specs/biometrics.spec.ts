@@ -129,7 +129,7 @@ test('Add, edit and delete patient biometrics', async ({ page }) => {
   });
 
   await test.step('Then I should see a success toast notification', async () => {
-    await expect(page.getByText(/Biometrics deleted/i)).toBeVisible();
+    await expect(page.getByText(/Vitals and biometrics deleted/i)).toBeVisible();
   });
 
   await test.step('And the Biometrics table should be empty', async () => {
