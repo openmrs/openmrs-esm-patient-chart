@@ -31,6 +31,7 @@
 
 .dateTimeSection {
   display: flex;
+  margin: layout.$spacing-05 0;
 }
 
 .radioButton {
@@ -129,10 +130,6 @@
 
 .bodyShort02 {
   @include type.type-style('body-compact-02');
-}
-
-.datePicker {
-  padding-bottom: layout.$spacing-05;
 }
 
 .timePicker {
