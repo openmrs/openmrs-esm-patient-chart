@@ -27,7 +27,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
     activeVisit && (
       <OverflowMenuItem
         className={styles.menuitem}
-        itemText={`${t('endVisit', 'End visit')}`}
+        itemText={`${t('endActiveVisit', 'End active visit')}`}
         onClick={handleLaunchModal}
       />
     )

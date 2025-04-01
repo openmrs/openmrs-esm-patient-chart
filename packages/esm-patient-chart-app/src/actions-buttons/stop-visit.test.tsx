@@ -17,7 +17,7 @@ describe('StopVisitOverflowMenuItem', () => {
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/i });
+    const endVisitButton = screen.getByRole('menuitem', { name: /End active visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
     await user.click(endVisitButton);

@@ -20,7 +20,7 @@ describe('StartVisitOverflowMenuItem', () => {
 
     render(<StartVisitOverflowMenuItem patient={mockPatient} />);
 
-    const startVisitButton = screen.getByRole('menuitem', { name: /start visit/i });
+    const startVisitButton = screen.getByRole('menuitem', { name: /add visit/i });
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);

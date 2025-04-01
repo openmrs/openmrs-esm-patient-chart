@@ -17,7 +17,6 @@ interface EndVisitDialogProps {
  */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  
   const { activeVisit, mutate } = useVisit(patientUuid);
   const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
 

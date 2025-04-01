@@ -22,11 +22,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
 
   return (
     !isDeceased && (
-      <OverflowMenuItem
-        className={styles.menuitem}
-        itemText={t('startVisit', 'Start visit')}
-        onClick={handleLaunchModal}
-      />
+      <OverflowMenuItem className={styles.menuitem} itemText={t('addVisit', 'Add visit')} onClick={handleLaunchModal} />
     )
   );
 };
