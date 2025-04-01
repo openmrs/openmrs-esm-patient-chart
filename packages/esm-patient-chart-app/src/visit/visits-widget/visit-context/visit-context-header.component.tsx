@@ -32,7 +32,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   }, [currentVisit, isLoading, setVisitContext, manuallySetVisitUuid, showVisitContextHeader]);
 
   const openVisitSwitcherModal = () => {
-    const dispose = showModal('visit-context-switcher-modal', {
+    const dispose = showModal('visit-context-switcher', {
       patientUuid,
       closeModal: () => dispose(),
       size: 'sm',

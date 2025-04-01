@@ -52,7 +52,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
         launchWorkspace(workspaceName, additionalProps);
       } else {
         if (isRdeEnabled) {
-          const dispose = showModal('visit-context-switcher-modal', {
+          const dispose = showModal('visit-context-switcher', {
             patientUuid,
             closeModal: () => dispose(),
             onAfterVisitSelected: () => launchPatientWorkspace(workspaceName, additionalProps),
