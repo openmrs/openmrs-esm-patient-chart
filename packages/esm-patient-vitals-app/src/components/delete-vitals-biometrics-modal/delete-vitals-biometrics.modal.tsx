@@ -63,7 +63,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
         <p>
           {t(
             'deleteConfirmationText',
-            'Note: Deleting these entries will also remove related vitals and biometrics data. Are you sure you want to continue?',
+            'Note: Deleting these entries will also remove related vitals or biometrics data. Are you sure you want to continue?',
           )}
         </p>
       </ModalBody>
