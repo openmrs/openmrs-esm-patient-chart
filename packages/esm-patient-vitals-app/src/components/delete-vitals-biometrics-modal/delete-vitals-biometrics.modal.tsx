@@ -3,7 +3,6 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { deleteEncounter, invalidateCachedVitalsAndBiometrics } from '../../common';
 import { ModalHeader, ModalBody, ModalFooter, Button, InlineLoading } from '@carbon/react';
-import styles from './delete-vitals-biometrics.modal.scss';
 
 interface DeleteVitalsAndBiometricsModalProps {
   patientUuid: string;
@@ -55,7 +54,6 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
   return (
     <>
       <ModalHeader
-        className={styles.modalHeader}
         closeModal={closeDeleteModal}
         title={t('deleteVitalsAndBiometrics', 'Delete vitals and biometrics')}
       />
