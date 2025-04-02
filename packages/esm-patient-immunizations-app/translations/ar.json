@@ -1,5 +1,6 @@
 {
   "add": "إضافة",
+  "AM": "AM",
   "cancel": "إلغاء",
   "doseNumber": "Dose Number",
   "doseNumberWithinSeries": "Dose number within series",
@@ -16,6 +17,7 @@
   "lotNumber": "رقم الدفعة",
   "manufacturer": "المصنع",
   "pleaseSelect": "يرجى الاختيار",
+  "PM": "PM",
   "recentVaccination": "تطعيم حديث",
   "save": "حفظ",
   "seeAll": "عرض الكل",
