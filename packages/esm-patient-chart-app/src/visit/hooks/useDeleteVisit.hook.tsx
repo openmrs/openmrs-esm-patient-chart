@@ -7,7 +7,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
   const { t } = useTranslation();
   const { mutateVisits } = useVisits(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
 
   const restoreDeletedVisit = () => {

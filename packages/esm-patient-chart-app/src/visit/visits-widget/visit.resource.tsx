@@ -1,59 +1,27 @@
-import useSWR, { mutate } from 'swr';
-import useSWRInfinite from 'swr/infinite';
 import {
-  type Obs,
   openmrsFetch,
   restBaseUrl,
   useConfig,
-  useOpenmrsPagination,
+  useOpenmrsInfinite,
+  type Obs,
   type OpenmrsResource,
   type Privilege,
   type Visit,
   makeUrl,
+  useOpenmrsPagination,
 } from '@openmrs/esm-framework';
+import useSWR, { mutate } from 'swr';
 import { type ChartConfig } from '../../config-schema';
 
 export function useInfiniteVisits(patientUuid: string) {
-  const config = useConfig<ChartConfig>();
+  const { numberOfVisitsToLoad } = useConfig<ChartConfig>();
   const customRepresentation =
     'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
-  const getKey = (pageIndex, previousPageData) => {
-    const pageSize = config.numberOfVisitsToLoad;
+  const url = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${numberOfVisitsToLoad}`;
+  const { data, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
 
-    if (previousPageData && !previousPageData?.data?.links.some((link) => link.rel === 'next')) {
-      return null;
-    }
-
-    let url = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${pageSize}`;
-
-    if (pageIndex) {
-      url += `&startIndex=${pageIndex * pageSize}`;
-    }
-
-    return url;
-  };
-
-  const {
-    data,
-    error,
-    isLoading,
-    isValidating,
-    mutate: localMutate,
-    size,
-    setSize,
-  } = useSWRInfinite(patientUuid ? getKey : null, openmrsFetch, { parallel: true });
-
-  return {
-    visits: data ? [].concat(data?.flatMap((page) => page?.data?.results)) : null,
-    error,
-    hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
-    isLoading,
-    isValidating,
-    mutateVisits: localMutate,
-    setSize,
-    size,
-  };
+  return { visits: data, ...rest };
 }
 
 const customRepresentation =
@@ -79,7 +47,7 @@ export function useVisits(patientUuid: string) {
   };
 }
 
-export function useVisitsPagination(patientUuid: string, pageSize: number) {
+export function usePaginatedVisits(patientUuid: string, pageSize: number) {
   const url = new URL(
     makeUrl(`${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`),
     window.location.toString(),
@@ -116,28 +84,6 @@ export function useEncounters(patientUuid: string) {
   return {
     encounters: data ? data?.data?.results : null,
     error,
-    isLoading,
-    isValidating,
-  };
-}
-
-export function usePastVisits(patientUuid: string) {
-  const customRepresentation =
-    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-    'form:(uuid,name),location:ref,' +
-    'encounterType:ref,encounterProviders:(uuid,display,' +
-    'provider:(uuid,display))),patient:(uuid,uuid),' +
-    'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
-    'stopDatetime)';
-
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
-    openmrsFetch,
-  );
-
-  return {
-    data: data ? data.data.results : null,
-    error: error,
     isLoading,
     isValidating,
   };
@@ -203,7 +149,7 @@ export interface Encounter {
     viewPrivilege?: Privilege;
     editPrivilege?: Privilege;
   };
-  obs: Array<Observation>;
+  obs: Array<Obs>;
   orders?: Array<Order>;
   form: OpenmrsResource;
   patient: OpenmrsResource;
@@ -223,33 +169,6 @@ export interface EncounterProvider {
       display: string;
     };
   };
-}
-
-export interface Observation {
-  uuid: string;
-  concept: {
-    uuid: string;
-    display: string;
-    conceptClass: {
-      uuid: string;
-      display: string;
-    };
-  };
-  display: string;
-  groupMembers: null | Array<{
-    uuid: string;
-    concept: {
-      uuid: string;
-      display: string;
-    };
-    value: {
-      uuid: string;
-      display: string;
-    };
-    display: string;
-  }>;
-  value: any;
-  obsDatetime?: string;
 }
 
 export interface Order {

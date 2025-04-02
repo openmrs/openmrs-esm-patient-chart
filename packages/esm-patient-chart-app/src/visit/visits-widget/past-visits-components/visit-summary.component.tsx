@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
   type Diagnosis,
   DiagnosisTags,
@@ -15,6 +14,7 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
 import { mapEncounters, type Encounter, type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';

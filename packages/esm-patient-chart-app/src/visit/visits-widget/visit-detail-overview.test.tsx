@@ -1,4 +1,4 @@
-import { FetchResponse, getConfig, getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { visitOverviewDetailMockData } from '__mocks__';
@@ -6,8 +6,7 @@ import React from 'react';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { useInfiniteVisits, useVisitsPagination } from './visit.resource';
-import { MutatorCallback, MutatorOptions } from 'swr';
+import { useInfiniteVisits, usePaginatedVisits } from './visit.resource';
 
 const mockGetConfig = getConfig as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
@@ -17,7 +16,7 @@ mockUseConfig.mockReturnValue({
   numberOfVisitsToLoad: 5,
 });
 
-const mockVisitPaginationData: ReturnType<typeof useVisitsPagination> = {
+const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   data: visitOverviewDetailMockData.data.results,
   error: null,
   mutate: jest.fn(),
@@ -40,22 +39,23 @@ const mockUseInfiniteVisitsData: ReturnType<typeof useInfiniteVisits> = {
   hasMore: false,
   isLoading: false,
   isValidating: false,
-  mutateVisits: jest.fn(),
-  setSize: jest.fn(),
-  size: 1,
+  mutate: jest.fn(),
+  totalCount: visitOverviewDetailMockData.data.results.length,
+  loadMore: jest.fn(),
+  nextUri: '',
 };
 jest.mock('./visit.resource', () => ({
   ...jest.requireActual('./visit.resource'),
-  useVisitsPagination: jest.fn().mockImplementation(() => mockVisitPaginationData),
+  usePaginatedVisits: jest.fn().mockImplementation(() => mockPaginatedVisitsData),
   useInfiniteVisits: jest.fn().mockImplementation(() => mockUseInfiniteVisitsData),
 }));
-const mockuseVisitsPagination = jest.mocked(useVisitsPagination);
+const mockUsePaginatedVisits = jest.mocked(usePaginatedVisits);
 const mockUseInfiniteVisits = jest.mocked(useInfiniteVisits);
 
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockuseVisitsPagination.mockReturnValueOnce({
-      ...mockVisitPaginationData,
+    mockUsePaginatedVisits.mockReturnValueOnce({
+      ...mockPaginatedVisitsData,
       data: [],
     });
     mockUseInfiniteVisits.mockReturnValue({
@@ -88,14 +88,14 @@ describe('VisitDetailOverview', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockuseVisitsPagination.mockReturnValue({
-      ...mockVisitPaginationData,
-      data: null,
-      error,
-    });
     mockUseInfiniteVisits.mockReturnValue({
       ...mockUseInfiniteVisitsData,
       visits: null,
+      error,
+    });
+    mockUsePaginatedVisits.mockReturnValue({
+      ...mockPaginatedVisitsData,
+      data: null,
       error,
     });
 
@@ -112,20 +112,18 @@ describe('VisitDetailOverview', () => {
     // visits summary view
     await screen.getByRole('tab', { name: /summary cards/i }).click();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Past visits/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Error 401: Unauthorized/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
   });
 
   it(`renders a summary of the patient's visits and encounters when data is available and showAllEncountersTab is true`, async () => {
     const user = userEvent.setup();
-
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
-    mockuseVisitsPagination.mockReturnValue(mockVisitPaginationData);
+    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
     mockUseInfiniteVisits.mockReturnValue(mockUseInfiniteVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
@@ -164,7 +162,7 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
-    mockuseVisitsPagination.mockReturnValue(mockVisitPaginationData);
+    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
     mockUseInfiniteVisits.mockReturnValue(mockUseInfiniteVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);

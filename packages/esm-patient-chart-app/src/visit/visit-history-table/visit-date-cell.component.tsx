@@ -9,10 +9,10 @@ interface Props {
 const VisitDateCell: React.FC<Props> = ({ visit }) => {
   const { t } = useTranslation();
   const { startDatetime, stopDatetime } = visit;
-  const from = formatDate(new Date(startDatetime));
-  const to = stopDatetime ? formatDate(new Date(stopDatetime)) : null;
+  const fromDate = formatDate(new Date(startDatetime));
+  const toDate = stopDatetime ? formatDate(new Date(stopDatetime)) : null;
 
-  return <>{to ? t('fromDateToDate', '{{from}} - {{to}}', { from, to }) : from}</>;
+  return <>{toDate ? t('fromDateToDate', '{{fromDate}} - {{toDate}}', { fromDate, toDate }) : fromDate}</>;
 };
 
 export default VisitDateCell;

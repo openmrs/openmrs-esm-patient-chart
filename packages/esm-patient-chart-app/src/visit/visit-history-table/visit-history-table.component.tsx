@@ -14,7 +14,7 @@ import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useVisitsPagination } from '../visits-widget/visit.resource';
+import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import styles from './visit-history-table.scss';
@@ -32,7 +32,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = useVisitsPagination(patientUuid, pageSize);
+  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
 
   // TODO: make this configurable

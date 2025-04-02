@@ -126,14 +126,6 @@
       "offline": true
     },
     {
-      "name": "past-visits-overview",
-      "component": "pastVisitsOverview",
-      "meta": {
-        "title": "Edit or load a past visit",
-        "view": "visits"
-      }
-    },
-    {
       "name": "patient-details-tile",
       "slot": "visit-form-header-slot",
       "component": "patientDetailsTile",
@@ -199,6 +191,11 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "visit-context-header",
+      "slot": "visit-context-header-slot",
+      "component": "visitContextHeader"
     }
   ],
   "modals": [
@@ -229,6 +226,10 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
+    },
+    {
+      "name": "visit-context-switcher",
+      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [

@@ -25,6 +25,22 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
+jest.mock('@carbon/charts-react', () => ({
+  LineChart: () => <div data-testid="line-chart">Line Chart</div>,
+  ScaleTypes: {
+    TIME: 'time',
+    LINEAR: 'linear',
+    LOG: 'log',
+    LABELS: 'labels',
+    LABELS_RATIO: 'labels-ratio',
+  },
+  TickRotations: {
+    ALWAYS: 'always',
+    AUTO: 'auto',
+    NEVER: 'never',
+  },
+}));
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 

@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from 'tools';
-import { mockEncounters } from '__mocks__';
+import { mockMappedEncounters } from '__mocks__';
 import VisitsTable from './visits-table.component';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
-  visits: mockEncounters,
+  visits: mockMappedEncounters,
 };
 
 const mockShowModal = jest.mocked(showModal);
@@ -29,7 +29,7 @@ describe('EncounterList', () => {
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderVisitsTable({ visits: mockMappedEncounters });
 
     await screen.findByRole('table');
 
@@ -37,9 +37,9 @@ describe('EncounterList', () => {
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
     const expectedColumnHeaders = [/date & time/, /visit type/, /Form name/, /encounter type/, /provider/];
     const expectedTableRows = [
-      /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/,
-      /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/,
-      /05-Jul-2021, 10:07 AM Facility Visit Consultation Covid 19 Dennis The Doctor Options/,
+      /18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- options/,
+      /03\-aug\-2021, 12:47 am facility visit visit note \-\- user one options/,
+      /05\-jul\-2021, 10:07 am facility visit consultation covid 19 dennis the doctor options/,
     ];
 
     expectedColumnHeaders.forEach((header) => {
@@ -80,7 +80,7 @@ describe('Delete Encounter', () => {
 
     mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable({ visits: mockEncounters });
+    renderVisitsTable({ visits: mockMappedEncounters });
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();

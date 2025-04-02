@@ -19,12 +19,10 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
 
   // useInfiniteVisits is needed for the summary cards view and the "All encounters" table,
   // but not the visit table itself
-  const { visits, error, hasMore, isLoading, isValidating, mutateVisits, setSize, size } =
-    useInfiniteVisits(patientUuid);
+  const { visits, error, hasMore, isLoading, isValidating, mutate, loadMore } = useInfiniteVisits(patientUuid);
   const [visitSummaryMode, setVisitSummaryMode] = useState<'table' | 'cards'>('table');
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
-  const shouldLoadMore = size !== visits?.length;
 
   const visitsWithEncounters = visits
     ?.filter((visit) => visit?.encounters?.length)
@@ -66,7 +64,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                 <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : (
                 <VisitsTable
-                  mutateVisits={mutateVisits}
+                  mutateVisits={mutate}
                   visits={visitsWithEncounters}
                   showAllEncounters
                   patientUuid={patientUuid}
@@ -79,12 +77,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
       {/* The following button loads more data for both the visit summaries view and the "All encounters" table view,
           but not the visit history table view */}
       {hasMore && !isShowingVisitHistoryTable ? (
-        <Button
-          className={styles.loadMoreButton}
-          disabled={isValidating && shouldLoadMore}
-          onClick={() => setSize(size + 1)}
-        >
-          {isValidating && shouldLoadMore ? (
+        <Button className={styles.loadMoreButton} disabled={isValidating} onClick={() => loadMore()}>
+          {isValidating ? (
             <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
           ) : (
             t('loadMore', 'Load more')
