@@ -1,19 +1,12 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList } from '@carbon/react';
-import { LineChart } from '@carbon/charts-react';
+import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical, Tabs } from '@carbon/react';
+import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
-
-enum ScaleTypes {
-  TIME = 'time',
-  LINEAR = 'linear',
-  LOG = 'log',
-  LABELS = 'labels',
-  LABELS_RATIO = 'labels-ratio',
-}
 
 interface ConceptDescriptor {
   label: string;
@@ -26,8 +19,8 @@ interface ObsGraphProps {
 
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
-  const { data: obss } = useObs(patientUuid);
+  const config = useConfig<ConfigObject>();
+  const { data: observations } = useObs(patientUuid);
 
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
     label: config.data[0]?.label,
@@ -35,7 +28,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   });
 
   const chartData = useMemo(() => {
-    const chartRecords = obss
+    const chartRecords = observations
       .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
       .map((obs) => ({
         group: selectedConcept.label,
@@ -48,7 +41,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     }
 
     return chartRecords;
-  }, [obss, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
+  }, [observations, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
 
   const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
 
@@ -82,8 +75,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           <label className={styles.conceptLabel} htmlFor="concept-tab-group">
             {t('displaying', 'Displaying')}
           </label>
-          <Tabs id="concept-tab-group" className={styles.verticalTabs} type="default">
-            <TabList className={styles.tablist} aria-label="Obs tabs">
+          <TabsVertical id="concept-tab-group" className={styles.verticalTabs} type="default">
+            <TabListVertical aria-label="Obs tabs">
               {config.data.map(({ concept, label }, index) => {
                 const tabClasses = classNames(styles.tab, styles.bodyLong01, {
                   [styles.selectedTab]: selectedConcept.label === label,
@@ -91,8 +84,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
                 return (
                   <Tab
-                    key={concept}
                     className={tabClasses}
+                    key={concept}
                     onClick={() =>
                       setSelectedConcept({
                         label,
@@ -104,11 +97,15 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
                   </Tab>
                 );
               })}
-            </TabList>
-          </Tabs>
-        </div>
-        <div className={styles.lineChartContainer}>
-          <LineChart data={chartData.flat()} options={chartOptions} />
+            </TabListVertical>
+            <TabPanels>
+              {config.data.map(({ concept, label }) => (
+                <TabPanel key={concept}>
+                  <LineChart data={chartData.flat()} options={chartOptions} />
+                </TabPanel>
+              ))}
+            </TabPanels>
+          </TabsVertical>
         </div>
       </div>
       {config.interpretationSlot ? (

@@ -6,6 +6,21 @@ import Trendline from './trendline.component';
 
 const mockUseObstreeData = jest.mocked(useObstreeData);
 
+jest.mock('@carbon/charts-react', () => ({
+  LineChart: () => <div data-testid="line-chart">Line Chart</div>,
+  ScaleTypes: {
+    TIME: 'time',
+    LINEAR: 'linear',
+    LOG: 'log',
+    LABELS: 'labels',
+  },
+  TickRotations: {
+    ALWAYS: 'always',
+    AUTO: 'auto',
+    NEVER: 'never',
+  },
+}));
+
 jest.mock('./trendline-resource', () => ({
   ...jest.requireActual('./trendline-resource'),
   useObstreeData: jest.fn(),
