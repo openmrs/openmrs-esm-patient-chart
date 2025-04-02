@@ -7,9 +7,9 @@ import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@ope
 import { launchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../common';
 import { type ConfigObject } from '../config-schema';
+import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
-import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import styles from './biometrics-base.scss';
 
 interface BiometricsBaseProps {
@@ -85,8 +85,14 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
     [biometrics],
   );
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (biometrics?.length) {
     return (
       <div className={styles.widgetCard}>
