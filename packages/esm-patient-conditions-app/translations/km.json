@@ -29,6 +29,7 @@
   "noConditionsToDisplay": "No conditions to display",
   "noResultsFor": "គ្មានលទ្ធផលសម្រាប់",
   "onsetDate": "កាលបរិច្ឆេទចាប់ផ្តើម",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Record a Condition",
   "required": "Required",
   "saveAndClose": "រក្សាទុក និងបិទ",
