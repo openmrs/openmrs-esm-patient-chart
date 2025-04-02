@@ -23,47 +23,17 @@
   padding-right: layout.$spacing-05;
 }
 
-.vitalsChartArea {
-  flex-grow: 4;
-  padding: 0 layout.$spacing-05 layout.$spacing-09;
-
-  :global(.cds--cc--layout-row) {
-    height: 0;
-  }
-
-  :global(.layout-child) {
-    margin-top: layout.$spacing-03;
-  }
-}
-
 .vitalsSignLabel {
   @extend .label01;
   margin-bottom: layout.$spacing-05;
   display: inline-block;
 }
 
-.verticalTabs {
-  margin: layout.$spacing-05 0;
-  scroll-behavior: smooth;
-
-  > ul {
-    flex-direction: column !important;
-  }
-
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
-    margin-left: 0;
-  }
-
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
-    border-bottom: 0 !important;
-    border-left: layout.$spacing-01 solid $color-gray-30;
-  }
-}
-
 .tab {
   outline: 0;
   outline-offset: 0;
-  min-height: layout.$spacing-07;
+  min-height: layout.$spacing-07 !important;
+  block-size: layout.$spacing-05 !important;
 
   &:active,
   &:focus {
@@ -71,7 +41,7 @@
   }
 
   &[aria-selected='true'] {
-    border-left: 3px solid var(--brand-03);
+    box-shadow: inset 4px 0 0 0 var(--brand-03) !important;
     border-bottom: none;
     font-weight: 600;
     margin-left: 0 !important;
@@ -81,17 +51,5 @@
     border-bottom: none;
     border-left: layout.$spacing-01 solid $ui-03;
     margin-left: 0 !important;
-  }
-}
-
-.tablist {
-  :global(.cds--tab--list) {
-    flex-direction: column;
-    max-height: fit-content;
-    overflow-x: visible;
-  }
-
-  > button :global(.cds--tabs .cds--tabs__nav-link) {
-    border-bottom: none;
   }
 }
