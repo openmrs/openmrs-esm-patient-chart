@@ -33,6 +33,7 @@ export interface ImmunizationFormState {
 }
 
 export interface ImmunizationFormData extends ImmunizationFormState {
+  nextDose: Date;
   patientUuid: string;
   vaccineName: string;
 }

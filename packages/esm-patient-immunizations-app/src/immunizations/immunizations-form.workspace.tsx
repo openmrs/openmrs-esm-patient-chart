@@ -38,11 +38,6 @@ import { DoseInput } from './components/dose-input.component';
 import { useImmunizations } from '../hooks/useImmunizations';
 import styles from './immunizations-form.scss';
 
-interface ResponsiveWrapperProps {
-  children: React.ReactNode;
-  isTablet: boolean;
-}
-
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
   closeWorkspace,
@@ -70,10 +65,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       doseNumber: z
         .number()
         .nullable()
-        // The backend will attempt to convert the dose number to a positive integer
-        // so we need to set it to null if the value is less than 1
         .transform((value) => (value < 1 ? null : value)),
-      expirationDate: z.date().nullable(),
+      nextDose: z.date().nullable(),
       lotNumber: z.string().nullable(),
       manufacturer: z.string().nullable(),
     });
@@ -89,7 +82,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccinationTime: dayjs(new Date()).format('hh:mm'),
       timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
       doseNumber: 0,
-      expirationDate: null,
+      nextDose: null,
       lotNumber: '',
       manufacturer: '',
     },
@@ -119,7 +112,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccinationTime: dayjs(vaccinationDateOrNow).format('hh:mm'),
           timeFormat: vaccinationDateOrNow.getHours() >= 12 ? 'PM' : 'AM',
           doseNumber: props.doseNumber,
-          expirationDate: props.expirationDate,
+          nextDose: props.expirationDate,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
         });
@@ -128,7 +121,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     });
 
     return () => {
-      // cleanup
       sub.unsubscribe();
       immunizationFormSub.next(null);
     };
@@ -140,7 +132,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         vaccineUuid,
         vaccinationDate,
         doseNumber,
-        expirationDate,
+        nextDose,
         lotNumber,
         manufacturer,
         timeFormat,
@@ -167,9 +159,10 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           ),
         ),
         doseNumber,
-        expirationDate,
+        nextDose,
         lotNumber,
         manufacturer,
+        expirationDate: undefined,
       };
 
       savePatientImmunization(
@@ -364,17 +357,17 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           <section>
             <ResponsiveWrapper>
               <Controller
-                name="expirationDate"
+                name="nextDose"
                 control={control}
                 render={({ field, fieldState }) => (
                   <div className={styles.row}>
                     <OpenmrsDatePicker
                       {...field}
-                      id="vaccinationExpiration"
-                      data-testid="vaccinationExpiration"
-                      className="vaccinationExpiration"
+                      id="vaccinationNextDose"
+                      data-testid="vaccinationNextDose"
+                      className="vaccinationNextDose"
                       minDate={immunizationToEditMeta ? null : new Date()}
-                      labelText={t('expirationDate', 'Expiration date')}
+                      labelText={t('nextDose', 'Next dose')}
                       invalid={Boolean(fieldState?.error?.message)}
                       invalidText={fieldState?.error?.message}
                     />

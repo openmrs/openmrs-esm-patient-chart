@@ -21,20 +21,19 @@ const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEn
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime as any as string;
-  const expirationDate = immunizationResource?.expirationDate as any as string;
+  const nextDose = immunizationResource?.expirationDate as any as string;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
     doseNumber,
     occurrenceDateTime,
-    expirationDate,
+    expirationDate: nextDose,
     visitUuid: fromReference(immunizationResource?.encounter),
   };
 };
 
 const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationResource) {
-  //Code without system represents internal code using uuid
   return find(immunizationResource?.vaccineCode?.coding, function (code: Code) {
     return isUndefined(code.system);
   });
@@ -86,9 +85,9 @@ export const mapToFHIRImmunizationResource = (
       ],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
-    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
+    encounter: toReferenceOfType('Encounter', visitUuid),
     occurrenceDateTime: immunizationFormData.vaccinationDate,
-    expirationDate: immunizationFormData.expirationDate,
+    expirationDate: immunizationFormData.nextDose,
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
     manufacturer: { display: immunizationFormData.manufacturer },
@@ -96,7 +95,7 @@ export const mapToFHIRImmunizationResource = (
     protocolApplied: [
       {
         doseNumberPositiveInt: immunizationFormData.doseNumber,
-        series: null, // the backend currently does not support "series"
+        series: null,
       },
     ],
   };

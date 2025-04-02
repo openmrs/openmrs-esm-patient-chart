@@ -258,7 +258,7 @@ describe('Immunizations Form', () => {
     const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
     const lotField = screen.getByRole('textbox', { name: /Lot number/i });
     const manufacturerField = screen.getByRole('textbox', { name: /Manufacturer/i });
-    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
+    const nextDoseField = screen.getByRole('textbox', { name: /Next dose/i });
     const saveButton = screen.getByRole('button', { name: /Save/i });
 
     // verify the form values
@@ -268,7 +268,7 @@ describe('Immunizations Form', () => {
     expect(doseField).toHaveValue(24);
     expect(lotField).toHaveValue('A123456');
     expect(manufacturerField).toHaveValue('Merck & Co., Inc.');
-    expect(expirationDateField).toHaveValue('19/05/2024');
+    expect(nextDoseField).toHaveValue('19/05/2024');
 
     // edit the form
     await selectOption(vaccineField, 'Hepatitis B vaccination');

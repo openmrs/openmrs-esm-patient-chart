@@ -28,7 +28,6 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
   const { sequences, vaccineUuid } = immunizationsByVaccine;
 
   const [doses, setDoses] = useState(immunizationsByVaccine.existingDoses);
-
   const [open, setOpen] = useState(false);
   const [selectedDoseId, setSelectedDoseId] = useState<string | null>(null);
 
@@ -36,7 +35,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
     () => [
       { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
+      { key: 'nextDose', header: t('nextDose', 'Next dose') },
       { key: 'edit', header: '' },
     ],
     [t, sequences.length],
@@ -48,7 +47,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
       ? dose.doseNumber || 0
       : sequences.find((s) => s.sequenceNumber === dose.doseNumber)?.sequenceLabel || dose.doseNumber,
     vaccinationDate: dose.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
-    expirationDate: dose.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true }),
+    nextDose: dose.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true }),
     edit: (
       <>
         <Button
