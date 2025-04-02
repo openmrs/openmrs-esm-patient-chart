@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   Form,
   InlineNotification,
@@ -24,6 +22,7 @@ import {
   toDateObjectStrict,
   showSnackbar,
   ResponsiveWrapper,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,8 +42,6 @@ interface ResponsiveWrapperProps {
   children: React.ReactNode;
   isTablet: boolean;
 }
-
-const datePickerFormat = 'd/m/Y';
 
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -228,26 +225,17 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 <Controller
                   name="vaccinationDate"
                   control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <DatePicker
+                  render={({ field, fieldState }) => (
+                    <OpenmrsDatePicker
+                      {...field}
                       id="vaccinationDate"
-                      maxDate={new Date().toISOString()}
-                      dateFormat={datePickerFormat}
-                      datePickerType="single"
-                      value={value}
-                      onChange={([date]) => onChange(date)}
-                      style={{ paddingBottom: '1rem' }}
-                    >
-                      <DatePickerInput
-                        id="vaccinationDateInput"
-                        placeholder="dd/mm/yyyy"
-                        labelText={t('vaccinationDate', 'Vaccination date')}
-                        type="text"
-                        invalid={!!errors['vaccinationDate']}
-                        invalidText={errors['vaccinationDate']?.message}
-                        style={{ width: '100%' }}
-                      />
-                    </DatePicker>
+                      data-testid="vaccinationDate"
+                      maxDate={new Date()}
+                      style={{ paddingBottom: '1rem', width: '100%' }}
+                      labelText={t('vaccinationDate', 'Vaccination date')}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
                   )}
                 />
               </ResponsiveWrapper>
@@ -275,8 +263,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                             value={value}
                             aria-label={t('timeFormat ', 'Time Format')}
                           >
-                            <SelectItem value="AM" text="AM" />
-                            <SelectItem value="PM" text="PM" />
+                            <SelectItem value="AM" text={t('AM', 'AM')} />
+                            <SelectItem value="PM" text={t('PM', 'PM')} />
                           </TimePickerSelect>
                         )}
                       />
@@ -378,24 +366,18 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <Controller
                 name="expirationDate"
                 control={control}
-                render={({ field: { onChange, value } }) => (
+                render={({ field, fieldState }) => (
                   <div className={styles.row}>
-                    <DatePicker
+                    <OpenmrsDatePicker
+                      {...field}
                       id="vaccinationExpiration"
+                      data-testid="vaccinationExpiration"
                       className="vaccinationExpiration"
-                      minDate={immunizationToEditMeta ? null : new Date().toISOString()}
-                      dateFormat={datePickerFormat}
-                      datePickerType="single"
-                      value={value}
-                      onChange={([date]) => onChange(date)}
-                    >
-                      <DatePickerInput
-                        id="date-picker-calendar-id"
-                        placeholder="dd/mm/yyyy"
-                        labelText={t('expirationDate', 'Expiration date')}
-                        type="text"
-                      />
-                    </DatePicker>
+                      minDate={immunizationToEditMeta ? null : new Date()}
+                      labelText={t('expirationDate', 'Expiration date')}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
                   </div>
                 )}
               />

@@ -49,3 +49,7 @@
   min-width: 100%;
   padding: 0;
 }
+
+.programName {
+  @include type.type-style('body-compact-02');
+}

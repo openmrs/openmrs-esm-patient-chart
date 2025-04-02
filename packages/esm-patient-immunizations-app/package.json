@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-immunizations-app",
-  "version": "9.1.0",
+  "version": "9.2.2",
   "license": "MPL-2.0",
   "description": "Patient immunizations microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-immunizations-app.js",
@@ -41,7 +41,7 @@
     "@hookform/resolvers": "^3.3.1",
     "lodash-es": "^4.17.21",
     "react-hook-form": "^7.46.2",
-    "zod": "^3.22.2"
+    "zod": "^3.23.8"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "6.x",
@@ -54,7 +54,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "workspace:*",
+    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.94.0"
   }
 }

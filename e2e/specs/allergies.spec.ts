@@ -27,7 +27,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('When I select `ACE inhibitors` as the allergy', async () => {
-    await page.getByPlaceholder(/select the allergen/i).click();
+    await page.getByRole('combobox', { name: /choose an item/i }).click();
     await page.getByText(/ace inhibitors/i).click();
   });
 
@@ -55,7 +55,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
-    await expect(headerRow).toContainText(/onset date and comments/i);
+    await expect(headerRow).toContainText(/comments/i);
     await expect(dataRow).toContainText(/ace inhibitors/i);
     await expect(dataRow).toContainText(/mild/i);
     await expect(dataRow).toContainText(/mental status change/i);
@@ -104,7 +104,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
     await expect(headerRow).toContainText(/allergen/i);
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
-    await expect(headerRow).toContainText(/onset date and comments/i);
+    await expect(headerRow).toContainText(/comments/i);
     await expect(dataRow).toContainText(/bee stings/i);
     await expect(dataRow).not.toContainText(/ace inhibitors/i);
     await expect(dataRow).toContainText(/severe/i);
@@ -130,7 +130,7 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted allergy in the list', async () => {
-    await expect(page.getByText(/bee stings/i)).not.toBeVisible();
+    await expect(page.getByText(/bee stings/i)).toBeHidden();
   });
 
   await test.step('And the allergy table should be empty', async () => {

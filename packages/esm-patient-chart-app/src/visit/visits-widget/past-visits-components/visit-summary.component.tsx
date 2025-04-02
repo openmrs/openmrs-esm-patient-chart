@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
 import {
@@ -13,15 +12,8 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import {
-  mapEncounters,
-  type Diagnosis,
-  type Encounter,
-  type Note,
-  type Observation,
-  type Order,
-  type OrderItem,
-} from '../visit.resource';
+import classNames from 'classnames';
+import { mapEncounters, type Encounter, type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -56,7 +48,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     // Notes Tab
     const notes: Array<Note> = [];
 
-    visit?.encounters?.forEach((enc: Encounter) => {
+    visit?.encounters?.forEach((enc) => {
       if (enc.hasOwnProperty('orders')) {
         medications.push(
           ...enc.orders.map((order: Order) => ({
@@ -73,8 +65,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
           const validDiagnoses = enc.diagnoses
-            .filter((diagnosis: Diagnosis) => !diagnosis.voided)
-            .map((diagnosis: Diagnosis) => ({
+            .filter((diagnosis) => !diagnosis.voided)
+            .map((diagnosis) => ({
               diagnosis: diagnosis.display,
               type: diagnosis.rank === 1 ? 'red' : 'blue',
               rank: diagnosis.rank,
@@ -86,11 +78,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
 
       // Check for Visit Diagnoses and Notes
       if (enc.hasOwnProperty('obs')) {
-        enc.obs.forEach((obs: Observation) => {
+        enc.obs.forEach((obs) => {
           if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
             // Putting all notes in a single array.
             notes.push({
-              note: obs.value,
+              note: obs.value as string, // TODO: add better typing check
               provider: {
                 name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
                 role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',

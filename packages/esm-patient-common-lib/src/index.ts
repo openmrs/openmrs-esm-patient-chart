@@ -6,7 +6,6 @@ export * from './empty-state';
 export * from './error-state';
 export * from './form-entry-interop';
 export * from './form-entry/form-entry';
-export * from './get-patient-uuid-from-url';
 export * from './launchStartVisitPrompt';
 export * from './nav-group/createDashboardGroup';
 export * from './nav-group/DashboardGroupExtension';

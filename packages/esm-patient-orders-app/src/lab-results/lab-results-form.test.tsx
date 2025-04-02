@@ -13,6 +13,7 @@ import {
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
+import { mockPatient } from 'tools';
 
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
@@ -48,7 +49,8 @@ const testProps = {
   order: mockOrder as Order,
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
-  patientUuid: 'patient-uuid',
+  patientUuid: mockPatient.id,
+  patient: mockPatient,
 };
 
 describe('LabResultsForm', () => {

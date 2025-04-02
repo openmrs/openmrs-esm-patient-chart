@@ -24,12 +24,10 @@
   "endDate": "结束日期",
   "error": "错误",
   "errorFetchingTestTypes": "获取“{{searchTerm}}”的结果时出现错误",
-  "female": "女性",
   "goToDrugOrderForm": "医嘱表单",
   "hideResultsTable": "隐藏结果表格",
   "individualTests": "独立检验",
   "labOrders": "实验室医嘱",
-  "male": "男性",
   "moreResultsAvailable": "更多结果可用",
   "noPanelsFound": "未找到面板",
   "noResultsForTestTypeSearch": "没有与“{{searchTerm}}”有关的结果可显示",
@@ -46,7 +44,6 @@
   "ordered": "已下医嘱",
   "orderReason": "医嘱原因",
   "orderReasonRequired": "Order reason is required",
-  "other": "其他",
   "overTime": "超时",
   "panel": "面板",
   "panels": "面板",
@@ -107,9 +104,7 @@
   "trendlineRangeSelectorMonths": "6个月",
   "trySearchingAgain": "请尝试重新搜索",
   "tryTo": "尝试",
-  "unknown": "未知",
   "usingADifferentTerm": "使用不同的术语",
   "value": "值",
-  "view": "查看",
-  "viewTimeline": "查看时间线"
+  "view": "查看"
 }

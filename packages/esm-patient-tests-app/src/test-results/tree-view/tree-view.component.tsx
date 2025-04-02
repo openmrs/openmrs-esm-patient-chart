@@ -66,7 +66,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
 
   const { timelineData, resetTree } = useContext(FilterContext);
-  const { isLoading: isLoadingPanelData } = usePanelData();
+  const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
 
   if (tablet) {
     return (

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-flags-app",
-  "version": "9.1.0",
+  "version": "9.2.2",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient flags",
   "browser": "dist/openmrs-esm-patient-flags-app.js",
@@ -50,7 +50,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "workspace:*",
+    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.94.0"
   }
 }

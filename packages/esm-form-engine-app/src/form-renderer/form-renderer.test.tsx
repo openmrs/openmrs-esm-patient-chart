@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { mockPatient } from 'tools';
 import FormRenderer from './form-renderer.component';
 import useFormSchema from '../hooks/useFormSchema';
 
@@ -19,7 +20,8 @@ jest.mock('../hooks/useFormSchema', () => ({
 describe('FormRenderer', () => {
   const defaultProps = {
     formUuid: 'test-form-uuid',
-    patientUuid: 'test-patient-uuid',
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
     closeWorkspace: jest.fn(),
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),

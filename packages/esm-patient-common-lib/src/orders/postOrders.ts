@@ -1,5 +1,4 @@
 import { openmrsFetch, type OpenmrsResource, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import type {
   DrugOrderPost,
@@ -13,15 +12,15 @@ import type {
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
   orderEncounterType: string,
-  activeVisit: Visit | null,
+  currentVisit: Visit | null,
   sessionLocationUuid: string,
   abortController?: AbortController,
 ) {
   const now = new Date();
-  const visitStartDate = parseDate(activeVisit?.startDatetime);
-  const visitEndDate = parseDate(activeVisit?.stopDatetime);
+  const visitStartDate = parseDate(currentVisit?.startDatetime);
+  const visitEndDate = parseDate(currentVisit?.stopDatetime);
   let encounterDate: Date;
-  if (!activeVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
+  if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
     encounterDate = now;
   } else {
     console.warn(
@@ -46,7 +45,7 @@ export async function postOrdersOnNewEncounter(
     location: sessionLocationUuid,
     encounterType: orderEncounterType,
     encounterDatetime: encounterDate,
-    visit: activeVisit?.uuid,
+    visit: currentVisit?.uuid,
     obs: [],
     orders,
   };
@@ -61,8 +60,7 @@ export async function postOrdersOnNewEncounter(
   }).then((res) => res?.data?.uuid);
 }
 
-export async function postOrders(encounterUuid: string, abortController: AbortController) {
-  const patientUuid = getPatientUuidFromStore();
+export async function postOrders(patientUuid: string, encounterUuid: string, abortController: AbortController) {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 

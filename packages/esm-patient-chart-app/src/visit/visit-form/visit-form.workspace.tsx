@@ -1,12 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-dayjs.extend(isSameOrBefore);
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ButtonSet,
@@ -21,94 +13,95 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Extension,
   ExtensionSlot,
-  formatDatetime,
+  OpenmrsFetchError,
   saveVisit,
   showSnackbar,
-  toDateObjectStrict,
-  toOmrsIsoString,
-  type AssignedExtension,
-  type NewVisitPayload,
-  type Visit,
   updateVisit,
   useConfig,
   useConnectivity,
-  useFeatureFlag,
+  useEmrConfiguration,
   useLayoutType,
-  usePatient,
-  useSession,
   useVisit,
+  type AssignedExtension,
+  type NewVisitPayload,
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
-  convertTime12to24,
   createOfflineVisitForPatient,
-  type DefaultPatientWorkspaceProps,
-  time12HourFormatRegex,
   useActivePatientEnrollment,
+  type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
-import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useEmrConfiguration } from '../hooks/useEmrConfiguration';
-import { useInfiniteVisits, useVisits } from '../visits-widget/visit.resource';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeSection from './visit-date-time.component';
 import {
+  convertToDate,
   createVisitAttribute,
   deleteVisitAttribute,
+  extractErrorMessagesFromResponse,
   updateVisitAttribute,
   useConditionalVisitTypes,
   useVisitFormCallbacks,
+  useVisitFormSchemaAndDefaultValues,
+  visitStatuses,
+  type ErrorObject,
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeField from './visit-date-time.component';
 import styles from './visit-form.scss';
+dayjs.extend(isSameOrBefore);
 
-interface StartVisitFormProps extends DefaultPatientWorkspaceProps {
+interface VisitFormProps extends DefaultPatientWorkspaceProps {
   /**
    * A unique string identifying where the visit form is opened from.
    * This string is passed into various extensions within the form to
    * affect how / if they should be rendered.
    */
+  handleReturnToSearchList?: () => void;
   openedFrom: string;
   showPatientHeader?: boolean;
-  showVisitEndDateTimeFields: boolean;
   visitToEdit?: Visit;
 }
-
-const StartVisitForm: React.FC<StartVisitFormProps> = ({
+/**
+ * This form is used for starting a new visit and for editing
+ * an existing visit
+ */
+const VisitForm: React.FC<VisitFormProps> = ({
   closeWorkspace,
-  patientUuid: initialPatientUuid,
+  handleReturnToSearchList,
+  openedFrom,
+  patient,
+  patientUuid,
   promptBeforeClosing,
   showPatientHeader = false,
-  showVisitEndDateTimeFields,
   visitToEdit,
-  openedFrom,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
   const isOnline = useConnectivity();
   const config = useConfig<ChartConfig>();
-  const sessionUser = useSession();
-  const sessionLocation = sessionUser?.sessionLocation;
-  const defaultVisitLocation = useDefaultVisitLocation(
-    sessionLocation,
-    config.restrictByVisitLocationTag && isEmrApiModuleInstalled,
+  const { emrConfiguration } = useEmrConfiguration();
+  const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
+    config.showRecommendedVisitTypeTab ? 0 : 1,
   );
-  const { emrConfiguration } = useEmrConfiguration(isEmrApiModuleInstalled);
-  const { patientUuid, patient } = usePatient(initialPatientUuid);
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutateVisits } = useVisits(patientUuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -118,125 +111,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
-  const displayVisitStopDateTimeFields = useMemo(
-    () => Boolean(visitToEdit?.uuid || showVisitEndDateTimeFields),
-    [visitToEdit?.uuid, showVisitEndDateTimeFields],
-  );
-
-  const visitFormSchema = useMemo(() => {
-    const createVisitAttributeSchema = (required: boolean) =>
-      required
-        ? z.string({
-            required_error: t('fieldRequired', 'This field is required'),
-          })
-        : z.string().optional();
-
-    const visitAttributes = (config.visitAttributeTypes ?? [])?.reduce(
-      (acc, { uuid, required }) => ({
-        ...acc,
-        [uuid]: createVisitAttributeSchema(required),
-      }),
-      {},
-    );
-
-    // Validates that the start time is not in the future
-    const validateStartTime = (data: z.infer<typeof visitFormSchema>) => {
-      const [visitStartHours, visitStartMinutes] = convertTime12to24(data.visitStartTime, data.visitStartTimeFormat);
-      const visitStartDatetime = new Date(data.visitStartDate).setHours(visitStartHours, visitStartMinutes);
-      return new Date(visitStartDatetime) <= new Date();
-    };
-
-    const hadPreviousStopDateTime = Boolean(visitToEdit?.stopDatetime);
-
-    return z
-      .object({
-        visitStartDate: z.date().refine(
-          (value) => {
-            const today = dayjs();
-            const startDate = dayjs(value);
-
-            return startDate.isSameOrBefore(today, 'day');
-          },
-          t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-            firstEncounterDatetime: formatDatetime(new Date()),
-            interpolation: {
-              escapeValue: false,
-            },
-          }),
-        ),
-        visitStartTime: z
-          .string()
-          .refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat', 'Invalid time format')),
-        visitStartTimeFormat: z.enum(['PM', 'AM']),
-        visitStopDate: displayVisitStopDateTimeFields && hadPreviousStopDateTime ? z.date() : z.date().optional(),
-        visitStopTime:
-          displayVisitStopDateTimeFields && hadPreviousStopDateTime
-            ? z.string().refine((value) => value.match(time12HourFormatRegex), t('invalidTimeFormat'))
-            : z
-                .string()
-                .refine((value) => !value || value.match(time12HourFormatRegex), t('invalidTimeFormat'))
-                .optional(),
-        visitStopTimeFormat:
-          displayVisitStopDateTimeFields && hadPreviousStopDateTime
-            ? z.enum(['PM', 'AM'])
-            : z.enum(['PM', 'AM']).optional(),
-        programType: z.string().optional(),
-        visitType: z.string().refine((value) => !!value, t('visitTypeRequired', 'Visit type is required')),
-        visitLocation: z.object({
-          display: z.string(),
-          uuid: z.string(),
-        }),
-        visitAttributes: z.object(visitAttributes),
-      })
-      .refine((data) => validateStartTime(data), {
-        message: t('futureStartTime', 'Visit start time cannot be in the future'),
-        path: ['visitStartTime'],
-      })
-      .refine((data) => !(displayVisitStopDateTimeFields && data.visitStopDate && !data.visitStopTime), {
-        message: t('visitStopTimeRequired', 'Visit stop time is required'),
-        path: ['visitStopTime'],
-      })
-      .refine(
-        (data) =>
-          !(displayVisitStopDateTimeFields && data.visitStopDate && data.visitStopTime && !data.visitStopTimeFormat),
-        {
-          message: t('visitStopTimeFormatRequired', 'Visit stop time format is required'),
-          path: ['visitStopTimeFormat'],
-        },
-      );
-  }, [config.visitAttributeTypes, visitToEdit?.stopDatetime, t, displayVisitStopDateTimeFields]);
-
-  const defaultValues = useMemo(() => {
-    const visitStartDate = visitToEdit?.startDatetime ? new Date(visitToEdit?.startDatetime) : new Date();
-    const visitStopDate = visitToEdit?.stopDatetime ? new Date(visitToEdit?.stopDatetime) : null;
-
-    let defaultValues: Partial<VisitFormData> = {
-      visitStartDate,
-      visitStartTime: dayjs(visitStartDate).format('hh:mm'),
-      visitStartTimeFormat: new Date(visitStartDate).getHours() >= 12 ? 'PM' : 'AM',
-      visitType: visitToEdit?.visitType?.uuid ?? emrConfiguration?.atFacilityVisitType?.uuid,
-      visitLocation: visitToEdit?.location ?? defaultVisitLocation ?? {},
-      visitAttributes:
-        visitToEdit?.attributes.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.attributeType.uuid]: typeof curr.value === 'object' ? curr?.value?.uuid : `${curr.value ?? ''}`,
-          }),
-          {},
-        ) ?? {},
-    };
-
-    if (visitStopDate) {
-      defaultValues = {
-        ...defaultValues,
-        visitStopDate,
-        visitStopTime: dayjs(visitStopDate).format('hh:mm'),
-        visitStopTimeFormat: visitStopDate.getHours() >= 12 ? 'PM' : 'AM',
-      };
-    }
-
-    return defaultValues;
-  }, [visitToEdit, defaultVisitLocation, emrConfiguration]);
+  const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
+    useVisitFormSchemaAndDefaultValues(visitToEdit);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -249,7 +125,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
     control,
     getValues,
     formState: { errors, isDirty, isSubmitting },
-    setError,
     reset,
   } = methods;
 
@@ -261,85 +136,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
-
-  let [maxVisitStartDatetime, minVisitStopDatetime] = useMemo(() => {
-    const now = Date.now();
-
-    if (!visitToEdit?.encounters?.length) {
-      return [now, null];
-    }
-
-    const allEncounterDatetimes = visitToEdit?.encounters?.map(({ encounterDatetime }) =>
-      Date.parse(encounterDatetime),
-    );
-
-    const maxVisitStartDatetime = Math.min(...allEncounterDatetimes);
-    const minVisitStopDatetime = Math.max(...allEncounterDatetimes);
-    return [maxVisitStartDatetime, minVisitStopDatetime];
-  }, [visitToEdit]);
-
-  const validateVisitStartStopDatetime = useCallback(() => {
-    let visitStartDate = getValues('visitStartDate');
-    const visitStartTime = getValues('visitStartTime');
-    const visitStartTimeFormat = getValues('visitStartTimeFormat');
-
-    const [visitStartHours, visitStartMinutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
-
-    const visitStartDatetime = visitStartDate.setHours(visitStartHours, visitStartMinutes);
-
-    let validSubmission = true;
-
-    if (maxVisitStartDatetime && visitStartDatetime >= maxVisitStartDatetime) {
-      validSubmission = false;
-      setError('visitStartDate', {
-        message: t('invalidVisitStartDate', 'Start date needs to be on or before {{firstEncounterDatetime}}', {
-          firstEncounterDatetime: new Date(maxVisitStartDatetime).toLocaleString(),
-          interpolation: {
-            escapeValue: false,
-          },
-        }),
-      });
-    }
-
-    if (!displayVisitStopDateTimeFields) {
-      return validSubmission;
-    }
-
-    let visitStopDate = getValues('visitStopDate');
-    const visitStopTime = getValues('visitStopTime');
-    const visitStopTimeFormat = getValues('visitStopTimeFormat');
-
-    if (visitStopDate && visitStopTime && visitStopTimeFormat) {
-      const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
-
-      const visitStopDatetime = visitStopDate.setHours(visitStopHours, visitStopMinutes);
-
-      if (minVisitStopDatetime && visitStopDatetime <= minVisitStopDatetime) {
-        validSubmission = false;
-        setError('visitStopDate', {
-          message: t(
-            'visitStopDateMustBeAfterMostRecentEncounter',
-            'Stop date needs to be on or after {{lastEncounterDatetime}}',
-            {
-              lastEncounterDatetime: new Date(minVisitStopDatetime).toLocaleString(),
-              interpolation: {
-                escapeValue: false,
-              },
-            },
-          ),
-        });
-      }
-
-      if (visitStartDatetime >= visitStopDatetime) {
-        validSubmission = false;
-        setError('visitStopDate', {
-          message: t('invalidVisitStopDate', 'Visit stop date time cannot be on or before visit start date time'),
-        });
-      }
-    }
-
-    return validSubmission;
-  }, [displayVisitStopDateTimeFields, getValues, maxVisitStartDatetime, minVisitStopDatetime, setError, t]);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -421,11 +217,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitFormData) => {
-      if (visitToEdit && !validateVisitStartStopDatetime()) {
-        return;
-      }
-
       const {
+        visitStatus,
         visitStartTimeFormat,
         visitStartDate,
         visitLocation,
@@ -437,57 +230,27 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
         visitStopTimeFormat,
       } = data;
 
-      const [hours, minutes] = convertTime12to24(visitStartTime, visitStartTimeFormat);
+      const { handleCreateExtraVisitInfo, attributes: extraAttributes } = extraVisitInfo ?? {};
+      const hasStartTime = ['ongoing', 'past'].includes(visitStatus);
+      const hasStopTime = 'past' === visitStatus;
+      const startDatetime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+      const stopDatetime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
       let payload: NewVisitPayload = {
-        patient: patientUuid,
-        startDatetime: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(
-              dayjs(visitStartDate).year(),
-              dayjs(visitStartDate).month(),
-              dayjs(visitStartDate).date(),
-              hours,
-              minutes,
-            ),
-          ),
-        ),
         visitType: visitType,
         location: visitLocation?.uuid,
+        startDatetime: hasStartTime ? startDatetime : null,
+        stopDatetime: hasStopTime ? stopDatetime : null,
+        // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
+        ...(!visitToEdit && { patient: patientUuid }),
+        ...(config.showExtraVisitAttributesSlot && extraAttributes && { attributes: extraAttributes }),
       };
 
-      if (visitToEdit?.uuid) {
-        // The request throws 400 (Bad request) error when the patient is passed in the update payload
-        delete payload.patient;
-      }
-
-      if (displayVisitStopDateTimeFields && visitStopDate && visitStopTime && visitStopTimeFormat) {
-        const [visitStopHours, visitStopMinutes] = convertTime12to24(visitStopTime, visitStopTimeFormat);
-
-        payload.stopDatetime = toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(
-              dayjs(visitStopDate).year(),
-              dayjs(visitStopDate).month(),
-              dayjs(visitStopDate).date(),
-              visitStopHours,
-              visitStopMinutes,
-            ),
-          ),
-        );
+      if (config.showExtraVisitAttributesSlot) {
+        handleCreateExtraVisitInfo?.();
       }
 
       const abortController = new AbortController();
-
-      if (config.showExtraVisitAttributesSlot) {
-        const { handleCreateExtraVisitInfo, attributes } = extraVisitInfo ?? {};
-        if (!payload.attributes) {
-          payload.attributes = [];
-        }
-        payload.attributes.push(...attributes);
-        handleCreateExtraVisitInfo && handleCreateExtraVisitInfo();
-      }
-
       if (isOnline) {
         const visitRequest = visitToEdit?.uuid
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
@@ -512,13 +275,20 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             return response;
           })
           .catch((error) => {
+            const errorDescription =
+              typeof OpenmrsFetchError === 'object' && error instanceof OpenmrsFetchError
+                ? typeof error.responseBody === 'string'
+                  ? error.responseBody
+                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+                : error?.message;
+
             showSnackbar({
               title: !visitToEdit
                 ? t('startVisitError', 'Error starting visit')
                 : t('errorUpdatingVisitDetails', 'Error updating visit details'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: error?.message,
+              subtitle: errorDescription,
             });
             return Promise.reject(error); // short-circuit promise chain
           })
@@ -558,7 +328,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
           })
           .finally(() => {
             mutateCurrentVisit();
-            mutateVisits();
+            invalidateUseVisits(patientUuid);
             mutateInfiniteVisits();
           });
       } else {
@@ -597,25 +367,25 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
       closeWorkspace,
       config.offlineVisitTypeUuid,
       config.showExtraVisitAttributesSlot,
-      displayVisitStopDateTimeFields,
       extraVisitInfo,
       handleVisitAttributes,
       isOnline,
       mutateCurrentVisit,
-      mutateVisits,
       mutateInfiniteVisits,
       visitFormCallbacks,
       patientUuid,
       t,
-      validateVisitStartStopDatetime,
       visitToEdit,
     ],
   );
 
-  const visitStartDate = getValues('visitStartDate') ?? new Date();
-  minVisitStopDatetime = minVisitStopDatetime ?? Date.parse(visitStartDate.toLocaleString());
-  const minVisitStopDatetimeFallback = Date.parse(visitStartDate.toLocaleString());
-  minVisitStopDatetime = minVisitStopDatetime || minVisitStopDatetimeFallback;
+  const handleDiscard = useCallback(() => {
+    if (handleReturnToSearchList) {
+      handleReturnToSearchList();
+    } else {
+      closeWorkspace();
+    }
+  }, [handleReturnToSearchList, closeWorkspace]);
 
   return (
     <FormProvider {...methods}>
@@ -649,25 +419,36 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
               />
             </Row>
           )}
-          <Stack gap={1} className={styles.container}>
-            <VisitDateTimeField
-              dateFieldName="visitStartDate"
-              maxDate={maxVisitStartDatetime}
-              timeFieldName="visitStartTime"
-              timeFormatFieldName="visitStartTimeFormat"
-              visitDatetimeLabel={t('visitStartDatetime', 'Visit start date and time')}
-            />
+          <Stack gap={4} className={styles.container}>
+            <section>
+              <div className={styles.sectionTitle}>{t('theVisitIs', 'The visit is')}</div>
+              <FormGroup>
+                <Controller
+                  name="visitStatus"
+                  control={control}
+                  render={({ field: { onChange, value } }) => {
+                    const validVisitStatuses = visitToEdit ? ['ongoing', 'past'] : visitStatuses;
+                    const selectedIndex = validVisitStatuses.indexOf(value) ?? 0;
 
-            {displayVisitStopDateTimeFields && (
-              <VisitDateTimeField
-                dateFieldName="visitStopDate"
-                minDate={minVisitStopDatetime}
-                timeFieldName="visitStopTime"
-                timeFormatFieldName="visitStopTimeFormat"
-                visitDatetimeLabel={t('visitStopDatetime', 'Visit stop date and time')}
-              />
-            )}
-
+                    // For some reason, Carbon throws NPE when trying to conditionally
+                    // render a <Switch> component
+                    return visitToEdit ? (
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                        <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
+                        <Switch name="past" text={t('ended', 'Ended')} />
+                      </ContentSwitcher>
+                    ) : (
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                        <Switch name="new" text={t('new', 'New')} />
+                        <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
+                        <Switch name="past" text={t('inThePast', 'In the past')} />
+                      </ContentSwitcher>
+                    );
+                  }}
+                />
+              </FormGroup>
+            </section>
+            <VisitDateTimeSection {...{ control, firstEncounterDateTime, lastEncounterDateTime }} />
             {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
             {config.showUpcomingAppointments && (
               <section>
@@ -727,13 +508,13 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                   {config.showRecommendedVisitTypeTab ? (
                     <>
                       <ContentSwitcher
-                        selectedIndex={contentSwitcherIndex}
-                        onChange={({ index }) => setContentSwitcherIndex(index)}
+                        selectedIndex={visitTypeContentSwitcherIndex}
+                        onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
                       >
                         <Switch name="recommended" text={t('recommended', 'Recommended')} />
                         <Switch name="all" text={t('all', 'All')} />
                       </ContentSwitcher>
-                      {contentSwitcherIndex === 0 && !isLoading && (
+                      {visitTypeContentSwitcherIndex === 0 && !isLoading && (
                         <MemoizedRecommendedVisitType
                           patientUuid={patientUuid}
                           patientProgramEnrollment={(() => {
@@ -744,7 +525,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
                           locationUuid={getValues('visitLocation')?.uuid}
                         />
                       )}
-                      {contentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
+                      {visitTypeContentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
                     </>
                   ) : (
                     // Defaults to showing all possible visit types if recommended visits are not enabled
@@ -801,7 +582,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({
             [styles.desktop]: !isTablet,
           })}
         >
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
             {t('discard', 'Discard')}
           </Button>
           <Button
@@ -876,4 +657,4 @@ const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo
   },
 );
 
-export default StartVisitForm;
+export default VisitForm;

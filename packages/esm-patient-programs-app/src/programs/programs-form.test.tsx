@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import {
   type FetchResponse,
   showSnackbar,
@@ -34,6 +34,7 @@ const testProps = {
   closeWorkspace: mockCloseWorkspace,
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: jest.fn(),
 };
@@ -86,7 +87,7 @@ describe('ProgramsForm', () => {
     await user.click(enrollButton);
     expect(screen.getByText(/program is required/i)).toBeInTheDocument();
 
-    await user.type(enrollmentDateInput, '2020-05-05');
+    fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
     await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
     await user.selectOptions(enrollmentLocationInput, [inpatientWardUuid]);
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
@@ -100,6 +101,7 @@ describe('ProgramsForm', () => {
         location: inpatientWardUuid,
         patient: mockPatient.id,
         program: oncologyScreeningProgramUuid,
+        dateEnrolled: expect.stringMatching(/^2020-05-05/),
       }),
       new AbortController(),
     );
@@ -119,6 +121,7 @@ describe('ProgramsForm', () => {
     renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
 
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
+
     const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
 
     mockUpdateProgramEnrollment.mockResolvedValue({
@@ -126,7 +129,8 @@ describe('ProgramsForm', () => {
       statusText: 'OK',
     } as unknown as FetchResponse);
 
-    await user.type(completionDateInput, '05/05/2020');
+    await user.click(completionDateInput);
+    await user.paste('2020-05-05');
     await user.tab();
     await user.click(enrollButton);
 

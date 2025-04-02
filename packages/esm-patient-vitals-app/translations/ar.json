@@ -26,6 +26,7 @@
   "male": "ذكر",
   "muac": "MUAC",
   "noDataRecorded": "لم يتم تسجيل أي بيانات لهذا المريض",
+  "notAvailable": "Not available",
   "notes": "ملاحظات",
   "other": "أخرى",
   "outOfDateVitals": "<0>These vitals are <1>out of date</1></0>",

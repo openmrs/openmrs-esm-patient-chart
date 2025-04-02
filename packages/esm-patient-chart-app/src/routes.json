@@ -37,6 +37,12 @@
       "offline": true
     },
     {
+      "name": "clinical-views-summary",
+      "component": "clinicalViewsSummary",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "stop-visit-button",
       "component": "stopVisitActionButton",
       "slot": "patient-actions-slot",
@@ -100,7 +106,8 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "path": "Visits"
+        "path": "Visits",
+        "layoutMode": "anchored"
       },
       "order": 5,
       "online": true,
@@ -117,14 +124,6 @@
       },
       "online": true,
       "offline": true
-    },
-    {
-      "name": "past-visits-overview",
-      "component": "pastVisitsOverview",
-      "meta": {
-        "title": "Edit or load a past visit",
-        "view": "visits"
-      }
     },
     {
       "name": "patient-details-tile",
@@ -192,6 +191,11 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "visit-context-header",
+      "slot": "visit-context-header-slot",
+      "component": "visitContextHeader"
     }
   ],
   "modals": [
@@ -222,6 +226,10 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
+    },
+    {
+      "name": "visit-context-switcher",
+      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [

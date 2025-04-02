@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
+  FormLabel,
   InlineLoading,
   InlineNotification,
   Layer,
@@ -18,8 +18,17 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 import {
   createProgramEnrollment,
   useAvailablePrograms,
@@ -57,7 +66,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
-  const { showProgramStatusField } = useConfig();
+  const { showProgramStatusField } = useConfig<ConfigObject>();
+  const inEditMode = Boolean(programEnrollmentId);
 
   const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
 
@@ -77,10 +87,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       });
 
   const getLocationUuid = () => {
-    if (!currentEnrollment?.location.uuid && session?.sessionLocation?.uuid) {
+    if (!currentEnrollment?.location?.uuid && session?.sessionLocation?.uuid) {
       return session?.sessionLocation?.uuid;
     }
-    return currentEnrollment?.location.uuid ?? null;
+    return currentEnrollment?.location?.uuid ?? null;
   };
 
   const currentState = currentEnrollment ? findLastState(currentEnrollment.states) : null;
@@ -156,30 +166,34 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     [closeWorkspaceWithSavedChanges, currentEnrollment, currentState, mutateEnrollments, patientUuid, t],
   );
 
+  const programName = (
+    <FormGroup legendText={t('programName', 'Program name')}>
+      <FormLabel className={styles.programName}>{currentProgram?.display}</FormLabel>
+    </FormGroup>
+  );
+
   const programSelect = (
     <Controller
       name="selectedProgram"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <>
-          <Select
-            aria-label="program name"
-            id="program"
-            invalid={!!errors?.selectedProgram}
-            invalidText={errors?.selectedProgram?.message}
-            labelText={t('programName', 'Program name')}
-            onChange={(event) => onChange(event.target.value)}
-            value={value}
-          >
-            <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
-            {eligiblePrograms?.length > 0 &&
-              eligiblePrograms.map((program) => (
-                <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                  {program.display}
-                </SelectItem>
-              ))}
-          </Select>
-        </>
+        <Select
+          aria-label="program name"
+          id="program"
+          invalid={!!errors?.selectedProgram}
+          invalidText={errors?.selectedProgram?.message}
+          labelText={t('programName', 'Program name')}
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+        >
+          <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
+          {eligiblePrograms?.length > 0 &&
+            eligiblePrograms.map((program) => (
+              <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                {program.display}
+              </SelectItem>
+            ))}
+        </Select>
       )}
     />
   );
@@ -188,19 +202,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="enrollmentDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="enrollment date"
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          data-testid="enrollmentDate"
+          maxDate={new Date()}
+          labelText={t('dateEnrolled', 'Date enrolled')}
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );
@@ -209,20 +220,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="completionDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="completion date"
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          data-testid="completionDate"
+          minDate={new Date(watch('enrollmentDate'))}
+          maxDate={new Date()}
+          labelText={t('dateCompleted', 'Date completed')}
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );
@@ -263,34 +271,38 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="selectedProgramStatus"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <>
-          <Select
-            aria-label={t('programStatus', 'Program status')}
-            id="programStatus"
-            invalid={!!errors?.selectedProgramStatus}
-            invalidText={errors?.selectedProgramStatus?.message}
-            labelText={t('programStatus', 'Program status')}
-            onChange={(event) => onChange(event.target.value)}
-            value={value}
-          >
-            <SelectItem text={t('chooseStatus', 'Choose a program status')} value="" />
-            {workflowStates.map((state) => (
-              <SelectItem key={state.uuid} text={state.concept.display} value={state.uuid}>
-                {state.concept.display}
-              </SelectItem>
-            ))}
-          </Select>
-        </>
+        <Select
+          aria-label={t('programStatus', 'Program status')}
+          id="programStatus"
+          invalid={!!errors?.selectedProgramStatus}
+          invalidText={errors?.selectedProgramStatus?.message}
+          labelText={t('programStatus', 'Program status')}
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+        >
+          <SelectItem text={t('chooseStatus', 'Choose a program status')} value="" />
+          {workflowStates.map((state) => (
+            <SelectItem key={state.uuid} text={state.concept.display} value={state.uuid}>
+              {state.concept.display}
+            </SelectItem>
+          ))}
+        </Select>
       )}
     />
   );
 
   const formGroups = [
-    {
-      style: { maxWidth: isTablet && '50%' },
-      legendText: '',
-      value: programSelect,
-    },
+    inEditMode
+      ? {
+          style: { maxWidth: isTablet && '50%' },
+          legendText: '',
+          value: programName,
+        }
+      : {
+          style: { maxWidth: isTablet && '50%' },
+          legendText: '',
+          value: programSelect,
+        },
     {
       style: { maxWidth: '50%' },
       legendText: '',
@@ -334,7 +346,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           </FormGroup>
         ))}
       </Stack>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>

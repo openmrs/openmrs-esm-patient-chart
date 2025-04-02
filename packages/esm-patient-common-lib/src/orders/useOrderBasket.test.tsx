@@ -3,10 +3,6 @@ import { useOrderBasket } from './useOrderBasket';
 import { type OrderBasketItem, type PostDataPrepFunction } from './types';
 import { _resetOrderBasketStore } from './store';
 
-jest.mock('../get-patient-uuid-from-url', () => ({
-  getPatientUuidFromUrl: jest.fn(() => 'test-patient-uuid'),
-}));
-
 const mockDrugOrderBasketItem = {
   action: 'NEW',
   uuid: 'mock-drug-uuid',

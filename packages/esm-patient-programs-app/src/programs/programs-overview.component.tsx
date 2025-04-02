@@ -1,4 +1,4 @@
-import React, { type ComponentProps } from 'react';
+import React, { type ComponentProps, useCallback } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -32,8 +32,9 @@ import {
   usePagination,
   isDesktop as desktopLayout,
 } from '@openmrs/esm-framework';
-import { findLastState, usePrograms } from './programs.resource';
 import { type ConfigurableProgram } from '../types';
+import { findLastState, usePrograms } from './programs.resource';
+import { ProgramsActionMenu } from './programs-action-menu.component';
 import styles from './programs-overview.scss';
 
 interface ProgramsOverviewProps {
@@ -58,7 +59,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
 
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
-  const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   const tableHeaders = [
     {
@@ -103,8 +104,14 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     });
   }, [paginatedEnrollments, t]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -132,7 +139,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           />
         )}
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
             <TableContainer>
               <Table aria-label="programs overview" {...getTableProps()}>
                 <TableHead>
@@ -151,11 +158,17 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id}>
+                  {rows.map((row, i) => (
+                    <TableRow key={row.id} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
+                      <TableCell className="cds--table-column-menu">
+                        <ProgramsActionMenu
+                          patientUuid={patientUuid}
+                          programEnrollmentId={activeEnrollments[i]?.uuid}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
