@@ -42,7 +42,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import { invalidateUseVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
+import { useInfiniteVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
@@ -328,7 +328,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
           })
           .finally(() => {
             mutateCurrentVisit();
-            invalidateUseVisits(patientUuid);
             mutateInfiniteVisits();
           });
       } else {
