@@ -9,6 +9,9 @@ global.spaBase = '/spa';
 global.getOpenmrsSpaBase = () => '/openmrs/spa/';
 global.Response = Object as any;
 
+// https://github.com/jsdom/jsdom/issues/1695
+window.HTMLElement.prototype.scrollIntoView = function () {};
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
