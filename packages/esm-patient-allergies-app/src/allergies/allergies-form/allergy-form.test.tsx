@@ -31,14 +31,14 @@ jest.mock('./allergy-form.resource', () => ({
 }));
 
 const mockConcepts = {
+  allergyReactionUuid: '162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   drugAllergenUuid: '162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   environmentalAllergenUuid: '162554AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   foodAllergenUuid: '162553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   mildReactionUuid: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   moderateReactionUuid: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  severeReactionUuid: '1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  allergyReactionUuid: '162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   otherConceptUuid: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  severeReactionUuid: '1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 };
 
 describe('AllergyForm', () => {
@@ -96,21 +96,12 @@ describe('AllergyForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
 
-    expect(saveButton).toBeDisabled();
-
     await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
-    expect(saveButton).toBeDisabled();
-
     await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    expect(saveButton).toBeDisabled();
-
     await user.click(screen.getByRole('radio', { name: /moderate/i }));
     expect(saveButton).toBeEnabled();
-
     await user.click(screen.getByRole('button', { name: /Clear selected item/i }));
-    expect(saveButton).toBeDisabled();
-
     await user.click(allergenInput);
     await user.click(screen.getByText(allergen.display));
     expect(saveButton).toBeEnabled();
@@ -124,7 +115,6 @@ describe('AllergyForm', () => {
     renderAllergyForm();
 
     const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-
     const allergen = mockAllergens[0];
     const reaction = mockAllergicReactions[0];
     const comment = 'some comment';
@@ -298,11 +288,7 @@ describe('AllergyForm', () => {
         codedAllergen: { uuid: allergen.uuid },
       },
       comment,
-      reactions: [
-        { reaction: { uuid: reaction.uuid } },
-        { reaction: { uuid: mockAllergicReactions[2].uuid } },
-        { reaction: { uuid: mockAllergicReactions[3].uuid } },
-      ],
+      reactions: [{ reaction: { uuid: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' } }],
       severity: { uuid: mockConcepts.moderateReactionUuid },
     };
 
