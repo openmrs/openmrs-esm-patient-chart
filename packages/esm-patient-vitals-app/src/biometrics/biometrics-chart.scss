@@ -21,6 +21,17 @@
   flex-grow: 1;
   margin: layout.$spacing-03 0;
   padding-right: layout.$spacing-05;
+
+  // This is a hack to override the max-width of the overflow menu button
+  :global(
+      .cds--chart-holder
+        .cds--cc--toolbar
+        .cds--overflow-menu-options
+        .cds--overflow-menu-options__option
+        .cds--overflow-menu-options__btn
+    ) {
+    max-width: none !important;
+  }
 }
 
 .biometricLabel {
