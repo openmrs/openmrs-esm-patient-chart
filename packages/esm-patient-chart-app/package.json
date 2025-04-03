@@ -55,6 +55,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-patient-common-lib": "workspace:*",
     "@types/uuid": "^9.0.4",
     "webpack": "^5.94.0"
   }
