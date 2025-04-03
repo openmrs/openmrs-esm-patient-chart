@@ -29,6 +29,7 @@
   "noConditionsToDisplay": "Nenhuma condição a ser exibida",
   "noResultsFor": "Nenhum resultado para",
   "onsetDate": "Data de início",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Registrar uma condição",
   "required": "Obrigatório",
   "saveAndClose": "Salvar e fechar",

@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@carbon/react": "^1.76.0",
-    "@openmrs/esm-patient-common-lib": "^8.2.0",
+    "@openmrs/esm-patient-common-lib": "next",
     "linkify-react": "^4.2.0",
     "linkifyjs": "^4.2.0",
     "lodash-es": "^4.17.21",

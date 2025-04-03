@@ -1,20 +1,12 @@
-import React, { useId, useMemo } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList } from '@carbon/react';
-import { LineChart } from '@carbon/charts-react';
+import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
+import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { withUnit, type PatientVitalsAndBiometrics } from '../common';
 import styles from './vitals-chart.scss';
-
-enum ScaleTypes {
-  LABELS = 'labels',
-  LABELS_RATIO = 'labels-ratio',
-  LINEAR = 'linear',
-  LOG = 'log',
-  TIME = 'time',
-}
 
 interface VitalsChartProps {
   conceptUnits: Map<string, string>;
@@ -30,7 +22,7 @@ interface VitalsChartData {
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
   const id = useId();
-  const [selectedVitalSign, setSelectedVitalsSign] = React.useState<VitalsChartData>({
+  const [selectedVitalsSign, setSelectedVitalsSign] = useState<VitalsChartData>({
     title: `${t('bp', 'BP')} (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
     value: 'systolic',
   });
@@ -65,40 +57,39 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
 
   const chartData = useMemo(() => {
     return patientVitals
-      .filter((vitals) => vitals[selectedVitalSign.value])
-      .splice(0, 10)
+      .filter((vitals) => vitals[selectedVitalsSign.value])
+      .slice(0, 10)
       .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
-        if (vitals[selectedVitalSign.value]) {
-          if (['systolic', 'diastolic'].includes(selectedVitalSign.value)) {
-            return [
-              {
-                group: 'Systolic blood pressure',
-                key: formatDate(parseDate(vitals.date.toString()), { year: false }),
-                value: vitals.systolic,
-                date: vitals.date,
-              },
-              {
-                group: 'Diastolic blood pressure',
-                key: formatDate(parseDate(vitals.date.toString()), { year: false }),
-                value: vitals.diastolic,
-                date: vitals.date,
-              },
-            ];
-          } else {
-            return {
-              group: selectedVitalSign.title,
-              key: formatDate(parseDate(vitals.date.toString()), { year: false }),
-              value: vitals[selectedVitalSign.value],
+        const formattedDate = formatDate(parseDate(vitals.date.toString()), { year: false });
+
+        if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
+          return [
+            {
+              group: 'Systolic blood pressure',
+              key: formattedDate,
+              value: vitals.systolic,
               date: vitals.date,
-            };
-          }
+            },
+            {
+              group: 'Diastolic blood pressure',
+              key: formattedDate,
+              value: vitals.diastolic,
+              date: vitals.date,
+            },
+          ];
         }
+        return {
+          group: selectedVitalsSign.value,
+          key: formattedDate,
+          value: vitals[selectedVitalsSign.value],
+          date: vitals.date,
+        };
       });
-  }, [patientVitals, selectedVitalSign]);
+  }, [patientVitals, selectedVitalsSign]);
 
   const chartOptions = {
-    title: selectedVitalSign.title,
+    title: selectedVitalsSign.title,
     axes: {
       bottom: {
         title: t('date', 'Date'),
@@ -107,7 +98,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       },
       left: {
         mapsTo: 'value',
-        title: selectedVitalSign.title,
+        title: selectedVitalsSign.title,
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
       },
@@ -117,7 +108,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
     color: {
       scale: {
-        [selectedVitalSign.title]: '#6929c4',
+        [selectedVitalsSign.title]: '#6929c4',
       },
     },
     tooltip: {
@@ -136,30 +127,41 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         <label className={styles.vitalsSignLabel} htmlFor={`${id}-tab`}>
           {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
-        <Tabs className={styles.verticalTabs}>
-          <TabList className={styles.tablist} aria-label="Vitals tabs">
-            {vitalSigns.map(({ id, title, value }) => {
-              return (
-                <Tab
-                  className={classNames(styles.tab, { [styles.selectedTab]: selectedVitalSign.title === title })}
-                  id={`${id}-tab`}
-                  key={id}
-                  onClick={() =>
-                    setSelectedVitalsSign({
-                      title: title,
-                      value: value,
-                    })
-                  }
-                >
-                  {title}
-                </Tab>
-              );
-            })}
-          </TabList>
-        </Tabs>
-      </div>
-      <div className={styles.vitalsChartArea}>
-        <LineChart data={chartData.flat()} options={chartOptions} />
+        <TabsVertical>
+          <TabListVertical aria-label="Vitals tabs">
+            {vitalSigns.map(({ id, title, value }) => (
+              <Tab
+                className={classNames(styles.tab, { [styles.selectedTab]: selectedVitalsSign.title === title })}
+                id={`${id}-tab`}
+                key={id}
+                onClick={() =>
+                  setSelectedVitalsSign({
+                    title: title,
+                    value: value,
+                  })
+                }
+              >
+                {title}
+              </Tab>
+            ))}
+          </TabListVertical>
+          <TabPanels>
+            {vitalSigns.map(({ id, title, value }) => (
+              <TabPanel key={id}>
+                <LineChart
+                  data={chartData
+                    .flat()
+                    .filter((data) =>
+                      value === 'systolic'
+                        ? data.group === 'Systolic blood pressure' || data.group === 'Diastolic blood pressure'
+                        : data.group === value,
+                    )}
+                  options={chartOptions}
+                />
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </TabsVertical>
       </div>
     </div>
   );

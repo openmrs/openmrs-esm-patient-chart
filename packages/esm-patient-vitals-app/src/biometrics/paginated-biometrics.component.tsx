@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
   DataTable,
-  type DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -12,8 +11,9 @@ import {
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './paginated-biometrics.scss';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
+import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
+import styles from './paginated-biometrics.scss';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<BiometricsTableRow>;
@@ -73,14 +73,14 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   return (
     <>
       <DataTable
-        rows={paginatedBiometrics}
         headers={tableHeaders}
-        size={isTablet ? 'lg' : 'sm'}
-        useZebraStyles
-        sortRow={handleSorting}
         isSortable
+        rows={paginatedBiometrics}
+        size={isTablet ? 'lg' : 'sm'}
+        sortRow={handleSorting}
+        useZebraStyles
       >
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+        {({ getHeaderProps, getTableProps, headers, rows }) => (
           <TableContainer className={styles.tableContainer}>
             <Table aria-label="biometrics" className={styles.table} {...getTableProps()}>
               <TableHead>
@@ -95,6 +95,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
+                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -103,6 +104,9 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
+                    <TableCell className="cds--table-column-menu" id="actions">
+                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -111,13 +115,13 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         )}
       </DataTable>
       <PatientChartPagination
-        pageNumber={currentPage}
-        totalItems={tableRows.length}
         currentItems={paginatedBiometrics.length}
-        pageSize={pageSize}
-        onPageNumberChange={({ page }) => goTo(page)}
-        dashboardLinkUrl={pageUrl}
         dashboardLinkLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        onPageNumberChange={({ page }) => goTo(page)}
+        pageNumber={currentPage}
+        pageSize={pageSize}
+        totalItems={tableRows.length}
       />
     </>
   );

@@ -73,5 +73,11 @@
       "title": "recordVitalsAndBiometrics",
       "component": "vitalsBiometricsFormWorkspace"
     }
+  ],
+  "modals": [
+    {
+      "name": "vitals-biometrics-delete-confirmation-modal",
+      "component": "vitalsAndBiometricsDeleteConfirmationModal"
+    }
   ]
 }
