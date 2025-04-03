@@ -13,8 +13,7 @@ import genericNavGroupComponent, { genericNavGroupConfigSchema } from './side-na
 import { moduleName } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
-import addPastVisitActionButtonComponent from './actions-buttons/add-past-visit.component';
-import cancelVisitActionButtonComponent from './actions-buttons/cancel-visit.component';
+import deleteVisitActionButtonComponent from './actions-buttons/delete-visit.component';
 import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
 import markPatientAliveActionButtonComponent from './actions-buttons/mark-patient-alive.component';
 import markPatientDeceasedActionButtonComponent from './actions-buttons/mark-patient-deceased.component';
@@ -82,13 +81,8 @@ export const stopVisitActionButton = getSyncLifecycle(stopVisitActionButtonCompo
   moduleName,
 });
 
-export const cancelVisitActionButton = getSyncLifecycle(cancelVisitActionButtonComponent, {
+export const deleteVisitActionMenuButton = getSyncLifecycle(deleteVisitActionButtonComponent, {
   featureName: 'patient-actions-slot',
-  moduleName,
-});
-
-export const addPastVisitActionButton = getSyncLifecycle(addPastVisitActionButtonComponent, {
-  featureName: 'patient-actions-slot-add-past-visit-button',
   moduleName,
 });
 
@@ -106,16 +100,6 @@ export const clinicalViewsSummary = getAsyncLifecycle(
   () => import('./clinical-views/encounter-tile/clinical-views-summary.component'),
   { featureName: 'clinical-views-summary', moduleName },
 );
-
-export const cancelVisitPatientSearchActionButton = getSyncLifecycle(cancelVisitActionButtonComponent, {
-  featureName: 'patient-actions-slot-cancel-visit-button',
-  moduleName,
-});
-
-export const addPastVisitPatientSearchActionButton = getSyncLifecycle(addPastVisitActionButtonComponent, {
-  featureName: 'patient-search-actions-slot-add-past-visit-button',
-  moduleName,
-});
 
 export const encountersSummaryDashboardLink =
   // t('Visits', 'Visits')
@@ -171,11 +155,6 @@ export const markPatientDeceasedForm = getAsyncLifecycle(
     moduleName,
   },
 );
-
-export const cancelVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
-  featureName: 'cancel visit',
-  moduleName,
-});
 
 export const startVisitModal = getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
   featureName: 'start visit',
