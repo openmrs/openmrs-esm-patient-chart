@@ -17,22 +17,6 @@ const testProps = {
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
-jest.mock('@carbon/charts-react', () => ({
-  LineChart: () => <div data-testid="line-chart">Line Chart</div>,
-  ScaleTypes: {
-    TIME: 'time',
-    LINEAR: 'linear',
-    LOG: 'log',
-    LABELS: 'labels',
-    LABELS_RATIO: 'labels-ratio',
-  },
-  TickRotations: {
-    ALWAYS: 'always',
-    AUTO: 'auto',
-    NEVER: 'never',
-  },
-}));
-
 jest.mock('../common', () => {
   const originalModule = jest.requireActual('../common');
 
