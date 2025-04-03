@@ -29,6 +29,7 @@
   "noConditionsToDisplay": "אין מצבים להצגה",
   "noResultsFor": "אין תוצאות עבור",
   "onsetDate": "תאריך התחלה",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Record a Condition",
   "required": "Required",
   "saveAndClose": "שמירה וסגירה",

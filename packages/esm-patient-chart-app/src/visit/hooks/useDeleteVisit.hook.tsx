@@ -28,7 +28,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
       .catch(() => {
         showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
-          subtitle: t('errorWhenRestoringVisit', 'Error occured when restoring {{visit}}', {
+          subtitle: t('errorWhenRestoringVisit', 'Error occurred when restoring {{visit}}', {
             visit: visit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'error',
@@ -38,7 +38,6 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
   const initiateDeletingVisit = () => {
     setIsDeletingVisit(true);
-    const isCurrentVisitDeleted = !visit?.stopDatetime; // True if it's an active visit
 
     deleteVisit(visit?.uuid)
       .then(() => {
@@ -46,37 +45,24 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
         mutateCurrentVisit();
         mutateInfiniteVisits();
 
-        if (!isCurrentVisitDeleted) {
-          showSnackbar({
-            title: t('visitDeleted', '{{visit}} deleted', {
-              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-            }),
-            subtitle: t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
-              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-            }),
-            kind: 'success',
-            actionButtonLabel: t('undo', 'Undo'),
-            onActionButtonClick: restoreDeletedVisit,
-          });
-        } else {
-          showSnackbar({
-            title: t('visitCancelled', 'Visit cancelled'),
-            subtitle: t('visitCancelSuccessMessage', 'Active {{visit}} cancelled successfully', {
-              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-            }),
-            isLowContrast: true,
-            kind: 'success',
-          });
-        }
+        showSnackbar({
+          title: t('visitDeleted', '{{visit}} deleted', {
+            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+          }),
+          subtitle: t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
+            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+          }),
+          kind: 'success',
+          actionButtonLabel: t('undo', 'Undo'),
+          onActionButtonClick: restoreDeletedVisit,
+        });
         onVisitDelete?.();
       })
       .catch(() => {
         showSnackbar({
-          title: isCurrentVisitDeleted
-            ? t('errorCancellingVisit', 'Error cancelling active visit')
-            : t('errorDeletingVisit', 'Error deleting visit'),
+          title: t('errorDeletingVisit', 'Error deleting visit'),
           kind: 'error',
-          subtitle: t('errorOccuredDeletingVisit', 'An error occured when deleting visit'),
+          subtitle: t('errorOccurredDeletingVisit', 'An error occurred when deleting visit'),
         });
       })
       .finally(() => {

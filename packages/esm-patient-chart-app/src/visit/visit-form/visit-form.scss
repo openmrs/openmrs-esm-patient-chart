@@ -31,6 +31,7 @@
 
 .dateTimeSection {
   display: flex;
+  margin: layout.$spacing-05 0;
 }
 
 .radioButton {
@@ -89,10 +90,6 @@
   padding: '0';
 }
 
-.queueSection {
-  margin-top: layout.$spacing-04;
-}
-
 .label {
   @include type.type-style('label-01');
   color: colors.$gray-70;
@@ -129,10 +126,6 @@
 
 .bodyShort02 {
   @include type.type-style('body-compact-02');
-}
-
-.datePicker {
-  padding-bottom: layout.$spacing-05;
 }
 
 .timePicker {

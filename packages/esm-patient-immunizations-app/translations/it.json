@@ -1,5 +1,6 @@
 {
   "add": "Aggiungi",
+  "AM": "AM",
   "cancel": "Annulla",
   "doseNumber": "Numero dose",
   "doseNumberWithinSeries": "Numero dose nella serie",
@@ -16,6 +17,7 @@
   "lotNumber": "Numero di lotto",
   "manufacturer": "Produttore",
   "pleaseSelect": "Seleziona",
+  "PM": "PM",
   "recentVaccination": "Vaccinazione recente",
   "save": "Salva",
   "seeAll": "Vedi tutto",
