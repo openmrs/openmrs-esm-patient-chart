@@ -32,6 +32,11 @@
       "title": "immunizationWorkspaceTitle",
       "component": "immunizationFormWorkspace"
     }
+  ],
+  "modals": [
+    {
+      "name": "delete-dose-modal",
+      "component": "DeleteDoseModal"
+    }
   ]
 }
-

@@ -12,11 +12,10 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { EditIcon, formatDate, parseDate, TrashCanIcon } from '@openmrs/esm-framework';
+import { EditIcon, formatDate, parseDate, TrashCanIcon, showModal } from '@openmrs/esm-framework';
 import { type ImmunizationGrouped } from '../../types';
 import { immunizationFormSub } from '../utils';
 import styles from './immunizations-sequence-table.scss';
-import DeleteConfirmationModal from './delete-confirmation-modal.component';
 
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
@@ -28,9 +27,6 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
   const { sequences, vaccineUuid } = immunizationsByVaccine;
 
   const [doses, setDoses] = useState(immunizationsByVaccine.existingDoses);
-
-  const [open, setOpen] = useState(false);
-  const [selectedDoseId, setSelectedDoseId] = useState<string | null>(null);
 
   const tableHeader = useMemo(
     () => [
@@ -57,7 +53,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
           renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
-              vaccineUuid: vaccineUuid,
+              vaccineUuid,
               immunizationId: dose.immunizationObsUuid,
               vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               doseNumber: dose.doseNumber,
@@ -76,8 +72,14 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
           iconDescription={t('delete', 'Delete')}
           renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
           onClick={() => {
-            setSelectedDoseId(dose.immunizationObsUuid);
-            setOpen(true);
+            const dispose = showModal('delete-dose-modal', {
+              onClose: () => dispose(),
+              onConfirm: () => {
+                setDoses((prev) => prev.filter((d) => d.immunizationObsUuid !== dose.immunizationObsUuid));
+                dispose();
+              },
+              itemLabel: 'dose',
+            });
           }}
         />
       </>
@@ -116,17 +118,6 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
           )}
         </DataTable>
       )}
-      <DeleteConfirmationModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onConfirm={() => {
-          if (selectedDoseId) {
-            setDoses((prev) => prev.filter((dose) => dose.immunizationObsUuid !== selectedDoseId));
-          }
-          setOpen(false);
-        }}
-        itemLabel="dose"
-      />
     </>
   );
 };
