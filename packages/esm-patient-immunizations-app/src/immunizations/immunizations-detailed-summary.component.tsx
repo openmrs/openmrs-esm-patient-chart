@@ -53,7 +53,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
   const { data: existingImmunizations, isLoading, error, isValidating } = useImmunizations(patientUuid);
-  const consolidatedImmunizations = linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
+
+  const consolidatedImmunizations = useMemo(() => {
+    const immunizations = linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
+    immunizations.reverse();
+    return immunizations;
+  }, [existingImmunizations, sequenceDefinitions]);
 
   const launchImmunizationsForm = React.useCallback(() => {
     if (!currentVisit) {
@@ -63,10 +68,10 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     launchPatientWorkspace('immunization-form-workspace');
   }, [currentVisit, launchStartVisitPrompt]);
 
-  const sortedImmunizations = orderBy(
-    consolidatedImmunizations,
-    [(immunization) => get(immunization, 'existingDoses.length', 0)],
-    ['desc'],
+  const sortedImmunizations = useMemo(
+    () =>
+      orderBy(consolidatedImmunizations, [(immunization) => get(immunization, 'existingDoses.length', 0)], ['desc']),
+    [consolidatedImmunizations],
   );
 
   const tableHeader = useMemo(
