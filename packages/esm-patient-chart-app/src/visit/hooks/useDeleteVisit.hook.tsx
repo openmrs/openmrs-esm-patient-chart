@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Visit, showSnackbar, useVisit } from '@openmrs/esm-framework';
-import { deleteVisit, restoreVisit, useVisits, useInfiniteVisits } from '../visits-widget/visit.resource';
+import { deleteVisit, restoreVisit, useInfiniteVisits } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const { mutateVisits } = useVisits(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
@@ -20,7 +19,6 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
           }),
           kind: 'success',
         });
-        mutateVisits();
         mutateCurrentVisit();
         mutateInfiniteVisits();
         onVisitRestore?.();
@@ -41,7 +39,6 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
     deleteVisit(visit?.uuid)
       .then(() => {
-        mutateVisits();
         mutateCurrentVisit();
         mutateInfiniteVisits();
 
