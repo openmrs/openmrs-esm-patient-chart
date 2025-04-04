@@ -241,12 +241,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentLocation"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <LocationPicker
-          selectedLocationUuid={value}
-          defaultLocationUuid={session?.sessionLocation?.uuid}
-          locationTag="Login Location"
-          onChange={(locationUuid) => onChange(locationUuid)}
-        />
+        <React.Fragment>
+          <FormLabel className={`${styles.locationLabel} cds--label`}>
+            {t('enrollmentLocation', 'Enrollment location')}
+          </FormLabel>
+          <LocationPicker
+            selectedLocationUuid={value}
+            defaultLocationUuid={session?.sessionLocation?.uuid}
+            locationTag="Login Location"
+            onChange={(locationUuid) => onChange(locationUuid)}
+          />
+        </React.Fragment>
       )}
     />
   );
@@ -307,7 +312,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: completionDate,
     },
     {
-      style: { width: '50%' },
+      style: { width: '100%' },
       legendText: '',
       value: enrollmentLocation,
     },
