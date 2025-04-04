@@ -3,6 +3,7 @@ import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 import { type Patient, generateRandomPatient, startVisit, endVisit, deletePatient } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
+import { get } from 'lodash';
 
 let patient: Patient;
 let visit: Visit;
@@ -50,8 +51,9 @@ test('Add and delete a visit note', async ({ page }) => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
-  await test.step('When I navigate to the visits dashboard', async () => {
+  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
     await visitsPage.goTo(patient.uuid);
+    await page.getByRole('tab', { name: /summary cards/i }).click();
   });
 
   await test.step('Then I should see the newly added visit note added to the list', async () => {

@@ -1,0 +1,6 @@
+@use '@carbon/layout';
+
+.emptyStateContainer {
+  text-align: center;
+  margin: layout.$spacing-05 0;
+}
