@@ -20,12 +20,11 @@ import {
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type Control, Controller, type FieldErrors, useForm, type UseFormSetValue, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type Allergen,
-  type AllergicReaction,
   type NewAllergy,
   saveAllergy,
   updatePatientAllergy,
@@ -33,63 +32,18 @@ import {
   useAllergicReactions,
 } from './allergy-form.resource';
 import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
-import { AllergenType } from '../../types';
 import { type AllergiesConfigObject } from '../../config-schema';
+import { ALLERGEN_TYPES } from '../../types';
 import styles from './allergy-form.scss';
 
-const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
-  z
-    .object({
-      allergen: z
-        .object({
-          uuid: z.string(),
-          display: z.string(),
-          type: z.string(),
-        })
-        .nullable()
-        .refine((val) => val !== null, {
-          message: t('allergenRequired', 'Allergen is required'),
-        }),
-      nonCodedAllergen: z.string().optional(),
-      allergicReactions: z.array(z.string().optional()).refine((val) => val.some((item) => item !== ''), {
-        message: t('atLeastOneReactionRequired', 'At least one reaction is required'),
-      }),
-      nonCodedAllergicReaction: z.string().optional(),
-      severityOfWorstReaction: z
-        .string()
-        .nullable()
-        .refine((val) => val !== null && val !== '', {
-          message: t('severityRequired', 'Severity is required'),
-        }),
-      comment: z.string().optional(),
-    })
-    .superRefine((data, ctx) => {
-      if (data.allergen?.uuid === otherConceptUuid && !data.nonCodedAllergen) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t('nonCodedAllergenRequired', 'Please specify the non-coded allergen'),
-          path: ['nonCodedAllergen'],
-        });
-      }
-      if (data.allergicReactions?.includes(otherConceptUuid) && !data.nonCodedAllergicReaction) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t('nonCodedAllergicReactionRequired', 'Please specify the non-coded allergic reaction'),
-          path: ['nonCodedAllergicReaction'],
-        });
-      }
-    });
-
-type AllergyFormData = {
+interface AllergyFormData {
   allergen: Allergen;
   nonCodedAllergen: string;
   allergicReactions: string[];
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
   comment: string;
-};
-
-type Severity = 'mild' | 'moderate' | 'severe';
+}
 
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
   allergy?: Allergy;
@@ -105,6 +59,56 @@ interface DefaultAllergy {
   comment: string;
   reactionManifestations?: string[];
 }
+
+type Severity = 'mild' | 'moderate' | 'severe';
+
+const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
+  z
+    .object({
+      // Ensure an allergen is selected
+      allergen: z
+        .object({
+          uuid: z.string(),
+          display: z.string(),
+          type: z.string(),
+        })
+        .nullable()
+        .refine((val) => val !== null, {
+          message: t('allergenRequired', 'Allergen is required'),
+        }),
+      nonCodedAllergen: z.string().optional(),
+      // Ensure at least one allergic reaction is selected
+      allergicReactions: z.array(z.string().optional()).refine((val) => val.some((item) => item !== ''), {
+        message: t('atLeastOneReactionRequired', 'At least one reaction is required'),
+      }),
+      nonCodedAllergicReaction: z.string().optional(),
+      // Ensure severity is selected
+      severityOfWorstReaction: z
+        .string()
+        .nullable()
+        .refine((val) => val !== null && val !== '', {
+          message: t('severityRequired', 'Severity is required'),
+        }),
+      comment: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+      // If "other" allergen is selected, ensure a non-coded allergen is provided
+      if (data.allergen?.uuid === otherConceptUuid && !data.nonCodedAllergen) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('nonCodedAllergenRequired', 'Please specify the non-coded allergen'),
+          path: ['nonCodedAllergen'],
+        });
+      }
+      // If "other" allergic reaction is selected, ensure a non-coded allergic reaction is provided
+      if (data.allergicReactions?.includes(otherConceptUuid) && !data.nonCodedAllergicReaction) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('nonCodedAllergicReactionRequired', 'Please specify the non-coded allergic reaction'),
+          path: ['nonCodedAllergicReaction'],
+        });
+      }
+    });
 
 function AllergyForm({
   closeWorkspace,
@@ -175,7 +179,7 @@ function AllergyForm({
     (defaultAllergy: DefaultAllergy) => {
       const codedAllergenDisplays = allergens?.map((allergen) => allergen.display);
       if (!codedAllergenDisplays?.includes(allergy?.display)) {
-        defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType?.OTHER };
+        defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER };
         defaultAllergy.nonCodedAllergen = allergy?.display;
       }
     },
@@ -229,10 +233,9 @@ function AllergyForm({
 
   const {
     control,
-    handleSubmit,
-    watch,
-    setValue,
     formState: { isDirty, isSubmitting, errors },
+    handleSubmit,
+    setValue,
   } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema(t, otherConceptUuid)),
@@ -247,23 +250,11 @@ function AllergyForm({
     control,
     name: 'allergen',
   });
+
   const selectedAllergicReactions = useWatch({
     control,
     name: 'allergicReactions',
   });
-
-  const handleAllergicReactionChange = useCallback(
-    (checked: boolean, id: string, index: number) => {
-      const newValue = [...selectedAllergicReactions];
-      if (checked) {
-        newValue[index] = id;
-      } else {
-        newValue[index] = '';
-      }
-      setValue('allergicReactions', newValue);
-    },
-    [selectedAllergicReactions, setValue],
-  );
 
   const onSubmit = useCallback(
     (data: AllergyFormData) => {
@@ -349,7 +340,7 @@ function AllergyForm({
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
   const allergenItems = useMemo(
-    () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: AllergenType.OTHER }],
+    () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER }],
     [allergens, otherConceptUuid, t],
   );
 
@@ -434,13 +425,23 @@ function AllergyForm({
                         invalidText={errors.allergicReactions?.message}
                         legendText={t('selectReactions', 'Select the reactions')}
                       >
-                        <AllergicReactionsField
-                          allergicReactions={allergicReactions}
-                          methods={{ setValue, control }}
-                          errors={errors}
-                          onChange={onChange}
-                          value={value}
-                        />
+                        {allergicReactions.map((reaction, index) => (
+                          <Checkbox
+                            checked={Boolean(value[index])}
+                            className={styles.checkbox}
+                            id={reaction.uuid}
+                            key={reaction.uuid}
+                            labelText={reaction.display}
+                            onChange={(_, { checked, id }) => {
+                              const newValue = [...value];
+                              newValue[index] = checked ? id : '';
+                              onChange(newValue);
+                              setValue(`allergicReactions.${index}`, checked ? id : '', {
+                                shouldValidate: true,
+                              });
+                            }}
+                          />
+                        ))}
                       </CheckboxGroup>
                     )}
                   />
@@ -524,57 +525,6 @@ function AllergyForm({
       </div>
     </Form>
   );
-}
-
-function AllergicReactionsField({
-  allergicReactions,
-  methods: { setValue },
-  onChange,
-  value,
-}: {
-  allergicReactions: AllergicReaction[];
-  methods: {
-    control: Control<AllergyFormData>;
-    setValue: UseFormSetValue<AllergyFormData>;
-  };
-  errors: FieldErrors<AllergyFormData>;
-  onChange: (value: string[]) => void;
-  value: string[];
-}) {
-  const handleAllergicReactionChange = useCallback(
-    (checked: boolean, id: string, index: number) => {
-      const newValue = [...value];
-      if (checked) {
-        newValue[index] = id;
-      } else {
-        newValue[index] = '';
-      }
-      onChange(newValue);
-      setValue(`allergicReactions.${index}`, checked ? id : '', {
-        shouldValidate: true,
-      });
-    },
-    [setValue, onChange, value],
-  );
-
-  const controlledFields = useMemo(
-    () =>
-      allergicReactions.map((reaction, index) => (
-        <Checkbox
-          checked={Boolean(value[index])}
-          className={styles.checkbox}
-          id={reaction.uuid}
-          key={reaction.uuid}
-          labelText={reaction.display}
-          onChange={(_, { checked, id }) => {
-            handleAllergicReactionChange(checked, id, index);
-          }}
-        />
-      )),
-    [allergicReactions, value, handleAllergicReactionChange],
-  );
-
-  return <React.Fragment>{controlledFields}</React.Fragment>;
 }
 
 export default AllergyForm;

@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, within } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -12,7 +12,6 @@ import {
   updatePatientAllergy,
 } from './allergy-form.resource';
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
-import { AllergenType } from '../../types';
 import AllergyForm from './allergy-form.workspace';
 
 const mockSaveAllergy = jest.mocked(saveAllergy);
@@ -57,243 +56,163 @@ describe('AllergyForm', () => {
     });
   });
 
-  it('renders the allergy form with all the expected fields and values', async () => {
+  describe('Creating a new allergy', () => {
     const user = userEvent.setup();
 
-    renderAllergyForm();
+    const aceInhibitorsAllergen = mockAllergens.find((allergen) => allergen.display === 'ACE inhibitors');
+    const reactionToAceInhibitors = mockAllergicReactions.find((reaction) => reaction.display === 'Cough')?.display;
 
-    const allergensContainer = screen.getByTestId('allergens-container');
-    const allergenInput = screen.queryByPlaceholderText(/select the allergen/i);
+    it('creates a new allergy when the user selects an allergen and reaction', async () => {
+      renderAllergyForm();
 
-    expect(allergenInput).toBeInTheDocument();
-    await user.click(allergenInput);
-    mockAllergens.forEach((allergen) => {
-      expect(within(allergensContainer).getByText(allergen.display)).toBeInTheDocument();
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.type(
+        screen.getByLabelText(/comments/i),
+        'Patient experienced a persistent dry cough while taking ACE inhibitors, which resolved upon discontinuation and recurred upon rechallenge',
+      );
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
+      expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        isLowContrast: true,
+        kind: 'success',
+        title: 'Allergy saved',
+        subtitle: 'It is now visible on the Allergies page',
+      });
     });
 
-    expect(screen.getByText(/select the reactions/i)).toBeInTheDocument();
-    mockAllergicReactions.forEach((reaction) => {
-      expect(screen.getByRole('checkbox', { name: reaction.display })).toBeInTheDocument();
+    it('validates required fields before saving', async () => {
+      renderAllergyForm();
+
+      // Test initial validation
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      // Test all required field validations
+      expect(mockSaveAllergy).not.toHaveBeenCalled();
+      expect(screen.getByText(/allergen is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/at least one reaction is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/severity is required/i)).toBeInTheDocument();
+
+      // Test allergen validation
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      expect(screen.queryByText(/allergen is required/i)).not.toBeInTheDocument();
+
+      // Test "other" allergen validation
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getAllByText('Other')[0]);
+
+      const warningMessage = screen.queryByText(
+        "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
+      );
+      expect(warningMessage).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+      expect(screen.getByText(/please specify the non-coded allergen/i)).toBeInTheDocument();
+
+      // Test reaction validation
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      expect(screen.queryByText(/at least one reaction is required/i)).not.toBeInTheDocument();
+
+      // Test "other" reaction validation
+      await user.click(screen.getByRole('checkbox', { name: /other/i }));
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+      expect(screen.getByText(/please specify the non-coded allergic reaction/i)).toBeInTheDocument();
+
+      // Test severity validation
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      expect(screen.queryByText(/severity is required/i)).not.toBeInTheDocument();
+
+      // Test successful submission with all required fields
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      await user.click(screen.getByRole('checkbox', { name: /other/i }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.type(screen.getByLabelText(/comments/i), 'Test comment');
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        isLowContrast: true,
+        kind: 'success',
+        title: 'Allergy saved',
+        subtitle: 'It is now visible on the Allergies page',
+      });
     });
 
-    expect(screen.getByText(/severity of worst reaction/i)).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /mild/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /severe/i })).toBeInTheDocument();
+    it('handles submission errors gracefully', async () => {
+      mockSaveAllergy.mockRejectedValue({
+        message: 'Internal Server Error',
+        response: {
+          status: 500,
+          statusText: 'Internal Server Error',
+        },
+      });
 
-    expect(screen.getByText(/comments/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/comments/i)).toBeInTheDocument();
-  });
+      renderAllergyForm();
 
-  it('enable the save button when all required fields are filled', async () => {
-    const user = userEvent.setup();
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.type(screen.getByLabelText(/comments/i), 'Test comment');
 
-    renderAllergyForm();
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-    const allergen = mockAllergens[0];
-    const reaction = mockAllergicReactions[0];
-
-    const saveButton = screen.getByRole('button', { name: /save and close/i });
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    expect(saveButton).toBeEnabled();
-    await user.click(screen.getByRole('button', { name: /Clear selected item/i }));
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    expect(saveButton).toBeEnabled();
-
-    // TODO: Fix O3-2629: changing the allergic reaction won't enable/disable the save button immediately.
-  });
-
-  it('calls the saveAllergy function with the correct payload', async () => {
-    const user = userEvent.setup();
-
-    renderAllergyForm();
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-    const allergen = mockAllergens[0];
-    const reaction = mockAllergicReactions[0];
-    const comment = 'some comment';
-
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/comments/i), comment);
-    await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-    expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
-
-    const expectedPayload: NewAllergy = {
-      allergen: {
-        allergenType: allergen.type,
-        codedAllergen: { uuid: allergen.uuid },
-      },
-      comment,
-      reactions: [{ reaction: { uuid: reaction.uuid } }],
-      severity: { uuid: mockConcepts.moderateReactionUuid },
-    };
-
-    expect(mockSaveAllergy.mock.calls[0][0]).toEqual(expectedPayload);
-  });
-
-  it('displays a custom input and a warning message when select other allergen', async () => {
-    const user = userEvent.setup();
-
-    renderAllergyForm();
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-    const allergensContainer = screen.getByTestId('allergens-container');
-
-    await user.click(allergenInput);
-    await user.click(within(allergensContainer).getByText(/other/i));
-
-    const otherInput = screen.queryByLabelText(/Other non-coded allergen/i);
-    expect(otherInput).toBeInTheDocument();
-
-    const warningMessage = screen.queryByText(
-      "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
-    );
-    expect(warningMessage).toBeInTheDocument();
-  });
-
-  it('calls the saveAllergy function with the correct payload when select other allergen', async () => {
-    const user = userEvent.setup();
-
-    renderAllergyForm();
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-    const allergensContainer = screen.getByTestId('allergens-container');
-    const customAllergen = 'some other allergen';
-    const reaction = mockAllergicReactions[0];
-    const comment = 'some comment';
-
-    await user.click(allergenInput);
-    await user.click(within(allergensContainer).getByText(/other/i));
-
-    const customAllergenInput = screen.getByLabelText(/Other non-coded allergen/i);
-
-    await user.type(customAllergenInput, customAllergen);
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/comments/i), comment);
-    await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-    expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
-    const expectedPayload: NewAllergy = {
-      allergen: {
-        allergenType: AllergenType.OTHER,
-        codedAllergen: { uuid: mockConcepts.otherConceptUuid },
-        nonCodedAllergen: customAllergen,
-      },
-      comment,
-      reactions: [{ reaction: { uuid: reaction.uuid } }],
-      severity: { uuid: mockConcepts.moderateReactionUuid },
-    };
-
-    expect(mockSaveAllergy.mock.calls[0][0]).toEqual(expectedPayload);
-  });
-
-  it('renders a success notification after successful submission', async () => {
-    const user = userEvent.setup();
-
-    renderAllergyForm();
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-
-    const allergen = mockAllergens[0];
-    const reaction = mockAllergicReactions[0];
-    const comment = 'some comment';
-
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/comments/i), comment);
-    await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
-    expect(mockShowSnackbar).toHaveBeenCalledWith({
-      isLowContrast: true,
-      kind: 'success',
-      title: 'Allergy saved',
-      subtitle: 'It is now visible on the Allergies page',
+      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
+      expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        isLowContrast: false,
+        title: 'Error saving allergy',
+        subtitle: 'Internal Server Error',
+        kind: 'error',
+      });
     });
   });
 
-  it('renders an error snackbar upon an invalid submission', async () => {
+  describe('Editing an existing allergy', () => {
     const user = userEvent.setup();
 
-    mockSaveAllergy.mockRejectedValue({
-      message: 'Internal Server Error',
-      response: {
-        status: 500,
-        statusText: 'Internal Server Error',
-      },
+    it('should call the saveAllergy function with updated payload', async () => {
+      renderAllergyForm({ allergy: mockAllergy, formContext: 'editing' });
+
+      const aspirinAllergen = mockAllergens.find((allergen) => allergen.display === 'Aspirin');
+      const rashReaction = mockAllergicReactions.find((reaction) => reaction.display === 'Rash');
+
+      // Clear existing reactions first
+      const existingReactions = screen.getAllByRole('checkbox', { checked: true });
+      for (const reaction of existingReactions) {
+        await user.click(reaction);
+      }
+
+      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByText(aspirinAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: rashReaction.display }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.clear(screen.getByLabelText(/comments/i));
+      await user.type(
+        screen.getByLabelText(/comments/i),
+        'Patient developed a rash after taking aspirin. The rash resolved after discontinuing the medication.',
+      );
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(mockUpdatePatientAllergy).toHaveBeenCalledTimes(1);
+
+      const expectedPayload: NewAllergy = buildExpectedPayload(
+        aspirinAllergen,
+        rashReaction,
+        mockConcepts.moderateReactionUuid,
+        'Patient developed a rash after taking aspirin. The rash resolved after discontinuing the medication.',
+      );
+
+      expect(mockUpdatePatientAllergy.mock.calls[0][0]).toEqual(expectedPayload);
+      expect(mockAllergy).not.toEqual(expectedPayload);
     });
-
-    renderAllergyForm();
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-
-    const allergen = mockAllergens[0];
-    const reaction = mockAllergicReactions[0];
-    const comment = 'some comment';
-
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.type(screen.getByLabelText(/comments/i), comment);
-    await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
-    expect(mockShowSnackbar).toHaveBeenCalledWith({
-      isLowContrast: false,
-      title: 'Error saving allergy',
-      subtitle: 'Internal Server Error',
-      kind: 'error',
-    });
-  });
-
-  it('Edit Allergy should call the saveAllergy function with updated payload', async () => {
-    const user = userEvent.setup();
-
-    renderAllergyForm({ allergy: mockAllergy, formContext: 'editing' });
-
-    const allergenInput = screen.getByPlaceholderText(/select the allergen/i);
-    const commentInput = screen.getByLabelText(/comments/i);
-
-    const allergen = mockAllergens[2];
-    const reaction = mockAllergicReactions[0];
-    const comment = 'new comment';
-
-    await user.click(allergenInput);
-    await user.click(screen.getByText(allergen.display));
-    await user.click(screen.getByRole('checkbox', { name: reaction.display }));
-    await user.click(screen.getByRole('radio', { name: /moderate/i }));
-    await user.clear(commentInput);
-    await user.type(commentInput, comment);
-    await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-    expect(mockUpdatePatientAllergy).toHaveBeenCalledTimes(1);
-
-    const expectedPayload: NewAllergy = {
-      allergen: {
-        allergenType: allergen.type,
-        codedAllergen: { uuid: allergen.uuid },
-      },
-      comment,
-      reactions: [{ reaction: { uuid: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' } }],
-      severity: { uuid: mockConcepts.moderateReactionUuid },
-    };
-
-    expect(mockUpdatePatientAllergy.mock.calls[0][0]).toEqual(expectedPayload);
-    expect(mockAllergy).not.toEqual(expectedPayload);
   });
 });
 
@@ -310,4 +229,16 @@ function renderAllergyForm(props = {}) {
   };
 
   render(<AllergyForm {...defaultProps} {...props} />);
+}
+
+function buildExpectedPayload(allergen, reaction, severity, comment) {
+  return {
+    allergen: {
+      allergenType: allergen.type,
+      codedAllergen: { uuid: allergen.uuid },
+    },
+    comment,
+    reactions: [{ reaction: { uuid: reaction.uuid } }],
+    severity: { uuid: severity },
+  };
 }
