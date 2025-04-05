@@ -102,3 +102,34 @@ export const ALLERGEN_TYPES = {
 } as const;
 
 export type AllergenType = (typeof ALLERGEN_TYPES)[keyof typeof ALLERGEN_TYPES];
+
+export interface PatientAllergyPayload {
+  allergenType: AllergenType;
+  codedAllergenUuid: string;
+  severityUuid: string;
+  comment?: string;
+  reactionUuids: OpenMRSResource[];
+}
+
+export type Allergy = {
+  id: string;
+  clinicalStatus: string;
+  criticality: string;
+  display: string;
+  recordedDate: string;
+  recordedBy: string;
+  recorderType: string;
+  note: string;
+  reactionToSubstance: string;
+  reactionManifestations: Array<string>;
+  reactionSeverity: ReactionSeverity;
+  lastUpdated: string;
+};
+
+export type UseAllergies = {
+  allergies: Array<Allergy>;
+  error: Error | null;
+  isLoading: boolean;
+  isValidating: boolean;
+  mutate: () => void;
+};
